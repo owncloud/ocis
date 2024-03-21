@@ -19,32 +19,32 @@ Feature: Upload files into a space
 
   Scenario Outline: user creates a folder in the space via the Graph API
     Given user "Alice" has shared a space "Project Ceres" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" creates a folder "mainFolder" in space "Project Ceres" using the WebDav Api
-    Then the HTTP status code should be "<code>"
-    And for user "Brian" the space "Project Ceres" <shouldOrNot> contain these entries:
+    Then the HTTP status code should be "<http-status-code>"
+    And for user "Brian" the space "Project Ceres" <should-or-not> contain these entries:
       | mainFolder |
     Examples:
-      | role    | code | shouldOrNot |
-      | manager | 201  | should      |
-      | editor  | 201  | should      |
-      | viewer  | 403  | should not  |
+      | space-role | http-status-code | should-or-not |
+      | manager    | 201              | should        |
+      | editor     | 201              | should        |
+      | viewer     | 403              | should not    |
 
 
   Scenario Outline: user uploads a file in shared space via the Graph API
     Given user "Alice" has shared a space "Project Ceres" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" uploads a file inside space "Project Ceres" with content "Test" to "test.txt" using the WebDAV API
-    Then the HTTP status code should be "<code>"
-    And for user "Brian" the space "Project Ceres" <shouldOrNot> contain these entries:
+    Then the HTTP status code should be "<http-status-code>"
+    And for user "Brian" the space "Project Ceres" <should-or-not> contain these entries:
       | test.txt |
     Examples:
-      | role    | code | shouldOrNot |
-      | manager | 201  | should      |
-      | editor  | 201  | should      |
-      | viewer  | 403  | should not  |
+      | space-role | http-status-code | should-or-not |
+      | manager    | 201              | should        |
+      | editor     | 201              | should        |
+      | viewer     | 403              | should not    |
 
 
   Scenario: user can create subfolders in a space via the Graph API
@@ -83,9 +83,9 @@ Feature: Upload files into a space
 
 
   Scenario Outline: user cannot create subfolder in a nonexistent folder
-    When user "Alice" tries to create subfolder "<path>" in a nonexistent folder of the space "Project Ceres" using the WebDav Api
+    When user "Alice" tries to create subfolder "<folder-name>" in a nonexistent folder of the space "Project Ceres" using the WebDav Api
     Then the HTTP status code should be "409"
     Examples:
-      | path        |
+      | folder-name |
       | foo/bar     |
       | foo/bar/baz |

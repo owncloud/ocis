@@ -22,22 +22,22 @@ Feature: Share a file or folder that is inside a space
 
   Scenario Outline: manager of the space can share an entity inside project space to another user with role
     When user "Alice" creates a share inside of space "share sub-item" with settings:
-      | path       | <entity>     |
-      | shareWith  | Brian        |
-      | role       | <role>       |
-      | expireDate | <expireDate> |
+      | path       | <resource>    |
+      | shareWith  | Brian         |
+      | role       | <space-role>  |
+      | expireDate | <expire-date> |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And as "Brian" <type> "Shares/<entity>" should exist
+    And as "Brian" <resource-type> "Shares/<resource>" should exist
     And the information about the last share for user "Brian" should include
       | expiration | <expiration> |
     Examples:
-      | entity   | type   | role   | expireDate               | expiration |
-      | folder   | folder | viewer |                          |            |
-      | folder   | folder | editor | 2042-03-25T23:59:59+0100 | 2042-03-25 |
-      | file.txt | file   | viewer |                          |            |
-      | file.txt | file   | editor | 2042-03-25T23:59:59+0100 | 2042-03-25 |
+      | resource | resource-type | space-role | expire-date              | expiration |
+      | folder   | folder        | viewer     |                          |            |
+      | folder   | folder        | editor     | 2042-03-25T23:59:59+0100 | 2042-03-25 |
+      | file.txt | file          | viewer     |                          |            |
+      | file.txt | file          | editor     | 2042-03-25T23:59:59+0100 | 2042-03-25 |
 
 
   Scenario Outline: user participant of the project space with manager role can share an entity to another user
@@ -45,47 +45,47 @@ Feature: Share a file or folder that is inside a space
       | shareWith | Brian   |
       | role      | manager |
     When user "Brian" creates a share inside of space "share sub-item" with settings:
-      | path       | <entity>     |
-      | shareWith  | Bob          |
-      | role       | <role>       |
-      | expireDate | <expireDate> |
+      | path       | <resource>    |
+      | shareWith  | Bob           |
+      | role       | <space-role>  |
+      | expireDate | <expire-date> |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And as "Bob" <type> "Shares/<entity>" should exist
+    And as "Bob" <resource-type> "Shares/<resource>" should exist
     And the information about the last share for user "Brian" should include
       | expiration | <expiration> |
     Examples:
-      | entity   | type   | role   | expireDate               | expiration |
-      | folder   | folder | viewer | 2042-03-25T23:59:59+0100 | 2042-03-25 |
-      | folder   | folder | editor |                          |            |
-      | file.txt | file   | viewer | 2042-03-25T23:59:59+0100 | 2042-03-25 |
-      | file.txt | file   | editor |                          |            |
+      | resource | resource-type | space-role | expire-date              | expiration |
+      | folder   | folder        | viewer     | 2042-03-25T23:59:59+0100 | 2042-03-25 |
+      | folder   | folder        | editor     |                          |            |
+      | file.txt | file          | viewer     | 2042-03-25T23:59:59+0100 | 2042-03-25 |
+      | file.txt | file          | editor     |                          |            |
 
   @skipOnRevaMaster
   Scenario Outline: user participant of the project space without space manager role cannot share an entity to another user
     Given user "Alice" has shared a space "share sub-item" with settings:
-      | shareWith | Brian       |
-      | role      | <spaceRole> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" creates a share inside of space "share sub-item" with settings:
-      | path      | <entity> |
-      | shareWith | Bob      |
-      | role      | editor   |
+      | path      | <resource> |
+      | shareWith | Bob        |
+      | role      | editor     |
     Then the HTTP status code should be "403"
     And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     Examples:
-      | entity   | spaceRole |
-      | folder   | editor    |
-      | file.txt | editor    |
-      | file.txt | viewer    |
-      | folder   | viewer    |
+      | resource | space-role |
+      | folder   | editor     |
+      | file.txt | editor     |
+      | file.txt | viewer     |
+      | folder   | viewer     |
 
 
   Scenario Outline: user participant of the project space can see the created resources share
     Given user "Alice" has shared a space "share sub-item" with settings:
-      | shareWith | Brian       |
-      | role      | <spaceRole> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Alice" creates a share inside of space "share sub-item" with settings:
       | path      | file.txt |
       | shareWith | Bob      |
@@ -93,10 +93,10 @@ Feature: Share a file or folder that is inside a space
     Then for user "Alice" the space "share sub-item" should contain the last created share of the file "file.txt"
     And for user "Brian" the space "share sub-item" should contain the last created share of the file "file.txt"
     Examples:
-      | spaceRole |
-      | editor    |
-      | viewer    |
-      | manager   |
+      | space-role |
+      | editor     |
+      | viewer     |
+      | manager    |
 
 
   Scenario: user shares the folder to the group

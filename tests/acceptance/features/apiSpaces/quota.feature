@@ -20,10 +20,10 @@ Feature: State of the quota
 
 
   Scenario Outline: quota information is returned in the list of spaces returned via the Graph API
-    Given user "Alice" has created a space "<spaceName>" of type "project" with quota "100"
-    When user "Alice" uploads a file inside space "<spaceName>" with content "<fileContent>" to "test.txt" using the WebDAV API
+    Given user "Alice" has created a space "<space-name>" of type "project" with quota "100"
+    When user "Alice" uploads a file inside space "<space-name>" with content "<file-content>" to "test.txt" using the WebDAV API
     And user "Alice" lists all available spaces via the Graph API
-    Then the JSON response should contain space called "<spaceName>" and match
+    Then the JSON response should contain space called "<space-name>" and match
     """
      {
       "type": "object",
@@ -34,7 +34,7 @@ Feature: State of the quota
       "properties": {
         "name": {
           "type": "string",
-          "enum": ["<spaceName>"]
+          "enum": ["<space-name>"]
         },
         "quota": {
           "type": "object",
@@ -67,14 +67,14 @@ Feature: State of the quota
     }
     """
     Examples:
-      | spaceName | fileContent                                                                                          | state    | remaining | used |
-      | Quota1%   | 1                                                                                                    | normal   | 99        | 1    |
-      | Quota75%  | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345                          | normal   | 25        | 75   |
-      | Quota76%  | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456                         | nearing  | 24        | 76   |
-      | Quota90%  | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234567890           | nearing  | 10        | 90   |
-      | Quota91%  | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1          | critical | 9         | 91   |
-      | Quota99%  | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789  | critical | 1         | 99   |
-      | Quota100% | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234567890 | exceeded | 0         | 100  |
+      | space-name | file-content                                                                                         | state    | remaining | used |
+      | Quota1%    | 1                                                                                                    | normal   | 99        | 1    |
+      | Quota75%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345                          | normal   | 25        | 75   |
+      | Quota76%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456                         | nearing  | 24        | 76   |
+      | Quota90%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234567890           | nearing  | 10        | 90   |
+      | Quota91%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1          | critical | 9         | 91   |
+      | Quota99%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789  | critical | 1         | 99   |
+      | Quota100%  | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234567890 | exceeded | 0         | 100  |
 
 
   Scenario: file cannot be uploaded if there is insufficient quota
@@ -108,19 +108,19 @@ Feature: State of the quota
 
   Scenario Outline: check the relative amount of quota of personal space
     Given user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "10000"
-    And user "Alice" has uploaded file "<file_upload>" to "/demo.txt"
+    And user "Alice" has uploaded file "<file-upload>" to "/demo.txt"
     When the user "Alice" requests these endpoints with "GET" with basic auth
       | endpoint    |
-      | <end_point> |
+      | <end-point> |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "<ocs_code>"
-    And the relative quota amount should be "<quota_relative>"
+    And the OCS status code should be "<ocs-status-code>"
+    And the relative quota amount should be "<quota-relative>"
     Examples:
-      | file_upload                   | end_point                          | ocs_code | quota_relative |
-      | /filesForUpload/lorem.txt     | /ocs/v1.php/cloud/users/%username% | 100      | 6.99           |
-      | /filesForUpload/lorem-big.txt | /ocs/v1.php/cloud/users/%username% | 100      | 91.17          |
-      | /filesForUpload/lorem.txt     | /ocs/v2.php/cloud/users/%username% | 200      | 6.99           |
-      | /filesForUpload/lorem-big.txt | /ocs/v2.php/cloud/users/%username% | 200      | 91.17          |
+      | file-upload                   | end-point                          | ocs-status-code | quota-relative |
+      | /filesForUpload/lorem.txt     | /ocs/v1.php/cloud/users/%username% | 100             | 6.99           |
+      | /filesForUpload/lorem-big.txt | /ocs/v1.php/cloud/users/%username% | 100             | 91.17          |
+      | /filesForUpload/lorem.txt     | /ocs/v2.php/cloud/users/%username% | 200             | 6.99           |
+      | /filesForUpload/lorem-big.txt | /ocs/v2.php/cloud/users/%username% | 200             | 91.17          |
 
 
   @env-config

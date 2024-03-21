@@ -29,55 +29,55 @@ Feature: A manager of the space can edit public link
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | <permissions> |
       | password    | <password>    |
-      | name        | <linkName>    |
+      | name        | <link-name>   |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
     And the fields of the last response to user "Alice" should include
-      | item_type         | folder                |
-      | mimetype          | httpd/unix-directory  |
-      | file_target       | /                     |
-      | path              | /                     |
-      | permissions       | <expectedPermissions> |
-      | share_type        | public_link           |
-      | displayname_owner | %displayname%         |
-      | name              | <linkName>            |
+      | item_type         | folder                 |
+      | mimetype          | httpd/unix-directory   |
+      | file_target       | /                      |
+      | path              | /                      |
+      | permissions       | <expected-permissions> |
+      | share_type        | public_link            |
+      | displayname_owner | %displayname%          |
+      | name              | <link-name>            |
     When the public downloads file "/test.txt" from inside the last public link shared folder with password "<password>" using the new public WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
     Examples:
-      | permissions | expectedPermissions       | password   | linkName |
-      | 5           | read,create               | newPass:12 |          |
-      | 15          | read,update,create,delete | newPass:12 | newName  |
+      | permissions | expected-permissions      | password   | link-name |
+      | 5           | read,create               | newPass:12 |           |
+      | 15          | read,update,create,delete | newPass:12 | newName   |
 
 
   Scenario Outline: members can see a created public link
     Given using OCS API version "2"
     When user "Alice" shares a space "edit space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And for user "Alice" the space "edit space" should contain the last created public link
     And for user "Brian" the space "edit space" should contain the last created public link
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: members of the space try to edit a public link
     Given using OCS API version "2"
     And user "Alice" has shared a space "edit space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | 15 |
-    Then the HTTP status code should be "<code>"
-    And the OCS status code should be "<codeOCS>"
+    Then the HTTP status code should be "<http-status-code>"
+    And the OCS status code should be "<ocs-status-code>"
     Examples:
-      | role    | code | codeOCS |
-      | manager | 200  | 200     |
-      | editor  | 401  | 997     |
-      | viewer  | 401  | 997     |
+      | space-role | http-status-code | ocs-status-code |
+      | manager    | 200              | 200             |
+      | editor     | 401              | 997             |
+      | viewer     | 401              | 997             |

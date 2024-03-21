@@ -2,9 +2,9 @@ Feature: Space management
   As a user with space admin permission
   I want to be able to manage all existing project spaces
   So that
-    - I can get all project space where I am not member using "graph/v1.0/drives" endpoint
-    - I can edit space: change quota, name, description
-    - I can enable, disable, delete space
+  - I can get all project space where I am not member using "graph/v1.0/drives" endpoint
+  - I can edit space: change quota, name, description
+  - I can enable, disable, delete space
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839

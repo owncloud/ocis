@@ -19,17 +19,17 @@ Feature: Share spaces
 
   Scenario Outline: space admin can share a space to another user
     When user "Alice" shares a space "share space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
     And the user "Brian" should have a space called "share space"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario: user can see who has been granted access
@@ -100,17 +100,17 @@ Feature: Share spaces
   Scenario Outline: user cannot share a disabled space to another user
     Given user "Alice" has disabled a space "share space"
     When user "Alice" shares a space "share space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     Then the HTTP status code should be "404"
     And the OCS status code should be "404"
     And the OCS status message should be "Wrong path, file/folder doesn't exist"
     But the user "Brian" should not have a space called "share space"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: user with manager role can share a space to another user
@@ -118,79 +118,79 @@ Feature: Share spaces
       | shareWith | Brian   |
       | role      | manager |
     When user "Brian" shares a space "share space" with settings:
-      | shareWith | Bob    |
-      | role      | <role> |
+      | shareWith | Bob          |
+      | role      | <space-role> |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
     And the user "Bob" should have a space called "share space"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
   @skipOnRevaMaster
   Scenario Outline: user with editor or viewer role cannot share a space to another user
     Given user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Brian" shares a space "share space" with settings:
-      | shareWith | Bob        |
-      | role      | <new_role> |
+      | shareWith | Bob                |
+      | role      | <share-space-role> |
     Then the HTTP status code should be "403"
     And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     And the user "Bob" should not have a space called "share space"
     Examples:
-      | role   | new_role |
-      | editor | manager  |
-      | editor | editor   |
-      | editor | viewer   |
-      | viewer | manager  |
-      | viewer | editor   |
-      | viewer | viewer   |
+      | space-role | share-space-role |
+      | editor     | manager          |
+      | editor     | editor           |
+      | editor     | viewer           |
+      | viewer     | manager          |
+      | viewer     | editor           |
+      | viewer     | viewer           |
 
 
   Scenario Outline: space manager can change the role of space members
     Given user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     When user "Alice" shares a space "share space" with settings:
-      | shareWith | Brian      |
-      | role      | <new_role> |
+      | shareWith | Brian            |
+      | role      | <new-space-role> |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
-    And the user "Alice" should have a space called "share space" granted to "Brian" with role "<new_role>"
+    And the user "Alice" should have a space called "share space" granted to "Brian" with role "<new-space-role>"
     Examples:
-      | role    | new_role |
-      | editor  | manager  |
-      | editor  | viewer   |
-      | viewer  | manager  |
-      | viewer  | editor   |
-      | manager | editor   |
-      | manager | viewer   |
+      | space-role | new-space-role |
+      | editor     | manager        |
+      | editor     | viewer         |
+      | viewer     | manager        |
+      | viewer     | editor         |
+      | manager    | editor         |
+      | manager    | viewer         |
 
   @skipOnRevaMaster
   Scenario Outline: user without manager role cannot change the role of space members
     Given user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian  |
-      | role      | <role> |
+      | shareWith | Brian        |
+      | role      | <space-role> |
     And user "Alice" has shared a space "share space" with settings:
       | shareWith | Bob    |
       | role      | viewer |
     When user "Brian" updates the space "share space" with settings:
-      | shareWith | Bob        |
-      | role      | <new_role> |
+      | shareWith | Bob              |
+      | role      | <new-space-role> |
     Then the HTTP status code should be "403"
     And the OCS status code should be "403"
     And the user "Alice" should have a space called "share space" granted to "Bob" with role "viewer"
     Examples:
-      | role   | new_role |
-      | editor | manager  |
-      | editor | viewer   |
-      | viewer | manager  |
-      | viewer | editor   |
+      | space-role | new-space-role |
+      | editor     | manager        |
+      | editor     | viewer         |
+      | viewer     | manager        |
+      | viewer     | editor         |
 
 
   Scenario Outline: user shares a space with a group
@@ -198,34 +198,34 @@ Feature: Share spaces
     And the administrator has added a user "Brian" to the group "group2" using the Graph API
     And the administrator has added a user "Bob" to the group "group2" using the Graph API
     When user "Alice" shares a space "share space" with settings:
-      | shareWith | group2 |
-      | shareType | 8      |
-      | role      | <role> |
+      | shareWith | group2       |
+      | shareType | 8            |
+      | role      | <space-role> |
     Then the HTTP status code should be "200"
     And the user "Brian" should have a space called "share space"
     And the user "Bob" should have a space called "share space"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: user has no access to the space if access for the group has been removed
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using the Graph API
     And user "Alice" has shared a space "share space" with settings:
-      | shareWith | group2 |
-      | shareType | 8      |
-      | role      | <role> |
+      | shareWith | group2       |
+      | shareType | 8            |
+      | role      | <space-role> |
     When user "Alice" unshares a space "share space" to group "group2"
     Then the HTTP status code should be "200"
     And the user "Brian" should not have a space called "share space"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario: user has no access to the space if he has been removed from the group
@@ -295,15 +295,15 @@ Feature: Share spaces
   Scenario Outline: space Admin can share a space to the user with an expiration date
     When user "Alice" shares a space "share space" with settings:
       | shareWith  | Brian                    |
-      | role       | <role>                   |
+      | role       | <space-role>             |
       | expireDate | 2042-03-25T23:59:59+0100 |
     Then the HTTP status code should be "200"
-    And the user "Brian" should have a space called "share space" granted to user "Brian" with role "<role>" and expiration date "2042-03-25"
+    And the user "Brian" should have a space called "share space" granted to user "Brian" with role "<space-role>" and expiration date "2042-03-25"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: space Admin can share a space to the group with an expiration date
@@ -312,33 +312,33 @@ Feature: Share spaces
     When user "Alice" shares a space "share space" with settings:
       | shareWith  | sales                    |
       | shareType  | 8                        |
-      | role       | <role>                   |
+      | role       | <space-role>             |
       | expireDate | 2042-03-25T23:59:59+0100 |
     Then the HTTP status code should be "200"
-    And the user "Brian" should have a space called "share space" granted to group "sales" with role "<role>" and expiration date "2042-03-25"
+    And the user "Brian" should have a space called "share space" granted to group "sales" with role "<space-role>" and expiration date "2042-03-25"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: update the expiration date of a space in user share
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith  | Brian                    |
-      | role       | <role>                   |
+      | role       | <space-role>             |
       | expireDate | 2042-03-25T23:59:59+0100 |
     When user "Alice" updates the space "share space" with settings:
       | shareWith  | Brian                         |
       | expireDate | 2044-01-01T23:59:59.999+01:00 |
-      | role       | <role>                        |
+      | role       | <space-role>                  |
     Then the HTTP status code should be "200"
-    And the user "Brian" should have a space called "share space" granted to user "Brian" with role "<role>" and expiration date "2044-01-01"
+    And the user "Brian" should have a space called "share space" granted to user "Brian" with role "<space-role>" and expiration date "2044-01-01"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: update the expiration date of a space in group share
@@ -347,38 +347,38 @@ Feature: Share spaces
     And user "Alice" has shared a space "share space" with settings:
       | shareWith  | sales                    |
       | shareType  | 8                        |
-      | role       | <role>                   |
+      | role       | <space-role>             |
       | expireDate | 2042-03-25T23:59:59+0100 |
     When user "Alice" updates the space "share space" with settings:
       | shareWith  | sales                         |
       | shareType  | 8                             |
       | expireDate | 2044-01-01T23:59:59.999+01:00 |
-      | role       | <role>                        |
+      | role       | <space-role>                  |
     Then the HTTP status code should be "200"
-    And the user "Brian" should have a space called "share space" granted to group "sales" with role "<role>" and expiration date "2044-01-01"
+    And the user "Brian" should have a space called "share space" granted to group "sales" with role "<space-role>" and expiration date "2044-01-01"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: delete the expiration date of a space in user share
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith  | Brian                    |
-      | role       | <role>                   |
+      | role       | <space-role>             |
       | expireDate | 2042-03-25T23:59:59+0100 |
     When user "Alice" updates the space "share space" with settings:
-      | shareWith  | Brian  |
-      | expireDate |        |
-      | role       | <role> |
+      | shareWith  | Brian        |
+      | expireDate |              |
+      | role       | <space-role> |
     Then the HTTP status code should be "200"
-    And the user "Brian" should have a space called "share space" granted to user "Brian" with role "<role>" and expiration date ""
+    And the user "Brian" should have a space called "share space" granted to user "Brian" with role "<space-role>" and expiration date ""
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: delete the expiration date of a space in group share
@@ -387,35 +387,35 @@ Feature: Share spaces
     And user "Alice" has shared a space "share space" with settings:
       | shareWith  | sales                    |
       | shareType  | 8                        |
-      | role       | <role>                   |
+      | role       | <space-role>             |
       | expireDate | 2042-03-25T23:59:59+0100 |
     When user "Alice" updates the space "share space" with settings:
-      | shareWith  | sales  |
-      | shareType  | 8      |
-      | expireDate |        |
-      | role       | <role> |
+      | shareWith  | sales        |
+      | shareType  | 8            |
+      | expireDate |              |
+      | role       | <space-role> |
     Then the HTTP status code should be "200"
-    And the user "Brian" should have a space called "share space" granted to group "sales" with role "<role>" and expiration date ""
+    And the user "Brian" should have a space called "share space" granted to group "sales" with role "<space-role>" and expiration date ""
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: check the end of expiration of a space in user share
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith  | Brian                    |
-      | role       | <role>                   |
+      | role       | <space-role>             |
       | expireDate | 2042-03-25T23:59:59+0100 |
     When user "Alice" expires the user share of space "share space" for user "Brian"
     Then the HTTP status code should be "200"
     And the user "Brian" should not have a space called "share space"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: check the end of expiration of a space in group share
@@ -424,20 +424,20 @@ Feature: Share spaces
     And user "Alice" has shared a space "share space" with settings:
       | shareWith  | sales                    |
       | shareType  | 8                        |
-      | role       | <role>                   |
+      | role       | <space-role>             |
       | expireDate | 2042-03-25T23:59:59+0100 |
     When user "Alice" expires the group share of space "share space" for group "sales"
     Then the HTTP status code should be "200"
     And the user "Brian" should not have a space called "share space"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | space-role |
+      | manager    |
+      | editor     |
+      | viewer     |
 
 
   Scenario Outline: user cannot share the personal space to an other user
-    Given the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<space-role>" to user "Brian" using the Graph API
     And user "Brian" shares a space "Brian Murphy" with settings:
       | shareWith | Bob    |
       | role      | viewer |
@@ -445,7 +445,7 @@ Feature: Share spaces
     And the OCS status message should be "can not add members to personal spaces"
     And the user "Bob" should not have a space called "Brian Murphy"
     Examples:
-      | role        |
+      | space-role  |
       | Space Admin |
       | Admin       |
       | User        |
