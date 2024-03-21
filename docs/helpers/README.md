@@ -17,7 +17,7 @@
 
 ## Introduction
 
-`docs/helpers` contains go programs creating docs by extracting information from the code. The `main.go` program is manually started with `make docs-generate` or via the CI. It calls the other required programs and has these main responsibilities:
+`docs/helpers` contains a go program named `main.go` which creates docs by extracting information from the code using additional go programs. Individual steps (programs) can be called manually if needed. Note that not all programs are called automatically by purpose, see the [Tasks for New Releases](#tasks-for-new-releases) below. `main.go` is used by `make docs-generate` which can be called manually or by the CI. It calls the other required programs and has these main responsibilities for automatic runs:
 
 - Generate docs for envvars in config structs including deprecations if there are any.
 - Extract and generate docs for `extended` envvars that are not mentioned in config structs (aka "rogue" envvars).
@@ -152,18 +152,24 @@ The process further picks up the `yaml` file generated in the `Extract Rogue Env
 
 ## Tasks for New Releases
 
-Close before a new release gets publsihed, but **before** a new ocis admin docs branch is created, some tasks need to be done manually. These tasks cant be done automatically! By processing these manual tasks, doc related and important files get updated respectively created, ready to be consumed by the admin docs. The following situations can occur, see the solution provided:
+Close before a new release gets published, but **before** a new ocis admin docs branch is created, some tasks need to be done manually. These tasks cant be done automatically! By processing these manual tasks, doc related and important files get updated respectively created, ready to be consumed by the admin docs. The following situations can occur, see the solution provided:
 
-1. A new admin docs branch gets created. Building the branched admin docs report inexisting referenced delta files.\
-&#8594; Run the manual tasks described below and restart building the branched admin docs.
+1. Admin docs prepares in master for envvar delta changes. Building the admin docs report inexisting referenced delta files.\
+&#8594; Run the manual tasks described below and restart the branched admin docs.
 
-2. A new ocis release is close to be released, the manual tasks **have not been** processed so far.\
-&#8594; Run the manual tasks.
+2. A new admin docs branch gets created but no `docs-stable-x.y` branch has been created in the ocis repo so far. Building the branched admin docs report inexisting referenced files.\
+&#8594; Run the manual tasks described below.\
+&#8594; Take care that the `docs-stable-x.y` branch gets created in the ocis repo.\
+&#8594; Alternatively you can _temporarily_ point in the branched [docs-ocis/antora.yml](https://github.com/owncloud/docs-ocis/blob/master/antora.yml) `compose_tab_1` to `master`.\
+&#8594; Restart building the branched admin docs.
 
-3. A new ocis release is close to be released, the manual tasks **have been** processed some time ago.\
-&#8594; Re-run the manual tasks.
+3. A new ocis release is close to be released, the manual tasks **have not been** processed so far.\
+&#8594; Run the manual tasks AND backport the results into the `docs-stable-x.y` branch.
 
-4. Re-running the manual tasks have been forgotten to be processed before publishing the final release.\
+4. A new ocis release is close to be released, the manual tasks **have been** processed some time ago.\
+&#8594; Re-run the manual tasks AND backport the results into the `docs-stable-x.y` branch.
+
+5. A new ocis release **has been released**, the manual tasks **have not been** processed so far.\
 &#8594; Re-run the manual tasks AND backport the results into the `docs-stable-x.y` branch.
   
 ### Task List
@@ -177,7 +183,7 @@ Close before a new release gets publsihed, but **before** a new ocis admin docs 
     2. Create delta files for added, removed and deprecated envvars. To do so type:\
     `go run . env-var-delta-table` and use as parameter the versions you want to compare. Example: `v5.0.0 v6.0.0`.
     3. List and check the files created in `./docs/helpers/output/env-deltas/`. These are the files defining a table in markdown and asciidoc where the former is used in the dev docs and the latter is consumed by the admin docs build process.\
-    **Important**: To make the files consumable, the following attribute must be changed in the respective admin docs branch definition: [docs-ocis/antora.yml](https://github.com/owncloud/docs-ocis/blob/master/antora.yml) `env_var_delta_name`. Only the delta filename part needs to be used. The complete filenames will be assembled automatically.
+    **Important**: To make the files consumable, the following attribute must be changed in the respective admin docs respective branch definition: [docs-ocis/antora.yml](https://github.com/owncloud/docs-ocis/blob/master/antora.yml) `env_var_delta_name`. Only the delta filename part needs to be used. The complete filenames will be assembled automatically.
        ```
        v5.0.0-v6.0.0 -->
        
