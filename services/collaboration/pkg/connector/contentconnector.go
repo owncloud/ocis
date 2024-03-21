@@ -203,10 +203,9 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		Opaque: opaque,
 		Ref:    &wopiContext.FileReference,
 		LockId: lockID,
-		// TODO: if-match
-		//Options: &providerv1beta1.InitiateFileUploadRequest_IfMatch{
-		//	IfMatch: "",
-		//},
+		Options: &providerv1beta1.InitiateFileUploadRequest_IfMatch{
+			IfMatch: statRes.Info.Etag,
+		},
 	}
 
 	// Initiate the upload request
