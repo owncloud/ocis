@@ -252,6 +252,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				failed     bool
 				keepUpload bool
 			)
+			unmarkPostprocessing := true
 
 			n, err := node.ReadNode(ctx, fs.lu, up.Info.Storage["SpaceRoot"], up.Info.Storage["NodeId"], false, nil, true)
 			if err != nil {
@@ -270,8 +271,10 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			case events.PPOutcomeContinue:
 				if err := up.Finalize(); err != nil {
 					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not finalize upload")
-					keepUpload = true // should we keep the upload when assembling failed?
 					failed = true
+					keepUpload = true
+					// keep postprocessing status so the upload is not deleted during housekeeping
+					unmarkPostprocessing = false
 				}
 			case events.PPOutcomeDelete:
 				failed = true
@@ -300,7 +303,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				}
 			}
 
-			upload.Cleanup(up, failed, keepUpload)
+			upload.Cleanup(up, failed, keepUpload, unmarkPostprocessing)
 
 			// remove cache entry in gateway
 			fs.cache.RemoveStatContext(ctx, ev.ExecutingUser.GetId(), &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID})
