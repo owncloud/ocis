@@ -189,9 +189,12 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 			return resp.GetLock().GetLockId(), nil
 		}
 
-		// TODO: Is this the right error code?
 		logger.Error().Msg("SetLock failed and could not refresh")
-		return "", NewConnectorError(404, "Could not refresh the lock")
+		return "", NewConnectorError(500, "Could not refresh the lock")
+
+	case rpcv1beta1.Code_CODE_NOT_FOUND:
+		logger.Error().Msg("SetLock failed, file not found")
+		return "", NewConnectorError(404, "File not found")
 
 	default:
 		logger.Error().

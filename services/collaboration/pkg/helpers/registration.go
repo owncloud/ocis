@@ -43,7 +43,6 @@ func RegisterAppProvider(
 		Str("AppName", cfg.App.Name).
 		Strs("Mimetypes", mimeTypes).
 		Msg("Registering mimetypes in the app provider")
-	// TODO: REVA has way to filter supported mimetypes (do we need to implement it here or is it in the registry?)
 
 	// TODO: an added app provider shouldn't last forever. Instead the registry should use a TTL
 	// and delete providers that didn't register again. If an app provider dies or get's disconnected,

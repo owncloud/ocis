@@ -54,9 +54,7 @@ func GetAppURLs(cfg *config.Config, logger log.Logger) (map[string]map[string]st
 		return nil, errors.Wrap(err, "error parsing wopi discovery response")
 	}
 
-	// TODO: Log appUrls? not easy with the format
-	// It's also a one-time call during service setup, so it's pointless
-	// to use an "all-is-good" debug log
+	// We won't log anything if successful
 	return appURLs, nil
 }
 

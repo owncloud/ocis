@@ -103,7 +103,6 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 		// public link downloads have the token in the download endpoint
 		httpReq.Header.Add("X-Reva-Transfer", downloadToken)
 	}
-	// TODO: the access token shouldn't be needed
 	httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
 
 	httpResp, err := httpClient.Do(httpReq)
@@ -276,7 +275,6 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 			// public link uploads have the token in the upload endpoint
 			httpReq.Header.Add("X-Reva-Transfer", uploadToken)
 		}
-		// TODO: the access token shouldn't be needed
 		httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
 
 		httpReq.Header.Add("X-Lock-Id", lockID)
