@@ -12,15 +12,16 @@ import (
 
 // Postprocessing handles postprocessing of a file
 type Postprocessing struct {
-	ID         string
-	URL        string
-	User       *user.User
-	Filename   string
-	Filesize   uint64
-	ResourceID *provider.ResourceId
-	Steps      []events.Postprocessingstep
-	Status     Status
-	Failures   int
+	ID          string
+	URL         string
+	User        *user.User
+	Filename    string
+	Filesize    uint64
+	ResourceID  *provider.ResourceId
+	Steps       []events.Postprocessingstep
+	Status      Status
+	Failures    int
+	InitiatorID string
 
 	config config.Postprocessing
 }
