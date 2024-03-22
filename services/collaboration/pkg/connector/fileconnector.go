@@ -56,17 +56,17 @@ func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	if resp.Status.Code != rpcv1beta1.Code_CODE_OK {
+	if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
 		logger.Error().
-			Str("StatusCode", resp.Status.GetCode().String()).
-			Str("StatusMsg", resp.Status.GetMessage()).
+			Str("StatusCode", resp.GetStatus().GetCode().String()).
+			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("GetLock failed with unexpected status")
-		return "", NewConnectorError(404, resp.Status.GetCode().String()+" "+resp.Status.GetMessage())
+		return "", NewConnectorError(404, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
 	}
 
 	lockID := ""
-	if resp.Lock != nil {
-		lockID = resp.Lock.LockId
+	if resp.GetLock() != nil {
+		lockID = resp.GetLock().GetLockId()
 	}
 
 	// log the success at debug level
@@ -116,7 +116,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 			logger.Error().Err(err).Msg("SetLock failed")
 			return "", err
 		}
-		setOrRefreshStatus = resp.Status
+		setOrRefreshStatus = resp.GetStatus()
 	} else {
 		// If the oldLockID isn't empty, this is a "UnlockAndRelock" request. We'll
 		// do a "RefreshLock" in reva and provide the old lock
@@ -138,11 +138,11 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 			logger.Error().Err(err).Msg("UnlockAndRefresh failed")
 			return "", err
 		}
-		setOrRefreshStatus = resp.Status
+		setOrRefreshStatus = resp.GetStatus()
 	}
 
 	// we're checking the status of either the "SetLock" or "RefreshLock" operations
-	switch setOrRefreshStatus.Code {
+	switch setOrRefreshStatus.GetCode() {
 	case rpcv1beta1.Code_CODE_OK:
 		logger.Debug().Msg("SetLock successful")
 		return "", nil
@@ -162,20 +162,20 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 			return "", err
 		}
 
-		if resp.Status.Code != rpcv1beta1.Code_CODE_OK {
+		if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
 			logger.Error().
-				Str("StatusCode", resp.Status.Code.String()).
-				Str("StatusMsg", resp.Status.Message).
+				Str("StatusCode", resp.GetStatus().GetCode().String()).
+				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("SetLock failed, fallback to GetLock failed with unexpected status")
 		}
 
-		if resp.Lock != nil {
-			if resp.Lock.LockId != lockID {
+		if resp.GetLock() != nil {
+			if resp.GetLock().GetLockId() != lockID {
 				// lockId is different -> return 409 with the current lockId
 				logger.Warn().
-					Str("LockID", resp.Lock.LockId).
+					Str("LockID", resp.GetLock().GetLockId()).
 					Msg("SetLock conflict")
-				return resp.Lock.LockId, NewConnectorError(409, "Lock conflict")
+				return resp.GetLock().GetLockId(), NewConnectorError(409, "Lock conflict")
 			}
 
 			// TODO: according to the spec we need to treat this as a RefreshLock
@@ -184,9 +184,9 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 			// Since the lockId matches now, we'll assume success for now.
 			// As said in the todo, we probably should send a "RefreshLock" request here.
 			logger.Warn().
-				Str("LockID", resp.Lock.LockId).
+				Str("LockID", resp.GetLock().GetLockId()).
 				Msg("SetLock lock refreshed instead")
-			return resp.Lock.LockId, nil
+			return resp.GetLock().GetLockId(), nil
 		}
 
 		// TODO: Is this the right error code?
@@ -195,8 +195,8 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 
 	default:
 		logger.Error().
-			Str("StatusCode", setOrRefreshStatus.Code.String()).
-			Str("StatusMsg", setOrRefreshStatus.Message).
+			Str("StatusCode", setOrRefreshStatus.GetCode().String()).
+			Str("StatusMsg", setOrRefreshStatus.GetMessage()).
 			Msg("SetLock failed with unexpected status")
 		return "", NewConnectorError(500, setOrRefreshStatus.GetCode().String()+" "+setOrRefreshStatus.GetMessage())
 	}
@@ -237,22 +237,22 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 		return "", err
 	}
 
-	switch resp.Status.Code {
+	switch resp.GetStatus().GetCode() {
 	case rpcv1beta1.Code_CODE_OK:
 		logger.Debug().Msg("RefreshLock successful")
 		return "", nil
 
 	case rpcv1beta1.Code_CODE_NOT_FOUND:
 		logger.Error().
-			Str("StatusCode", resp.Status.Code.String()).
-			Str("StatusMsg", resp.Status.Message).
+			Str("StatusCode", resp.GetStatus().GetCode().String()).
+			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("RefreshLock failed, file reference not found")
 		return "", NewConnectorError(404, "File reference not found")
 
 	case rpcv1beta1.Code_CODE_ABORTED:
 		logger.Error().
-			Str("StatusCode", resp.Status.Code.String()).
-			Str("StatusMsg", resp.Status.Message).
+			Str("StatusCode", resp.GetStatus().GetCode().String()).
+			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("RefreshLock failed, lock mismatch")
 
 		// Either the file is unlocked or there is no lock
@@ -267,35 +267,35 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 			return "", err
 		}
 
-		if resp.Status.Code != rpcv1beta1.Code_CODE_OK {
+		if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
 			logger.Error().
-				Str("StatusCode", resp.Status.Code.String()).
-				Str("StatusMsg", resp.Status.Message).
+				Str("StatusCode", resp.GetStatus().GetCode().String()).
+				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("RefreshLock failed, tried to get the current lock failed with unexpected status")
-			return "", NewConnectorError(500, resp.Status.GetCode().String()+" "+resp.Status.GetMessage())
+			return "", NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
 		}
 
-		if resp.Lock == nil {
+		if resp.GetLock() == nil {
 			logger.Error().
-				Str("StatusCode", resp.Status.Code.String()).
-				Str("StatusMsg", resp.Status.Message).
+				Str("StatusCode", resp.GetStatus().GetCode().String()).
+				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("RefreshLock failed, no lock on file")
 			return "", NewConnectorError(409, "No lock on file")
 		} else {
 			// lock is different than the one requested, otherwise we wouldn't reached this point
 			logger.Error().
-				Str("LockID", resp.Lock.LockId).
-				Str("StatusCode", resp.Status.Code.String()).
-				Str("StatusMsg", resp.Status.Message).
+				Str("LockID", resp.GetLock().GetLockId()).
+				Str("StatusCode", resp.GetStatus().GetCode().String()).
+				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("RefreshLock failed, lock mismatch")
-			return resp.Lock.LockId, NewConnectorError(409, "Lock mismatch")
+			return resp.GetLock().GetLockId(), NewConnectorError(409, "Lock mismatch")
 		}
 	default:
 		logger.Error().
-			Str("StatusCode", resp.Status.Code.String()).
-			Str("StatusMsg", resp.Status.Message).
+			Str("StatusCode", resp.GetStatus().GetCode().String()).
+			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("RefreshLock failed with unexpected status")
-		return "", NewConnectorError(500, resp.Status.GetCode().String()+" "+resp.Status.GetMessage())
+		return "", NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
 	}
 }
 
@@ -330,7 +330,7 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 		return "", err
 	}
 
-	switch resp.Status.Code {
+	switch resp.GetStatus().GetCode() {
 	case rpcv1beta1.Code_CODE_OK:
 		logger.Debug().Msg("Unlock successful")
 		return "", nil
@@ -350,37 +350,37 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 			return "", err
 		}
 
-		if resp.Status.Code != rpcv1beta1.Code_CODE_OK {
+		if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
 			logger.Error().
-				Str("StatusCode", resp.Status.Code.String()).
-				Str("StatusMsg", resp.Status.Message).
+				Str("StatusCode", resp.GetStatus().GetCode().String()).
+				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("Unlock failed, tried to get the current lock failed with unexpected status")
-			return "", NewConnectorError(500, resp.Status.GetCode().String()+" "+resp.Status.GetMessage())
+			return "", NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
 		}
 
 		var outLockId string
-		if resp.Lock == nil {
+		if resp.GetLock() == nil {
 			logger.Error().
-				Str("StatusCode", resp.Status.Code.String()).
-				Str("StatusMsg", resp.Status.Message).
+				Str("StatusCode", resp.GetStatus().GetCode().String()).
+				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("Unlock failed, no lock on file")
 			outLockId = ""
 		} else {
 			// lock is different than the one requested, otherwise we wouldn't reached this point
 			logger.Error().
-				Str("LockID", resp.Lock.LockId).
-				Str("StatusCode", resp.Status.Code.String()).
-				Str("StatusMsg", resp.Status.Message).
+				Str("LockID", resp.GetLock().GetLockId()).
+				Str("StatusCode", resp.GetStatus().GetCode().String()).
+				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("Unlock failed, lock mismatch")
-			outLockId = resp.Lock.LockId
+			outLockId = resp.GetLock().GetLockId()
 		}
 		return outLockId, NewConnectorError(409, "Lock mismatch")
 	default:
 		logger.Error().
-			Str("StatusCode", resp.Status.Code.String()).
-			Str("StatusMsg", resp.Status.Message).
+			Str("StatusCode", resp.GetStatus().GetCode().String()).
+			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("Unlock failed with unexpected status")
-		return "", NewConnectorError(500, resp.Status.GetCode().String()+" "+resp.Status.GetMessage())
+		return "", NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
 	}
 }
 
@@ -402,21 +402,21 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 		return FileInfo{}, err
 	}
 
-	if statRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+	if statRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
 		logger.Error().
-			Str("StatusCode", statRes.Status.Code.String()).
-			Str("StatusMsg", statRes.Status.Message).
+			Str("StatusCode", statRes.GetStatus().GetCode().String()).
+			Str("StatusMsg", statRes.GetStatus().GetMessage()).
 			Msg("CheckFileInfo: stat failed with unexpected status")
-		return FileInfo{}, NewConnectorError(500, statRes.Status.GetCode().String()+" "+statRes.Status.GetMessage())
+		return FileInfo{}, NewConnectorError(500, statRes.GetStatus().GetCode().String()+" "+statRes.GetStatus().GetMessage())
 	}
 
 	fileInfo := FileInfo{
 		// OwnerId must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
-		OwnerId:           hex.EncodeToString([]byte(statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp)),
-		Size:              int64(statRes.Info.Size),
-		Version:           statRes.Info.Mtime.String(),
-		BaseFileName:      path.Base(statRes.Info.Path),
-		BreadcrumbDocName: path.Base(statRes.Info.Path),
+		OwnerId:           hex.EncodeToString([]byte(statRes.GetInfo().GetOwner().GetOpaqueId() + "@" + statRes.GetInfo().GetOwner().GetIdp())),
+		Size:              int64(statRes.GetInfo().GetSize()),
+		Version:           statRes.GetInfo().GetMtime().String(),
+		BaseFileName:      path.Base(statRes.GetInfo().GetPath()),
+		BreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request
 		//BreadcrumbFolderName: path.Dir(statRes.Info.Path),
 
@@ -452,20 +452,20 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 	var isPublicShare bool = false
 	if wopiContext.User != nil {
 		// UserId must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
-		if wopiContext.User.Id.Type == userv1beta1.UserType_USER_TYPE_LIGHTWEIGHT {
-			fileInfo.UserId = hex.EncodeToString([]byte(statRes.Info.Owner.OpaqueId + "@" + statRes.Info.Owner.Idp))
+		if wopiContext.User.GetId().GetType() == userv1beta1.UserType_USER_TYPE_LIGHTWEIGHT {
+			fileInfo.UserId = hex.EncodeToString([]byte(statRes.GetInfo().GetOwner().GetOpaqueId() + "@" + statRes.GetInfo().GetOwner().GetIdp()))
 		} else {
-			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.Id.OpaqueId + "@" + wopiContext.User.Id.Idp))
+			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.GetId().GetOpaqueId() + "@" + wopiContext.User.GetId().GetIdp()))
 		}
 
-		if wopiContext.User.Opaque != nil {
-			if _, ok := wopiContext.User.Opaque.Map["public-share-role"]; ok {
+		if wopiContext.User.GetOpaque() != nil {
+			if _, ok := wopiContext.User.GetOpaque().GetMap()["public-share-role"]; ok {
 				isPublicShare = true
 			}
 		}
 		if !isPublicShare {
-			fileInfo.UserFriendlyName = wopiContext.User.Username
-			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.Id.OpaqueId + "@" + wopiContext.User.Id.Idp))
+			fileInfo.UserFriendlyName = wopiContext.User.GetUsername()
+			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.GetId().GetOpaqueId() + "@" + wopiContext.User.GetId().GetIdp()))
 		}
 	}
 	if wopiContext.User == nil || isPublicShare {
