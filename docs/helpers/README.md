@@ -17,7 +17,7 @@
 
 ## Introduction
 
-`docs/helpers` contains a go program named `main.go` which creates docs by extracting information from the code using additional go programs. Individual steps (programs) can be called manually if needed. Note that not all programs are called automatically by purpose, see the [Tasks for New Releases](#tasks-for-new-releases) below. `main.go` is used by `make docs-generate` which can be called manually or by the CI. It calls the other required programs and has these main responsibilities for automatic runs:
+`docs/helpers` contains a go program named `main.go` which creates docs by extracting information from the code using additional go programs. Individual steps (programs) can be called manually if needed. Note that not all programs are called automatically on purpose, see the [Tasks for New Releases](#tasks-for-new-releases) below. `main.go` is used by `make docs-generate` which can be called manually or by the CI. It calls the other required programs and has these main responsibilities for automatic runs:
 
 - Generate docs for envvars in config structs including deprecations if there are any.
 - Extract and generate docs for `extended` envvars that are not mentioned in config structs (aka "rogue" envvars).
@@ -152,21 +152,21 @@ The process further picks up the `yaml` file generated in the `Extract Rogue Env
 
 ## Tasks for New Releases
 
-Close before a new release gets published, but **before** a new ocis admin docs branch is created, some tasks need to be done manually. These tasks cant be done automatically! By processing these manual tasks, doc related and important files get updated respectively created, ready to be consumed by the admin docs. The following situations can occur, see the solution provided:
+Close before a new release gets published, but **before** a new ocis admin docs branch is created, some tasks need to be done manually. These tasks cant be done automatically! By processing these manual tasks, doc related and important files get updated or created, ready to be consumed by the admin docs. The following situations can occur, see the solution provided:
 
-1. Admin docs prepares in master for envvar delta changes. Building the admin docs report inexisting referenced delta files.\
+1. Admin docs prepares in master for envvar delta changes. Building the admin docs report non-existent referenced delta files.\
 &#8594; Run the manual tasks described below and restart the branched admin docs.
 
-2. A new admin docs branch gets created but no `docs-stable-x.y` branch has been created in the ocis repo so far. Building the branched admin docs report inexisting referenced files.\
+2. A new admin docs branch gets created but no `docs-stable-x.y` branch has been created in the ocis repo so far. Building the branched admin docs reports non-existent referenced files.\
 &#8594; Run the manual tasks described below.\
 &#8594; Take care that the `docs-stable-x.y` branch gets created in the ocis repo.\
 &#8594; Alternatively you can _temporarily_ point in the branched [docs-ocis/antora.yml](https://github.com/owncloud/docs-ocis/blob/master/antora.yml) `compose_tab_1` to `master`.\
 &#8594; Restart building the branched admin docs.
 
-3. A new ocis release is close to be released, the manual tasks **have not been** processed so far.\
+3. A new ocis release is close to being released, the manual tasks **have not been** processed so far.\
 &#8594; Run the manual tasks AND backport the results into the `docs-stable-x.y` branch.
 
-4. A new ocis release is close to be released, the manual tasks **have been** processed some time ago.\
+4. A new ocis release is close to being released, the manual tasks **have been** processed some time ago.\
 &#8594; Re-run the manual tasks AND backport the results into the `docs-stable-x.y` branch.
 
 5. A new ocis release **has been released**, the manual tasks **have not been** processed so far.\
@@ -175,10 +175,10 @@ Close before a new release gets published, but **before** a new ocis admin docs 
 ### Task List
 
 1. From the ocis root, run `make -C docs docs-generate` and check if there is a change in the `extended-envars.yaml` output.\
-&#8594; In case, process [Extended Envvars](#extended-envvars). When done, re-run the make command and check if the output of `./docs/services/_includes/adoc/extended_configvars.adoc` matches the expectations.
+&#8594; In this case, process [Extended Envvars](#extended-envvars). When done, re-run the make command and check if the output of `./docs/services/_includes/adoc/extended_configvars.adoc` matches the expectations.
 
 2. In `./docs/helpers` run: `go run . --help` This will give you an overview of available commands. 
-    1. Run `go run . all` to generate respectively update required base files.\
+    1. Run `go run . all` to generate and/or update required base files.\
    &#8594; Any change in `env_vars.yaml` must be check out to be available in master.
     2. Create delta files for added, removed and deprecated envvars. To do so type:\
     `go run . env-var-delta-table` and use as parameter the versions you want to compare. Example: `v5.0.0 v6.0.0`.
