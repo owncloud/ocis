@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -92,13 +93,14 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 	switch ev := e.Event.(type) {
 	case events.BytesReceived:
 		pp = &postprocessing.Postprocessing{
-			ID:         ev.UploadID,
-			URL:        ev.URL,
-			User:       ev.ExecutingUser,
-			Filename:   ev.Filename,
-			Filesize:   ev.Filesize,
-			ResourceID: ev.ResourceID,
-			Steps:      pps.steps,
+			ID:          ev.UploadID,
+			URL:         ev.URL,
+			User:        ev.ExecutingUser,
+			Filename:    ev.Filename,
+			Filesize:    ev.Filesize,
+			ResourceID:  ev.ResourceID,
+			Steps:       pps.steps,
+			InitiatorID: e.InitiatorID,
 		}
 		next = pp.Init(ev)
 	case events.PostprocessingStepFinished:
@@ -160,11 +162,14 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 	}
 
 	if pp != nil {
+		ctx = ctxpkg.ContextSetInitiator(ctx, pp.InitiatorID)
+
 		if err := storePP(pps.store, pp); err != nil {
 			pps.log.Error().Str("uploadID", pp.ID).Err(err).Msg("cannot store upload")
 			return fmt.Errorf("%w: cannot store upload", errEvent)
 		}
 	}
+
 	if next != nil {
 		if err := events.Publish(ctx, pps.pub, next); err != nil {
 			pps.log.Error().Err(err).Msg("unable to publish event")

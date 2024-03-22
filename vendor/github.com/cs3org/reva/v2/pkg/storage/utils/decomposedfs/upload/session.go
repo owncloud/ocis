@@ -54,7 +54,8 @@ func (s *OcisSession) Context(ctx context.Context) context.Context { // restore 
 	sub := log.With().Int("pid", os.Getpid()).Logger()
 	ctx = appctx.WithLogger(ctx, &sub)
 	ctx = ctxpkg.ContextSetLockID(ctx, s.lockID())
-	return ctxpkg.ContextSetUser(ctx, s.executantUser())
+	ctx = ctxpkg.ContextSetUser(ctx, s.executantUser())
+	return ctxpkg.ContextSetInitiator(ctx, s.InitiatorID())
 }
 
 func (s *OcisSession) lockID() string {
@@ -303,6 +304,11 @@ func (s *OcisSession) IsProcessing() bool {
 // binPath returns the path to the file storing the binary data.
 func (s *OcisSession) binPath() string {
 	return filepath.Join(s.store.root, "uploads", s.info.ID)
+}
+
+// InitiatorID returns the id of the initiating client
+func (s *OcisSession) InitiatorID() string {
+	return s.info.MetaData["initiatorid"]
 }
 
 // sessionPath returns the path to the .info file storing the file's info.

@@ -39,6 +39,14 @@ func NewUnary() grpc.UnaryServerInterceptor {
 					ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, tkn)
 				}
 			}
+
+			if val, ok := md[ctxpkg.InitiatorHeader]; ok {
+				if len(val) > 0 && val[0] != "" {
+					initiatorID := val[0]
+					ctx = ctxpkg.ContextSetInitiator(ctx, initiatorID)
+					ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorID)
+				}
+			}
 		}
 
 		return handler(ctx, req)
@@ -59,6 +67,14 @@ func NewStream() grpc.StreamServerInterceptor {
 					tkn := val[0]
 					ctx = ctxpkg.ContextSetToken(ctx, tkn)
 					ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, tkn)
+				}
+			}
+
+			if val, ok := md[ctxpkg.InitiatorHeader]; ok {
+				if len(val) > 0 && val[0] != "" {
+					initiatorID := val[0]
+					ctx = ctxpkg.ContextSetInitiator(ctx, initiatorID)
+					ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorID)
 				}
 			}
 		}
