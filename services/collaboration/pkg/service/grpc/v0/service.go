@@ -56,12 +56,12 @@ func (s *Service) OpenInApp(
 	// get the current user
 	var user *userv1beta1.User = nil
 	meReq := &gatewayv1beta1.WhoAmIRequest{
-		Token: req.AccessToken,
+		Token: req.GetAccessToken(),
 	}
 	meResp, err := s.gwc.WhoAmI(ctx, meReq)
 	if err == nil {
-		if meResp.Status.Code == rpcv1beta1.Code_CODE_OK {
-			user = meResp.User
+		if meResp.GetStatus().GetCode() == rpcv1beta1.Code_CODE_OK {
+			user = meResp.GetUser()
 		}
 	}
 
@@ -75,11 +75,11 @@ func (s *Service) OpenInApp(
 	// so that all sessions on one file end on the same office server
 
 	c := sha256.New()
-	c.Write([]byte(req.ResourceInfo.Id.StorageId + "$" + req.ResourceInfo.Id.SpaceId + "!" + req.ResourceInfo.Id.OpaqueId))
+	c.Write([]byte(req.GetResourceInfo().GetId().GetStorageId() + "$" + req.GetResourceInfo().GetId().GetSpaceId() + "!" + req.GetResourceInfo().GetId().GetOpaqueId()))
 	fileRef := hex.EncodeToString(c.Sum(nil))
 
 	// get the file extension to use the right wopi app url
-	fileExt := path.Ext(req.GetResourceInfo().Path)
+	fileExt := path.Ext(req.GetResourceInfo().GetPath())
 
 	var viewAppURL string
 	var editAppURL string
@@ -127,7 +127,7 @@ func (s *Service) OpenInApp(
 		s.logger.Error().
 			Err(err).
 			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.ViewMode.String()).
+			Str("ViewMode", req.GetViewMode().String()).
 			Str("Requester", user.GetId().String()).
 			Msg("OpenInApp: error parsing viewAppUrl")
 		return nil, err
@@ -137,23 +137,23 @@ func (s *Service) OpenInApp(
 		s.logger.Error().
 			Err(err).
 			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.ViewMode.String()).
+			Str("ViewMode", req.GetViewMode().String()).
 			Str("Requester", user.GetId().String()).
 			Msg("OpenInApp: error parsing editAppUrl")
 		return nil, err
 	}
 
 	appURL := viewAppURL
-	if req.ViewMode == appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE {
+	if req.GetViewMode() == appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE {
 		appURL = editAppURL
 	}
 
-	cryptedReqAccessToken, err := middleware.EncryptAES([]byte(s.config.JWTSecret), req.AccessToken)
+	cryptedReqAccessToken, err := middleware.EncryptAES([]byte(s.config.JWTSecret), req.GetAccessToken())
 	if err != nil {
 		s.logger.Error().
 			Err(err).
 			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.ViewMode.String()).
+			Str("ViewMode", req.GetViewMode().String()).
 			Str("Requester", user.GetId().String()).
 			Msg("OpenInApp: error encrypting access token")
 		return &appproviderv1beta1.OpenInAppResponse{
@@ -165,19 +165,19 @@ func (s *Service) OpenInApp(
 		AccessToken:   cryptedReqAccessToken,
 		FileReference: providerFileRef,
 		User:          user,
-		ViewMode:      req.ViewMode,
+		ViewMode:      req.GetViewMode(),
 		EditAppUrl:    editAppURL,
 		ViewAppUrl:    viewAppURL,
 	}
 
 	cs3Claims := &jwt.RegisteredClaims{}
 	cs3JWTparser := jwt.Parser{}
-	_, _, err = cs3JWTparser.ParseUnverified(req.AccessToken, cs3Claims)
+	_, _, err = cs3JWTparser.ParseUnverified(req.GetAccessToken(), cs3Claims)
 	if err != nil {
 		s.logger.Error().
 			Err(err).
 			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.ViewMode.String()).
+			Str("ViewMode", req.GetViewMode().String()).
 			Str("Requester", user.GetId().String()).
 			Msg("OpenInApp: error parsing JWT token")
 		return nil, err
@@ -197,7 +197,7 @@ func (s *Service) OpenInApp(
 		s.logger.Error().
 			Err(err).
 			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.ViewMode.String()).
+			Str("ViewMode", req.GetViewMode().String()).
 			Str("Requester", user.GetId().String()).
 			Msg("OpenInApp: error signing access token")
 		return &appproviderv1beta1.OpenInAppResponse{
@@ -207,7 +207,7 @@ func (s *Service) OpenInApp(
 
 	s.logger.Debug().
 		Str("FileReference", providerFileRef.String()).
-		Str("ViewMode", req.ViewMode.String()).
+		Str("ViewMode", req.GetViewMode().String()).
 		Str("Requester", user.GetId().String()).
 		Msg("OpenInApp: success")
 

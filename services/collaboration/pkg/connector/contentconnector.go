@@ -51,12 +51,12 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 		return err
 	}
 
-	if resp.Status.Code != rpcv1beta1.Code_CODE_OK {
+	if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
 		logger.Error().
-			Str("StatusCode", resp.Status.Code.String()).
-			Str("StatusMsg", resp.Status.Message).
+			Str("StatusCode", resp.GetStatus().GetCode().String()).
+			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("GetFile: InitiateFileDownload failed with wrong status")
-		return NewConnectorError(500, resp.Status.GetCode().String()+" "+resp.Status.GetMessage())
+		return NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
 	}
 
 	// Figure out the download endpoint and download token
@@ -64,11 +64,11 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 	downloadToken := ""
 	hasDownloadToken := false
 
-	for _, proto := range resp.Protocols {
-		if proto.Protocol == "simple" || proto.Protocol == "spaces" {
-			downloadEndpoint = proto.DownloadEndpoint
-			downloadToken = proto.Token
-			hasDownloadToken = proto.Token != ""
+	for _, proto := range resp.GetProtocols() {
+		if proto.GetProtocol() == "simple" || proto.GetProtocol() == "spaces" {
+			downloadEndpoint = proto.GetDownloadEndpoint()
+			downloadToken = proto.GetToken()
+			hasDownloadToken = proto.GetToken() != ""
 			break
 		}
 	}
@@ -160,28 +160,28 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		return "", err
 	}
 
-	if statRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+	if statRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
 		logger.Error().
-			Str("StatusCode", statRes.Status.Code.String()).
-			Str("StatusMsg", statRes.Status.Message).
+			Str("StatusCode", statRes.GetStatus().GetCode().String()).
+			Str("StatusMsg", statRes.GetStatus().GetMessage()).
 			Msg("PutFile: stat failed with unexpected status")
-		return "", NewConnectorError(500, statRes.Status.GetCode().String()+" "+statRes.Status.GetMessage())
+		return "", NewConnectorError(500, statRes.GetStatus().GetCode().String()+" "+statRes.GetStatus().GetMessage())
 	}
 
 	// If there is a lock and it mismatches, return 409
-	if statRes.Info.Lock != nil && statRes.Info.Lock.LockId != lockID {
+	if statRes.GetInfo().GetLock() != nil && statRes.GetInfo().GetLock().GetLockId() != lockID {
 		logger.Error().
-			Str("LockID", statRes.Info.Lock.LockId).
+			Str("LockID", statRes.GetInfo().GetLock().GetLockId()).
 			Msg("PutFile: wrong lock")
 		// onlyoffice says it's required to send the current lockId, MS doesn't say anything
-		return statRes.Info.Lock.LockId, NewConnectorError(409, "Wrong lock")
+		return statRes.GetInfo().GetLock().GetLockId(), NewConnectorError(409, "Wrong lock")
 	}
 
 	// only unlocked uploads can go through if the target file is empty,
 	// otherwise the X-WOPI-Lock header is required even if there is no lock on the file
 	// This is part of the onlyoffice documentation (https://api.onlyoffice.com/editors/wopi/restapi/putfile)
 	// Wopivalidator fails some tests if we don't also check for the X-WOPI-Lock header.
-	if lockID == "" && statRes.Info.Lock == nil && statRes.Info.Size > 0 {
+	if lockID == "" && statRes.GetInfo().GetLock() == nil && statRes.GetInfo().GetSize() > 0 {
 		logger.Error().Msg("PutFile: file must be locked first")
 		// onlyoffice says to send an empty string if the file is unlocked, MS doesn't say anything
 		return "", NewConnectorError(409, "File must be locked first")
@@ -204,7 +204,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		Ref:    &wopiContext.FileReference,
 		LockId: lockID,
 		Options: &providerv1beta1.InitiateFileUploadRequest_IfMatch{
-			IfMatch: statRes.Info.Etag,
+			IfMatch: statRes.GetInfo().GetEtag(),
 		},
 	}
 
@@ -215,12 +215,12 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		return "", err
 	}
 
-	if resp.Status.Code != rpcv1beta1.Code_CODE_OK {
+	if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
 		logger.Error().
-			Str("StatusCode", resp.Status.Code.String()).
-			Str("StatusMsg", resp.Status.Message).
+			Str("StatusCode", resp.GetStatus().GetCode().String()).
+			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("UploadHelper: InitiateFileUpload failed with wrong status")
-		return "", NewConnectorError(500, resp.Status.GetCode().String()+" "+resp.Status.GetMessage())
+		return "", NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
 	}
 
 	// if the content length is greater than 0, we need to upload the content to the
@@ -231,11 +231,11 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		uploadToken := ""
 		hasUploadToken := false
 
-		for _, proto := range resp.Protocols {
-			if proto.Protocol == "simple" || proto.Protocol == "spaces" {
-				uploadEndpoint = proto.UploadEndpoint
-				uploadToken = proto.Token
-				hasUploadToken = proto.Token != ""
+		for _, proto := range resp.GetProtocols() {
+			if proto.GetProtocol() == "simple" || proto.GetProtocol() == "spaces" {
+				uploadEndpoint = proto.GetUploadEndpoint()
+				uploadToken = proto.GetToken()
+				hasUploadToken = proto.GetToken() != ""
 				break
 			}
 		}

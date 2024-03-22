@@ -64,8 +64,8 @@ func RegisterAppProvider(
 		return err
 	}
 
-	if resp.Status.Code != rpcv1beta1.Code_CODE_OK {
-		logger.Error().Str("status_code", resp.Status.Code.String()).Msg("AddAppProvider failed")
+	if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+		logger.Error().Str("status_code", resp.GetStatus().GetCode().String()).Msg("AddAppProvider failed")
 		return errors.New("status code != CODE_OK")
 	}
 
