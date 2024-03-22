@@ -62,11 +62,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Update to go 1.22: [#8586](https://github.com/owncloud/ocis/pull/8586)
 * Enhancement - Send more sse events: [#8587](https://github.com/owncloud/ocis/pull/8587)
 * Enhancement - Send SSE when file is locked/unlocked: [#8602](https://github.com/owncloud/ocis/pull/8602)
-* Enhancement - Bump Reva: [#8606](https://github.com/owncloud/ocis/pull/8606)
 * Enhancement - Add the spaceID to sse: [#8614](https://github.com/owncloud/ocis/pull/8614)
 * Enhancement - Update web to v9.0.0-alpha.2: [#8634](https://github.com/owncloud/ocis/pull/8634)
 * Enhancement - The graph endpoints for listing permission works for spaces now: [#8642](https://github.com/owncloud/ocis/pull/8642)
 * Enhancement - Bump keycloak: [#8687](https://github.com/owncloud/ocis/pull/8687)
+* Enhancement - Bump Reva: [#8701](https://github.com/owncloud/ocis/pull/8701)
+* Enhancement - Initiator-IDs: [#8701](https://github.com/owncloud/ocis/pull/8701)
 
 ## Details
 
@@ -225,12 +226,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8602
 
-* Enhancement - Bump Reva: [#8606](https://github.com/owncloud/ocis/pull/8606)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/8606
-
 * Enhancement - Add the spaceID to sse: [#8614](https://github.com/owncloud/ocis/pull/8614)
 
    Adds the spaceID to all clientlog sse messages
@@ -305,6 +300,22 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8569
    https://github.com/owncloud/ocis/pull/8687
+
+* Enhancement - Bump Reva: [#8701](https://github.com/owncloud/ocis/pull/8701)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/8701
+   https://github.com/owncloud/ocis/pull/8606
+
+* Enhancement - Initiator-IDs: [#8701](https://github.com/owncloud/ocis/pull/8701)
+
+   Allows sending a header `Initiator-ID` on http requests. This id will be added
+   to sse events so clients can figure out if their particular instance was
+   triggering the event. Additionally this adds the etag of the file/folder to all
+   sse events.
+
+   https://github.com/owncloud/ocis/pull/8701
 
 # Changelog for [5.0.0] (2024-03-18)
 
