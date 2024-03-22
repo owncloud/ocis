@@ -2329,3 +2329,50 @@ Feature: Send a sharing invitations
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
+
+  @issue-8495
+  Scenario Outline: try to share Shares space with a user
+    When user "Alice" sends the following share invitation for space using the Graph API:
+      | space           | Shares             |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "<error-message>"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | error-message                                                                                      |
+      | Space Viewer     | space type is not eligible for sharing                                                             |
+      | Space Editor     | space type is not eligible for sharing                                                             |
+      | Manager          | space type is not eligible for sharing                                                             |
+      | Co Owner         | Key: 'DriveItemInvite.Roles' Error:Field validation for 'Roles' failed on the 'available_role' tag |

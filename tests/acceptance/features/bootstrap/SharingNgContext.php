@@ -178,7 +178,7 @@ class SharingNgContext implements Context {
 			$resource = $rows['resource'] ?? '';
 
 			// for a disabled and deleted space, resource id is not accessible, so get resource id from the saved response
-			if ($resource === '' && $rows['space'] !== 'Personal') {
+			if ($resource === '' && !\in_array($rows['space'], ['Personal', 'Shares'])) {
 				$itemId = $space['fileId'];
 			} else {
 				$itemId = $this->spacesContext->getResourceId($user, $rows['space'], $resource);
