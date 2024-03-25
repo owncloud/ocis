@@ -112,7 +112,6 @@ type Service interface {
 	CreateLink(w http.ResponseWriter, r *http.Request)
 	SetLinkPassword(writer http.ResponseWriter, request *http.Request)
 
-	Invite(w http.ResponseWriter, r *http.Request)
 	ListPermissions(w http.ResponseWriter, r *http.Request)
 	UpdatePermission(w http.ResponseWriter, r *http.Request)
 	DeletePermission(w http.ResponseWriter, r *http.Request)
@@ -214,6 +213,16 @@ func NewService(opts ...Option) (Graph, error) {
 		return svc, err
 	}
 
+	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config.FilesSharing.EnableResharing)
+	if err != nil {
+		return svc, err
+	}
+
+	driveItemPermissionsApi, err := NewDriveItemPermissionsApi(driveItemPermissionsService, options.Logger)
+	if err != nil {
+		return svc, err
+	}
+
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 
@@ -231,7 +240,7 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Post("/root/children", drivesDriveItemApi.CreateDriveItem)
 					r.Route("/items/{itemID}", func(r chi.Router) {
 						r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
-						r.Post("/invite", svc.Invite)
+						r.Post("/invite", driveItemPermissionsApi.Invite)
 						r.Route("/permissions", func(r chi.Router) {
 							r.Get("/", svc.ListPermissions)
 							r.Route("/{permissionID}", func(r chi.Router) {

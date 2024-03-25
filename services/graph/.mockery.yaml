@@ -8,6 +8,7 @@ packages:
             dir: "mocks"
         interfaces:
             DrivesDriveItemProvider:
+            DriveItemPermissionsProvider:
             HTTPClient:
             Permissions:
             Publisher:
