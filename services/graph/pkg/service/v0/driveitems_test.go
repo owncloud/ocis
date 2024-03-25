@@ -12,7 +12,6 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
@@ -64,6 +63,7 @@ var _ = Describe("Driveitems", func() {
 		identityBackend        *identitymocks.Backend
 		getPublicShareResponse *link.GetPublicShareResponse
 		getShareResponse       *collaboration.GetShareResponse
+		listSpacesResponse     *provider.ListStorageSpacesResponse
 
 		rr *httptest.ResponseRecorder
 
@@ -93,6 +93,31 @@ var _ = Describe("Driveitems", func() {
 		}
 		getShareResponse = &collaboration.GetShareResponse{
 			Status: status.NewNotFound(ctx, "not found"),
+		}
+
+		grantMapJSON, _ := json.Marshal(
+			map[string]*provider.ResourcePermissions{
+				"userid": roleconversions.NewSpaceViewerRole().CS3ResourcePermissions(),
+			},
+		)
+		spaceOpaque := &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"grants": {
+					Decoder: "json",
+					Value:   grantMapJSON,
+				},
+			},
+		}
+		listSpacesResponse = &provider.ListStorageSpacesResponse{
+			Status: status.NewOK(ctx),
+			StorageSpaces: []*provider.StorageSpace{
+				{
+					Id: &provider.StorageSpaceId{
+						OpaqueId: "2",
+					},
+					Opaque: spaceOpaque,
+				},
+			},
 		}
 
 		identityBackend = &identitymocks.Backend{}
@@ -277,7 +302,7 @@ var _ = Describe("Driveitems", func() {
 			driveItemPermission           *libregraph.Permission
 			getShareMockResponse          *collaboration.GetShareResponse
 			getPublicShareMockResponse    *link.GetPublicShareResponse
-			getUserMockResponse           *user.GetUserResponse
+			getUserMockResponse           *userpb.GetUserResponse
 			updateShareMockResponse       *collaboration.UpdateShareResponse
 			updatePublicShareMockResponse *link.UpdatePublicShareResponse
 		)
@@ -323,7 +348,7 @@ var _ = Describe("Driveitems", func() {
 				Grantee: &provider.Grantee{
 					Type: provider.GranteeType_GRANTEE_TYPE_USER,
 					Id: &provider.Grantee_UserId{
-						UserId: &user.UserId{
+						UserId: &userpb.UserId{
 							OpaqueId: "userid",
 						},
 					},
@@ -397,8 +422,33 @@ var _ = Describe("Driveitems", func() {
 					Type: provider.ResourceType_RESOURCE_TYPE_CONTAINER,
 				},
 			}
-
 			statMock.Return(statResponse, nil)
+			spaceRootStatMock := gatewayClient.On("Stat",
+				mock.Anything,
+				mock.MatchedBy(func(req *provider.StatRequest) bool {
+					return utils.ResourceIDEqual(
+						req.GetRef().GetResourceId(),
+						&provider.ResourceId{
+							StorageId: "1",
+							SpaceId:   "2",
+							OpaqueId:  "2",
+						},
+					)
+				}))
+
+			spaceRootStatMock.Return(
+				&provider.StatResponse{
+					Status: status.NewOK(ctx),
+					Info: &provider.ResourceInfo{
+						Id: &provider.ResourceId{
+							StorageId: "1",
+							SpaceId:   "2",
+							OpaqueId:  "2",
+						},
+						Type: provider.ResourceType_RESOURCE_TYPE_CONTAINER,
+					},
+				}, nil)
+
 		})
 		It("fails when no share is found", func() {
 			getShareMockResponse.Share = nil
@@ -615,6 +665,8 @@ var _ = Describe("Driveitems", func() {
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 		It("updates the expiration date", func() {
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
 			expiration := time.Now().Add(time.Hour)
 			updateShareMock := gatewayClient.On("UpdateShare",
 				mock.Anything,
@@ -647,6 +699,8 @@ var _ = Describe("Driveitems", func() {
 			Expect(res.GetExpirationDateTime().Equal(expiration)).To(BeTrue())
 		})
 		It("deletes the expiration date", func() {
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
 			updateShareMock := gatewayClient.On("UpdateShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
@@ -678,6 +732,8 @@ var _ = Describe("Driveitems", func() {
 			Expect(ok).To(BeFalse())
 		})
 		It("updates the share permissions with changing the role", func() {
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
 			updateShareMock := gatewayClient.On("UpdateShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
@@ -706,6 +762,8 @@ var _ = Describe("Driveitems", func() {
 			Expect(ok).To(BeTrue())
 		})
 		It("fails to update the share permissions for a file share when setting a space specific role", func() {
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
 			updateShareMock := gatewayClient.On("UpdateShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
@@ -724,7 +782,44 @@ var _ = Describe("Driveitems", func() {
 			)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
+		It("fails to update the space permissions for a space share when setting a file specific role", func() {
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			gatewayClient.On("GetPublicShare",
+				mock.Anything,
+				mock.Anything,
+			).Return(getPublicShareMockResponse, nil)
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
+
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			updateShareMock := gatewayClient.On("UpdateShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
+					return req.GetShare().GetId().GetOpaqueId() == "permissionid"
+				}),
+			)
+			updateShareMock.Return(updateShareMockResponse, nil)
+
+			driveItemPermission.SetRoles([]string{unifiedrole.NewFileEditorUnifiedRole(false).GetId()})
+			body, err := driveItemPermission.MarshalJSON()
+			Expect(err).To(BeNil())
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "1$2")
+			// This is a space root
+			rctx.URLParams.Add("itemID", "1$2!2")
+			rctx.URLParams.Add("permissionID", "u:userid")
+			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+			svc.UpdatePermission(
+				rr,
+				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
+					WithContext(ctx),
+			)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
 		It("updates the share permissions when changing the resource permission actions", func() {
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
 			updateShareMock := gatewayClient.On("UpdateShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
@@ -1324,32 +1419,7 @@ var _ = Describe("Driveitems", func() {
 			rctx.URLParams.Add("driveID", "1$2")
 			rctx.URLParams.Add("itemID", "1$2!2")
 			statResponse.Info.Id.OpaqueId = "2"
-			grantMap := map[string]*provider.ResourcePermissions{
-				"userid": roleconversions.NewSpaceViewerRole().CS3ResourcePermissions(),
-			}
-			grantMapJSON, _ := json.Marshal(grantMap)
-			spaceOpaque := &types.Opaque{
-				Map: map[string]*types.OpaqueEntry{
-					"grants": {
-						Decoder: "json",
-						Value:   grantMapJSON,
-					},
-				},
-			}
-
-			listSpacesMock := gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything)
-			listSpacesResponse := &provider.ListStorageSpacesResponse{
-				Status: status.NewOK(ctx),
-				StorageSpaces: []*provider.StorageSpace{
-					{
-						Id: &provider.StorageSpaceId{
-							OpaqueId: "2",
-						},
-						Opaque: spaceOpaque,
-					},
-				},
-			}
-			listSpacesMock.Return(listSpacesResponse, nil)
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
 
 			getUserMock := gatewayClient.On("GetUser", mock.Anything, mock.Anything)
 			getUserMockResponse := &userpb.GetUserResponse{

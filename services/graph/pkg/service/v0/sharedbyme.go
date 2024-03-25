@@ -124,7 +124,7 @@ func (g Graph) cs3UserSharesToDriveItems(ctx context.Context, shares []*collabor
 			}
 			item = *itemptr
 		}
-		perm, err := g.cs3UserShareToPermission(ctx, s)
+		perm, err := g.cs3UserShareToPermission(ctx, s, false)
 
 		var errcode errorcode.Error
 		switch {
@@ -140,10 +140,12 @@ func (g Graph) cs3UserSharesToDriveItems(ctx context.Context, shares []*collabor
 	return driveItems, nil
 }
 
-func (g Graph) cs3UserShareToPermission(ctx context.Context, share *collaboration.Share) (*libregraph.Permission, error) {
+func (g Graph) cs3UserShareToPermission(ctx context.Context, share *collaboration.Share, isSpacePermission bool) (*libregraph.Permission, error) {
 	perm := libregraph.Permission{}
 	perm.SetRoles([]string{})
-	perm.SetId(share.Id.OpaqueId)
+	if !isSpacePermission {
+		perm.SetId(share.GetId().GetOpaqueId())
+	}
 	grantedTo := libregraph.SharePointIdentitySet{}
 	switch share.GetGrantee().GetType() {
 	case storageprovider.GranteeType_GRANTEE_TYPE_USER:
@@ -157,6 +159,9 @@ func (g Graph) cs3UserShareToPermission(ctx context.Context, share *collaboratio
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
 		default:
 			grantedTo.SetUser(user)
+			if isSpacePermission {
+				perm.SetId("u:" + user.GetId())
+			}
 		}
 	case storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
 		group, err := groupIdToIdentity(ctx, g.identityCache, share.Grantee.GetGroupId().GetOpaqueId())
@@ -169,6 +174,9 @@ func (g Graph) cs3UserShareToPermission(ctx context.Context, share *collaboratio
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
 		default:
 			grantedTo.SetGroup(group)
+			if isSpacePermission {
+				perm.SetId("g:" + group.GetId())
+			}
 		}
 	}
 
@@ -176,9 +184,13 @@ func (g Graph) cs3UserShareToPermission(ctx context.Context, share *collaboratio
 	if share.GetExpiration() != nil {
 		perm.SetExpirationDateTime(cs3TimestampToTime(share.GetExpiration()))
 	}
+	condition := unifiedrole.UnifiedRoleConditionGrantee
+	if isSpacePermission {
+		condition = unifiedrole.UnifiedRoleConditionOwner
+	}
 	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
 		*share.GetPermissions().GetPermissions(),
-		unifiedrole.UnifiedRoleConditionGrantee,
+		condition,
 		g.config.FilesSharing.EnableResharing,
 	)
 	if role != nil {
