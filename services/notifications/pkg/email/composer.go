@@ -2,29 +2,36 @@ package email
 
 import (
 	"bytes"
+	"embed"
 	"strings"
 	"text/template"
 
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/email/l10n"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+)
+
+var (
+	//go:embed l10n/locale
+	_translationFS embed.FS
+	_domain        = "notifications"
 )
 
 // NewTextTemplate replace the body message template placeholders with the translated template
 func NewTextTemplate(mt MessageTemplate, locale, defaultLocale string, translationPath string, vars map[string]string) (MessageTemplate, error) {
 	var err error
-	t := l10n.NewTranslator(locale, defaultLocale, translationPath)
-	mt.Subject, err = composeMessage(t.Translate(mt.Subject), vars)
+	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, translationPath, _translationFS, "l10n/locale").Locale(locale)
+	mt.Subject, err = composeMessage(t.Get(mt.Subject), vars)
 	if err != nil {
 		return mt, err
 	}
-	mt.Greeting, err = composeMessage(t.Translate(mt.Greeting), vars)
+	mt.Greeting, err = composeMessage(t.Get(mt.Greeting), vars)
 	if err != nil {
 		return mt, err
 	}
-	mt.MessageBody, err = composeMessage(t.Translate(mt.MessageBody), vars)
+	mt.MessageBody, err = composeMessage(t.Get(mt.MessageBody), vars)
 	if err != nil {
 		return mt, err
 	}
-	mt.CallToAction, err = composeMessage(t.Translate(mt.CallToAction), vars)
+	mt.CallToAction, err = composeMessage(t.Get(mt.CallToAction), vars)
 	if err != nil {
 		return mt, err
 	}
@@ -34,20 +41,20 @@ func NewTextTemplate(mt MessageTemplate, locale, defaultLocale string, translati
 // NewHTMLTemplate replace the body message template placeholders with the translated template
 func NewHTMLTemplate(mt MessageTemplate, locale, defaultLocale string, translationPath string, vars map[string]string) (MessageTemplate, error) {
 	var err error
-	t := l10n.NewTranslator(locale, defaultLocale, translationPath)
-	mt.Subject, err = composeMessage(t.Translate(mt.Subject), vars)
+	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, translationPath, _translationFS, "l10n/locale").Locale(locale)
+	mt.Subject, err = composeMessage(t.Get(mt.Subject), vars)
 	if err != nil {
 		return mt, err
 	}
-	mt.Greeting, err = composeMessage(newlineToBr(t.Translate(mt.Greeting)), vars)
+	mt.Greeting, err = composeMessage(newlineToBr(t.Get(mt.Greeting)), vars)
 	if err != nil {
 		return mt, err
 	}
-	mt.MessageBody, err = composeMessage(newlineToBr(t.Translate(mt.MessageBody)), vars)
+	mt.MessageBody, err = composeMessage(newlineToBr(t.Get(mt.MessageBody)), vars)
 	if err != nil {
 		return mt, err
 	}
-	mt.CallToAction, err = composeMessage(callToActionToHTML(t.Translate(mt.CallToAction)), vars)
+	mt.CallToAction, err = composeMessage(callToActionToHTML(t.Get(mt.CallToAction)), vars)
 	if err != nil {
 		return mt, err
 	}
