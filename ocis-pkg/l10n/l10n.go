@@ -43,9 +43,10 @@ func (t Translator) Translate(str, locale string) string {
 // Locale returns the gotext.Locale, use `.Get` method to translate strings
 func (t Translator) Locale(locale string) *gotext.Locale {
 	l := gotext.NewLocaleFS(locale, t.fs)
+	l.AddDomain(t.domain) // make domain configurable only if needed
 	if locale != "en" && len(l.GetTranslations()) == 0 {
 		l = gotext.NewLocaleFS(t.defaultLocale, t.fs)
+		l.AddDomain(t.domain) // make domain configurable only if needed
 	}
-	l.AddDomain(t.domain) // make domain configurable only if needed
 	return l
 }

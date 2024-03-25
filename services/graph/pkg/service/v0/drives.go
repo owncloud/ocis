@@ -424,8 +424,8 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	space := resp.GetStorageSpace()
-	if driveType == _spaceTypeProject {
-		if err := g.applySpaceTemplate(gatewayClient, resp.GetStorageSpace().GetRoot(), r.URL.Query().Get("template")); err != nil {
+	if t := r.URL.Query().Get("template"); t != "" && driveType == _spaceTypeProject {
+		if err := g.applySpaceTemplate(r.Context(), gatewayClient, resp.GetStorageSpace().GetRoot(), t); err != nil {
 			logger.Error().Err(err).Msg("could not apply template to space")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 			return

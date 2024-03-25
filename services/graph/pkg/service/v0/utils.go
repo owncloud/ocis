@@ -446,7 +446,7 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 	return permission, nil
 }
 
-func (g Graph) applySpaceTemplate(gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId, template string) error {
+func (g Graph) applySpaceTemplate(ctx context.Context, gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId, template string) error {
 	var fsys fs.ReadDirFS
 
 	switch template {
@@ -464,11 +464,6 @@ func (g Graph) applySpaceTemplate(gwc gateway.GatewayAPIClient, root *storagepro
 
 	mdc := metadata.NewCS3(g.config.Reva.Address, g.config.Spaces.StorageUsersAddress)
 	mdc.SpaceRoot = root
-
-	ctx, err := utils.GetServiceUserContext(g.config.ServiceAccount.ServiceAccountID, gwc, g.config.ServiceAccount.ServiceAccountSecret)
-	if err != nil {
-		return err
-	}
 
 	opaque, err := uploadFolder(ctx, mdc, ".", "", nil, fsys)
 	if err != nil {

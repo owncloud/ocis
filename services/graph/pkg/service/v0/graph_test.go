@@ -764,6 +764,12 @@ var _ = Describe("Graph", func() {
 						Constraint: v0.Permission_CONSTRAINT_ALL,
 					},
 				}, nil)
+
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status:     status.NewOK(ctx),
+					TotalBytes: 500,
+				}, nil)
+
 				jsonBody := []byte(`{"Name": "Test Space", "DriveType": "project", "Description": "This space is for testing", "DriveAlias": "project/testspace"}`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
