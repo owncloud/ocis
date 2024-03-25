@@ -889,7 +889,7 @@ Feature: Send a sharing invitations
               "code": {
                 "type": "string",
                 "enum": [
-                  "generalException"
+                  "invalidRequest"
                 ]
               },
               "message": {
@@ -940,7 +940,7 @@ Feature: Send a sharing invitations
             "properties": {
               "code": {
                 "type": "string",
-                "pattern": "generalException"
+                "pattern": "invalidRequest"
               },
               "message": {
                 "type": "string",
@@ -1113,7 +1113,7 @@ Feature: Send a sharing invitations
               "code": {
                 "type": "string",
                 "enum": [
-                  "generalException"
+                  "invalidRequest"
                 ]
               },
               "message": {
@@ -1224,7 +1224,7 @@ Feature: Send a sharing invitations
             "properties": {
               "code": {
                 "type": "string",
-                "enum": ["generalException"]
+                "enum": ["invalidRequest"]
               },
               "message": {
                 "type": "string",
@@ -2375,14 +2375,14 @@ Feature: Send a sharing invitations
       | sharee            | grp1                 |
       | shareType         | group                |
       | permissionsAction | <permissions-action> |
-    Then the HTTP status code should be "400" 
+    Then the HTTP status code should be "400"
     When user "Alice" sends the following share invitation using the Graph API:
       | resource          | FolderToShare        |
       | space             | Personal             |
       | sharee            | Brian                |
       | shareType         | user                 |
       | permissionsAction | <permissions-action> |
-    Then the HTTP status code should be "400" 
+    Then the HTTP status code should be "400"
     Examples:
       | permissions-action |
       | permissions/create |
