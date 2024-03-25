@@ -14,11 +14,20 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 )
 
+// RegisterOcisService will register this service.
+// There are no explicit requirements for the context, and it will be passed
+// without changes to the underlying RegisterService method.
 func RegisterOcisService(ctx context.Context, cfg *config.Config, logger log.Logger) error {
 	svc := registry.BuildGRPCService(cfg.Service.Name, uuid.Must(uuid.NewV4()).String(), cfg.GRPC.Addr, "0.0.0")
 	return registry.RegisterService(ctx, svc, logger)
 }
 
+// RegisterAppProvider will register this service as app provider in REVA.
+// The GatewayAPIClient is expected to be provided via `helpers.GetCS3apiClient`.
+// The appUrls are expected to be provided via `helpers.GetAppURLs`
+//
+// Note that this method doesn't provide a re-registration mechanism, so it
+// will register the service once
 func RegisterAppProvider(
 	ctx context.Context,
 	cfg *config.Config,

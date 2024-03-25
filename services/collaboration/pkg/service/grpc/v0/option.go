@@ -39,7 +39,7 @@ func Config(val *config.Config) Option {
 	}
 }
 
-// ViewUrl provides a function to set the ViewUrl option.
+// AppURLs provides a function to set the AppURLs option.
 func AppURLs(val map[string]map[string]string) Option {
 	return func(o *Options) {
 		o.AppURLs = val

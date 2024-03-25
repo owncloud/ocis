@@ -21,6 +21,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 )
 
+// NewHandler creates a new grpc service implementing the OpenInApp interface
 func NewHandler(opts ...Option) (*Service, func(), error) {
 	teardown := func() {}
 	options := newOptions(opts...)
@@ -39,7 +40,7 @@ func NewHandler(opts ...Option) (*Service, func(), error) {
 	}, teardown, nil
 }
 
-// Service implements the searchServiceHandler interface
+// Service implements the OpenInApp interface
 type Service struct {
 	id      string
 	appURLs map[string]map[string]string
