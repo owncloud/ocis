@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -112,6 +113,7 @@ type Settings struct {
 
 	CookieBackendURI string
 	CookieNames      []string
+	CookieSameSite   http.SameSite
 
 	AccessTokenDurationSeconds        uint64 `yaml:"access_token_duration_seconds" env:"IDP_ACCESS_TOKEN_EXPIRATION" desc:"'Access token lifespan in seconds (time before an access token is expired).'" introductionVersion:"pre5.0"`
 	IDTokenDurationSeconds            uint64 `yaml:"id_token_duration_seconds" env:"IDP_ID_TOKEN_EXPIRATION" desc:"ID token lifespan in seconds (time before an ID token is expired)." introductionVersion:"pre5.0"`

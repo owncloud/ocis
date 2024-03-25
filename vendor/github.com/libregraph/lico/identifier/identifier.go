@@ -32,8 +32,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/longsleep/rndm"
 	"github.com/sirupsen/logrus"
-	jose "gopkg.in/square/go-jose.v2"
-	jwt "gopkg.in/square/go-jose.v2/jwt"
+	"gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2/jwt"
+
+	"github.com/libregraph/oidc-go"
 
 	konnect "github.com/libregraph/lico"
 	"github.com/libregraph/lico/identifier/backends"
@@ -44,7 +46,6 @@ import (
 	"github.com/libregraph/lico/identity/clients"
 	"github.com/libregraph/lico/managers"
 	"github.com/libregraph/lico/utils"
-	"github.com/libregraph/oidc-go"
 )
 
 // audienceMarker defines the value which gets included in logon cookies. Valid
@@ -62,9 +63,15 @@ type Identifier struct {
 	baseURI         *url.URL
 	pathPrefix      string
 	staticFolder    string
-	logonCookieName string
 	scopesConf      string
 	webappIndexHTML []byte
+
+	logonCookieName     string
+	logonCookieSameSite http.SameSite
+
+	consentCookieSameSite http.SameSite
+
+	stateCookieSameSite http.SameSite
 
 	authorizationEndpointURI *url.URL
 	signedOutEndpointURI     *url.URL
@@ -114,9 +121,15 @@ func NewIdentifier(c *Config) (*Identifier, error) {
 		baseURI:         c.BaseURI,
 		pathPrefix:      c.PathPrefix,
 		staticFolder:    staticFolder,
-		logonCookieName: c.LogonCookieName,
 		scopesConf:      c.ScopesConf,
 		webappIndexHTML: webappIndexHTML,
+
+		logonCookieName:     c.LogonCookieName,
+		logonCookieSameSite: c.LogonCookieSameSite,
+
+		consentCookieSameSite: c.ConsentCookieSameSite,
+
+		stateCookieSameSite: c.StateCookieSameSite,
 
 		authorizationEndpointURI: c.AuthorizationEndpointURI,
 		signedOutEndpointURI:     c.SignedOutEndpointURI,

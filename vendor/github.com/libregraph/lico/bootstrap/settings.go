@@ -17,6 +17,10 @@
 
 package bootstrap
 
+import (
+	"net/http"
+)
+
 // Settings is a typed application config which represents the user accessible
 // boostrap settings params.
 type Settings struct {
@@ -48,6 +52,7 @@ type Settings struct {
 	ValidationKeysPath                string
 	CookieBackendURI                  string
 	CookieNames                       []string
+	CookieSameSite                    http.SameSite
 	AccessTokenDurationSeconds        uint64
 	IDTokenDurationSeconds            uint64
 	RefreshTokenDurationSeconds       uint64
