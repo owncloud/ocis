@@ -21,6 +21,7 @@ import (
 	"crypto"
 	"crypto/tls"
 	"crypto/x509"
+	"net/http"
 	"net/url"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -64,4 +65,6 @@ type Config struct {
 	IDTokenDurationSeconds            uint64
 	RefreshTokenDurationSeconds       uint64
 	DyamicClientSecretDurationSeconds uint64
+
+	CookieSameSite http.SameSite
 }

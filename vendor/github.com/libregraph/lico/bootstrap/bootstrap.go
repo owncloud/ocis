@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -58,6 +59,7 @@ const (
 	DefaultSigningKeyBits = 2048
 
 	DefaultGuestIdentityManagerName = "guest"
+	DefaultCookieSameSite           = http.SameSiteNoneMode
 )
 
 // Bootstrap is a data structure to hold configuration required to start
@@ -332,6 +334,12 @@ func (bs *bootstrap) initialize(settings *Settings) error {
 	}
 	bs.config.DyamicClientSecretDurationSeconds = settings.DyamicClientSecretDurationSeconds
 
+	// add setting to allow setting the same site attribute of the cookies
+	bs.config.CookieSameSite = settings.CookieSameSite
+	if bs.config.CookieSameSite == 0 {
+		bs.config.CookieSameSite = DefaultCookieSameSite
+	}
+
 	return nil
 }
 
@@ -472,11 +480,13 @@ func (bs *bootstrap) setupOIDCProvider(ctx context.Context) (*oidcProvider.Provi
 		CheckSessionIframePath: bs.MakeURIPath(APITypeKonnect, "/session/check-session.html"),
 		RegistrationPath:       registrationPath,
 
-		BrowserStateCookiePath: bs.MakeURIPath(APITypeKonnect, "/session/"),
-		BrowserStateCookieName: "__Secure-KKBS", // Kopano-Konnect-Browser-State
+		BrowserStateCookiePath:     bs.MakeURIPath(APITypeKonnect, "/session/"),
+		BrowserStateCookieName:     "__Secure-KKBS", // Kopano-Konnect-Browser-State
+		BrowserStateCookieSameSite: bs.config.CookieSameSite,
 
-		SessionCookiePath: sessionCookiePath,
-		SessionCookieName: "__Secure-KKCS", // Kopano-Konnect-Client-Session
+		SessionCookiePath:     sessionCookiePath,
+		SessionCookieName:     "__Secure-KKCS", // Kopano-Konnect-Client-Session
+		SessionCookieSameSite: bs.config.CookieSameSite,
 
 		AccessTokenDuration:  time.Duration(bs.config.AccessTokenDurationSeconds) * time.Second,
 		IDTokenDuration:      time.Duration(bs.config.IDTokenDurationSeconds) * time.Second,
