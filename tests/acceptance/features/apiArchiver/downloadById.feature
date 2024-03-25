@@ -147,3 +147,17 @@ Feature: download multiple resources bundled into an archive
       | user-agent | archive-type |
       | Linux      | tar          |
       | Windows NT | zip          |
+
+
+  Scenario: user download the file shared with them using sharingNG API
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "to share" to "textfile.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When user "Brian" downloads a file "/Shares/textfile.txt" with file id using spaces WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "to share"

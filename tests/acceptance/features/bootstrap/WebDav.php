@@ -1496,6 +1496,25 @@ trait WebDav {
 	}
 
 	/**
+	 * @When user :user downloads a file :path with file id using :davChoice WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $davChoice
+	 *
+	 * @return void
+	 */
+	public function userDownloadsAFileWithFileIdUsingTheWebdavApi(
+		string $user,
+		string $path,
+		string $davChoice
+	):void {
+		$fileid = $this->getFileIdForPath($user, $path);
+		$this->usingOldOrNewDavPath($davChoice);
+		$this->setResponse($this->downloadFileAsUserUsingPassword($user, $fileid, null, null, "download"));
+	}
+
+	/**
 	 * @When user :user using password :password downloads the file :fileName using the WebDAV API
 	 *
 	 * @param string $user
@@ -1517,6 +1536,7 @@ trait WebDav {
 	 * @param string $fileName
 	 * @param string|null $password
 	 * @param array|null $headers
+	 * @param string|null $type
 	 *
 	 * @return ResponseInterface
 	 */
@@ -1524,7 +1544,8 @@ trait WebDav {
 		string $user,
 		string $fileName,
 		?string $password = null,
-		?array $headers = []
+		?array $headers = [],
+		?string $type = "files"
 	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$password = $this->getActualPassword($password);
@@ -1534,7 +1555,7 @@ trait WebDav {
 			$fileName,
 			$headers,
 			null,
-			"files",
+			$type,
 			null,
 			false,
 			$password

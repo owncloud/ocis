@@ -755,6 +755,9 @@ class WebDavHelper {
 			if ($type === "trash-bin") {
 				return "remote.php/dav/spaces/trash-bin/" . $spaceId . '/';
 			}
+			if ($type === "download") {
+				return "dav/spaces/";
+			}
 			return "remote.php/dav/spaces/" . $spaceId . '/';
 		} else {
 			if ($davPathVersionToUse === self::DAV_VERSION_OLD) {
@@ -764,7 +767,7 @@ class WebDavHelper {
 				}
 				return "remote.php/webdav/";
 			} elseif ($davPathVersionToUse === self::DAV_VERSION_NEW) {
-				if ($type === "files") {
+				if ($type === "files" || $type === "download") {
 					$path = 'remote.php/dav/files/';
 					return $path . $user . '/';
 				} elseif ($type === "trash-bin") {
