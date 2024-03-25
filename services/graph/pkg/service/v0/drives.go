@@ -423,27 +423,37 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	space := resp.GetStorageSpace()
 	if driveType == _spaceTypeProject {
-		opaque, err := g.applySpaceTemplate(gatewayClient, resp.GetStorageSpace().GetRoot(), r.URL.Query().Get("template"))
-		if err != nil {
+		if err := g.applySpaceTemplate(gatewayClient, resp.GetStorageSpace().GetRoot(), r.URL.Query().Get("template")); err != nil {
 			logger.Error().Err(err).Msg("could not apply template to space")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		resp.StorageSpace.Opaque = utils.MergeOpaques(resp.GetStorageSpace().GetOpaque(), opaque)
+		// refetch the drive to get quota information - should we calculate this ourselves to avoid the extra call?
+		space, err = utils.GetSpace(r.Context(), resp.GetStorageSpace().GetId().GetOpaqueId(), gatewayClient)
+		if err != nil {
+			logger.Error().Err(err).Msg("could not refetch space")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
 
-	newDrive, err := g.cs3StorageSpaceToDrive(r.Context(), webDavBaseURL, resp.GetStorageSpace(), APIVersion_1)
+	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1)
 	if err != nil {
-		logger.Debug().Err(err).Msg("could not create drive: error parsing drive")
+		logger.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	newDrive.Special = g.getSpecialDriveItems(r.Context(), webDavBaseURL, resp.GetStorageSpace())
+	if len(spaces) == 0 {
+		logger.Error().Msg("could not convert space")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not convert space")
+		return
+	}
 
 	render.Status(r, http.StatusCreated)
-	render.JSON(w, r, newDrive)
+	render.JSON(w, r, spaces[0])
 }
 
 // UpdateDrive updates the properties of a storage drive (space).

@@ -446,18 +446,18 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 	return permission, nil
 }
 
-func (g Graph) applySpaceTemplate(gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId, template string) (*v1beta1.Opaque, error) {
+func (g Graph) applySpaceTemplate(gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId, template string) error {
 	var fsys fs.ReadDirFS
 
 	switch template {
 	default:
 		fallthrough
 	case "none":
-		return &v1beta1.Opaque{}, nil
+		return nil
 	case "default":
 		f, err := fs.Sub(_spaceTemplateFS, "spacetemplate")
 		if err != nil {
-			return nil, err
+			return err
 		}
 		fsys = f.(fs.ReadDirFS)
 	}
@@ -467,12 +467,12 @@ func (g Graph) applySpaceTemplate(gwc gateway.GatewayAPIClient, root *storagepro
 
 	ctx, err := utils.GetServiceUserContext(g.config.ServiceAccount.ServiceAccountID, gwc, g.config.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	opaque, err := uploadFolder(ctx, mdc, ".", "", nil, fsys)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	resp, err := gwc.UpdateStorageSpace(ctx, &storageprovider.UpdateStorageSpaceRequest{
@@ -486,11 +486,11 @@ func (g Graph) applySpaceTemplate(gwc gateway.GatewayAPIClient, root *storagepro
 	})
 	switch {
 	case err != nil:
-		return nil, err
+		return err
 	case resp.GetStatus().GetCode() != rpc.Code_CODE_OK:
-		return nil, fmt.Errorf("could not update storage space: %s", resp.GetStatus().GetMessage())
+		return fmt.Errorf("could not update storage space: %s", resp.GetStatus().GetMessage())
 	default:
-		return opaque, nil
+		return nil
 	}
 }
 
