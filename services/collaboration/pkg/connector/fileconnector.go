@@ -38,6 +38,14 @@ func NewFileConnector(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *
 
 // GetLock returns a lock or an empty string if no lock exists
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/getlock
+//
+// The context MUST have a WOPI context, otherwise an error will be returned.
+// You can pass a pre-configured zerologger instance through the context that
+// will be used to log messages.
+//
+// The lock ID applied to the file reference in the context will be returned
+// (if any). An error will be returned if something goes wrong. The error
+// could be a ConnectorError
 func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
@@ -80,6 +88,21 @@ func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
 // Lock returns a WOPI lock or performs an unlock and relock
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/lock
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/unlockandrelock
+//
+// The context MUST have a WOPI context, otherwise an error will be returned.
+// You can pass a pre-configured zerologger instance through the context that
+// will be used to log messages.
+//
+// Lock the file reference contained in the context with the provided lockID.
+// The oldLockID is only used for the "unlock and relock" operation. The "lock"
+// operation doesn't use the oldLockID and needs to be empty in this case.
+//
+// For the "lock" operation, if the operation is successful, an empty lock id
+// will be returned without any error. In case of conflict, the current lock
+// id will be returned along with a 409 ConnectorError. For any other error,
+// the method will return an empty lock id.
+//
+// For the "unlock and relock" operation, the behavior will be the same.
 func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (string, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
@@ -207,6 +230,17 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 
 // RefreshLock refreshes a provided lock for 30 minutes
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/refreshlock
+//
+// The context MUST have a WOPI context, otherwise an error will be returned.
+// You can pass a pre-configured zerologger instance through the context that
+// will be used to log messages.
+//
+// If the operation is successful, an empty lock id will be returned without
+// any error. In case of conflict, the current lock id will be returned
+// along with a 409 ConnectorError. For any other error, the method will
+// return an empty lock id.
+// The conflict happens if the provided lockID doesn't match the one actually
+// applied in the target file.
 func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
@@ -304,6 +338,17 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 
 // UnLock removes a given lock from a file
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/unlock
+//
+// The context MUST have a WOPI context, otherwise an error will be returned.
+// You can pass a pre-configured zerologger instance through the context that
+// will be used to log messages.
+//
+// If the operation is successful, an empty lock id will be returned without
+// any error. In case of conflict, the current lock id will be returned
+// along with a 409 ConnectorError. For any other error, the method will
+// return an empty lock id.
+// The conflict happens if the provided lockID doesn't match the one actually
+// applied in the target file.
 func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
@@ -389,6 +434,13 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 
 // CheckFileInfo returns information about the requested file and capabilities of the wopi server
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo
+//
+// The context MUST have a WOPI context, otherwise an error will be returned.
+// You can pass a pre-configured zerologger instance through the context that
+// will be used to log messages.
+//
+// If the operation is successful, a "FileInfo" instance will be returned,
+// otherwise the "FileInfo" will be empty and an error will be returned.
 func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {

@@ -18,6 +18,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// ContentConnector implements the "File contents" endpoint.
+// Basically, the ContentConnector handles downloads (GetFile) and
+// uploads (PutFile)
+// Note that operations might return any kind of error, not just ConnectorError
 type ContentConnector struct {
 	gwc gatewayv1beta1.GatewayAPIClient
 	cfg *config.Config
@@ -32,6 +36,13 @@ func NewContentConnector(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config
 
 // GetFile downloads the file from the storage
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/getfile
+//
+// The context MUST have a WOPI context, otherwise an error will be returned.
+// You can pass a pre-configured zerologger instance through the context that
+// will be used to log messages.
+//
+// The contents of the file will be written directly into the writer passed as
+// parameter.
 func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
@@ -138,6 +149,24 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 
 // PutFile uploads the file to the storage
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/putfile
+//
+// The context MUST have a WOPI context, otherwise an error will be returned.
+// You can pass a pre-configured zerologger instance through the context that
+// will be used to log messages.
+//
+// The contents of the file will be read from the stream. The full stream
+// length must be provided in order to upload the file.
+//
+// A lock ID must be provided for the upload (which must match the lock in the
+// file). The only case where an empty lock ID can be used is if the target
+// file has 0 size.
+//
+// This method will return the lock ID that should be returned in case of a
+// conflict, otherwise it will return an empty string. This means that if the
+// method returns a ConnectorError with code 409, the returned string is the
+// lock ID that should be used in the X-WOPI-Lock header. In other error
+// cases or if the method is successful, an empty string will be returned
+// (check for err != nil to know if something went wrong)
 func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (string, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {

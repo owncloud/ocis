@@ -1,5 +1,9 @@
 package connector
 
+// ConnectorError defines an error in the connector. It contains an error code
+// and a message.
+// For convenience, the error code can be used as HTTP error code, although
+// the connector shouldn't know anything about HTTP.
 type ConnectorError struct {
 	HttpCodeOut int
 	Msg         string
@@ -16,6 +20,15 @@ func NewConnectorError(code int, msg string) *ConnectorError {
 	}
 }
 
+// Connector will implement the WOPI operations.
+// For convenience, the connector splits the operations based on the
+// WOPI endpoints, so you'll need to get the specific connector first.
+//
+// Available endpoints:
+// * "Files" -> GetFileConnector()
+// * "File contents" -> GetContentConnector()
+//
+// Other endpoints aren't available for now.
 type Connector struct {
 	fileConnector    *FileConnector
 	contentConnector *ContentConnector

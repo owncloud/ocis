@@ -1,5 +1,11 @@
 package connector
 
+// FileInfo contains the properties of the file.
+// Some properties refer to capabilities in the WOPI client, and capabilities
+// that the WOPI server has.
+//
+// For now, the FileInfo contains data for Microsoft, Collabora and OnlyOffice.
+// Not all the properties are supported by every system.
 type FileInfo struct {
 	// ------------
 	// Microsoft WOPI check file info specification:

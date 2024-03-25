@@ -15,6 +15,14 @@ const (
 	HeaderWopiOldLock string = "X-WOPI-OldLock"
 )
 
+// HttpAdapter will adapt the responses from the connector to HTTP.
+//
+// The adapter will use the request's context for the connector operations,
+// this means that the request MUST have a valid WOPI context and a
+// pre-configured logger. This should have been prepared in the routing.
+//
+// All operations are expected to follow the definitions found in
+// https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/endpoints
 type HttpAdapter struct {
 	con *Connector
 }

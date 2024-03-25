@@ -8,6 +8,10 @@ import (
 
 var commonCS3ApiClient gatewayv1beta1.GatewayAPIClient
 
+// GatewayAPIClient gets an instance based on the provided configuration.
+// The instance will be cached and returned if possible, unless the "forceNew"
+// parameter is set to true. In this case, the old instance will be replaced
+// with the new one if there is no error.
 func GetCS3apiClient(cfg *config.Config, forceNew bool) (gatewayv1beta1.GatewayAPIClient, error) {
 	// establish a connection to the cs3 api endpoint
 	// in this case a REVA gateway, started by oCIS
