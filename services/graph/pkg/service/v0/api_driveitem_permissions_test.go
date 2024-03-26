@@ -369,6 +369,54 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
 			Expect(len(permissions.Value)).To(Equal(2))
 		})
+	})
+	Describe("ListSpaceRootPermissions", func() {
+		var (
+			listSpacesResponse       *provider.ListStorageSpacesResponse
+			driveId                  provider.ResourceId
+			listPublicSharesResponse *link.ListPublicSharesResponse
+		)
+
+		BeforeEach(func() {
+			driveId = provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "2",
+			}
+
+			listSpacesResponse = &provider.ListStorageSpacesResponse{
+				Status: status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{
+					{
+						Id: &provider.StorageSpaceId{
+							OpaqueId: "2",
+						},
+					},
+				},
+			}
+			listPublicSharesResponse = &link.ListPublicSharesResponse{
+				Status: status.NewOK(ctx),
+			}
+		})
+
+		It("adds a user to a space as expected (happy path)", func() {
+			listSpacesResponse.StorageSpaces[0].SpaceType = "project"
+			listSpacesResponse.StorageSpaces[0].Root = &provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "2",
+				OpaqueId:  "2",
+			}
+
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
+			statResponse.Info = &provider.ResourceInfo{
+				Id:            listSpacesResponse.StorageSpaces[0].Root,
+				PermissionSet: roleconversions.NewViewerRole(false).CS3ResourcePermissions(),
+			}
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			permissions, err := driveItemPermissionsService.ListSpaceRootPermissions(context.Background(), driveId)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
+		})
 
 	})
 })

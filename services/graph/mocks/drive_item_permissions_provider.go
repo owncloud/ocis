@@ -139,6 +139,63 @@ func (_c *DriveItemPermissionsProvider_ListPermissions_Call) RunAndReturn(run fu
 	return _c
 }
 
+// ListSpaceRootPermissions provides a mock function with given fields: ctx, driveID
+func (_m *DriveItemPermissionsProvider) ListSpaceRootPermissions(ctx context.Context, driveID providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+	ret := _m.Called(ctx, driveID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListSpaceRootPermissions")
+	}
+
+	var r0 libregraph.CollectionOfPermissionsWithAllowedValues
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
+		return rf(ctx, driveID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
+		r0 = rf(ctx, driveID)
+	} else {
+		r0 = ret.Get(0).(libregraph.CollectionOfPermissionsWithAllowedValues)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId) error); ok {
+		r1 = rf(ctx, driveID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DriveItemPermissionsProvider_ListSpaceRootPermissions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListSpaceRootPermissions'
+type DriveItemPermissionsProvider_ListSpaceRootPermissions_Call struct {
+	*mock.Call
+}
+
+// ListSpaceRootPermissions is a helper method to define mock.On call
+//   - ctx context.Context
+//   - driveID providerv1beta1.ResourceId
+func (_e *DriveItemPermissionsProvider_Expecter) ListSpaceRootPermissions(ctx interface{}, driveID interface{}) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
+	return &DriveItemPermissionsProvider_ListSpaceRootPermissions_Call{Call: _e.mock.On("ListSpaceRootPermissions", ctx, driveID)}
+}
+
+func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) Run(run func(ctx context.Context, driveID providerv1beta1.ResourceId)) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId))
+	})
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) Return(_a0 libregraph.CollectionOfPermissionsWithAllowedValues, _a1 error) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SpaceRootInvite provides a mock function with given fields: ctx, driveID, invite
 func (_m *DriveItemPermissionsProvider) SpaceRootInvite(ctx context.Context, driveID providerv1beta1.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 	ret := _m.Called(ctx, driveID, invite)
