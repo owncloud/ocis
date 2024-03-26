@@ -235,6 +235,7 @@ def getPipelineNames(pipelines = []):
     return names
 
 def main(ctx):
+    return e2eTestPipeline(ctx)
     """main is the entrypoint for drone
 
     Args:
@@ -1223,7 +1224,7 @@ def e2eTestPipeline(ctx):
 
         e2e_args = ""
         if params["totalParts"] > 0:
-            e2e_args = "--total-parts %s" % params["totalParts"]
+            e2e_args = "--total-parts %d" % params["totalParts"]
         elif params["suites"]:
             e2e_args = "--suites %s" % ",".join(params["suites"])
 
@@ -1250,7 +1251,7 @@ def e2eTestPipeline(ctx):
                 "LOCAL_UPLOAD_DIR": "/uploads",
             },
             "commands": [
-                "cd %s" % dirs["web"],
+                "cd %s/tests/e2e" % dirs["web"],
             ],
         }
 
@@ -1261,8 +1262,8 @@ def e2eTestPipeline(ctx):
             for index in range(params["totalParts"]):
                 run_part = index + 1
                 step_e2e["commands"] = [
-                    "cd %s" % dirs["web"],
-                    "pnpm test:e2e:cucumber %s --run-part %s" % (e2e_args, run_part),
+                    "cd %s/tests/e2e" % dirs["web"],
+                    "bash run-e2e.sh %s --run-part %d" % (e2e_args, run_part),
                 ]
                 pipelines.append({
                     "kind": "pipeline",
@@ -1273,8 +1274,9 @@ def e2eTestPipeline(ctx):
                     "trigger": e2e_trigger,
                     "volumes": e2e_volumes,
                 })
+                print(step_e2e["commands"])
         else:
-            step_e2e["commands"].append("pnpm test:e2e:cucumber %s" % e2e_args)
+            step_e2e["commands"].append("bash run-e2e.sh %s" % e2e_args)
             pipelines.append({
                 "kind": "pipeline",
                 "type": "docker",
