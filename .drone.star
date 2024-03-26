@@ -235,7 +235,6 @@ def getPipelineNames(pipelines = []):
     return names
 
 def main(ctx):
-    return e2eTestPipeline(ctx)
     """main is the entrypoint for drone
 
     Args:
@@ -1261,7 +1260,9 @@ def e2eTestPipeline(ctx):
         if params["totalParts"]:
             for index in range(params["totalParts"]):
                 run_part = index + 1
-                step_e2e["commands"] = [
+                run_e2e = {}
+                run_e2e.update(step_e2e)
+                run_e2e["commands"] = [
                     "cd %s/tests/e2e" % dirs["web"],
                     "bash run-e2e.sh %s --run-part %d" % (e2e_args, run_part),
                 ]
@@ -1269,12 +1270,11 @@ def e2eTestPipeline(ctx):
                     "kind": "pipeline",
                     "type": "docker",
                     "name": "e2e-tests-%s-%s" % (name, run_part),
-                    "steps": steps_before + [step_e2e] + steps_after,
+                    "steps": steps_before + [run_e2e] + steps_after,
                     "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
                     "trigger": e2e_trigger,
                     "volumes": e2e_volumes,
                 })
-                print(step_e2e["commands"])
         else:
             step_e2e["commands"].append("bash run-e2e.sh %s" % e2e_args)
             pipelines.append({
