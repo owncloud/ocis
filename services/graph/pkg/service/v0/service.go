@@ -145,13 +145,15 @@ func NewService(opts ...Option) (Graph, error) {
 	)
 
 	svc := Graph{
-		config:                   options.Config,
+		BaseGraphService: BaseGraphService{
+			logger:          &options.Logger,
+			identityCache:   identityCache,
+			gatewaySelector: options.GatewaySelector,
+			config:          options.Config,
+		},
 		mux:                      m,
-		logger:                   &options.Logger,
 		specialDriveItemsCache:   spacePropertiesCache,
-		identityCache:            identityCache,
 		eventsPublisher:          options.EventsPublisher,
-		gatewaySelector:          options.GatewaySelector,
 		searchService:            options.SearchService,
 		identityEducationBackend: options.IdentityEducationBackend,
 		keycloakClient:           options.KeycloakClient,
@@ -213,7 +215,7 @@ func NewService(opts ...Option) (Graph, error) {
 		return svc, err
 	}
 
-	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config.FilesSharing.EnableResharing)
+	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config)
 	if err != nil {
 		return svc, err
 	}

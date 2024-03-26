@@ -18,15 +18,12 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 )
@@ -61,17 +58,14 @@ type RoleService interface {
 
 // Graph defines implements the business logic for Service.
 type Graph struct {
-	config                   *config.Config
+	BaseGraphService
 	mux                      *chi.Mux
-	logger                   *log.Logger
 	identityBackend          identity.Backend
 	identityEducationBackend identity.EducationBackend
-	gatewaySelector          pool.Selectable[gateway.GatewayAPIClient]
 	roleService              RoleService
 	permissionsService       Permissions
 	valueService             settingssvc.ValueService
 	specialDriveItemsCache   *ttlcache.Cache[string, interface{}]
-	identityCache            identity.IdentityCache
 	eventsPublisher          events.Publisher
 	searchService            searchsvc.SearchProviderService
 	keycloakClient           keycloak.Client
