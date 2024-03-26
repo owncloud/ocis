@@ -82,6 +82,64 @@ func (_c *DriveItemPermissionsProvider_Invite_Call) RunAndReturn(run func(contex
 	return _c
 }
 
+// SpaceRootInvite provides a mock function with given fields: ctx, driveID, invite
+func (_m *DriveItemPermissionsProvider) SpaceRootInvite(ctx context.Context, driveID providerv1beta1.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+	ret := _m.Called(ctx, driveID, invite)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SpaceRootInvite")
+	}
+
+	var r0 libregraph.Permission
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) (libregraph.Permission, error)); ok {
+		return rf(ctx, driveID, invite)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) libregraph.Permission); ok {
+		r0 = rf(ctx, driveID, invite)
+	} else {
+		r0 = ret.Get(0).(libregraph.Permission)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) error); ok {
+		r1 = rf(ctx, driveID, invite)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DriveItemPermissionsProvider_SpaceRootInvite_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SpaceRootInvite'
+type DriveItemPermissionsProvider_SpaceRootInvite_Call struct {
+	*mock.Call
+}
+
+// SpaceRootInvite is a helper method to define mock.On call
+//   - ctx context.Context
+//   - driveID providerv1beta1.ResourceId
+//   - invite libregraph.DriveItemInvite
+func (_e *DriveItemPermissionsProvider_Expecter) SpaceRootInvite(ctx interface{}, driveID interface{}, invite interface{}) *DriveItemPermissionsProvider_SpaceRootInvite_Call {
+	return &DriveItemPermissionsProvider_SpaceRootInvite_Call{Call: _e.mock.On("SpaceRootInvite", ctx, driveID, invite)}
+}
+
+func (_c *DriveItemPermissionsProvider_SpaceRootInvite_Call) Run(run func(ctx context.Context, driveID providerv1beta1.ResourceId, invite libregraph.DriveItemInvite)) *DriveItemPermissionsProvider_SpaceRootInvite_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(libregraph.DriveItemInvite))
+	})
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_SpaceRootInvite_Call) Return(_a0 libregraph.Permission, _a1 error) *DriveItemPermissionsProvider_SpaceRootInvite_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_SpaceRootInvite_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) (libregraph.Permission, error)) *DriveItemPermissionsProvider_SpaceRootInvite_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewDriveItemPermissionsProvider creates a new instance of DriveItemPermissionsProvider. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewDriveItemPermissionsProvider(t interface {

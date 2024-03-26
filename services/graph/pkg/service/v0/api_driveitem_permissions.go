@@ -8,9 +8,9 @@ import (
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
-	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -23,7 +23,8 @@ import (
 )
 
 type DriveItemPermissionsProvider interface {
-	Invite(ctx context.Context, resourceId provider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
+	Invite(ctx context.Context, resourceId storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
+	SpaceRootInvite(ctx context.Context, driveID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 }
 
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
@@ -45,7 +46,7 @@ func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Sele
 }
 
 // Invite invites a user to a drive item.
-func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId provider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return libregraph.Permission{}, err
@@ -167,6 +168,26 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId prov
 	return *permission, nil
 }
 
+// SpaceRootInvite handles invitation request on project spaces
+func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return libregraph.Permission{}, err
+	}
+
+	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(driveID), gatewayClient)
+	if err != nil {
+		return libregraph.Permission{}, err
+	}
+
+	if space.SpaceType != "project" {
+		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
+	}
+
+	rootResourceID := space.GetRoot()
+	return s.Invite(ctx, *rootResourceID, invite)
+}
+
 // DriveItemPermissionsService is the api that registers the http endpoints which expose needed operation to the graph api.
 // the business logic is delegated to the permissions service and further down to the cs3 client.
 type DriveItemPermissionsApi struct {
@@ -206,6 +227,39 @@ func (api DriveItemPermissionsApi) Invite(w http.ResponseWriter, r *http.Request
 		return
 	}
 	permission, err := api.driveItemPermissionsService.Invite(ctx, itemID, *driveItemInvite)
+
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &ListResponse{Value: []interface{}{permission}})
+}
+
+func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *http.Request) {
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		msg := "could not parse driveID"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		return
+	}
+
+	driveItemInvite := &libregraph.DriveItemInvite{}
+	if err = StrictJSONUnmarshal(r.Body, driveItemInvite); err != nil {
+		api.logger.Debug().Err(err).Interface("Body", r.Body).Msg("failed unmarshalling request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	ctx := r.Context()
+	if err = validate.StructCtx(ctx, driveItemInvite); err != nil {
+		api.logger.Debug().Err(err).Interface("Body", r.Body).Msg("invalid request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+	permission, err := api.driveItemPermissionsService.SpaceRootInvite(ctx, driveID, *driveItemInvite)
 
 	if err != nil {
 		errorcode.RenderError(w, r, err)
