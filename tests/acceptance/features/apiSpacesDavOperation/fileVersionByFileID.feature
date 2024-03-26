@@ -79,7 +79,6 @@ Feature: checking file versions using file id
     And user "Alice" has created a share inside of space "Project1" with settings:
       | path      | testFolder |
       | shareWith | Brian      |
-      | role      | manager |
     And user "Alice" has shared a space "Project1" with settings:
       | shareWith | Brian   |
       | role      | manager |

@@ -52,10 +52,10 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
     And user "Alice" has created a share with settings
-      | path        | /tmp.txt          |
-      | shareType   | group             |
-      | permissions | share,update,read |
-      | shareWith   | grp1              |
+      | path        | /tmp.txt    |
+      | shareType   | group       |
+      | permissions | update,read |
+      | shareWith   | grp1        |
     When user "Brian" gets the following properties of file "/Shares/tmp.txt" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -144,7 +144,7 @@ Feature: sharing
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "15"
+    And the single response should contain a property "ocs:share-permissions" with value "31"
     Examples:
       | dav-path-version |
       | old              |
