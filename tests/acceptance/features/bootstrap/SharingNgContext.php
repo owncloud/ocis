@@ -596,6 +596,22 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @Given user :user has disabled sync for share :share using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHasDisabledSyncForShareUsingTheGraphApi(string $user): void {
+		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$itemId = $shareSpaceId . '!' . $shareItemId;
+		$response = $this->unmountShare($user, $itemId, $shareSpaceId);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+	}
+
+	/**
 	 * @When user :user mounts share :share offered by :offeredBy from :space space using the Graph API
 	 *
 	 * @param string $user
@@ -619,5 +635,31 @@ class SharingNgContext implements Context {
 			$shareSpaceId
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given user :user has enabled sync for share :share offered by :offeredBy from :space space using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $share
+	 * @param string $offeredBy
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHasEnabledSyncForShareOfferedByFromSpaceUsingTheGraphApi(string $user, string $share, string $offeredBy, string $space):void {
+		$share = ltrim($share, '/');
+		$itemId = $this->spacesContext->getResourceId($offeredBy, $space, $share);
+		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$response =  GraphHelper::mountShare(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$itemId,
+			$shareSpaceId
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
 	}
 }
