@@ -1,8 +1,8 @@
-Enhancement: Update web to v9.0.0-alpha.2
+Enhancement: Update web to v9.0.0-alpha.3
 
 Tags: web
 
-We updated ownCloud Web to v9.0.0-alpha.2. Please refer to the changelog (linked) for details on the web release.
+We updated ownCloud Web to v9.0.0-alpha.3. Please refer to the changelog (linked) for details on the web release.
 
 ## Summary
 * Bugfix [owncloud/web#10377](https://github.com/owncloud/web/pull/10377): User data not updated while altering own user
@@ -26,6 +26,12 @@ We updated ownCloud Web to v9.0.0-alpha.2. Please refer to the changelog (linked
 * Enhancement [owncloud/web#10519](https://github.com/owncloud/web/pull/10519): Warn user before closing browser when upload is in progress
 * Enhancement [owncloud/web#10544](https://github.com/owncloud/web/pull/10544): Show locked and processing next to other status indicators
 * Enhancement [owncloud/web#10546](https://github.com/owncloud/web/pull/10546): Set emoji as space icon
+* Enhancement [owncloud/web#10624](https://github.com/owncloud/web/pull/10624): Add details panel to trash
+* Enhancement [owncloud/web#10586](https://github.com/owncloud/web/pull/10586): Add SSE events for locking, renaming, deleting, and restoring
+* Enhancement [owncloud/web#10626](https://github.com/owncloud/web/pull/10626): Full text search default
+* Enhancement [owncloud/web#10611](https://github.com/owncloud/web/pull/10611): Remember left nav bar state
+* Enhancement [owncloud/web#10612](https://github.com/owncloud/web/pull/10612): Remember right nav bar state
+* Enhancement [owncloud/web#10558](https://github.com/owncloud/web/pull/10558): Tile sizes
 
-https://github.com/owncloud/ocis/pull/8634
-https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.2
+https://github.com/owncloud/ocis/pull/8736
+https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.3
