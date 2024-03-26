@@ -140,7 +140,16 @@ config = {
         "skipExceptParts": [],
     },
     "e2eTests": {
-        "skip": False,
+        "basic": {
+            "skip": False,
+            "totalParts": 3,  # divide and run all suites in parts (divide pipelines)
+            "xsuites": ["search", "app-provider"],  # suites to skip
+        },
+        "search": {
+            "skip": False,
+            "suites": ["search"],  # suites to run
+            "tikaNeeded": True,
+        },
     },
     "rocketchat": {
         "channel": "infinitescale",
@@ -343,8 +352,7 @@ def testPipelines(ctx):
     if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
         pipelines += uiTests(ctx)
 
-    if "skip" not in config["e2eTests"] or not config["e2eTests"]["skip"]:
-        pipelines += e2eTests(ctx)
+    pipelines += e2eTestPipeline(ctx)
 
     return pipelines
 
@@ -1165,20 +1173,13 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
         },
     }
 
-def e2eTests(ctx):
-    test_suites = {
-        "suite1": {
-            "path": "tests/e2e/cucumber/features/{smoke,journeys}/*.feature",
-            "tikaNeeded": False,
-        },
-        "suite2": {
-            "path": "tests/e2e/cucumber/features/smoke/{spaces,admin-settings}/*.feature",
-            "tikaNeeded": False,
-        },
-        "suite3": {
-            "path": "tests/e2e/cucumber/features/smoke/{search,shares}/*.feature",
-            "tikaNeeded": True,
-        },
+def e2eTestPipeline(ctx):
+    defaults = {
+        "skip": False,
+        "suites": [],
+        "xsuites": [],
+        "totalParts": 0,
+        "tikaNeeded": False,
     }
 
     extra_server_environment = {
@@ -1207,40 +1208,80 @@ def e2eTests(ctx):
     pipelines = []
 
     if ("skip-e2e" in ctx.build.title.lower()):
-        return []
+        return pipelines
 
-    for name, suite in test_suites.items():
-        steps = \
+    if (ctx.build.event == "tag"):
+        return pipelines
+
+    for name, suite in config["e2eTests"].items():
+        if "skip" in suite and suite["skip"]:
+            return pipelines
+
+        params = {}
+        for item in defaults:
+            params[item] = suite[item] if item in suite else defaults[item]
+
+        e2e_args = ""
+        if params["totalParts"] > 0:
+            e2e_args = "--total-parts %d" % params["totalParts"]
+        elif params["suites"]:
+            e2e_args = "--suites %s" % ",".join(params["suites"])
+
+        # suites to skip
+        if params["xsuites"]:
+            e2e_args += " --xsuites %s" % ",".join(params["xsuites"])
+
+        steps_before = \
             skipIfUnchanged(ctx, "e2e-tests") + \
             restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
-            (tikaService() if suite["tikaNeeded"] else []) + \
-            ocisServer("ocis", 4, [], extra_server_environment = extra_server_environment, tika_enabled = suite["tikaNeeded"]) + \
-            [{
-                "name": "e2e-tests",
-                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-                "environment": {
-                    "BASE_URL_OCIS": "ocis-server:9200",
-                    "HEADLESS": "true",
-                    "RETRY": "1",
-                    "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
-                    "LOCAL_UPLOAD_DIR": "/uploads",
-                },
-                "commands": [
-                    "cd %s" % dirs["web"],
-                    "pnpm test:e2e:cucumber %s" % suite["path"],
-                ],
-            }] + \
-            uploadTracingResult(ctx) + \
-            logTracingResults()
+            (tikaService() if params["tikaNeeded"] else []) + \
+            ocisServer("ocis", 4, [], extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
 
-        if (ctx.build.event != "tag"):
+        step_e2e = {
+            "name": "e2e-tests",
+            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+            "environment": {
+                "BASE_URL_OCIS": "ocis-server:9200",
+                "HEADLESS": "true",
+                "RETRY": "1",
+                "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+                "LOCAL_UPLOAD_DIR": "/uploads",
+            },
+            "commands": [
+                "cd %s/tests/e2e" % dirs["web"],
+            ],
+        }
+
+        steps_after = uploadTracingResult(ctx) + \
+                      logTracingResults()
+
+        if params["totalParts"]:
+            for index in range(params["totalParts"]):
+                run_part = index + 1
+                run_e2e = {}
+                run_e2e.update(step_e2e)
+                run_e2e["commands"] = [
+                    "cd %s/tests/e2e" % dirs["web"],
+                    "bash run-e2e.sh %s --run-part %d" % (e2e_args, run_part),
+                ]
+                pipelines.append({
+                    "kind": "pipeline",
+                    "type": "docker",
+                    "name": "e2e-tests-%s-%s" % (name, run_part),
+                    "steps": steps_before + [run_e2e] + steps_after,
+                    "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
+                    "trigger": e2e_trigger,
+                    "volumes": e2e_volumes,
+                })
+        else:
+            step_e2e["commands"].append("bash run-e2e.sh %s" % e2e_args)
             pipelines.append({
                 "kind": "pipeline",
                 "type": "docker",
                 "name": "e2e-tests-%s" % name,
-                "steps": steps,
+                "steps": steps_before + [step_e2e] + steps_after,
                 "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
                 "trigger": e2e_trigger,
                 "volumes": e2e_volumes,
