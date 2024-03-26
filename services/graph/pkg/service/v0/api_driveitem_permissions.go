@@ -16,6 +16,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
@@ -29,19 +30,18 @@ type DriveItemPermissionsProvider interface {
 
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
 type DriveItemPermissionsService struct {
-	logger           log.Logger
-	gatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
-	identityCache    identity.IdentityCache
-	resharingEnabled bool
+	BaseGraphService
 }
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
-func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, resharing bool) (DriveItemPermissionsService, error) {
+func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config) (DriveItemPermissionsService, error) {
 	return DriveItemPermissionsService{
-		logger:           log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
-		gatewaySelector:  gatewaySelector,
-		identityCache:    identityCache,
-		resharingEnabled: resharing,
+		BaseGraphService: BaseGraphService{
+			logger:          &log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
+			gatewaySelector: gatewaySelector,
+			identityCache:   identityCache,
+			config:          config,
+		},
 	}, nil
 }
 
@@ -66,7 +66,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 
 	unifiedRolePermissions := []*libregraph.UnifiedRolePermission{{AllowedResourceActions: invite.LibreGraphPermissionsActions}}
 	for _, roleID := range invite.GetRoles() {
-		role, err := unifiedrole.NewUnifiedRoleFromID(roleID, s.resharingEnabled)
+		role, err := unifiedrole.NewUnifiedRoleFromID(roleID, s.config.FilesSharing.EnableResharing)
 		if err != nil {
 			s.logger.Debug().Err(err).Interface("role", invite.GetRoles()[0]).Msg("unable to convert requested role")
 			return libregraph.Permission{}, err
@@ -95,7 +95,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 	}
 
 	permission := &libregraph.Permission{}
-	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, condition, s.resharingEnabled); role != nil {
+	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, condition, s.config.FilesSharing.EnableResharing); role != nil {
 		permission.Roles = []string{role.GetId()}
 	}
 

@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"path"
 	"strconv"
 	"time"
 
@@ -171,38 +170,6 @@ func (g Graph) createLink(ctx context.Context, driveItemID *providerv1beta1.Reso
 		return nil, errorcode.New(cs3StatusToErrCode(statusCode), createResp.Status.Message)
 	}
 	return createResp.GetShare(), nil
-}
-
-func (g Graph) libreGraphPermissionFromCS3PublicShare(createdLink *link.PublicShare) (*libregraph.Permission, error) {
-	webURL, err := url.Parse(g.config.Spaces.WebDavBase)
-	if err != nil {
-		g.logger.Error().
-			Err(err).
-			Str("url", g.config.Spaces.WebDavBase).
-			Msg("failed to parse webURL base url")
-		return nil, err
-	}
-	lt, actions := linktype.SharingLinkTypeFromCS3Permissions(createdLink.GetPermissions())
-	perm := libregraph.NewPermission()
-	perm.Id = libregraph.PtrString(createdLink.GetId().GetOpaqueId())
-	perm.Link = &libregraph.SharingLink{
-		Type:                  lt,
-		PreventsDownload:      libregraph.PtrBool(false),
-		LibreGraphDisplayName: libregraph.PtrString(createdLink.GetDisplayName()),
-		LibreGraphQuickLink:   libregraph.PtrBool(createdLink.GetQuicklink()),
-	}
-	perm.LibreGraphPermissionsActions = actions
-	webURL.Path = path.Join(webURL.Path, "s", createdLink.GetToken())
-	perm.Link.SetWebUrl(webURL.String())
-
-	// set expiration date
-	if createdLink.GetExpiration() != nil {
-		perm.SetExpirationDateTime(cs3TimestampToTime(createdLink.GetExpiration()).UTC())
-	}
-
-	perm.SetHasPassword(createdLink.GetPasswordProtected())
-
-	return perm, nil
 }
 
 func parseAndFillUpTime(t *time.Time) *types.Timestamp {

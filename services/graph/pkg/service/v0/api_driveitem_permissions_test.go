@@ -26,6 +26,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
@@ -55,7 +56,8 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 		cache := identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
-		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, false)
+		cfg := defaults.FullDefaultConfig()
+		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg)
 		Expect(err).ToNot(HaveOccurred())
 		driveItemPermissionsService = service
 	})
