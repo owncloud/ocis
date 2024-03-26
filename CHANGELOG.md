@@ -63,12 +63,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Send more sse events: [#8587](https://github.com/owncloud/ocis/pull/8587)
 * Enhancement - Send SSE when file is locked/unlocked: [#8602](https://github.com/owncloud/ocis/pull/8602)
 * Enhancement - Add the spaceID to sse: [#8614](https://github.com/owncloud/ocis/pull/8614)
-* Enhancement - Update web to v9.0.0-alpha.2: [#8634](https://github.com/owncloud/ocis/pull/8634)
 * Enhancement - The graph endpoints for listing permission works for spaces now: [#8642](https://github.com/owncloud/ocis/pull/8642)
 * Enhancement - Bump keycloak: [#8687](https://github.com/owncloud/ocis/pull/8687)
 * Enhancement - Bump Reva: [#8701](https://github.com/owncloud/ocis/pull/8701)
 * Enhancement - Initiator-IDs: [#8701](https://github.com/owncloud/ocis/pull/8701)
 * Enhancement - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
+* Enhancement - Update web to v9.0.0-alpha.3: [#8736](https://github.com/owncloud/ocis/pull/8736)
 
 ## Details
 
@@ -234,58 +234,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8614
    https://github.com/owncloud/ocis/pull/8624
 
-* Enhancement - Update web to v9.0.0-alpha.2: [#8634](https://github.com/owncloud/ocis/pull/8634)
-
-   Tags: web
-
-   We updated ownCloud Web to v9.0.0-alpha.2. Please refer to the changelog
-   (linked) for details on the web release.
-
-   ## Summary * Bugfix
-   [owncloud/web#10377](https://github.com/owncloud/web/pull/10377): User data not
-   updated while altering own user * Bugfix
-   [owncloud/web#10417](https://github.com/owncloud/web/pull/10417): Admin settings
-   keyboard navigation * Bugfix
-   [owncloud/web#10517](https://github.com/owncloud/web/pull/10517): Load thumbnail
-   when postprocessing is finished * Bugfix
-   [owncloud/web#10551](https://github.com/owncloud/web/pull/10551): Share sidebar
-   icons * Change [owncloud/web#7338](https://github.com/owncloud/web/issues/7338):
-   Remove deprecated code * Change
-   [owncloud/web#9892](https://github.com/owncloud/web/issues/9892): Remove
-   skeleton app * Change
-   [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Remove
-   deprecated extension point for adding quick actions * Change
-   [owncloud/web#10122](https://github.com/owncloud/web/pull/10122): Remove
-   homeFolder option * Change
-   [owncloud/web#10210](https://github.com/owncloud/web/issues/10210): Vuex store
-   removed * Change
-   [owncloud/web#10240](https://github.com/owncloud/web/pull/10240): Remove ocs
-   user * Change [owncloud/web#10330](https://github.com/owncloud/web/pull/10330):
-   Registering app file editors * Enhancement
-   [owncloud/web#9215](https://github.com/owncloud/web/issues/9215): Icon for .dcm
-   files * Enhancement
-   [owncloud/web#10207](https://github.com/owncloud/web/pull/10207): Enable user
-   preferences in public links * Enhancement
-   [owncloud/web#10334](https://github.com/owncloud/web/pull/10334): Move
-   ThemeSwitcher into Account Settings * Enhancement
-   [owncloud/web#10383](https://github.com/owncloud/web/issues/10383): Top loading
-   bar increase visibility * Enhancement
-   [owncloud/web#10390](https://github.com/owncloud/web/pull/10390): Integrate
-   ToastUI editor in the text editor app * Enhancement
-   [owncloud/web#10448](https://github.com/owncloud/web/pull/10448): Epub reader
-   app * Enhancement
-   [owncloud/web#10485](https://github.com/owncloud/web/pull/10485): Highlight
-   search term in sharing autosuggest list * Enhancement
-   [owncloud/web#10519](https://github.com/owncloud/web/pull/10519): Warn user
-   before closing browser when upload is in progress * Enhancement
-   [owncloud/web#10544](https://github.com/owncloud/web/pull/10544): Show locked
-   and processing next to other status indicators * Enhancement
-   [owncloud/web#10546](https://github.com/owncloud/web/pull/10546): Set emoji as
-   space icon
-
-   https://github.com/owncloud/ocis/pull/8634
-   https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.2
-
 * Enhancement - The graph endpoints for listing permission works for spaces now: [#8642](https://github.com/owncloud/ocis/pull/8642)
 
    We enhanced the 'graph/v1beta1/drives/{{driveid}}/items/{{itemid}}/permissions'
@@ -332,6 +280,69 @@ The following sections list the changes for unreleased.
    provides an additional layer of security where needed.
 
    https://github.com/owncloud/ocis/pull/8716
+
+* Enhancement - Update web to v9.0.0-alpha.3: [#8736](https://github.com/owncloud/ocis/pull/8736)
+
+   Tags: web
+
+   We updated ownCloud Web to v9.0.0-alpha.3. Please refer to the changelog
+   (linked) for details on the web release.
+
+   ## Summary * Bugfix
+   [owncloud/web#10377](https://github.com/owncloud/web/pull/10377): User data not
+   updated while altering own user * Bugfix
+   [owncloud/web#10417](https://github.com/owncloud/web/pull/10417): Admin settings
+   keyboard navigation * Bugfix
+   [owncloud/web#10517](https://github.com/owncloud/web/pull/10517): Load thumbnail
+   when postprocessing is finished * Bugfix
+   [owncloud/web#10551](https://github.com/owncloud/web/pull/10551): Share sidebar
+   icons * Change [owncloud/web#7338](https://github.com/owncloud/web/issues/7338):
+   Remove deprecated code * Change
+   [owncloud/web#9892](https://github.com/owncloud/web/issues/9892): Remove
+   skeleton app * Change
+   [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Remove
+   deprecated extension point for adding quick actions * Change
+   [owncloud/web#10122](https://github.com/owncloud/web/pull/10122): Remove
+   homeFolder option * Change
+   [owncloud/web#10210](https://github.com/owncloud/web/issues/10210): Vuex store
+   removed * Change
+   [owncloud/web#10240](https://github.com/owncloud/web/pull/10240): Remove ocs
+   user * Change [owncloud/web#10330](https://github.com/owncloud/web/pull/10330):
+   Registering app file editors * Enhancement
+   [owncloud/web#9215](https://github.com/owncloud/web/issues/9215): Icon for .dcm
+   files * Enhancement
+   [owncloud/web#10207](https://github.com/owncloud/web/pull/10207): Enable user
+   preferences in public links * Enhancement
+   [owncloud/web#10334](https://github.com/owncloud/web/pull/10334): Move
+   ThemeSwitcher into Account Settings * Enhancement
+   [owncloud/web#10383](https://github.com/owncloud/web/issues/10383): Top loading
+   bar increase visibility * Enhancement
+   [owncloud/web#10390](https://github.com/owncloud/web/pull/10390): Integrate
+   ToastUI editor in the text editor app * Enhancement
+   [owncloud/web#10448](https://github.com/owncloud/web/pull/10448): Epub reader
+   app * Enhancement
+   [owncloud/web#10485](https://github.com/owncloud/web/pull/10485): Highlight
+   search term in sharing autosuggest list * Enhancement
+   [owncloud/web#10519](https://github.com/owncloud/web/pull/10519): Warn user
+   before closing browser when upload is in progress * Enhancement
+   [owncloud/web#10544](https://github.com/owncloud/web/pull/10544): Show locked
+   and processing next to other status indicators * Enhancement
+   [owncloud/web#10546](https://github.com/owncloud/web/pull/10546): Set emoji as
+   space icon * Enhancement
+   [owncloud/web#10624](https://github.com/owncloud/web/pull/10624): Add details
+   panel to trash * Enhancement
+   [owncloud/web#10586](https://github.com/owncloud/web/pull/10586): Add SSE events
+   for locking, renaming, deleting, and restoring * Enhancement
+   [owncloud/web#10626](https://github.com/owncloud/web/pull/10626): Full text
+   search default * Enhancement
+   [owncloud/web#10611](https://github.com/owncloud/web/pull/10611): Remember left
+   nav bar state * Enhancement
+   [owncloud/web#10612](https://github.com/owncloud/web/pull/10612): Remember right
+   nav bar state * Enhancement
+   [owncloud/web#10558](https://github.com/owncloud/web/pull/10558): Tile sizes
+
+   https://github.com/owncloud/ocis/pull/8736
+   https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.3
 
 # Changelog for [5.0.0] (2024-03-18)
 
