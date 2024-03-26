@@ -188,10 +188,107 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permission.GetLibreGraphPermissionsActions()).To(HaveLen(1))
 			Expect(permission.GetLibreGraphPermissionsActions()[0]).To(Equal(unifiedrole.DriveItemContentRead))
 		})
+		It("fails with a missing driveritem", func() {
+			statResponse.Status = status.NewNotFound(context.Background(), "not found")
+			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, "not found")))
+			Expect(permission).To(BeZero())
+		})
+	})
+	Describe("SpaceRootInvite", func() {
+		var (
+			listSpacesResponse  *provider.ListStorageSpacesResponse
+			createShareResponse *collaboration.CreateShareResponse
+			driveItemInvite     libregraph.DriveItemInvite
+			driveId             provider.ResourceId
+			statResponse        *provider.StatResponse
+			getUserResponse     *userpb.GetUserResponse
+		)
+
+		BeforeEach(func() {
+			driveId = provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "2",
+			}
+			ctx := revactx.ContextSetUser(context.Background(), currentUser)
+
+			statResponse = &provider.StatResponse{
+				Status: status.NewOK(ctx),
+			}
+
+			listSpacesResponse = &provider.ListStorageSpacesResponse{
+				Status: status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{
+					{
+						Id: &provider.StorageSpaceId{
+							OpaqueId: "2",
+						},
+					},
+				},
+			}
+
+			getUserResponse = &userpb.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userpb.User{
+					Id:          &userpb.UserId{OpaqueId: "1"},
+					DisplayName: "Cem Kaner",
+				},
+			}
+
+			createShareResponse = &collaboration.CreateShareResponse{
+				Status: status.NewOK(ctx),
+			}
+		})
+
+		It("adds a user to a space as expected (happy path)", func() {
+			listSpacesResponse.StorageSpaces[0].SpaceType = "project"
+			listSpacesResponse.StorageSpaces[0].Root = &provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "2",
+				OpaqueId:  "3",
+			}
+
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+			}
+			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			createShareResponse.Share = &collaboration.Share{
+				Id:         &collaboration.ShareId{OpaqueId: "123"},
+				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
+			}
+
+			permission, err := driveItemPermissionsService.SpaceRootInvite(context.Background(), driveId, driveItemInvite)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(permission.GetId()).To(Equal("123"))
+			Expect(permission.GetExpirationDateTime().Equal(*driveItemInvite.ExpirationDateTime)).To(BeTrue())
+			Expect(permission.GrantedToV2.User.GetDisplayName()).To(Equal(getUserResponse.User.DisplayName))
+			Expect(permission.GrantedToV2.User.GetId()).To(Equal("1"))
+		})
+		It("rejects to add a user to a personal space", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+			}
+			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			createShareResponse.Share = &collaboration.Share{
+				Id:         &collaboration.ShareId{OpaqueId: "123"},
+				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
+			}
+
+			permission, err := driveItemPermissionsService.SpaceRootInvite(context.Background(), driveId, driveItemInvite)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "unsupported space type")))
+			Expect(permission).To(BeZero())
+		})
 	})
 })
 
-var _ = Describe("DriveItemPermissionsApiApi", func() {
+var _ = Describe("DriveItemPermissionsApi", func() {
 	var (
 		mockProvider *mocks.DriveItemPermissionsProvider
 		httpAPI      svc.DriveItemPermissionsApi
@@ -284,6 +381,41 @@ var _ = Describe("DriveItemPermissionsApiApi", func() {
 			httpAPI.Invite(responseRecorder, request)
 
 			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
+		})
+	})
+	Describe("SpaceRootInvite", func() {
+		It("call the Invite provider with the correct arguments", func() {
+			responseRecorder := httptest.NewRecorder()
+			inviteJson, err := json.Marshal(invite)
+			Expect(err).ToNot(HaveOccurred())
+
+			onInvite := mockProvider.On("SpaceRootInvite", mock.Anything, mock.Anything, mock.Anything)
+			onInvite.Return(func(ctx context.Context, driveID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+				Expect(storagespace.FormatResourceID(driveID)).To(Equal("1$2"))
+				return libregraph.Permission{}, nil
+			}).Once()
+
+			request := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(inviteJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+			httpAPI.SpaceRootInvite(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
+		})
+		It("call the Invite provider with the correct arguments", func() {
+			rCTX.URLParams.Add("driveID", "")
+			responseRecorder := httptest.NewRecorder()
+			inviteJson, err := json.Marshal(invite)
+			Expect(err).ToNot(HaveOccurred())
+
+			request := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(inviteJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+			httpAPI.SpaceRootInvite(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusUnprocessableEntity))
 		})
 	})
 })
