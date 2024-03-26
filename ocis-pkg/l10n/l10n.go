@@ -8,6 +8,9 @@ import (
 	"github.com/leonelquinteros/gotext"
 )
 
+// Template marks a string as translatable
+func Template(s string) string { return s }
+
 // Translator is able to translate strings
 type Translator struct {
 	fs            fs.FS

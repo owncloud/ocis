@@ -3,22 +3,14 @@ package svc
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
-	"io/fs"
 	"net/http"
-	"os"
-	"path/filepath"
 	"reflect"
-	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3User "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	v1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"golang.org/x/sync/errgroup"
@@ -444,100 +436,4 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 	}
 
 	return permission, nil
-}
-
-func (g Graph) applySpaceTemplate(ctx context.Context, gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId, template string) error {
-	var fsys fs.ReadDirFS
-
-	switch template {
-	default:
-		fallthrough
-	case "none":
-		return nil
-	case "default":
-		f, err := fs.Sub(_spaceTemplateFS, "spacetemplate")
-		if err != nil {
-			return err
-		}
-		fsys = f.(fs.ReadDirFS)
-	}
-
-	mdc := metadata.NewCS3(g.config.Reva.Address, g.config.Spaces.StorageUsersAddress)
-	mdc.SpaceRoot = root
-
-	opaque, err := uploadFolder(ctx, mdc, ".", "", nil, fsys)
-	if err != nil {
-		return err
-	}
-
-	resp, err := gwc.UpdateStorageSpace(ctx, &storageprovider.UpdateStorageSpaceRequest{
-		StorageSpace: &storageprovider.StorageSpace{
-			Id: &storageprovider.StorageSpaceId{
-				OpaqueId: storagespace.FormatResourceID(*root),
-			},
-			Root:   root,
-			Opaque: opaque,
-		},
-	})
-	switch {
-	case err != nil:
-		return err
-	case resp.GetStatus().GetCode() != rpc.Code_CODE_OK:
-		return fmt.Errorf("could not update storage space: %s", resp.GetStatus().GetMessage())
-	default:
-		return nil
-	}
-}
-
-func uploadFolder(ctx context.Context, mdc *metadata.CS3, pathOnDisc, pathOnSpace string, opaque *v1beta1.Opaque, fsys fs.ReadDirFS) (*v1beta1.Opaque, error) {
-	entries, err := fsys.ReadDir(pathOnDisc)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, entry := range entries {
-		opaque, err = uploadEntry(ctx, mdc, pathOnDisc, pathOnSpace, opaque, fsys, entry)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return opaque, nil
-}
-
-func uploadEntry(ctx context.Context, mdc *metadata.CS3, pathOnDisc, pathOnSpace string, opaque *v1beta1.Opaque, fsys fs.ReadDirFS, entry os.DirEntry) (*v1beta1.Opaque, error) {
-	spacePath := filepath.Join(pathOnSpace, entry.Name())
-	discPath := filepath.Join(pathOnDisc, entry.Name())
-
-	switch {
-	case entry.IsDir():
-		err := mdc.MakeDirIfNotExist(ctx, spacePath)
-		if err != nil {
-			return nil, err
-		}
-
-		return uploadFolder(ctx, mdc, discPath, spacePath, opaque, fsys)
-	default:
-		b, err := fs.ReadFile(fsys, discPath)
-		if err != nil {
-			return nil, err
-		}
-
-		res, err := mdc.Upload(ctx, metadata.UploadRequest{
-			Path:    spacePath,
-			Content: b,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		identifier := strings.TrimSuffix(entry.Name(), filepath.Ext(entry.Name()))
-		for _, special := range []string{ReadmeSpecialFolderName, SpaceImageSpecialFolderName} {
-			if special == identifier {
-				opaque = utils.AppendPlainToOpaque(opaque, identifier, res.FileID)
-				break
-			}
-		}
-		return opaque, nil
-	}
 }
