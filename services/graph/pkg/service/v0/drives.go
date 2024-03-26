@@ -11,7 +11,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -34,7 +33,6 @@ import (
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 	settingsServiceExt "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
@@ -843,116 +841,6 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 
 	return drive, nil
-}
-
-func (g Graph) cs3SpacePermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace, apiVersion APIVersion) []libregraph.Permission {
-	if space.Opaque == nil {
-		return nil
-	}
-	logger := g.logger.SubloggerWithRequestID(ctx)
-
-	var permissionsMap map[string]*storageprovider.ResourcePermissions
-	opaqueGrants, ok := space.Opaque.Map["grants"]
-	if ok {
-		err := json.Unmarshal(opaqueGrants.Value, &permissionsMap)
-		if err != nil {
-			logger.Debug().
-				Err(err).
-				Interface("space", space.Root).
-				Bytes("grants", opaqueGrants.Value).
-				Msg("unable to parse space: failed to read spaces grants")
-		}
-	}
-	if len(permissionsMap) == 0 {
-		return nil
-	}
-
-	var permissionsExpirations map[string]*types.Timestamp
-	opaqueGrantsExpirations, ok := space.Opaque.Map["grants_expirations"]
-	if ok {
-		err := json.Unmarshal(opaqueGrantsExpirations.Value, &permissionsExpirations)
-		if err != nil {
-			logger.Debug().
-				Err(err).
-				Interface("space", space.Root).
-				Bytes("grants_expirations", opaqueGrantsExpirations.Value).
-				Msg("unable to parse space: failed to read spaces grants expirations")
-		}
-	}
-
-	var groupsMap map[string]struct{}
-	opaqueGroups, ok := space.Opaque.Map["groups"]
-	if ok {
-		err := json.Unmarshal(opaqueGroups.Value, &groupsMap)
-		if err != nil {
-			logger.Debug().
-				Err(err).
-				Interface("space", space.Root).
-				Bytes("groups", opaqueGroups.Value).
-				Msg("unable to parse space: failed to read spaces groups")
-		}
-	}
-
-	permissions := make([]libregraph.Permission, 0, len(permissionsMap))
-	for id, perm := range permissionsMap {
-		// This temporary variable is necessary since we need to pass a pointer to the
-		// libregraph.Identity and if we pass the pointer from the loop every identity
-		// will have the same id.
-		tmp := id
-		isGroup := false
-		var identity libregraph.Identity
-		var err error
-		var p libregraph.Permission
-		if _, ok := groupsMap[id]; ok {
-			identity, err = groupIdToIdentity(ctx, g.identityCache, tmp)
-			if err != nil {
-				g.logger.Warn().Str("groupid", tmp).Msg("Group not found by id")
-			}
-			isGroup = true
-		} else {
-			identity, err = userIdToIdentity(ctx, g.identityCache, tmp)
-			if err != nil {
-				g.logger.Warn().Str("userid", tmp).Msg("User not found by id")
-			}
-		}
-		switch apiVersion {
-		case APIVersion_1:
-			var identitySet libregraph.IdentitySet
-			if isGroup {
-				identitySet.SetGroup(identity)
-			} else {
-				identitySet.SetUser(identity)
-			}
-			p.SetGrantedToIdentities([]libregraph.IdentitySet{identitySet})
-		case APIVersion_1_Beta_1:
-			var identitySet libregraph.SharePointIdentitySet
-			if isGroup {
-				identitySet.SetGroup(identity)
-			} else {
-				identitySet.SetUser(identity)
-			}
-			p.SetId(identitySetToSpacePermissionID(identitySet))
-			p.SetGrantedToV2(identitySet)
-		}
-
-		if exp := permissionsExpirations[id]; exp != nil {
-			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
-		}
-
-		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*perm, unifiedrole.UnifiedRoleConditionOwner, false); role != nil {
-			switch apiVersion {
-			case APIVersion_1:
-				if r := unifiedrole.GetLegacyName(*role); r != "" {
-					p.SetRoles([]string{r})
-				}
-			case APIVersion_1_Beta_1:
-				p.SetRoles([]string{role.GetId()})
-			}
-		}
-
-		permissions = append(permissions, p)
-	}
-	return permissions
 }
 
 func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (libregraph.Quota, error) {

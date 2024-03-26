@@ -640,20 +640,6 @@ func (g Graph) getPermissionByID(ctx context.Context, permissionID string, itemI
 
 }
 
-func (g Graph) getSpaceRootPermissions(ctx context.Context, spaceID *storageprovider.StorageSpaceId) ([]libregraph.Permission, error) {
-	gatewayClient, err := g.gatewaySelector.Next()
-	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
-		return nil, err
-	}
-	space, err := utils.GetSpace(ctx, spaceID.GetOpaqueId(), gatewayClient)
-	if err != nil {
-		return nil, err
-	}
-
-	return g.cs3SpacePermissionsToLibreGraph(ctx, space, APIVersion_1_Beta_1), nil
-}
-
 func (g Graph) getUserPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
 	shareByID, err := g.getCS3UserShareByID(ctx, permissionID)
 	if err != nil {
@@ -914,23 +900,6 @@ func (g Graph) removePublicShare(ctx context.Context, permissionID string) error
 	}
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
-}
-
-func (g Graph) getDriveItem(ctx context.Context, ref storageprovider.Reference) (*libregraph.DriveItem, error) {
-	gatewayClient, err := g.gatewaySelector.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &ref})
-	if err != nil {
-		return nil, err
-	}
-	if res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
-		refStr, _ := storagespace.FormatReference(&ref)
-		return nil, fmt.Errorf("could not stat %s: %s", refStr, res.GetStatus().GetMessage())
-	}
-	return cs3ResourceToDriveItem(g.logger, res.GetInfo())
 }
 
 func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.ResourceId, baseURL *url.URL) (*libregraph.RemoteItem, error) {
