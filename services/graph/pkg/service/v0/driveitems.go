@@ -27,14 +27,10 @@ import (
 	"golang.org/x/crypto/sha3"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
-	"github.com/cs3org/reva/v2/pkg/publicshare"
-	"github.com/cs3org/reva/v2/pkg/share"
-
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
@@ -365,90 +361,6 @@ func (g Graph) GetDriveItemChildren(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &ListResponse{Value: files})
-}
-
-// ListPermissions lists the permissions of a driveItem
-func (g Graph) ListPermissions(w http.ResponseWriter, r *http.Request) {
-	gatewayClient, ok := g.GetGatewayClient(w, r)
-	if !ok {
-		return
-	}
-
-	_, itemID, err := GetDriveAndItemIDParam(r, g.logger)
-	if err != nil {
-		errorcode.RenderError(w, r, err)
-		return
-	}
-
-	ctx := r.Context()
-
-	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
-	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
-		g.logger.Warn().Err(errCode).Interface("stat.res", statResponse).Msg("stat failed")
-		errCode.Render(w, r)
-		return
-	}
-
-	condition := unifiedrole.UnifiedRoleConditionGrantee
-	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
-		condition = unifiedrole.UnifiedRoleConditionOwner
-	}
-
-	permissionSet := *statResponse.GetInfo().GetPermissionSet()
-	allowedActions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissionSet)
-
-	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{
-		LibreGraphPermissionsActionsAllowedValues: allowedActions,
-		LibreGraphPermissionsRolesAllowedValues: conversions.ToValueSlice(
-			unifiedrole.GetApplicableRoleDefinitionsForActions(
-				allowedActions,
-				condition,
-				g.config.FilesSharing.EnableResharing,
-				false,
-			),
-		),
-	}
-
-	for i, definition := range collectionOfPermissions.LibreGraphPermissionsRolesAllowedValues {
-		// the openapi spec defines that the rolePermissions should not be part of the response
-		definition.RolePermissions = nil
-		collectionOfPermissions.LibreGraphPermissionsRolesAllowedValues[i] = definition
-	}
-
-	driveItems := make(driveItemsByResourceID)
-	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
-		permissions, err := g.getSpaceRootPermissions(ctx, statResponse.GetInfo().GetSpace().GetId())
-		if err != nil {
-			errorcode.RenderError(w, r, err)
-			return
-		}
-		collectionOfPermissions.Value = permissions
-	} else {
-		// "normal" driveItem, populate user  permissions via share providers
-		driveItems, err = g.listUserShares(ctx, []*collaboration.Filter{
-			share.ResourceIDFilter(conversions.ToPointer(itemID)),
-		}, driveItems)
-		if err != nil {
-			errorcode.RenderError(w, r, err)
-			return
-		}
-
-	}
-	// finally get public shares, which are possible for spaceroots and "normal" resources
-	driveItems, err = g.listPublicShares(ctx, []*link.ListPublicSharesRequest_Filter{
-		publicshare.ResourceIDFilter(conversions.ToPointer(itemID)),
-	}, driveItems)
-	if err != nil {
-		errorcode.RenderError(w, r, err)
-		return
-	}
-
-	for _, driveItem := range driveItems {
-		collectionOfPermissions.Value = append(collectionOfPermissions.Value, driveItem.Permissions...)
-	}
-
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, collectionOfPermissions)
 }
 
 // UpdatePermission updates a Permission of a Drive item
