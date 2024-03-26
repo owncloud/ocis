@@ -26,10 +26,13 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/validate"
 )
 
+const invalidIdMsg = "invalid driveID or itemID"
+
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	SpaceRootInvite(ctx context.Context, driveID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	ListPermissions(ctx context.Context, itemID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	ListSpaceRootPermissions(ctx context.Context, driveID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 }
 
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
@@ -263,6 +266,27 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 	return collectionOfPermissions, nil
 }
 
+// ListSpaceRootPermissions handles ListPermissions request on project spaces
+func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Context, driveID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{}
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return collectionOfPermissions, err
+	}
+
+	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(driveID), gatewayClient)
+	if err != nil {
+		return collectionOfPermissions, err
+	}
+
+	if space.SpaceType != "project" {
+		return collectionOfPermissions, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
+	}
+
+	rootResourceID := space.GetRoot()
+	return s.ListPermissions(ctx, *rootResourceID)
+}
+
 // DriveItemPermissionsService is the api that registers the http endpoints which expose needed operation to the graph api.
 // the business logic is delegated to the permissions service and further down to the cs3 client.
 type DriveItemPermissionsApi struct {
@@ -281,9 +305,8 @@ func NewDriveItemPermissionsApi(driveItemPermissionService DriveItemPermissionsP
 func (api DriveItemPermissionsApi) Invite(w http.ResponseWriter, r *http.Request) {
 	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
-		msg := "invalid driveID or itemID"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		api.logger.Debug().Err(err).Msg(invalidIdMsg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, invalidIdMsg)
 		return
 	}
 
@@ -348,8 +371,7 @@ func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *htt
 func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *http.Request) {
 	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
-		msg := "invalid driveID or itemID"
-		api.logger.Debug().Err(err).Msg(msg)
+		api.logger.Debug().Err(err).Msg(invalidIdMsg)
 		errorcode.RenderError(w, r, err)
 		return
 	}
@@ -357,6 +379,27 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 	ctx := r.Context()
 
 	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, itemID)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, permissions)
+}
+
+func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWriter, r *http.Request) {
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		msg := "could not parse driveID"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		return
+	}
+
+	ctx := r.Context()
+	permissions, err := api.driveItemPermissionsService.ListSpaceRootPermissions(ctx, driveID)
+
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
