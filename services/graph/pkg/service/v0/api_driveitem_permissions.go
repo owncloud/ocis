@@ -8,8 +8,11 @@ import (
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/publicshare"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
@@ -26,6 +29,7 @@ import (
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	SpaceRootInvite(ctx context.Context, driveID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
+	ListPermissions(ctx context.Context, itemID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 }
 
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
@@ -188,6 +192,77 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 	return s.Invite(ctx, *rootResourceID, invite)
 }
 
+// ListPermissions lists the permissions of a driveItem
+func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{}
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return collectionOfPermissions, err
+	}
+
+	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
+	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
+		s.logger.Warn().Err(errCode).Interface("stat.res", statResponse).Msg("stat failed")
+		return collectionOfPermissions, err
+	}
+
+	condition := unifiedrole.UnifiedRoleConditionGrantee
+	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
+		condition = unifiedrole.UnifiedRoleConditionOwner
+	}
+
+	permissionSet := *statResponse.GetInfo().GetPermissionSet()
+	allowedActions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissionSet)
+
+	collectionOfPermissions = libregraph.CollectionOfPermissionsWithAllowedValues{
+		LibreGraphPermissionsActionsAllowedValues: allowedActions,
+		LibreGraphPermissionsRolesAllowedValues: conversions.ToValueSlice(
+			unifiedrole.GetApplicableRoleDefinitionsForActions(
+				allowedActions,
+				condition,
+				s.config.FilesSharing.EnableResharing,
+				false,
+			),
+		),
+	}
+
+	for i, definition := range collectionOfPermissions.LibreGraphPermissionsRolesAllowedValues {
+		// the openapi spec defines that the rolePermissions should not be part of the response
+		definition.RolePermissions = nil
+		collectionOfPermissions.LibreGraphPermissionsRolesAllowedValues[i] = definition
+	}
+
+	driveItems := make(driveItemsByResourceID)
+	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
+		permissions, err := s.getSpaceRootPermissions(ctx, statResponse.GetInfo().GetSpace().GetId())
+		if err != nil {
+			return collectionOfPermissions, err
+		}
+		collectionOfPermissions.Value = permissions
+	} else {
+		// "normal" driveItem, populate user  permissions via share providers
+		driveItems, err = s.listUserShares(ctx, []*collaboration.Filter{
+			share.ResourceIDFilter(conversions.ToPointer(itemID)),
+		}, driveItems)
+		if err != nil {
+			return collectionOfPermissions, err
+		}
+	}
+	// finally get public shares, which are possible for spaceroots and "normal" resources
+	driveItems, err = s.listPublicShares(ctx, []*link.ListPublicSharesRequest_Filter{
+		publicshare.ResourceIDFilter(conversions.ToPointer(itemID)),
+	}, driveItems)
+	if err != nil {
+		return collectionOfPermissions, err
+	}
+
+	for _, driveItem := range driveItems {
+		collectionOfPermissions.Value = append(collectionOfPermissions.Value, driveItem.Permissions...)
+	}
+
+	return collectionOfPermissions, nil
+}
+
 // DriveItemPermissionsService is the api that registers the http endpoints which expose needed operation to the graph api.
 // the business logic is delegated to the permissions service and further down to the cs3 client.
 type DriveItemPermissionsApi struct {
@@ -268,4 +343,25 @@ func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *htt
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &ListResponse{Value: []interface{}{permission}})
+}
+
+func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *http.Request) {
+	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
+	if err != nil {
+		msg := "invalid driveID or itemID"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	ctx := r.Context()
+
+	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, itemID)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, permissions)
 }

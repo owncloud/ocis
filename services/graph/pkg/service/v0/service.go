@@ -112,7 +112,6 @@ type Service interface {
 	CreateLink(w http.ResponseWriter, r *http.Request)
 	SetLinkPassword(writer http.ResponseWriter, request *http.Request)
 
-	ListPermissions(w http.ResponseWriter, r *http.Request)
 	UpdatePermission(w http.ResponseWriter, r *http.Request)
 	DeletePermission(w http.ResponseWriter, r *http.Request)
 
@@ -247,7 +246,7 @@ func NewService(opts ...Option) (Graph, error) {
 						r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
 						r.Post("/invite", driveItemPermissionsApi.Invite)
 						r.Route("/permissions", func(r chi.Router) {
-							r.Get("/", svc.ListPermissions)
+							r.Get("/", driveItemPermissionsApi.ListPermissions)
 							r.Route("/{permissionID}", func(r chi.Router) {
 								r.Delete("/", svc.DeletePermission)
 								r.Patch("/", svc.UpdatePermission)
