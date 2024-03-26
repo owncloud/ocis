@@ -2564,6 +2564,24 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * @Then the response should contain the property :property with value :value
+	 *
+	 * @param string $property
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainThePropertyWithValue(string $property, string $value): void {
+		$responseBody = $this->getJsonDecodedResponse($this->getResponse());
+		$propertyValue = var_export($responseBody[$property], true);
+		Assert::assertSame(
+			$propertyValue,
+			$value,
+			"Expected value of property: $property to have value: $value but found: {$propertyValue}"
+		);
+	}
+
+	/**
 	 * send request to read a server file for core
 	 *
 	 * @param string $path
