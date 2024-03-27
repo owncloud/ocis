@@ -153,6 +153,10 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 
 	receivedSharesByResourceID := make(map[string][]*collaboration.ReceivedShare, len(receivedShares))
 	for _, receivedShare := range receivedShares {
+		if receivedShare == nil {
+			continue
+		}
+
 		rIDStr := storagespace.FormatResourceID(*receivedShare.GetShare().GetResourceId())
 		receivedSharesByResourceID[rIDStr] = append(receivedSharesByResourceID[rIDStr], receivedShare)
 	}
@@ -453,4 +457,20 @@ func roleConditionForResourceType(ri *storageprovider.ResourceInfo) (string, err
 	default:
 		return "", errorcode.New(errorcode.InvalidRequest, "unsupported resource type")
 	}
+}
+
+// GetShareID returns a valid share ID from the given resource ID.
+// Basically, it just checks if the given ID has an opaque ID that is
+// compatible with the id format defined by storagespace package.
+func GetShareID(shareID storageprovider.ResourceId) (*collaboration.ShareId, error) {
+	if _, err := storagespace.ParseID(shareID.GetOpaqueId()); err != nil {
+		return nil, err
+	}
+
+	// This is a bit of a hack.
+	// We should not rely on a specific format of the item id.
+	// But currently there is no other way to get the ShareID.
+	return &collaboration.ShareId{
+		OpaqueId: shareID.GetOpaqueId(),
+	}, nil
 }
