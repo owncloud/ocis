@@ -105,7 +105,7 @@ func (s DriveItemPermissionsService) CreateSpaceRootLink(ctx context.Context, dr
 		return libregraph.Permission{}, err
 	}
 
-	if space.SpaceType != "project" {
+	if space.SpaceType != _spaceTypeProject {
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
@@ -143,7 +143,7 @@ func (s DriveItemPermissionsService) SetPublicLinkPasswordOnSpaceRoot(ctx contex
 		return libregraph.Permission{}, err
 	}
 
-	if space.SpaceType != "project" {
+	if space.SpaceType != _spaceTypeProject {
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 	rootResourceID := space.GetRoot()

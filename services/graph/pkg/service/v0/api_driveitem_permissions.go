@@ -197,7 +197,7 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 		return libregraph.Permission{}, err
 	}
 
-	if space.SpaceType != "project" {
+	if space.SpaceType != _spaceTypeProject {
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
@@ -289,7 +289,7 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 		return collectionOfPermissions, err
 	}
 
-	if space.SpaceType != "project" {
+	if space.SpaceType != _spaceTypeProject {
 		return collectionOfPermissions, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
@@ -360,7 +360,7 @@ func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Conte
 		return err
 	}
 
-	if space.SpaceType != "project" {
+	if space.SpaceType != _spaceTypeProject {
 		return errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
@@ -409,7 +409,7 @@ func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Conte
 		return libregraph.Permission{}, err
 	}
 
-	if space.SpaceType != "project" {
+	if space.SpaceType != _spaceTypeProject {
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
