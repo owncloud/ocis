@@ -31,7 +31,7 @@ Feature: sharing
       | spaces           |
 
   @skipOnReva
-  Scenario Outline: check webdav share-permissions for received file with edit and reshare permissions
+  Scenario Outline: check webdav share-permissions for received file with edit
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
     And user "Alice" has shared file "/tmp.txt" with user "Brian"
@@ -39,28 +39,28 @@ Feature: sharing
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "19"
+    And the single response should contain a property "ocs:share-permissions" with value "3"
     Examples:
       | dav-path-version |
       | old              |
       | new              |
 
 
-  Scenario Outline: check webdav share-permissions for received group shared file with edit and reshare permissions
+  Scenario Outline: check webdav share-permissions for received group shared file with edit
     Given using <dav-path-version> DAV path
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
     And user "Alice" has created a share with settings
-      | path        | /tmp.txt          |
-      | shareType   | group             |
-      | permissions | share,update,read |
-      | shareWith   | grp1              |
+      | path        | /tmp.txt    |
+      | shareType   | group       |
+      | permissions | update,read |
+      | shareWith   | grp1        |
     When user "Brian" gets the following properties of file "/Shares/tmp.txt" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "19"
+    And the single response should contain a property "ocs:share-permissions" with value "3"
     Examples:
       | dav-path-version |
       | old              |
@@ -102,14 +102,14 @@ Feature: sharing
       | new              |
 
   @skipOnReva @issue-2213
-  Scenario Outline: check webdav share-permissions for received file with reshare permissions but no edit permissions
+  Scenario Outline: check webdav share-permissions for received file without edit permissions
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
     And user "Alice" has shared file "tmp.txt" with user "Brian"
     When user "Alice" updates the last share using the sharing API with
-      | permissions | share,read |
+      | permissions | read |
     Then the HTTP status code should be "200"
-    And as user "Brian" file "/Shares/tmp.txt" should contain a property "ocs:share-permissions" with value "17"
+    And as user "Brian" file "/Shares/tmp.txt" should contain a property "ocs:share-permissions" with value "1"
     Examples:
       | dav-path-version |
       | old              |
@@ -122,15 +122,15 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
     And user "Alice" has created a share with settings
-      | path        | /tmp.txt   |
-      | shareType   | group      |
-      | permissions | share,read |
-      | shareWith   | grp1       |
+      | path        | /tmp.txt |
+      | shareType   | group    |
+      | permissions | read     |
+      | shareWith   | grp1     |
     When user "Brian" gets the following properties of file "/Shares/tmp.txt" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "17"
+    And the single response should contain a property "ocs:share-permissions" with value "1"
     Examples:
       | dav-path-version |
       | old              |
@@ -164,7 +164,7 @@ Feature: sharing
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "31"
+    And the single response should contain a property "ocs:share-permissions" with value "15"
     Examples:
       | dav-path-version |
       | old              |
@@ -184,7 +184,7 @@ Feature: sharing
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "31"
+    And the single response should contain a property "ocs:share-permissions" with value "15"
     Examples:
       | dav-path-version |
       | old              |
@@ -196,9 +196,9 @@ Feature: sharing
     And user "Alice" has created folder "/tmp"
     And user "Alice" has shared file "/tmp" with user "Brian"
     When user "Alice" updates the last share using the sharing API with
-      | permissions | share,delete,create,read |
+      | permissions | delete,create,read |
     Then the HTTP status code should be "200"
-    And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "29"
+    And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "13"
     Examples:
       | dav-path-version |
       | old              |
@@ -211,15 +211,15 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
     And user "Alice" has created a share with settings
-      | path        | tmp                      |
-      | shareType   | group                    |
-      | shareWith   | grp1                     |
-      | permissions | share,delete,create,read |
+      | path        | tmp                |
+      | shareType   | group              |
+      | shareWith   | grp1               |
+      | permissions | delete,create,read |
     When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "29"
+    And the single response should contain a property "ocs:share-permissions" with value "13"
     Examples:
       | dav-path-version |
       | old              |
@@ -231,9 +231,9 @@ Feature: sharing
     And user "Alice" has created folder "/tmp"
     And user "Alice" has shared file "/tmp" with user "Brian"
     When user "Alice" updates the last share using the sharing API with
-      | permissions | share,delete,update,read |
+      | permissions | delete,update,read |
     Then the HTTP status code should be "200"
-    And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "27"
+    And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "11"
     Examples:
       | dav-path-version |
       | old              |
@@ -246,15 +246,15 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
     And user "Alice" has created a share with settings
-      | path        | tmp                      |
-      | shareType   | group                    |
-      | shareWith   | grp1                     |
-      | permissions | share,delete,update,read |
+      | path        | tmp                |
+      | shareType   | group              |
+      | shareWith   | grp1               |
+      | permissions | delete,update,read |
     When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "27"
+    And the single response should contain a property "ocs:share-permissions" with value "11"
     Examples:
       | dav-path-version |
       | old              |
@@ -266,9 +266,9 @@ Feature: sharing
     And user "Alice" has created folder "/tmp"
     And user "Alice" has shared file "/tmp" with user "Brian"
     When user "Alice" updates the last share using the sharing API with
-      | permissions | share,create,update,read |
+      | permissions | create,update,read |
     Then the HTTP status code should be "200"
-    And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "23"
+    And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "7"
     Examples:
       | dav-path-version |
       | old              |
@@ -281,15 +281,15 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
     And user "Alice" has created a share with settings
-      | path        | tmp                      |
-      | shareType   | group                    |
-      | shareWith   | grp1                     |
-      | permissions | share,create,update,read |
+      | path        | tmp                |
+      | shareType   | group              |
+      | shareWith   | grp1               |
+      | permissions | create,update,read |
     When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "23"
+    And the single response should contain a property "ocs:share-permissions" with value "7"
     Examples:
       | dav-path-version |
       | old              |

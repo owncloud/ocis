@@ -18,19 +18,18 @@ Feature: checking file versions using file id
 
   Scenario Outline: check the file versions of a file shared from project space
     Given user "Alice" has created a share inside of space "Project1" with settings:
-      | path      | text.txt     |
-      | shareWith | Brian        |
-      | role      | <space-role> |
+      | path      | text.txt |
+      | shareWith | Brian    |
+      | role      | <role>   |
     When user "Alice" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
     When user "Brian" tries to get the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
     Then the HTTP status code should be "403"
     Examples:
-      | space-role |
-      | editor     |
-      | viewer     |
-      | all        |
+      | role   |
+      | editor |
+      | viewer |
 
 
   Scenario Outline: check the versions of a file in a shared space as editor/manager
@@ -60,9 +59,9 @@ Feature: checking file versions using file id
   Scenario Outline: check the versions of a file after moving to a shared folder inside a project space as editor/viewer
     Given user "Alice" has created a folder "testFolder" in space "Project1"
     And user "Alice" has created a share inside of space "Project1" with settings:
-      | path      | testFolder   |
-      | shareWith | Brian        |
-      | role      | <space-role> |
+      | path      | testFolder |
+      | shareWith | Brian      |
+      | role      | <role>     |
     And user "Alice" has moved file "text.txt" to "/testFolder/movedText.txt" in space "Project1"
     When user "Alice" gets the number of versions of file "/testFolder/movedText.txt" using file-id path "/meta/<<FILEID>>/v"
     Then the HTTP status code should be "207"
@@ -70,17 +69,19 @@ Feature: checking file versions using file id
     When user "Brian" tries to get the number of versions of file "/Shares/testFolder/movedText.txt" using file-id path "/meta/<<FILEID>>/v"
     Then the HTTP status code should be "403"
     Examples:
-      | space-role |
-      | editor     |
-      | viewer     |
+      | role   |
+      | editor |
+      | viewer |
 
   @issue-7738
-  Scenario: check the versions of a file after moving it to a shared folder of a project space shared with all permissions
+  Scenario: check the versions of a file after moving it to a shared folder inside a project space as manager
     Given user "Alice" has created a folder "testFolder" in space "Project1"
     And user "Alice" has created a share inside of space "Project1" with settings:
       | path      | testFolder |
       | shareWith | Brian      |
-      | role      | all        |
+    And user "Alice" has shared a space "Project1" with settings:
+      | shareWith | Brian   |
+      | role      | manager |
     And user "Alice" has moved file "text.txt" to "/testFolder/movedText.txt" in space "Project1"
     When user "Brian" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
     Then the HTTP status code should be "207"

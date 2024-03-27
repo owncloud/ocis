@@ -71,14 +71,6 @@ File and sync features in a shared scenario
 - [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:159](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L159)
 - [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:160](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L160)
 
-#### [sharing the shares folder to users exits with different status code than in oc10 backend](https://github.com/owncloud/ocis/issues/2215)
-
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:654](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L654)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:655](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L655)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:672](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L672)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:673](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L673)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:687](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L687)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:688](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L688)
 
 #### [file_target of an auto-renamed file is not correct directly after sharing](https://github.com/owncloud/core/issues/32322)
 
@@ -133,29 +125,13 @@ cannot share a folder with create permission
 - [coreApiTrashbin/trashbinSharingToShares.feature:201](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L201)
 - [coreApiTrashbin/trashbinSharingToShares.feature:224](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L224)
 
-#### [Expiration date for shares is not implemented](https://github.com/owncloud/ocis/issues/1250)
-
-#### Expiration date of user shares
-
-- [coreApiShareReshareToShares2/reShareWithExpiryDate.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares2/reShareWithExpiryDate.feature#L33)
-- [coreApiShareReshareToShares2/reShareWithExpiryDate.feature:34](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares2/reShareWithExpiryDate.feature#L34)
-
-#### Expiration date of group shares
-
-- [coreApiShareReshareToShares2/reShareWithExpiryDate.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares2/reShareWithExpiryDate.feature#L56)
-- [coreApiShareReshareToShares2/reShareWithExpiryDate.feature:57](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares2/reShareWithExpiryDate.feature#L57)
-
-#### [Cannot move folder/file from one received share to another](https://github.com/owncloud/ocis/issues/2442)
-
-- [coreApiShareUpdateToShares/updateShare.feature:124](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L124)
-- [coreApiShareUpdateToShares/updateShare.feature:154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L154)
 
 #### [Sharing folder and sub-folder with same user but different permission,the permission of sub-folder is not obeyed ](https://github.com/owncloud/ocis/issues/2440)
 
 - [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:213](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L213)
 - [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:239](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L239)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:324](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L324)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:350](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L350)
+- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:292](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L292)
+- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:318](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L318)
 
 #### [Empty OCS response for a share create request using a disabled user](https://github.com/owncloud/ocis/issues/2212)
 
@@ -164,13 +140,13 @@ cannot share a folder with create permission
 
 #### [Edit user share response has a "name" field](https://github.com/owncloud/ocis/issues/1225)
 
-- [coreApiShareUpdateToShares/updateShare.feature:227](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L227)
-- [coreApiShareUpdateToShares/updateShare.feature:228](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L228)
+- [coreApiShareUpdateToShares/updateShare.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L161)
+- [coreApiShareUpdateToShares/updateShare.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L162)
 
 #### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
 
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:594](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L594)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:595](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L595)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:544](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L544)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:545](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L545)
 
 #### [deleting a share with wrong authentication returns OCS status 996 / HTTP 500](https://github.com/owncloud/ocis/issues/1229)
 
@@ -278,8 +254,8 @@ And other missing implementation of favorites
 
 #### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
 
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:638](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L638)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:639](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L639)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:588](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L588)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:589](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L589)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 

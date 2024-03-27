@@ -30,7 +30,7 @@ Feature: sharing
     And user "Brian" accepts share "/merge-test-outside-perms" offered by user "Alice" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
-    And as user "Brian" folder "/Shares/merge-test-outside-perms" should contain a property "oc:permissions" with value "SRDNVCK"
+    And as user "Brian" folder "/Shares/merge-test-outside-perms" should contain a property "oc:permissions" with value "SDNVCK"
     And as "Brian" folder "/Shares/merge-test-outside-perms (2)" should not exist
 
 
@@ -56,7 +56,7 @@ Feature: sharing
     And user "Brian" accepts share "/merge-test-outside-twogroups-perms" offered by user "Alice" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
-    And as user "Brian" folder "/Shares/merge-test-outside-twogroups-perms" should contain a property "oc:permissions" with value "SRDNVCK"
+    And as user "Brian" folder "/Shares/merge-test-outside-twogroups-perms" should contain a property "oc:permissions" with value "SDNVCK"
     And as "Brian" folder "/Shares/merge-test-outside-twogroups-perms (2)" should not exist
 
 
@@ -70,7 +70,7 @@ Feature: sharing
     And user "Brian" accepts share "/merge-test-outside-twogroups-member-perms" offered by user "Alice" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
-    And as user "Brian" folder "/Shares/merge-test-outside-twogroups-member-perms" should contain a property "oc:permissions" with value "SRDNVCK"
+    And as user "Brian" folder "/Shares/merge-test-outside-twogroups-member-perms" should contain a property "oc:permissions" with value "SDNVCK"
     And as "Brian" folder "/Shares/merge-test-outside-twogroups-member-perms (2)" should not exist
 
 

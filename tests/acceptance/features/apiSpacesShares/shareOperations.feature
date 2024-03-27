@@ -19,7 +19,7 @@ Feature: sharing
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "19"
+    And the single response should contain a property "ocs:share-permissions" with value "3"
 
 
   Scenario: correct webdav share-permissions for received group shared file with edit and reshare permissions
@@ -27,15 +27,15 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
     And user "Alice" has created a share with settings
-      | path        | /tmp.txt          |
-      | shareType   | group             |
-      | permissions | share,update,read |
-      | shareWith   | grp1              |
+      | path        | /tmp.txt    |
+      | shareType   | group       |
+      | permissions | update,read |
+      | shareWith   | grp1        |
     When user "Brian" gets the following properties of file "/tmp.txt" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "19"
+    And the single response should contain a property "ocs:share-permissions" with value "3"
 
 
   Scenario: correct webdav share-permissions for received file with edit permissions but no reshare permissions
@@ -67,9 +67,9 @@ Feature: sharing
     Given user "Alice" has uploaded file with content "foo" to "/tmp.txt"
     And user "Alice" has shared file "tmp.txt" with user "Brian"
     When user "Alice" updates the last share using the sharing API with
-      | permissions | share,read |
+      | permissions | read |
     Then the HTTP status code should be "200"
-    And as user "Brian" file "/tmp.txt" inside space "Shares" should contain a property "ocs:share-permissions" with value "17"
+    And as user "Brian" file "/tmp.txt" inside space "Shares" should contain a property "ocs:share-permissions" with value "1"
 
 
   Scenario: correct webdav share-permissions for received group shared file with reshare permissions but no edit permissions
@@ -77,15 +77,15 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
     And user "Alice" has created a share with settings
-      | path        | /tmp.txt   |
-      | shareType   | group      |
-      | permissions | share,read |
-      | shareWith   | grp1       |
+      | path        | /tmp.txt |
+      | shareType   | group    |
+      | permissions | read     |
+      | shareWith   | grp1     |
     When user "Brian" gets the following properties of file "/tmp.txt" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "17"
+    And the single response should contain a property "ocs:share-permissions" with value "1"
 
 
   Scenario: correct webdav share-permissions for received folder with all permissions
@@ -95,7 +95,7 @@ Feature: sharing
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "31"
+    And the single response should contain a property "ocs:share-permissions" with value "15"
 
 
   Scenario: correct webdav share-permissions for received group shared folder with all permissions
@@ -110,16 +110,16 @@ Feature: sharing
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "31"
+    And the single response should contain a property "ocs:share-permissions" with value "15"
 
 
   Scenario: correct webdav share-permissions for received folder with all permissions but edit
     Given user "Alice" has created folder "/tmp"
     And user "Alice" has shared file "/tmp" with user "Brian"
     When user "Alice" updates the last share using the sharing API with
-      | permissions | share,delete,create,read |
+      | permissions | delete,create,read |
     Then the HTTP status code should be "200"
-    And as user "Brian" folder "/tmp" inside space "Shares" should contain a property "ocs:share-permissions" with value "29"
+    And as user "Brian" folder "/tmp" inside space "Shares" should contain a property "ocs:share-permissions" with value "13"
 
 
   Scenario: correct webdav share-permissions for received group shared folder with all permissions but edit
@@ -127,24 +127,24 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
     And user "Alice" has created a share with settings
-      | path        | tmp                      |
-      | shareType   | group                    |
-      | shareWith   | grp1                     |
-      | permissions | share,delete,create,read |
+      | path        | tmp                |
+      | shareType   | group              |
+      | shareWith   | grp1               |
+      | permissions | delete,create,read |
     When user "Brian" gets the following properties of folder "/tmp" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "29"
+    And the single response should contain a property "ocs:share-permissions" with value "13"
 
 
   Scenario: correct webdav share-permissions for received folder with all permissions but create
     Given user "Alice" has created folder "/tmp"
     And user "Alice" has shared file "/tmp" with user "Brian"
     When user "Alice" updates the last share using the sharing API with
-      | permissions | share,delete,update,read |
+      | permissions | delete,update,read |
     Then the HTTP status code should be "200"
-    And as user "Brian" folder "/tmp" inside space "Shares" should contain a property "ocs:share-permissions" with value "27"
+    And as user "Brian" folder "/tmp" inside space "Shares" should contain a property "ocs:share-permissions" with value "11"
 
 
   Scenario: correct webdav share-permissions for received group shared folder with all permissions but create
@@ -152,24 +152,24 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
     And user "Alice" has created a share with settings
-      | path        | tmp                      |
-      | shareType   | group                    |
-      | shareWith   | grp1                     |
-      | permissions | share,delete,update,read |
+      | path        | tmp                |
+      | shareType   | group              |
+      | shareWith   | grp1               |
+      | permissions | delete,update,read |
     When user "Brian" gets the following properties of folder "/tmp" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "27"
+    And the single response should contain a property "ocs:share-permissions" with value "11"
 
 
   Scenario: correct webdav share-permissions for received folder with all permissions but delete
     Given user "Alice" has created folder "/tmp"
     And user "Alice" has shared file "/tmp" with user "Brian"
     When user "Alice" updates the last share using the sharing API with
-      | permissions | share,create,update,read |
+      | permissions | create,update,read |
     Then the HTTP status code should be "200"
-    And as user "Brian" folder "/tmp" inside space "Shares" should contain a property "ocs:share-permissions" with value "23"
+    And as user "Brian" folder "/tmp" inside space "Shares" should contain a property "ocs:share-permissions" with value "7"
 
 
   Scenario: correct webdav share-permissions for received group shared folder with all permissions but delete
@@ -177,15 +177,15 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
     And user "Alice" has created a share with settings
-      | path        | tmp                      |
-      | shareType   | group                    |
-      | shareWith   | grp1                     |
-      | permissions | share,create,update,read |
+      | path        | tmp                |
+      | shareType   | group              |
+      | shareWith   | grp1               |
+      | permissions | create,update,read |
     When user "Brian" gets the following properties of folder "/tmp" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "23"
+    And the single response should contain a property "ocs:share-permissions" with value "7"
 
 
   Scenario: correct webdav share-permissions for received folder with all permissions but share

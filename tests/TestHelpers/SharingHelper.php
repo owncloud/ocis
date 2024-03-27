@@ -39,7 +39,6 @@ class SharingHelper {
 		'update' => 2,
 		'create' => 4,
 		'delete' => 8,
-		'share' => 16,
 		'invite' => 0
 	];
 
@@ -123,6 +122,9 @@ class SharingHelper {
 
 		if ($permissions !== null) {
 			$fd['permissions'] = self::getPermissionSum($permissions);
+		} elseif ($shareType !== "public_link") {
+			// sharing without permissions should automatically set the permission to 15 for share and 1 for public link
+			$fd['permissions'] = 15;
 		}
 
 		if (!\in_array($ocsApiVersion, [1, 2], true)) {

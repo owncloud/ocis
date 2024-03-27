@@ -59,47 +59,6 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @smokeTest
-  Scenario Outline: getting all shares of a file with reshares
-    Given using OCS API version "<ocs-api-version>"
-    And these users have been created with default attributes and without skeleton files:
-      | username |
-      | Carol    |
-      | David    |
-    And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Brian" has shared file "/Shares/textfile0.txt" with user "Carol"
-    When user "Alice" gets all the shares with reshares of the file "textfile0.txt" using the sharing API
-    Then the OCS status code should be "<ocs-status-code>"
-    And the HTTP status code should be "200"
-    And user "Brian" should be included in the response
-    And user "Carol" should be included in the response
-    And user "David" should not be included in the response
-    Examples:
-      | ocs-api-version | ocs-status-code |
-      | 1               | 100             |
-      | 2               | 200             |
-
-  @smokeTest
-  Scenario Outline: resource can be reshared to resource owner
-    Given using OCS API version "<ocs-api-version>"
-    And group "grp1" has been created
-    And user "Carol" has been created with default attributes and without skeleton files
-    And user "Carol" has been added to group "grp1"
-    And user "Carol" has created folder "/shared"
-    And user "Carol" has uploaded file with content "some data" to "/shared/shared_file.txt"
-    And user "Carol" has shared folder "/shared" with user "Brian"
-    And user "Brian" has shared folder "/Shares/shared" with group "grp1"
-    # no need to accept this share as it is Carol's file
-    When user "Carol" gets all the shares shared with her using the sharing API
-    Then the OCS status code should be "<ocs-status-code>"
-    And the HTTP status code should be "200"
-    And file "/Shares/shared" should be included in the response
-    Examples:
-      | ocs-api-version | ocs-status-code |
-      | 1               | 100             |
-      | 2               | 200             |
-
   @smokeTest @issue-1226 @issue-1270 @issue-1271
   Scenario Outline: getting share info of a share
     Given using OCS API version "<ocs-api-version>"
@@ -117,7 +76,7 @@ Feature: sharing
       | file_source            | A_STRING                  |
       | file_target            | /Shares/file_to_share.txt |
       | path                   | /file_to_share.txt        |
-      | permissions            | share,read,update         |
+      | permissions            | read,update               |
       | stime                  | A_NUMBER                  |
       | storage                | A_STRING                  |
       | mail_send              | 0                         |
@@ -181,7 +140,7 @@ Feature: sharing
       | file_source            | A_STRING                  |
       | file_target            | /Shares/file_to_share.txt |
       | path                   | /PARENT/file_to_share.txt |
-      | permissions            | share,read,update         |
+      | permissions            | read,update               |
       | stime                  | A_NUMBER                  |
       | storage                | A_STRING                  |
       | mail_send              | 0                         |

@@ -11,7 +11,7 @@ Feature: REPORT request to Shares space
     And user "Alice" has created folder "/folderMain"
     And user "Alice" has created folder "/folderMain/SubFolder1"
     And user "Alice" has created folder "/folderMain/SubFolder1/subFOLDER2"
-    And user "Alice" has shared entry "/folderMain" with user "Brian" with permissions "17"
+    And user "Alice" has shared entry "/folderMain" with user "Brian" with permissions "1"
 
 
   Scenario Outline: check the REPORT response of the found folder
@@ -60,7 +60,7 @@ Feature: REPORT request to Shares space
     Given user "Brian" has disabled auto-accepting
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folderToBrian"
-    And user "Alice" has shared entry "/folderToBrian" with user "Brian" with permissions "17"
+    And user "Alice" has shared entry "/folderToBrian" with user "Brian" with permissions "1"
     When user "Brian" searches for "folderToBrian" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions

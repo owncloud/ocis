@@ -80,7 +80,7 @@ Feature: List and create spaces
   Scenario: ordinary user can request information about their Space via the Graph API using a filter
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "folder"
-    And user "Brian" has shared folder "folder" with user "Alice" with permissions "31"
+    And user "Brian" has shared folder "folder" with user "Alice" with permissions "15"
     When user "Alice" lists all available spaces via the Graph API with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" and match

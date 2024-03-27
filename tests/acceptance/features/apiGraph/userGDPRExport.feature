@@ -625,7 +625,6 @@ Feature: user GDPR (General Data Protection Regulation) report
                 "permissions": {
                   "type": "object",
                   "required": [
-                    "add_grant",
                     "get_path",
                     "get_quota",
                     "initiate_file_download",
@@ -634,10 +633,6 @@ Feature: user GDPR (General Data Protection Regulation) report
                     "stat"
                   ],
                   "properties": {
-                    "add_grant" : {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
                     "get_path" : {
                       "type": "boolean",
                       "enum": [true]

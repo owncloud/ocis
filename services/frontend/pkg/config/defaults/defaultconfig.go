@@ -85,7 +85,7 @@ func DefaultConfig() *config.Config {
 		UploadMaxChunkSize:       1e+7,
 		UploadHTTPMethodOverride: "",
 		DefaultUploadProtocol:    "tus",
-		EnableResharing:          true,
+		EnableResharing:          false,
 		DefaultLinkPermissions:   1,
 		SearchMinLength:          3,
 		Edition:                  "Community",

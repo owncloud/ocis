@@ -8,7 +8,7 @@ Feature: sharing
     Given user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest
-  Scenario Outline: creating a share of a file with a user, the default permissions are read(1)+update(2)+can-share(16)
+  Scenario Outline: creating a share of a file with a user, the default permissions are read(1)+update(2)
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
@@ -21,7 +21,7 @@ Feature: sharing
       | share_with_user_type   | 0                     |
       | file_target            | /Shares/textfile0.txt |
       | path                   | /textfile0.txt        |
-      | permissions            | share,read,update     |
+      | permissions            | read,update           |
       | uid_owner              | %username%            |
       | displayname_owner      | %displayname%         |
       | item_type              | file                  |
@@ -47,7 +47,7 @@ Feature: sharing
       | share_with_displayname | %displayname%        |
       | file_target            | /Shares/sample,1.txt |
       | path                   | /sample,1.txt        |
-      | permissions            | share,read,update    |
+      | permissions            | read,update          |
       | uid_owner              | %username%           |
       | displayname_owner      | %displayname%        |
       | item_type              | file                 |
@@ -83,11 +83,11 @@ Feature: sharing
     Examples:
       | ocs-api-version | requested-permissions | granted-permissions | ocs-status-code |
       # Ask for full permissions. You get share plus read plus update. create and delete do not apply to shares of a file
-      | 1               | 31                    | 19                  | 100             |
-      | 2               | 31                    | 19                  | 200             |
-      # Ask for read, share (17), create and delete. You get share plus read
-      | 1               | 29                    | 17                  | 100             |
-      | 2               | 29                    | 17                  | 200             |
+      | 1               | 15                    | 3                   | 100             |
+      | 2               | 15                    | 3                   | 200             |
+      # Ask for read, create and delete. You get share plus read
+      | 1               | 13                    | 1                   | 100             |
+      | 2               | 13                    | 1                   | 200             |
       # Ask for read, update, create, delete. You get read plus update.
       | 1               | 15                    | 3                   | 100             |
       | 2               | 15                    | 3                   | 200             |
@@ -128,7 +128,7 @@ Feature: sharing
       | 2               | 400              |
 
   @issue-2133
-  Scenario Outline: creating a share of a folder with a user, the default permissions are all permissions(31)
+  Scenario Outline: creating a share of a folder with a user, the default permissions are all permissions(15)
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/FOLDER"
@@ -153,7 +153,7 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: creating a share of a file with a group, the default permissions are read(1)+update(2)+can-share(16)
+  Scenario Outline: creating a share of a file with a group, the default permissions are read(1)+update(2)
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
@@ -165,7 +165,7 @@ Feature: sharing
       | share_with_displayname | grp1                  |
       | file_target            | /Shares/textfile0.txt |
       | path                   | /textfile0.txt        |
-      | permissions            | share,read,update     |
+      | permissions            | read,update           |
       | uid_owner              | %username%            |
       | displayname_owner      | %displayname%         |
       | item_type              | file                  |
@@ -178,7 +178,7 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: creating a share of a folder with a group, the default permissions are all permissions(31)
+  Scenario Outline: creating a share of a folder with a group, the default permissions are all permissions(15)
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
     And user "Alice" has created folder "/FOLDER"
@@ -363,7 +363,7 @@ Feature: sharing
       | share_with  | brian                  |
       | file_target | /Shares/randomfile.txt |
       | path        | /randomfile.txt        |
-      | permissions | share,read,update      |
+      | permissions | read,update            |
       | uid_owner   | %username%             |
     Then user "brian" should see the following elements
       | /Shares/randomfile.txt |
@@ -496,56 +496,6 @@ Feature: sharing
     And the content of file "/Shares/common/sub/textfile0.txt" for user "Brian" should be "BLABLABLA" plus end-of-line
     And the content of file "/common/sub/textfile0.txt" for user "Alice" should be "BLABLABLA" plus end-of-line
 
-  @issue-enterprise-3896 @issue-2201
-  Scenario: sharing back to resharer is allowed
-    Given these users have been created with default attributes and without skeleton files:
-      | username |
-      | Brian    |
-      | Carol    |
-    And user "Alice" has created folder "userZeroFolder"
-    And user "Alice" has shared folder "userZeroFolder" with user "Brian"
-    And user "Brian" has created folder "/Shares/userZeroFolder/userOneFolder"
-    And user "Brian" has shared folder "/Shares/userZeroFolder/userOneFolder" with user "Carol" with permissions "read, share"
-    When user "Carol" shares folder "/Shares/userOneFolder" with user "Brian" using the sharing API
-    Then the HTTP status code should be "200"
-    #    Then the HTTP status code should be "405"
-    And the sharing API should report to user "Brian" that no shares are in the pending state
-    And as "Brian" folder "/Shares/userOneFolder" should not exist
-
-  @issue-enterprise-3896 @issue-2201
-  Scenario: sharing back to original sharer is allowed
-    Given these users have been created with default attributes and without skeleton files:
-      | username |
-      | Brian    |
-      | Carol    |
-    And user "Alice" has created folder "userZeroFolder"
-    And user "Alice" has shared folder "userZeroFolder" with user "Brian"
-    And user "Brian" has created folder "/Shares/userZeroFolder/userOneFolder"
-    And user "Brian" has shared folder "/Shares/userZeroFolder/userOneFolder" with user "Carol" with permissions "read, share"
-    When user "Carol" shares folder "/Shares/userOneFolder" with user "Alice" using the sharing API
-    Then the HTTP status code should be "200"
-    #    Then the HTTP status code should be "405"
-    And the sharing API should report to user "Alice" that no shares are in the pending state
-    And as "Alice" folder "/Shares/userOneFolder" should not exist
-
-  @issue-enterprise-3896 @issue-2201
-  Scenario: sharing a subfolder to a user that already received parent folder share
-    Given these users have been created with default attributes and without skeleton files:
-      | username |
-      | Brian    |
-      | Carol    |
-      | David    |
-    And user "Alice" has created folder "userZeroFolder"
-    And user "Alice" has shared folder "userZeroFolder" with user "Brian"
-    And user "Alice" has shared folder "userZeroFolder" with user "Carol"
-    And user "Brian" has created folder "/Shares/userZeroFolder/userOneFolder"
-    And user "Brian" has shared folder "/Shares/userZeroFolder/userOneFolder" with user "David" with permissions "read, share"
-    When user "David" shares folder "/Shares/userOneFolder" with user "Carol" using the sharing API
-    Then the HTTP status code should be "200"
-    #    Then the HTTP status code should be "405"
-    And the sharing API should report to user "Carol" that no shares are in the pending state
-    And as "Carol" folder "/Shares/userOneFolder" should not exist
-
   @smokeTest
   Scenario Outline: creating a share of a renamed file
     Given using OCS API version "<ocs-api-version>"
@@ -560,7 +510,7 @@ Feature: sharing
       | share_with_displayname | %displayname%       |
       | file_target            | /Shares/renamed.txt |
       | path                   | /renamed.txt        |
-      | permissions            | share,read,update   |
+      | permissions            | read,update         |
       | uid_owner              | %username%          |
       | displayname_owner      | %displayname%       |
       | item_type              | file                |
@@ -630,59 +580,10 @@ Feature: sharing
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with group "grp1"
     When user "Alice" shares file "textfile0.txt" with group "grp1" using the sharing API
-    Then the HTTP status code should be "<http-status-code>"
+    Then the HTTP status code should be "<http-status>"
     And the OCS status code should be "403"
     And the OCS status message should be "Path already shared with this group"
     Examples:
-      | ocs-api-version | http-status-code |
-      | 1               | 200              |
-      | 2               | 403              |
-
-  @issue-2215
-  Scenario Outline: sharing the shares folder to users is not possible
-    Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    When user "Brian" shares folder "Shares" with user "Carol" using the sharing API
-    Then the HTTP status code should be "<http-status-code>"
-    And the OCS status code should be "403"
-    And the OCS status message should be "Path contains files shared with you"
-    Examples:
-      | ocs-api-version | http-status-code |
-      | 1               | 200              |
-      | 2               | 403              |
-
-  @issue-2215
-  Scenario Outline: sharing the shares folder to groups is not possible
-    Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
-    And group "share_group" has been created
-    And user "Carol" has been added to group "share_group"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    When user "Brian" shares folder "Shares" with group "share_group" using the sharing API
-    Then the HTTP status code should be "<http-status-code>"
-    And the OCS status code should be "403"
-    And the OCS status message should be "Path contains files shared with you"
-    Examples:
-      | ocs-api-version | http-status-code |
-      | 1               | 200              |
-      | 2               | 403              |
-
-  @issue-2215
-  Scenario Outline: sharing the shares folder as public link is not possible
-    Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    When user "Brian" creates a public link share of folder "Shares" using the sharing API
-    Then the HTTP status code should be "<http-status-code>"
-    And the OCS status code should be "403"
-    And the OCS status message should be "Path contains files shared with you"
-    Examples:
-      | ocs-api-version | http-status-code |
-      | 1               | 200              |
-      | 2               | 403              |
+      | ocs-api-version | http-status |
+      | 1               | 200         |
+      | 2               | 403         |

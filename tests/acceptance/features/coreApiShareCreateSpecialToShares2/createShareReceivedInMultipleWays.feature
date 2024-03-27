@@ -143,7 +143,7 @@ Feature: share resources where the sharee receives the share in multiple ways
       | file_target | /zzzfolder  |
       | item_type   | folder      |
       | permissions | read,delete |
-    When user "Carol" shares folder "zzzfolder" with user "Alice" with permissions "read,share" using the sharing API
+    When user "Carol" shares folder "zzzfolder" with user "Alice" with permissions "read" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs-status-code>"
     And as "Alice" the info about the last share by user "Carol" with user "Alice" should include
@@ -262,38 +262,6 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" should not be able to delete folder "/Shares/child1/child2"
 
 
-  Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check reshare operation
-    Given group "grp1" has been created
-    And user "Carol" has been created with default attributes and without skeleton files
-    And user "Carol" has created the following folders
-      | path                  |
-      | /parent               |
-      | /parent/child1        |
-      | /parent/child1/child2 |
-    And user "Alice" has been added to group "grp1"
-    And user "Brian" has been added to group "grp1"
-    And user "Carol" has created a share with settings
-      | path        | /parent |
-      | shareType   | user    |
-      | shareWith   | Brian   |
-      | permissions | all     |
-    And user "Carol" has created a share with settings
-      | path        | /parent/child1 |
-      | shareType   | group          |
-      | shareWith   | grp1           |
-      | permissions | read           |
-    When user "Brian" creates a share using the sharing API with settings
-      | path        | /Shares/parent |
-      | shareType   | user           |
-      | shareWith   | Alice          |
-      | permissions | read           |
-    Then the HTTP status code should be "200"
-    And the OCS status code should be "100"
-    And as "Brian" folder "/Shares/child1" should exist
-    And as "Alice" folder "/Shares/child1" should exist
-    And as "Alice" folder "/Shares/parent" should exist
-
-
   Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check create operation
     Given group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
@@ -373,32 +341,6 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" should not be able to delete folder "/Shares/parent/child1"
 
 
-  Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check reshare operation
-    Given group "grp1" has been created
-    And user "Carol" has been created with default attributes and without skeleton files
-    And user "Carol" has created the following folders
-      | path                  |
-      | /parent               |
-      | /parent/child1        |
-      | /parent/child1/child2 |
-    And user "Alice" has been added to group "grp1"
-    And user "Brian" has been added to group "grp1"
-    And user "Carol" has created a share with settings
-      | path        | /parent |
-      | shareType   | group   |
-      | shareWith   | grp1    |
-      | permissions | read    |
-    And user "Carol" has created a share with settings
-      | path        | /parent/child1 |
-      | shareType   | user           |
-      | shareWith   | Brian          |
-      | permissions | all            |
-    And user "Brian" should be able to share folder "/Shares/child1" with user "Alice" with permissions "read" using the sharing API
-    And as "Brian" folder "/Shares/parent" should exist
-    And as "Alice" folder "/Shares/parent" should exist
-    And as "Alice" folder "/Shares/child1" should exist
-
-
   Scenario: sharing parent folder to one group with all permissions and its child folder to another group with read permission
     Given these groups have been created:
       | groupname |
@@ -429,7 +371,7 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" should be able to delete folder "/Shares/parent/child1/fo1"
     And user "Alice" should be able to delete folder "/Shares/parent/child1/child2/fo2"
     And user "Alice" should be able to rename file "/Shares/parent/child1/child2/textfile-2.txt" to "/Shares/parent/child1/child2/rename.txt"
-    And user "Alice" should be able to share folder "/Shares/parent/child1" with group "grp3" with permissions "all" using the sharing API
+    And user "Alice" should not be able to share folder "/Shares/parent/child1" with group "grp3" with permissions "all" using the sharing API
     And as "Brian" folder "/Shares/child1" should exist
     And user "Brian" should not be able to create folder "/Shares/child1/fo1"
     And user "Brian" should not be able to create folder "/Shares/child1/child2/fo2"

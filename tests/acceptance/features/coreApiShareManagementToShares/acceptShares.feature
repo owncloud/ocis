@@ -94,7 +94,7 @@ Feature: accept/decline shares coming from internal users
       | share_type             | user                          |
       | uid_owner              | %username%                    |
       | displayname_owner      | %displayname%                 |
-      | permissions            | share,read,update             |
+      | permissions            | read,update                   |
       | uid_file_owner         | %username%                    |
       | displayname_file_owner | %displayname%                 |
       | state                  | 0                             |

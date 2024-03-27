@@ -731,36 +731,37 @@ var _ = Describe("Driveitems", func() {
 			_, ok := res.GetExpirationDateTimeOk()
 			Expect(ok).To(BeFalse())
 		})
-		It("updates the share permissions with changing the role", func() {
-			getPublicShareMockResponse.Share = nil
-			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
-			updateShareMock := gatewayClient.On("UpdateShare",
-				mock.Anything,
-				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
-					return req.GetShare().GetId().GetOpaqueId() == "permissionid"
-				}),
-			)
-			updateShareMock.Return(updateShareMockResponse, nil)
+		// that is resharing test. Please delete after disable resharing feature
+		
+		// It("updates the share permissions with changing the role", func() {
+		// 	getPublicShareMockResponse.Share = nil
+		// 	getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+		// 	updateShareMock := gatewayClient.On("UpdateShare",
+		// 		mock.Anything,
+		// 		mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
+		// 			return req.GetShare().GetId().GetOpaqueId() == "permissionid"
+		// 		}),
+		// 	)
+		// 	updateShareMock.Return(updateShareMockResponse, nil)
+		// 	driveItemPermission.SetRoles([]string{unifiedrole.NewViewerUnifiedRole(false).GetId()})
+		// 	body, err := driveItemPermission.MarshalJSON()
+		// 	Expect(err).To(BeNil())
+		// 	svc.UpdatePermission(
+		// 		rr,
+		// 		httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
+		// 			WithContext(ctx),
+		// 	)
+		// 	Expect(rr.Code).To(Equal(http.StatusOK))
+		// 	data, err := io.ReadAll(rr.Body)
+		// 	Expect(err).ToNot(HaveOccurred())
 
-			driveItemPermission.SetRoles([]string{unifiedrole.NewViewerUnifiedRole(true).GetId()})
-			body, err := driveItemPermission.MarshalJSON()
-			Expect(err).To(BeNil())
-			svc.UpdatePermission(
-				rr,
-				httptest.NewRequest(http.MethodPatch, "/", strings.NewReader(string(body))).
-					WithContext(ctx),
-			)
-			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := io.ReadAll(rr.Body)
-			Expect(err).ToNot(HaveOccurred())
+		// 	res := libregraph.Permission{}
 
-			res := libregraph.Permission{}
-
-			err = json.Unmarshal(data, &res)
-			Expect(err).ToNot(HaveOccurred())
-			_, ok := res.GetRolesOk()
-			Expect(ok).To(BeTrue())
-		})
+		// 	err = json.Unmarshal(data, &res)
+		// 	Expect(err).ToNot(HaveOccurred())
+		// 	_, ok := res.GetRolesOk()
+		// 	Expect(ok).To(BeTrue())
+		// })
 		It("fails to update the share permissions for a file share when setting a space specific role", func() {
 			getPublicShareMockResponse.Share = nil
 			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")

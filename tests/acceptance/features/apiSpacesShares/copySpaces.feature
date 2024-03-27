@@ -116,7 +116,9 @@ Feature: copy file
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice        |
       | role      | <space-role> |
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "31"
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "15"
+      | shareWith | Alice  |
+      | role      | <role> |
     When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" folder "testshare" of the space "Shares" should contain these files:
@@ -137,7 +139,7 @@ Feature: copy file
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice        |
       | role      | <space-role> |
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "17"
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "1"
     When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" folder "testshare" of the space "Shares" should not contain these files:
@@ -182,7 +184,7 @@ Feature: copy file
 
   Scenario: user copies a file from personal space to share space with role editor
     Given user "Brian" has created folder "/testshare"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "31"
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "15"
     And user "Alice" has uploaded file with content "personal content" to "personal.txt"
     When user "Alice" copies file "/personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -193,7 +195,7 @@ Feature: copy file
 
   Scenario: user copies a file from personal space to share space with role viewer
     Given user "Brian" has created folder "/testshare"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "17"
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "1"
     And user "Alice" has uploaded file with content "personal content" to "/personal.txt"
     When user "Alice" copies file "/personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
@@ -213,8 +215,8 @@ Feature: copy file
     And for user "Alice" the content of the file "/testshare.txt" of the space "Personal" should be "testshare content"
     Examples:
       | permissions |
-      | 31          |
-      | 17          |
+      | 15          |
+      | 1           |
 
 
   Scenario Outline: user copies a file from share space with different role to project space with different role
@@ -233,10 +235,10 @@ Feature: copy file
     And for user "Alice" the content of the file "/testshare.txt" of the space "Project" should be "testshare content"
     Examples:
       | space-role | permissions |
-      | manager    | 31          |
-      | manager    | 17          |
-      | editor     | 31          |
-      | editor     | 17          |
+      | manager    | 15          |
+      | manager    | 1           |
+      | editor     | 15          |
+      | editor     | 1           |
 
 
   Scenario Outline: user copies a file from share space with different role to project space with role viewer
@@ -254,8 +256,8 @@ Feature: copy file
       | /testshare.txt |
     Examples:
       | permissions |
-      | 31          |
-      | 17          |
+      | 15          |
+      | 1           |
 
 
   Scenario Outline: user copies a file from share space with different role to share space with role editor
@@ -263,7 +265,7 @@ Feature: copy file
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
     And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "<permissions>"
-    And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "31"
+    And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "15"
     When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" folder "testshare2" of the space "Shares" should contain these files:
@@ -274,8 +276,8 @@ Feature: copy file
     And for user "Brian" the content of the file "/testshare1/testshare1.txt" of the space "Personal" should be "testshare1 content"
     Examples:
       | permissions |
-      | 31          |
-      | 17          |
+      | 15          |
+      | 1           |
 
 
   Scenario Outline: user copies a file from share space with different role to share space with role viewer
@@ -283,7 +285,7 @@ Feature: copy file
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
     And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "<permissions>"
-    And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "17"
+    And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "1"
     When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" folder "testshare2" of the space "Shares" should not contain these files:
@@ -292,8 +294,8 @@ Feature: copy file
       | testshare1.txt |
     Examples:
       | permissions |
-      | 31          |
-      | 17          |
+      | 15          |
+      | 1           |
 
 
   Scenario Outline: copying a folder within the same project space with different role
@@ -378,12 +380,12 @@ Feature: copy file
       | <entry> |
     Examples:
       | space-role | should-or-not | permissions | status-code | parent-folder     | entry    |
-      | manager    | should        | 31          | 201         | testshare/folder1 | demo.txt |
-      | editor     | should        | 31          | 201         | testshare/folder1 | demo.txt |
-      | viewer     | should        | 31          | 201         | testshare/folder1 | demo.txt |
-      | manager    | should not    | 17          | 403         | testshare         | folder1  |
-      | editor     | should not    | 17          | 403         | testshare         | folder1  |
-      | viewer     | should not    | 17          | 403         | testshare         | folder1  |
+      | manager    | should        | 15          | 201         | testshare/folder1 | demo.txt |
+      | editor     | should        | 15          | 201         | testshare/folder1 | demo.txt |
+      | viewer     | should        | 15          | 201         | testshare/folder1 | demo.txt |
+      | manager    | should not    | 1           | 403         | testshare         | folder1  |
+      | editor     | should not    | 1           | 403         | testshare         | folder1  |
+      | viewer     | should not    | 1           | 403         | testshare         | folder1  |
 
 
   Scenario Outline: user copies a folder from personal space to project space with different role
@@ -416,8 +418,8 @@ Feature: copy file
       | <resource> |
     Examples:
       | permissions | should-or-not | status-code | parent-folder     | resource |
-      | 31          | should        | 201         | testshare/folder1 | demo.txt |
-      | 17          | should not    | 403         | testshare         | folder1  |
+      | 15          | should        | 201         | testshare/folder1 | demo.txt |
+      | 1           | should not    | 403         | testshare         | folder1  |
 
 
   Scenario Outline: user copies a folder from share space with different role to personal space
@@ -432,8 +434,8 @@ Feature: copy file
     And for user "Alice" the content of the file "/testshare.txt" of the space "Personal" should be "testshare content"
     Examples:
       | permissions |
-      | 31          |
-      | 17          |
+      | 15          |
+      | 1           |
 
 
   Scenario Outline: user copies a folder from share space with different role to project space with different role
@@ -452,10 +454,10 @@ Feature: copy file
       | testshare.txt |
     Examples:
       | space-role | permissions |
-      | manager    | 31          |
-      | manager    | 17          |
-      | editor     | 31          |
-      | editor     | 17          |
+      | manager    | 15          |
+      | manager    | 1           |
+      | editor     | 15          |
+      | editor     | 1           |
 
 
   Scenario Outline: user copies a folder from share space with different role to project space with role viewer
@@ -474,8 +476,8 @@ Feature: copy file
       | folder1 |
     Examples:
       | permissions |
-      | 31          |
-      | 17          |
+      | 15          |
+      | 1           |
 
 
   Scenario: copying a file to a folder with no permissions

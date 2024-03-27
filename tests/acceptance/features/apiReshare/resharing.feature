@@ -1,10 +1,7 @@
-Feature: Resharing
+Feature: re-share resources
   As a user
-  I want to reshare resources
-  So that other users can have access to them
-
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
+  I cannot to re-share resources
+  This feature has been removed from ocis
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -12,109 +9,87 @@ Feature: Resharing
       | Alice    |
       | Brian    |
       | Carol    |
-      | Damian   |
-      | Ember    |
-      | Fred     |
-      | Gina     |
-    And user "Alice" has created folder "folder"
-    And user "Alice" has shared folder "folder" with user "Brian" with permissions "31"
-    And user "Brian" has shared folder "Shares/folder" with user "Carol" with permissions "31"
-    And user "Carol" has shared folder "Shares/folder" with user "Damian" with permissions "17"
+    And user "Alice" has created folder "test"
 
 
-  Scenario Outline: user should only be able to see direct outgoing shares not all the chain
-    Given user "Brian" has shared folder "Shares/folder" with user "Fred" with permissions "17"
-    When user "<user>" gets all the shares inside the folder "Shares/folder" using the sharing API
-    Then the OCS status code should be "100"
-    And the HTTP status code should be "200"
-    And the response should contain <visible-shares-no> entries
-    And user "Brian" should not be included in the response
-    And user "Carol" <carol-visible> included in the response
-    And user "Damian" <damian-visible> included in the response
-    And user "Fred" <fred-visible> included in the response
+  Scenario Outline: share folder with different roles
+    Given using <dav-path-version> DAV path
+    When user "Alice" creates a share inside of space "Personal" with settings:
+      | path      | test   |
+      | shareWith | Brian  |
+      | role      | <role> |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
+    And the fields of the last response to user "Alice" sharing with user "Brian" should include
+      | permissions | <expected-permissions> |
     Examples:
-      | user   | visible-shares-no | carol-visible | damian-visible | fred-visible  |
-      | Brian  | 2                 | should be     | should not be  | should be     |
-      | Carol  | 1                 | should not be | should be      | should not be |
-      | Damian | 0                 | should not be | should not be  | should not be |
-      | Fred   | 0                 | should not be | should not be  | should not be |
+      | dav-path-version | role   | expected-permissions |
+      | old              | editor | 15                   |
+      | old              | viewer | 1                    |
+      | new              | editor | 15                   |
+      | new              | viewer | 1                    |
+      | spaces           | editor | 15                   |
+      | spaces           | viewer | 1                    |
 
 
-  Scenario: owners can see all the chain
-    When user "Alice" gets all the shares inside the folder "folder" using the sharing API
-    Then the OCS status code should be "100"
-    And the HTTP status code should be "200"
-    And the response should contain 3 entries
-    And user "Brian" should be included in the response
-    And user "Carol" should be included in the response
-    And user "Damian" should be included in the response
-
-  @skipOnRevaMaster
-  Scenario: user can't share with more permissions than they have
-    When user "Damian" shares folder "Shares/folder" with user "Ember" with permissions "31" using the sharing API
-    Then the OCS status code should be "403"
-    And the OCS status message should be "Cannot set the requested share permissions"
-
-
-  Scenario Outline: editing reshares
-    Given user "Carol" has shared folder "Shares/folder" with user "Fred" with permissions "17"
-    When user "<user>" updates the last share using the sharing API with
-      | permissions | 31 |
-    Then the OCS status code should be "<ocs-status-code>"
-    And user "Fred" <can-upload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
+  Scenario Outline: try to re-share folder
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created a share inside of space "Personal" with settings:
+      | path      | test   |
+      | shareWith | Brian  |
+      | role      | <role> |
+    When user "Brian" creates a share inside of space "Shares" with settings:
+      | path      | test   |
+      | shareWith | Carol  |
+      | role      | <role> |
+    Then the HTTP status code should be "403"
+    And the OCS status code should be "403"
+    And the OCS status message should be "No share permission"
     Examples:
-      | user  | ocs-status-code | can-upload    |
-      | Alice | 100             | should be     |
-      | Brian | 998             | should not be |
-      | Carol | 100             | should be     |
+      | dav-path-version | role   |
+      | old              | editor |
+      | old              | viewer |
+      | new              | editor |
+      | new              | viewer |
+      | spaces           | editor |
+      | spaces           | viewer |
 
 
-  Scenario Outline: deleting reshares
-    Given user "Carol" has shared folder "Shares/folder" with user "Gina" with permissions "17"
-    When user "<user>" deletes the last share using the sharing API
-    Then the OCS status code should be "<ocs-status-code>"
-    And as "Gina" folder "Shares/folder" <exists>
-    And as "Carol" folder "Shares/folder" should exist
+  Scenario Outline: try to re-share file
+    Given user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created a share inside of space "Personal" with settings:
+      | path      | textfile1.txt |
+      | shareWith | Brian         |
+      | role      | <role>        |
+    When user "Brian" creates a share inside of space "Shares" with settings:
+      | path      | textfile1.txt |
+      | shareWith | Carol         |
+      | role      | <role>        |
+    Then the HTTP status code should be "403"
+    And the OCS status code should be "403"
+    And the OCS status message should be "No share permission"
     Examples:
-      | user  | ocs-status-code | exists           |
-      | Alice | 100             | should not exist |
-      | Brian | 998             | should exist     |
-      | Carol | 100             | should not exist |
+      | dav-path-version | role   |
+      | old              | editor |
+      | old              | viewer |
+      | new              | editor |
+      | new              | viewer |
+      | spaces           | editor |
+      | spaces           | viewer |
 
-  @skipOnRevaMaster
-  Scenario Outline: resharing folder with different permissions
-    When user "<user>" shares folder "Shares/folder" with user "Ember" with permissions "<sharee-permissions>" using the sharing API
-    Then the OCS status code should be "<ocs-status-code>"
+
+  Scenario Outline: try to create a link to the shared folder
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
+    When user "Brian" creates a public link share using the sharing API with settings
+      | path        | /Shares/test |
+      | permissions | 1            |
+      | password    | %public%     |
+    Then the OCS status code should be "<ocs_status_code>"
+    And the HTTP status code should be "<http_status_code>"
     Examples:
-      | user   | sharee-permissions | ocs-status-code |
-      | Brian  | 17                 | 100             |
-      | Carol  | 31                 | 100             |
-      | Damian | 17                 | 100             |
-      | Damian | 27                 | 403             |
-      | Damian | 31                 | 403             |
-
-  @skipOnRevaMaster
-  Scenario Outline: Resharing files with different permissions
-    Given user "Alice" has uploaded file with content "Random data" to "/file.txt"
-    And user "Alice" has shared file "/file.txt" with user "Brian" with permissions "<sharee-permissions>"
-    When user "Brian" shares file "Shares/file.txt" with user "Fred" with permissions "<grantee-permissions>" using the sharing API
-    Then the OCS status code should be "<ocs-status-code>"
-    Examples:
-      | sharee-permissions | grantee-permissions | ocs-status-code |
-      | 17                 | 17                  | 100             |
-      | 17                 | 19                  | 403             |
-      | 19                 | 19                  | 100             |
-
-
-  Scenario Outline: resharing with group with different permissions
-    Given group "security department" has been created
-    And the administrator has added a user "Ember" to the group "security department" using the Graph API
-    And the administrator has added a user "Fred" to the group "security department" using the Graph API
-    When user "Brian" shares folder "Shares/folder" with group "security department" with permissions "<sharee-permissions>" using the sharing API
-    Then the OCS status code should be "100"
-    And user "Ember" <can-upload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
-    And user "Fred" <can-upload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
-    Examples:
-      | sharee-permissions | can-upload    |
-      | 17                 | should not be |
-      | 31                 | should be     |
+      | ocs_api_version | ocs_status_code | http_status_code |
+      | 1               | 403             | 200              |
+      | 2               | 403             | 403              |
+      

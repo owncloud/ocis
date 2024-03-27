@@ -23,7 +23,7 @@ Feature: share access by ID
       | share_with_displayname | %displayname%         |
       | file_target            | /Shares/textfile0.txt |
       | path                   | /textfile0.txt        |
-      | permissions            | share,read,update     |
+      | permissions            | read,update           |
       | uid_owner              | %username%            |
       | displayname_owner      | %displayname%         |
       | item_type              | file                  |
