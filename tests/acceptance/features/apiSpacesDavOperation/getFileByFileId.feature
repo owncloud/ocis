@@ -104,3 +104,44 @@ Feature: accessing files using file id
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: sharee gets content of a shared file when sync is disable
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has disabled the auto-sync share
+    And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When user "Brian" sends HTTP method "GET" to URL "<dav-path>"
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "some data"
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: sharee gets content of a file inside a shared folder when sync is disable
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has disabled the auto-sync share
+    And user "Alice" has created folder "uploadFolder"
+    And user "Alice" has uploaded file with content "some data" to "uploadFolder/textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When user "Brian" sends HTTP method "GET" to URL "<dav-path>"
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "some data"
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |

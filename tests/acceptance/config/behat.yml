@@ -298,6 +298,8 @@ default:
         - FeatureContext: *common_feature_context_params
         - WebDavPropertiesContext:
         - FilesVersionsContext:
+        - SharingNgContext:
+        - SettingsContext:
 
     apiLocks:
       paths:
