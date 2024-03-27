@@ -86,9 +86,20 @@ func WopiContextAuthMiddleware(jwtSecret string, next http.Handler) http.Handler
 	})
 }
 
+// Extract a WopiContext from the context if possible. An error will be
+// returned if there is no WopiContext
 func WopiContextFromCtx(ctx context.Context) (WopiContext, error) {
 	if wopiContext, ok := ctx.Value(wopiContextKey).(WopiContext); ok {
 		return wopiContext, nil
 	}
 	return WopiContext{}, errors.New("no wopi context found")
+}
+
+// Set a WopiContext in the context. A new context will be returned with the
+// add WopiContext inside. Note that the old one won't have the WopiContext set.
+//
+// This method is used for testing. The WopiContextAuthMiddleware should be
+// used instead in order to provide a valid WopiContext
+func WopiContextToCtx(ctx context.Context, wopiContext WopiContext) context.Context {
+	return context.WithValue(ctx, wopiContextKey, wopiContext)
 }

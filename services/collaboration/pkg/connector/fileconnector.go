@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"path"
+	"strconv"
 	"time"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
@@ -69,6 +70,7 @@ func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
 			Str("StatusCode", resp.GetStatus().GetCode().String()).
 			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("GetLock failed with unexpected status")
+		// TODO: Should we be more strict? There could be more causes for the failure
 		return "", NewConnectorError(404, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
 	}
 
@@ -469,7 +471,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 		// OwnerId must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
 		OwnerId:           hex.EncodeToString([]byte(statRes.GetInfo().GetOwner().GetOpaqueId() + "@" + statRes.GetInfo().GetOwner().GetIdp())),
 		Size:              int64(statRes.GetInfo().GetSize()),
-		Version:           statRes.GetInfo().GetMtime().String(),
+		Version:           strconv.FormatUint(statRes.GetInfo().GetMtime().GetSeconds(), 10) + "." + strconv.FormatUint(uint64(statRes.GetInfo().GetMtime().GetNanos()), 10),
 		BaseFileName:      path.Base(statRes.GetInfo().GetPath()),
 		BreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request
