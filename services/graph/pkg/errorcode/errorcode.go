@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
+	"github.com/huandu/xstrings"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
@@ -89,18 +90,18 @@ var errorCodes = [...]string{
 func New(e ErrorCode, msg string) Error {
 	return Error{
 		errorCode: e,
-		msg:       msg,
+		msg:       xstrings.FirstRuneToUpper(msg),
 	}
 }
 
 // Render writes an Graph ErrorCode	object to the response writer
 func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, msg string) {
 	render.Status(r, status)
-	render.JSON(w, r, e.CreateOdataError(r.Context(), msg))
+	render.JSON(w, r, e.createOdataError(r.Context(), xstrings.FirstRuneToUpper(msg)))
 }
 
-// CreateOdataError creates and populates a Graph ErrorCode object
-func (e ErrorCode) CreateOdataError(ctx context.Context, msg string) *libregraph.OdataError {
+// createOdataError creates and populates a Graph ErrorCode object
+func (e ErrorCode) createOdataError(ctx context.Context, msg string) *libregraph.OdataError {
 	innererror := map[string]interface{}{
 		"date": time.Now().UTC().Format(time.RFC3339),
 	}
@@ -115,7 +116,7 @@ func (e ErrorCode) CreateOdataError(ctx context.Context, msg string) *libregraph
 	}
 }
 
-// Render writes an Graph Error object to the response writer
+// Render writes a Graph Error object to the response writer
 func (e Error) Render(w http.ResponseWriter, r *http.Request) {
 	var status int
 	switch e.errorCode {
