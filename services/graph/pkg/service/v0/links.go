@@ -189,7 +189,7 @@ func parseAndFillUpTime(t *time.Time) *types.Timestamp {
 	}
 }
 
-func (g Graph) updatePublicLinkPassword(ctx context.Context, permissionID string, password string) (*libregraph.Permission, error) {
+func (g BaseGraphService) updatePublicLinkPassword(ctx context.Context, permissionID string, password string) (*libregraph.Permission, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		return nil, err
@@ -220,7 +220,7 @@ func (g Graph) updatePublicLinkPassword(ctx context.Context, permissionID string
 	return permission, nil
 }
 
-func (g Graph) updatePublicLinkPermission(ctx context.Context, permissionID string, itemID *providerv1beta1.ResourceId, newPermission *libregraph.Permission) (perm *libregraph.Permission, err error) {
+func (g BaseGraphService) updatePublicLinkPermission(ctx context.Context, permissionID string, itemID *providerv1beta1.ResourceId, newPermission *libregraph.Permission) (perm *libregraph.Permission, err error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		g.logger.Error().Err(err).Msg("could not select next gateway client")
@@ -294,7 +294,7 @@ func (g Graph) updatePublicLinkPermission(ctx context.Context, permissionID stri
 	return perm, err
 }
 
-func (g Graph) updatePublicLink(ctx context.Context, permissionID string, update *link.UpdatePublicShareRequest_Update) (*libregraph.Permission, error) {
+func (g BaseGraphService) updatePublicLink(ctx context.Context, permissionID string, update *link.UpdatePublicShareRequest_Update) (*libregraph.Permission, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		return nil, err

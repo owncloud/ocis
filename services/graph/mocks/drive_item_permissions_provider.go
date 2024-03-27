@@ -302,6 +302,65 @@ func (_c *DriveItemPermissionsProvider_SpaceRootInvite_Call) RunAndReturn(run fu
 	return _c
 }
 
+// UpdatePermission provides a mock function with given fields: ctx, itemID, permissionID, newPermission
+func (_m *DriveItemPermissionsProvider) UpdatePermission(ctx context.Context, itemID providerv1beta1.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
+	ret := _m.Called(ctx, itemID, permissionID, newPermission)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdatePermission")
+	}
+
+	var r0 libregraph.Permission
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) (libregraph.Permission, error)); ok {
+		return rf(ctx, itemID, permissionID, newPermission)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) libregraph.Permission); ok {
+		r0 = rf(ctx, itemID, permissionID, newPermission)
+	} else {
+		r0 = ret.Get(0).(libregraph.Permission)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) error); ok {
+		r1 = rf(ctx, itemID, permissionID, newPermission)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DriveItemPermissionsProvider_UpdatePermission_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdatePermission'
+type DriveItemPermissionsProvider_UpdatePermission_Call struct {
+	*mock.Call
+}
+
+// UpdatePermission is a helper method to define mock.On call
+//   - ctx context.Context
+//   - itemID providerv1beta1.ResourceId
+//   - permissionID string
+//   - newPermission libregraph.Permission
+func (_e *DriveItemPermissionsProvider_Expecter) UpdatePermission(ctx interface{}, itemID interface{}, permissionID interface{}, newPermission interface{}) *DriveItemPermissionsProvider_UpdatePermission_Call {
+	return &DriveItemPermissionsProvider_UpdatePermission_Call{Call: _e.mock.On("UpdatePermission", ctx, itemID, permissionID, newPermission)}
+}
+
+func (_c *DriveItemPermissionsProvider_UpdatePermission_Call) Run(run func(ctx context.Context, itemID providerv1beta1.ResourceId, permissionID string, newPermission libregraph.Permission)) *DriveItemPermissionsProvider_UpdatePermission_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(string), args[3].(libregraph.Permission))
+	})
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_UpdatePermission_Call) Return(_a0 libregraph.Permission, _a1 error) *DriveItemPermissionsProvider_UpdatePermission_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_UpdatePermission_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) (libregraph.Permission, error)) *DriveItemPermissionsProvider_UpdatePermission_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewDriveItemPermissionsProvider creates a new instance of DriveItemPermissionsProvider. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewDriveItemPermissionsProvider(t interface {
