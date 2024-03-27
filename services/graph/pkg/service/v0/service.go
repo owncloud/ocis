@@ -236,13 +236,20 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Route("/root", func(r chi.Router) {
 						r.Post("/children", drivesDriveItemApi.CreateDriveItem)
 						r.Post("/invite", driveItemPermissionsApi.SpaceRootInvite)
+						r.Post("/createLink", driveItemPermissionsApi.CreateSpaceRootLink)
 						r.Route("/permissions", func(r chi.Router) {
 							r.Get("/", driveItemPermissionsApi.ListSpaceRootPermissions)
+							r.Route("/{permissionID}", func(r chi.Router) {
+								r.Delete("/", driveItemPermissionsApi.DeleteSpaceRootPermission)
+								r.Patch("/", driveItemPermissionsApi.UpdateSpaceRootPermission)
+								r.Post("/setPassword", driveItemPermissionsApi.SetLinkPassword)
+							})
 						})
 					})
 					r.Route("/items/{itemID}", func(r chi.Router) {
 						r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
 						r.Post("/invite", driveItemPermissionsApi.Invite)
+						r.Post("/createLink", driveItemPermissionsApi.CreateLink)
 						r.Route("/permissions", func(r chi.Router) {
 							r.Get("/", driveItemPermissionsApi.ListPermissions)
 							r.Route("/{permissionID}", func(r chi.Router) {
@@ -251,7 +258,6 @@ func NewService(opts ...Option) (Graph, error) {
 								r.Post("/setPassword", driveItemPermissionsApi.SetLinkPassword)
 							})
 						})
-						r.Post("/createLink", driveItemPermissionsApi.CreateLink)
 					})
 				})
 			})

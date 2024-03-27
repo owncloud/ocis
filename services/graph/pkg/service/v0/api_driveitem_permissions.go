@@ -36,9 +36,13 @@ type DriveItemPermissionsProvider interface {
 	ListPermissions(ctx context.Context, itemID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	ListSpaceRootPermissions(ctx context.Context, driveID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	DeletePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string) error
+	DeleteSpaceRootPermission(ctx context.Context, driveID storageprovider.ResourceId, permissionID string) error
 	UpdatePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error)
+	UpdateSpaceRootPermission(ctx context.Context, driveID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error)
 	CreateLink(ctx context.Context, driveItemID storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error)
+	CreateSpaceRootLink(ctx context.Context, driveID storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error)
 	SetPublicLinkPassword(ctx context.Context, driveItemID storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error)
+	SetPublicLinkPasswordOnSpaceRoot(ctx context.Context, driveID storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error)
 }
 
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
@@ -354,6 +358,25 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 	return errorcode.New(errorcode.GeneralException, "failed to delete permission")
 }
 
+func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Context, driveID storageprovider.ResourceId, permissionID string) error {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return err
+	}
+
+	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(driveID), gatewayClient)
+	if err != nil {
+		return err
+	}
+
+	if space.SpaceType != "project" {
+		return errorcode.New(errorcode.InvalidRequest, "unsupported space type")
+	}
+
+	rootResourceID := space.GetRoot()
+	return s.DeletePermission(ctx, *rootResourceID, permissionID)
+}
+
 func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
 	oldPermission, sharedResourceID, err := s.getPermissionByID(ctx, permissionID, &itemID)
 	if err != nil {
@@ -382,6 +405,25 @@ func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemI
 		return libregraph.Permission{}, err
 	}
 	return *updatedPermission, nil
+}
+
+func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Context, driveID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return libregraph.Permission{}, err
+	}
+
+	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(driveID), gatewayClient)
+	if err != nil {
+		return libregraph.Permission{}, err
+	}
+
+	if space.SpaceType != "project" {
+		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
+	}
+
+	rootResourceID := space.GetRoot()
+	return s.UpdatePermission(ctx, *rootResourceID, permissionID, newPermission)
 }
 
 // DriveItemPermissionsService is the api that registers the http endpoints which expose needed operation to the graph api.
@@ -532,6 +574,33 @@ func (api DriveItemPermissionsApi) DeletePermission(w http.ResponseWriter, r *ht
 	render.NoContent(w, r)
 }
 
+func (api DriveItemPermissionsApi) DeleteSpaceRootPermission(w http.ResponseWriter, r *http.Request) {
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		msg := "could not parse driveID"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		return
+	}
+
+	permissionID, err := url.PathUnescape(chi.URLParam(r, "permissionID"))
+	if err != nil {
+		api.logger.Debug().Err(err).Msg("could not parse permissionID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid permissionID")
+		return
+	}
+
+	ctx := r.Context()
+	err = api.driveItemPermissionsService.DeleteSpaceRootPermission(ctx, driveID, permissionID)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+}
+
 func (api DriveItemPermissionsApi) UpdatePermission(w http.ResponseWriter, r *http.Request) {
 	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
@@ -562,6 +631,45 @@ func (api DriveItemPermissionsApi) UpdatePermission(w http.ResponseWriter, r *ht
 	}
 
 	updatedPermission, err := api.driveItemPermissionsService.UpdatePermission(ctx, itemID, permissionID, permission)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &updatedPermission)
+}
+
+func (api DriveItemPermissionsApi) UpdateSpaceRootPermission(w http.ResponseWriter, r *http.Request) {
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		msg := "could not parse driveID"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		return
+	}
+
+	permissionID, err := url.PathUnescape(chi.URLParam(r, "permissionID"))
+	if err != nil {
+		api.logger.Debug().Err(err).Msg("could not parse permissionID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid permissionID")
+		return
+	}
+
+	permission := libregraph.Permission{}
+	if err = StrictJSONUnmarshal(r.Body, &permission); err != nil {
+		api.logger.Debug().Err(err).Interface("Body", r.Body).Msg("failed unmarshalling request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	ctx := r.Context()
+	if err = validate.StructCtx(ctx, permission); err != nil {
+		api.logger.Debug().Err(err).Interface("Body", r.Body).Msg("invalid request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	updatedPermission, err := api.driveItemPermissionsService.UpdateSpaceRootPermission(ctx, driveID, permissionID, permission)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
