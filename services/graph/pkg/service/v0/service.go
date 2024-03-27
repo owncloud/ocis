@@ -109,8 +109,6 @@ type Service interface {
 	GetRootDriveChildren(w http.ResponseWriter, r *http.Request)
 	GetDriveItem(w http.ResponseWriter, r *http.Request)
 	GetDriveItemChildren(w http.ResponseWriter, r *http.Request)
-	CreateLink(w http.ResponseWriter, r *http.Request)
-	SetLinkPassword(writer http.ResponseWriter, request *http.Request)
 
 	CreateUploadSession(w http.ResponseWriter, r *http.Request)
 
@@ -250,10 +248,10 @@ func NewService(opts ...Option) (Graph, error) {
 							r.Route("/{permissionID}", func(r chi.Router) {
 								r.Delete("/", driveItemPermissionsApi.DeletePermission)
 								r.Patch("/", driveItemPermissionsApi.UpdatePermission)
-								r.Post("/setPassword", svc.SetLinkPassword)
+								r.Post("/setPassword", driveItemPermissionsApi.SetLinkPassword)
 							})
 						})
-						r.Post("/createLink", svc.CreateLink)
+						r.Post("/createLink", driveItemPermissionsApi.CreateLink)
 					})
 				})
 			})
