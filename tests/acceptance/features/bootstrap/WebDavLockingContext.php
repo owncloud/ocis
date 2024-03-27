@@ -556,7 +556,13 @@ class WebDavLockingContext implements Context {
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 
-		$this->numberOfLockShouldBeReported($lockCount - 1, $itemToUnlock, $user);
+		$lockCountAfterUnlock = $this->countLockOfResources($user, $itemToUnlock);
+
+		Assert::assertEquals(
+			$lockCount - 1,
+			$lockCountAfterUnlock,
+			"Expected $lockCount lock(s) for '$itemToUnlock' but found '$lockCount'"
+		);
 	}
 
 	/**
@@ -831,11 +837,37 @@ class WebDavLockingContext implements Context {
 		string $lockOwner,
 		string $publicWebDAVAPIVersion
 	) {
+		$response = $this->publicUploadWithUserLockToken(
+			$filename,
+			$content,
+			$itemToUseLockOf,
+			$lockOwner,
+			$publicWebDAVAPIVersion
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @param string $filename
+	 * @param string $content
+	 * @param string $itemToUseLockOf
+	 * @param string $lockOwner
+	 * @param string $publicWebDAVAPIVersion
+	 *
+	 * @return ResponseInterface
+	 */
+	public function publicUploadWithUserLockToken(
+		string $filename,
+		string $content,
+		string $itemToUseLockOf,
+		string $lockOwner,
+		string $publicWebDAVAPIVersion
+	): ResponseInterface {
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
 		$headers = [
 			"If" => "(<" . $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf] . ">)"
 		];
-		$response = $this->publicWebDavContext->publicUploadContent(
+		return $this->publicWebDavContext->publicUploadContent(
 			$filename,
 			'',
 			$content,
@@ -843,7 +875,6 @@ class WebDavLockingContext implements Context {
 			$headers,
 			$publicWebDAVAPIVersion
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -863,13 +894,14 @@ class WebDavLockingContext implements Context {
 		string $publicWebDAVAPIVersion
 	) {
 		$lockOwner = $this->featureContext->getLastCreatedPublicShareToken();
-		$this->publicUploadFileSendingLockTokenOfUser(
+		$response = $this->publicUploadWithUserLockToken(
 			$filename,
 			$content,
 			$itemToUseLockOf,
 			$lockOwner,
 			$publicWebDAVAPIVersion
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
