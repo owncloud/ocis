@@ -391,3 +391,144 @@ func (g BaseGraphService) cs3PublicSharesToDriveItems(ctx context.Context, share
 
 	return driveItems, nil
 }
+
+func (g BaseGraphService) getLinkPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
+	share, err := g.getCS3PublicShareByID(ctx, permissionID)
+	if err != nil {
+		return nil, err
+	}
+	return share.GetResourceId(), nil
+}
+
+func (g BaseGraphService) getCS3PublicShareByID(ctx context.Context, permissionID string) (*link.PublicShare, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return nil, err
+	}
+
+	getPublicShareResp, err := gatewayClient.GetPublicShare(ctx,
+		&link.GetPublicShareRequest{
+			Ref: &link.PublicShareReference{
+				Spec: &link.PublicShareReference_Id{
+					Id: &link.PublicShareId{
+						OpaqueId: permissionID,
+					},
+				},
+			},
+		},
+	)
+	if errCode := errorcode.FromCS3Status(getPublicShareResp.GetStatus(), err); errCode != nil {
+		return nil, *errCode
+	}
+	return getPublicShareResp.GetShare(), nil
+}
+
+func (g BaseGraphService) removePublicShare(ctx context.Context, permissionID string) error {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return err
+	}
+
+	removePublicShareResp, err := gatewayClient.RemovePublicShare(ctx,
+		&link.RemovePublicShareRequest{
+			Ref: &link.PublicShareReference{
+				Spec: &link.PublicShareReference_Id{
+					Id: &link.PublicShareId{
+						OpaqueId: permissionID,
+					},
+				},
+			},
+		})
+	if errcode := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); errcode != nil {
+		return *errcode
+	}
+	// We need to return an untyped nil here otherwise the error==nil check won't work
+	return nil
+}
+
+func (g BaseGraphService) removeUserShare(ctx context.Context, permissionID string) error {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return err
+	}
+
+	removeShareResp, err := gatewayClient.RemoveShare(ctx,
+		&collaboration.RemoveShareRequest{
+			Ref: &collaboration.ShareReference{
+				Spec: &collaboration.ShareReference_Id{
+					Id: &collaboration.ShareId{
+						OpaqueId: permissionID,
+					},
+				},
+			},
+		})
+
+	if errCode := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); errCode != nil {
+		return *errCode
+	}
+	// We need to return an untyped nil here otherwise the error==nil check won't work
+	return nil
+}
+
+func (g BaseGraphService) removeSpacePermission(ctx context.Context, permissionID string, resourceId *storageprovider.ResourceId) error {
+	grantee, err := spacePermissionIdToCS3Grantee(permissionID)
+	if err != nil {
+		return err
+	}
+
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return err
+	}
+	removeShareResp, err := gatewayClient.RemoveShare(ctx, &collaboration.RemoveShareRequest{
+		Ref: &collaboration.ShareReference{
+			Spec: &collaboration.ShareReference_Key{
+				Key: &collaboration.ShareKey{
+					ResourceId: resourceId,
+					Grantee:    &grantee,
+				},
+			},
+		},
+	})
+
+	if errCode := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); errCode != nil {
+		return *errCode
+	}
+	// We need to return an untyped nil here otherwise the error==nil check won't work
+	return nil
+}
+
+func (g BaseGraphService) getUserPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
+	share, err := g.getCS3UserShareByID(ctx, permissionID)
+	if err != nil {
+		return nil, err
+	}
+	return share.GetResourceId(), nil
+}
+
+func (g BaseGraphService) getCS3UserShareByID(ctx context.Context, permissionID string) (*collaboration.Share, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return nil, err
+	}
+
+	getShareResp, err := gatewayClient.GetShare(ctx,
+		&collaboration.GetShareRequest{
+			Ref: &collaboration.ShareReference{
+				Spec: &collaboration.ShareReference_Id{
+					Id: &collaboration.ShareId{
+						OpaqueId: permissionID,
+					},
+				},
+			},
+		})
+	if errCode := errorcode.FromCS3Status(getShareResp.GetStatus(), err); errCode != nil {
+		return nil, *errCode
+	}
+	return getShareResp.GetShare(), nil
+}

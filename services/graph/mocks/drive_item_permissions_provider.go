@@ -24,6 +24,54 @@ func (_m *DriveItemPermissionsProvider) EXPECT() *DriveItemPermissionsProvider_E
 	return &DriveItemPermissionsProvider_Expecter{mock: &_m.Mock}
 }
 
+// DeletePermission provides a mock function with given fields: ctx, itemID, permissionID
+func (_m *DriveItemPermissionsProvider) DeletePermission(ctx context.Context, itemID providerv1beta1.ResourceId, permissionID string) error {
+	ret := _m.Called(ctx, itemID, permissionID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeletePermission")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string) error); ok {
+		r0 = rf(ctx, itemID, permissionID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DriveItemPermissionsProvider_DeletePermission_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeletePermission'
+type DriveItemPermissionsProvider_DeletePermission_Call struct {
+	*mock.Call
+}
+
+// DeletePermission is a helper method to define mock.On call
+//   - ctx context.Context
+//   - itemID providerv1beta1.ResourceId
+//   - permissionID string
+func (_e *DriveItemPermissionsProvider_Expecter) DeletePermission(ctx interface{}, itemID interface{}, permissionID interface{}) *DriveItemPermissionsProvider_DeletePermission_Call {
+	return &DriveItemPermissionsProvider_DeletePermission_Call{Call: _e.mock.On("DeletePermission", ctx, itemID, permissionID)}
+}
+
+func (_c *DriveItemPermissionsProvider_DeletePermission_Call) Run(run func(ctx context.Context, itemID providerv1beta1.ResourceId, permissionID string)) *DriveItemPermissionsProvider_DeletePermission_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_DeletePermission_Call) Return(_a0 error) *DriveItemPermissionsProvider_DeletePermission_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_DeletePermission_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, string) error) *DriveItemPermissionsProvider_DeletePermission_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Invite provides a mock function with given fields: ctx, resourceId, invite
 func (_m *DriveItemPermissionsProvider) Invite(ctx context.Context, resourceId providerv1beta1.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 	ret := _m.Called(ctx, resourceId, invite)

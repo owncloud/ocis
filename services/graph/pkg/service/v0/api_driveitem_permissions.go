@@ -3,6 +3,7 @@ package svc
 import (
 	"context"
 	"net/http"
+	"net/url"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -15,6 +16,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
@@ -33,12 +35,22 @@ type DriveItemPermissionsProvider interface {
 	SpaceRootInvite(ctx context.Context, driveID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	ListPermissions(ctx context.Context, itemID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	ListSpaceRootPermissions(ctx context.Context, driveID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	DeletePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string) error
 }
 
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
 type DriveItemPermissionsService struct {
 	BaseGraphService
 }
+
+type permissionType int
+
+const (
+	Unknown permissionType = iota
+	Public
+	User
+	Space
+)
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
 func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config) (DriveItemPermissionsService, error) {
@@ -287,6 +299,58 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 	return s.ListPermissions(ctx, *rootResourceID)
 }
 
+func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string) error {
+	var permissionType permissionType
+
+	sharedResourceID, err := s.getLinkPermissionResourceID(ctx, permissionID)
+	switch {
+	// Check if the ID is referring to a public share
+	case err == nil:
+		permissionType = Public
+	// If the item id is referring to a space root and this is not a public share
+	// we have to deal with space permissions
+	case IsSpaceRoot(&itemID):
+		permissionType = Space
+		sharedResourceID = &itemID
+		err = nil
+	// If this is neither a public share nor a space permission, check if this is a
+	// user share
+	default:
+		sharedResourceID, err = s.getUserPermissionResourceID(ctx, permissionID)
+		if err == nil {
+			permissionType = User
+		}
+	}
+
+	switch {
+	case err != nil:
+		return err
+	case permissionType == Unknown:
+		return errorcode.New(errorcode.ItemNotFound, "permission not found")
+	case sharedResourceID == nil:
+		return errorcode.New(errorcode.ItemNotFound, "failed to resolve resource id for shared resource")
+	}
+
+	// The resourceID of the shared resource need to match the item ID from the Request Path
+	// otherwise this is an invalid Request.
+	if !utils.ResourceIDEqual(sharedResourceID, &itemID) {
+		s.logger.Debug().Msg("resourceID of shared does not match itemID")
+		return errorcode.New(errorcode.InvalidRequest, "permissionID and itemID do not match")
+	}
+
+	switch permissionType {
+	case User:
+		return s.removeUserShare(ctx, permissionID)
+	case Public:
+		return s.removePublicShare(ctx, permissionID)
+	case Space:
+		return s.removeSpacePermission(ctx, permissionID, sharedResourceID)
+	}
+
+	// This should never be reached
+	return errorcode.New(errorcode.GeneralException, "failed to delete permission")
+}
+
 // DriveItemPermissionsService is the api that registers the http endpoints which expose needed operation to the graph api.
 // the business logic is delegated to the permissions service and further down to the cs3 client.
 type DriveItemPermissionsApi struct {
@@ -407,4 +471,30 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, permissions)
+}
+
+func (api DriveItemPermissionsApi) DeletePermission(w http.ResponseWriter, r *http.Request) {
+	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
+	if err != nil {
+		api.logger.Debug().Err(err).Msg(invalidIdMsg)
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	permissionID, err := url.PathUnescape(chi.URLParam(r, "permissionID"))
+	if err != nil {
+		api.logger.Debug().Err(err).Msg("could not parse permissionID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid permissionID")
+		return
+	}
+
+	ctx := r.Context()
+	err = api.driveItemPermissionsService.DeletePermission(ctx, itemID, permissionID)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
 }

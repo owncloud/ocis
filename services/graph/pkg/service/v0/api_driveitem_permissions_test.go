@@ -35,6 +35,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
+	"google.golang.org/grpc"
 )
 
 var _ = Describe("DriveItemPermissionsService", func() {
@@ -43,6 +44,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		gatewayClient               *cs3mocks.GatewayAPIClient
 		gatewaySelector             *mocks.Selectable[gateway.GatewayAPIClient]
 		getUserResponse             *userpb.GetUserResponse
+		listPublicSharesResponse    *link.ListPublicSharesResponse
 		currentUser                 = &userpb.User{
 			Id: &userpb.UserId{
 				OpaqueId: "user",
@@ -75,6 +77,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				Id:          &userpb.UserId{OpaqueId: "1"},
 				DisplayName: "Cem Kaner",
 			},
+		}
+		listPublicSharesResponse = &link.ListPublicSharesResponse{
+			Status: status.NewOK(ctx),
 		}
 
 	})
@@ -287,9 +292,8 @@ var _ = Describe("DriveItemPermissionsService", func() {
 	})
 	Describe("ListPermissions", func() {
 		var (
-			itemID                   provider.ResourceId
-			listSharesResponse       *collaboration.ListSharesResponse
-			listPublicSharesResponse *link.ListPublicSharesResponse
+			itemID             provider.ResourceId
+			listSharesResponse *collaboration.ListSharesResponse
 		)
 		BeforeEach(func() {
 			itemID = provider.ResourceId{
@@ -300,9 +304,6 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			listSharesResponse = &collaboration.ListSharesResponse{
 				Status: status.NewOK(ctx),
 				Shares: []*collaboration.Share{},
-			}
-			listPublicSharesResponse = &link.ListPublicSharesResponse{
-				Status: status.NewOK(ctx),
 			}
 		})
 		It("populates allowedValues for files that are not shared", func() {
@@ -372,9 +373,8 @@ var _ = Describe("DriveItemPermissionsService", func() {
 	})
 	Describe("ListSpaceRootPermissions", func() {
 		var (
-			listSpacesResponse       *provider.ListStorageSpacesResponse
-			driveId                  provider.ResourceId
-			listPublicSharesResponse *link.ListPublicSharesResponse
+			listSpacesResponse *provider.ListStorageSpacesResponse
+			driveId            provider.ResourceId
 		)
 
 		BeforeEach(func() {
@@ -392,9 +392,6 @@ var _ = Describe("DriveItemPermissionsService", func() {
 						},
 					},
 				},
-			}
-			listPublicSharesResponse = &link.ListPublicSharesResponse{
-				Status: status.NewOK(ctx),
 			}
 		})
 
@@ -418,6 +415,148 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 		})
 
+	})
+	Describe("DeletePermission", func() {
+		var (
+			getShareResponse       collaboration.GetShareResponse
+			getPublicShareResponse link.GetPublicShareResponse
+		)
+		BeforeEach(func() {
+			getPublicShareResponse.Status = status.NewOK(context.Background())
+			getShareResponse.Status = status.NewOK(context.Background())
+			getShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{
+					OpaqueId: "permissionid",
+				},
+				ResourceId: &provider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "3",
+				},
+			}
+		})
+		It("fails to deletes a public link permission when it can be resolved", func() {
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(&getPublicShareResponse, nil)
+
+			err := driveItemPermissionsService.DeletePermission(context.Background(),
+				*getShareResponse.Share.ResourceId,
+				"permissionid",
+			)
+			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, "failed to resolve resource id for shared resource")))
+		})
+		It("deletes a user permission as expected", func() {
+			getPublicShareResponse.Status = status.NewNotFound(context.Background(), "")
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(&getPublicShareResponse, nil)
+			gatewayClient.On("GetShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			).Return(&getShareResponse, nil)
+
+			rmShareMockResponse := &collaboration.RemoveShareResponse{
+				Status: status.NewOK(ctx),
+			}
+			gatewayClient.On("RemoveShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *collaboration.RemoveShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			).Return(rmShareMockResponse, nil)
+
+			err := driveItemPermissionsService.DeletePermission(context.Background(),
+				*getShareResponse.Share.ResourceId,
+				"permissionid",
+			)
+			Expect(err).ToNot(HaveOccurred())
+		})
+		It("deletes a link permission as expected", func() {
+			getPublicShareResponse.Share = &link.PublicShare{
+				Id: &link.PublicShareId{
+					OpaqueId: "linkpermissionid",
+				},
+				ResourceId: &provider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "3",
+				},
+			}
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(&getPublicShareResponse, nil)
+
+			gatewayClient.On("RemovePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.RemovePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "linkpermissionid"
+				}),
+			).Return(
+				&link.RemovePublicShareResponse{
+					Status: status.NewOK(ctx),
+				}, nil,
+			)
+
+			err := driveItemPermissionsService.DeletePermission(context.Background(),
+				*getShareResponse.Share.ResourceId,
+				"linkpermissionid",
+			)
+			Expect(err).ToNot(HaveOccurred())
+		})
+		It("deletes a space permission as expected", func() {
+			getPublicShareResponse.Status = status.NewNotFound(context.Background(), "")
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(&getPublicShareResponse, nil)
+
+			gatewayClient.On("RemoveShare",
+				mock.Anything,
+				mock.Anything,
+			).Return(func(ctx context.Context, in *collaboration.RemoveShareRequest, opts ...grpc.CallOption) (*collaboration.RemoveShareResponse, error) {
+				Expect(in.Ref.GetKey()).ToNot(BeNil())
+				Expect(in.Ref.GetKey().GetGrantee().GetUserId().GetOpaqueId()).To(Equal("userid"))
+				return &collaboration.RemoveShareResponse{Status: status.NewOK(ctx)}, nil
+			})
+
+			err := driveItemPermissionsService.DeletePermission(context.Background(),
+				provider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "2",
+				},
+				"u:userid",
+			)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("fails to delete permission when the item id does not match the shared resource's id", func() {
+			getPublicShareResponse.Status = status.NewNotFound(context.Background(), "")
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(&getPublicShareResponse, nil)
+			getShareResponse.Share.ResourceId = &provider.ResourceId{
+				StorageId: "3",
+				SpaceId:   "4",
+				OpaqueId:  "5",
+			}
+			gatewayClient.On("GetShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			).Return(&getShareResponse, nil)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "1$2")
+			rctx.URLParams.Add("itemID", "1$2!3")
+			rctx.URLParams.Add("permissionID", "permissionid")
+
+			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+
+			err := driveItemPermissionsService.DeletePermission(context.Background(),
+				provider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "3",
+				},
+				"permissionid",
+			)
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "permissionID and itemID do not match")))
+
+		})
 	})
 })
 
