@@ -16,6 +16,7 @@ import (
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	roleconversions "github.com/cs3org/reva/v2/pkg/conversions"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
@@ -31,6 +32,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 	"github.com/stretchr/testify/mock"
@@ -45,12 +47,14 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		gatewaySelector             *mocks.Selectable[gateway.GatewayAPIClient]
 		getUserResponse             *userpb.GetUserResponse
 		listPublicSharesResponse    *link.ListPublicSharesResponse
+		listSpacesResponse          *provider.ListStorageSpacesResponse
 		currentUser                 = &userpb.User{
 			Id: &userpb.UserId{
 				OpaqueId: "user",
 			},
 		}
 		statResponse *provider.StatResponse
+		driveItemId  provider.ResourceId
 		ctx          context.Context
 	)
 
@@ -82,23 +86,22 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Status: status.NewOK(ctx),
 		}
 
+		driveItemId = provider.ResourceId{
+			StorageId: "1",
+			SpaceId:   "2",
+			OpaqueId:  "3",
+		}
+
 	})
 
 	Describe("Invite", func() {
 		var (
 			createShareResponse *collaboration.CreateShareResponse
 			driveItemInvite     libregraph.DriveItemInvite
-			driveItemId         provider.ResourceId
 			getGroupResponse    *grouppb.GetGroupResponse
 		)
 
 		BeforeEach(func() {
-			driveItemId = provider.ResourceId{
-				StorageId: "1",
-				SpaceId:   "2",
-				OpaqueId:  "3",
-			}
-
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 
 			getGroupResponse = &grouppb.GetGroupResponse{
@@ -208,7 +211,6 @@ var _ = Describe("DriveItemPermissionsService", func() {
 	})
 	Describe("SpaceRootInvite", func() {
 		var (
-			listSpacesResponse  *provider.ListStorageSpacesResponse
 			createShareResponse *collaboration.CreateShareResponse
 			driveItemInvite     libregraph.DriveItemInvite
 			driveId             provider.ResourceId
@@ -373,8 +375,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 	})
 	Describe("ListSpaceRootPermissions", func() {
 		var (
-			listSpacesResponse *provider.ListStorageSpacesResponse
-			driveId            provider.ResourceId
+			driveId provider.ResourceId
 		)
 
 		BeforeEach(func() {
@@ -558,6 +559,399 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 		})
 	})
+	Describe("UpdatePermission", func() {
+		var (
+			driveItemPermission           libregraph.Permission
+			getShareMockResponse          *collaboration.GetShareResponse
+			getPublicShareMockResponse    *link.GetPublicShareResponse
+			updateShareMockResponse       *collaboration.UpdateShareResponse
+			updatePublicShareMockResponse *link.UpdatePublicShareResponse
+		)
+		const TestLinkName = "Test Link"
+		BeforeEach(func() {
+			ctx = revactx.ContextSetUser(context.Background(), currentUser)
+			driveItemPermission = libregraph.Permission{}
+
+			share := &collaboration.Share{
+				Id: &collaboration.ShareId{
+					OpaqueId: "permissionid",
+				},
+				ResourceId: &driveItemId,
+				Grantee: &provider.Grantee{
+					Type: provider.GranteeType_GRANTEE_TYPE_USER,
+					Id: &provider.Grantee_UserId{
+						UserId: &userpb.UserId{
+							OpaqueId: "userid",
+						},
+					},
+				},
+				Permissions: &collaboration.SharePermissions{
+					Permissions: roleconversions.NewViewerRole(true).CS3ResourcePermissions(),
+				},
+			}
+			getShareMockResponse = &collaboration.GetShareResponse{
+				Status: status.NewOK(ctx),
+				Share:  share,
+			}
+
+			updateShareMockResponse = &collaboration.UpdateShareResponse{
+				Status: status.NewOK(ctx),
+				Share:  share,
+			}
+
+			updatePublicShareMockResponse = &link.UpdatePublicShareResponse{
+				Status: status.NewOK(ctx),
+				Share:  &link.PublicShare{DisplayName: TestLinkName},
+			}
+
+			getPublicShareMockResponse = &link.GetPublicShareResponse{
+				Status: status.NewOK(ctx),
+				Share: &link.PublicShare{
+					Id: &link.PublicShareId{
+						OpaqueId: "permissionid",
+					},
+					ResourceId: &driveItemId,
+					Permissions: &link.PublicSharePermissions{
+						Permissions: linktype.NewViewLinkPermissionSet().GetPermissions(),
+					},
+					Token: "token",
+				},
+			}
+			statResponse = &provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id:   &driveItemId,
+					Type: provider.ResourceType_RESOURCE_TYPE_CONTAINER,
+				},
+			}
+
+			grantMapJSON, _ := json.Marshal(
+				map[string]*provider.ResourcePermissions{
+					"userid": roleconversions.NewSpaceViewerRole().CS3ResourcePermissions(),
+				},
+			)
+			spaceOpaque := &types.Opaque{
+				Map: map[string]*types.OpaqueEntry{
+					"grants": {
+						Decoder: "json",
+						Value:   grantMapJSON,
+					},
+				},
+			}
+			listSpacesResponse = &provider.ListStorageSpacesResponse{
+				Status: status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{
+					{
+						Id: &provider.StorageSpaceId{
+							OpaqueId: "2",
+						},
+						Opaque: spaceOpaque,
+					},
+				},
+			}
+
+		})
+		It("fails when no share is found", func() {
+			getShareMockResponse.Share = nil
+			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			gatewayClient.On("GetShare", mock.Anything, mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getShareMockResponse, nil)
+
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getPublicShareMockResponse, nil)
+
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).To(HaveOccurred())
+			Expect(res).To(BeZero())
+		})
+		It("fails to update permission when the resourceID mismatches with the shared resource's id", func() {
+			getShareMockResponse.Share = nil
+			getShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			getPublicShareMockResponse.Share.ResourceId = &provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "2",
+				OpaqueId:  "4",
+			}
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getPublicShareMockResponse, nil)
+
+			driveItemPermission.SetExpirationDateTime(time.Now().Add(time.Hour))
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "permissionID and itemID do not match")))
+			Expect(res).To(BeZero())
+		})
+		It("succeeds when trying to update a link permission with displayname", func() {
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getPublicShareMockResponse, nil)
+
+			gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(req *provider.StatRequest) bool {
+				return utils.ResourceIDEqual(req.GetRef().GetResourceId(), &driveItemId) && req.GetRef().GetPath() == "."
+			})).Return(statResponse, nil)
+
+			gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					if req.GetRef().GetId().GetOpaqueId() == "permissionid" {
+						return req.Update.GetDisplayName() == TestLinkName
+					}
+					return false
+				}),
+			).Return(updatePublicShareMockResponse, nil)
+
+			link := libregraph.NewSharingLink()
+			link.SetLibreGraphDisplayName(TestLinkName)
+
+			driveItemPermission.SetLink(*link)
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.Link).ToNot(BeNil())
+			Expect(res.Link.GetLibreGraphDisplayName() == TestLinkName)
+		})
+		It("updates the expiration date", func() {
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getPublicShareMockResponse, nil)
+
+			gatewayClient.On("GetShare", mock.Anything, mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getShareMockResponse, nil)
+
+			expiration := time.Now().Add(time.Hour)
+			updateShareMockResponse.Share.Expiration = utils.TimeToTS(expiration)
+			gatewayClient.On("UpdateShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
+					if req.GetShare().GetId().GetOpaqueId() == "permissionid" {
+						return expiration.Equal(utils.TSToTime(req.GetShare().GetExpiration()))
+					}
+					return false
+				}),
+			).Return(updateShareMockResponse, nil)
+
+			driveItemPermission.SetExpirationDateTime(expiration)
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.GetExpirationDateTime().Equal(expiration)).To(BeTrue())
+		})
+		It("deletes the expiration date", func() {
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getPublicShareMockResponse, nil)
+
+			gatewayClient.On("GetShare", mock.Anything, mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getShareMockResponse, nil)
+			gatewayClient.On("UpdateShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
+					if req.GetShare().GetId().GetOpaqueId() == "permissionid" {
+						return true
+					}
+					return false
+				}),
+			).Return(updateShareMockResponse, nil)
+
+			driveItemPermission.SetExpirationDateTimeNil()
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).ToNot(HaveOccurred())
+			_, ok := res.GetExpirationDateTimeOk()
+			Expect(ok).To(BeFalse())
+		})
+		It("fails to update the share permissions for a file share when setting a space specific role", func() {
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getPublicShareMockResponse, nil)
+
+			gatewayClient.On("GetShare", mock.Anything, mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getShareMockResponse, nil)
+
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+
+			driveItemPermission.SetRoles([]string{unifiedrole.NewSpaceViewerUnifiedRole().GetId()})
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
+			Expect(res).To(BeZero())
+		})
+		It("fails to update the space permissions for a space share when setting a file specific role", func() {
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareMockResponse, nil)
+
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
+
+			statResponse.Info.Id = listSpacesResponse.StorageSpaces[0].Root
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+
+			driveItemPermission.SetRoles([]string{unifiedrole.NewFileEditorUnifiedRole(false).GetId()})
+			spaceId := provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "2",
+				OpaqueId:  "2",
+			}
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), spaceId, "u:userid", driveItemPermission)
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
+			Expect(res).To(BeZero())
+		})
+		It("updates the share permissions when changing the resource permission actions", func() {
+			getPublicShareMockResponse.Share = nil
+			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareMockResponse, nil)
+
+			gatewayClient.On("GetShare", mock.Anything, mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getShareMockResponse, nil)
+
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+
+			updateShareMockResponse.Share.Permissions = &collaboration.SharePermissions{
+				Permissions: &provider.ResourcePermissions{
+					GetPath: true,
+				},
+			}
+			gatewayClient.On("UpdateShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
+					return req.GetShare().GetId().GetOpaqueId() == "permissionid"
+				}),
+			).Return(updateShareMockResponse, nil)
+
+			driveItemPermission.SetLibreGraphPermissionsActions([]string{unifiedrole.DriveItemPathRead})
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).ToNot(HaveOccurred())
+			_, ok := res.GetRolesOk()
+			Expect(ok).To(BeFalse())
+			_, ok = res.GetLibreGraphPermissionsActionsOk()
+			Expect(ok).To(BeTrue())
+		})
+		It("updates the expiration date on a public share", func() {
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareMockResponse, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+
+			expiration := time.Now().UTC().Add(time.Hour)
+			updatePublicShareMockResponse.Share.Expiration = utils.TimeToTS(expiration)
+			gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			).Return(updatePublicShareMockResponse, nil)
+
+			driveItemPermission.SetExpirationDateTime(expiration)
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.GetExpirationDateTime().Equal(expiration)).To(BeTrue())
+		})
+		It("updates the permissions on a public share", func() {
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareMockResponse, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+
+			newLink := libregraph.NewSharingLink()
+			newLinkType, err := libregraph.NewSharingLinkTypeFromValue("edit")
+			Expect(err).ToNot(HaveOccurred())
+			newLink.SetType(*newLinkType)
+
+			updatePublicShareMockResponse.Share.Permissions = &link.PublicSharePermissions{
+				Permissions: linktype.NewFolderEditLinkPermissionSet().Permissions,
+			}
+			gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			).Return(updatePublicShareMockResponse, nil)
+
+			driveItemPermission.SetLink(*newLink)
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).ToNot(HaveOccurred())
+			linkType := res.Link.GetType()
+			Expect(string(linkType)).To(Equal("edit"))
+		})
+		It("updates the public share to internal link", func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			getPublicShareMockResponse.Share = &link.PublicShare{
+				Id: &link.PublicShareId{
+					OpaqueId: "permissionid",
+				},
+				ResourceId: &provider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "3",
+				},
+				PasswordProtected: true,
+				Permissions: &link.PublicSharePermissions{
+					Permissions: linktype.NewFileEditLinkPermissionSet().GetPermissions(),
+				},
+				Token: "token",
+			}
+			gatewayClient.On("GetPublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			).Return(getPublicShareMockResponse, nil)
+
+			newLink := libregraph.NewSharingLink()
+			newLinkType, err := libregraph.NewSharingLinkTypeFromValue("internal")
+			Expect(err).ToNot(HaveOccurred())
+			newLink.SetType(*newLinkType)
+
+			updatePublicShareMockResponse.Share.Permissions = &link.PublicSharePermissions{
+				Permissions: linktype.NewInternalLinkPermissionSet().Permissions,
+			}
+			gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			).Return(updatePublicShareMockResponse, nil)
+
+			driveItemPermission.SetLink(*newLink)
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).ToNot(HaveOccurred())
+			linkType := res.Link.GetType()
+			Expect(string(linkType)).To(Equal("internal"))
+			pp, hasPP := res.GetHasPasswordOk()
+			Expect(hasPP).To(Equal(true))
+			Expect(*pp).To(Equal(false))
+		})
+		It("fails when updating the expiration date on a public share", func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareMockResponse, nil)
+			expiration := time.Now().UTC().AddDate(0, 0, -1)
+			updatePublicShareMock := gatewayClient.On("UpdatePublicShare",
+				mock.Anything,
+				mock.MatchedBy(func(req *link.UpdatePublicShareRequest) bool {
+					return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+				}),
+			)
+
+			updatePublicShareMockResponse.Share = nil
+			updatePublicShareMockResponse.Status = status.NewFailedPrecondition(ctx, nil, "expiration date is in the past")
+			updatePublicShareMock.Return(updatePublicShareMockResponse, nil)
+
+			driveItemPermission.SetExpirationDateTime(expiration)
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "expiration date is in the past")))
+			Expect(res).To(BeZero())
+		})
+	})
+
 })
 
 var _ = Describe("DriveItemPermissionsApi", func() {
