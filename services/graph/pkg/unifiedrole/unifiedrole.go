@@ -73,7 +73,7 @@ func NewViewerUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewViewerRole(sharing)
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleViewerID),
-		Description: proto.String("Allows reading the shared file or folder"),
+		Description: proto.String("View and download."),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -90,7 +90,7 @@ func NewSpaceViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewSpaceViewerRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleSpaceViewerID),
-		Description: proto.String("Allows reading the shared space"),
+		Description: proto.String("View and download."),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -107,7 +107,7 @@ func NewEditorUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewEditorRole(sharing)
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleEditorID),
-		Description: proto.String("Allows creating, reading, updating and deleting the shared file or folder"),
+		Description: proto.String("View, download, upload, edit, add and delete."),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -124,7 +124,7 @@ func NewSpaceEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewSpaceEditorRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleSpaceEditorID),
-		Description: proto.String("Allows creating, reading, updating and deleting file or folder in the shared space"),
+		Description: proto.String("View, download, upload, edit, add and delete."),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -141,7 +141,7 @@ func NewFileEditorUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewFileEditorRole(sharing)
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleFileEditorID),
-		Description: proto.String("Allows reading and updating file"),
+		Description: proto.String("View, download and edit."),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -158,7 +158,7 @@ func NewUploaderUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewUploaderRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleUploaderID),
-		Description: proto.String("Allows upload file or folder"),
+		Description: proto.String("View, download and upload."),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -175,7 +175,7 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewManagerRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleManagerID),
-		Description: proto.String("Grants manager permissions on a resource. Semantically equivalent to co-owner"),
+		Description: proto.String("View, download, upload, edit, add, delete and manage members."),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -451,19 +451,19 @@ func displayName(role *conversions.Role) *string {
 	var displayName string
 	switch role.Name {
 	case conversions.RoleViewer:
-		displayName = "Viewer"
+		displayName = "Can view"
 	case conversions.RoleSpaceViewer:
-		displayName = "Space Viewer"
+		displayName = "Can view"
 	case conversions.RoleEditor:
-		displayName = "Editor"
+		displayName = "Can edit"
 	case conversions.RoleSpaceEditor:
-		displayName = "Space Editor"
+		displayName = "Can edit"
 	case conversions.RoleFileEditor:
-		displayName = "File Editor"
+		displayName = "Can edit"
 	case conversions.RoleUploader:
-		displayName = "Uploader"
+		displayName = "Can upload"
 	case conversions.RoleManager:
-		displayName = "Manager"
+		displayName = "Can manage"
 	default:
 		return nil
 	}
