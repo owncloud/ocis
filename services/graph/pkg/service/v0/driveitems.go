@@ -18,7 +18,6 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
-	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/chi/v5"
@@ -35,15 +34,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/validate"
-)
-
-type PermissionType int
-
-const (
-	Unknown PermissionType = iota
-	Public
-	User
-	Space
 )
 
 // CreateUploadSession create an upload session to allow your app to upload files up to the maximum file size.
@@ -429,76 +419,6 @@ func (g Graph) UpdatePermission(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &updatedPermission)
 }
 
-// DeletePermission removes a Permission from a Drive item
-func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
-	_, itemID, err := GetDriveAndItemIDParam(r, g.logger)
-	if err != nil {
-		errorcode.RenderError(w, r, err)
-		return
-	}
-
-	permissionID, err := url.PathUnescape(chi.URLParam(r, "permissionID"))
-	if err != nil {
-		g.logger.Debug().Err(err).Msg("could not parse permissionID")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid permissionID")
-		return
-	}
-
-	ctx := r.Context()
-	var permissionType PermissionType
-
-	sharedResourceID, err := g.getLinkPermissionResourceID(ctx, permissionID)
-	switch {
-	// Check if the ID is referring to a public share
-	case err == nil:
-		permissionType = Public
-	// If the item id is referring to a space root and this is not a public share
-	// we have to deal with space permissions
-	case IsSpaceRoot(&itemID):
-		permissionType = Space
-		sharedResourceID = &itemID
-		err = nil
-	// If this is neither a public share nor a space permission, check if this is a
-	// user share
-	default:
-		sharedResourceID, err = g.getUserPermissionResourceID(ctx, permissionID)
-		if err == nil {
-			permissionType = User
-		}
-	}
-
-	if err != nil {
-		errorcode.RenderError(w, r, err)
-		return
-	}
-
-	// The resourceID of the shared resource need to match the item ID from the Request Path
-	// otherwise this is an invalid Request.
-	if !utils.ResourceIDEqual(sharedResourceID, &itemID) {
-		g.logger.Debug().Msg("resourceID of shared does not match itemID")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "permissionID and itemID do not match")
-		return
-	}
-
-	switch permissionType {
-	case User:
-		err = g.removeUserShare(ctx, permissionID)
-	case Public:
-		err = g.removePublicShare(ctx, permissionID)
-	case Space:
-		err = g.removeSpacePermission(ctx, permissionID, sharedResourceID)
-	}
-
-	if err != nil {
-		errorcode.RenderError(w, r, err)
-		return
-	}
-
-	render.Status(r, http.StatusNoContent)
-	render.NoContent(w, r)
-
-}
-
 func (g Graph) getPermissionByID(ctx context.Context, permissionID string, itemID *storageprovider.ResourceId) (*libregraph.Permission, *storageprovider.ResourceId, error) {
 	publicShare, err := g.getCS3PublicShareByID(ctx, permissionID)
 	if err == nil {
@@ -550,37 +470,6 @@ func (g Graph) getPermissionByID(ctx context.Context, permissionID string, itemI
 
 	return nil, nil, err
 
-}
-
-func (g Graph) getUserPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
-	shareByID, err := g.getCS3UserShareByID(ctx, permissionID)
-	if err != nil {
-		return nil, err
-	}
-	return shareByID.GetResourceId(), nil
-}
-
-func (g Graph) getCS3UserShareByID(ctx context.Context, permissionID string) (*collaboration.Share, error) {
-	gatewayClient, err := g.gatewaySelector.Next()
-	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
-		return nil, err
-	}
-
-	getShareResp, err := gatewayClient.GetShare(ctx,
-		&collaboration.GetShareRequest{
-			Ref: &collaboration.ShareReference{
-				Spec: &collaboration.ShareReference_Id{
-					Id: &collaboration.ShareId{
-						OpaqueId: permissionID,
-					},
-				},
-			},
-		})
-	if errCode := errorcode.FromCS3Status(getShareResp.GetStatus(), err); errCode != nil {
-		return nil, *errCode
-	}
-	return getShareResp.GetShare(), nil
 }
 
 func (g Graph) updateUserShare(ctx context.Context, permissionID string, itemID *storageprovider.ResourceId, newPermission *libregraph.Permission) (*libregraph.Permission, error) {
@@ -679,60 +568,6 @@ func (g Graph) updateUserShare(ctx context.Context, permissionID string, itemID 
 	return permission, nil
 }
 
-func (g Graph) removeUserShare(ctx context.Context, permissionID string) error {
-	gatewayClient, err := g.gatewaySelector.Next()
-	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
-		return err
-	}
-
-	removeShareResp, err := gatewayClient.RemoveShare(ctx,
-		&collaboration.RemoveShareRequest{
-			Ref: &collaboration.ShareReference{
-				Spec: &collaboration.ShareReference_Id{
-					Id: &collaboration.ShareId{
-						OpaqueId: permissionID,
-					},
-				},
-			},
-		})
-
-	if errCode := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); errCode != nil {
-		return *errCode
-	}
-	// We need to return an untyped nil here otherwise the error==nil check won't work
-	return nil
-}
-
-func (g Graph) removeSpacePermission(ctx context.Context, permissionID string, resourceId *storageprovider.ResourceId) error {
-	grantee, err := spacePermissionIdToCS3Grantee(permissionID)
-	if err != nil {
-		return err
-	}
-
-	gatewayClient, err := g.gatewaySelector.Next()
-	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
-		return err
-	}
-	removeShareResp, err := gatewayClient.RemoveShare(ctx, &collaboration.RemoveShareRequest{
-		Ref: &collaboration.ShareReference{
-			Spec: &collaboration.ShareReference_Key{
-				Key: &collaboration.ShareKey{
-					ResourceId: resourceId,
-					Grantee:    &grantee,
-				},
-			},
-		},
-	})
-
-	if errCode := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); errCode != nil {
-		return *errCode
-	}
-	// We need to return an untyped nil here otherwise the error==nil check won't work
-	return nil
-}
-
 func spacePermissionIdToCS3Grantee(permissionID string) (storageprovider.Grantee, error) {
 	// the permission ID for space permission is made of two parts
 	// the grantee type ('u' or user, 'g' for group) and the user or group id
@@ -756,62 +591,6 @@ func spacePermissionIdToCS3Grantee(permissionID string) (storageprovider.Grantee
 		},
 	}
 	return grantee, nil
-}
-
-func (g Graph) getLinkPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
-	shareByID, err := g.getCS3PublicShareByID(ctx, permissionID)
-	if err != nil {
-		return nil, err
-	}
-	return shareByID.GetResourceId(), nil
-}
-
-func (g Graph) getCS3PublicShareByID(ctx context.Context, permissionID string) (*link.PublicShare, error) {
-	gatewayClient, err := g.gatewaySelector.Next()
-	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
-		return nil, err
-	}
-
-	getPublicShareResp, err := gatewayClient.GetPublicShare(ctx,
-		&link.GetPublicShareRequest{
-			Ref: &link.PublicShareReference{
-				Spec: &link.PublicShareReference_Id{
-					Id: &link.PublicShareId{
-						OpaqueId: permissionID,
-					},
-				},
-			},
-		},
-	)
-	if errCode := errorcode.FromCS3Status(getPublicShareResp.GetStatus(), err); errCode != nil {
-		return nil, *errCode
-	}
-	return getPublicShareResp.GetShare(), nil
-}
-
-func (g Graph) removePublicShare(ctx context.Context, permissionID string) error {
-	gatewayClient, err := g.gatewaySelector.Next()
-	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
-		return err
-	}
-
-	removePublicShareResp, err := gatewayClient.RemovePublicShare(ctx,
-		&link.RemovePublicShareRequest{
-			Ref: &link.PublicShareReference{
-				Spec: &link.PublicShareReference_Id{
-					Id: &link.PublicShareId{
-						OpaqueId: permissionID,
-					},
-				},
-			},
-		})
-	if errcode := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); errcode != nil {
-		return *errcode
-	}
-	// We need to return an untyped nil here otherwise the error==nil check won't work
-	return nil
 }
 
 func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.ResourceId, baseURL *url.URL) (*libregraph.RemoteItem, error) {
