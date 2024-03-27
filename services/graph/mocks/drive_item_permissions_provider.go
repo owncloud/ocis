@@ -24,6 +24,64 @@ func (_m *DriveItemPermissionsProvider) EXPECT() *DriveItemPermissionsProvider_E
 	return &DriveItemPermissionsProvider_Expecter{mock: &_m.Mock}
 }
 
+// CreateLink provides a mock function with given fields: ctx, driveItemID, createLink
+func (_m *DriveItemPermissionsProvider) CreateLink(ctx context.Context, driveItemID providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error) {
+	ret := _m.Called(ctx, driveItemID, createLink)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateLink")
+	}
+
+	var r0 libregraph.Permission
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) (libregraph.Permission, error)); ok {
+		return rf(ctx, driveItemID, createLink)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) libregraph.Permission); ok {
+		r0 = rf(ctx, driveItemID, createLink)
+	} else {
+		r0 = ret.Get(0).(libregraph.Permission)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) error); ok {
+		r1 = rf(ctx, driveItemID, createLink)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DriveItemPermissionsProvider_CreateLink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateLink'
+type DriveItemPermissionsProvider_CreateLink_Call struct {
+	*mock.Call
+}
+
+// CreateLink is a helper method to define mock.On call
+//   - ctx context.Context
+//   - driveItemID providerv1beta1.ResourceId
+//   - createLink libregraph.DriveItemCreateLink
+func (_e *DriveItemPermissionsProvider_Expecter) CreateLink(ctx interface{}, driveItemID interface{}, createLink interface{}) *DriveItemPermissionsProvider_CreateLink_Call {
+	return &DriveItemPermissionsProvider_CreateLink_Call{Call: _e.mock.On("CreateLink", ctx, driveItemID, createLink)}
+}
+
+func (_c *DriveItemPermissionsProvider_CreateLink_Call) Run(run func(ctx context.Context, driveItemID providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink)) *DriveItemPermissionsProvider_CreateLink_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(libregraph.DriveItemCreateLink))
+	})
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_CreateLink_Call) Return(_a0 libregraph.Permission, _a1 error) *DriveItemPermissionsProvider_CreateLink_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_CreateLink_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) (libregraph.Permission, error)) *DriveItemPermissionsProvider_CreateLink_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeletePermission provides a mock function with given fields: ctx, itemID, permissionID
 func (_m *DriveItemPermissionsProvider) DeletePermission(ctx context.Context, itemID providerv1beta1.ResourceId, permissionID string) error {
 	ret := _m.Called(ctx, itemID, permissionID)
@@ -240,6 +298,65 @@ func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) Return(_a0
 }
 
 func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetPublicLinkPassword provides a mock function with given fields: ctx, driveItemID, permissionID, password
+func (_m *DriveItemPermissionsProvider) SetPublicLinkPassword(ctx context.Context, driveItemID providerv1beta1.ResourceId, permissionID string, password string) (libregraph.Permission, error) {
+	ret := _m.Called(ctx, driveItemID, permissionID, password)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetPublicLinkPassword")
+	}
+
+	var r0 libregraph.Permission
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, string) (libregraph.Permission, error)); ok {
+		return rf(ctx, driveItemID, permissionID, password)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, string) libregraph.Permission); ok {
+		r0 = rf(ctx, driveItemID, permissionID, password)
+	} else {
+		r0 = ret.Get(0).(libregraph.Permission)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, string, string) error); ok {
+		r1 = rf(ctx, driveItemID, permissionID, password)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DriveItemPermissionsProvider_SetPublicLinkPassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetPublicLinkPassword'
+type DriveItemPermissionsProvider_SetPublicLinkPassword_Call struct {
+	*mock.Call
+}
+
+// SetPublicLinkPassword is a helper method to define mock.On call
+//   - ctx context.Context
+//   - driveItemID providerv1beta1.ResourceId
+//   - permissionID string
+//   - password string
+func (_e *DriveItemPermissionsProvider_Expecter) SetPublicLinkPassword(ctx interface{}, driveItemID interface{}, permissionID interface{}, password interface{}) *DriveItemPermissionsProvider_SetPublicLinkPassword_Call {
+	return &DriveItemPermissionsProvider_SetPublicLinkPassword_Call{Call: _e.mock.On("SetPublicLinkPassword", ctx, driveItemID, permissionID, password)}
+}
+
+func (_c *DriveItemPermissionsProvider_SetPublicLinkPassword_Call) Run(run func(ctx context.Context, driveItemID providerv1beta1.ResourceId, permissionID string, password string)) *DriveItemPermissionsProvider_SetPublicLinkPassword_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(string), args[3].(string))
+	})
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_SetPublicLinkPassword_Call) Return(_a0 libregraph.Permission, _a1 error) *DriveItemPermissionsProvider_SetPublicLinkPassword_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *DriveItemPermissionsProvider_SetPublicLinkPassword_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, string, string) (libregraph.Permission, error)) *DriveItemPermissionsProvider_SetPublicLinkPassword_Call {
 	_c.Call.Return(run)
 	return _c
 }
