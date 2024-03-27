@@ -336,61 +336,61 @@ func PermissionsToCS3ResourcePermissions(unifiedRolePermissions []*libregraph.Un
 // CS3ResourcePermissionsToLibregraphActions converts the provided cs3 ResourcePermissions to a list of
 // libregraph actions
 func CS3ResourcePermissionsToLibregraphActions(p provider.ResourcePermissions) (actions []string) {
-	if p.AddGrant {
+	if p.GetAddGrant() {
 		actions = append(actions, DriveItemPermissionsCreate)
 	}
-	if p.CreateContainer {
+	if p.GetCreateContainer() {
 		actions = append(actions, DriveItemChildrenCreate)
 	}
-	if p.Delete {
+	if p.GetDelete() {
 		actions = append(actions, DriveItemStandardDelete)
 	}
-	if p.GetPath {
+	if p.GetGetPath() {
 		actions = append(actions, DriveItemPathRead)
 	}
-	if p.GetQuota {
+	if p.GetGetQuota() {
 		actions = append(actions, DriveItemQuotaRead)
 	}
-	if p.InitiateFileDownload {
+	if p.GetInitiateFileDownload() {
 		actions = append(actions, DriveItemContentRead)
 	}
-	if p.InitiateFileUpload {
+	if p.GetInitiateFileUpload() {
 		actions = append(actions, DriveItemUploadCreate)
 	}
-	if p.ListGrants {
+	if p.GetListGrants() {
 		actions = append(actions, DriveItemPermissionsRead)
 	}
-	if p.ListContainer {
+	if p.GetListContainer() {
 		actions = append(actions, DriveItemChildrenRead)
 	}
-	if p.ListFileVersions {
+	if p.GetListFileVersions() {
 		actions = append(actions, DriveItemVersionsRead)
 	}
-	if p.ListRecycle {
+	if p.GetListRecycle() {
 		actions = append(actions, DriveItemDeletedRead)
 	}
-	if p.Move {
+	if p.GetMove() {
 		actions = append(actions, DriveItemPathUpdate)
 	}
-	if p.RemoveGrant {
+	if p.GetRemoveGrant() {
 		actions = append(actions, DriveItemPermissionsDelete)
 	}
-	if p.PurgeRecycle {
+	if p.GetPurgeRecycle() {
 		actions = append(actions, DriveItemDeletedDelete)
 	}
-	if p.RestoreFileVersion {
+	if p.GetRestoreFileVersion() {
 		actions = append(actions, DriveItemVersionsUpdate)
 	}
-	if p.RestoreRecycleItem {
+	if p.GetRestoreRecycleItem() {
 		actions = append(actions, DriveItemDeletedUpdate)
 	}
-	if p.Stat {
+	if p.GetStat() {
 		actions = append(actions, DriveItemBasicRead)
 	}
-	if p.UpdateGrant {
+	if p.GetUpdateGrant() {
 		actions = append(actions, DriveItemPermissionsUpdate)
 	}
-	if p.DenyGrant {
+	if p.GetDenyGrant() {
 		actions = append(actions, DriveItemPermissionsDeny)
 	}
 	return actions
