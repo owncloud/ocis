@@ -252,7 +252,7 @@ class FavoritesContext implements Context {
 	 */
 	public function asUserFileOrFolderShouldBeFavorited(string $user, string $path, int $expectedValue = 1):void {
 		$property = "oc:favorite";
-		$this->webDavPropertiesContext->asUserFolderShouldContainAPropertyWithValue(
+		$this->webDavPropertiesContext->checkPropertyOfAFolder(
 			$user,
 			$path,
 			$property,
