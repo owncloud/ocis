@@ -54,6 +54,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Internal links shouldn't have a password: [#8668](https://github.com/owncloud/ocis/pull/8668)
 * Bugfix - Fix uploading via a public link: [#8702](https://github.com/owncloud/ocis/pull/8702)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
+* Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 * Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
@@ -160,6 +161,14 @@ The following sections list the changes for unreleased.
    default to the built-in NATS instance.
 
    https://github.com/owncloud/ocis/pull/8419
+
+* Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
+
+   We disabled the resharing feature by default. This feature will be removed from
+   the product in the next major release. The resharing feature is not recommended
+   for use and should be disabled. Existing reshares will continue to work.
+
+   https://github.com/owncloud/ocis/pull/8653
 
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
 
