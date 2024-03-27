@@ -78,7 +78,7 @@ max_quota: 0
 upload_max_chunk_size: 10000000
 upload_http_method_override: ""
 default_upload_protocol: tus
-enable_resharing: true
+enable_resharing: false
 enable_federated_sharing_incoming: false
 enable_federated_sharing_outgoing: false
 search_min_length: 3
