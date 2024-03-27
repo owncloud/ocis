@@ -7,11 +7,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
 )
 
 var (
@@ -31,6 +32,7 @@ var (
 		"/remote.php/dav/public-files/",
 		"/ocs/v1.php/apps/files_sharing/api/v1/tokeninfo/unprotected",
 		"/ocs/v2.php/apps/files_sharing/api/v1/tokeninfo/unprotected",
+		"/graph/v1beta1/extensions/org.libregraph/info/token",
 		"/ocs/v1.php/cloud/capabilities",
 	}
 )
@@ -78,7 +80,7 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 					return
 				}
 			}
-			if !isPublicPath(r.URL.Path) {
+			if !IsPublicPath(r.URL.Path) {
 				// Failed basic authentication attempts receive the Www-Authenticate header in the response
 				var touch bool
 				caser := cases.Title(language.Und)
@@ -131,7 +133,8 @@ func isOIDCTokenAuth(req *http.Request) bool {
 	return req.URL.Path == "/konnect/v1/token"
 }
 
-func isPublicPath(p string) bool {
+// IsPublicPath checks if a given path is public.
+func IsPublicPath(p string) bool {
 	for _, pp := range _publicPaths {
 		if strings.HasPrefix(p, pp) {
 			return true

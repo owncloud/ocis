@@ -204,20 +204,41 @@ func NewService(opts ...Option) (Graph, error) {
 		requireAdmin = options.RequireAdminMiddleware
 	}
 
-	drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger, options.GatewaySelector, identityCache, options.Config.FilesSharing.EnableResharing)
-	if err != nil {
-		return svc, err
+	var drivesDriveItemApi DrivesDriveItemApi
+	{
+		drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger, options.GatewaySelector, identityCache, options.Config.FilesSharing.EnableResharing)
+		if err != nil {
+			return svc, err
+		}
+
+		drivesDriveItemApi, err = NewDrivesDriveItemApi(drivesDriveItemService, options.Logger)
+		if err != nil {
+			return svc, err
+		}
 	}
 
-	drivesDriveItemApi, err := NewDrivesDriveItemApi(drivesDriveItemService, options.Logger)
-	if err != nil {
-		return svc, err
+	var extensionsOrgLibregraphInfoApi ExtensionsOrgLibregraphInfoApi
+	{
+		extensionsOrgLibregraphInfoService, err := NewExtensionsOrgLibregraphInfoService(options.Logger, options.GatewaySelector)
+		if err != nil {
+			return svc, err
+		}
+
+		extensionsOrgLibregraphInfoApi, err = NewExtensionsOrgLibregraphInfoApi(extensionsOrgLibregraphInfoService, options.Logger)
+		if err != nil {
+			return svc, err
+		}
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 
 		r.Route("/v1beta1", func(r chi.Router) {
+			r.Route("/extensions/org.libregraph", func(r chi.Router) {
+				r.Route("/info", func(r chi.Router) {
+					r.Get("/token/{token}", extensionsOrgLibregraphInfoApi.TokenInfo)
+				})
+			})
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/drives", svc.GetDrives(APIVersion_1_Beta_1))
 				r.Route("/drive", func(r chi.Router) {

@@ -8,13 +8,14 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
-	store "go-micro.dev/v4/store"
+	"go-micro.dev/v4/store"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/oauth2"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 )
 
 const (
@@ -168,7 +169,7 @@ func (m OIDCAuthenticator) shouldServe(req *http.Request) bool {
 // Authenticate implements the authenticator interface to authenticate requests via oidc auth.
 func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	// there is no bearer token on the request,
-	if !m.shouldServe(r) || isPublicPath(r.URL.Path) {
+	if !m.shouldServe(r) || IsPublicPath(r.URL.Path) {
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.

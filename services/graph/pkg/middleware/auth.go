@@ -13,6 +13,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/middleware"
 )
 
 // authOptions initializes the available default options.
@@ -41,6 +42,12 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 	}
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			if middleware.IsPublicPath(r.URL.Path) {
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			ctx := r.Context()
 			t := r.Header.Get("x-access-token")
 			if t == "" {
