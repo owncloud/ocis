@@ -92,4 +92,54 @@ Feature: re-share resources
       | ocs_api_version | ocs_status_code | http_status_code |
       | 1               | 403             | 200              |
       | 2               | 403             | 403              |
+
+
+  @issue-enterprise-6423
+  Scenario Outline: user cannot share items in the project space with share permission
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And using spaces DAV path
+    And user "Alice" has created a space "project1" with the default quota using the Graph API
+    And user "Alice" has created a folder "folder" in space "project1"
+    And user "Alice" has shared a space "project1" with settings:
+      | shareWith | Brian  |
+      | role      | viewer |
+    When user "Alice" creates a share inside of space "project1" with settings:
+      | path        | folder        |
+      | shareWith   | Brian         |
+      | role        | custom        |
+      | permissions | <permissions> |
+    Then the HTTP status code should be "400"
+    And the OCS status code should be "400"
+    And the OCS status message should be "resharing not supported"
+    Examples:
+      | permissions | description                           |
+      | 19          | share + view + edit                   |
+      | 21          | share + view + create                 |
+      | 23          | share + view + create + edit          |
+      | 25          | share + view + delete                 |
+      | 27          | share + view + edit + delete          |
+      | 29          | share + view + create + delete        |
+      | 31          | share + view + create + edit + delete |
+
+
+  @issue-enterprise-6423
+  Scenario Outline: user cannot share items in the personal space with share permission
+    Given user "Alice" has uploaded file with content "some content" to "/file.txt"
+    When user "Alice" creates a share inside of space "Alice Hansen" with settings:
+      | path        | file.txt      |
+      | shareWith   | Brian         |
+      | role        | custom        |
+      | permissions | <permissions> |
+    Then the HTTP status code should be "400"
+    And the OCS status code should be "400"
+    And the OCS status message should be "resharing not supported"
+    Examples:
+      | permissions | description                           |
+      | 19          | share + view + edit                   |
+      | 21          | share + view + create                 |
+      | 23          | share + view + create + edit          |
+      | 25          | share + view + delete                 |
+      | 27          | share + view + edit + delete          |
+      | 29          | share + view + create + delete        |
+      | 31          | share + view + create + edit + delete |
       
