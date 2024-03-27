@@ -71,13 +71,13 @@ Feature: List a sharing permissions
                     "description": {
                       "type": "string",
                       "enum": [
-                        "Allows upload file or folder"
+                        "View, download and upload."
                       ]
                     },
                     "displayName": {
                       "type": "string",
                       "enum": [
-                        "Uploader"
+                        "Can upload"
                       ]
                     },
                     "id": {
@@ -106,13 +106,13 @@ Feature: List a sharing permissions
                     "description": {
                       "type": "string",
                       "enum": [
-                        "Allows reading the shared file or folder"
+                        "View and download."
                       ]
                     },
                     "displayName": {
                       "type": "string",
                       "enum": [
-                        "Viewer"
+                        "Can view"
                       ]
                     },
                     "id": {
@@ -141,13 +141,13 @@ Feature: List a sharing permissions
                     "description": {
                       "type": "string",
                       "enum": [
-                        "Allows reading and updating file"
+                        "View, download and edit."
                       ]
                     },
                     "displayName": {
                       "type": "string",
                       "enum": [
-                        "Editor"
+                        "Can edit"
                       ]
                     },
                     "id": {
@@ -176,13 +176,13 @@ Feature: List a sharing permissions
                     "description": {
                       "type": "string",
                       "enum": [
-                        "Allows creating, reading, updating and deleting the shared file or folder"
+                        "View, download, upload, edit, add and delete."
                       ]
                     },
                     "displayName": {
                       "type": "string",
                       "enum": [
-                        "Editor"
+                        "Can edit"
                       ]
                     },
                     "id": {
@@ -260,10 +260,10 @@ Feature: List a sharing permissions
                       "const": 1
                     },
                     "description": {
-                      "const": "Allows reading the shared space"
+                      "const": "View and download."
                     },
                     "displayName": {
-                      "const": "Space Viewer"
+                      "const": "Can view"
                     },
                     "id": {
                       "const": "a8d5fe5e-96e3-418d-825b-534dbdf22b99"
@@ -283,10 +283,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "Allows creating, reading, updating and deleting file or folder in the shared space"
+                      "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "const": "Space Editor"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
@@ -306,10 +306,10 @@ Feature: List a sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "Grants manager permissions on a resource. Semantically equivalent to co-owner"
+                      "const": "View, download, upload, edit, add, delete and manage members."
                     },
                     "displayName": {
-                      "const": "Manager"
+                      "const": "Can manage"
                     },
                     "id": {
                       "const": "312c0871-5ef7-4b3a-85b6-0e4074c64049"
@@ -394,10 +394,10 @@ Feature: List a sharing permissions
                       "const": 1
                     },
                     "description": {
-                      "const": "Allows reading the shared space"
+                      "const": "View and download."
                     },
                     "displayName": {
-                      "const": "Space Viewer"
+                      "const": "Can view"
                     },
                     "id": {
                       "const": "a8d5fe5e-96e3-418d-825b-534dbdf22b99"
@@ -417,10 +417,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "Allows creating, reading, updating and deleting file or folder in the shared space"
+                      "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "const": "Space Editor"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
@@ -440,10 +440,10 @@ Feature: List a sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "Grants manager permissions on a resource. Semantically equivalent to co-owner"
+                      "const": "View, download, upload, edit, add, delete and manage members."
                     },
                     "displayName": {
-                      "const": "Manager"
+                      "const": "Can manage"
                     },
                     "id": {
                       "const": "312c0871-5ef7-4b3a-85b6-0e4074c64049"
