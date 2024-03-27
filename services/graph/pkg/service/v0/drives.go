@@ -29,6 +29,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -326,7 +327,10 @@ func (g Graph) canCreateSpace(ctx context.Context, ownPersonalHome bool) bool {
 func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling create drive")
-	us, ok := revactx.ContextGetUser(r.Context())
+
+	ctx := r.Context()
+
+	us, ok := revactx.ContextGetUser(ctx)
 	if !ok {
 		logger.Debug().Msg("could not create drive: invalid user")
 		errorcode.NotAllowed.Render(w, r, http.StatusUnauthorized, "invalid user")
@@ -334,7 +338,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO determine if the user tries to create his own personal space and pass that as a boolean
-	canCreateSpace := g.canCreateSpace(r.Context(), false)
+	canCreateSpace := g.canCreateSpace(ctx, false)
 	if !canCreateSpace {
 		logger.Debug().Bool("cancreatespace", canCreateSpace).Msg("could not create drive: insufficient permissions")
 		// if the permission is not existing for the user in context we can assume we don't have it. Return 401.
@@ -393,7 +397,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		csr.Owner = us
 	}
 
-	resp, err := gatewayClient.CreateStorageSpace(r.Context(), &csr)
+	resp, err := gatewayClient.CreateStorageSpace(ctx, &csr)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not create drive: transport error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -424,15 +428,16 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	space := resp.GetStorageSpace()
-	if t := r.URL.Query().Get("template"); t != "" && driveType == _spaceTypeProject {
-		if err := g.applySpaceTemplate(r.Context(), gatewayClient, resp.GetStorageSpace().GetRoot(), t); err != nil {
+	if t := r.URL.Query().Get(TemplateParameter); t != "" && driveType == _spaceTypeProject {
+		loc := l10n.MustGetUserLocale(ctx, us.GetId().GetOpaqueId(), r.Header.Get(HeaderAcceptLanguage), g.valueService)
+		if err := g.applySpaceTemplate(ctx, gatewayClient, space.GetRoot(), t, loc); err != nil {
 			logger.Error().Err(err).Msg("could not apply template to space")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		// refetch the drive to get quota information - should we calculate this ourselves to avoid the extra call?
-		space, err = utils.GetSpace(r.Context(), resp.GetStorageSpace().GetId().GetOpaqueId(), gatewayClient)
+		space, err = utils.GetSpace(ctx, space.GetId().GetOpaqueId(), gatewayClient)
 		if err != nil {
 			logger.Error().Err(err).Msg("could not refetch space")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -440,7 +445,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())

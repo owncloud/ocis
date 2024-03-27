@@ -29,8 +29,6 @@ import (
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
-var _defaultLocale = "en"
-
 // Service should be named `Runner`
 type Service interface {
 	Run() error

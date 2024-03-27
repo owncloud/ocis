@@ -24,30 +24,50 @@ var (
 	//go:embed l10n/locale
 	_localeFS embed.FS
 
+	// subfolder where the translation files are stored
+	_localeSubPath = "l10n/locale"
+
+	// name of the secret space folder
+	_spaceFolderName = ".space"
+
+	// path to the image file
 	_imagepath = "spacetemplate/image.png"
 
+	// text for the readme.md file
 	_readmeText = l10n.Template("Here you can add a description for this Space.")
+
+	// name of the readme.md file
+	_readmeName = "readme.md"
+
+	// domain of the graph service (transifex)
+	_domain = "graph"
+
+	// HeaderAcceptLanguage is the header key for the accept-language header
+	HeaderAcceptLanguage = "Accept-Language"
+
+	// TemplateParameter is the key for the template parameter in the request
+	TemplateParameter = "template"
 )
 
-func (g Graph) applySpaceTemplate(ctx context.Context, gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId, template string) error {
+func (g Graph) applySpaceTemplate(ctx context.Context, gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId, template string, locale string) error {
 	switch template {
 	default:
 		fallthrough
 	case "none":
 		return nil
 	case "default":
-		return g.applyDefaultTemplate(ctx, gwc, root)
+		return g.applyDefaultTemplate(ctx, gwc, root, locale)
 	}
 }
 
-func (g Graph) applyDefaultTemplate(ctx context.Context, gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId) error {
+func (g Graph) applyDefaultTemplate(ctx context.Context, gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId, locale string) error {
 	mdc := metadata.NewCS3(g.config.Reva.Address, g.config.Spaces.StorageUsersAddress)
 	mdc.SpaceRoot = root
 
 	var opaque *v1beta1.Opaque
 
 	// create .space folder
-	if err := mdc.MakeDirIfNotExist(ctx, ".space"); err != nil {
+	if err := mdc.MakeDirIfNotExist(ctx, _spaceFolderName); err != nil {
 		return err
 	}
 
@@ -59,7 +79,7 @@ func (g Graph) applyDefaultTemplate(ctx context.Context, gwc gateway.GatewayAPIC
 	opaque = utils.AppendPlainToOpaque(opaque, SpaceImageSpecialFolderName, iid)
 
 	// upload readme.md
-	rid, err := readmeUpload(ctx, mdc)
+	rid, err := readmeUpload(ctx, mdc, locale, g.config.Spaces.DefaultLanguage)
 	if err != nil {
 		return err
 	}
@@ -91,7 +111,7 @@ func imageUpload(ctx context.Context, mdc *metadata.CS3) (string, error) {
 		return "", err
 	}
 	res, err := mdc.Upload(ctx, metadata.UploadRequest{
-		Path:    filepath.Join(".space", filepath.Base(_imagepath)),
+		Path:    filepath.Join(_spaceFolderName, filepath.Base(_imagepath)),
 		Content: b,
 	})
 	if err != nil {
@@ -100,11 +120,11 @@ func imageUpload(ctx context.Context, mdc *metadata.CS3) (string, error) {
 	return res.FileID, nil
 }
 
-func readmeUpload(ctx context.Context, mdc *metadata.CS3) (string, error) {
-	t := l10n.NewTranslatorFromCommonConfig("en", "graph", "", _localeFS, "l10n/locale")
+func readmeUpload(ctx context.Context, mdc *metadata.CS3, locale string, defaultLocale string) (string, error) {
+	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, "", _localeFS, _localeSubPath)
 	res, err := mdc.Upload(ctx, metadata.UploadRequest{
-		Path:    filepath.Join(".space", "readme.md"),
-		Content: []byte(t.Translate(_readmeText, "en_GB")),
+		Path:    filepath.Join(_spaceFolderName, _readmeName),
+		Content: []byte(t.Translate(_readmeText, locale)),
 	})
 	if err != nil {
 		return "", err
