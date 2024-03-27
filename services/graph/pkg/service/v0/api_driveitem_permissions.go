@@ -28,7 +28,10 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/validate"
 )
 
-const invalidIdMsg = "invalid driveID or itemID"
+const (
+	invalidIdMsg       = "invalid driveID or itemID"
+	parseDriveIDErrMsg = "could not parse driveID"
+)
 
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
@@ -206,7 +209,7 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 		return libregraph.Permission{}, err
 	}
 
-	if space.SpaceType != "project" {
+	if space.SpaceType != _spaceTypeProject {
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
@@ -298,7 +301,7 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 		return collectionOfPermissions, err
 	}
 
-	if space.SpaceType != "project" {
+	if space.SpaceType != _spaceTypeProject {
 		return collectionOfPermissions, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
@@ -369,7 +372,7 @@ func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Conte
 		return err
 	}
 
-	if space.SpaceType != "project" {
+	if space.SpaceType != _spaceTypeProject {
 		return errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
@@ -418,7 +421,7 @@ func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Conte
 		return libregraph.Permission{}, err
 	}
 
-	if space.SpaceType != "project" {
+	if space.SpaceType != _spaceTypeProject {
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
@@ -477,9 +480,8 @@ func (api DriveItemPermissionsApi) Invite(w http.ResponseWriter, r *http.Request
 func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *http.Request) {
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		msg := "could not parse driveID"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		api.logger.Debug().Err(err).Msg(parseDriveIDErrMsg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, parseDriveIDErrMsg)
 		return
 	}
 
@@ -530,9 +532,8 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWriter, r *http.Request) {
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		msg := "could not parse driveID"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		api.logger.Debug().Err(err).Msg(parseDriveIDErrMsg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, parseDriveIDErrMsg)
 		return
 	}
 
@@ -577,9 +578,8 @@ func (api DriveItemPermissionsApi) DeletePermission(w http.ResponseWriter, r *ht
 func (api DriveItemPermissionsApi) DeleteSpaceRootPermission(w http.ResponseWriter, r *http.Request) {
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		msg := "could not parse driveID"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		api.logger.Debug().Err(err).Msg(parseDriveIDErrMsg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, parseDriveIDErrMsg)
 		return
 	}
 
@@ -642,9 +642,8 @@ func (api DriveItemPermissionsApi) UpdatePermission(w http.ResponseWriter, r *ht
 func (api DriveItemPermissionsApi) UpdateSpaceRootPermission(w http.ResponseWriter, r *http.Request) {
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		msg := "could not parse driveID"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		api.logger.Debug().Err(err).Msg(parseDriveIDErrMsg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, parseDriveIDErrMsg)
 		return
 	}
 
