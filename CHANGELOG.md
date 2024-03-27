@@ -70,6 +70,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Initiator-IDs: [#8701](https://github.com/owncloud/ocis/pull/8701)
 * Enhancement - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
 * Enhancement - Update web to v9.0.0-alpha.3: [#8736](https://github.com/owncloud/ocis/pull/8736)
+* Enhancement - Sharing NG role names and descriptions: [#8743](https://github.com/owncloud/ocis/pull/8743)
 
 ## Details
 
@@ -352,6 +353,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8736
    https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.3
+
+* Enhancement - Sharing NG role names and descriptions: [#8743](https://github.com/owncloud/ocis/pull/8743)
+
+   We've adjusted the display names and descriptions of the sharing NG roles to
+   align with the previously agreed upon terms.
+
+   https://github.com/owncloud/ocis/pull/8743
 
 # Changelog for [5.0.0] (2024-03-18)
 
