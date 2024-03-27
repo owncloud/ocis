@@ -291,9 +291,15 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 		if length == 0 || httpRes.Header.Get(net.HeaderUploadOffset) == r.Header.Get(net.HeaderUploadLength) {
 			// get uploaded file metadata
 
-			if resid, err := storagespace.ParseID(httpRes.Header.Get(net.HeaderOCFileID)); err == nil {
-				sReq.Ref = &provider.Reference{
-					ResourceId: &resid,
+			if strings.HasPrefix(uReq.GetRef().GetPath(), "/public") && uReq.GetRef().GetResourceId() == nil {
+				// Use the path based request for the public link
+				sReq.Ref.Path = uReq.Ref.GetPath()
+				sReq.Ref.ResourceId = nil
+			} else {
+				if resid, err := storagespace.ParseID(httpRes.Header.Get(net.HeaderOCFileID)); err == nil {
+					sReq.Ref = &provider.Reference{
+						ResourceId: &resid,
+					}
 				}
 			}
 

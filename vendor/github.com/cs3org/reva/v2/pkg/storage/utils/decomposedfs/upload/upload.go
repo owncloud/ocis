@@ -132,15 +132,17 @@ func buildUpload(ctx context.Context, info tusd.FileInfo, binPath string, infoPa
 }
 
 // Cleanup cleans the upload
-func Cleanup(upload *Upload, failure bool, keepUpload bool) {
+func Cleanup(upload *Upload, revertNodeMetadata, keepUpload, unmarkPostprocessing bool) {
 	ctx, span := tracer.Start(upload.Ctx, "Cleanup")
 	defer span.End()
-	upload.cleanup(failure, !keepUpload, !keepUpload)
+	upload.cleanup(revertNodeMetadata, !keepUpload, !keepUpload)
 
-	// unset processing status
-	if upload.Node != nil { // node can be nil when there was an error before it was created (eg. checksum-mismatch)
-		if err := upload.Node.UnmarkProcessing(ctx, upload.Info.ID); err != nil {
-			upload.log.Info().Str("path", upload.Node.InternalPath()).Err(err).Msg("unmarking processing failed")
+	if unmarkPostprocessing {
+		// unset processing status
+		if upload.Node != nil { // node can be nil when there was an error before it was created (eg. checksum-mismatch)
+			if err := upload.Node.UnmarkProcessing(ctx, upload.Info.ID); err != nil {
+				upload.log.Info().Str("path", upload.Node.InternalPath()).Err(err).Msg("unmarking processing failed")
+			}
 		}
 	}
 }
@@ -247,7 +249,7 @@ func (upload *Upload) FinishUpload(_ context.Context) error {
 			err = errtypes.BadRequest("unsupported checksum algorithm: " + parts[0])
 		}
 		if err != nil {
-			Cleanup(upload, true, false)
+			Cleanup(upload, true, false, false)
 			return err
 		}
 	}
@@ -261,7 +263,7 @@ func (upload *Upload) FinishUpload(_ context.Context) error {
 
 	n, err := CreateNodeForUpload(upload, attrs)
 	if err != nil {
-		Cleanup(upload, true, false)
+		Cleanup(upload, true, false, false)
 		return err
 	}
 
@@ -290,7 +292,7 @@ func (upload *Upload) FinishUpload(_ context.Context) error {
 	if !upload.async {
 		// handle postprocessing synchronously
 		err = upload.Finalize()
-		Cleanup(upload, err != nil, false)
+		Cleanup(upload, err != nil, false, err == nil)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to upload")
 			return err
@@ -382,8 +384,8 @@ func (upload *Upload) checkHash(expected string, h hash.Hash) error {
 }
 
 // cleanup cleans up after the upload is finished
-func (upload *Upload) cleanup(cleanNode, cleanBin, cleanInfo bool) {
-	if cleanNode && upload.Node != nil {
+func (upload *Upload) cleanup(revertNodeMetadata, cleanBin, cleanInfo bool) {
+	if revertNodeMetadata && upload.Node != nil {
 		switch p := upload.versionsPath; p {
 		case "":
 			// remove node
