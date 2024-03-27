@@ -37,6 +37,8 @@ type DriveItemPermissionsProvider interface {
 	ListSpaceRootPermissions(ctx context.Context, driveID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	DeletePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string) error
 	UpdatePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error)
+	CreateLink(ctx context.Context, driveItemID storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error)
+	SetPublicLinkPassword(ctx context.Context, driveItemID storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error)
 }
 
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
