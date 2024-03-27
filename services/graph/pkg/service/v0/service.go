@@ -115,13 +115,6 @@ type Service interface {
 	GetRootDriveChildren(w http.ResponseWriter, r *http.Request)
 	GetDriveItem(w http.ResponseWriter, r *http.Request)
 	GetDriveItemChildren(w http.ResponseWriter, r *http.Request)
-	CreateLink(w http.ResponseWriter, r *http.Request)
-	SetLinkPassword(writer http.ResponseWriter, request *http.Request)
-
-	Invite(w http.ResponseWriter, r *http.Request)
-	ListPermissions(w http.ResponseWriter, r *http.Request)
-	UpdatePermission(w http.ResponseWriter, r *http.Request)
-	DeletePermission(w http.ResponseWriter, r *http.Request)
 
 	CreateUploadSession(w http.ResponseWriter, r *http.Request)
 
@@ -152,13 +145,15 @@ func NewService(opts ...Option) (Graph, error) {
 	)
 
 	svc := Graph{
-		config:                   options.Config,
+		BaseGraphService: BaseGraphService{
+			logger:          &options.Logger,
+			identityCache:   identityCache,
+			gatewaySelector: options.GatewaySelector,
+			config:          options.Config,
+		},
 		mux:                      m,
-		logger:                   &options.Logger,
 		specialDriveItemsCache:   spacePropertiesCache,
-		identityCache:            identityCache,
 		eventsPublisher:          options.EventsPublisher,
-		gatewaySelector:          options.GatewaySelector,
 		searchService:            options.SearchService,
 		identityEducationBackend: options.IdentityEducationBackend,
 		keycloakClient:           options.KeycloakClient,
@@ -220,6 +215,16 @@ func NewService(opts ...Option) (Graph, error) {
 		return svc, err
 	}
 
+	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config)
+	if err != nil {
+		return svc, err
+	}
+
+	driveItemPermissionsApi, err := NewDriveItemPermissionsApi(driveItemPermissionsService, options.Logger)
+	if err != nil {
+		return svc, err
+	}
+
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 
@@ -234,19 +239,31 @@ func NewService(opts ...Option) (Graph, error) {
 			r.Route("/drives", func(r chi.Router) {
 				r.Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
 				r.Route("/{driveID}", func(r chi.Router) {
-					r.Post("/root/children", drivesDriveItemApi.CreateDriveItem)
-					r.Route("/items/{itemID}", func(r chi.Router) {
-						r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
-						r.Post("/invite", svc.Invite)
+					r.Route("/root", func(r chi.Router) {
+						r.Post("/children", drivesDriveItemApi.CreateDriveItem)
+						r.Post("/invite", driveItemPermissionsApi.SpaceRootInvite)
+						r.Post("/createLink", driveItemPermissionsApi.CreateSpaceRootLink)
 						r.Route("/permissions", func(r chi.Router) {
-							r.Get("/", svc.ListPermissions)
+							r.Get("/", driveItemPermissionsApi.ListSpaceRootPermissions)
 							r.Route("/{permissionID}", func(r chi.Router) {
-								r.Delete("/", svc.DeletePermission)
-								r.Patch("/", svc.UpdatePermission)
-								r.Post("/setPassword", svc.SetLinkPassword)
+								r.Delete("/", driveItemPermissionsApi.DeleteSpaceRootPermission)
+								r.Patch("/", driveItemPermissionsApi.UpdateSpaceRootPermission)
+								r.Post("/setPassword", driveItemPermissionsApi.SetLinkPassword)
 							})
 						})
-						r.Post("/createLink", svc.CreateLink)
+					})
+					r.Route("/items/{itemID}", func(r chi.Router) {
+						r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
+						r.Post("/invite", driveItemPermissionsApi.Invite)
+						r.Post("/createLink", driveItemPermissionsApi.CreateLink)
+						r.Route("/permissions", func(r chi.Router) {
+							r.Get("/", driveItemPermissionsApi.ListPermissions)
+							r.Route("/{permissionID}", func(r chi.Router) {
+								r.Delete("/", driveItemPermissionsApi.DeletePermission)
+								r.Patch("/", driveItemPermissionsApi.UpdatePermission)
+								r.Post("/setPassword", driveItemPermissionsApi.SetLinkPassword)
+							})
+						})
 					})
 				})
 			})
