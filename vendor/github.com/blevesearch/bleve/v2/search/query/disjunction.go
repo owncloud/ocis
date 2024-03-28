@@ -27,10 +27,15 @@ import (
 )
 
 type DisjunctionQuery struct {
-	Disjuncts       []Query `json:"disjuncts"`
-	BoostVal        *Boost  `json:"boost,omitempty"`
-	Min             float64 `json:"min"`
-	queryStringMode bool
+	Disjuncts              []Query `json:"disjuncts"`
+	BoostVal               *Boost  `json:"boost,omitempty"`
+	Min                    float64 `json:"min"`
+	retrieveScoreBreakdown bool
+	queryStringMode        bool
+}
+
+func (q *DisjunctionQuery) RetrieveScoreBreakdown(b bool) {
+	q.retrieveScoreBreakdown = b
 }
 
 // NewDisjunctionQuery creates a new compound Query.
@@ -73,18 +78,22 @@ func (q *DisjunctionQuery) Searcher(ctx context.Context, i index.IndexReader, m 
 			}
 			return nil, err
 		}
-		if _, ok := sr.(*searcher.MatchNoneSearcher); ok && q.queryStringMode {
-			// in query string mode, skip match none
-			continue
+		if sr != nil {
+			if _, ok := sr.(*searcher.MatchNoneSearcher); ok && q.queryStringMode {
+				// in query string mode, skip match none
+				continue
+			}
+			ss = append(ss, sr)
 		}
-		ss = append(ss, sr)
 	}
 
 	if len(ss) < 1 {
 		return searcher.NewMatchNoneSearcher(i)
 	}
 
-	return searcher.NewDisjunctionSearcher(ctx, i, ss, q.Min, options)
+	nctx := context.WithValue(ctx, search.IncludeScoreBreakdownKey, q.retrieveScoreBreakdown)
+
+	return searcher.NewDisjunctionSearcher(nctx, i, ss, q.Min, options)
 }
 
 func (q *DisjunctionQuery) Validate() error {
