@@ -120,7 +120,6 @@ Feature: re-share resources
       | 29          | share + view + create + delete        |
       | 31          | share + view + create + edit + delete |
 
-
   @issue-enterprise-6423
   Scenario Outline: user cannot share items in the personal space with share permission
     Given user "Alice" has uploaded file with content "some content" to "/file.txt"
