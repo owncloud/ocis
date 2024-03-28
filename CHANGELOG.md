@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Reva: [#8701](https://github.com/owncloud/ocis/pull/8701)
 * Enhancement - Initiator-IDs: [#8701](https://github.com/owncloud/ocis/pull/8701)
 * Enhancement - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
+* Enhancement - Make server side space templates production ready: [#8723](https://github.com/owncloud/ocis/pull/8723)
 * Enhancement - Update web to v9.0.0-alpha.3: [#8736](https://github.com/owncloud/ocis/pull/8736)
 * Enhancement - Sharing NG role names and descriptions: [#8743](https://github.com/owncloud/ocis/pull/8743)
 
@@ -290,6 +291,13 @@ The following sections list the changes for unreleased.
    provides an additional layer of security where needed.
 
    https://github.com/owncloud/ocis/pull/8716
+
+* Enhancement - Make server side space templates production ready: [#8723](https://github.com/owncloud/ocis/pull/8723)
+
+   Fixes several smaller bugs and adds some improvements to space templates,
+   introduced with https://github.com/owncloud/ocis/pull/8558
+
+   https://github.com/owncloud/ocis/pull/8723
 
 * Enhancement - Update web to v9.0.0-alpha.3: [#8736](https://github.com/owncloud/ocis/pull/8736)
 
