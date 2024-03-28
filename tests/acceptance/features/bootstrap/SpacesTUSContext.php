@@ -13,6 +13,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
 use Behat\Gherkin\Node\TableNode;
+use PHPUnit\Framework\Assert;
 
 require_once 'bootstrap.php';
 
@@ -58,7 +59,8 @@ class SpacesTUSContext implements Context {
 	 */
 	public function userHasUploadedFileViaTusInSpace(string $user, string $source, string $destination, string $spaceName): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->tusContext->userUploadsUsingTusAFileTo($user, $source, $destination);
+		$this->tusContext->uploadFileUsingTus($user, $source, $destination);
+		$this->featureContext->setLastUploadDeleteTime(\time());
 	}
 
 	/**
@@ -80,7 +82,8 @@ class SpacesTUSContext implements Context {
 		string $spaceName
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->tusContext->userUploadsUsingTusAFileTo($user, $source, $destination);
+		$this->tusContext->uploadFileUsingTus($user, $source, $destination);
+		$this->featureContext->setLastUploadDeleteTime(\time());
 	}
 
 	/**
@@ -149,7 +152,18 @@ class SpacesTUSContext implements Context {
 		string $spaceName
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->tusContext->userUploadsAFileWithContentToUsingTus($user, $content, $resource);
+		$tmpFile = $this->tusContext->writeDataToTempFile($content);
+		try {
+			$this->tusContext->uploadFileUsingTus(
+				$user,
+				\basename($tmpFile),
+				$resource
+			);
+			$this->featureContext->setLastUploadDeleteTime(\time());
+		} catch (Exception $e) {
+			Assert::assertStringContainsString('Unable to create resource', (string)$e);
+		}
+		\unlink($tmpFile);
 	}
 
 	/**
@@ -213,7 +227,16 @@ class SpacesTUSContext implements Context {
 				$mtime;
 		}
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->tusContext->userUploadsFileWithContentToWithMtimeUsingTUS($user, $source, $destination, $mtime);
+		$mtime = new DateTime($mtime);
+		$mtime = $mtime->format('U');
+		$user = $this->featureContext->getActualUsername($user);
+		$this->tusContext->uploadFileUsingTus(
+			$user,
+			$source,
+			$destination,
+			['mtime' => $mtime]
+		);
+		$this->featureContext->setLastUploadDeleteTime(\time());
 	}
 
 	/**
@@ -236,7 +259,8 @@ class SpacesTUSContext implements Context {
 		string $spaceName
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->tusContext->userHasUploadedFileWithChecksum($user, $checksum, $offset, $content);
+		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**
@@ -283,7 +307,8 @@ class SpacesTUSContext implements Context {
 		string $spaceName
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->tusContext->userUploadsChunkFileWithChecksum($user, $offset, $data, $checksum);
+		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -331,7 +356,10 @@ class SpacesTUSContext implements Context {
 		TableNode $headers
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->tusContext->userOverwritesFileWithChecksum($user, $offset, $data, $checksum, $headers);
+		$createResponse = $this->tusContext->createNewTUSResource($user, $headers);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $createResponse);
+		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
