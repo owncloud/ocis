@@ -40,7 +40,6 @@ type Handler struct {
 	gatewayAddr             string
 	additionalInfoAttribute string
 	includeOCMSharees       bool
-	showUserEmailInResults  bool
 }
 
 // Init initializes this and any contained handlers
@@ -48,7 +47,6 @@ func (h *Handler) Init(c *config.Config) {
 	h.gatewayAddr = c.GatewaySvc
 	h.additionalInfoAttribute = c.AdditionalInfoAttribute
 	h.includeOCMSharees = c.IncludeOCMSharees
-	h.showUserEmailInResults = c.ShowEmailInResults
 }
 
 // FindSharees implements the /apps/files_sharing/api/v1/sharees endpoint
@@ -122,21 +120,6 @@ func (h *Handler) FindSharees(w http.ResponseWriter, r *http.Request) {
 			exactGroupMatches = append(exactGroupMatches, match)
 		} else {
 			groupMatches = append(groupMatches, match)
-		}
-	}
-
-	if !h.showUserEmailInResults {
-		for _, m := range userMatches {
-			m.Value.ShareWithAdditionalInfo = m.Value.ShareWith
-		}
-		for _, m := range exactUserMatches {
-			m.Value.ShareWithAdditionalInfo = m.Value.ShareWith
-		}
-		for _, m := range groupMatches {
-			m.Value.ShareWithAdditionalInfo = m.Value.ShareWith
-		}
-		for _, m := range exactGroupMatches {
-			m.Value.ShareWithAdditionalInfo = m.Value.ShareWith
 		}
 	}
 
