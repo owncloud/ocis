@@ -28,6 +28,7 @@ OCIS_MODULES = \
 	services/auth-machine \
 	services/auth-service \
 	services/clientlog \
+	services/collaboration \
 	services/eventhistory \
 	services/frontend \
 	services/gateway \

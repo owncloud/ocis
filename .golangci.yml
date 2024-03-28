@@ -41,6 +41,7 @@ linters:
     - stylecheck
     - gocognit
     - nestif # each 10-50 issues in codebase
+    - depguard # disabled for now. Needs configuration
 
 linters-settings:
   gocyclo:

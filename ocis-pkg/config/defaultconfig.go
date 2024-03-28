@@ -10,6 +10,7 @@ import (
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/config/defaults"
 	authservice "github.com/owncloud/ocis/v2/services/auth-service/pkg/config/defaults"
 	clientlog "github.com/owncloud/ocis/v2/services/clientlog/pkg/config/defaults"
+	collaboration "github.com/owncloud/ocis/v2/services/collaboration/pkg/config/defaults"
 	eventhistory "github.com/owncloud/ocis/v2/services/eventhistory/pkg/config/defaults"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/config/defaults"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config/defaults"
@@ -60,6 +61,7 @@ func DefaultConfig() *Config {
 		AuthMachine:       authmachine.DefaultConfig(),
 		AuthService:       authservice.DefaultConfig(),
 		Clientlog:         clientlog.DefaultConfig(),
+		Collaboration:     collaboration.DefaultConfig(),
 		EventHistory:      eventhistory.DefaultConfig(),
 		Frontend:          frontend.DefaultConfig(),
 		Gateway:           gateway.DefaultConfig(),
