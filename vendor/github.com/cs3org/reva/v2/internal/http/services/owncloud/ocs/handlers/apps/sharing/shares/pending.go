@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
-	"slices"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -128,62 +128,55 @@ func GetMountpointAndUnmountedShares(ctx context.Context, gwc gateway.GatewayAPI
 	}
 
 	// we need to sort the received shares by mount point in order to make things easier to evaluate.
-	base := filepath.Clean(info.Name)
-	mount := base
+	mount := filepath.Clean(info.Name)
 	existingMountpoint := ""
-	mountedShares := make([]string, 0, len(receivedShares))
-	var pathExists bool
-
+	mountedShares := make([]*collaboration.ReceivedShare, 0, len(receivedShares))
 	for _, s := range receivedShares {
-		resourceIDEqual := utils.ResourceIDEqual(s.GetShare().GetResourceId(), info.GetId())
-
-		if resourceIDEqual && s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
-			// a share to the resource already exists and is mounted, remember the mount point
-			_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
-			if err == nil {
-				existingMountpoint = s.GetMountPoint().GetPath()
+		if utils.ResourceIDEqual(s.Share.ResourceId, info.GetId()) {
+			if s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
+				// a share to the resource already exists and is mounted, remember the mount point
+				_, err := utils.GetResourceByID(ctx, s.Share.ResourceId, gwc)
+				if err == nil {
+					existingMountpoint = s.MountPoint.Path
+				}
+			} else {
+				// a share to the resource already exists but is not mounted, collect the unmounted share
+				unmountedShares = append(unmountedShares, s)
 			}
-		}
-
-		if resourceIDEqual && s.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
-			// a share to the resource already exists but is not mounted, collect the unmounted share
-			unmountedShares = append(unmountedShares, s)
 		}
 
 		if s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
-			// collect all accepted mount points
-			mountedShares = append(mountedShares, s.GetMountPoint().GetPath())
-			if s.GetMountPoint().GetPath() == mount {
-				// does the shared resource still exist?
-				_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
-				if err == nil {
-					pathExists = true
-				}
-				// TODO we could delete shares here if the stat returns code NOT FOUND ... but listening for file deletes would be better
-			}
+			mountedShares = append(mountedShares, s)
 		}
 	}
+
+	sort.Slice(mountedShares, func(i, j int) bool {
+		return mountedShares[i].MountPoint.Path > mountedShares[j].MountPoint.Path
+	})
 
 	if existingMountpoint != "" {
 		// we want to reuse the same mountpoint for all unmounted shares to the same resource
 		return existingMountpoint, unmountedShares, nil
 	}
 
-	// If the mount point really already exists, we need to insert a number into the filename
-	if pathExists {
-		// now we have a list of shares, we want to iterate over all of them and check for name collisions agents a mount points list
-		for i := 1; i <= len(mountedShares)+1; i++ {
-			ext := filepath.Ext(base)
-			name := strings.TrimSuffix(base, ext)
-			// be smart about .tar.(gz|bz) files
-			if strings.HasSuffix(name, ".tar") {
-				name = strings.TrimSuffix(name, ".tar")
-				ext = ".tar" + ext
+	// we have a list of shares, we want to iterate over all of them and check for name collisions
+	for i, ms := range mountedShares {
+		if ms.MountPoint.Path == mount {
+			// does the shared resource still exist?
+			_, err := utils.GetResourceByID(ctx, ms.Share.ResourceId, gwc)
+			if err == nil {
+				// The mount point really already exists, we need to insert a number into the filename
+				ext := filepath.Ext(mount)
+				name := strings.TrimSuffix(mount, ext)
+				// be smart about .tar.(gz|bz) files
+				if strings.HasSuffix(name, ".tar") {
+					name = strings.TrimSuffix(name, ".tar")
+					ext = ".tar" + ext
+				}
+
+				mount = fmt.Sprintf("%s (%s)%s", name, strconv.Itoa(i+1), ext)
 			}
-			mount = name + " (" + strconv.Itoa(i) + ")" + ext
-			if !slices.Contains(mountedShares, mount) {
-				return mount, unmountedShares, nil
-			}
+			// TODO we could delete shares here if the stat returns code NOT FOUND ... but listening for file deletes would be better
 		}
 	}
 	return mount, unmountedShares, nil

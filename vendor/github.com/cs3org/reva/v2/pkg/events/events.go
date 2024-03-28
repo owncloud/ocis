@@ -23,7 +23,6 @@ import (
 	"log"
 	"reflect"
 
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/google/uuid"
 	"go-micro.dev/v4/events"
 	"go.opentelemetry.io/otel/propagation"
@@ -44,9 +43,6 @@ var (
 
 	// MetadatakeyTraceParent is the key used for the traceparent in the metadata map of the event
 	MetadatakeyTraceParent = "traceparent"
-
-	// MetadatakeyInitiatorID is the key used for the initiator id in the metadata map of the event
-	MetadatakeyInitiatorID = "initiatorid"
 )
 
 type (
@@ -76,7 +72,6 @@ type (
 		Type        string
 		ID          string
 		TraceParent string
-		InitiatorID string
 		Event       interface{}
 	}
 )
@@ -116,7 +111,6 @@ func Consume(s Consumer, group string, evs ...Unmarshaller) (<-chan Event, error
 				Type:        et,
 				ID:          e.Metadata[MetadatakeyEventID],
 				TraceParent: e.Metadata[MetadatakeyTraceParent],
-				InitiatorID: e.Metadata[MetadatakeyInitiatorID],
 				Event:       event,
 			}
 		}
@@ -139,7 +133,6 @@ func ConsumeAll(s Consumer, group string) (<-chan Event, error) {
 				Type:        e.Metadata[MetadatakeyEventType],
 				ID:          e.Metadata[MetadatakeyEventID],
 				TraceParent: e.Metadata[MetadatakeyTraceParent],
-				InitiatorID: e.Metadata[MetadatakeyInitiatorID],
 				Event:       e.Payload,
 			}
 		}
@@ -152,12 +145,10 @@ func ConsumeAll(s Consumer, group string) (<-chan Event, error) {
 func Publish(ctx context.Context, s Publisher, ev interface{}) error {
 	evName := reflect.TypeOf(ev).String()
 	traceParent := getTraceParentFromCtx(ctx)
-	iid, _ := ctxpkg.ContextGetInitiator(ctx)
 	return s.Publish(MainQueueName, ev, events.WithMetadata(map[string]string{
 		MetadatakeyEventType:   evName,
 		MetadatakeyEventID:     uuid.New().String(),
 		MetadatakeyTraceParent: traceParent,
-		MetadatakeyInitiatorID: iid,
 	}))
 }
 

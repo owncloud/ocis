@@ -73,6 +73,7 @@ type config struct {
 	DataTransfersFolder            string                            `mapstructure:"data_transfers_folder"`
 	TokenManagers                  map[string]map[string]interface{} `mapstructure:"token_managers"`
 	AllowedUserAgents              map[string][]string               `mapstructure:"allowed_user_agents"` // map[path][]user-agent
+	StatCacheConfig                cache.Config                      `mapstructure:"stat_cache_config"`
 	CreatePersonalSpaceCacheConfig cache.Config                      `mapstructure:"create_personal_space_cache_config"`
 	ProviderCacheConfig            cache.Config                      `mapstructure:"provider_cache_config"`
 	UseCommonSpaceRootShareLogic   bool                              `mapstructure:"use_common_space_root_share_logic"`
@@ -122,6 +123,14 @@ func (c *config) init() {
 	}
 
 	// caching needs to be explicitly enabled
+	if c.StatCacheConfig.Store == "" {
+		c.StatCacheConfig.Store = "noop"
+	}
+
+	if c.StatCacheConfig.Database == "" {
+		c.StatCacheConfig.Database = "reva"
+	}
+
 	if c.ProviderCacheConfig.Store == "" {
 		c.ProviderCacheConfig.Store = "noop"
 	}
@@ -143,6 +152,7 @@ type svc struct {
 	c                        *config
 	dataGatewayURL           url.URL
 	tokenmgr                 token.Manager
+	statCache                cache.StatCache
 	providerCache            cache.ProviderCache
 	createPersonalSpaceCache cache.CreatePersonalSpaceCache
 }
@@ -173,6 +183,7 @@ func New(m map[string]interface{}, _ *grpc.Server) (rgrpc.Service, error) {
 		c:                        c,
 		dataGatewayURL:           *u,
 		tokenmgr:                 tokenManager,
+		statCache:                cache.GetStatCache(c.StatCacheConfig),
 		providerCache:            cache.GetProviderCache(c.ProviderCacheConfig),
 		createPersonalSpaceCache: cache.GetCreatePersonalSpaceCache(c.CreatePersonalSpaceCacheConfig),
 	}
@@ -185,6 +196,7 @@ func (s *svc) Register(ss *grpc.Server) {
 }
 
 func (s *svc) Close() error {
+	s.statCache.Close()
 	s.providerCache.Close()
 	s.createPersonalSpaceCache.Close()
 	return nil
