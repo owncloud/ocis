@@ -18,12 +18,14 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	v1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"golang.org/x/sync/errgroup"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
@@ -545,4 +547,20 @@ func uploadEntry(ctx context.Context, mdc *metadata.CS3, pathOnDisc, pathOnSpace
 		}
 		return opaque, nil
 	}
+}
+
+// GetShareID returns a valid share ID from the given resource ID.
+// Basically, it just checks if the given ID has an opaque ID that is
+// compatible with the id format defined by storagespace package.
+func GetShareID(shareID storageprovider.ResourceId) (*collaboration.ShareId, error) {
+	if _, err := storagespace.ParseID(shareID.GetOpaqueId()); err != nil {
+		return nil, err
+	}
+
+	// This is a bit of a hack.
+	// We should not rely on a specific format of the item id.
+	// But currently there is no other way to get the ShareID.
+	return &collaboration.ShareId{
+		OpaqueId: shareID.GetOpaqueId(),
+	}, nil
 }

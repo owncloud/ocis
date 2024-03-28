@@ -24,12 +24,14 @@ import (
 const (
 	_fieldMaskPathState      = "state"
 	_fieldMaskPathMountPoint = "mount_point"
+	_fieldMaskPathHidden     = "hidden"
 )
 
 // DrivesDriveItemProvider is the interface that needs to be implemented by the individual space service
 type DrivesDriveItemProvider interface {
 	MountShare(ctx context.Context, resourceID storageprovider.ResourceId, name string) (libregraph.DriveItem, error)
 	UnmountShare(ctx context.Context, resourceID storageprovider.ResourceId) error
+	UpdateShareVisibility(ctx context.Context, resourceID storageprovider.ResourceId, visibility bool) error
 }
 
 // DrivesDriveItemService contains the production business logic for everything that relates to drives
@@ -50,6 +52,32 @@ func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectabl
 	}, nil
 }
 
+func (s DrivesDriveItemService) UpdateShareVisibility(ctx context.Context, resourceID storageprovider.ResourceId, visibility bool) error {
+	shareID, err := GetShareID(resourceID)
+	if err != nil {
+		return err
+	}
+
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return err
+	}
+
+	if _, err := gatewayClient.UpdateReceivedShare(ctx, &collaboration.UpdateReceivedShareRequest{
+		Share: &collaboration.ReceivedShare{
+			Share: &collaboration.Share{
+				Id: shareID,
+			},
+			Hidden: visibility,
+		},
+		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{_fieldMaskPathHidden}},
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UnmountShare unmounts a share from the sharejail
 func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID storageprovider.ResourceId) error {
 	gatewayClient, err := s.gatewaySelector.Next()
@@ -57,25 +85,24 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 		return err
 	}
 
-	// This is a a bit of a hack. We should not rely on a specific format of the item id.
-	// But currently there is no other way to get the ShareID.
-	shareId := resourceID.GetOpaqueId()
+	shareId, err := GetShareID(resourceID)
+	if err != nil {
+		return err
+	}
 
 	// Now, find out the resourceID of the shared resource
 	getReceivedShareResponse, err := gatewayClient.GetReceivedShare(ctx,
 		&collaboration.GetReceivedShareRequest{
 			Ref: &collaboration.ShareReference{
 				Spec: &collaboration.ShareReference_Id{
-					Id: &collaboration.ShareId{
-						OpaqueId: shareId,
-					},
+					Id: shareId,
 				},
 			},
 		},
 	)
 	if errCode := errorcode.FromCS3Status(getReceivedShareResponse.GetStatus(), err); errCode != nil {
 		s.logger.Debug().Err(errCode).
-			Str("shareid", shareId).
+			Str("shareid", shareId.GetOpaqueId()).
 			Msg("failed to read share")
 		return errCode
 	}
@@ -263,6 +290,42 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 	}
 
 	render.Status(r, http.StatusOK)
+}
+
+// UpdateDriveItem updates a drive item, currently only the visibility of the share is updated
+func (api DrivesDriveItemApi) UpdateDriveItem(w http.ResponseWriter, r *http.Request) {
+	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
+	if err != nil {
+		msg := "invalid driveID or itemID"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		return
+	}
+
+	if !IsShareJail(driveID) {
+		msg := "invalid driveID, must be share jail"
+		api.logger.Debug().Interface("driveID", driveID).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		return
+	}
+
+	requestDriveItem := libregraph.DriveItem{}
+	if err := StrictJSONUnmarshal(r.Body, &requestDriveItem); err != nil {
+		msg := "invalid request body"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		return
+	}
+
+	if err := api.drivesDriveItemService.UpdateShareVisibility(r.Context(), itemID, requestDriveItem.GetUIHidden()); err != nil {
+		msg := "update share visibility failed"
+		api.logger.Debug().Err(err).Msg(msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, msg)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+
 }
 
 // CreateDriveItem creates a drive item

@@ -236,6 +236,7 @@ func NewService(opts ...Option) (Graph, error) {
 				r.Route("/{driveID}", func(r chi.Router) {
 					r.Post("/root/children", drivesDriveItemApi.CreateDriveItem)
 					r.Route("/items/{itemID}", func(r chi.Router) {
+						r.Put("/", drivesDriveItemApi.UpdateDriveItem)
 						r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
 						r.Post("/invite", svc.Invite)
 						r.Route("/permissions", func(r chi.Router) {
