@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
@@ -29,7 +30,7 @@ type PublicShareAuthenticator struct {
 // The archiver is able to create archives from public shares in which case it needs to use the
 // PublicShareAuthenticator. It might however also be called using "normal" authentication or
 // using signed url, which are handled by other middleware. For this reason we can't just
-// handle `/archiver` with the `isPublicPath()` check.
+// handle `/archiver` with the `IsPublicPath()` check.
 func isPublicShareArchive(r *http.Request) bool {
 	if strings.HasPrefix(r.URL.Path, "/archiver") {
 		if r.URL.Query().Get(headerShareToken) != "" || r.Header.Get(headerShareToken) != "" {
@@ -50,7 +51,7 @@ func isPublicShareAppOpen(r *http.Request) bool {
 
 // Authenticate implements the authenticator interface to authenticate requests via public share auth.
 func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
-	if !isPublicPath(r.URL.Path) && !isPublicShareArchive(r) && !isPublicShareAppOpen(r) {
+	if !IsPublicPath(r.URL.Path) && !isPublicShareArchive(r) && !isPublicShareAppOpen(r) {
 		return nil, false
 	}
 

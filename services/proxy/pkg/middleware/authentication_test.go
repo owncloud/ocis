@@ -6,9 +6,9 @@ import (
 )
 
 var _ = Describe("authentication helpers", func() {
-	DescribeTable("isPublicPath should recognize public paths",
+	DescribeTable("IsPublicPath should recognize public paths",
 		func(input string, expected bool) {
-			isPublic := isPublicPath(input)
+			isPublic := IsPublicPath(input)
 			Expect(isPublic).To(Equal(expected))
 		},
 		Entry("public files path", "/remote.php/dav/public-files/", true),

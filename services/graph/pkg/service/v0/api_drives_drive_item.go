@@ -270,7 +270,7 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 	ctx := r.Context()
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		api.logger.Debug().Err(err).Msg("invlid driveID")
+		api.logger.Debug().Err(err).Msg("invalid driveID")
 		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, "invalid driveID")
 		return
 	}
