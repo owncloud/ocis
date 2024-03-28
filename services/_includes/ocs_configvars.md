@@ -29,3 +29,4 @@
 | OCIS_CACHE_AUTH_USERNAME<br/>OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME | string |  | The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_CACHE_AUTH_PASSWORD<br/>OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD | string |  | The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_JWT_SECRET<br/>OCS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
+| OCS_SHOW_USER_EMAIL_IN_RESULTS | bool | false | Mask user email addresses in responses.|

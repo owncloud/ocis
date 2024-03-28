@@ -52,3 +52,4 @@ signing_keys:
   password: ""
 token_manager:
   jwt_secret: ""
+  mask_user_email: false

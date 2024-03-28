@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-28-10-58-07]
+[#deprecation-note-2024-03-28-11-38-36]
 [caption=]
 .Deprecation notes for the ocs service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -286,5 +286,14 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
+
+a|`OCS_SHOW_USER_EMAIL_IN_RESULTS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Mask user email addresses in responses.
 |===
 
