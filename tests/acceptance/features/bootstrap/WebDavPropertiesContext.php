@@ -25,7 +25,6 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
 use TestHelpers\Asserts\WebDav as WebDavTest;
-use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
 use Psr\Http\Message\ResponseInterface;
 
@@ -616,7 +615,18 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertValueOfItemInResponseAboutUserIs(string $xpath, ?string $user, string $expectedValue):void {
+	public function theValueOfTheItemInTheResponseAboutUserShouldBe(string $xpath, ?string $user, string $expectedValue):void {
+		$this->assertValueOfItemInResponseAboutUserIs($xpath, $user, $expectedValue);
+	}
+
+	/**
+	 * @param string $xpath
+	 * @param string|null $user
+	 * @param string $expectedValue
+	 *
+	 * @return void
+	 */
+	public function assertValueOfItemInResponseAboutUserIs(string $xpath, ?string $user, string $expectedValue) :void {
 		$resXml = $this->featureContext->getResponseXml(
 			$this->featureContext->getResponse(),
 			__METHOD__
@@ -897,6 +907,7 @@ class WebDavPropertiesContext implements Context {
 
 	/**
 	 * @Then /^as user "([^"]*)" (?:file|folder|entry) "([^"]*)" should contain a property "([^"]*)" with value "([^"]*)" or with value "([^"]*)"$/
+	 * @Then /^as user "([^"]*)" (?:file|folder|entry) "([^"]*)" should contain a property "([^"]*)" with value "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $path
@@ -912,7 +923,26 @@ class WebDavPropertiesContext implements Context {
 		string $path,
 		string $property,
 		string $expectedValue,
-		string $altExpectedValue
+		?string $altExpectedValue = null
+	):void {
+		$this->checkPropertyOfAFolder($user, $path, $property, $expectedValue, $altExpectedValue);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $path
+	 * @param string $property
+	 * @param string $expectedValue
+	 * @param string|null $altExpectedValue
+	 *
+	 * @return void
+	 */
+	public function checkPropertyOfAFolder(
+		string $user,
+		string $path,
+		string $property,
+		string $expectedValue,
+		string|null $altExpectedValue
 	):void {
 		$response = $this->featureContext->listFolder(
 			$user,
@@ -920,37 +950,14 @@ class WebDavPropertiesContext implements Context {
 			'0',
 			[$property]
 		);
+		if ($altExpectedValue === null) {
+			$altExpectedValue = $expectedValue;
+		}
 		$this->checkResponseContainsAPropertyWithValue(
 			$response,
 			$property,
 			$expectedValue,
 			$altExpectedValue
-		);
-	}
-
-	/**
-	 * @Then /^as user "([^"]*)" (?:file|folder|entry) "([^"]*)" should contain a property "([^"]*)" with value "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $path
-	 * @param string $property
-	 * @param string $value
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function asUserFolderShouldContainAPropertyWithValue(
-		string $user,
-		string $path,
-		string $property,
-		string $value
-	):void {
-		$this->asUserFolderShouldContainAPropertyWithValueOrWithValue(
-			$user,
-			$path,
-			$property,
-			$value,
-			$value
 		);
 	}
 
