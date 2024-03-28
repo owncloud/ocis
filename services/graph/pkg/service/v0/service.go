@@ -18,7 +18,6 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
-
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
@@ -219,12 +218,20 @@ func NewService(opts ...Option) (Graph, error) {
 
 	var extensionsOrgLibregraphInfoApi ExtensionsOrgLibregraphInfoApi
 	{
-		extensionsOrgLibregraphInfoService, err := NewExtensionsOrgLibregraphInfoService(options.Logger, options.GatewaySelector)
+		extensionsOrgLibregraphInfoService, err := NewExtensionsOrgLibregraphInfoService(
+			ExtensionsOrgLibregraphInfoServiceOptions{}.
+				WithLogger(options.Logger).
+				WithGatewaySelector(options.GatewaySelector),
+		)
 		if err != nil {
 			return svc, err
 		}
 
-		extensionsOrgLibregraphInfoApi, err = NewExtensionsOrgLibregraphInfoApi(extensionsOrgLibregraphInfoService, options.Logger)
+		extensionsOrgLibregraphInfoApi, err = NewExtensionsOrgLibregraphInfoApi(
+			ExtensionsOrgLibregraphInfoApiOptions{}.
+				WithLogger(options.Logger).
+				WithExtensionsOrgLibregraphInfoProvider(extensionsOrgLibregraphInfoService),
+		)
 		if err != nil {
 			return svc, err
 		}
@@ -236,7 +243,8 @@ func NewService(opts ...Option) (Graph, error) {
 		r.Route("/v1beta1", func(r chi.Router) {
 			r.Route("/extensions/org.libregraph", func(r chi.Router) {
 				r.Route("/info", func(r chi.Router) {
-					r.Get("/token/{token}", extensionsOrgLibregraphInfoApi.TokenInfo)
+					r.Get("/token/protected/{token}", extensionsOrgLibregraphInfoApi.TokenInfo)
+					r.Get("/token/unprotected/{token}", extensionsOrgLibregraphInfoApi.TokenInfo)
 				})
 			})
 			r.Route("/me", func(r chi.Router) {

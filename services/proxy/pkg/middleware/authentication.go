@@ -32,7 +32,7 @@ var (
 		"/remote.php/dav/public-files/",
 		"/ocs/v1.php/apps/files_sharing/api/v1/tokeninfo/unprotected",
 		"/ocs/v2.php/apps/files_sharing/api/v1/tokeninfo/unprotected",
-		"/graph/v1beta1/extensions/org.libregraph/info/token",
+		"/graph/v1beta1/extensions/org.libregraph/info/token/unprotected",
 		"/ocs/v1.php/cloud/capabilities",
 	}
 )
