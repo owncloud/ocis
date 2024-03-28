@@ -124,6 +124,7 @@ Feature: Share a file or folder that is inside a space
       | expireDate | 2042-01-01T23:59:59+0100 |
     When user "Alice" changes the last share with settings:
       | expireDate | 2044-01-01T23:59:59.999+01:00 |
+      | role       | viewer                        |
     Then the HTTP status code should be "200"
     And the information about the last share for user "Brian" should include
       | expiration | 2044-01-01 |
@@ -136,10 +137,23 @@ Feature: Share a file or folder that is inside a space
       | role       | viewer                   |
       | expireDate | 2042-01-01T23:59:59+0100 |
     When user "Alice" changes the last share with settings:
-      | expireDate |  |
+      | expireDate |        |
+      | role       | viewer |
     Then the HTTP status code should be "200"
     And the information about the last share for user "Brian" should include
       | expiration |  |
+
+
+  Scenario: user cannot delete share role
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has created a share inside of space "share sub-item" with settings:
+      | path       | folder                   |
+      | shareWith  | Brian                    |
+      | role       | viewer                   |
+      | expireDate | 2042-01-01T23:59:59+0100 |
+    When user "Alice" changes the last share with settings:
+      | role |  |
+    Then the HTTP status code should be "400"
 
 
   Scenario: check the end of expiration date in user share
@@ -165,50 +179,3 @@ Feature: Share a file or folder that is inside a space
     When user "Alice" expires the last share
     Then the HTTP status code should be "200"
     And as "Brian" folder "Shares/folder" should not exist
-
-  @issue-enterprise-6423 @env-config
-  Scenario Outline: user cannot share items in the project space with share permission if resharing is denied
-    Given the config "OCIS_ENABLE_RESHARING" has been set to "false"
-    And user "Alice" has shared a space "share sub-item" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
-    When user "Alice" creates a share inside of space "share sub-item" with settings:
-      | path        | folder        |
-      | shareWith   | Bob           |
-      | role        | custom        |
-      | permissions | <permissions> |
-    Then the HTTP status code should be "400"
-    And the OCS status code should be "400"
-    And the OCS status message should be "resharing not supported"
-    Examples:
-      | permissions | description                  |
-      | 19          | view + edit                  |
-      | 21          | view + create                |
-      | 23          | view + create + edit         |
-      | 25          | view + delete                |
-      | 27          | view + edit + delete         |
-      | 29          | view + create + delete       |
-      | 31          | view + create + edit +delete |
-
-
-  @issue-enterprise-6423 @env-config
-  Scenario Outline: user cannot share items in the personal space with share permission if resharing is denied
-    Given the config "OCIS_ENABLE_RESHARING" has been set to "false"
-    And user "Alice" has uploaded file with content "some content" to "/file.txt"
-    When user "Alice" creates a share inside of space "Alice Hansen" with settings:
-      | path        | file.txt      |
-      | shareWith   | Bob           |
-      | role        | custom        |
-      | permissions | <permissions> |
-    Then the HTTP status code should be "400"
-    And the OCS status code should be "400"
-    And the OCS status message should be "resharing not supported"
-    Examples:
-      | permissions | description                  |
-      | 19          | view + edit                  |
-      | 21          | view + create                |
-      | 23          | view + create + edit         |
-      | 25          | view + delete                |
-      | 27          | view + edit + delete         |
-      | 29          | view + create + delete       |
-      | 31          | view + create + edit +delete |

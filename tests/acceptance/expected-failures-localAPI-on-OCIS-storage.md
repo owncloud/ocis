@@ -285,11 +285,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:464](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L464)
 - [apiSpacesDavOperation/moveByFileId.feature:465](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L465)
 
-### [Delete resharing tests ](https://github.com/owncloud/ocis/pull/8704)
-- [apiSpacesShares/shareSubItemOfSpace.feature:119](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L119)
-- [apiSpacesShares/shareSubItemOfSpace.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L132)
-- [apiSpacesShares/shareSubItemOfSpace.feature:145](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L145)
-- [apiSpacesShares/shareSubItemOfSpace.feature:156](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L156)
+### [500 when deleting share role](https://github.com/owncloud/ocis/issues/8747)
+- [apiSpacesShares/shareSubItemOfSpace.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L147)
 
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.

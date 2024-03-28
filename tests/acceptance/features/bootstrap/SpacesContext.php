@@ -2338,6 +2338,7 @@ class SpacesContext implements Context {
 	public function userExpiresLastResourceShare(string $user): void {
 		$dateTime = new DateTime('yesterday');
 		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		$rows['permissions'] = (string) $this->featureContext->getLastCreatedPublicShare()->permissions;
 		$this->featureContext->setResponse($this->updateSharedResource($user, $rows));
 	}
 
