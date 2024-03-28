@@ -512,7 +512,7 @@ class TrashbinContext implements Context {
 	 * @throws Exception
 	 */
 	public function userTriesToDeleteFromTrashbinOfUser(string $asUser, string $path, string $user):void {
-		$numItemsDeleted = $this->tryToDeleteFileFromTrashbin($user, $path, $asUser);
+		$this->atemptToDeleteFilesFromTrashBin($user, $path, $asUser);
 	}
 
 	/**
@@ -530,7 +530,7 @@ class TrashbinContext implements Context {
 	public function userTriesToDeleteFromTrashbinOfUserUsingPassword(?string $asUser, ?string $path, ?string $user, ?string $password):void {
 		$user = $this->featureContext->getActualUsername($user);
 		$asUser = $this->featureContext->getActualUsername($asUser);
-		$this->tryToDeleteFileFromTrashbin($user, $path, $asUser, $password);
+		$this->atemptToDeleteFilesFromTrashBin($user, $path, $asUser, $password);
 	}
 
 	/**
@@ -589,21 +589,36 @@ class TrashbinContext implements Context {
 	/**
 	 * @When /^user "([^"]*)" tries to delete the (?:file|folder|entry) with original path "([^"]*)" from the trashbin using the trashbin API$/
 	 *
-	 * @param string|null $user
-	 * @param string|null $originalPath
-	 * @param string|null $asUser
-	 * @param string|null $password
+	 * @param string $user
+	 * @param string $originalPath
 	 *
 	 * @return int the number of items that were matched and requested for delete
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function tryToDeleteFileFromTrashbin(?string $user, ?string $originalPath, ?string $asUser = null, ?string $password = null):int {
+	public function tryToDeleteFileFromTrashbin(string $user, string $originalPath):void {
+		$result = $this->atemptToDeleteFilesFromTrashBin($user, $originalPath);
+		foreach ($result[0] as $response) {
+			$this->featureContext->setResponse($response);
+		}
+	}
+
+	/**
+	 * @param string|null $user
+	 * @param string|null $originalPath
+	 * @param string|null $asUser
+	 * @param string|null $password
+	 *
+	 * @return array
+	 */
+	public function atemptToDeleteFilesFromTrashBin(?string $user, ?string $originalPath, ?string $asUser = null, ?string $password = null):array {
 		$user = $this->featureContext->getActualUsername($user);
+		$password = $this->featureContext->getPasswordForUser($user);
 		$asUser = $asUser ?? $user;
 		$listing = $this->listTrashbinFolder($user);
 		$originalPath = \trim($originalPath, '/');
 		$numItemsDeleted = 0;
+		$responseArray = [];
 
 		foreach ($listing as $entry) {
 			// The entry for the trashbin root can have original-location null.
@@ -612,7 +627,7 @@ class TrashbinContext implements Context {
 			if (\trim($originalLocation, '/') === $originalPath) {
 				$trashItemHRef = $this->convertTrashbinHref($entry['href']);
 				$response = $this->featureContext->makeDavRequest(
-					$asUser,
+					$user,
 					'DELETE',
 					$trashItemHRef,
 					[],
@@ -624,12 +639,12 @@ class TrashbinContext implements Context {
 					[],
 					$user
 				);
-				$this->featureContext->setResponse($response);
+				$responseArray[] = $response;
 				$numItemsDeleted++;
 			}
 		}
 
-		return $numItemsDeleted;
+		return [$responseArray, $numItemsDeleted];
 	}
 
 	/**
@@ -642,7 +657,7 @@ class TrashbinContext implements Context {
 	 * @throws Exception
 	 */
 	public function deleteFileFromTrashbin(string $user, string $originalPath):void {
-		$numItemsDeleted = $this->tryToDeleteFileFromTrashbin($user, $originalPath);
+		$numItemsDeleted = $this->atemptToDeleteFilesFromTrashBin($user, $originalPath)[1];
 
 		Assert::assertEquals(
 			1,
@@ -666,8 +681,13 @@ class TrashbinContext implements Context {
 		$paths = $table->getHash();
 
 		foreach ($paths as $path) {
-			$this->deleteFileFromTrashbin($user, $path["path"]);
+			$numItemsDeleted = $this->atemptToDeleteFilesFromTrashBin($user, $path)[1];
 
+			Assert::assertEquals(
+				1,
+				$numItemsDeleted,
+				"Expected to delete exactly one item from the trashbin but $numItemsDeleted were deleted"
+			);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
 	}
@@ -940,8 +960,8 @@ class TrashbinContext implements Context {
 		$paths = $table->getHash();
 
 		foreach ($paths as $originalPath) {
-			$this->elementInTrashIsRestored($user, $originalPath["path"]);
-
+			$user = $this->featureContext->getActualUsername($user);
+			$this->featureContext->setResponse($this->restoreElement($user, $originalPath["path"]));
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
 	}
@@ -985,6 +1005,7 @@ class TrashbinContext implements Context {
 
 	/**
 	 * @Then /^as "([^"]*)" the (?:file|folder|entry) with original path "([^"]*)" should exist in the trashbin$/
+	 * TODO
 	 *
 	 * @param string|null $user
 	 * @param string|null $originalPath
@@ -1041,7 +1062,11 @@ class TrashbinContext implements Context {
 		$paths = $table->getHash();
 
 		foreach ($paths as $originalPath) {
-			$this->elementIsNotInTrashCheckingOriginalPath($user, $originalPath["path"]);
+			$user = $this->featureContext->getActualUsername($user);
+			Assert::assertFalse(
+				$this->isInTrash($user, $originalPath["path"]),
+				"File previously located at $originalPath was found in the trashbin of user $user"
+			);
 		}
 	}
 
@@ -1062,7 +1087,11 @@ class TrashbinContext implements Context {
 		$paths = $table->getHash();
 
 		foreach ($paths as $originalPath) {
-			$this->elementIsInTrashCheckingOriginalPath($user, $originalPath["path"]);
+			$user = $this->featureContext->getActualUsername($user);
+			Assert::assertTrue(
+				$this->isInTrash($user, $originalPath["path"]),
+				"File previously located at $originalPath wasn't found in the trashbin of user $user"
+			);
 		}
 	}
 
