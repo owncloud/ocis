@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-03-28-10-48-44]
+[#deprecation-note-2024-03-28-10-58-07]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -483,6 +483,15 @@ a| [subs=-attributes]
 ++com.owncloud.api.storage-users ++
 a| [subs=-attributes]
 The address of the storage-users service.
+
+a|`OCIS_DEFAULT_LANGUAGE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.
 
 a|`GRAPH_IDENTITY_BACKEND` +
 
@@ -1032,7 +1041,7 @@ The service account secret.
 
 a|`OCIS_ENABLE_RESHARING` +
 `GRAPH_ENABLE_RESHARING` +
-xref:deprecation-note-2024-03-28-10-48-44[Deprecation Note]
+xref:deprecation-note-2024-03-28-10-58-07[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
