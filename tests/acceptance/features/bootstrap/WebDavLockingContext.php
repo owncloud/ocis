@@ -556,7 +556,7 @@ class WebDavLockingContext implements Context {
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 
-		$this->numberOfLockShouldBeReported($lockCount - 1, $itemToUnlock, $user);
+		$this->checkCountOfLockFiles($lockCount - 1, $itemToUnlock, $user);
 	}
 
 	/**
@@ -831,11 +831,37 @@ class WebDavLockingContext implements Context {
 		string $lockOwner,
 		string $publicWebDAVAPIVersion
 	) {
+		$response = $this->sendingLockTockenOfPublicUploadFileOfUser(
+			$filename,
+			$content,
+			$itemToUseLockOf,
+			$lockOwner,
+			$publicWebDAVAPIVersion
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @param string $filename
+	 * @param string $content
+	 * @param string $itemToUseLockOf
+	 * @param string $lockOwner
+	 * @param string $publicWebDAVAPIVersion
+	 *
+	 * @return ResponseInterface
+	 */
+	public function sendingLockTockenOfPublicUploadFileOfUser(
+		string $filename,
+		string $content,
+		string $itemToUseLockOf,
+		string $lockOwner,
+		string $publicWebDAVAPIVersion
+	) : ResponseInterface {
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
 		$headers = [
 			"If" => "(<" . $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf] . ">)"
 		];
-		$response = $this->publicWebDavContext->publicUploadContent(
+		return $this->publicWebDavContext->publicUploadContent(
 			$filename,
 			'',
 			$content,
@@ -843,7 +869,6 @@ class WebDavLockingContext implements Context {
 			$headers,
 			$publicWebDAVAPIVersion
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -863,13 +888,14 @@ class WebDavLockingContext implements Context {
 		string $publicWebDAVAPIVersion
 	) {
 		$lockOwner = $this->featureContext->getLastCreatedPublicShareToken();
-		$this->publicUploadFileSendingLockTokenOfUser(
+		$response = $this->sendingLockTockenOfPublicUploadFileOfUser(
 			$filename,
 			$content,
 			$itemToUseLockOf,
 			$lockOwner,
 			$publicWebDAVAPIVersion
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -883,6 +909,17 @@ class WebDavLockingContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function numberOfLockShouldBeReported(int $count, string $file, string $user) {
+		$this->checkCountOfLockFiles($count, $user, $file);
+	}
+
+	/**
+	 * @param integer $count
+	 * @param string $file
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function checkCountOfLockFiles(int $count, string $file, string $user) : void {
 		$lockCount = $this->countLockOfResources($user, $file);
 		Assert::assertEquals(
 			$count,
