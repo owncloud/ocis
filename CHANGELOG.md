@@ -53,6 +53,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Disable Multipart uploads: [#8666](https://github.com/owncloud/ocis/pull/8666)
 * Bugfix - Internal links shouldn't have a password: [#8668](https://github.com/owncloud/ocis/pull/8668)
 * Bugfix - Fix uploading via a public link: [#8702](https://github.com/owncloud/ocis/pull/8702)
+* Bugfix - Mask user email in output: [#8726](https://github.com/owncloud/ocis/issues/8726)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
@@ -156,6 +157,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8699
    https://github.com/owncloud/ocis/pull/8702
+
+* Bugfix - Mask user email in output: [#8726](https://github.com/owncloud/ocis/issues/8726)
+
+   We have fixed a bug where the user email was not masked in the output and the
+   user emails could be enumerated through the sharee search. This is the ocis side
+   which adds an suiting config option to mask user emails in the output.
+
+   https://github.com/owncloud/ocis/issues/8726
+   https://github.com/cs3org/reva/pull/4603
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
