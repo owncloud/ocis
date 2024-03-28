@@ -93,7 +93,6 @@ Feature: re-share resources
       | 1               | 403             | 200              |
       | 2               | 403             | 403              |
 
-
   @issue-enterprise-6423
   Scenario Outline: user cannot share items in the project space with share permission
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
