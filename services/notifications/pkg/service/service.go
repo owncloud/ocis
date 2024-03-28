@@ -18,6 +18,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -27,8 +28,6 @@ import (
 	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
-
-var _defaultLocale = "en"
 
 // Service should be named `Runner`
 type Service interface {
@@ -108,7 +107,7 @@ func (s eventsNotifier) render(ctx context.Context, template email.MessageTempla
 	// Render the Email Template for each user
 	messageList := make([]*channels.Message, len(granteeList))
 	for i, usr := range granteeList {
-		locale := s.getUserLang(ctx, usr.GetId())
+		locale := l10n.MustGetUserLocale(ctx, usr.GetId().GetOpaqueId(), "", s.valueService)
 		fields[granteeFieldName] = usr.GetDisplayName()
 
 		rendered, err := email.RenderEmailTemplate(template, locale, s.defaultLanguage, s.emailTemplatePath, s.translationPath, fields)
@@ -213,22 +212,6 @@ func (s eventsNotifier) getUser(ctx context.Context, u *user.UserId) (*user.User
 		return nil, fmt.Errorf("unexpected status code from gateway client: %d", r.GetStatus().GetCode())
 	}
 	return r.GetUser(), nil
-}
-
-func (s eventsNotifier) getUserLang(ctx context.Context, u *user.UserId) string {
-	granteeCtx := metadata.Set(ctx, middleware.AccountID, u.GetOpaqueId())
-	if resp, err := s.valueService.GetValueByUniqueIdentifiers(granteeCtx,
-		&settingssvc.GetValueByUniqueIdentifiersRequest{
-			AccountUuid: u.GetOpaqueId(),
-			SettingId:   defaults.SettingUUIDProfileLanguage,
-		},
-	); err == nil {
-		val := resp.GetValue().GetValue().GetListValue().GetValues()
-		if len(val) > 0 && val[0] != nil {
-			return val[0].GetStringValue()
-		}
-	}
-	return _defaultLocale
 }
 
 func (s eventsNotifier) disableEmails(ctx context.Context, u *user.UserId) bool {

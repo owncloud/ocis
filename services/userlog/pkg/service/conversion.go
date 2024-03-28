@@ -6,7 +6,6 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
-	"io/fs"
 	"strings"
 	"text/template"
 	"time"
@@ -18,7 +17,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/leonelquinteros/gotext"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 )
 
 //go:embed l10n/locale
@@ -338,7 +337,7 @@ func (c *Converter) getResource(ctx context.Context, resourceID *storageprovider
 	return resource, err
 }
 
-func (c *Converter) getUser(ctx context.Context, userID *user.UserId) (*user.User, error) {
+func (c *Converter) getUser(_ context.Context, userID *user.UserId) (*user.User, error) {
 	if u, ok := c.users[userID.GetOpaqueId()]; ok {
 		return u, nil
 	}
@@ -361,25 +360,9 @@ func composeMessage(nt NotificationTemplate, locale, defaultLocale, path string,
 	return subject, subjectraw, message, messageraw, err
 }
 
-func newLocate(locale string, path string) *gotext.Locale {
-	// Create Locale with library path and language code and load default domain
-	var l *gotext.Locale
-	if path == "" {
-		filesystem, _ := fs.Sub(_translationFS, "l10n/locale")
-		l = gotext.NewLocaleFS(locale, filesystem)
-	} else { // use custom path instead
-		l = gotext.NewLocale(path, locale)
-	}
-	l.AddDomain(_domain) // make domain configurable only if needed
-	return l
-}
-
 func loadTemplates(nt NotificationTemplate, locale, defaultLocale, path string) (string, string) {
-	l := newLocate(locale, path)
-	if locale != "en" && len(l.GetTranslations()) == 0 {
-		l = newLocate(defaultLocale, path)
-	}
-	return l.Get(nt.Subject), l.Get(nt.Message)
+	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, path, _translationFS, "l10n/locale").Locale(locale)
+	return t.Get(nt.Subject), t.Get(nt.Message)
 }
 
 func executeTemplate(raw string, vars map[string]interface{}) (string, error) {

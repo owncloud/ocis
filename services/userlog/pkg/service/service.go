@@ -11,20 +11,18 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/go-chi/chi/v5"
-	micrometadata "go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 )
 
@@ -343,7 +341,7 @@ func (ul *UserlogService) sendSSE(ctx context.Context, userIDs []string, event e
 	m := make(map[string]events.SendSSE)
 
 	for _, userid := range userIDs {
-		loc := ul.getUserLocale(userid)
+		loc := l10n.MustGetUserLocale(ctx, userid, "", ul.valueClient)
 		if ev, ok := m[loc]; ok {
 			ev.UserIDs = append(m[loc].UserIDs, userid)
 			m[loc] = ev
@@ -453,25 +451,6 @@ func (ul *UserlogService) alterGlobalEvents(ctx context.Context, alter func(map[
 		Key:   "global-events",
 		Value: val,
 	})
-}
-
-func (ul *UserlogService) getUserLocale(userid string) string {
-	resp, err := ul.valueClient.GetValueByUniqueIdentifiers(
-		micrometadata.Set(context.Background(), middleware.AccountID, userid),
-		&settingssvc.GetValueByUniqueIdentifiersRequest{
-			AccountUuid: userid,
-			SettingId:   defaults.SettingUUIDProfileLanguage,
-		},
-	)
-	if err != nil {
-		ul.log.Error().Err(err).Str("userid", userid).Msg("cannot get users locale")
-		return ""
-	}
-	val := resp.GetValue().GetValue().GetListValue().GetValues()
-	if len(val) == 0 {
-		return ""
-	}
-	return val[0].GetStringValue()
 }
 
 func removeExecutant(users []string, executant *user.UserId) []string {

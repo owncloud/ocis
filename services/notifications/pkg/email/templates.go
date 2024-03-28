@@ -1,7 +1,6 @@
 package email
 
-// Template marks the string as a translatable template
-func Template(s string) string { return s }
+import "github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 
 // the available templates
 var (
@@ -10,24 +9,24 @@ var (
 		textTemplate: "templates/text/email.text.tmpl",
 		htmlTemplate: "templates/html/email.html.tmpl",
 		// ShareCreated email template, Subject field (resolves directly)
-		Subject: Template(`{ShareSharer} shared '{ShareFolder}' with you`),
+		Subject: l10n.Template(`{ShareSharer} shared '{ShareFolder}' with you`),
 		// ShareCreated email template, resolves via {{ .Greeting }}
-		Greeting: Template(`Hello {ShareGrantee}`),
+		Greeting: l10n.Template(`Hello {ShareGrantee}`),
 		// ShareCreated email template, resolves via {{ .MessageBody }}
-		MessageBody: Template(`{ShareSharer} has shared "{ShareFolder}" with you.`),
+		MessageBody: l10n.Template(`{ShareSharer} has shared "{ShareFolder}" with you.`),
 		// ShareCreated email template, resolves via {{ .CallToAction }}
-		CallToAction: Template(`Click here to view it: {ShareLink}`),
+		CallToAction: l10n.Template(`Click here to view it: {ShareLink}`),
 	}
 
 	ShareExpired = MessageTemplate{
 		textTemplate: "templates/text/email.text.tmpl",
 		htmlTemplate: "templates/html/email.html.tmpl",
 		// ShareExpired email template, Subject field (resolves directly)
-		Subject: Template(`Share to '{ShareFolder}' expired at {ExpiredAt}`),
+		Subject: l10n.Template(`Share to '{ShareFolder}' expired at {ExpiredAt}`),
 		// ShareExpired email template, resolves via {{ .Greeting }}
-		Greeting: Template(`Hello {ShareGrantee},`),
+		Greeting: l10n.Template(`Hello {ShareGrantee},`),
 		// ShareExpired email template, resolves via {{ .MessageBody }}
-		MessageBody: Template(`Your share to {ShareFolder} has expired at {ExpiredAt}
+		MessageBody: l10n.Template(`Your share to {ShareFolder} has expired at {ExpiredAt}
 
 Even though this share has been revoked you still might have access through other shares and/or space memberships.`),
 	}
@@ -37,39 +36,39 @@ Even though this share has been revoked you still might have access through othe
 		textTemplate: "templates/text/email.text.tmpl",
 		htmlTemplate: "templates/html/email.html.tmpl",
 		// SharedSpace email template, Subject field (resolves directly)
-		Subject: Template("{SpaceSharer} invited you to join {SpaceName}"),
+		Subject: l10n.Template("{SpaceSharer} invited you to join {SpaceName}"),
 		// SharedSpace email template, resolves via {{ .Greeting }}
-		Greeting: Template(`Hello {SpaceGrantee},`),
+		Greeting: l10n.Template(`Hello {SpaceGrantee},`),
 		// SharedSpace email template, resolves via {{ .MessageBody }}
-		MessageBody: Template(`{SpaceSharer} has invited you to join "{SpaceName}".`),
+		MessageBody: l10n.Template(`{SpaceSharer} has invited you to join "{SpaceName}".`),
 		// SharedSpace email template, resolves via {{ .CallToAction }}
-		CallToAction: Template(`Click here to view it: {ShareLink}`),
+		CallToAction: l10n.Template(`Click here to view it: {ShareLink}`),
 	}
 
 	UnsharedSpace = MessageTemplate{
 		textTemplate: "templates/text/email.text.tmpl",
 		htmlTemplate: "templates/html/email.html.tmpl",
 		// UnsharedSpace email template, Subject field (resolves directly)
-		Subject: Template(`{SpaceSharer} removed you from {SpaceName}`),
+		Subject: l10n.Template(`{SpaceSharer} removed you from {SpaceName}`),
 		// UnsharedSpace email template, resolves via {{ .Greeting }}
-		Greeting: Template(`Hello {SpaceGrantee},`),
+		Greeting: l10n.Template(`Hello {SpaceGrantee},`),
 		// UnsharedSpace email template, resolves via {{ .MessageBody }}
-		MessageBody: Template(`{SpaceSharer} has removed you from "{SpaceName}".
+		MessageBody: l10n.Template(`{SpaceSharer} has removed you from "{SpaceName}".
 
 You might still have access through your other groups or direct membership.`),
 		// UnsharedSpace email template, resolves via {{ .CallToAction }}
-		CallToAction: Template(`Click here to check it: {ShareLink}`),
+		CallToAction: l10n.Template(`Click here to check it: {ShareLink}`),
 	}
 
 	MembershipExpired = MessageTemplate{
 		textTemplate: "templates/text/email.text.tmpl",
 		htmlTemplate: "templates/html/email.html.tmpl",
 		// MembershipExpired email template, Subject field (resolves directly)
-		Subject: Template(`Membership of '{SpaceName}' expired at {ExpiredAt}`),
+		Subject: l10n.Template(`Membership of '{SpaceName}' expired at {ExpiredAt}`),
 		// MembershipExpired email template, resolves via {{ .Greeting }}
-		Greeting: Template(`Hello {SpaceGrantee},`),
+		Greeting: l10n.Template(`Hello {SpaceGrantee},`),
 		// MembershipExpired email template, resolves via {{ .MessageBody }}
-		MessageBody: Template(`Your membership of space {SpaceName} has expired at {ExpiredAt}
+		MessageBody: l10n.Template(`Your membership of space {SpaceName} has expired at {ExpiredAt}
 
 Even though this membership has expired you still might have access through other shares and/or space memberships`),
 	}
