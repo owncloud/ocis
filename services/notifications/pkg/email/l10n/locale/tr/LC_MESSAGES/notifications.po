@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-03-15 00:04+0000\n"
+"POT-Creation-Date: 2024-03-29 00:04+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: Begüm Topyıldız <bgmtpyldz@gmail.com>, 2023\n"
 "Language-Team: Turkish (https://app.transifex.com/owncloud-org/teams/6149/tr/)\n"
@@ -22,46 +22,46 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. UnsharedSpace email template, resolves via {{ .CallToAction }}
-#: pkg/email/templates.go:61
+#: pkg/email/templates.go:60
 msgid "Click here to check it: {ShareLink}"
 msgstr "Kontrol etmek için buraya tıkla: {ShareLink}"
 
 #. ShareCreated email template, resolves via {{ .CallToAction }}
 #. SharedSpace email template, resolves via {{ .CallToAction }}
-#: pkg/email/templates.go:19 pkg/email/templates.go:46
+#: pkg/email/templates.go:18 pkg/email/templates.go:45
 msgid "Click here to view it: {ShareLink}"
 msgstr "Görüntülemek için buraya tıkla: {ShareLink}"
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
-#: pkg/email/templates.go:15
+#: pkg/email/templates.go:14
 msgid "Hello {ShareGrantee}"
 msgstr "Merhaba {ShareGrantee}"
 
 #. ShareExpired email template, resolves via {{ .Greeting }}
-#: pkg/email/templates.go:28
+#: pkg/email/templates.go:27
 msgid "Hello {ShareGrantee},"
 msgstr "Merhaba {ShareGrantee},"
 
 #. SharedSpace email template, resolves via {{ .Greeting }}
 #. UnsharedSpace email template, resolves via {{ .Greeting }}
 #. MembershipExpired email template, resolves via {{ .Greeting }}
-#: pkg/email/templates.go:42 pkg/email/templates.go:55
-#: pkg/email/templates.go:70
+#: pkg/email/templates.go:41 pkg/email/templates.go:54
+#: pkg/email/templates.go:69
 msgid "Hello {SpaceGrantee},"
 msgstr "Merhaba {SpaceGrantee},"
 
 #. MembershipExpired email template, Subject field (resolves directly)
-#: pkg/email/templates.go:68
+#: pkg/email/templates.go:67
 msgid "Membership of '{SpaceName}' expired at {ExpiredAt}"
 msgstr "'{SpaceName}' üyeliği {ExpiredAt} tarihinde sona erdi"
 
 #. ShareExpired email template, Subject field (resolves directly)
-#: pkg/email/templates.go:26
+#: pkg/email/templates.go:25
 msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
 msgstr "'{ShareFolder}' paylaşımı {ExpiredAt} tarihinde sona erdi"
 
 #. MembershipExpired email template, resolves via {{ .MessageBody }}
-#: pkg/email/templates.go:72
+#: pkg/email/templates.go:71
 msgid ""
 "Your membership of space {SpaceName} has expired at {ExpiredAt}\n"
 "\n"
@@ -72,7 +72,7 @@ msgstr ""
 "Üyeliğiniz sona erse bile, diğer paylaşımlar ve/veya alan üyelikleriniz üzerinden erişebilirsiniz"
 
 #. ShareExpired email template, resolves via {{ .MessageBody }}
-#: pkg/email/templates.go:30
+#: pkg/email/templates.go:29
 msgid ""
 "Your share to {ShareFolder} has expired at {ExpiredAt}\n"
 "\n"
@@ -83,22 +83,22 @@ msgstr ""
 "Bu paylaşım iptal edilmiş olsa bile, diğer paylaşımlar ve/veya alan üyelikleriniz üzerinden erişebilirsiniz."
 
 #. ShareCreated email template, resolves via {{ .MessageBody }}
-#: pkg/email/templates.go:17
+#: pkg/email/templates.go:16
 msgid "{ShareSharer} has shared \"{ShareFolder}\" with you."
 msgstr "{ShareSharer}, \"{ShareFolder}\"'yi sizinle paylaştı."
 
 #. ShareCreated email template, Subject field (resolves directly)
-#: pkg/email/templates.go:13
+#: pkg/email/templates.go:12
 msgid "{ShareSharer} shared '{ShareFolder}' with you"
 msgstr "{ShareSharer}, '{ShareFolder}'yi sizinle paylaştı"
 
 #. SharedSpace email template, resolves via {{ .MessageBody }}
-#: pkg/email/templates.go:44
+#: pkg/email/templates.go:43
 msgid "{SpaceSharer} has invited you to join \"{SpaceName}\"."
 msgstr "{SpaceSharer} sizi \"{SpaceName}\"ye katılmaya davet etti."
 
 #. UnsharedSpace email template, resolves via {{ .MessageBody }}
-#: pkg/email/templates.go:57
+#: pkg/email/templates.go:56
 msgid ""
 "{SpaceSharer} has removed you from \"{SpaceName}\".\n"
 "\n"
@@ -109,11 +109,11 @@ msgstr ""
 "Yine de diğer gruplarınızdan veya doğrudan üyeliğiniz üzerinden erişebilirsiniz."
 
 #. SharedSpace email template, Subject field (resolves directly)
-#: pkg/email/templates.go:40
+#: pkg/email/templates.go:39
 msgid "{SpaceSharer} invited you to join {SpaceName}"
 msgstr "{SpaceSharer} sizi {SpaceName}'ye katılmaya davet etti"
 
 #. UnsharedSpace email template, Subject field (resolves directly)
-#: pkg/email/templates.go:53
+#: pkg/email/templates.go:52
 msgid "{SpaceSharer} removed you from {SpaceName}"
 msgstr "{SpaceSharer} sizi {SpaceName}'den kaldırdı"

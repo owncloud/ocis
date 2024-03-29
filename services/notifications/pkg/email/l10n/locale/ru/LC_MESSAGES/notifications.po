@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-03-11 00:40+0000\n"
+"POT-Creation-Date: 2024-03-29 00:04+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: Roman Perekhod, 2023\n"
 "Language-Team: Russian (https://app.transifex.com/owncloud-org/teams/6149/ru/)\n"
@@ -22,46 +22,46 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #. UnsharedSpace email template, resolves via {{ .CallToAction }}
-#: pkg/email/templates.go:61
+#: pkg/email/templates.go:60
 msgid "Click here to check it: {ShareLink}"
 msgstr "Нажмите здесь, чтобы проверить это: {ShareLink}"
 
 #. ShareCreated email template, resolves via {{ .CallToAction }}
 #. SharedSpace email template, resolves via {{ .CallToAction }}
-#: pkg/email/templates.go:19 pkg/email/templates.go:46
+#: pkg/email/templates.go:18 pkg/email/templates.go:45
 msgid "Click here to view it: {ShareLink}"
 msgstr "Нажмите здесь, чтобы увидеть это: {ShareLink}"
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
-#: pkg/email/templates.go:15
+#: pkg/email/templates.go:14
 msgid "Hello {ShareGrantee}"
 msgstr "Здравствуйте {ShareGrantee}"
 
 #. ShareExpired email template, resolves via {{ .Greeting }}
-#: pkg/email/templates.go:28
+#: pkg/email/templates.go:27
 msgid "Hello {ShareGrantee},"
 msgstr "Здравствуйте {ShareGrantee},"
 
 #. SharedSpace email template, resolves via {{ .Greeting }}
 #. UnsharedSpace email template, resolves via {{ .Greeting }}
 #. MembershipExpired email template, resolves via {{ .Greeting }}
-#: pkg/email/templates.go:42 pkg/email/templates.go:55
-#: pkg/email/templates.go:70
+#: pkg/email/templates.go:41 pkg/email/templates.go:54
+#: pkg/email/templates.go:69
 msgid "Hello {SpaceGrantee},"
 msgstr "Здравствуйте {SpaceGrantee},"
 
 #. MembershipExpired email template, Subject field (resolves directly)
-#: pkg/email/templates.go:68
+#: pkg/email/templates.go:67
 msgid "Membership of '{SpaceName}' expired at {ExpiredAt}"
 msgstr "Членство в '{SpaceName}' истекло {ExpiredAt}"
 
 #. ShareExpired email template, Subject field (resolves directly)
-#: pkg/email/templates.go:26
+#: pkg/email/templates.go:25
 msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
 msgstr "Доступ к '{ShareFolder}' истёк {ExpiredAt}"
 
 #. MembershipExpired email template, resolves via {{ .MessageBody }}
-#: pkg/email/templates.go:72
+#: pkg/email/templates.go:71
 msgid ""
 "Your membership of space {SpaceName} has expired at {ExpiredAt}\n"
 "\n"
@@ -72,7 +72,7 @@ msgstr ""
 "Несмотря на то, что срок действия членства истёк, у вас все еще может быть доступ через другие общие ресурсы и/или членство в пространстве."
 
 #. ShareExpired email template, resolves via {{ .MessageBody }}
-#: pkg/email/templates.go:30
+#: pkg/email/templates.go:29
 msgid ""
 "Your share to {ShareFolder} has expired at {ExpiredAt}\n"
 "\n"
@@ -83,22 +83,22 @@ msgstr ""
 "Несмотря на то, что этот общий ресурс был отозван, у вас все еще может быть доступ через другие общие ресурсы и/или членство в пространстве."
 
 #. ShareCreated email template, resolves via {{ .MessageBody }}
-#: pkg/email/templates.go:17
+#: pkg/email/templates.go:16
 msgid "{ShareSharer} has shared \"{ShareFolder}\" with you."
 msgstr "{ShareShare} поделился с вами \"{ShareFolder}\"."
 
 #. ShareCreated email template, Subject field (resolves directly)
-#: pkg/email/templates.go:13
+#: pkg/email/templates.go:12
 msgid "{ShareSharer} shared '{ShareFolder}' with you"
 msgstr "{ShareShare} поделился с вами '{ShareFolder}'"
 
 #. SharedSpace email template, resolves via {{ .MessageBody }}
-#: pkg/email/templates.go:44
+#: pkg/email/templates.go:43
 msgid "{SpaceSharer} has invited you to join \"{SpaceName}\"."
 msgstr "{SpaceSharer} пригласил вас присоединиться к \"{SpaceName}\"."
 
 #. UnsharedSpace email template, resolves via {{ .MessageBody }}
-#: pkg/email/templates.go:57
+#: pkg/email/templates.go:56
 msgid ""
 "{SpaceSharer} has removed you from \"{SpaceName}\".\n"
 "\n"
@@ -109,11 +109,11 @@ msgstr ""
 "У вас все еще может быть доступ через другие группы или прямое членство."
 
 #. SharedSpace email template, Subject field (resolves directly)
-#: pkg/email/templates.go:40
+#: pkg/email/templates.go:39
 msgid "{SpaceSharer} invited you to join {SpaceName}"
 msgstr "{SpaceSharer} пригласил вас присоединиться к {SpaceName}"
 
 #. UnsharedSpace email template, Subject field (resolves directly)
-#: pkg/email/templates.go:53
+#: pkg/email/templates.go:52
 msgid "{SpaceSharer} removed you from {SpaceName}"
 msgstr "{SpaceShare} удалил вас из {SpaceName}"
