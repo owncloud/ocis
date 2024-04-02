@@ -20,6 +20,15 @@ func NewConnectorError(code int, msg string) *ConnectorError {
 	}
 }
 
+// ConnectorService is the interface to implement the WOPI operations. They're
+// divided into multiple endpoints.
+// The IFileConnector will implement the "File" endpoint
+// The IContentConnector will implement the "File content" endpoint
+type ConnectorService interface {
+	GetFileConnector() FileConnectorService
+	GetContentConnector() ContentConnectorService
+}
+
 // Connector will implement the WOPI operations.
 // For convenience, the connector splits the operations based on the
 // WOPI endpoints, so you'll need to get the specific connector first.
@@ -30,21 +39,21 @@ func NewConnectorError(code int, msg string) *ConnectorError {
 //
 // Other endpoints aren't available for now.
 type Connector struct {
-	fileConnector    *FileConnector
-	contentConnector *ContentConnector
+	fileConnector    FileConnectorService
+	contentConnector ContentConnectorService
 }
 
-func NewConnector(fc *FileConnector, cc *ContentConnector) *Connector {
+func NewConnector(fc FileConnectorService, cc ContentConnectorService) *Connector {
 	return &Connector{
 		fileConnector:    fc,
 		contentConnector: cc,
 	}
 }
 
-func (c *Connector) GetFileConnector() *FileConnector {
+func (c *Connector) GetFileConnector() FileConnectorService {
 	return c.fileConnector
 }
 
-func (c *Connector) GetContentConnector() *ContentConnector {
+func (c *Connector) GetContentConnector() ContentConnectorService {
 	return c.contentConnector
 }

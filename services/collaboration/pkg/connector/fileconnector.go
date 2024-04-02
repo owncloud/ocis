@@ -25,6 +25,32 @@ const (
 	lockDuration time.Duration = 30 * time.Minute
 )
 
+// FileConnectorService is the interface to implement the "Files"
+// endpoint. Basically lock operations on the file plus the CheckFileInfo.
+// All operations need a context containing a WOPI context and, optionally,
+// a zerolog logger.
+// Target file is within the WOPI context
+type FileConnectorService interface {
+	// GetLock will return the lockID present in the target file.
+	GetLock(ctx context.Context) (string, error)
+	// Lock will lock the target file with the provided lockID. If the oldLockID
+	// is provided (not empty), the method will perform an unlockAndRelock
+	// operation (unlock the file with the oldLockID and immediately relock
+	// the file with the new lockID).
+	// The current lockID will be returned if a conflict happens
+	Lock(ctx context.Context, lockID, oldLockID string) (string, error)
+	// RefreshLock will extend the lock time 30 minutes. The current lockID
+	// needs to be provided.
+	// The current lockID will be returned if a conflict happens
+	RefreshLock(ctx context.Context, lockID string) (string, error)
+	// Unlock will unlock the target file. The current lockID needs to be
+	// provided.
+	// The current lockID will be returned if a conflict happens
+	UnLock(ctx context.Context, lockID string) (string, error)
+	// CheckFileInfo will return the file information of the target file
+	CheckFileInfo(ctx context.Context) (FileInfo, error)
+}
+
 type FileConnector struct {
 	gwc gatewayv1beta1.GatewayAPIClient
 	cfg *config.Config

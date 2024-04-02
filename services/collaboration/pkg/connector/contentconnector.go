@@ -18,6 +18,21 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// ContentConnectorService is the interface to implement the "File contents"
+// endpoint. Basically upload and download contents.
+// All operations need a context containing a WOPI context and, optionally,
+// a zerolog logger.
+// Target file is within the WOPI context
+type ContentConnectorService interface {
+	// GetFile downloads the file and write its contents in the provider writer
+	GetFile(ctx context.Context, writer io.Writer) error
+	// PutFile uploads the stream up to the stream length. The file should be
+	// locked beforehand, so the lockID needs to be provided.
+	// The current lockID will be returned ONLY if a conflict happens (the file is
+	// locked with a different lockID)
+	PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (string, error)
+}
+
 // ContentConnector implements the "File contents" endpoint.
 // Basically, the ContentConnector handles downloads (GetFile) and
 // uploads (PutFile)

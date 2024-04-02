@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -24,15 +25,25 @@ const (
 // All operations are expected to follow the definitions found in
 // https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/endpoints
 type HttpAdapter struct {
-	con *Connector
+	con ConnectorService
 }
 
+// NewHttpAdapter will create a new HTTP adapter. A new connector using the
+// provided gateway API client and configuration will be used in the adapter
 func NewHttpAdapter(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *HttpAdapter {
 	return &HttpAdapter{
 		con: NewConnector(
 			NewFileConnector(gwc, cfg),
 			NewContentConnector(gwc, cfg),
 		),
+	}
+}
+
+// NewHttpAdapterWithConnector will create a new HTTP adapter that will use
+// the provided connector service
+func NewHttpAdapterWithConnector(con ConnectorService) *HttpAdapter {
+	return &HttpAdapter{
+		con: con,
 	}
 }
 
@@ -119,6 +130,9 @@ func (h *HttpAdapter) UnLock(w http.ResponseWriter, r *http.Request) {
 func (h *HttpAdapter) CheckFileInfo(w http.ResponseWriter, r *http.Request) {
 	fileCon := h.con.GetFileConnector()
 
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Length", "0")
+
 	fileInfo, err := fileCon.CheckFileInfo(r.Context())
 	if err != nil {
 		var conError *ConnectorError
@@ -138,7 +152,7 @@ func (h *HttpAdapter) CheckFileInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Length", strconv.Itoa(len(jsonFileInfo)))
 	w.WriteHeader(http.StatusOK)
 	bytes, err := w.Write(jsonFileInfo)
 
