@@ -17,7 +17,6 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++ ++
-    
 
 a| `CS3_MACHINE_AUTH_API_KEY` +
 a| [subs=-attributes]
@@ -26,14 +25,7 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++ ++
-
-a| `MICRO_LOG_LEVEL` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
+    
 
 a| `MICRO_LOG_LEVEL` +
 a| [subs=-attributes]
@@ -43,6 +35,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++Set the log level for the internal go micro framework. Only change on supervision of ownCloud Support. ++
     
+
+a| `MICRO_LOG_LEVEL` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
 
 a| `MICRO_LOG_LEVEL` +
 a| [subs=-attributes]
