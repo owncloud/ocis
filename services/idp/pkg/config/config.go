@@ -70,9 +70,6 @@ type Client struct {
 }
 
 type Settings struct {
-	// don't change the order of elements in this struct
-	// it needs to match github.com/libregraph/lico/bootstrap.Settings
-
 	Iss string `yaml:"iss" env:"OCIS_URL;OCIS_OIDC_ISSUER;IDP_ISS" desc:"The OIDC issuer URL to use." introductionVersion:"pre5.0"`
 
 	IdentityManager string `yaml:"identity_manager" env:"IDP_IDENTITY_MANAGER" desc:"The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'libregraph' and 'guest'." introductionVersion:"pre5.0"`
@@ -115,8 +112,8 @@ type Settings struct {
 	CookieNames      []string
 	CookieSameSite   http.SameSite
 
-	AccessTokenDurationSeconds        uint64 `yaml:"access_token_duration_seconds" env:"IDP_ACCESS_TOKEN_EXPIRATION" desc:"'Access token lifespan in seconds (time before an access token is expired).'" introductionVersion:"pre5.0"`
-	IDTokenDurationSeconds            uint64 `yaml:"id_token_duration_seconds" env:"IDP_ID_TOKEN_EXPIRATION" desc:"ID token lifespan in seconds (time before an ID token is expired)." introductionVersion:"pre5.0"`
-	RefreshTokenDurationSeconds       uint64 `yaml:"refresh_token_duration_seconds" env:"IDP_REFRESH_TOKEN_EXPIRATION" desc:"Refresh token lifespan in seconds (time before an refresh token is expired). This also limits the duration of an idle offline session." introductionVersion:"pre5.0"`
-	DyamicClientSecretDurationSeconds uint64 `yaml:"dynamic_client_secret_duration_seconds" env:"IDP_DYNAMIC_CLIENT_SECRET_DURATION" desc:"Lifespan in seconds of a dynamically registered OIDC client." introductionVersion:"pre5.0"`
+	AccessTokenDurationSeconds         uint64 `yaml:"access_token_duration_seconds" env:"IDP_ACCESS_TOKEN_EXPIRATION" desc:"'Access token lifespan in seconds (time before an access token is expired).'" introductionVersion:"pre5.0"`
+	IDTokenDurationSeconds             uint64 `yaml:"id_token_duration_seconds" env:"IDP_ID_TOKEN_EXPIRATION" desc:"ID token lifespan in seconds (time before an ID token is expired)." introductionVersion:"pre5.0"`
+	RefreshTokenDurationSeconds        uint64 `yaml:"refresh_token_duration_seconds" env:"IDP_REFRESH_TOKEN_EXPIRATION" desc:"Refresh token lifespan in seconds (time before an refresh token is expired). This also limits the duration of an idle offline session." introductionVersion:"pre5.0"`
+	DynamicClientSecretDurationSeconds uint64 `yaml:"dynamic_client_secret_duration_seconds" env:"IDP_DYNAMIC_CLIENT_SECRET_DURATION" desc:"Lifespan in seconds of a dynamically registered OIDC client." introductionVersion:"pre5.0"`
 }
