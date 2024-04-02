@@ -73,6 +73,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Make server side space templates production ready: [#8723](https://github.com/owncloud/ocis/pull/8723)
 * Enhancement - Update web to v9.0.0-alpha.3: [#8736](https://github.com/owncloud/ocis/pull/8736)
 * Enhancement - Sharing NG role names and descriptions: [#8743](https://github.com/owncloud/ocis/pull/8743)
+* Enhancement - Enable web extension drawio by default: [#8760](https://github.com/owncloud/ocis/pull/8760)
 
 ## Details
 
@@ -378,6 +379,12 @@ The following sections list the changes for unreleased.
    align with the previously agreed upon terms.
 
    https://github.com/owncloud/ocis/pull/8743
+
+* Enhancement - Enable web extension drawio by default: [#8760](https://github.com/owncloud/ocis/pull/8760)
+
+   Enable web extension drawio by default
+
+   https://github.com/owncloud/ocis/pull/8760
 
 # Changelog for [5.0.0] (2024-03-18)
 
