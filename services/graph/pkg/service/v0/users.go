@@ -279,8 +279,11 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 			finalUsers[i] = &libregraph.User{
 				Id:          u.Id,
 				DisplayName: u.DisplayName,
-				Mail:        u.Mail,
 				UserType:    u.UserType,
+			}
+
+			if g.config.TokenManager.ShowUserEmailInResults {
+				finalUsers[i].Mail = u.Mail
 			}
 		}
 		users = finalUsers
@@ -543,6 +546,10 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			errorcode.RenderError(w, r, err)
 			return
 		}
+	}
+
+	if !g.config.TokenManager.ShowUserEmailInResults {
+		user.Mail = nil
 	}
 
 	render.Status(r, http.StatusOK)
