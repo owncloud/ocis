@@ -167,7 +167,7 @@ Open https://ocis.owncloud.test in your browser and accept the invalid certifica
 In case you want to run ownCloud Web from a development branch together with this deployment example (e.g. for feature development for the app provider frontend) you can use this deployment example with the local setup and some additional steps as described below.
 
 1. Clone the [ownCloud Web repository](https://github.com/owncloud/web) on your development machine.
-2. Run `pnpm && pnpm build:w` for `web`, so that it creates and continuously updates the `dist` folder for web.
+2. Run `pnpm i && pnpm build:w` for `web`, so that it creates and continuously updates the `dist` folder for web.
 3. Add the dist folder as read only volume to `volumes` section of the `ocis` service in the `docker-compose.yml` file:
    ```yaml
    - /your/local/path/to/web/dist/:/web/dist:ro
