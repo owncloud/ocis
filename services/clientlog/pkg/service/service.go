@@ -134,7 +134,7 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 					InitiatorID: event.InitiatorID,
 				}
 
-				gwc, err := cl.gatewaySelector.Next()
+				gwc, err = cl.gatewaySelector.Next()
 				if err != nil {
 					cl.log.Error().Err(err).Interface("event", event).Msg("error getting gateway client")
 					return
