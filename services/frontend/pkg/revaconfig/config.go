@@ -229,7 +229,6 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 							},
 							"files_sharing": map[string]interface{}{
 								"api_enabled":                       true,
-								"resharing":                         cfg.EnableResharing,
 								"group_sharing":                     true,
 								"sharing_roles":                     true,
 								"deny_access":                       cfg.OCS.EnableDenials,

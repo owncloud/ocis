@@ -20,13 +20,13 @@ var _ = Describe("unifiedroles", func() {
 		func(legacyRole *rConversions.Role, unifiedRole *libregraph.UnifiedRoleDefinition, constraints string) {
 			cs3perm := legacyRole.CS3ResourcePermissions()
 
-			r := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3perm, constraints, true)
+			r := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3perm, constraints)
 			Expect(r.GetId()).To(Equal(unifiedRole.GetId()))
 
 		},
-		Entry(rConversions.RoleViewer, rConversions.NewViewerRole(true), unifiedrole.NewViewerUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
-		Entry(rConversions.RoleEditor, rConversions.NewEditorRole(true), unifiedrole.NewEditorUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
-		Entry(rConversions.RoleFileEditor, rConversions.NewFileEditorRole(true), unifiedrole.NewFileEditorUnifiedRole(true), unifiedrole.UnifiedRoleConditionGrantee),
+		Entry(rConversions.RoleViewer, rConversions.NewViewerRole(), unifiedrole.NewViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionGrantee),
+		Entry(rConversions.RoleEditor, rConversions.NewEditorRole(), unifiedrole.NewEditorUnifiedRole(), unifiedrole.UnifiedRoleConditionGrantee),
+		Entry(rConversions.RoleFileEditor, rConversions.NewFileEditorRole(), unifiedrole.NewFileEditorUnifiedRole(), unifiedrole.UnifiedRoleConditionGrantee),
 		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
 		Entry(rConversions.RoleSpaceViewer, rConversions.NewSpaceViewerRole(), unifiedrole.NewSpaceViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
 		Entry(rConversions.RoleSpaceEditor, rConversions.NewSpaceEditorRole(), unifiedrole.NewSpaceEditorUnifiedRole(), unifiedrole.UnifiedRoleConditionOwner),
@@ -49,11 +49,11 @@ var _ = Describe("unifiedroles", func() {
 
 			Expect(permsFromCS3).To(matcher)
 		},
-		Entry(rConversions.RoleViewer, rConversions.NewViewerRole(true), unifiedrole.NewViewerUnifiedRole(true), true),
-		Entry(rConversions.RoleEditor, rConversions.NewEditorRole(true), unifiedrole.NewEditorUnifiedRole(true), true),
-		Entry(rConversions.RoleFileEditor, rConversions.NewFileEditorRole(true), unifiedrole.NewFileEditorUnifiedRole(true), true),
+		Entry(rConversions.RoleViewer, rConversions.NewViewerRole(), unifiedrole.NewViewerUnifiedRole(), true),
+		Entry(rConversions.RoleEditor, rConversions.NewEditorRole(), unifiedrole.NewEditorUnifiedRole(), true),
+		Entry(rConversions.RoleFileEditor, rConversions.NewFileEditorRole(), unifiedrole.NewFileEditorUnifiedRole(), true),
 		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole(), true),
-		Entry("no match", rConversions.NewFileEditorRole(true), unifiedrole.NewManagerUnifiedRole(), false),
+		Entry("no match", rConversions.NewFileEditorRole(), unifiedrole.NewManagerUnifiedRole(), false),
 	)
 
 	DescribeTable("WeightRoleDefinitions",
@@ -66,25 +66,25 @@ var _ = Describe("unifiedroles", func() {
 
 		Entry("ascending",
 			[]*libregraph.UnifiedRoleDefinition{
-				unifiedrole.NewViewerUnifiedRole(false),
-				unifiedrole.NewFileEditorUnifiedRole(false),
+				unifiedrole.NewViewerUnifiedRole(),
+				unifiedrole.NewFileEditorUnifiedRole(),
 			},
 			false,
 			[]*libregraph.UnifiedRoleDefinition{
-				unifiedrole.NewViewerUnifiedRole(false),
-				unifiedrole.NewFileEditorUnifiedRole(false),
+				unifiedrole.NewViewerUnifiedRole(),
+				unifiedrole.NewFileEditorUnifiedRole(),
 			},
 		),
 
 		Entry("descending",
 			[]*libregraph.UnifiedRoleDefinition{
-				unifiedrole.NewViewerUnifiedRole(false),
-				unifiedrole.NewFileEditorUnifiedRole(false),
+				unifiedrole.NewViewerUnifiedRole(),
+				unifiedrole.NewFileEditorUnifiedRole(),
 			},
 			true,
 			[]*libregraph.UnifiedRoleDefinition{
-				unifiedrole.NewFileEditorUnifiedRole(false),
-				unifiedrole.NewViewerUnifiedRole(false),
+				unifiedrole.NewFileEditorUnifiedRole(),
+				unifiedrole.NewViewerUnifiedRole(),
 			},
 		),
 	)
@@ -108,9 +108,9 @@ var _ = Describe("unifiedroles", func() {
 		}
 
 		DescribeTable("GetApplicableRoleDefinitionsForActions",
-			func(givenActions []string, constraints string, resharing bool, expectedDefinitions []*libregraph.UnifiedRoleDefinition) {
+			func(givenActions []string, constraints string, expectedDefinitions []*libregraph.UnifiedRoleDefinition) {
 
-				generatedDefinitions := unifiedrole.GetApplicableRoleDefinitionsForActions(givenActions, constraints, resharing, false)
+				generatedDefinitions := unifiedrole.GetApplicableRoleDefinitionsForActions(givenActions, constraints, false)
 
 				Expect(len(generatedDefinitions)).To(Equal(len(expectedDefinitions)))
 
@@ -129,90 +129,82 @@ var _ = Describe("unifiedroles", func() {
 
 			Entry(
 				"ViewerUnifiedRole",
-				rolesToAction(unifiedrole.NewViewerUnifiedRole(false)),
+				rolesToAction(unifiedrole.NewViewerUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionGrantee,
-				false,
 				[]*libregraph.UnifiedRoleDefinition{
-					unifiedrole.NewViewerUnifiedRole(false),
+					unifiedrole.NewViewerUnifiedRole(),
 				},
 			),
 
 			Entry(
 				"ViewerUnifiedRole | share",
-				rolesToAction(unifiedrole.NewViewerUnifiedRole(true)),
+				rolesToAction(unifiedrole.NewViewerUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionGrantee,
-				true,
 				[]*libregraph.UnifiedRoleDefinition{
-					unifiedrole.NewViewerUnifiedRole(true),
+					unifiedrole.NewViewerUnifiedRole(),
 				},
 			),
 
 			Entry(
 				"NewFileEditorUnifiedRole",
-				rolesToAction(unifiedrole.NewFileEditorUnifiedRole(false)),
+				rolesToAction(unifiedrole.NewFileEditorUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionGrantee,
-				false,
 				[]*libregraph.UnifiedRoleDefinition{
-					unifiedrole.NewViewerUnifiedRole(false),
-					unifiedrole.NewFileEditorUnifiedRole(false),
+					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewFileEditorUnifiedRole(),
 				},
 			),
 
 			Entry(
 				"NewFileEditorUnifiedRole - share",
-				rolesToAction(unifiedrole.NewFileEditorUnifiedRole(true)),
+				rolesToAction(unifiedrole.NewFileEditorUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionGrantee,
-				true,
 				[]*libregraph.UnifiedRoleDefinition{
-					unifiedrole.NewViewerUnifiedRole(true),
-					unifiedrole.NewFileEditorUnifiedRole(true),
+					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewFileEditorUnifiedRole(),
 				},
 			),
 
 			Entry(
 				"NewEditorUnifiedRole",
-				rolesToAction(unifiedrole.NewEditorUnifiedRole(false)),
+				rolesToAction(unifiedrole.NewEditorUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionGrantee,
-				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewUploaderUnifiedRole(),
-					unifiedrole.NewViewerUnifiedRole(false),
-					unifiedrole.NewFileEditorUnifiedRole(false),
-					unifiedrole.NewEditorUnifiedRole(false),
+					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewFileEditorUnifiedRole(),
+					unifiedrole.NewEditorUnifiedRole(),
 				},
 			),
 
 			Entry(
 				"NewEditorUnifiedRole - share",
-				rolesToAction(unifiedrole.NewEditorUnifiedRole(true)),
+				rolesToAction(unifiedrole.NewEditorUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionGrantee,
-				true,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewUploaderUnifiedRole(),
-					unifiedrole.NewViewerUnifiedRole(true),
-					unifiedrole.NewFileEditorUnifiedRole(true),
-					unifiedrole.NewEditorUnifiedRole(true),
+					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewFileEditorUnifiedRole(),
+					unifiedrole.NewEditorUnifiedRole(),
 				},
 			),
 
 			Entry(
 				"GetBuiltinRoleDefinitionList",
-				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList(false)...),
+				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList()...),
 				unifiedrole.UnifiedRoleConditionGrantee,
-				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewUploaderUnifiedRole(),
-					unifiedrole.NewViewerUnifiedRole(false),
-					unifiedrole.NewFileEditorUnifiedRole(false),
-					unifiedrole.NewEditorUnifiedRole(false),
+					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewFileEditorUnifiedRole(),
+					unifiedrole.NewEditorUnifiedRole(),
 				},
 			),
 
 			Entry(
 				"GetBuiltinRoleDefinitionList",
-				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList(false)...),
+				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList()...),
 				unifiedrole.UnifiedRoleConditionOwner,
-				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSpaceViewerUnifiedRole(),
 					unifiedrole.NewSpaceEditorUnifiedRole(),
@@ -222,14 +214,13 @@ var _ = Describe("unifiedroles", func() {
 
 			Entry(
 				"GetBuiltinRoleDefinitionList - share",
-				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList(true)...),
+				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList()...),
 				unifiedrole.UnifiedRoleConditionGrantee,
-				true,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewUploaderUnifiedRole(),
-					unifiedrole.NewViewerUnifiedRole(true),
-					unifiedrole.NewFileEditorUnifiedRole(true),
-					unifiedrole.NewEditorUnifiedRole(true),
+					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewFileEditorUnifiedRole(),
+					unifiedrole.NewEditorUnifiedRole(),
 				},
 			),
 
@@ -237,7 +228,6 @@ var _ = Describe("unifiedroles", func() {
 				"single",
 				[]string{unifiedrole.DriveItemQuotaRead},
 				unifiedrole.UnifiedRoleConditionGrantee,
-				true,
 				[]*libregraph.UnifiedRoleDefinition{},
 			),
 
@@ -245,7 +235,6 @@ var _ = Describe("unifiedroles", func() {
 				"mixed",
 				append(rolesToAction(unifiedrole.NewUploaderUnifiedRole()), unifiedrole.DriveItemQuotaRead),
 				unifiedrole.UnifiedRoleConditionGrantee,
-				true,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewUploaderUnifiedRole(),
 				},
@@ -255,29 +244,26 @@ var _ = Describe("unifiedroles", func() {
 
 	{
 		var newUnifiedRoleFromIDEntries []TableEntry
-		for _, resharing := range []bool{true, false} {
-			attachEntry := func(name, id string, definition *libregraph.UnifiedRoleDefinition, errors bool) {
-				e := Entry(
-					fmt.Sprintf("%s - resharing: %t", name, resharing),
-					id,
-					resharing,
-					definition,
-					errors,
-				)
+		attachEntry := func(name, id string, definition *libregraph.UnifiedRoleDefinition, errors bool) {
+			e := Entry(
+				fmt.Sprintf("%s", name),
+				id,
+				definition,
+				errors,
+			)
 
-				newUnifiedRoleFromIDEntries = append(newUnifiedRoleFromIDEntries, e)
-			}
-
-			for _, definition := range unifiedrole.GetBuiltinRoleDefinitionList(resharing) {
-				attachEntry(definition.GetDisplayName(), definition.GetId(), definition, false)
-			}
-
-			attachEntry("unknown", "123", nil, true)
+			newUnifiedRoleFromIDEntries = append(newUnifiedRoleFromIDEntries, e)
 		}
 
+		for _, definition := range unifiedrole.GetBuiltinRoleDefinitionList() {
+			attachEntry(definition.GetDisplayName(), definition.GetId(), definition, false)
+		}
+
+		attachEntry("unknown", "123", nil, true)
+
 		DescribeTable("NewUnifiedRoleFromID",
-			func(id string, resharing bool, expectedRole *libregraph.UnifiedRoleDefinition, expectError bool) {
-				role, err := unifiedrole.NewUnifiedRoleFromID(id, resharing)
+			func(id string, expectedRole *libregraph.UnifiedRoleDefinition, expectError bool) {
+				role, err := unifiedrole.NewUnifiedRoleFromID(id)
 
 				if expectError {
 					Expect(err).To(HaveOccurred())

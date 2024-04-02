@@ -34,19 +34,17 @@ type DrivesDriveItemProvider interface {
 
 // DrivesDriveItemService contains the production business logic for everything that relates to drives
 type DrivesDriveItemService struct {
-	logger           log.Logger
-	gatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
-	identityCache    identity.IdentityCache
-	resharingEnabled bool
+	logger          log.Logger
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	identityCache   identity.IdentityCache
 }
 
 // NewDrivesDriveItemService creates a new DrivesDriveItemService
-func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, resharing bool) (DrivesDriveItemService, error) {
+func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache) (DrivesDriveItemService, error) {
 	return DrivesDriveItemService{
-		logger:           log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
-		gatewaySelector:  gatewaySelector,
-		identityCache:    identityCache,
-		resharingEnabled: resharing,
+		logger:          log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
+		gatewaySelector: gatewaySelector,
+		identityCache:   identityCache,
 	}, nil
 }
 
@@ -211,8 +209,8 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 		return libregraph.DriveItem{}, errors.Join(errs...)
 	}
 
-	// As the accepted shares are all for the same resource they should collapse to a single drive-item
-	items, err := cs3ReceivedSharesToDriveItems(ctx, &s.logger, gatewayClient, s.identityCache, s.resharingEnabled, acceptedShares)
+	// As the accepted shares are all for the same resource they should collapse to a single driveitem
+	items, err := cs3ReceivedSharesToDriveItems(ctx, &s.logger, gatewayClient, s.identityCache, acceptedShares)
 	switch {
 	case err != nil:
 		return libregraph.DriveItem{}, nil

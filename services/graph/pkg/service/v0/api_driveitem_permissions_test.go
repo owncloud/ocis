@@ -164,13 +164,13 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewViewerUnifiedRole(true).GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.NewViewerUnifiedRole().GetId()}
 
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(permission.GetRoles()).To(HaveLen(1))
-			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.NewViewerUnifiedRole(true).GetId()))
+			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.NewViewerUnifiedRole().GetId()))
 		})
 
 		It("fails with wrong role", func() {
@@ -311,7 +311,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		It("populates allowedValues for files that are not shared", func() {
 			statResponse.Info = &provider.ResourceInfo{
 				Id:            &itemID,
-				PermissionSet: roleconversions.NewViewerRole(false).CS3ResourcePermissions(),
+				PermissionSet: roleconversions.NewViewerRole().CS3ResourcePermissions(),
 			}
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
@@ -324,13 +324,13 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		It("returns one permission per share", func() {
 			statResponse.Info = &provider.ResourceInfo{
 				Id:            &itemID,
-				PermissionSet: roleconversions.NewEditorRole(false).CS3ResourcePermissions(),
+				PermissionSet: roleconversions.NewEditorRole().CS3ResourcePermissions(),
 			}
 			listSharesResponse.Shares = []*collaboration.Share{
 				{
 					Id: &collaboration.ShareId{OpaqueId: "1"},
 					Permissions: &collaboration.SharePermissions{
-						Permissions: roleconversions.NewViewerRole(false).CS3ResourcePermissions(),
+						Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions(),
 					},
 					ResourceId: &provider.ResourceId{
 						StorageId: "1",
@@ -358,7 +358,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 						SpaceId:   "spaceid",
 						OpaqueId:  "public-share-opaqueid",
 					},
-					Permissions: &link.PublicSharePermissions{Permissions: roleconversions.NewViewerRole(false).CS3ResourcePermissions()},
+					Permissions: &link.PublicSharePermissions{Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions()},
 				},
 			}
 
@@ -408,7 +408,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
 			statResponse.Info = &provider.ResourceInfo{
 				Id:            listSpacesResponse.StorageSpaces[0].Root,
-				PermissionSet: roleconversions.NewViewerRole(false).CS3ResourcePermissions(),
+				PermissionSet: roleconversions.NewViewerRole().CS3ResourcePermissions(),
 			}
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			permissions, err := driveItemPermissionsService.ListSpaceRootPermissions(context.Background(), driveId)
@@ -586,7 +586,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					},
 				},
 				Permissions: &collaboration.SharePermissions{
-					Permissions: roleconversions.NewViewerRole(true).CS3ResourcePermissions(),
+					Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions(),
 				},
 			}
 			getShareMockResponse = &collaboration.GetShareResponse{
@@ -798,7 +798,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 
-			driveItemPermission.SetRoles([]string{unifiedrole.NewFileEditorUnifiedRole(false).GetId()})
+			driveItemPermission.SetRoles([]string{unifiedrole.NewFileEditorUnifiedRole().GetId()})
 			spaceId := provider.ResourceId{
 				StorageId: "1",
 				SpaceId:   "2",
@@ -980,7 +980,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 					ObjectId:                libregraph.PtrString("1"),
 					LibreGraphRecipientType: libregraph.PtrString("user")},
 			},
-			Roles: []string{unifiedrole.NewViewerUnifiedRole(true).GetId()},
+			Roles: []string{unifiedrole.NewViewerUnifiedRole().GetId()},
 		}
 	})
 

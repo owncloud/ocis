@@ -96,7 +96,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 
 	unifiedRolePermissions := []*libregraph.UnifiedRolePermission{{AllowedResourceActions: invite.LibreGraphPermissionsActions}}
 	for _, roleID := range invite.GetRoles() {
-		role, err := unifiedrole.NewUnifiedRoleFromID(roleID, s.config.FilesSharing.EnableResharing)
+		role, err := unifiedrole.NewUnifiedRoleFromID(roleID)
 		if err != nil {
 			s.logger.Debug().Err(err).Interface("role", invite.GetRoles()[0]).Msg("unable to convert requested role")
 			return libregraph.Permission{}, err
@@ -125,7 +125,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 	}
 
 	permission := &libregraph.Permission{}
-	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, condition, s.config.FilesSharing.EnableResharing); role != nil {
+	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, condition); role != nil {
 		permission.Roles = []string{role.GetId()}
 	}
 
@@ -246,7 +246,6 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 			unifiedrole.GetApplicableRoleDefinitionsForActions(
 				allowedActions,
 				condition,
-				s.config.FilesSharing.EnableResharing,
 				false,
 			),
 		),

@@ -15,7 +15,7 @@ import (
 // GetRoleDefinitions a list of permission roles than can be used when sharing with users or groups
 func (g Graph) GetRoleDefinitions(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, unifiedrole.GetBuiltinRoleDefinitionList(g.config.FilesSharing.EnableResharing))
+	render.JSON(w, r, unifiedrole.GetBuiltinRoleDefinitionList())
 }
 
 // GetRoleDefinition a permission role than can be used when sharing with users or groups
@@ -27,7 +27,7 @@ func (g Graph) GetRoleDefinition(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping role id failed")
 		return
 	}
-	role, err := getRoleDefinition(roleID, g.config.FilesSharing.EnableResharing)
+	role, err := getRoleDefinition(roleID)
 	if err != nil {
 		logger.Debug().Str("roleID", roleID).Msg("could not get role: not found")
 		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, err.Error())
@@ -37,8 +37,8 @@ func (g Graph) GetRoleDefinition(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, role)
 }
 
-func getRoleDefinition(roleID string, resharing bool) (*libregraph.UnifiedRoleDefinition, error) {
-	roleList := unifiedrole.GetBuiltinRoleDefinitionList(resharing)
+func getRoleDefinition(roleID string) (*libregraph.UnifiedRoleDefinition, error) {
+	roleList := unifiedrole.GetBuiltinRoleDefinitionList()
 	for _, role := range roleList {
 		if role != nil && role.Id != nil && *role.Id == roleID {
 			return role, nil

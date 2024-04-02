@@ -165,7 +165,7 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
 		}
 
-		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*perm, unifiedrole.UnifiedRoleConditionOwner, false); role != nil {
+		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*perm, unifiedrole.UnifiedRoleConditionOwner); role != nil {
 			switch apiVersion {
 			case APIVersion_1:
 				if r := unifiedrole.GetLegacyName(*role); r != "" {
@@ -354,7 +354,6 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
 		*share.GetPermissions().GetPermissions(),
 		condition,
-		g.config.FilesSharing.EnableResharing,
 	)
 	if role != nil {
 		perm.SetRoles([]string{role.GetId()})
@@ -627,7 +626,7 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 	var permissionsUpdated, ok bool
 	if roles, ok = newPermission.GetRolesOk(); ok && len(roles) > 0 {
 		for _, roleID := range roles {
-			role, err := unifiedrole.NewUnifiedRoleFromID(roleID, g.config.FilesSharing.EnableResharing)
+			role, err := unifiedrole.NewUnifiedRoleFromID(roleID)
 			if err != nil {
 				g.logger.Debug().Err(err).Interface("role", role).Msg("unable to convert requested role")
 				return nil, err

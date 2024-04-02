@@ -84,8 +84,8 @@ func rolesAndActions(sl validator.StructLevel, roles, actions []string, allowEmp
 	var availableRoles []string
 	var availableActions []string
 	for _, definition := range append(
-		unifiedrole.GetBuiltinRoleDefinitionList(true),
-		unifiedrole.GetBuiltinRoleDefinitionList(false)...,
+		unifiedrole.GetBuiltinRoleDefinitionList(),
+		unifiedrole.GetBuiltinRoleDefinitionList()...,
 	) {
 		if slices.Contains(availableRoles, definition.GetId()) {
 			continue

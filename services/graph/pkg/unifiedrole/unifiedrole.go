@@ -69,8 +69,8 @@ var legacyNames map[string]string = map[string]string{
 }
 
 // NewViewerUnifiedRole creates a viewer role. `sharing` indicates if sharing permission should be added
-func NewViewerUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
-	r := conversions.NewViewerRole(sharing)
+func NewViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
+	r := conversions.NewViewerRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleViewerID),
 		Description: proto.String("View and download."),
@@ -103,8 +103,8 @@ func NewSpaceViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 }
 
 // NewEditorUnifiedRole creates an editor role. `sharing` indicates if sharing permission should be added
-func NewEditorUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
-	r := conversions.NewEditorRole(sharing)
+func NewEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
+	r := conversions.NewEditorRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleEditorID),
 		Description: proto.String("View, download, upload, edit, add and delete."),
@@ -137,8 +137,8 @@ func NewSpaceEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 }
 
 // NewFileEditorUnifiedRole creates a file-editor role
-func NewFileEditorUnifiedRole(sharing bool) *libregraph.UnifiedRoleDefinition {
-	r := conversions.NewFileEditorRole(sharing)
+func NewFileEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
+	r := conversions.NewFileEditorRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleFileEditorID),
 		Description: proto.String("View, download and edit."),
@@ -188,8 +188,8 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 }
 
 // NewUnifiedRoleFromID returns a unified role definition from the provided id
-func NewUnifiedRoleFromID(id string, resharing bool) (*libregraph.UnifiedRoleDefinition, error) {
-	for _, definition := range GetBuiltinRoleDefinitionList(resharing) {
+func NewUnifiedRoleFromID(id string) (*libregraph.UnifiedRoleDefinition, error) {
+	for _, definition := range GetBuiltinRoleDefinitionList() {
 		if definition.GetId() != id {
 			continue
 		}
@@ -200,13 +200,13 @@ func NewUnifiedRoleFromID(id string, resharing bool) (*libregraph.UnifiedRoleDef
 	return nil, errors.New("role not found")
 }
 
-func GetBuiltinRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefinition {
+func GetBuiltinRoleDefinitionList() []*libregraph.UnifiedRoleDefinition {
 	return []*libregraph.UnifiedRoleDefinition{
-		NewViewerUnifiedRole(resharing),
+		NewViewerUnifiedRole(),
 		NewSpaceViewerUnifiedRole(),
-		NewEditorUnifiedRole(resharing),
+		NewEditorUnifiedRole(),
 		NewSpaceEditorUnifiedRole(),
-		NewFileEditorUnifiedRole(resharing),
+		NewFileEditorUnifiedRole(),
 		NewUploaderUnifiedRole(),
 		NewManagerUnifiedRole(),
 	}
@@ -214,8 +214,8 @@ func GetBuiltinRoleDefinitionList(resharing bool) []*libregraph.UnifiedRoleDefin
 
 // GetApplicableRoleDefinitionsForActions returns a list of role definitions
 // that match the provided actions and constraints
-func GetApplicableRoleDefinitionsForActions(actions []string, constraints string, resharing, descending bool) []*libregraph.UnifiedRoleDefinition {
-	builtin := GetBuiltinRoleDefinitionList(resharing)
+func GetApplicableRoleDefinitionsForActions(actions []string, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
+	builtin := GetBuiltinRoleDefinitionList()
 	definitions := make([]*libregraph.UnifiedRoleDefinition, 0, len(builtin))
 
 	for _, definition := range builtin {
@@ -402,14 +402,14 @@ func GetLegacyName(role libregraph.UnifiedRoleDefinition) string {
 
 // CS3ResourcePermissionsToUnifiedRole tries to find the UnifiedRoleDefinition that matches the supplied
 // CS3 ResourcePermissions and constraints.
-func CS3ResourcePermissionsToUnifiedRole(p provider.ResourcePermissions, constraints string, resharing bool) *libregraph.UnifiedRoleDefinition {
+func CS3ResourcePermissionsToUnifiedRole(p provider.ResourcePermissions, constraints string) *libregraph.UnifiedRoleDefinition {
 	actionSet := map[string]struct{}{}
 	for _, action := range CS3ResourcePermissionsToLibregraphActions(p) {
 		actionSet[action] = struct{}{}
 	}
 
 	var res *libregraph.UnifiedRoleDefinition
-	for _, uRole := range GetBuiltinRoleDefinitionList(resharing) {
+	for _, uRole := range GetBuiltinRoleDefinitionList() {
 		matchFound := false
 		for _, uPerm := range uRole.GetRolePermissions() {
 			if uPerm.GetCondition() != constraints {
@@ -448,6 +448,10 @@ func displayName(role *conversions.Role) *string {
 	if role == nil {
 		return nil
 	}
+
+	// linter wants this to be a var
+	canEdit := "Can edit"
+
 	var displayName string
 	switch role.Name {
 	case conversions.RoleViewer:
@@ -455,11 +459,11 @@ func displayName(role *conversions.Role) *string {
 	case conversions.RoleSpaceViewer:
 		displayName = "Can view"
 	case conversions.RoleEditor:
-		displayName = "Can edit"
+		displayName = canEdit
 	case conversions.RoleSpaceEditor:
-		displayName = "Can edit"
+		displayName = canEdit
 	case conversions.RoleFileEditor:
-		displayName = "Can edit"
+		displayName = canEdit
 	case conversions.RoleUploader:
 		displayName = "Can upload"
 	case conversions.RoleManager:

@@ -47,7 +47,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 
 		cache := identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
-		service, err := svc.NewDrivesDriveItemService(logger, gatewaySelector, cache, false)
+		service, err := svc.NewDrivesDriveItemService(logger, gatewaySelector, cache)
 		Expect(err).ToNot(HaveOccurred())
 		drivesDriveItemService = service
 	})

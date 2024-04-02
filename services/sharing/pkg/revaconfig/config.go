@@ -86,7 +86,6 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 							},
 						},
 					},
-					"disable_resharing": !cfg.EnableResharing,
 				},
 				"publicshareprovider": map[string]interface{}{
 					"gateway_addr":                       cfg.Reva.Address,
