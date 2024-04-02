@@ -83,8 +83,6 @@ const LockTypeKey = "reva.lock.type"
 
 var hiddenReg = regexp.MustCompile(`\.sys\..#.`)
 
-var _resharing = false
-
 func (c *Config) init() {
 	c.Namespace = path.Clean(c.Namespace)
 	if !strings.HasPrefix(c.Namespace, "/") {
@@ -2129,12 +2127,12 @@ func (fs *eosfs) permissionSet(ctx context.Context, eosFileInfo *eosclient.FileI
 			// The role names should not be hardcoded any more as they will come from config in the future
 			if publicShare, ok := u.Opaque.Map["public-share-role"]; ok {
 				if string(publicShare.Value) == "editor" {
-					return conversions.NewEditorRole(_resharing).CS3ResourcePermissions()
+					return conversions.NewEditorRole().CS3ResourcePermissions()
 				} else if string(publicShare.Value) == "uploader" {
 					return conversions.NewUploaderRole().CS3ResourcePermissions()
 				}
 				// Default to viewer role
-				return conversions.NewViewerRole(_resharing).CS3ResourcePermissions()
+				return conversions.NewViewerRole().CS3ResourcePermissions()
 			}
 		}
 

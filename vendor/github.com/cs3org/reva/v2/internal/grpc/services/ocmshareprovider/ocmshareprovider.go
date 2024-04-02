@@ -327,7 +327,7 @@ func (s *service) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareReq
 		ProviderID: ocmshare.Id.OpaqueId,
 		Owner: formatOCMUser(&userpb.UserId{
 			OpaqueId: info.Owner.OpaqueId,
-			Idp:      s.conf.ProviderDomain, // FIXME: this is not generally true in case of resharing
+			Idp:      s.conf.ProviderDomain,
 		}),
 		Sender: formatOCMUser(&userpb.UserId{
 			OpaqueId: user.Id.OpaqueId,
