@@ -79,8 +79,41 @@ func NewService(opts ...Option) Service {
 		libreGraphBackendSupport.MustRegister()
 	}
 
-	// https://play.golang.org/p/Mh8AVJCd593
-	idpSettings := bootstrap.Settings(options.Config.IDP)
+	idpSettings := bootstrap.Settings{
+		Iss:                               options.Config.IDP.Iss,
+		IdentityManager:                   options.Config.IDP.IdentityManager,
+		URIBasePath:                       options.Config.IDP.URIBasePath,
+		SignInURI:                         options.Config.IDP.SignInURI,
+		SignedOutURI:                      options.Config.IDP.SignedOutURI,
+		AuthorizationEndpointURI:          options.Config.IDP.AuthorizationEndpointURI,
+		EndsessionEndpointURI:             options.Config.IDP.EndsessionEndpointURI,
+		Insecure:                          options.Config.IDP.Insecure,
+		TrustedProxy:                      options.Config.IDP.TrustedProxy,
+		AllowScope:                        options.Config.IDP.AllowScope,
+		AllowClientGuests:                 options.Config.IDP.AllowClientGuests,
+		AllowDynamicClientRegistration:    options.Config.IDP.AllowDynamicClientRegistration,
+		EncryptionSecretFile:              options.Config.IDP.EncryptionSecretFile,
+		Listen:                            options.Config.IDP.Listen,
+		IdentifierClientDisabled:          options.Config.IDP.IdentifierClientDisabled,
+		IdentifierClientPath:              options.Config.IDP.IdentifierClientPath,
+		IdentifierRegistrationConf:        options.Config.IDP.IdentifierRegistrationConf,
+		IdentifierScopesConf:              options.Config.IDP.IdentifierScopesConf,
+		IdentifierDefaultBannerLogo:       options.Config.IDP.IdentifierDefaultBannerLogo,
+		IdentifierDefaultSignInPageText:   options.Config.IDP.IdentifierDefaultSignInPageText,
+		IdentifierDefaultUsernameHintText: options.Config.IDP.IdentifierDefaultUsernameHintText,
+		IdentifierUILocales:               options.Config.IDP.IdentifierUILocales,
+		SigningKid:                        options.Config.IDP.SigningKid,
+		SigningMethod:                     options.Config.IDP.SigningMethod,
+		SigningPrivateKeyFiles:            options.Config.IDP.SigningPrivateKeyFiles,
+		ValidationKeysPath:                options.Config.IDP.ValidationKeysPath,
+		CookieBackendURI:                  options.Config.IDP.CookieBackendURI,
+		CookieNames:                       options.Config.IDP.CookieNames,
+		CookieSameSite:                    options.Config.IDP.CookieSameSite,
+		AccessTokenDurationSeconds:        options.Config.IDP.AccessTokenDurationSeconds,
+		IDTokenDurationSeconds:            options.Config.IDP.IDTokenDurationSeconds,
+		RefreshTokenDurationSeconds:       options.Config.IDP.RefreshTokenDurationSeconds,
+		DyamicClientSecretDurationSeconds: options.Config.IDP.DynamicClientSecretDurationSeconds,
+	}
 	bs, err := bootstrap.Boot(ctx, &idpSettings, &licoconfig.Config{
 		Logger: log.LogrusWrap(logger),
 	})
@@ -179,7 +212,7 @@ func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 
 	if ldap.UserEnabledAttribute != "" {
 		// Using a (!(enabled=FALSE)) filter here to allow user without
-		// any value for the enable flag to login
+		// any value for the enable flag to log in
 		filter += fmt.Sprintf("(!(%s=FALSE))", ldap.UserEnabledAttribute)
 		needsAnd = true
 	}
@@ -225,7 +258,7 @@ type IDP struct {
 	tp     trace.TracerProvider
 }
 
-// initMux initializes the internal idp gorilla mux and mounts it in to a ocis chi-router
+// initMux initializes the internal idp gorilla mux and mounts it in to an ocis chi-router
 func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handler, options Options) {
 	gm := mux.NewRouter()
 	for _, route := range r {
