@@ -167,6 +167,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8726
    https://github.com/cs3org/reva/pull/4603
+   https://github.com/owncloud/ocis/pull/8764
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
