@@ -280,7 +280,7 @@ func (i *LDAP) UpdateGroupName(ctx context.Context, groupID string, groupName st
 }
 
 // AddMembersToGroup implements the Backend Interface for the LDAP backend.
-// Currently it is limited to adding Users as Group members. Adding other groups
+// Currently, it is limited to adding Users as Group members. Adding other groups
 // as members is not yet implemented
 func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs []string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
@@ -340,17 +340,17 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 
 	if len(newMemberDN) > 0 {
 		// Small retry loop. It might be that, when reading the group we found the empty group member ("",
-		// line 289 above). Our modify operation tries to delete that value. However another go-routine
+		// line 289 above). Our modify operation tries to delete that value. However, another go-routine
 		// might have done that in parallel. In that case
 		// (LDAPResultNoSuchAttribute) we need to retry the modification
-		// without the delete.
+		// without to delete.
 		for j := 0; j < 2; j++ {
 			mr.Add(i.groupAttributeMap.member, newMemberDN)
 			if err := i.conn.Modify(&mr); err != nil {
 				if lerr, ok := err.(*ldap.Error); ok {
 					switch lerr.ResultCode {
 					case ldap.LDAPResultAttributeOrValueExists:
-						err = fmt.Errorf("Duplicate member entries in request")
+						err = fmt.Errorf("duplicate member entries in request")
 					case ldap.LDAPResultNoSuchAttribute:
 						if len(mr.Changes) == 2 {
 							// We tried the special case for adding the first group member, but some
@@ -363,7 +363,7 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 						}
 					default:
 						logger.Info().Err(err).Msg("Failed to modify group member entries on PATCH group")
-						err = fmt.Errorf("Unknown error when trying to modify group member entries")
+						err = fmt.Errorf("unknown error when trying to modify group member entries")
 					}
 				}
 				return err
@@ -437,7 +437,7 @@ func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]strin
 		// as required attribute for groupOfNames/groupOfUniqueNames. So we
 		// add an empty string (which is a valid DN) as the initial member.
 		// It will be replaced once real members are added.
-		// We might wanna use the newer, but not so broadly used "groupOfMembers"
+		// We might want to use the newer, but not so broadly used "groupOfMembers"
 		// objectclass (RFC2307bis-02) where "member" is optional.
 		i.groupAttributeMap.member: {""},
 	}
@@ -452,7 +452,7 @@ func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]strin
 func (i *LDAP) getLDAPGroupByID(id string, requestMembers bool) (*ldap.Entry, error) {
 	idString, err := filterEscapeUUID(i.groupIDisOctetString, id)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid group id: %w", err)
+		return nil, fmt.Errorf("invalid group id: %w", err)
 	}
 	filter := fmt.Sprintf("(%s=%s)", i.groupAttributeMap.id, idString)
 	return i.getLDAPGroupByFilter(filter, requestMembers)
@@ -460,7 +460,7 @@ func (i *LDAP) getLDAPGroupByID(id string, requestMembers bool) (*ldap.Entry, er
 
 func (i *LDAP) getLDAPGroupByNameOrID(nameOrID string, requestMembers bool) (*ldap.Entry, error) {
 	idString, err := filterEscapeUUID(i.groupIDisOctetString, nameOrID)
-	// err != nil just means that this is not a uuid so we can skip the uuid filterpart
+	// err != nil just means that this is not an uuid, so we can skip the uuid filter part
 	// and just filter by name
 	filter := ""
 	if err == nil {

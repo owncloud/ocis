@@ -28,7 +28,7 @@ type AuditEventSharing struct {
 	FileID  string // The file identifier for the item shared.
 	Owner   string // The UID of the owner of the shared item.
 	Path    string // The path to the shared item.
-	ShareID string // The sharing identifier. (not available for public_link_accessed or when recipient unshares)
+	ShareID string // The sharing identifier. (not available for public_link_accessed or when recipient un-shares)
 }
 
 // AuditEventShareCreated is the event logged when a share is created
@@ -91,7 +91,7 @@ type AuditEventLinkAccessed struct {
 type AuditEventFiles struct {
 	AuditEvent
 
-	Path   string // The full path to the create file.
+	Path   string // The full path to the created file.
 	Owner  string // The UID of the owner of the file.
 	FileID string // The newly created files identifier.
 }
@@ -137,12 +137,12 @@ type AuditEventFileRenamed struct {
 	OldPath string
 }
 
-// AuditEventFilePurged is the event logged when a file is purged (deleted from trashbin)
+// AuditEventFilePurged is the event logged when a file is purged (deleted from trash-bin)
 type AuditEventFilePurged struct {
 	AuditEventFiles
 }
 
-// AuditEventFileRestored is the event logged when a file is restored (from trashbin)
+// AuditEventFileRestored is the event logged when a file is restored (from trash-bin)
 type AuditEventFileRestored struct {
 	AuditEventFiles
 

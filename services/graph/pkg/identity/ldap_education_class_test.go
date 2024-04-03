@@ -56,15 +56,15 @@ func TestCreateEducationClass(t *testing.T) {
 	class := libregraph.NewEducationClass("Math", "course")
 	class.SetExternalId("Math0123")
 	class.SetId("abcd-defg")
-	res_class, err := b.CreateEducationClass(context.Background(), *class)
+	resClass, err := b.CreateEducationClass(context.Background(), *class)
 	lm.AssertNumberOfCalls(t, "Add", 1)
 	lm.AssertNumberOfCalls(t, "Search", 1)
 	assert.Nil(t, err)
-	assert.NotNil(t, res_class)
-	assert.Equal(t, res_class.GetDisplayName(), class.GetDisplayName())
-	assert.Equal(t, res_class.GetId(), class.GetId())
-	assert.Equal(t, res_class.GetExternalId(), class.GetExternalId())
-	assert.Equal(t, res_class.GetClassification(), class.GetClassification())
+	assert.NotNil(t, resClass)
+	assert.Equal(t, resClass.GetDisplayName(), class.GetDisplayName())
+	assert.Equal(t, resClass.GetId(), class.GetId())
+	assert.Equal(t, resClass.GetExternalId(), class.GetExternalId())
+	assert.Equal(t, resClass.GetClassification(), class.GetClassification())
 }
 
 func TestGetEducationClasses(t *testing.T) {
@@ -268,7 +268,7 @@ func TestGetEducationClassMembers(t *testing.T) {
 
 	for _, tt := range tests {
 		lm := &mocks.Client{}
-		user_sr := &ldap.SearchRequest{
+		userSr := &ldap.SearchRequest{
 			BaseDN:     "uid=user",
 			Scope:      0,
 			SizeLimit:  1,
@@ -276,7 +276,7 @@ func TestGetEducationClassMembers(t *testing.T) {
 			Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 			Controls:   []ldap.Control(nil),
 		}
-		lm.On("Search", user_sr).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
+		lm.On("Search", userSr).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
 		sr := &ldap.SearchRequest{
 			BaseDN:     "ou=groups,dc=test",
 			Scope:      2,

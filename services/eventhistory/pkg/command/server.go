@@ -53,12 +53,12 @@ func Server(cfg *config.Config) *cli.Command {
 					}
 					return context.WithCancel(cfg.Context)
 				}()
-				metrics = metrics.New()
+				m = metrics.New()
 			)
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(version.GetString()).Set(1)
+			m.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			consumer, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Events))
 			if err != nil {
@@ -82,7 +82,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Name(cfg.Service.Name),
 				grpc.Namespace(cfg.GRPC.Namespace),
 				grpc.Address(cfg.GRPC.Addr),
-				grpc.Metrics(metrics),
+				grpc.Metrics(m),
 				grpc.Consumer(consumer),
 				grpc.Persistence(st),
 				grpc.TraceProvider(traceProvider),

@@ -50,14 +50,14 @@ func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectabl
 	}, nil
 }
 
-// UnmountShare unmounts a share from the sharejail
+// UnmountShare unmounts a share from the share-jail
 func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID storageprovider.ResourceId) error {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return err
 	}
 
-	// This is a a bit of a hack. We should not rely on a specific format of the item id.
+	// This is a bit of a hack. We should not rely on a specific format of the item id.
 	// But currently there is no other way to get the ShareID.
 	shareId := resourceID.GetOpaqueId()
 
@@ -165,7 +165,7 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 
 	var acceptedShares []*collaboration.ReceivedShare
 
-	// try to accept all of the received shares for this resource. So that the stat is in sync across all
+	// try to accept all the received shares for this resource. So that the stat is in sync across all
 	// shares
 	for _, receivedShare := range receivedSharesResponse.GetShares() {
 		updateMask := &fieldmaskpb.FieldMask{Paths: []string{_fieldMaskPathState}}
@@ -211,13 +211,13 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 		return libregraph.DriveItem{}, errors.Join(errs...)
 	}
 
-	// As the accepted shares are all for the same resource they should collapse to a single driveitem
+	// As the accepted shares are all for the same resource they should collapse to a single drive-item
 	items, err := cs3ReceivedSharesToDriveItems(ctx, &s.logger, gatewayClient, s.identityCache, s.resharingEnabled, acceptedShares)
 	switch {
 	case err != nil:
 		return libregraph.DriveItem{}, nil
 	case len(items) != 1:
-		return libregraph.DriveItem{}, errorcode.New(errorcode.GeneralException, "failed to convert accepted shares into driveitem")
+		return libregraph.DriveItem{}, errorcode.New(errorcode.GeneralException, "failed to convert accepted shares into drive-item")
 	}
 	return items[0], nil
 }
@@ -270,7 +270,7 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 	ctx := r.Context()
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		api.logger.Debug().Err(err).Msg("invlid driveID")
+		api.logger.Debug().Err(err).Msg("invalid driveID")
 		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, "invalid driveID")
 		return
 	}

@@ -13,8 +13,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"go-micro.dev/v4/logger"
-
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
 var (
@@ -22,7 +20,7 @@ var (
 )
 
 func init() {
-	// this is ugly, but "logger.DefaultLogger" is a global variable and we need to set it _before_ anybody uses it
+	// this is ugly, but "logger.DefaultLogger" is a global variable, and we need to set it _before_ anybody uses it
 	setMicroLogger()
 }
 
@@ -50,17 +48,6 @@ type Logger struct {
 	zerolog.Logger
 }
 
-// LoggerFromConfig initializes a service-specific logger instance.
-func LoggerFromConfig(name string, cfg *shared.Log) Logger {
-	return NewLogger(
-		Name(name),
-		Level(cfg.Level),
-		Pretty(cfg.Pretty),
-		Color(cfg.Color),
-		File(cfg.File),
-	)
-}
-
 // NopLogger initializes a no-operation logger.
 func NopLogger() Logger {
 	return Logger{zerolog.Nop()}
@@ -71,7 +58,7 @@ type LineInfoHook struct{}
 // Run is a hook to add line info to log messages.
 // I found the zerolog example for this here:
 // https://github.com/rs/zerolog/issues/22#issuecomment-1127295489
-func (h LineInfoHook) Run(e *zerolog.Event, l zerolog.Level, msg string) {
+func (h LineInfoHook) Run(e *zerolog.Event, _ zerolog.Level, _ string) {
 	_, file, line, ok := runtime.Caller(3)
 	if ok {
 		e.Str("line", fmt.Sprintf("%s:%d", file, line))
@@ -105,10 +92,10 @@ func NewLogger(opts ...Option) Logger {
 		logLevel = zerolog.ErrorLevel
 	}
 
-	var logger zerolog.Logger
+	var l zerolog.Logger
 
 	if options.Pretty {
-		logger = log.Output(
+		l = log.Output(
 			zerolog.NewConsoleWriter(
 				func(w *zerolog.ConsoleWriter) {
 					w.TimeFormat = time.RFC3339
@@ -123,27 +110,27 @@ func NewLogger(opts ...Option) Logger {
 			print(fmt.Sprintf("file could not be opened for writing: %s. error: %v", options.File, err))
 			os.Exit(1)
 		}
-		logger = logger.Output(f)
+		l = l.Output(f)
 	} else {
-		logger = zerolog.New(os.Stderr)
+		l = zerolog.New(os.Stderr)
 	}
 
-	logger = logger.With().
+	l = l.With().
 		Str("service", options.Name).
 		Timestamp().
 		Logger().Level(logLevel)
 
 	if logLevel <= zerolog.InfoLevel {
 		var lineInfoHook LineInfoHook
-		logger = logger.Hook(lineInfoHook)
+		l = l.Hook(lineInfoHook)
 	}
 
 	return Logger{
-		logger,
+		l,
 	}
 }
 
-// SubloggerWithRequestID returns a sublogger with the x-request-id added to all events
+// SubloggerWithRequestID returns a sub-logger with the x-request-id added to all events
 func (l Logger) SubloggerWithRequestID(c context.Context) Logger {
 	return Logger{
 		l.With().Str(RequestIDString, chimiddleware.GetReqID(c)).Logger(),

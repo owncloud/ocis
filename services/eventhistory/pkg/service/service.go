@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 
@@ -32,7 +33,7 @@ type EventHistoryService struct {
 // NewEventHistoryService returns an EventHistory service
 func NewEventHistoryService(cfg *config.Config, consumer events.Consumer, store store.Store, log log.Logger) (*EventHistoryService, error) {
 	if consumer == nil || store == nil {
-		return nil, fmt.Errorf("Need non nil consumer (%v) and store (%v) to work properly", consumer, store)
+		return nil, fmt.Errorf("need non nil consumer (%v) and store (%v) to work properly", consumer, store)
 	}
 
 	ch, err := events.ConsumeAll(consumer, "evhistory")
@@ -123,7 +124,7 @@ func (eh *EventHistoryService) GetEventsForUser(ctx context.Context, req *ehsvc.
 func (eh *EventHistoryService) getEvent(id string) (*ehmsg.Event, error) {
 	evs, err := eh.store.Read(id)
 	if err != nil {
-		if err != store.ErrNotFound {
+		if !errors.Is(err, store.ErrNotFound) {
 			eh.log.Error().Err(err).Str("eventid", id).Msg("could not read event")
 		}
 		return nil, err

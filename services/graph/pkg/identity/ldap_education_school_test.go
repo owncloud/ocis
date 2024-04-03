@@ -184,18 +184,18 @@ func TestCreateEducationSchool(t *testing.T) {
 		school.SetDisplayName(tt.schoolName)
 		school.SetSchoolNumber(tt.schoolNumber)
 		school.SetId("abcd-defg")
-		res_school, err := b.CreateEducationSchool(context.Background(), *school)
+		resSchool, err := b.CreateEducationSchool(context.Background(), *school)
 		if tt.expectedError == nil {
 			assert.Nil(t, err)
 			lm.AssertNumberOfCalls(t, "Add", 1)
-			assert.NotNil(t, res_school)
-			assert.Equal(t, res_school.GetDisplayName(), school.GetDisplayName())
-			assert.Equal(t, res_school.GetId(), school.GetId())
-			assert.Equal(t, res_school.GetSchoolNumber(), school.GetSchoolNumber())
-			assert.False(t, res_school.HasTerminationDate())
+			assert.NotNil(t, resSchool)
+			assert.Equal(t, resSchool.GetDisplayName(), school.GetDisplayName())
+			assert.Equal(t, resSchool.GetId(), school.GetId())
+			assert.Equal(t, resSchool.GetSchoolNumber(), school.GetSchoolNumber())
+			assert.False(t, resSchool.HasTerminationDate())
 		} else {
 			assert.Equal(t, err, tt.expectedError)
-			assert.Nil(t, res_school)
+			assert.Nil(t, resSchool)
 		}
 	}
 }
@@ -238,15 +238,15 @@ func TestUpdateEducationSchoolTerminationDate(t *testing.T) {
 	school := libregraph.NewEducationSchool()
 	terminationTime := time.Date(2042, time.January, 31, 12, 0, 0, 0, time.UTC)
 	school.SetTerminationDate(terminationTime)
-	res_school, err := b.UpdateEducationSchool(context.Background(), "abcd-defg", *school)
+	resSchool, err := b.UpdateEducationSchool(context.Background(), "abcd-defg", *school)
 	lm.AssertNumberOfCalls(t, "Search", 2)
 	assert.Nil(t, err)
-	assert.NotNil(t, res_school)
-	assert.Equal(t, "Test School", res_school.GetDisplayName())
-	assert.Equal(t, "abcd-defg", res_school.GetId())
-	assert.Equal(t, "0123", res_school.GetSchoolNumber())
-	assert.True(t, res_school.HasTerminationDate())
-	assert.True(t, terminationTime.Equal(res_school.GetTerminationDate()))
+	assert.NotNil(t, resSchool)
+	assert.Equal(t, "Test School", resSchool.GetDisplayName())
+	assert.Equal(t, "abcd-defg", resSchool.GetId())
+	assert.Equal(t, "0123", resSchool.GetSchoolNumber())
+	assert.True(t, resSchool.HasTerminationDate())
+	assert.True(t, terminationTime.Equal(resSchool.GetTerminationDate()))
 }
 
 func TestUpdateEducationSchoolOperation(t *testing.T) {

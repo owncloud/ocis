@@ -561,7 +561,7 @@ var testCases = []struct {
 }
 
 func TestAuditLogging(t *testing.T) {
-	log := log.NewLogger()
+	l := log.NewLogger()
 
 	inch := make(chan events.Event)
 	defer close(inch)
@@ -572,7 +572,7 @@ func TestAuditLogging(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.TODO())
 	defer cancel()
 
-	go StartAuditLogger(ctx, inch, log, Marshal("json", log), func(b []byte) {
+	go StartAuditLogger(ctx, inch, l, Marshal("json", l), func(b []byte) {
 		outch <- b
 	})
 

@@ -109,7 +109,7 @@ func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logg
 		l.Error().Err(err).Msg("cannot get gateway client")
 		return
 	}
-	ctx, err := utils.GetServiceUserContext(cfg.ServiceAccountID, gwc, cfg.ServiceAccountSecret)
+	ctx, err := utils.GetServiceUserContextWithContext(context.Background(), gwc, cfg.ServiceAccountID, cfg.ServiceAccountSecret)
 	if err != nil {
 		l.Error().Err(err).Msg("cannot impersonate user")
 		return
@@ -137,9 +137,9 @@ func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logg
 			continue
 		}
 
-		mountpoint, err := getMountpoint(ctx, l, ev.ItemID, uid, gatewaySelector, info)
+		mp, err := getMountPoint(ctx, l, ev.ItemID, uid, gatewaySelector, info)
 		if err != nil {
-			l.Error().Err(err).Msg("error getting mountpoint")
+			l.Error().Err(err).Msg("error getting mount point")
 			continue
 
 		}
@@ -149,7 +149,7 @@ func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logg
 			l.Error().Err(err).Msg("cannot get gateway client")
 			continue
 		}
-		resp, err := gwc.UpdateReceivedShare(ctx, updateShareRequest(ev.ShareID, uid, mountpoint))
+		resp, err := gwc.UpdateReceivedShare(ctx, updateShareRequest(ev.ShareID, uid, mp))
 		if err != nil {
 			l.Error().Err(err).Msg("error sending grpc request")
 			continue
@@ -162,7 +162,7 @@ func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logg
 
 }
 
-func getMountpoint(ctx context.Context, l log.Logger, itemid *provider.ResourceId, uid *user.UserId, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], info *provider.ResourceInfo) (string, error) {
+func getMountPoint(ctx context.Context, l log.Logger, itemid *provider.ResourceId, uid *user.UserId, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], info *provider.ResourceInfo) (string, error) {
 	lrs, err := getSharesList(ctx, gatewaySelector, uid)
 	if err != nil {
 		return "", err

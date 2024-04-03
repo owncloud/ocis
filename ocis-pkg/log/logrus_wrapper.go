@@ -24,7 +24,7 @@ type LogrusWrapper struct {
 	levelMap levelMap
 }
 
-// Wrap return a logrus logger which internally logs to /dev/null. Messages are passed to the
+// LogrusWrap returns a logrus logger which internally logs to /dev/null. Messages are passed to the
 // underlying zerolog via hooks.
 func LogrusWrap(zr zerolog.Logger) *logrus.Logger {
 	lr := logrus.New()

@@ -24,7 +24,7 @@ type ldapConnection struct {
 	Error error
 }
 
-// Implements the ldap.CLient interface
+// ConnWithReconnect implements the ldap.Client interface
 type ConnWithReconnect struct {
 	conn    chan ldapConnection
 	reset   chan *ldap.Conn

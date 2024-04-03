@@ -80,11 +80,11 @@ func (cl *ClientlogService) Run() error {
 func (cl *ClientlogService) processEvent(event events.Event) {
 	gwc, err := cl.gatewaySelector.Next()
 	if err != nil {
-		cl.log.Error().Err(err).Interface("event", event).Msg("error getting gatway client")
+		cl.log.Error().Err(err).Interface("event", event).Msg("error getting gateway client")
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContext(cl.cfg.ServiceAccount.ServiceAccountID, gwc, cl.cfg.ServiceAccount.ServiceAccountSecret)
+	ctx, err := utils.GetServiceUserContextWithContext(context.Background(), gwc, cl.cfg.ServiceAccount.ServiceAccountID, cl.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		cl.log.Error().Err(err).Interface("event", event).Msg("error authenticating service user")
 		return

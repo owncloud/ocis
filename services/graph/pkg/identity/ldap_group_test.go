@@ -45,7 +45,7 @@ var groupLookupSearchRequest = &ldap.SearchRequest{
 	Controls:   []ldap.Control(nil),
 }
 
-var groupListSeachRequest = &ldap.SearchRequest{
+var groupListSearchRequest = &ldap.SearchRequest{
 	BaseDN:     "ou=groups,dc=test",
 	Scope:      2,
 	Filter:     "(&(objectClass=groupOfNames))",
@@ -273,7 +273,7 @@ func TestGetGroups(t *testing.T) {
 		if err != nil {
 			t.Errorf("Expected success, got '%s'", err.Error())
 		}
-		lm.On("Search", groupListSeachRequest).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
+		lm.On("Search", groupListSearchRequest).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
 		lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
 		lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{invalidUserEntry}}, nil)
 		b, _ = getMockedBackend(lm, lconfig, &logger)
@@ -439,8 +439,8 @@ func TestUpdateGroupName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			lm := &mocks.Client{}
-			for _, mock := range tt.ldapMocks {
-				lm.On(mock.funcName, mock.args...).Return(mock.returns...)
+			for _, ldapMock := range tt.ldapMocks {
+				lm.On(ldapMock.funcName, ldapMock.args...).Return(ldapMock.returns...)
 			}
 
 			ldapConfig := lconfig

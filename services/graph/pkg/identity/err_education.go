@@ -89,7 +89,7 @@ func (i *ErrEducationBackend) GetEducationClassMembers(ctx context.Context, name
 	return nil, errNotImplemented
 }
 
-// UpdateEducationClass implments the EducationBackend interface
+// UpdateEducationClass implements the EducationBackend interface
 func (i *ErrEducationBackend) UpdateEducationClass(ctx context.Context, id string, class libregraph.EducationClass) (*libregraph.EducationClass, error) {
 	return nil, errNotImplemented
 }
@@ -99,7 +99,7 @@ func (i *ErrEducationBackend) CreateEducationUser(ctx context.Context, user libr
 	return nil, errNotImplemented
 }
 
-// DeleteEducationUser deletes a given educationuser, identified by username or id, from the backend
+// DeleteEducationUser deletes a given education user, identified by username or id, from the backend
 func (i *ErrEducationBackend) DeleteEducationUser(ctx context.Context, nameOrID string) error {
 	return errNotImplemented
 }

@@ -19,7 +19,7 @@ type Config struct {
 	InfectedFileHandling string `yaml:"infected-file-handling" env:"ANTIVIRUS_INFECTED_FILE_HANDLING" desc:"Defines the behaviour when a virus has been found. Supported options are: 'delete', 'continue' and 'abort '. Delete will delete the file. Continue will mark the file as infected but continues further processing. Abort will keep the file in the uploads folder for further admin inspection and will not move it to its final destination." introductionVersion:"pre5.0"`
 	Events               Events
 	Scanner              Scanner
-	MaxScanSize          string `yaml:"max-scan-size" env:"ANTIVIRUS_MAX_SCAN_SIZE" desc:"The maximum scan size the virusscanner can handle. Only this many bytes of a file will be scanned. 0 means unlimited and is the default. Usable common abbreviations: [KB, KiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB." introductionVersion:"pre5.0"`
+	MaxScanSize          string `yaml:"max-scan-size" env:"ANTIVIRUS_MAX_SCAN_SIZE" desc:"The maximum scan size the virus scanner can handle. Only this many bytes of a file will be scanned. 0 means unlimited and is the default. Usable common abbreviations: [KB, KiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB." introductionVersion:"pre5.0"`
 
 	Context context.Context `yaml:"-" json:"-"`
 
@@ -58,7 +58,7 @@ type Events struct {
 	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;ANTIVIRUS_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 }
 
-// Scanner provides configuration options for the antivirusscanner
+// Scanner provides configuration options for the virus scanner
 type Scanner struct {
 	Type string `yaml:"type" env:"ANTIVIRUS_SCANNER_TYPE" desc:"The antivirus scanner to use. Supported values are 'clamav' and 'icap'." introductionVersion:"pre5.0"`
 
