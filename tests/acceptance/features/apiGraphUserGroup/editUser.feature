@@ -15,8 +15,9 @@ Feature: edit user
       | email       | brian@example.com |
       | password    | 1234              |
 
-
+  @env-config
   Scenario Outline: admin user can edit another user's email
+    Given the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true"
     When the user "Alice" changes the email of user "Brian" to "<new-email>" using the Graph API
     Then the HTTP status code should be "<http-status-code>"
     And the user information of "Brian" should match this JSON schema
@@ -120,9 +121,10 @@ Feature: edit user
     }
     """
 
-
+  @env-config
   Scenario Outline: normal user should not be able to change their email address
     Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true"
     When the user "Brian" tries to change the email of user "Brian" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Brian" should match this JSON schema
@@ -146,9 +148,10 @@ Feature: edit user
       | User        |
       | User Light  |
 
-
+  @env-config
   Scenario Outline: normal user should not be able to edit another user's email
     Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true"
     And the user "Alice" has created a new user with the following attributes:
       | userName    | Carol             |
       | displayName | Carol King        |
@@ -329,7 +332,6 @@ Feature: edit user
       "required": [
         "displayName",
         "id",
-        "mail",
         "onPremisesSamAccountName",
         "accountEnabled"
       ],
@@ -341,10 +343,6 @@ Feature: edit user
         "id" : {
           "type": "string",
           "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["brian@example.com"]
         },
         "onPremisesSamAccountName": {
           "type": "string",
@@ -373,7 +371,6 @@ Feature: edit user
       "required": [
         "displayName",
         "id",
-        "mail",
         "onPremisesSamAccountName",
         "accountEnabled"
       ],
@@ -385,10 +382,6 @@ Feature: edit user
         "id" : {
           "type": "string",
           "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["carol@example.org"]
         },
         "onPremisesSamAccountName": {
           "type": "string",
@@ -421,7 +414,6 @@ Feature: edit user
       "required": [
         "displayName",
         "id",
-        "mail",
         "onPremisesSamAccountName",
         "accountEnabled"
       ],
@@ -433,10 +425,6 @@ Feature: edit user
         "id" : {
           "type": "string",
           "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["brian@example.com"]
         },
         "onPremisesSamAccountName": {
           "type": "string",
@@ -466,7 +454,6 @@ Feature: edit user
       "required": [
         "displayName",
         "id",
-        "mail",
         "onPremisesSamAccountName",
         "accountEnabled"
       ],
@@ -478,10 +465,6 @@ Feature: edit user
         "id" : {
           "type": "string",
           "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["carol@example.org"]
         },
         "onPremisesSamAccountName": {
           "type": "string",
