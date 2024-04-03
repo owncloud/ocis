@@ -1,6 +1,7 @@
 package service
 
 import (
+	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 )
@@ -13,6 +14,7 @@ type Options struct {
 	Logger  log.Logger
 	Config  *config.Config
 	AppURLs map[string]map[string]string
+	Gwc     gatewayv1beta1.GatewayAPIClient
 }
 
 func newOptions(opts ...Option) Options {
@@ -43,5 +45,12 @@ func Config(val *config.Config) Option {
 func AppURLs(val map[string]map[string]string) Option {
 	return func(o *Options) {
 		o.AppURLs = val
+	}
+}
+
+// GatewayAPIClient provides a function to set the GatewayAPIClient option.
+func GatewayAPIClient(val gatewayv1beta1.GatewayAPIClient) Option {
+	return func(o *Options) {
+		o.Gwc = val
 	}
 }

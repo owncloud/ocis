@@ -26,9 +26,13 @@ func NewHandler(opts ...Option) (*Service, func(), error) {
 	teardown := func() {}
 	options := newOptions(opts...)
 
-	gwc, err := pool.GetGatewayServiceClient(options.Config.CS3Api.Gateway.Name)
-	if err != nil {
-		return nil, teardown, err
+	gwc := options.Gwc
+	var err error
+	if gwc == nil {
+		gwc, err = pool.GetGatewayServiceClient(options.Config.CS3Api.Gateway.Name)
+		if err != nil {
+			return nil, teardown, err
+		}
 	}
 
 	return &Service{
