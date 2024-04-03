@@ -22,7 +22,8 @@ A modern text indexing library in go
     * Conjunction, Disjunction, Boolean (must/should/must_not)
     * Term Range, Numeric Range, Date Range
     * [Geo Spatial](https://github.com/blevesearch/bleve/blob/master/geo/README.md)
-    * Simple [query string syntax](http://www.blevesearch.com/docs/Query-String-Query/) for human entry
+    * Simple [query string syntax](http://www.blevesearch.com/docs/Query-String-Query/)
+    * [Vector Search](https://github.com/blevesearch/bleve/blob/master/docs/vectors.md)
 * [tf-idf](https://en.wikipedia.org/wiki/Tf-idf) Scoring
 * Query time boosting
 * Search result match highlighting with document fragments
@@ -101,7 +102,7 @@ Use "bleve [command] --help" for more information about a command.
 
 Bleve includes general-purpose analyzers (customizable) as well as pre-built text analyzers for the following languages:
 
-Arabic (ar), Bulgarian (bg), Catalan (ca), Chinese-Japanese-Korean (cjk), Kurdish (ckb), Danish (da), German (de), Greek (el), English (en), Spanish - Castilian (es), Basque (eu), Persian (fa), Finnish (fi), French (fr), Gaelic (ga), Spanish - Galician (gl), Hindi (hi), Croatian (hr), Hungarian (hu), Armenian (hy), Indonesian (id, in), Italian (it), Dutch (nl), Norwegian (no), Portuguese (pt), Romanian (ro), Russian (ru), Swedish (sv), Turkish (tr)
+Arabic (ar), Bulgarian (bg), Catalan (ca), Chinese-Japanese-Korean (cjk), Kurdish (ckb), Danish (da), German (de), Greek (el), English (en), Spanish - Castilian (es), Basque (eu), Persian (fa), Finnish (fi), French (fr), Gaelic (ga), Spanish - Galician (gl), Hindi (hi), Croatian (hr), Hungarian (hu), Armenian (hy), Indonesian (id, in), Italian (it), Dutch (nl), Norwegian (no), Polish (pl), Portuguese (pt), Romanian (ro), Russian (ru), Swedish (sv), Turkish (tr)
 
 ## Text Analysis Wizard
 

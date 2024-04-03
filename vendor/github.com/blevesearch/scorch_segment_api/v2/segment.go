@@ -168,3 +168,13 @@ type DocVisitState interface {
 type StatsReporter interface {
 	ReportBytesWritten(bytesWritten uint64)
 }
+
+type FieldStatsReporter interface {
+	UpdateFieldStats(FieldStats)
+}
+
+type FieldStats interface {
+	Store(statName, fieldName string, value uint64)
+	Aggregate(stats FieldStats)
+	Fetch() map[string]map[string]uint64
+}

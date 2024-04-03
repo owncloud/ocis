@@ -69,6 +69,17 @@ type FieldMapping struct {
 	// the processing of freq/norm details when the default score based relevancy
 	// isn't needed.
 	SkipFreqNorm bool `json:"skip_freq_norm,omitempty"`
+
+	// Dimensionality of the vector
+	Dims int `json:"dims,omitempty"`
+
+	// Similarity is the similarity algorithm used for scoring
+	// vector fields.
+	// See: index.DefaultSimilarityMetric & index.SupportedSimilarityMetrics
+	Similarity string `json:"similarity,omitempty"`
+
+	// Applicable to vector fields only - optimization string
+	VectorIndexOptimizedFor string `json:"vector_index_optimized_for,omitempty"`
 }
 
 // NewTextFieldMapping returns a default field mapping for text
@@ -445,6 +456,21 @@ func (fm *FieldMapping) UnmarshalJSON(data []byte) error {
 			}
 		case "skip_freq_norm":
 			err := util.UnmarshalJSON(v, &fm.SkipFreqNorm)
+			if err != nil {
+				return err
+			}
+		case "dims":
+			err := json.Unmarshal(v, &fm.Dims)
+			if err != nil {
+				return err
+			}
+		case "similarity":
+			err := json.Unmarshal(v, &fm.Similarity)
+			if err != nil {
+				return err
+			}
+		case "vector_index_optimized_for":
+			err := json.Unmarshal(v, &fm.VectorIndexOptimizedFor)
 			if err != nil {
 				return err
 			}
