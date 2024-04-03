@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-04-03-08-00-38]
+[#deprecation-note-2024-04-03-12-53-04]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -364,6 +364,15 @@ a| [subs=-attributes]
 ++3 ++
 a| [subs=-attributes]
 The minimum length the search term needs to have for unprivileged users when searching for users or groups.
+
+a|`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Mask user email addresses in responses.
 
 a|`OCIS_REVA_GATEWAY` +
 
@@ -1041,7 +1050,7 @@ The service account secret.
 
 a|`OCIS_ENABLE_RESHARING` +
 `GRAPH_ENABLE_RESHARING` +
-xref:deprecation-note-2024-04-03-08-00-38[Deprecation Note]
+xref:deprecation-note-2024-04-03-12-53-04[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

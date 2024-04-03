@@ -23,10 +23,10 @@
 | OCIS_HTTP_TLS_ENABLED | bool | false | Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.|
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
+| OCIS_SHOW_USER_EMAIL_IN_RESULTS | bool | false | Mask user email addresses in responses.|
 | OCIS_CACHE_STORE<br/>OCS_PRESIGNEDURL_SIGNING_KEYS_STORE | string | nats-js-kv | The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.|
 | OCIS_CACHE_STORE_NODES<br/>OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
 | OCIS_CACHE_TTL<br/>OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL | Duration | 12h0m0s | Default time to live for signing keys. See the Environment Variable Types description for more details.|
 | OCIS_CACHE_AUTH_USERNAME<br/>OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME | string |  | The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_CACHE_AUTH_PASSWORD<br/>OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD | string |  | The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_JWT_SECRET<br/>OCS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| OCS_SHOW_USER_EMAIL_IN_RESULTS | bool | false | Mask user email addresses in responses.|
