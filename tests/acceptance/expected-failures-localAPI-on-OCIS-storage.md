@@ -47,6 +47,11 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 
+- [apiGraphUserGroup/getUser.feature:84](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L84)
+- [apiGraphUserGroup/getUser.feature:85](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L85)
+- [apiGraphUserGroup/getUser.feature:86](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L86)
+- [apiGraphUserGroup/getUser.feature:87](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L87)
+- [apiGraphUserGroup/getUser.feature:88](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L88)
 - [apiGraphUserGroup/getUser.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L89)
 - [apiGraphUserGroup/getUser.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L90)
 - [apiGraphUserGroup/getUser.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L91)
@@ -54,23 +59,18 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraphUserGroup/getUser.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L93)
 - [apiGraphUserGroup/getUser.feature:94](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L94)
 - [apiGraphUserGroup/getUser.feature:95](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L95)
-- [apiGraphUserGroup/getUser.feature:96](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L96)
-- [apiGraphUserGroup/getUser.feature:97](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L97)
-- [apiGraphUserGroup/getUser.feature:98](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L98)
-- [apiGraphUserGroup/getUser.feature:99](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L99)
-- [apiGraphUserGroup/getUser.feature:100](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L100)
-- [apiGraphUserGroup/getUser.feature:657](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L657)
-- [apiGraphUserGroup/getUser.feature:658](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L658)
-- [apiGraphUserGroup/getUser.feature:659](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L659)
-- [apiGraphUserGroup/getUser.feature:660](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L660)
-- [apiGraphUserGroup/getUser.feature:661](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L661)
-- [apiGraphUserGroup/getUser.feature:662](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L662)
-- [apiGraphUserGroup/getUser.feature:663](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L663)
-- [apiGraphUserGroup/getUser.feature:664](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L664)
-- [apiGraphUserGroup/getUser.feature:665](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L665)
-- [apiGraphUserGroup/getUser.feature:666](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L666)
-- [apiGraphUserGroup/getUser.feature:667](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L667)
-- [apiGraphUserGroup/getUser.feature:668](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L668)
+- [apiGraphUserGroup/getUser.feature:637](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L637)
+- [apiGraphUserGroup/getUser.feature:638](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L638)
+- [apiGraphUserGroup/getUser.feature:639](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L639)
+- [apiGraphUserGroup/getUser.feature:640](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L640)
+- [apiGraphUserGroup/getUser.feature:641](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L641)
+- [apiGraphUserGroup/getUser.feature:642](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L642)
+- [apiGraphUserGroup/getUser.feature:643](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L643)
+- [apiGraphUserGroup/getUser.feature:644](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L644)
+- [apiGraphUserGroup/getUser.feature:645](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L645)
+- [apiGraphUserGroup/getUser.feature:646](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L646)
+- [apiGraphUserGroup/getUser.feature:647](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L647)
+- [apiGraphUserGroup/getUser.feature:648](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L648)
 
 #### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
 
@@ -286,6 +286,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:465](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L465)
 
 ### [500 when deleting share role](https://github.com/owncloud/ocis/issues/8747)
+
 - [apiSpacesShares/shareSubItemOfSpace.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L147)
 
 - Note: always have an empty line at the end of this file.
