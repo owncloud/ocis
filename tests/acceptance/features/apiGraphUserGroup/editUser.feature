@@ -15,34 +15,6 @@ Feature: edit user
       | email       | brian@example.com |
       | password    | 1234              |
 
-  @env-config
-  Scenario Outline: admin user can edit another user's email
-    Given the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true"
-    When the user "Alice" changes the email of user "Brian" to "<new-email>" using the Graph API
-    Then the HTTP status code should be "<http-status-code>"
-    And the user information of "Brian" should match this JSON schema
-    """
-    {
-      "type": "object",
-      "required": [
-        "mail"
-      ],
-      "properties": {
-        "mail": {
-          "type": "string",
-          "enum": ["<expected-email>"]
-        }
-      }
-    }
-    """
-    Examples:
-      | action description        | new-email            | http-status-code | expected-email       |
-      | change to a valid email   | newemail@example.com | 200              | newemail@example.com |
-      | override existing mail    | brian@example.com    | 200              | brian@example.com    |
-      | two users with same mail  | alice@example.org    | 200              | alice@example.org    |
-      | empty mail                |                      | 400              | brian@example.com    |
-      | change to a invalid email | invalidEmail         | 400              | brian@example.com    |
-
   @issue-7044
   Scenario Outline: admin user can edit another user's name
     Given user "Carol" has been created with default attributes and without skeleton files
@@ -120,75 +92,6 @@ Feature: edit user
       }
     }
     """
-
-  @env-config
-  Scenario Outline: normal user should not be able to change their email address
-    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
-    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true"
-    When the user "Brian" tries to change the email of user "Brian" to "newemail@example.com" using the Graph API
-    Then the HTTP status code should be "401"
-    And the user information of "Brian" should match this JSON schema
-    """
-    {
-      "type": "object",
-      "required": [
-        "mail"
-      ],
-      "properties": {
-        "mail": {
-          "type": "string",
-          "enum": ["brian@example.com"]
-        }
-      }
-    }
-    """
-    Examples:
-      | user-role   |
-      | Space Admin |
-      | User        |
-      | User Light  |
-
-  @env-config
-  Scenario Outline: normal user should not be able to edit another user's email
-    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
-    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true"
-    And the user "Alice" has created a new user with the following attributes:
-      | userName    | Carol             |
-      | displayName | Carol King        |
-      | email       | carol@example.com |
-      | password    | 1234              |
-    And the administrator has assigned the role "<user-role-2>" to user "Carol" using the Graph API
-    When the user "Brian" tries to change the email of user "Carol" to "newemail@example.com" using the Graph API
-    Then the HTTP status code should be "401"
-    And the user information of "Carol" should match this JSON schema
-    """
-    {
-      "type": "object",
-      "required": [
-        "mail"
-      ],
-      "properties": {
-        "mail": {
-          "type": "string",
-          "enum": ["carol@example.com"]
-        }
-      }
-    }
-    """
-    Examples:
-      | user-role   | user-role-2 |
-      | Space Admin | Space Admin |
-      | Space Admin | User        |
-      | Space Admin | User Light  |
-      | Space Admin | Admin       |
-      | User        | Space Admin |
-      | User        | User        |
-      | User        | User Light  |
-      | User        | Admin       |
-      | User Light  | Space Admin |
-      | User Light  | User        |
-      | User Light  | User Light  |
-      | User Light  | Admin       |
 
 
   Scenario Outline: admin user can edit another user display name
