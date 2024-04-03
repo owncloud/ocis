@@ -5,3 +5,4 @@ the sharee search. This is the ocis side which adds an suiting config option to 
 
 https://github.com/owncloud/ocis/issues/8726
 https://github.com/cs3org/reva/pull/4603
+https://github.com/owncloud/ocis/pull/8764

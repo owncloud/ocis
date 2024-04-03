@@ -21,7 +21,6 @@ Feature: get users
       "required": [
         "displayName",
         "id",
-        "mail",
         "onPremisesSamAccountName",
         "accountEnabled",
         "userType"
@@ -34,10 +33,6 @@ Feature: get users
         "id" : {
           "type": "string",
           "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["brian@example.org"]
         },
         "onPremisesSamAccountName": {
           "type": "string",
@@ -298,7 +293,6 @@ Feature: get users
         "required": [
           "displayName",
           "id",
-          "mail",
           "onPremisesSamAccountName",
           "drive",
           "accountEnabled",
@@ -312,10 +306,6 @@ Feature: get users
           "id" : {
             "type": "string",
             "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "enum": ["brian@example.org"]
           },
           "onPremisesSamAccountName": {
             "type": "string",
@@ -428,7 +418,6 @@ Feature: get users
         "required": [
           "displayName",
           "id",
-          "mail",
           "onPremisesSamAccountName",
           "drive",
           "accountEnabled",
@@ -442,10 +431,6 @@ Feature: get users
           "id" : {
             "type": "string",
             "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "enum": ["brian@example.org"]
           },
           "onPremisesSamAccountName": {
             "type": "string",
@@ -567,17 +552,12 @@ Feature: get users
       "type": "object",
       "required": [
         "id",
-        "mail",
         "onPremisesSamAccountName"
       ],
       "properties": {
         "id" : {
           "type": "string",
           "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["brian@example.org"]
         },
         "onPremisesSamAccountName": {
           "type": "string",
@@ -1371,7 +1351,6 @@ Feature: get users
             "required": [
               "displayName",
               "id",
-              "mail",
               "userType"
             ],
             "properties": {
@@ -1383,10 +1362,6 @@ Feature: get users
                 "type": "string",
                 "pattern": "^%user_id_pattern%$"
               },
-              "mail": {
-                "type": "string",
-                "enum": ["alice@example.org"]
-              },
               "userType": {
                 "type": "string",
                 "enum": ["Member"]
@@ -1397,7 +1372,6 @@ Feature: get users
       }
     }
     """
-
 
   Scenario: non-admin user tries to search for a user by display name with less than 3 characters
     When user "Brian" tries to search for user "al" using Graph API
@@ -1480,7 +1454,6 @@ Feature: get users
             "required": [
               "displayName",
               "id",
-              "mail",
               "userType"
             ],
             "properties": {
@@ -1491,10 +1464,6 @@ Feature: get users
               "id": {
                 "type": "string",
                 "pattern": "^%user_id_pattern%$"
-              },
-              "mail": {
-                "type": "string",
-                "enum": ["alice@example.org"]
               },
               "userType": {
                 "type": "string",
@@ -1529,7 +1498,6 @@ Feature: get users
             "required": [
               "displayName",
               "id",
-              "mail",
               "userType"
             ],
             "properties": {
@@ -1540,10 +1508,6 @@ Feature: get users
               "id": {
                 "type": "string",
                 "pattern": "^%user_id_pattern%$"
-              },
-              "mail": {
-                "type": "string",
-                "enum": ["alice@example.org"]
               },
               "userType": {
                 "type": "string",
@@ -1560,10 +1524,9 @@ Feature: get users
   Scenario: non-admin user searches for multiple users having same displayname
     Given the user "Admin" has created a new user with the following attributes:
       | userName    | another-alice                |
-      | displayName | Alice Hansen                 |
+      | displayName | Alice Murphy                 |
       | email       | another-alice@example.org    |
       | password    | containsCharacters(*:!;_+-&) |
-
     When user "Brian" searches for user "alice" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -1586,7 +1549,6 @@ Feature: get users
                 "required": [
                   "displayName",
                   "id",
-                  "mail",
                   "userType"
                 ],
                 "properties": {
@@ -1597,10 +1559,6 @@ Feature: get users
                   "id": {
                     "type": "string",
                     "pattern": "^%user_id_pattern%$"
-                  },
-                  "mail": {
-                    "type": "string",
-                    "enum": ["alice@example.org"]
                   },
                   "userType": {
                     "type": "string",
@@ -1613,21 +1571,16 @@ Feature: get users
                 "required": [
                   "displayName",
                   "id",
-                  "mail",
                   "userType"
                 ],
                 "properties": {
                   "displayName": {
                     "type": "string",
-                    "enum": ["Alice Hansen"]
+                    "enum": ["Alice Murphy"]
                   },
                   "id": {
                     "type": "string",
                     "pattern": "^%user_id_pattern%$"
-                  },
-                  "mail": {
-                    "type": "string",
-                    "enum": ["another-alice@example.org"]
                   },
                   "userType": {
                     "type": "string",
