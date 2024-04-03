@@ -282,7 +282,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 				UserType:    u.UserType,
 			}
 
-			if g.config.TokenManager.ShowUserEmailInResults {
+			if g.config.API.ShowUserEmailInResults {
 				finalUsers[i].Mail = u.Mail
 			}
 		}
@@ -548,7 +548,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if !g.config.TokenManager.ShowUserEmailInResults {
+	if !g.config.API.ShowUserEmailInResults {
 		user.Mail = nil
 	}
 
