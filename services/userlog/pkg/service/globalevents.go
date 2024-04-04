@@ -6,7 +6,6 @@ var (
 	_globalEventsKey = "global-events"
 )
 
-// DeprovisionData is the data needed for the deprovision global event
 type DeprovisionData struct {
 	// The deprovision date
 	DeprovisionDate time.Time `json:"deprovision_date"`
@@ -14,4 +13,8 @@ type DeprovisionData struct {
 	DeprovisionFormat string
 	// The user who stored the deprovision message
 	Deprovisioner string
+
+	AnotherField           bool
+	MoreFields             string
+	LintThisFileSonarcloud bool
 }
