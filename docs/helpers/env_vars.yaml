@@ -2695,11 +2695,7 @@ FRONTEND_ENABLE_RESHARING:
   introductionVersion: pre5.0
   deprecationVersion: "5.0"
   removalVersion: ""
-  deprecationInfo: Resharing will be removed in the future. | Re-sharing will be removed
-    in the future. | Re-sharing will be removed in the future. | Re-sharing will be
-    removed in the future. | Re-sharing will be removed in the future. | Re-sharing
-    will be removed in the future. | Re-sharing will be removed in the future. | Re-sharing
-    will be removed in the future.
+  deprecationInfo: Resharing will be removed in the future.
 FRONTEND_EVENTS_AUTH_PASSWORD:
   name: OCIS_EVENTS_AUTH_PASSWORD;FRONTEND_EVENTS_AUTH_PASSWORD
   defaultValue: ""
@@ -7145,18 +7141,7 @@ OCIS_ENABLE_RESHARING:
   introductionVersion: pre5.0
   deprecationVersion: "5.0"
   removalVersion: ""
-  deprecationInfo: Resharing will be removed in the future. | Re-sharing will be removed
-    in the future. | Resharing will be removed in the future. | Resharing will be
-    removed in the future. | Resharing will be removed in the future. | Resharing
-    will be removed in the future. | Re-sharing will be removed in the future. | Resharing
-    will be removed in the future. | Re-sharing will be removed in the future. | Resharing
-    will be removed in the future. | Resharing will be removed in the future. | Re-sharing
-    will be removed in the future. | Resharing will be removed in the future. | Resharing
-    will be removed in the future. | Re-sharing will be removed in the future. | Resharing
-    will be removed in the future. | Re-sharing will be removed in the future. | Resharing
-    will be removed in the future. | Resharing will be removed in the future. | Resharing
-    will be removed in the future. | Resharing will be removed in the future. | Re-sharing
-    will be removed in the future.
+  deprecationInfo: Resharing will be removed in the future.
 OCIS_EVENTS_AUTH_PASSWORD:
   name: OCIS_EVENTS_AUTH_PASSWORD;USERLOG_EVENTS_AUTH_PASSWORD
   defaultValue: ""
