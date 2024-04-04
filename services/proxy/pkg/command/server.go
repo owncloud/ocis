@@ -298,6 +298,11 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		Now:                time.Now,
 	})
 
+	cspConfig, err := middleware.LoadCSPConfig(cfg)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to load CSP configuration.")
+	}
+
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
 		otelhttp.NewMiddleware("proxy",
@@ -313,6 +318,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		chimiddleware.RequestID,
 		middleware.AccessLog(logger),
 		middleware.HTTPSRedirect,
+		middleware.Security(cspConfig),
 		router.Middleware(cfg.PolicySelector, cfg.Policies, logger),
 		middleware.Authentication(
 			authenticators,

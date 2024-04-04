@@ -86,6 +86,7 @@ func DefaultConfig() *config.Config {
 		AutoprovisionAccounts: false,
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,
+		CSPConfigFileLocation: "",
 	}
 }
 

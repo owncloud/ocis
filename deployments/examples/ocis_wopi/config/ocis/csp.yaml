@@ -1,0 +1,33 @@
+directives:
+  child-src:
+    - '''self'''
+  connect-src:
+    - '''self'''
+  default-src:
+    - '''none'''
+  font-src:
+    - '''self'''
+  frame-src:
+    - '''self'''
+    - 'https://embed.diagrams.net/'
+    - 'https://onlyoffice.owncloud.test/'
+    - 'https://collabora.owncloud.test/'
+  img-src:
+    - '''self'''
+    - 'data:'
+    - 'blob:'
+    - 'https://onlyoffice.owncloud.test/'
+    - 'https://collabora.owncloud.test/'
+  manifest-src:
+    - '''self'''
+  media-src:
+    - '''self'''
+  object-src:
+    - '''self'''
+    - 'blob:'
+  script-src:
+    - '''self'''
+    - '''unsafe-inline'''
+  style-src:
+    - '''self'''
+    - '''unsafe-inline'''
