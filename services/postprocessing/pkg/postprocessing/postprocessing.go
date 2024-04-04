@@ -40,7 +40,7 @@ func New(config config.Postprocessing) *Postprocessing {
 }
 
 // Init is the first step of the postprocessing
-func (pp *Postprocessing) Init(ev events.BytesReceived) interface{} {
+func (pp *Postprocessing) Init(_ events.BytesReceived) interface{} {
 	if len(pp.Steps) == 0 {
 		return pp.finished(events.PPOutcomeContinue)
 	}

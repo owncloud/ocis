@@ -69,7 +69,7 @@ func ListUploads(cfg *config.Config) *cli.Command {
 			fmt.Println("Incomplete uploads:")
 			for _, u := range uploads {
 				ref := u.Reference()
-				fmt.Printf(" - %s (Space: %s, Name: %s, Size: %d/%d, Expires: %s, Processing: %t)\n", ref.GetResourceId().GetSpaceId(), u.ID(), u.Filename(), u.Offset(), u.Size(), u.Expires(), u.IsProcessing())
+				fmt.Printf(" - %s (Space: %s, Name: %s, Size: %d/%d, Expires: %s, Processing: %t)\n", u.ID(), ref.GetResourceId().GetSpaceId(), u.Filename(), u.Offset(), u.Size(), u.Expires(), u.IsProcessing())
 			}
 			return nil
 		},
