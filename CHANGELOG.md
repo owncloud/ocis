@@ -74,6 +74,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update web to v9.0.0-alpha.3: [#8736](https://github.com/owncloud/ocis/pull/8736)
 * Enhancement - Sharing NG role names and descriptions: [#8743](https://github.com/owncloud/ocis/pull/8743)
 * Enhancement - Enable web extension drawio by default: [#8760](https://github.com/owncloud/ocis/pull/8760)
+* Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
 
 ## Details
 
@@ -386,6 +387,12 @@ The following sections list the changes for unreleased.
    Enable web extension drawio by default
 
    https://github.com/owncloud/ocis/pull/8760
+
+* Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
+
+   Send an sse when a file is touched (aka 0 byte upload)
+
+   https://github.com/owncloud/ocis/pull/8778
 
 # Changelog for [5.0.0] (2024-03-18)
 
