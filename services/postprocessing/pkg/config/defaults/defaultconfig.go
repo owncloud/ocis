@@ -35,9 +35,10 @@ func DefaultConfig() *config.Config {
 			MaxRetries:           14,
 		},
 		Store: config.Store{
-			Store:    "memory",
+			Store:    "nats-js-kv",
+			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "postprocessing",
-			Table:    "postprocessing",
+			Table:    "",
 		},
 	}
 }
