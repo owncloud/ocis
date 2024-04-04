@@ -33,6 +33,7 @@ const (
 	parseDriveIDErrMsg = "could not parse driveID"
 )
 
+// DriveItemPermissionsProvider contains the methods related to handling permissions on drive items
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	SpaceRootInvite(ctx context.Context, driveID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
@@ -309,6 +310,7 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 	return s.ListPermissions(ctx, *rootResourceID)
 }
 
+// DeletePermission deletes a permission from a drive item
 func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string) error {
 	var permissionType permissionType
 
@@ -361,6 +363,7 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 	return errorcode.New(errorcode.GeneralException, "failed to delete permission")
 }
 
+// DeleteSpaceRootPermission deletes a permission on the root item of a project space
 func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Context, driveID storageprovider.ResourceId, permissionID string) error {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -380,6 +383,7 @@ func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Conte
 	return s.DeletePermission(ctx, *rootResourceID, permissionID)
 }
 
+// UpdatePermission updates a permission on a drive item
 func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
 	oldPermission, sharedResourceID, err := s.getPermissionByID(ctx, permissionID, &itemID)
 	if err != nil {
@@ -410,6 +414,7 @@ func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemI
 	return *updatedPermission, nil
 }
 
+// UpdateSpaceRootPermission updates a permission on the root item of a project space
 func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Context, driveID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -444,6 +449,7 @@ func NewDriveItemPermissionsApi(driveItemPermissionService DriveItemPermissionsP
 	}, nil
 }
 
+// Invite handles DriveItemInvite requests
 func (api DriveItemPermissionsApi) Invite(w http.ResponseWriter, r *http.Request) {
 	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
@@ -477,6 +483,7 @@ func (api DriveItemPermissionsApi) Invite(w http.ResponseWriter, r *http.Request
 	render.JSON(w, r, &ListResponse{Value: []interface{}{permission}})
 }
 
+// SpaceRootInvite handles DriveItemInvite requests on a space root
 func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *http.Request) {
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
@@ -509,6 +516,7 @@ func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *htt
 	render.JSON(w, r, &ListResponse{Value: []interface{}{permission}})
 }
 
+// ListPermissions handles ListPermissions requests
 func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *http.Request) {
 	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
@@ -529,6 +537,7 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 	render.JSON(w, r, permissions)
 }
 
+// ListSpaceRootPermissions handles ListPermissions requests on a space root
 func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWriter, r *http.Request) {
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
@@ -549,6 +558,7 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 	render.JSON(w, r, permissions)
 }
 
+// DeletePermission handles DeletePermission requests
 func (api DriveItemPermissionsApi) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
@@ -575,6 +585,7 @@ func (api DriveItemPermissionsApi) DeletePermission(w http.ResponseWriter, r *ht
 	render.NoContent(w, r)
 }
 
+// DeleteSpaceRootPermission handles DeletePermission requests on a space root
 func (api DriveItemPermissionsApi) DeleteSpaceRootPermission(w http.ResponseWriter, r *http.Request) {
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
@@ -601,6 +612,7 @@ func (api DriveItemPermissionsApi) DeleteSpaceRootPermission(w http.ResponseWrit
 	render.NoContent(w, r)
 }
 
+// UpdatePermission handles UpdatePermission requests
 func (api DriveItemPermissionsApi) UpdatePermission(w http.ResponseWriter, r *http.Request) {
 	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
@@ -639,6 +651,7 @@ func (api DriveItemPermissionsApi) UpdatePermission(w http.ResponseWriter, r *ht
 	render.JSON(w, r, &updatedPermission)
 }
 
+// UpdateSpaceRootPermission handles UpdatePermission requests on a space root
 func (api DriveItemPermissionsApi) UpdateSpaceRootPermission(w http.ResponseWriter, r *http.Request) {
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
