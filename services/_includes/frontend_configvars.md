@@ -32,12 +32,12 @@
 | OCIS_SPACES_MAX_QUOTA<br/>FRONTEND_MAX_QUOTA | uint64 | 0 | Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.|
 | FRONTEND_UPLOAD_MAX_CHUNK_SIZE | int | 10000000 | Sets the max chunk sizes in bytes for uploads via the clients.|
 | FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE | string |  | Advise TUS to replace PATCH requests by POST requests.|
-| FRONTEND_DEFAULT_UPLOAD_PROTOCOL | string | tus | The default upload protocol to use in clients. Currently only 'tus' is avaliable. See the developer API documentation for more details about TUS.|
-| OCIS_ENABLE_RESHARING<br/>FRONTEND_ENABLE_RESHARING | bool | false | Changing this value is NOT supported. Enables the support for resharing in the clients.|
+| FRONTEND_DEFAULT_UPLOAD_PROTOCOL | string | tus | The default upload protocol to use in clients. Currently only 'tus' is available. See the developer API documentation for more details about TUS.|
+| OCIS_ENABLE_RESHARING<br/>FRONTEND_ENABLE_RESHARING | bool | false | Changing this value is NOT supported. Enables the support for re-sharing in the clients.|
 | FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING | bool | false | Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.|
 | FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING | bool | false | Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed.|
 | FRONTEND_SEARCH_MIN_LENGTH | int | 3 | Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed.|
-| OCIS_EDITION<br/>FRONTEND_EDITION | string | Community | Edition of oCIS. Used for branding pruposes.|
+| OCIS_EDITION<br/>FRONTEND_EDITION | string | Community | Edition of oCIS. Used for branding purposes.|
 | OCIS_DISABLE_SSE<br/>FRONTEND_DISABLE_SSE | bool | false | When set to true, clients are informed that the Server-Sent Events endpoint is not accessible.|
 | FRONTEND_DEFAULT_LINK_PERMISSIONS | int | 1 | Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1.|
 | OCIS_URL<br/>FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
@@ -48,7 +48,7 @@
 | FRONTEND_DATA_GATEWAY_PREFIX | string | data | Path prefix for the data gateway.|
 | FRONTEND_OCS_PREFIX | string | ocs | URL path prefix for the OCS service. Note that the string must not start with '/'.|
 | FRONTEND_OCS_SHARE_PREFIX | string | /Shares | Path prefix for shares as part of an ocis resource. Note that the path must start with '/'.|
-| FRONTEND_OCS_PERSONAL_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Homespace namespace identifier.|
+| FRONTEND_OCS_PERSONAL_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Home namespace identifier.|
 | FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE | string | {{.Mail}} | Additional information attribute for the user like {{.Mail}}.|
 | OCIS_CACHE_STORE<br/>FRONTEND_OCS_STAT_CACHE_STORE | string | memory | The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.|
 | OCIS_CACHE_STORE_NODES<br/>FRONTEND_OCS_STAT_CACHE_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|

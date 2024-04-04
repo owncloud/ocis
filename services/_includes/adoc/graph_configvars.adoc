@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-04-04-09-08-52]
+[#deprecation-note-2024-04-04-09-10-59]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -167,7 +167,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
 
 a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `GRAPH_CACHE_DISABLE_PERSISTENCE` +
@@ -446,7 +446,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/dav/spaces/ ++
 a| [subs=-attributes]
-The WebDAV subpath for spaces.
+The WebDAV sub-path for spaces.
 
 a|`GRAPH_SPACES_DEFAULT_QUOTA` +
 
@@ -656,7 +656,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++displayName ++
 a| [subs=-attributes]
-LDAP Attribute to use for the displayname of users.
+LDAP Attribute to use for the display name of users.
 
 a|`OCIS_LDAP_USER_SCHEMA_USERNAME` +
 `GRAPH_LDAP_USER_NAME_ATTRIBUTE` +
@@ -1050,12 +1050,12 @@ The service account secret.
 
 a|`OCIS_ENABLE_RESHARING` +
 `GRAPH_ENABLE_RESHARING` +
-xref:deprecation-note-2024-04-04-09-08-52[Deprecation Note]
+xref:deprecation-note-2024-04-04-09-10-59[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Changing this value is NOT supported. Enables the support for resharing.
+Changing this value is NOT supported. Enables the support for re-sharing.
 |===
 

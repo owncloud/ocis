@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-04-04-09-08-52]
+[#deprecation-note-2024-04-04-09-10-59]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -14,7 +14,7 @@ ifeval::[{show-deprecation} == true]
 | Removal Version
 | Deprecation Replacement
 
-| Resharing will be removed in the future.
+| Re-sharing will be removed in the future.
 | 5.0
 | 
 | 
@@ -323,17 +323,17 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++tus ++
 a| [subs=-attributes]
-The default upload protocol to use in clients. Currently only 'tus' is avaliable. See the developer API documentation for more details about TUS.
+The default upload protocol to use in clients. Currently only 'tus' is available. See the developer API documentation for more details about TUS.
 
 a|`OCIS_ENABLE_RESHARING` +
 `FRONTEND_ENABLE_RESHARING` +
-xref:deprecation-note-2024-04-04-09-08-52[Deprecation Note]
+xref:deprecation-note-2024-04-04-09-10-59[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Changing this value is NOT supported. Enables the support for resharing in the clients.
+Changing this value is NOT supported. Enables the support for re-sharing in the clients.
 
 a|`FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING` +
 
@@ -370,7 +370,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++Community ++
 a| [subs=-attributes]
-Edition of oCIS. Used for branding pruposes.
+Edition of oCIS. Used for branding purposes.
 
 a|`OCIS_DISABLE_SSE` +
 `FRONTEND_DISABLE_SSE` +
@@ -473,7 +473,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/users/{{.Id.OpaqueId}} ++
 a| [subs=-attributes]
-Homespace namespace identifier.
+Home namespace identifier.
 
 a|`FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE` +
 

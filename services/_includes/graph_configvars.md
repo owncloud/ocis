@@ -15,7 +15,7 @@
 | GRAPH_CACHE_STORE_DATABASE | string | cache-roles | The database name the configured store should use.|
 | GRAPH_CACHE_STORE_TABLE | string |  | The database table the store should use.|
 | OCIS_CACHE_TTL<br/>GRAPH_CACHE_TTL | Duration | 336h0m0s | Time to live for cache records in the graph. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.|
-| OCIS_CACHE_SIZE<br/>GRAPH_CACHE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
+| OCIS_CACHE_SIZE<br/>GRAPH_CACHE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.|
 | OCIS_CACHE_DISABLE_PERSISTENCE<br/>GRAPH_CACHE_DISABLE_PERSISTENCE | bool | false | Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.|
 | OCIS_CACHE_AUTH_USERNAME<br/>GRAPH_CACHE_AUTH_USERNAME | string |  | The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_CACHE_AUTH_PASSWORD<br/>GRAPH_CACHE_AUTH_PASSWORD | string |  | The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
@@ -45,7 +45,7 @@
 | GRAPH_APPLICATION_ID | string |  | The ocis application ID shown in the graph. All app roles are tied to this ID.|
 | GRAPH_APPLICATION_DISPLAYNAME | string | ownCloud Infinite Scale | The ocis application name.|
 | OCIS_URL<br/>GRAPH_SPACES_WEBDAV_BASE | string | https://localhost:9200 | The public facing URL of WebDAV.|
-| GRAPH_SPACES_WEBDAV_PATH | string | /dav/spaces/ | The WebDAV subpath for spaces.|
+| GRAPH_SPACES_WEBDAV_PATH | string | /dav/spaces/ | The WebDAV sub-path for spaces.|
 | GRAPH_SPACES_DEFAULT_QUOTA | string | 1000000000 | The default quota in bytes.|
 | GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL | int | 60000000000 | Max TTL in seconds for the spaces property cache.|
 | GRAPH_SPACES_USERS_CACHE_TTL | int | 60000000000 | Max TTL in seconds for the spaces users cache.|
@@ -67,7 +67,7 @@
 | OCIS_LDAP_USER_FILTER<br/>GRAPH_LDAP_USER_FILTER | string |  | LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.|
 | OCIS_LDAP_USER_OBJECTCLASS<br/>GRAPH_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | The object class to use for users in the default user search filter ('inetOrgPerson').|
 | OCIS_LDAP_USER_SCHEMA_MAIL<br/>GRAPH_LDAP_USER_EMAIL_ATTRIBUTE | string | mail | LDAP Attribute to use for the email address of users.|
-| LDAP_USER_SCHEMA_DISPLAY_NAME<br/>GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE | string | displayName | LDAP Attribute to use for the displayname of users.|
+| LDAP_USER_SCHEMA_DISPLAY_NAME<br/>GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE | string | displayName | LDAP Attribute to use for the display name of users.|
 | OCIS_LDAP_USER_SCHEMA_USERNAME<br/>GRAPH_LDAP_USER_NAME_ATTRIBUTE | string | uid | LDAP Attribute to use for username of users.|
 | OCIS_LDAP_USER_SCHEMA_ID<br/>GRAPH_LDAP_USER_UID_ATTRIBUTE | string | owncloudUUID | LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.|
 | OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>GRAPH_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the user ID's.|
@@ -108,4 +108,4 @@
 | OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY<br/>GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY | bool | false | Disable TLS certificate validation for Keycloak connections. Do not set this in production environments.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>GRAPH_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>GRAPH_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
-| OCIS_ENABLE_RESHARING<br/>GRAPH_ENABLE_RESHARING | bool | false | Changing this value is NOT supported. Enables the support for resharing.|
+| OCIS_ENABLE_RESHARING<br/>GRAPH_ENABLE_RESHARING | bool | false | Changing this value is NOT supported. Enables the support for re-sharing.|
