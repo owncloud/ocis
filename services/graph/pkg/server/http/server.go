@@ -114,7 +114,7 @@ func Server(opts ...Option) (http.Service, error) {
 		requireAdminMiddleware = func(next stdhttp.Handler) stdhttp.Handler {
 			return next
 		}
-		// no gatewayclient needed
+		// no gateway client needed
 	}
 
 	// Keycloak client is optional, so if it stays nil, it's fine.

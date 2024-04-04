@@ -28,7 +28,7 @@ type identityCacheOptions struct {
 	groupsTTL       time.Duration
 }
 
-// IdentityCacheOptiondefines a single option function.
+// IdentityCacheOption defines a single option function.
 type IdentityCacheOption func(o *identityCacheOptions)
 
 // IdentityCacheWithGatewaySelector set the gatewaySelector for the Identity Cache
@@ -60,7 +60,7 @@ func newOptions(opts ...IdentityCacheOption) identityCacheOptions {
 	return opt
 }
 
-// NewIdentityCache instanciates a new IdentityCache and sets the supplied options
+// NewIdentityCache instantiates a new IdentityCache and sets the supplied options
 func NewIdentityCache(opts ...IdentityCacheOption) IdentityCache {
 	opt := newOptions(opts...)
 
@@ -83,7 +83,7 @@ func NewIdentityCache(opts ...IdentityCacheOption) IdentityCache {
 	return cache
 }
 
-// GetUser looks up a user by id, if the user is not cached yet it will do a lookup via the CS3 API
+// GetUser looks up a user by id, if the user is not cached, yet it will do a lookup via the CS3 API
 func (cache IdentityCache) GetUser(ctx context.Context, userid string) (libregraph.User, error) {
 	var user libregraph.User
 	if item := cache.users.Get(userid); item == nil {
@@ -91,14 +91,14 @@ func (cache IdentityCache) GetUser(ctx context.Context, userid string) (libregra
 		cs3UserID := &cs3User.UserId{
 			OpaqueId: userid,
 		}
-		cs3User, err := revautils.GetUser(cs3UserID, gatewayClient)
+		u, err := revautils.GetUserWithContext(ctx, cs3UserID, gatewayClient)
 		if err != nil {
 			if revautils.IsErrNotFound(err) {
 				return libregraph.User{}, ErrNotFound
 			}
 			return libregraph.User{}, errorcode.New(errorcode.GeneralException, err.Error())
 		}
-		user = *CreateUserModelFromCS3(cs3User)
+		user = *CreateUserModelFromCS3(u)
 		cache.users.Set(userid, user, ttlcache.DefaultTTL)
 
 	} else {
@@ -107,13 +107,13 @@ func (cache IdentityCache) GetUser(ctx context.Context, userid string) (libregra
 	return user, nil
 }
 
-// GetUser looks up a group by id, if the group is not cached yet it will do a lookup via the CS3 API
-func (cache IdentityCache) GetGroup(ctx context.Context, groupid string) (libregraph.Group, error) {
+// GetGroup looks up a group by id, if the group is not cached, yet it will do a lookup via the CS3 API
+func (cache IdentityCache) GetGroup(ctx context.Context, groupID string) (libregraph.Group, error) {
 	var group libregraph.Group
-	if item := cache.groups.Get(groupid); item == nil {
+	if item := cache.groups.Get(groupID); item == nil {
 		gatewayClient, err := cache.gatewaySelector.Next()
 		cs3GroupID := &cs3Group.GroupId{
-			OpaqueId: groupid,
+			OpaqueId: groupID,
 		}
 		req := cs3Group.GetGroupRequest{
 			GroupId: cs3GroupID,
@@ -124,9 +124,9 @@ func (cache IdentityCache) GetGroup(ctx context.Context, groupid string) (libreg
 		}
 		switch res.Status.Code {
 		case rpc.Code_CODE_OK:
-			cs3Group := res.GetGroup()
-			group = *CreateGroupModelFromCS3(cs3Group)
-			cache.groups.Set(groupid, group, ttlcache.DefaultTTL)
+			g := res.GetGroup()
+			group = *CreateGroupModelFromCS3(g)
+			cache.groups.Set(groupID, group, ttlcache.DefaultTTL)
 		case rpc.Code_CODE_NOT_FOUND:
 			return group, ErrNotFound
 		default:

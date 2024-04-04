@@ -203,7 +203,7 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 	}
 
 	if i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
-		if err := i.updateUserPassowrd(ctx, ar.DN, user.PasswordProfile.GetPassword()); err != nil {
+		if err := i.updateUserPassword(ctx, ar.DN, user.PasswordProfile.GetPassword()); err != nil {
 			return nil, err
 		}
 	}
@@ -265,7 +265,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("UpdateUser")
 	if !i.writeEnabled {
-		// still allow eanble/disable User when using DisableMechanismGroup
+		// still allow to enable/disable user when using DisableMechanismGroup
 		if i.disableUserMechanism == DisableMechanismGroup && isUserEnabledUpdate(user) {
 			logger.Error().Str("backend", "ldap").Msg("Allowing accountEnabled Update on read-only backend")
 		} else {
@@ -319,7 +319,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 
 	if user.PasswordProfile != nil && user.PasswordProfile.GetPassword() != "" {
 		if i.usePwModifyExOp {
-			if err := i.updateUserPassowrd(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
+			if err := i.updateUserPassword(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
 				msg := "error updating user password"
 				logger.Error().Err(err).Msg(msg)
 				errMap := ldapResultToErrMap{
@@ -376,7 +376,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 
 	returnUser := i.createUserModelFromLDAP(e)
 
-	// To avoid an ldap lookup for group membership, set the enabled flag to same as input value
+	// To avoid a ldap lookup for group membership, set the enabled flag to same as input value
 	// since this would have been updated with group membership from the input anyway.
 	if user.AccountEnabled != nil && i.disableUserMechanism == DisableMechanismGroup {
 		returnUser.AccountEnabled = user.AccountEnabled
@@ -490,7 +490,7 @@ func filterEscapeUUID(binary bool, id string) (string, error) {
 func (i *LDAP) getLDAPUserByID(id string) (*ldap.Entry, error) {
 	idString, err := filterEscapeUUID(i.userIDisOctetString, id)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid User id: %w", err)
+		return nil, fmt.Errorf("invalid User id: %w", err)
 	}
 	filter := fmt.Sprintf("(%s=%s)", i.userAttributeMap.id, idString)
 	return i.getLDAPUserByFilter(filter)
@@ -498,7 +498,7 @@ func (i *LDAP) getLDAPUserByID(id string) (*ldap.Entry, error) {
 
 func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
 	idString, err := filterEscapeUUID(i.userIDisOctetString, nameOrID)
-	// err != nil just means that this is not a uuid so we can skip the uuid filterpart
+	// err != nil just means that this is not an uuid, so we can skip the uuid filter part
 	// and just filter by name
 	filter := ""
 	if err == nil {
@@ -738,9 +738,9 @@ func (i *LDAP) renameMemberInGroup(ctx context.Context, group *ldap.Entry, oldMe
 	return nil
 }
 
-func (i *LDAP) updateUserPassowrd(ctx context.Context, dn, password string) error {
+func (i *LDAP) updateUserPassword(ctx context.Context, dn, password string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
-	logger.Debug().Str("backend", "ldap").Msg("updateUserPassowrd")
+	logger.Debug().Str("backend", "ldap").Msg("updateUserPassword")
 	pwMod := ldap.PasswordModifyRequest{
 		UserIdentity: dn,
 		NewPassword:  password,
@@ -915,7 +915,7 @@ func stringToScope(scope string) (int, error) {
 	return s, nil
 }
 
-// removeEntryByDNAndAttributeFromEntry creates a request to remove a single member entry by attribute and DN from an ldap entry
+// removeEntryByDNAndAttributeFromEntry creates a request to remove a single member entry by attribute and DN from a ldap entry
 func (i *LDAP) removeEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string, attribute string) error {
 	nOldDN, err := ldapdn.ParseNormalize(dn)
 	if err != nil {
@@ -982,7 +982,7 @@ func (i *LDAP) removeEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string
 	return nil
 }
 
-// expandLDAPAttributeEntries reads an attribute from an ldap entry and expands to users
+// expandLDAPAttributeEntries reads an attribute from a ldap entry and expands to users
 func (i *LDAP) expandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, attribute string) ([]*ldap.Entry, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("ExpandLDAPAttributeEntries")
@@ -1007,7 +1007,7 @@ func (i *LDAP) expandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, at
 
 func replaceDN(fullDN *ldap.DN, newDN string) (string, error) {
 	if len(fullDN.RDNs) == 0 {
-		return "", fmt.Errorf("Can't operate on an empty dn")
+		return "", fmt.Errorf("can't operate on an empty dn")
 	}
 
 	if len(fullDN.RDNs) == 1 {

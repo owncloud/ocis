@@ -53,151 +53,151 @@ const (
 	ActionGroupMemberRemoved = "group_member_removed"
 )
 
-// MessageShareCreated returns the human readable string that describes the action
+// MessageShareCreated returns the human-readable string that describes the action
 func MessageShareCreated(sharer, item, grantee string) string {
 	return fmt.Sprintf("user '%s' shared file '%s' with '%s'", sharer, item, grantee)
 }
 
-// MessageLinkCreated returns the human readable string that describes the action
-func MessageLinkCreated(sharer, item, shareid string) string {
-	return fmt.Sprintf("user '%s' created a public link to file '%s' with id '%s'", sharer, item, shareid)
+// MessageLinkCreated returns the human-readable string that describes the action
+func MessageLinkCreated(sharer, item, shareID string) string {
+	return fmt.Sprintf("user '%s' created a public link to file '%s' with id '%s'", sharer, item, shareID)
 }
 
-// MessageShareUpdated returns the human readable string that describes the action
+// MessageShareUpdated returns the human-readable string that describes the action
 func MessageShareUpdated(sharer, shareID, fieldUpdated string) string {
 	return fmt.Sprintf("user '%s' updated field '%s' of share '%s'", sharer, fieldUpdated, shareID)
 }
 
-// MessageLinkUpdated returns the human readable string that describes the action
-func MessageLinkUpdated(sharer, shareid, fieldUpdated string) string {
-	return fmt.Sprintf("user '%s' updated field '%s' of public link '%s'", sharer, fieldUpdated, shareid)
+// MessageLinkUpdated returns the human-readable string that describes the action
+func MessageLinkUpdated(sharer, shareID, fieldUpdated string) string {
+	return fmt.Sprintf("user '%s' updated field '%s' of public link '%s'", sharer, fieldUpdated, shareID)
 }
 
-// MessageShareRemoved returns the human readable string that describes the action
-func MessageShareRemoved(sharer, shareid, itemid string) string {
-	return fmt.Sprintf("share id:'%s' uid:'%s' item-id:'%s' was removed", shareid, sharer, itemid)
+// MessageShareRemoved returns the human-readable string that describes the action
+func MessageShareRemoved(sharer, shareID, itemid string) string {
+	return fmt.Sprintf("share id:'%s' uid:'%s' item-id:'%s' was removed", shareID, sharer, itemid)
 }
 
-// MessageLinkRemoved returns the human readable string that describes the action
-func MessageLinkRemoved(executant, shareid string) string {
-	return fmt.Sprintf("user '%s' removed public link with id:'%s'", executant, shareid)
+// MessageLinkRemoved returns the human-readable string that describes the action
+func MessageLinkRemoved(executant, shareID string) string {
+	return fmt.Sprintf("user '%s' removed public link with id:'%s'", executant, shareID)
 }
 
-// MessageShareAccepted returns the human readable string that describes the action
-func MessageShareAccepted(userid, shareid, sharerid string) string {
-	return fmt.Sprintf("user '%s' accepted share '%s' from user '%s'", userid, shareid, sharerid)
+// MessageShareAccepted returns the human-readable string that describes the action
+func MessageShareAccepted(userid, shareID, sharerID string) string {
+	return fmt.Sprintf("user '%s' accepted share '%s' from user '%s'", userid, shareID, sharerID)
 }
 
-// MessageShareDeclined returns the human readable string that describes the action
-func MessageShareDeclined(userid, shareid, sharerid string) string {
-	return fmt.Sprintf("user '%s' declined share '%s' from user '%s'", userid, shareid, sharerid)
+// MessageShareDeclined returns the human-readable string that describes the action
+func MessageShareDeclined(userid, shareID, sharerID string) string {
+	return fmt.Sprintf("user '%s' declined share '%s' from user '%s'", userid, shareID, sharerID)
 }
 
-// MessageLinkAccessed returns the human readable string that describes the action
+// MessageLinkAccessed returns the human-readable string that describes the action
 func MessageLinkAccessed(token string, success bool) string {
 	return fmt.Sprintf("link with token '%s' was accessed. Success: %v", token, success)
 }
 
-// MessageContainerCreated returns the human readable string that describes the action
+// MessageContainerCreated returns the human-readable string that describes the action
 func MessageContainerCreated(executant, item string) string {
 	return fmt.Sprintf("user '%s' created folder '%s'", executant, item)
 }
 
-// MessageFileCreated returns the human readable string that describes the action
+// MessageFileCreated returns the human-readable string that describes the action
 func MessageFileCreated(executant, item string) string {
 	return fmt.Sprintf("user '%s' created file '%s'", executant, item)
 }
 
-// MessageFileRead returns the human readable string that describes the action
+// MessageFileRead returns the human-readable string that describes the action
 func MessageFileRead(executant, item string) string {
 	return fmt.Sprintf("user '%s' read file '%s'", executant, item)
 }
 
-// MessageFileTrashed returns the human readable string that describes the action
+// MessageFileTrashed returns the human-readable string that describes the action
 func MessageFileTrashed(executant, item string) string {
 	return fmt.Sprintf("user '%s' trashed file '%s'", executant, item)
 }
 
-// MessageFileRenamed returns the human readable string that describes the action
+// MessageFileRenamed returns the human-readable string that describes the action
 func MessageFileRenamed(executant, item, oldpath, newpath string) string {
 	return fmt.Sprintf("user '%s' moved file '%s' from '%s' to '%s'", executant, item, oldpath, newpath)
 }
 
-// MessageFilePurged returns the human readable string that describes the action
+// MessageFilePurged returns the human-readable string that describes the action
 func MessageFilePurged(executant, item string) string {
 	return fmt.Sprintf("user '%s' removed file '%s' from trashbin", executant, item)
 }
 
-// MessageFileRestored returns the human readable string that describes the action
+// MessageFileRestored returns the human-readable string that describes the action
 func MessageFileRestored(executant, item, path string) string {
 	return fmt.Sprintf("user '%s' restored file '%s' from trashbin to '%s'", executant, item, path)
 }
 
-// MessageFileVersionRestored returns the human readable string that describes the action
+// MessageFileVersionRestored returns the human-readable string that describes the action
 func MessageFileVersionRestored(executant, item, version string) string {
 	return fmt.Sprintf("user '%s' restored file '%s' in version '%s'", executant, item, version)
 }
 
-// MessageSpaceCreated returns the human readable string that describes the action
+// MessageSpaceCreated returns the human-readable string that describes the action
 func MessageSpaceCreated(executant, spaceID, name string) string {
 	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' created a space '%s' with name '%s' (storage: '%s')", executant, spaceID, name, storagID)
 }
 
-// MessageSpaceRenamed returns the human readable string that describes the action
+// MessageSpaceRenamed returns the human-readable string that describes the action
 func MessageSpaceRenamed(executant, spaceID, name string) string {
 	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' renamed space '%s' to '%s' (storage: '%s')", executant, spaceID, name, storagID)
 }
 
-// MessageSpaceDisabled returns the human readable string that describes the action
+// MessageSpaceDisabled returns the human-readable string that describes the action
 func MessageSpaceDisabled(executant, spaceID string) string {
 	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' disabled the space '%s' (storage: '%s')", executant, spaceID, storagID)
 }
 
-// MessageSpaceEnabled returns the human readable string that describes the action
+// MessageSpaceEnabled returns the human-readable string that describes the action
 func MessageSpaceEnabled(executant, spaceID string) string {
 	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' (re-) enabled the space '%s' (storage: '%s')", executant, spaceID, storagID)
 }
 
-// MessageSpaceDeleted returns the human readable string that describes the action
+// MessageSpaceDeleted returns the human-readable string that describes the action
 func MessageSpaceDeleted(executant, spaceID string) string {
 	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' deleted the space '%s' (storage: '%s')", executant, spaceID, storagID)
 }
 
-// MessageSpaceShared returns the human readable string that describes the action
+// MessageSpaceShared returns the human-readable string that describes the action
 func MessageSpaceShared(executant, spaceID, grantee string) string {
 	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' shared the space '%s' with '%s' (storage: '%s')", executant, spaceID, grantee, storagID)
 }
 
-// MessageSpaceUnshared returns the human readable string that describes the action
+// MessageSpaceUnshared returns the human-readable string that describes the action
 func MessageSpaceUnshared(executant, spaceID, grantee string) string {
 	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' unshared the space '%s' with '%s' (storage: '%s')", executant, spaceID, grantee, storagID)
 }
 
-// MessageSpaceUpdated returns the human readable string that describes the action
+// MessageSpaceUpdated returns the human-readable string that describes the action
 func MessageSpaceUpdated(executant, spaceID, name string, quota uint64, opaque map[string]string) string {
 	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' updated space '%s'. name: '%s', quota: '%d', opaque: '%s' (storage: '%s')",
 		executant, spaceID, name, quota, opaque, storagID)
 }
 
-// MessageUserCreated returns the human readable string that describes the action
+// MessageUserCreated returns the human-readable string that describes the action
 func MessageUserCreated(executant, userID string) string {
 	return fmt.Sprintf("user '%s' created the user '%s'", executant, userID)
 }
 
-// MessageUserDeleted returns the human readable string that describes the action
+// MessageUserDeleted returns the human-readable string that describes the action
 func MessageUserDeleted(executant, userID string) string {
 	return fmt.Sprintf("user '%s' deleted the user '%s'", executant, userID)
 }
 
-// MessageUserFeatureChanged returns the human readable string that describes the action
+// MessageUserFeatureChanged returns the human-readable string that describes the action
 func MessageUserFeatureChanged(executant, userID string, features []events.UserFeature) string {
 	// Result is: "user '%executant%' changed user %username%'s features: %featurename%=%featurevalue% %featurename%=%featurevalue%"
 	var sb strings.Builder
@@ -215,22 +215,22 @@ func MessageUserFeatureChanged(executant, userID string, features []events.UserF
 	return sb.String()
 }
 
-// MessageGroupCreated returns the human readable string that describes the action
+// MessageGroupCreated returns the human-readable string that describes the action
 func MessageGroupCreated(executant, groupID string) string {
 	return fmt.Sprintf("user '%s' created group '%s'", executant, groupID)
 }
 
-// MessageGroupDeleted returns the human readable string that describes the action
+// MessageGroupDeleted returns the human-readable string that describes the action
 func MessageGroupDeleted(executant, groupID string) string {
 	return fmt.Sprintf("user '%s' deleted group '%s'", executant, groupID)
 }
 
-// MessageGroupMemberAdded returns the human readable string that describes the action
+// MessageGroupMemberAdded returns the human-readable string that describes the action
 func MessageGroupMemberAdded(executant, userID, groupID string) string {
 	return fmt.Sprintf("user '%s' added user '%s' was added to group '%s'", executant, userID, groupID)
 }
 
-// MessageGroupMemberRemoved returns the human readable string that describes the action
+// MessageGroupMemberRemoved returns the human-readable string that describes the action
 func MessageGroupMemberRemoved(executant, userID, groupID string) string {
 	return fmt.Sprintf("user '%s' added user '%s' was removed from group '%s'", executant, userID, groupID)
 }

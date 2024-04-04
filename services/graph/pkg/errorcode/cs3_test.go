@@ -46,7 +46,7 @@ func TestFromCS3Status(t *testing.T) {
 
 	for _, test := range tests {
 		if output := errorcode.FromCS3Status(test.status, test.err, test.ignore...); !reflect.DeepEqual(output, test.result) {
-			t.Error("Test Failed: {} expected, recieved: {}", test.result, output)
+			t.Error("Test Failed: {} expected, received: {}", test.result, output)
 		}
 	}
 }
@@ -63,7 +63,7 @@ func TestFromStat(t *testing.T) {
 
 	for _, test := range tests {
 		if output := errorcode.FromStat(test.stat, test.err); !reflect.DeepEqual(output, test.result) {
-			t.Error("Test Failed: {} expected, recieved: {}", test.result, output)
+			t.Error("Test Failed: {} expected, received: {}", test.result, output)
 		}
 	}
 }

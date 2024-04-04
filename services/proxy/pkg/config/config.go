@@ -66,7 +66,7 @@ type Route struct {
 	Unprotected bool   `yaml:"unprotected,omitempty"`
 }
 
-// RouteType defines the type of a route
+// RouteType defines the type of route
 type RouteType string
 
 const (
@@ -90,7 +90,7 @@ type AuthMiddleware struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
 }
 
-// PoliciesMiddleware configures the proxy policies middleware.
+// PoliciesMiddleware configures the proxy's policies middleware.
 type PoliciesMiddleware struct {
 	Query string `yaml:"query" env:"PROXY_POLICIES_QUERY" desc:"Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Rules default to deny if the variable was not found." introductionVersion:"pre5.0"`
 }
@@ -128,7 +128,7 @@ type Cache struct {
 	Database           string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
 	Table              string        `yaml:"table" env:"PROXY_OIDC_USERINFO_CACHE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default." introductionVersion:"pre5.0"`
+	Size               int           `yaml:"size" env:"OCIS_CACHE_SIZE;PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default." introductionVersion:"pre5.0"`
 	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;PROXY_OIDC_USERINFO_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"pre5.0"`
 	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;PROXY_OIDC_USERINFO_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;PROXY_OIDC_USERINFO_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
@@ -164,7 +164,7 @@ type StaticSelectorConf struct {
 	Policy string `yaml:"policy"`
 }
 
-// PreSignedURL is the config for the presigned url middleware
+// PreSignedURL is the config for the pre-signed url middleware
 type PreSignedURL struct {
 	AllowedHTTPMethods []string     `yaml:"allowed_http_methods"`
 	Enabled            bool         `yaml:"enabled" env:"PROXY_ENABLE_PRESIGNEDURLS" desc:"Allow OCS to get a signing key to sign requests." introductionVersion:"pre5.0"`

@@ -116,9 +116,9 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 			"services": map[string]interface{}{
 				// this reva service called "appprovider" comes from
 				// `internal/http/services/appprovider` and is a translation
-				// layer from the grpc app registry to http, used by eg. ownCloud Web
+				// layer from the grpc app registry to http, used by e.g. ownCloud Web
 				// It should not be confused with `internal/grpc/services/appprovider`
-				// which is currently only has only the driver for the CS3org WOPI server
+				// which is currently only the driver for the CS3org WOPI server
 				"appprovider": map[string]interface{}{
 					"prefix":                 cfg.AppHandler.Prefix,
 					"transfer_shared_secret": cfg.TransferSecret,

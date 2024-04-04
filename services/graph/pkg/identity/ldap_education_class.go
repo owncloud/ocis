@@ -66,7 +66,7 @@ func (i *LDAP) GetEducationClasses(ctx context.Context) ([]*libregraph.Education
 
 // CreateEducationClass implements the EducationBackend interface for the LDAP backend.
 // An EducationClass is mapped to an LDAP entry of the "groupOfNames" structural ObjectClass.
-// With a few additional Attributes added on top via the "ocEducationClass" auxiallary ObjectClass.
+// With a few additional Attributes added on top via the "ocEducationClass" auxiliary ObjectClass.
 func (i *LDAP) CreateEducationClass(ctx context.Context, class libregraph.EducationClass) (*libregraph.EducationClass, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("create educationClass")

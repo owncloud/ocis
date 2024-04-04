@@ -55,7 +55,7 @@ func (i *LDAP) CreateEducationUser(ctx context.Context, user libregraph.Educatio
 	return i.createEducationUserModelFromLDAP(e), nil
 }
 
-// DeleteEducationUser deletes a given educationuser, identified by username or id, from the backend
+// DeleteEducationUser deletes a given education user, identified by username or id, from the backend
 func (i *LDAP) DeleteEducationUser(ctx context.Context, nameOrID string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("DeleteEducationUser")
@@ -145,7 +145,7 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 	}
 	if user.PasswordProfile != nil && user.PasswordProfile.GetPassword() != "" {
 		if i.usePwModifyExOp {
-			if err := i.updateUserPassowrd(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
+			if err := i.updateUserPassword(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
 				return nil, err
 			}
 		} else {
@@ -182,7 +182,7 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 
 	returnUser := i.createEducationUserModelFromLDAP(e)
 
-	// To avoid an ldap lookup for group membership, set the enabled flag to same as input value
+	// To avoid a ldap lookup for group membership, set the enabled flag to same as input value
 	// since this would have been updated with group membership from the input anyway.
 	if user.AccountEnabled != nil && i.disableUserMechanism == DisableMechanismGroup {
 		returnUser.AccountEnabled = user.AccountEnabled

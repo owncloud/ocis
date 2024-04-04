@@ -87,7 +87,7 @@ var _ = Describe("EventHistoryService", func() {
 		Expect(resp).ToNot(BeNil())
 
 		// Events don't always come back in the same order as they were sent, so we need to sort them and
-		// do the same for the expcted IDs as well.
+		// do the same for the expected IDs as well.
 		expectedIDs := []string{ids[0], ids[2]}
 		sort.Strings(expectedIDs)
 		var gotIDs []string

@@ -50,7 +50,7 @@ const (
 const ldapDateFormat = "20060102150405Z0700"
 
 var (
-	errNotSet             = errors.New("Attribute not set")
+	errNotSet             = errors.New("attribute not set")
 	errSchoolNameExists   = errorcode.New(errorcode.NameAlreadyExists, "A school with that name is already present")
 	errSchoolNumberExists = errorcode.New(errorcode.NameAlreadyExists, "A school with that number is already present")
 )
@@ -761,7 +761,7 @@ func (i *LDAP) getTerminationDate(e *ldap.Entry) (*time.Time, error) {
 	}
 	t, err := time.Parse(ldapDateFormat, dateString)
 	if err != nil {
-		err = fmt.Errorf("Error parsing LDAP date: '%s': %w", dateString, err)
+		err = fmt.Errorf("error parsing LDAP date: '%s': %w", dateString, err)
 		return nil, err
 	}
 	return &t, nil

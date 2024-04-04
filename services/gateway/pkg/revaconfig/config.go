@@ -37,7 +37,7 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"gateway": map[string]interface{}{
-					// registries is located on the gateway
+					// registries are located on the gateway
 					"authregistrysvc":    cfg.Reva.Address,
 					"storageregistrysvc": cfg.Reva.Address,
 					"appregistrysvc":     cfg.AppRegistryEndpoint,

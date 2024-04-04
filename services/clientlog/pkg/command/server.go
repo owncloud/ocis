@@ -63,7 +63,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			stream, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Events))
+			s, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Events))
 			if err != nil {
 				return err
 			}
@@ -87,7 +87,7 @@ func Server(cfg *config.Config) *cli.Command {
 				svc, err := service.NewClientlogService(
 					service.Logger(logger),
 					service.Config(cfg),
-					service.Stream(stream),
+					service.Stream(s),
 					service.GatewaySelector(gatewaySelector),
 					service.RegisteredEvents(_registeredEvents),
 					service.TraceProvider(tracerProvider),

@@ -15,7 +15,7 @@ import (
 // ErrorCode defines code as used in MS Graph - see https://docs.microsoft.com/en-us/graph/errors?context=graph%2Fapi%2F1.0&view=graph-rest-1.0
 type ErrorCode int
 
-// Error defines a custom error struct, containing and MS Graph error code an a textual error message
+// Error defines a custom error struct, containing and MS Graph error code and a textual error message
 type Error struct {
 	errorCode ErrorCode
 	msg       string
@@ -51,7 +51,7 @@ const (
 	ResyncRequired
 	// ServiceNotAvailable defines the error if the service is not available. Try the request again after a delay. There may be a Retry-After header.
 	ServiceNotAvailable
-	// The sync state generation is not found. The delta token is expired and data must be synchronized again.
+	// SyncStateNotFound defines the error when the sync state generation is not found. The delta token is expired and data must be synchronized again.
 	SyncStateNotFound
 	// QuotaLimitReached the user has reached their quota limit.
 	QuotaLimitReached
@@ -93,7 +93,7 @@ func New(e ErrorCode, msg string) Error {
 	}
 }
 
-// Render writes an Graph ErrorCode	object to the response writer
+// Render writes a Graph ErrorCode object to the response writer
 func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, msg string) {
 	render.Status(r, status)
 	render.JSON(w, r, e.CreateOdataError(r.Context(), msg))
@@ -115,7 +115,7 @@ func (e ErrorCode) CreateOdataError(ctx context.Context, msg string) *libregraph
 	}
 }
 
-// Render writes an Graph Error object to the response writer
+// Render writes a Graph Error object to the response writer
 func (e Error) Render(w http.ResponseWriter, r *http.Request) {
 	var status int
 	switch e.errorCode {
@@ -148,7 +148,7 @@ func (e ErrorCode) String() string {
 	return errorCodes[e]
 }
 
-// Error return the concatenation of the error string and optinal message
+// Error return the concatenation of the error string and optional message
 func (e Error) Error() string {
 	errString := errorCodes[e.errorCode]
 	if e.msg != "" {

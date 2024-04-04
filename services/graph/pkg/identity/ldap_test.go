@@ -1431,8 +1431,8 @@ func TestUpdateUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			lm := &mocks.Client{}
-			for _, mock := range tt.ldapMocks {
-				lm.On(mock.funcName, mock.args...).Return(mock.returns...)
+			for _, ldapMock := range tt.ldapMocks {
+				lm.On(ldapMock.funcName, ldapMock.args...).Return(ldapMock.returns...)
 			}
 
 			ldapConfig := lconfig
@@ -1659,7 +1659,7 @@ func TestUsersEnabledState(t *testing.T) {
 					returns: []interface{}{
 						nil,
 						&ldap.Error{
-							Err: fmt.Errorf("Very Problematic Problems"),
+							Err: fmt.Errorf("very problematic problems"),
 						},
 					},
 				},
@@ -1669,8 +1669,8 @@ func TestUsersEnabledState(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			lm := &mocks.Client{}
-			for _, mock := range tt.ldapMocks {
-				lm.On(mock.funcName, mock.args...).Return(mock.returns...)
+			for _, ldapMock := range tt.ldapMocks {
+				lm.On(ldapMock.funcName, ldapMock.args...).Return(ldapMock.returns...)
 			}
 
 			ldapConfig := lconfig

@@ -6,7 +6,7 @@ import (
 	"github.com/dutchcoders/go-clamd"
 )
 
-// NewClamAV returns an Scanner talking to clamAV via socket
+// NewClamAV returns a Scanner talking to clamAV via socket
 func NewClamAV(socket string) *ClamAV {
 	return &ClamAV{
 		clamd: clamd.NewClamd(socket),

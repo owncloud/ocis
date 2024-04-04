@@ -589,8 +589,8 @@ func (g Graph) Invite(w http.ResponseWriter, r *http.Request) {
 	if id := createShareResponse.GetShare().GetId().GetOpaqueId(); id != "" {
 		permission.Id = conversions.ToPointer(id)
 	} else if IsSpaceRoot(statResponse.GetInfo().GetId()) {
-		// permissions on a space root are not handled by a share manager so
-		// they don't get a shareid
+		// permissions on a space root are not handled by a share manager, so
+		// they don't get a share-id
 		permission.SetId(identitySetToSpacePermissionID(permission.GetGrantedToV2()))
 	}
 
@@ -691,7 +691,7 @@ func (g Graph) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	// Check if the ID is referring to a public share
 	case err == nil:
 		permissionType = Public
-	// If the item id is referring to a space root an this is not a public share
+	// If the item id is referring to a space root and this is not a public share
 	// we have to deal with space permissions
 	case IsSpaceRoot(&itemID):
 		permissionType = Space
@@ -776,15 +776,15 @@ func (g Graph) getPermissionByID(ctx context.Context, permissionID string, itemI
 	var errcode errorcode.Error
 	if errors.As(err, &errcode) && errcode.GetCode() == errorcode.ItemNotFound {
 		// there is no public link with that id, check if this is a user share
-		share, err := g.getCS3UserShareByID(ctx, permissionID)
+		shareById, err := g.getCS3UserShareByID(ctx, permissionID)
 		if err != nil {
 			return nil, nil, err
 		}
-		permission, err := g.cs3UserShareToPermission(ctx, share, false)
+		permission, err := g.cs3UserShareToPermission(ctx, shareById, false)
 		if err != nil {
 			return nil, nil, err
 		}
-		return permission, share.GetResourceId(), nil
+		return permission, shareById.GetResourceId(), nil
 	}
 
 	return nil, nil, err
@@ -806,11 +806,11 @@ func (g Graph) getSpaceRootPermissions(ctx context.Context, spaceID *storageprov
 }
 
 func (g Graph) getUserPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
-	share, err := g.getCS3UserShareByID(ctx, permissionID)
+	shareByID, err := g.getCS3UserShareByID(ctx, permissionID)
 	if err != nil {
 		return nil, err
 	}
-	return share.GetResourceId(), nil
+	return shareByID.GetResourceId(), nil
 }
 
 func (g Graph) getCS3UserShareByID(ctx context.Context, permissionID string) (*collaboration.Share, error) {
@@ -1012,11 +1012,11 @@ func spacePermissionIdToCS3Grantee(permissionID string) (storageprovider.Grantee
 }
 
 func (g Graph) getLinkPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
-	share, err := g.getCS3PublicShareByID(ctx, permissionID)
+	shareByID, err := g.getCS3PublicShareByID(ctx, permissionID)
 	if err != nil {
 		return nil, err
 	}
-	return share.GetResourceId(), nil
+	return shareByID.GetResourceId(), nil
 }
 
 func (g Graph) getCS3PublicShareByID(ctx context.Context, permissionID string) (*link.PublicShare, error) {

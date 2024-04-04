@@ -40,7 +40,7 @@ func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 		// TODO: check if services are up and running
 
 		_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-		// io.WriteString should not fail but if it does we want to know.
+		// io.WriteString should not fail but if it does, we want to know.
 		if err != nil {
 			panic(err)
 		}
@@ -56,7 +56,7 @@ func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 		// TODO: check if services are up and running
 
 		_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-		// io.WriteString should not fail but if it does we want to know.
+		// io.WriteString should not fail but if it does, we want to know.
 		if err != nil {
 			panic(err)
 		}

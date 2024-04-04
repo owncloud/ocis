@@ -62,7 +62,7 @@ func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 		// if there is a mishap when initializing, there is a minimal (talking ms or ns window)
 		// timeframe where this code is callable
 		_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-		// io.WriteString should not fail but if it does we want to know.
+		// io.WriteString should not fail but if it does, we want to know.
 		if err != nil {
 			panic(err)
 		}
