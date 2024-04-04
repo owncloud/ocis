@@ -44,6 +44,9 @@ func DefaultConfig() *config.Config {
 			Nodes: []string{"127.0.0.1:9233"},
 			TTL:   time.Hour * 12,
 		},
+		API: config.API{
+			ShowUserEmailInResults: true,
+		},
 	}
 }
 
