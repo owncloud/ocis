@@ -1,91 +1,66 @@
----
-title: "Apps"
-date: 2018-05-02T00:00:00+00:00
-weight: 10
-geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/services/app-registry
-geekdocFilePath: apps.md
----
+# App Registry
 
-oCIS is all about files. But most of the time you want to do something with files that is beyond the basic upload, download and share behavior. Therefore, oCIS has a concept for apps, that can handle specific file types, so-called mime types.
+The `app-registry` service is the single point where all apps register themselves and their respective supported mime types.
 
-## App provider capability
+Administrators can set default applications on a per MIME type basis and also allow the creation of new files for certain MIME types. This per MIME type configuration also features a description, file extension option and an icon.
 
-The capabilities endpoint (e.g. `https://localhost:9200/ocs/v1.php/cloud/capabilities?format=json`) gives you following capabilities which are relevant for the app provider:
+## MIME Type Configuration / Creation Allow List
 
-```json
-{
-  "ocs": {
-    "data": {
-      "capabilities": {
-        "files": {
-          "app_providers": [
-            {
-              "enabled": true,
-              "version": "1.1.0",
-              "apps_url": "/app/list",
-              "open_url": "/app/open",
-              "open_web_url": "/app/open-with-web",
-              "new_url": "/app/new"
-            }
-          ]
-        }
-      }
-    }
-  }
-}
+The apps will register their supported MIME types automatically, so that users can open supported files with them.
+
+Administrators can set default applications for each MIME type and also allow the creation of new files for certain mime types. This, per MIME type configuration, also features a description, file extension option and an icon.
+
+### MIME Type Configuration
+
+Modifing the MIME type config can only be achieved via a yaml configuration. Using environment variables is not possible. For an example, see the `ocis_wopi/config/ocis/app-registry.yaml` at [docker-compose example](https://github.com/owncloud/ocis/tree/master/deployments/examples). The following is a brief structure and a field description:
+
+**Structure**
+
+```yaml
+app_registry:
+  mimetypes:
+  - mime_type: application/vnd.oasis.opendocument.spreadsheet
+    extension: ods
+    name: OpenSpreadsheet
+    description: OpenDocument spreadsheet document
+    icon: https://some-website.test/opendocument-spreadsheet-icon.png
+    default_app: Collabora
+    allow_creation: true
+  - mime_type: ...
 ```
 
-{{< hint info >}}
-Please note that there might be two or more app providers with different versions. This is not be expected to happen on a regular basis. It was designed for a possible migration period for clients when the app provider needs a breaking change.
-{{< /hint >}}
+**Fields**
 
-## App registry
+* `mime_type`\
+The MIME type you want to configure.
+* `extension`\
+The file extension to be used for new files.
+* `name`\
+The name of the file / MIME type.
+* `description`\
+The human-readable description of the file / MIME type.
+* `icon`\
+The URL to an icon which should be used for that MIME type.
+* `default_app`\
+The name of the default app which opens this MIME type if the user doesn’t specify one.
+* `allow_creation`\
+Whether a user should be able to create new files of that MIME type (true or false).
 
-The app registry is the single point where all apps register themselves and their respective supported mime types.
+## App Drivers
 
-### Mime type configuration / creation allow list
+App drivers represent apps if the app is not able to register itself. Currently there is only the CS3org WOPI server app driver.
 
-The apps will register their supported mime types automatically, so that users can open supported files with them.
+### CS3org WOPI Server App Driver
 
-Administrators can set default applications on a per mime type basis and also allow the creation of new files for certain mime types. This per mime type configuration also features a description, file extension option and an icon.
+The CS3org WOPI server app driver is included in Infinite Scale by default. It needs at least one WOPI-compliant app like Collabora, OnlyOffice or the Microsoft Online Server or a CS3org WOPI bridge supported app like CodiMD or Etherpad and the [CS3org WOPI server](https://github.com/cs3org/wopiserver).
 
-In order to modify the mime type config you need to set `STORAGE_APP_REGISTRY_MIMETYPES_JSON=.../mimetypes.json` to a valid JSON file with content like this:
+### App Provider Configuration
 
-```json
-[
-  {
-    "mime_type": "application/vnd.oasis.opendocument.text",
-    "extension": "odt",
-    "name": "OpenDocument",
-    "description": "OpenDocument text document",
-    "icon": "https://some-website.test/opendocument-text-icon.png",
-    "default_app": "Collabora",
-    "allow_creation": true
-  },
-  {
-    "mime_type": "application/vnd.oasis.opendocument.spreadsheet",
-    "extension": "ods",
-    "name": "OpenSpreadsheet",
-    "description": "OpenDocument spreadsheet document",
-    "icon": "",
-    "default_app": "Collabora",
-    "allow_creation": false
-  }
-]
-```
+The configuration of the actual app provider in a [docker-compose example](https://github.com/owncloud/ocis/tree/master/deployments/examples) can be found in the full `ocis-wopi` example directory especially in the config sections `ocis-appprovider-collabora` and `ocis-appprovider-onlyoffice`.
 
-Fields:
+## Endpoint Access
 
-- `mime_type` is the mime type you want to configure
-- `extension` is the file extension to be used for new files
-- `name` is the name of the file / mime type
-- `description` is a human-readable description of the file / mime type
-- `icon` URL to an icon which should be used for that mime type
-- `default_app` name of the default app which opens this mime type when the user doesn't specify one
-- `allow_creation` is whether a user should be able to create new file from that mime type (`true` or `false`)
-
-### Listing available apps / mime types
+### Listing available apps and mime types
 
 Clients, for example ownCloud Web, need to offer users the available apps to open files and mime types for new file creation. This information can be obtained from this endpoint.
 
@@ -179,7 +154,7 @@ HTTP status code: 200
 }
 ```
 
-### Open a file with the ownCloud Web
+### Open a File With ownCloud Web
 
 **Endpoint**: specified in the capabilities in `open_web_url`, currently `/app/open-with-web`
 
@@ -221,7 +196,7 @@ HTTP status code: 200
 
 See error cases for [Open a file with the app provider](#open-a-file-with-the-app-provider)
 
-### Open a file with the app provider
+### Open a File With the App Provider
 
 **Endpoint**: specified in the capabilities in `open_url`, currently `/app/open`
 
@@ -382,7 +357,7 @@ HTTP status code: 200
   }
   ```
 
-### Creating a file with the app provider
+### Creating a File With the App Provider
 
 **Endpoint**: specified in the capabilities in `new_file_url`, currently `/app/new`
 
@@ -483,14 +458,3 @@ You will receive a file id of the freshly created file, which you can use to ope
     "message": "the file already exists"
   }
   ```
-
-
-## App drivers
-
-App drivers represent apps, if the app is not able to register itself. Currently there is only the CS3org WOPI server app driver.
-
-### CS3org WOPI server app driver
-
-The CS3org WOPI server app driver is included in oCIS by default. It needs at least one WOPI compliant app (e.g. Collabora, OnlyOffice or Microsoft Online Server) or a CS3org WOPI bridge supported app (CodiMD or Etherpad) and the CS3org WOPI server.
-
-The configuration of the actual app provider in a docker-compose example can be found in the [full example](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_wopi/docker-compose.yml) especially [ocis-appprovider-collabora](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_wopi/docker-compose.yml#L102-L128) and [ocis-appprovider-onlyoffice](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_wopi/docker-compose.yml#L130-L161)
