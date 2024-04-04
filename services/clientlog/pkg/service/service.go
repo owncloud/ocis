@@ -147,6 +147,8 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		p("file-locked", e.Ref)
 	case events.FileUnlocked:
 		p("file-unlocked", e.Ref)
+	case events.FileTouched:
+		p("file-touched", e.Ref)
 	}
 
 	if err != nil {
