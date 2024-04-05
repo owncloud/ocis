@@ -620,4 +620,38 @@ class SharingNgContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * @Then /^user "([^"]*)" should have sync (enabled|disabled) for share "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $status
+	 * @param string $resource
+	 *
+	 * @return void
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userShouldHaveSyncEnabledOrDisabledForShare(string $user, string $status, string $resource):void {
+		$response = GraphHelper::getSharesSharedWithMe(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user)
+		);
+		$responseBody = $this->featureContext->getJsonDecodedResponse($response);
+		$expectedValue = $status === "enabled" ? "true" : "false";
+		foreach ($responseBody["value"] as $value) {
+			if ($value["remoteItem"]["name"] === $resource) {
+				// var_export converts values to their string representations
+				// e.g.: true -> 'true'
+				$actaulValue = var_export($value["@client.synchronize"], true);
+				break;
+			}
+		}
+		Assert::assertSame(
+			$actaulValue,
+			$expectedValue,
+			"Expected property '@client.synchronize' to be '$expectedValue' but found '$actaulValue'"
+		);
+	}
 }

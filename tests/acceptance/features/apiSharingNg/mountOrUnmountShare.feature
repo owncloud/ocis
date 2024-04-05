@@ -86,3 +86,65 @@ Feature:  mount or unmount incoming share
       | resource      |
       | textfile0.txt |
       | folder        |
+
+
+  Scenario Outline: enable a group share sync by only one user in a group
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has disabled the auto-sync share
+    And user "Brian" has disabled the auto-sync share
+    And user "Carol" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Carol" has created folder "FolderToShare"
+    And user "Carol" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | grp1       |
+      | shareType       | group      |
+      | permissionsRole | Viewer     |
+    When user "Alice" mounts share "<resource>" offered by "Carol" from "Personal" space using the Graph API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@client.synchronize"
+        ],
+        "properties": {
+          "@client.synchronize": {
+            "const": true
+          }
+        }
+      }
+      """
+    And user "Alice" should have sync enabled for share "<resource>"
+    And user "Brian" should have sync disabled for share "<resource>"
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | FolderToShare |
+
+
+  Scenario Outline: disable group share sync by only one user in a group
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And user "Brian" has been added to group "grp1"
+    And user "Carol" has created folder "FolderToShare"
+    And user "Carol" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Carol" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | grp1       |
+      | shareType       | group      |
+      | permissionsRole | Viewer     |
+    When user "Alice" unmounts share "<resource>" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Alice" should have sync disabled for share "<resource>"
+    And user "Brian" should have sync enabled for share "<resource>"
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | FolderToShare |
