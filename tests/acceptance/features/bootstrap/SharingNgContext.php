@@ -561,15 +561,18 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When user :user disables sync of share :share using the Graph API
 	 *
 	 * @param string $user
-	 * @param string $itemId
-	 * @param string $shareSpaceId
 	 *
-	 * @return ResponseInterface
+	 * @return void
+	 * @throws Exception
 	 */
-	public function unmountShare(string $user, string $itemId, string $shareSpaceId): ResponseInterface {
-		return GraphHelper::unmountShare(
+	public function userDisablesSyncOfShareUsingTheGraphApi(string $user):void {
+		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$itemId = $shareSpaceId . '!' . $shareItemId;
+		$response = GraphHelper::disableShareSync(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($user),
@@ -577,26 +580,12 @@ class SharingNgContext implements Context {
 			$itemId,
 			$shareSpaceId,
 		);
-	}
-
-	/**
-	 * @When user :user unmounts share :share using the Graph API
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userUnmountsShareUsingTheGraphApi(string $user):void {
-		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
-		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
-		$itemId = $shareSpaceId . '!' . $shareItemId;
-		$this->featureContext->setResponse($this->unmountShare($user, $itemId, $shareSpaceId));
+		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastStatusCodesArrays();
 	}
 
 	/**
-	 * @When user :user mounts share :share offered by :offeredBy from :space space using the Graph API
+	 * @When user :user enables sync of share :share offered by :offeredBy from :space space using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $share
@@ -606,11 +595,11 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userMountsShareOfferedByFromSpaceUsingTheGraphApi(string $user, string $share, string $offeredBy, string $space):void {
+	public function userEnablesSyncOfShareUsingTheGraphApi(string $user, string $share, string $offeredBy, string $space):void {
 		$share = ltrim($share, '/');
 		$itemId = $this->spacesContext->getResourceId($offeredBy, $space, $share);
 		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
-		$response =  GraphHelper::mountShare(
+		$response =  GraphHelper::enableShareSync(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($user),

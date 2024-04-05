@@ -1905,7 +1905,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function unmountShare(
+	public static function disableShareSync(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
@@ -1934,7 +1934,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function mountShare(
+	public static function enableShareSync(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
