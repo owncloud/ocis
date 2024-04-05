@@ -141,20 +141,20 @@ func (r *Role) WebDAVPermissions(isDir, isShared, isMountpoint, isPublic bool) s
 }
 
 // RoleFromName creates a role from the name
-func RoleFromName(name string) *Role {
+func RoleFromName(name string, sharing bool) *Role {
 	switch name {
 	case RoleDenied:
 		return NewDeniedRole()
 	case RoleViewer:
-		return NewViewerRole()
+		return NewViewerRole(sharing)
 	case RoleSpaceViewer:
 		return NewSpaceViewerRole()
 	case RoleEditor:
-		return NewEditorRole()
+		return NewEditorRole(sharing)
 	case RoleSpaceEditor:
 		return NewSpaceEditorRole()
 	case RoleFileEditor:
-		return NewFileEditorRole()
+		return NewFileEditorRole(sharing)
 	case RoleUploader:
 		return NewUploaderRole()
 	case RoleManager:
@@ -183,11 +183,15 @@ func NewDeniedRole() *Role {
 }
 
 // NewViewerRole creates a viewer role. `sharing` indicates if sharing permission should be added
-func NewViewerRole() *Role {
+func NewViewerRole(sharing bool) *Role {
 	p := PermissionRead
+	if sharing {
+		p |= PermissionShare
+	}
 	return &Role{
 		Name: RoleViewer,
 		cS3ResourcePermissions: &provider.ResourcePermissions{
+			AddGrant:             sharing,
 			GetPath:              true,
 			GetQuota:             true,
 			InitiateFileDownload: true,
@@ -217,11 +221,15 @@ func NewSpaceViewerRole() *Role {
 }
 
 // NewEditorRole creates an editor role. `sharing` indicates if sharing permission should be added
-func NewEditorRole() *Role {
+func NewEditorRole(sharing bool) *Role {
 	p := PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete
+	if sharing {
+		p |= PermissionShare
+	}
 	return &Role{
 		Name: RoleEditor,
 		cS3ResourcePermissions: &provider.ResourcePermissions{
+			AddGrant:             sharing,
 			CreateContainer:      true,
 			Delete:               true,
 			GetPath:              true,
@@ -263,11 +271,15 @@ func NewSpaceEditorRole() *Role {
 }
 
 // NewFileEditorRole creates a file-editor role
-func NewFileEditorRole() *Role {
+func NewFileEditorRole(sharing bool) *Role {
 	p := PermissionRead | PermissionWrite
+	if sharing {
+		p |= PermissionShare
+	}
 	return &Role{
 		Name: RoleEditor,
 		cS3ResourcePermissions: &provider.ResourcePermissions{
+			AddGrant:             sharing,
 			GetPath:              true,
 			GetQuota:             true,
 			InitiateFileDownload: true,
@@ -366,30 +378,34 @@ func NewManagerRole() *Role {
 // RoleFromOCSPermissions tries to map ocs permissions to a role
 // TODO: rethink using this. ocs permissions cannot be assigned 1:1 to roles
 func RoleFromOCSPermissions(p Permissions, ri *provider.ResourceInfo) *Role {
-	switch {
-	// Invalid
-	case p == PermissionInvalid:
+	if p == PermissionInvalid {
 		return NewNoneRole()
-	// Uploader
-	case p == PermissionCreate:
-		return NewUploaderRole()
-	// Viewer/SpaceViewer
-	case p == PermissionRead:
-		if isSpaceRoot(ri) {
-			return NewSpaceViewerRole()
-		}
-		return NewViewerRole()
-	// Editor/SpaceEditor
-	case p.Contain(PermissionRead) && p.Contain(PermissionWrite) && p.Contain(PermissionCreate) && p.Contain(PermissionDelete) && !p.Contain(PermissionShare):
-		if isSpaceRoot(ri) {
-			return NewSpaceEditorRole()
+	}
+
+	if p.Contain(PermissionRead) {
+		if p.Contain(PermissionWrite) && p.Contain(PermissionCreate) && p.Contain(PermissionDelete) {
+			if p.Contain(PermissionShare) {
+				return NewEditorRole(true)
+			}
+
+			if isSpaceRoot(ri) {
+				return NewSpaceEditorRole()
+			}
 		}
 
-		return NewEditorRole()
-	// Custom
-	default:
-		return NewLegacyRoleFromOCSPermissions(p)
+		if p == PermissionRead && isSpaceRoot(ri) {
+			return NewSpaceViewerRole()
+		}
+
+		if p == PermissionRead|PermissionShare && !isSpaceRoot(ri) {
+			return NewViewerRole(true)
+		}
 	}
+	if p == PermissionCreate {
+		return NewUploaderRole()
+	}
+	// legacy
+	return NewLegacyRoleFromOCSPermissions(p)
 }
 
 func isSpaceRoot(ri *provider.ResourceInfo) bool {
