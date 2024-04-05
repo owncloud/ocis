@@ -145,12 +145,12 @@ func SharePermToInt(p *provider.ResourcePermissions) int {
 func IntTosharePerm(p int, itemType string) *provider.ResourcePermissions {
 	switch p {
 	case 1:
-		return conversions.NewViewerRole(false).CS3ResourcePermissions()
+		return conversions.NewViewerRole().CS3ResourcePermissions()
 	case 15:
 		if itemType == "folder" {
-			return conversions.NewEditorRole(false).CS3ResourcePermissions()
+			return conversions.NewEditorRole().CS3ResourcePermissions()
 		}
-		return conversions.NewFileEditorRole(false).CS3ResourcePermissions()
+		return conversions.NewFileEditorRole().CS3ResourcePermissions()
 	case 4:
 		return conversions.NewUploaderRole().CS3ResourcePermissions()
 	default:

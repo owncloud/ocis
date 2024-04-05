@@ -142,7 +142,6 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 	logger *log.Logger,
 	gatewayClient gateway.GatewayAPIClient,
 	identityCache identity.IdentityCache,
-	resharing bool,
 	receivedShares []*collaboration.ReceivedShare) ([]libregraph.DriveItem, error) {
 
 	ch := make(chan libregraph.DriveItem)
@@ -178,8 +177,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 				return errCode
 			}
 
-			driveItem, err := fillDriveItemPropertiesFromReceivedShare(ctx, logger, identityCache,
-				resharing, receivedShares)
+			driveItem, err := fillDriveItemPropertiesFromReceivedShare(ctx, logger, identityCache, receivedShares)
 			if err != nil {
 				return err
 			}
@@ -315,8 +313,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 }
 
 func fillDriveItemPropertiesFromReceivedShare(ctx context.Context, logger *log.Logger,
-	identityCache identity.IdentityCache, resharing bool,
-	receivedShares []*collaboration.ReceivedShare) (*libregraph.DriveItem, error) {
+	identityCache identity.IdentityCache, receivedShares []*collaboration.ReceivedShare) (*libregraph.DriveItem, error) {
 
 	driveItem := libregraph.NewDriveItem()
 	permissions := make([]libregraph.Permission, 0, len(receivedShares))
@@ -330,7 +327,7 @@ func fillDriveItemPropertiesFromReceivedShare(ctx context.Context, logger *log.L
 			oldestReceivedShare = receivedShare
 		}
 
-		permission, err := cs3ReceivedShareToLibreGraphPermissions(ctx, logger, identityCache, resharing, receivedShare)
+		permission, err := cs3ReceivedShareToLibreGraphPermissions(ctx, logger, identityCache, receivedShare)
 		if err != nil {
 			return driveItem, err
 		}
@@ -390,7 +387,7 @@ func fillDriveItemPropertiesFromReceivedShare(ctx context.Context, logger *log.L
 }
 
 func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Logger,
-	identityCache identity.IdentityCache, resharing bool, receivedShare *collaboration.ReceivedShare) (*libregraph.Permission, error) {
+	identityCache identity.IdentityCache, receivedShare *collaboration.ReceivedShare) (*libregraph.Permission, error) {
 	permission := libregraph.NewPermission()
 	if id := receivedShare.GetShare().GetId().GetOpaqueId(); id != "" {
 		permission.SetId(id)
@@ -404,7 +401,6 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
 			*permissionSet,
 			unifiedrole.UnifiedRoleConditionGrantee,
-			resharing,
 		)
 
 		if role != nil {

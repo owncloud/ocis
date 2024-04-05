@@ -52,7 +52,7 @@ var _ = Describe("sharedbyme", func() {
 	)
 	expiration := time.Now()
 
-	editorResourcePermissions := conversions.NewEditorRole(true).CS3ResourcePermissions()
+	editorResourcePermissions := conversions.NewEditorRole().CS3ResourcePermissions()
 	userShare := collaboration.Share{
 		Id: &collaboration.ShareId{
 			OpaqueId: "share-id",
@@ -243,7 +243,6 @@ var _ = Describe("sharedbyme", func() {
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-		cfg.FilesSharing.EnableResharing = true
 
 		svc, _ = service.NewService(
 			service.Config(cfg),

@@ -39,5 +39,5 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 		return nil, *errCode
 	}
 
-	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, g.config.FilesSharing.EnableResharing, listReceivedSharesResponse.GetShares())
+	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedSharesResponse.GetShares())
 }

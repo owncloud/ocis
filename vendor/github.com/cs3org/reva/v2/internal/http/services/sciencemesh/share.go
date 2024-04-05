@@ -150,9 +150,9 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 func getPermissionsByRole(role string) (*providerpb.ResourcePermissions, appprovider.ViewMode) {
 	switch role {
 	case "viewer":
-		return conversions.NewViewerRole(false).CS3ResourcePermissions(), appprovider.ViewMode_VIEW_MODE_READ_ONLY
+		return conversions.NewViewerRole().CS3ResourcePermissions(), appprovider.ViewMode_VIEW_MODE_READ_ONLY
 	case "editor":
-		return conversions.NewEditorRole(false).CS3ResourcePermissions(), appprovider.ViewMode_VIEW_MODE_READ_WRITE
+		return conversions.NewEditorRole().CS3ResourcePermissions(), appprovider.ViewMode_VIEW_MODE_READ_WRITE
 	}
 	return nil, 0
 }

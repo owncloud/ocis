@@ -21,8 +21,6 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"SHARING_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token." introductionVersion:"pre5.0"`
 
-	EnableResharing bool `yaml:"enable_resharing" env:"OCIS_ENABLE_RESHARING;SHARING_ENABLE_RESHARING" desc:"Changing this value is NOT supported. Enables the support for resharing." introductionVersion:"5.0" deprecationVersion:"5.0" deprecationInfo:"Resharing will be removed in the future."`
-
 	UserSharingDriver              string               `yaml:"user_sharing_driver" env:"SHARING_USER_DRIVER" desc:"Driver to be used to persist shares. Supported values are 'jsoncs3', 'json', 'cs3' (deprecated) and 'owncloudsql'." introductionVersion:"pre5.0"`
 	UserSharingDrivers             UserSharingDrivers   `yaml:"user_sharing_drivers"`
 	PublicSharingDriver            string               `yaml:"public_sharing_driver" env:"SHARING_PUBLIC_DRIVER" desc:"Driver to be used to persist public shares. Supported values are 'jsoncs3', 'json' and 'cs3' (deprecated)." introductionVersion:"pre5.0"`

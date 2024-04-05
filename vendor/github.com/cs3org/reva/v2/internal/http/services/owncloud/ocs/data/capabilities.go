@@ -209,7 +209,6 @@ type CapabilitiesDav struct {
 // CapabilitiesFilesSharing TODO document
 type CapabilitiesFilesSharing struct {
 	APIEnabled                    ocsBool                                  `json:"api_enabled" xml:"api_enabled" mapstructure:"api_enabled"`
-	Resharing                     ocsBool                                  `json:"resharing" xml:"resharing"`
 	GroupSharing                  ocsBool                                  `json:"group_sharing" xml:"group_sharing" mapstructure:"group_sharing"`
 	SharingRoles                  ocsBool                                  `json:"sharing_roles" xml:"sharing_roles" mapstructure:"sharing_roles"`
 	DenyAccess                    ocsBool                                  `json:"deny_access" xml:"deny_access" mapstructure:"deny_access"`
@@ -222,6 +221,8 @@ type CapabilitiesFilesSharing struct {
 	Federation                    *CapabilitiesFilesSharingFederation      `json:"federation" xml:"federation"`
 	Public                        *CapabilitiesFilesSharingPublic          `json:"public" xml:"public"`
 	User                          *CapabilitiesFilesSharingUser            `json:"user" xml:"user"`
+	// TODO: Remove next line once web defaults to resharing=false
+	Resharing ocsBool `json:"resharing" xml:"resharing"`
 }
 
 // CapabilitiesFilesSharingPublic TODO document

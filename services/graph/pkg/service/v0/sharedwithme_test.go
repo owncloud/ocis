@@ -155,7 +155,7 @@ var _ = Describe("SharedWithMe", func() {
 								OpaqueId: "sh:are:id",
 							},
 							Permissions: &collaborationv1beta1.SharePermissions{
-								Permissions: roleconversions.NewViewerRole(true).CS3ResourcePermissions(),
+								Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions(),
 							},
 							Creator: getUserResponseShareCreator.User.Id,
 							Ctime:   utils.TSNow(),
@@ -351,29 +351,6 @@ var _ = Describe("SharedWithMe", func() {
 			Expect(jsonData.Get("file.mimeType").String()).To(Equal(resourceInfo.MimeType))
 		})
 
-		// that is resharing test. Please delete after disable resharing feature
-		
-		// It("populates the driveItem.remoteItem.permissions properties", func() {
-		// 	resourceInfo := statResponse.Info
-		// 	resourceInfo.PermissionSet = roleconversions.NewViewerRole(false).CS3ResourcePermissions()
-
-		// 	svc.ListSharedWithMe(
-		// 		tape,
-		// 		httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
-		// 	)
-
-		// 	driveitemJSON := gjson.Get(tape.Body.String(), "value.0")
-		// 	Expect(driveitemJSON.Get("@UI\\.Hidden").Exists()).To(BeTrue())
-		// 	Expect(driveitemJSON.Get("@UI\\.Hidden").Bool()).To(BeFalse())
-		// 	Expect(driveitemJSON.Get("@client\\.synchronize").Exists()).To(BeTrue())
-		// 	Expect(driveitemJSON.Get("@client\\.synchronize").Bool()).To(BeTrue())
-
-		// 	permissionsJSON := driveitemJSON.Get("remoteItem.permissions.0")
-		// 	Expect(permissionsJSON.Get("id").String()).To(Equal(listReceivedSharesResponse.Shares[0].Share.Id.OpaqueId))
-		// 	Expect(permissionsJSON.Get("roles.0").String()).To(Equal(unifiedrole.UnifiedRoleViewerID))
-		// 	Expect(permissionsJSON.Get("invitation.invitedBy.user.id").String()).To(Equal(getUserResponseShareCreator.User.Id.OpaqueId))
-		// })
-
 		It("returns shares created on project space", func() {
 			ownerID := &userv1beta1.UserId{
 				OpaqueId: "project-space-id",
@@ -406,7 +383,7 @@ var _ = Describe("SharedWithMe", func() {
 						OpaqueId: "sh:are:id2",
 					},
 					Permissions: &collaborationv1beta1.SharePermissions{
-						Permissions: roleconversions.NewViewerRole(true).CS3ResourcePermissions(),
+						Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions(),
 					},
 					Creator: getUserResponseShareCreator.User.Id,
 					Ctime:   utils.TSNow(),

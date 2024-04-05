@@ -35,7 +35,6 @@ func DefaultConfig() *config.Config {
 			Name: "sharing",
 		},
 		Reva:              shared.DefaultRevaConfig(),
-		EnableResharing:   false,
 		UserSharingDriver: "jsoncs3",
 		UserSharingDrivers: config.UserSharingDrivers{
 			JSON: config.UserSharingJSONDriver{

@@ -107,9 +107,6 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		FilesSharing: config.FilesSharing{
-			EnableResharing: false,
-		},
 	}
 }
 
