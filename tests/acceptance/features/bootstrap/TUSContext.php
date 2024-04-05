@@ -112,10 +112,20 @@ class TUSContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userHasCreatedNewTUSResourceWithHeaders(string $user, TableNode $headers): void {
+		$response = $this->createNewTUSResource($user, $headers);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
+	}
+
+	/**
+	 * @param string $user
+	 * @param TableNode $headers
+	 *
+	 * @return ResponseInterface
+	 */
+	public function createNewTUSResource(string $user, TableNode $headers):ResponseInterface {
 		$rows = $headers->getRows();
 		$rows[] = ['Tus-Resumable', '1.0.0'];
-		$response = $this->createNewTUSResourceWithHeaders($user, new TableNode($rows));
-		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
+		return $this->createNewTUSResourceWithHeaders($user, new TableNode($rows));
 	}
 
 	/**
@@ -199,6 +209,30 @@ class TUSContext implements Context {
 		int     $bytes = null,
 		string  $checksum = ''
 	): void {
+		$this->uploadFileUsingTus($user, $source, $destination, $uploadMetadata, $noOfChunks, $bytes, $checksum);
+		$this->featureContext->setLastUploadDeleteTime(\time());
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 * @param array $uploadMetadata
+	 * @param integer $noOfChunks
+	 * @param integer $bytes
+	 * @param string $checksum
+	 *
+	 * @return void
+	 */
+	public function uploadFileUsingTus(
+		?string $user,
+		string  $source,
+		string  $destination,
+		array   $uploadMetadata = [],
+		int     $noOfChunks = 1,
+		int     $bytes = null,
+		string  $checksum = ''
+	) {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
 		$headers = [
@@ -252,7 +286,6 @@ class TUSContext implements Context {
 				$client->upload($bytesPerChunk);
 			}
 		}
-		$this->featureContext->setLastUploadDeleteTime(\time());
 	}
 
 	/**
@@ -273,11 +306,12 @@ class TUSContext implements Context {
 	): void {
 		$tmpfname = $this->writeDataToTempFile($content);
 		try {
-			$this->userUploadsUsingTusAFileTo(
+			$this->uploadFileUsingTus(
 				$user,
 				\basename($tmpfname),
 				$destination
 			);
+			$this->featureContext->setLastUploadDeleteTime(\time());
 		} catch (Exception $e) {
 			Assert::assertStringContainsString('TusPhp\Exception\FileException: Unable to create resource', (string)$e);
 		}
@@ -308,13 +342,14 @@ class TUSContext implements Context {
 		string  $destination
 	): void {
 		$tmpfname = $this->writeDataToTempFile($content);
-		$this->userUploadsUsingTusAFileTo(
+		$this->uploadFileUsingTus(
 			$user,
 			\basename($tmpfname),
 			$destination,
 			[],
 			$noOfChunks
 		);
+		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($tmpfname);
 	}
 
@@ -339,12 +374,13 @@ class TUSContext implements Context {
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
 		$user = $this->featureContext->getActualUsername($user);
-		$this->userUploadsUsingTusAFileTo(
+		$this->uploadFileUsingTus(
 			$user,
 			$source,
 			$destination,
 			['mtime' => $mtime]
 		);
+		$this->featureContext->setLastUploadDeleteTime(\time());
 	}
 
 	/**
@@ -353,7 +389,7 @@ class TUSContext implements Context {
 	 * @return string the file name
 	 * @throws Exception
 	 */
-	private function writeDataToTempFile(string $content): string {
+	public function writeDataToTempFile(string $content): string {
 		$tmpfname = \tempnam(
 			$this->featureContext->acceptanceTestsDirLocation(),
 			"tus-upload-test-"
@@ -421,7 +457,7 @@ class TUSContext implements Context {
 		string $content
 	): void {
 		$tmpfname = $this->writeDataToTempFile($content);
-		$this->userUploadsUsingTusAFileTo(
+		$this->uploadFileUsingTus(
 			$user,
 			\basename($tmpfname),
 			$source,
@@ -429,6 +465,7 @@ class TUSContext implements Context {
 			1,
 			-1
 		);
+		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($tmpfname);
 	}
 
@@ -522,7 +559,8 @@ class TUSContext implements Context {
 	 * @throws Exception
 	 */
 	public function userOverwritesFileWithChecksum(string $user, string $offset, string $data, string $checksum, TableNode $headers): void {
-		$this->userHasCreatedNewTUSResourceWithHeaders($user, $headers);
+		$createResponse = $this->createNewTUSResource($user, $headers);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $createResponse);
 		$response = $this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
 		$this->featureContext->setResponse($response);
 	}
