@@ -3831,6 +3831,38 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Then as user :user the key :key from PROPFIND response should match with shared-with-me drive-item-id of share :resource
+	 *
+	 * @param string $user
+	 * @param string $key
+	 * @param string $resource
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function asUserTheKeyFromPropfindResponseShouldMatchWithSharedwithmeDriveitemidOfShare(string $user, string $key, string $resource): void {
+		$xmlResponse = $this->featureContext->getResponseXml();
+		$fileId = $xmlResponse->xpath("//oc:name[text()='$resource']/preceding-sibling::$key")[0]->__toString();
+
+		$jsonResponse = GraphHelper::getSharesSharedWithMe(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user)
+		);
+		$jsonResponseBody = $this->featureContext->getJsonDecodedResponseBodyContent($jsonResponse);
+		foreach ($jsonResponseBody->value as $value) {
+			if ($value->name === "$resource") {
+				$driveItemId = $value->id;
+				break;
+			} else {
+				throw new Error("Response didn't contain a share $resource");
+			}
+		}
+		Assert::assertEquals($fileId, $driveItemId, "File-id '$fileId' doesn't match driveItemId '$driveItemId'");
+	}
+
+	/**
 	 * @When /^public downloads the folder "([^"]*)" from the last created public link using the public files API$/
 	 *
 	 * @param string $resource

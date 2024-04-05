@@ -120,3 +120,22 @@ Feature: propfind a shares
       | oc:fileid      | UUIDof:textfile.txt |
       | oc:name        | textfile.txt        |
       | oc:permissions | S                   |
+
+
+  Scenario Outline: check file-id from PROPFIND with shared-with-me drive-item-id
+    Given using spaces DAV path
+    And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Brian" sends PROPFIND request to space "Shares" with depth "1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the key "oc:fileid" from PROPFIND response should match with shared-with-me drive-item-id of share "<resource>"
+    Examples:
+      | resource      |
+      | textfile1.txt |
+      | folderToShare |
