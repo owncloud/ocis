@@ -6,5 +6,5 @@ type TokenManager struct {
 }
 
 type API struct {
-	ShowUserEmailInResults bool `yaml:"show_email_in_results" env:"OCIS_SHOW_USER_EMAIL_IN_RESULTS" desc:"Mask user email addresses in responses." introductionVersion:"5.1"`
+	ShowUserEmailInResults bool `yaml:"show_email_in_results" env:"OCIS_SHOW_USER_EMAIL_IN_RESULTS" desc:"Mask user email addresses in responses. (EXPERIMENTAL)" introductionVersion:"5.1"`
 }
