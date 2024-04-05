@@ -33,7 +33,6 @@
 | FRONTEND_UPLOAD_MAX_CHUNK_SIZE | int | 10000000 | Sets the max chunk sizes in bytes for uploads via the clients.|
 | FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE | string |  | Advise TUS to replace PATCH requests by POST requests.|
 | FRONTEND_DEFAULT_UPLOAD_PROTOCOL | string | tus | The default upload protocol to use in clients. Currently only 'tus' is available. See the developer API documentation for more details about TUS.|
-| OCIS_ENABLE_RESHARING<br/>FRONTEND_ENABLE_RESHARING | bool | false | Changing this value is NOT supported. Enables the support for re-sharing in the clients.|
 | FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING | bool | false | Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.|
 | FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING | bool | false | Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed.|
 | FRONTEND_SEARCH_MIN_LENGTH | int | 3 | Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed.|

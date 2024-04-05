@@ -108,4 +108,3 @@
 | OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY<br/>GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY | bool | false | Disable TLS certificate validation for Keycloak connections. Do not set this in production environments.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>GRAPH_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>GRAPH_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
-| OCIS_ENABLE_RESHARING<br/>GRAPH_ENABLE_RESHARING | bool | false | Changing this value is NOT supported. Enables the support for re-sharing.|

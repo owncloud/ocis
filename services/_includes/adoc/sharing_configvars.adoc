@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-04-05-06-37-04]
+[#deprecation-note-2024-04-05-09-45-47]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,11 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| Resharing will be removed in the future.
-| 5.0
-| 
-| 
 |===
 
 endif::[]
@@ -280,16 +275,6 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disables the loading of user's group memberships from the reva access token.
-
-a|`OCIS_ENABLE_RESHARING` +
-`SHARING_ENABLE_RESHARING` +
-xref:deprecation-note-2024-04-05-06-37-04[Deprecation Note]
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++false ++
-a| [subs=-attributes]
-Changing this value is NOT supported. Enables the support for resharing.
 
 a|`SHARING_USER_DRIVER` +
 
