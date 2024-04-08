@@ -242,7 +242,7 @@ func NewService(opts ...Option) (Graph, error) {
 							r.Route("/{permissionID}", func(r chi.Router) {
 								r.Delete("/", driveItemPermissionsApi.DeleteSpaceRootPermission)
 								r.Patch("/", driveItemPermissionsApi.UpdateSpaceRootPermission)
-								r.Post("/setPassword", driveItemPermissionsApi.SetLinkPassword)
+								r.Post("/setPassword", driveItemPermissionsApi.SetSpaceRootLinkPassword)
 							})
 						})
 					})
