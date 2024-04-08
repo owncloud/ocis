@@ -67,7 +67,6 @@ The following sections list the changes for unreleased.
 * Enhancement - Add the spaceID to sse: [#8614](https://github.com/owncloud/ocis/pull/8614)
 * Enhancement - The graph endpoints for listing permission works for spaces now: [#8642](https://github.com/owncloud/ocis/pull/8642)
 * Enhancement - Bump keycloak: [#8687](https://github.com/owncloud/ocis/pull/8687)
-* Enhancement - Bump Reva: [#8701](https://github.com/owncloud/ocis/pull/8701)
 * Enhancement - Initiator-IDs: [#8701](https://github.com/owncloud/ocis/pull/8701)
 * Enhancement - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
 * Enhancement - Make server side space templates production ready: [#8723](https://github.com/owncloud/ocis/pull/8723)
@@ -76,6 +75,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Enable web extension drawio by default: [#8760](https://github.com/owncloud/ocis/pull/8760)
 * Enhancement - Remove resharing: [#8762](https://github.com/owncloud/ocis/pull/8762)
 * Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
+* Enhancement - Bump Reva: [#8795](https://github.com/owncloud/ocis/pull/8795)
 
 ## Details
 
@@ -275,13 +275,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8569
    https://github.com/owncloud/ocis/pull/8687
 
-* Enhancement - Bump Reva: [#8701](https://github.com/owncloud/ocis/pull/8701)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/8701
-   https://github.com/owncloud/ocis/pull/8606
-
 * Enhancement - Initiator-IDs: [#8701](https://github.com/owncloud/ocis/pull/8701)
 
    Allows sending a header `Initiator-ID` on http requests. This id will be added
@@ -400,6 +393,14 @@ The following sections list the changes for unreleased.
    Send an sse when a file is touched (aka 0 byte upload)
 
    https://github.com/owncloud/ocis/pull/8778
+
+* Enhancement - Bump Reva: [#8795](https://github.com/owncloud/ocis/pull/8795)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/8795
+   https://github.com/owncloud/ocis/pull/8701
+   https://github.com/owncloud/ocis/pull/8606
 
 # Changelog for [5.0.0] (2024-03-18)
 
