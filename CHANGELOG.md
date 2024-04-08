@@ -54,6 +54,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Internal links shouldn't have a password: [#8668](https://github.com/owncloud/ocis/pull/8668)
 * Bugfix - Fix uploading via a public link: [#8702](https://github.com/owncloud/ocis/pull/8702)
 * Bugfix - Mask user email in output: [#8726](https://github.com/owncloud/ocis/issues/8726)
+* Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
@@ -170,6 +171,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8726
    https://github.com/cs3org/reva/pull/4603
    https://github.com/owncloud/ocis/pull/8764
+
+* Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
+
+   We fixed a problem with the config for the create personal space cache which
+   resulted in the cache never being used.
+
+   https://github.com/owncloud/ocis/pull/8799
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
