@@ -15,6 +15,7 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -359,16 +360,20 @@ func spacePermissionIdToCS3Grantee(permissionID string) (storageprovider.Grantee
 	switch parts[0] {
 	case "u":
 		grantee.Type = storageprovider.GranteeType_GRANTEE_TYPE_USER
+		grantee.Id = &storageprovider.Grantee_UserId{
+			UserId: &userpb.UserId{
+				OpaqueId: parts[1],
+			},
+		}
 	case "g":
 		grantee.Type = storageprovider.GranteeType_GRANTEE_TYPE_GROUP
+		grantee.Id = &storageprovider.Grantee_GroupId{
+			GroupId: &grouppb.GroupId{
+				OpaqueId: parts[1],
+			},
+		}
 	default:
 		return grantee, errorcode.New(errorcode.InvalidRequest, "invalid space permission id")
-	}
-
-	grantee.Id = &storageprovider.Grantee_UserId{
-		UserId: &userpb.UserId{
-			OpaqueId: parts[1],
-		},
 	}
 	return grantee, nil
 }
