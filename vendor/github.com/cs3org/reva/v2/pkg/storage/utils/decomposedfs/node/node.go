@@ -54,8 +54,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-//go:generate make --no-print-directory -C ../../../../.. mockery NAME=Tree
-
 var tracer trace.Tracer
 
 func init() {

@@ -16,9 +16,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-//go:generate make --no-print-directory -C ../../../../.. mockery NAME=PermissionsChecker
-//go:generate make --no-print-directory -C ../../../../.. mockery NAME=CS3PermissionsClient
-
 var (
 	tracer trace.Tracer
 )
