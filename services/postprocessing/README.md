@@ -81,12 +81,17 @@ See the [cs3 org](https://github.com/cs3org/reva/blob/edge/pkg/events/postproces
 
 If postprocessing fails in one step due to an unforseen error, current uploads will not be retried automatically. A system admin can instead run a CLI command to retry the failed upload which is a two step process:
 
--   First find the upload ID of the failed upload.
+-   First list ongoing upload sessions
 ```bash
-ocis storage-users uploads list
+ocis storage-users uploads sessions
 ```
 
--   Then use the restart command to resume postprocessing of the ID selected.
+-   If you want to restart all uploads just rerun the command with the `--restart` flag
+```bash
+ocis storage-users uploads sessions --restart
+```
+
+-   If you want to restart only one upload use the postprocessing restart command
 ```bash
 ocis postprocessing restart -u <uploadID>
 ```
