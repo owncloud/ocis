@@ -29,8 +29,7 @@ Translations have a `context` and a `translatable string`. The context is shown 
 * Add the `OCIS_DEFAULT_LANGUAGE` envvar in `services/<service-name>/pkg/config/config.go`.\
   For details see the userlog or notifications service code.
 
-* Add `"github.com/owncloud/ocis/v2/ocis-pkg/l10n"` where required in\
-  `services/<service-name>/pkg/service/...<file>.go`.
+* Use `"github.com/owncloud/ocis/v2/ocis-pkg/l10n"` for the translation.
 
 * Create a config in `services/<service-name>/pkg/service/l10n/.tx/config` with the following content. Note that it is important to stick with `ocis-<service-name>` to easily identify all ocis translations on Transifex:
   ```
@@ -47,20 +46,8 @@ Translations have a `context` and a `translatable string`. The context is shown 
 
 * Create a go file like `templates.go` in `ocis/services/<service-name>/pkg/service` that will define your translation sources like the following:
   ```
-  // available templates
-  var (
-  	YourVar = Template{
-  		Subject: l10n.Template("Context string"),
-  		Message: l10n.Template("Translation String"),
-  	}
-  var (
-  ...
-  
-  // Template is the data structure for translations
-  type Template struct {
-  	Subject string
-  	Message string
-  }
+  // context string
+  var yourString = l10n.Template("Translation String")
   ```
 
 * In the `Makefile` in the **ocis root**, add in the following section the service you want to synchroize translations with Transifex:
