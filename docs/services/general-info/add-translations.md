@@ -1,6 +1,6 @@
 ---
 title: Add Translations
-date: 2023-12-19T00:00:00+00:00
+date: 2024-04-08T00:00:00+00:00
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/general-info
