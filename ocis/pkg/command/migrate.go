@@ -106,11 +106,11 @@ func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			gc, err := pool.GetGatewayServiceClient(conf.GatewayAddr)
+			gs, err := pool.GatewaySelector(conf.GatewayAddr)
 			if err != nil {
 				return err
 			}
-			mgr, err := jsoncs3.New(s, gc, 0, nil, 1)
+			mgr, err := jsoncs3.New(s, gs, 0, nil, 1)
 			if err != nil {
 				return err
 			}
