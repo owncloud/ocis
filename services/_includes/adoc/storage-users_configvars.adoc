@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-04-08-08-36-03]
+[#deprecation-note-2024-04-08-10-05-27]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -393,7 +393,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++20 ++
 a| [subs=-attributes]
-When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.
+When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value will be used.
 
 a|`STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR` +
 
@@ -402,7 +402,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++30 ++
 a| [subs=-attributes]
-When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.
+When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value will be used.
 
 a|`STORAGE_USERS_OCIS_MAX_CONCURRENCY` +
 
@@ -411,7 +411,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++5 ++
 a| [subs=-attributes]
-Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.
+Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
 
 a|`OCIS_ASYNC_UPLOADS` +
 
