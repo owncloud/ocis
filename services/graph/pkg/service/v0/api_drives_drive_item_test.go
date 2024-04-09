@@ -80,6 +80,9 @@ var _ = Describe("DrivesDriveItemService", func() {
 					OpaqueId:  "2",
 					SpaceId:   "3",
 				}
+				expectedShareID := collaborationv1beta1.ShareId{
+					OpaqueId: "1:2:3",
+				}
 				gatewayClient.
 					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
 					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
@@ -106,7 +109,44 @@ var _ = Describe("DrivesDriveItemService", func() {
 						Expect(resourceIDs).To(HaveLen(1))
 						Expect(resourceIDs[0]).To(Equal(&expectedResourceID))
 
-						return nil, nil
+						return &collaborationv1beta1.ListReceivedSharesResponse{
+							Shares: []*collaborationv1beta1.ReceivedShare{
+								{
+									State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING,
+									Share: &collaborationv1beta1.Share{
+										Id: &expectedShareID,
+									},
+								},
+							},
+						}, nil
+					})
+				gatewayClient.
+					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+						Expect(in.GetUpdateMask().GetPaths()).To(Equal([]string{"state"}))
+						Expect(in.GetShare().GetState()).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED))
+						Expect(in.GetShare().GetShare().GetId().GetOpaqueId()).To(Equal(expectedShareID.GetOpaqueId()))
+						return &collaborationv1beta1.UpdateReceivedShareResponse{
+							Status: status.NewOK(ctx),
+							Share: &collaborationv1beta1.ReceivedShare{
+								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
+								Share: &collaborationv1beta1.Share{
+									Id:         &expectedShareID,
+									ResourceId: &expectedResourceID,
+								},
+							},
+						}, nil
+					})
+				gatewayClient.
+					On("Stat", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *storageprovider.StatRequest, opts ...grpc.CallOption) (*storageprovider.StatResponse, error) {
+						return &storageprovider.StatResponse{
+							Status: status.NewOK(ctx),
+							Info: &storageprovider.ResourceInfo{
+								Id:   &expectedResourceID,
+								Name: "name",
+							},
+						}, nil
 					})
 
 				_, err := drivesDriveItemService.MountShare(context.Background(), expectedResourceID, "")
@@ -634,7 +674,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			httpAPI.CreateDriveItem(responseRecorder, request)
 
-			Expect(responseRecorder.Code).To(Equal(http.StatusUnprocessableEntity))
+			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(responseRecorder.Body.String(), "error")
 			Expect(jsonData.Get("message").String()).To(Equal("invalid request body"))
@@ -654,7 +694,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			httpAPI.CreateDriveItem(responseRecorder, request)
 
-			Expect(responseRecorder.Code).To(Equal(http.StatusUnprocessableEntity))
+			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData = gjson.Get(responseRecorder.Body.String(), "error")
 			Expect(jsonData.Get("message").String()).To(Equal("invalid remote item id"))
@@ -688,7 +728,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			httpAPI.CreateDriveItem(responseRecorder, request)
 
-			Expect(responseRecorder.Code).To(Equal(http.StatusFailedDependency))
+			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(responseRecorder.Body.String(), "error")
 			Expect(jsonData.Get("message").String()).To(Equal("mounting share failed"))
