@@ -18,6 +18,9 @@ const (
 	ScopeBaseObject   = 0
 	ScopeSingleLevel  = 1
 	ScopeWholeSubtree = 2
+	// ScopeChildren is an OpenLDAP extension that may not be supported by another directory server.
+	// See: https://github.com/openldap/openldap/blob/7c55484ee153047efd0e562fc1638c1a2525f320/include/ldap.h#L598
+	ScopeChildren = 3
 )
 
 // ScopeMap contains human readable descriptions of scope choices
@@ -25,6 +28,7 @@ var ScopeMap = map[int]string{
 	ScopeBaseObject:   "Base Object",
 	ScopeSingleLevel:  "Single Level",
 	ScopeWholeSubtree: "Whole Subtree",
+	ScopeChildren:     "Children",
 }
 
 // derefAliases
@@ -42,6 +46,10 @@ var DerefMap = map[int]string{
 	DerefFindingBaseObj: "DerefFindingBaseObj",
 	DerefAlways:         "DerefAlways",
 }
+
+// ErrSizeLimitExceeded will be returned if the search result is exceeding the defined SizeLimit
+// and enforcing the requested limit is enabled in the search request (EnforceSizeLimit)
+var ErrSizeLimitExceeded = NewError(ErrorNetwork, errors.New("ldap: size limit exceeded"))
 
 // NewEntry returns an Entry object with the specified distinguished name and attribute key-value pairs.
 // The map of attributes is accessed in alphabetical order of the keys in order to ensure that, for the
@@ -187,8 +195,8 @@ func readTag(f reflect.StructField) (string, bool) {
 // Unmarshal parses the Entry in the value pointed to by i
 //
 // Currently, this methods only supports struct fields of type
-// string, []string, int, int64, []byte, *DN, []*DN or time.Time. Other field types
-// will not be regarded. If the field type is a string or int but multiple
+// string, *string, []string, int, int64, []byte, *DN, []*DN or time.Time.
+// Other field types will not be regarded. If the field type is a string or int but multiple
 // attribute values are returned, the first value will be used to fill the field.
 //
 // Example:
@@ -279,6 +287,8 @@ func (e *Entry) Unmarshal(i interface{}) (err error) {
 			}
 		case string:
 			fv.SetString(values[0])
+		case *string:
+			fv.Set(reflect.ValueOf(&values[0]))
 		case []byte:
 			fv.SetBytes([]byte(values[0]))
 		case int, int64:
@@ -308,7 +318,7 @@ func (e *Entry) Unmarshal(i interface{}) (err error) {
 				fv.Set(reflect.Append(fv, reflect.ValueOf(dn)))
 			}
 		default:
-			return fmt.Errorf("ldap: expected field to be of type string, []string, int, int64, []byte, *DN, []*DN or time.Time, got %v", ft.Type)
+			return fmt.Errorf("ldap: expected field to be of type string, *string, []string, int, int64, []byte, *DN, []*DN or time.Time, got %v", ft.Type)
 		}
 	}
 	return
@@ -411,6 +421,11 @@ type SearchRequest struct {
 	Filter       string
 	Attributes   []string
 	Controls     []Control
+
+	// EnforceSizeLimit will hard limit the maximum number of entries parsed, in case the directory
+	// server returns more results than requested. This setting is disabled by default and does not
+	// work in async search requests.
+	EnforceSizeLimit bool
 }
 
 func (req *SearchRequest) appendTo(envelope *ber.Packet) error {
@@ -558,6 +573,12 @@ func (l *Conn) Search(searchRequest *SearchRequest) (*SearchResult, error) {
 
 		switch packet.Children[1].Tag {
 		case 4:
+			if searchRequest.EnforceSizeLimit &&
+				searchRequest.SizeLimit > 0 &&
+				len(result.Entries) >= searchRequest.SizeLimit {
+				return result, ErrSizeLimitExceeded
+			}
+
 			entry := &Entry{
 				DN:         packet.Children[1].Children[0].Value.(string),
 				Attributes: unpackAttributes(packet.Children[1].Children[1].Children),
