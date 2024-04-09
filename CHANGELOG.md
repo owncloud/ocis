@@ -42,9 +42,21 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix restarting of postprocessing: [#8782](https://github.com/owncloud/ocis/pull/8782)
 * Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
 
 ## Details
+
+* Bugfix - Fix restarting of postprocessing: [#8782](https://github.com/owncloud/ocis/pull/8782)
+
+   When an upload is not found, the logic to restart postprocessing was bunked.
+   Additionally we extended the upload sessions command to be able to restart the
+   uploads without using a second command.
+
+   NOTE: This also includes a breaking fix for the deprecated `ocis storage-users
+   uploads list` command
+
+   https://github.com/owncloud/ocis/pull/8782
 
 * Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
 
