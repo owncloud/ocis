@@ -23,8 +23,8 @@ type GroupRunner struct {
 	runners []*Runner
 }
 
-// NewGroupRunner will create a GroupRunner
-func NewGroupRunner() *GroupRunner {
+// NewGroup will create a GroupRunner
+func NewGroup() *GroupRunner {
 	return &GroupRunner{
 		runners: []*Runner{},
 	}
@@ -61,7 +61,7 @@ func (gr *GroupRunner) Run(ctx context.Context) []*Result {
 
 	ch := make(chan *Result, len(gr.runners)) // no need to block writing results
 	for _, runner := range gr.runners {
-		runner.RunNoContext(ch)
+		runner.RunAsync(ch)
 	}
 
 	// wait for a result or for the context to be done
@@ -76,7 +76,9 @@ func (gr *GroupRunner) Run(ctx context.Context) []*Result {
 	for _, runner := range gr.runners {
 		if _, ok := results[runner.ID]; !ok {
 			// there might still be race conditions because the result might not have
-			// been made available even though the runner has finished
+			// been made available even though the runner has finished. We assume
+			// that calling the `Interrupt` method multiple times and / or calling
+			// the `Interrupt` method when the task has finished is safe
 			runner.Interrupt()
 		}
 	}
@@ -97,20 +99,13 @@ func (gr *GroupRunner) Run(ctx context.Context) []*Result {
 	return values
 }
 
-// RunNoContext will execute the tasks in the group asynchronously.
-// Each tasks will run a separated goroutine (one goroutine per task), and then
-// this method will finish.
-// The tasks' result will be available in the provided channel when it's
-// available, so you can wait for it if needed. It's up to you to decide
-// to use a blocking or non-blocking channel, but the task will always finish
-// before writing in the channel.
-//
-// This method guarantees that there will be the same number of results as the
-// number of provided tasks (one result per task), but it won't guarantee
-// any order
-func (gr *GroupRunner) RunNoContext(ch chan<- *Result) {
+// RunAsync will execute the tasks in the group asynchronously.
+// The result of each task will be placed in the provided channel as soon
+// as it's available.
+// Note that this method will finish as soon as all the tasks are running.
+func (gr *GroupRunner) RunAsync(ch chan<- *Result) {
 	for _, runner := range gr.runners {
-		runner.RunNoContext(ch)
+		runner.RunAsync(ch)
 	}
 }
 

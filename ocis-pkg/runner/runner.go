@@ -15,7 +15,7 @@ type Runner struct {
 	interrupt Stopper
 }
 
-// NewRunner will create a new runner.
+// New will create a new runner.
 // The runner will be created with the provided id (the id must be unique,
 // otherwise undefined behavior might occur), and will run the provided
 // runable task, using the "interrupt" function to stop that task if needed.
@@ -23,7 +23,7 @@ type Runner struct {
 // Note that it's your responsibility to provide a proper stopper for the task.
 // The runner will just call that method assuming it will be enough to
 // eventually stop the task at some point.
-func NewRunner(id string, fn Runable, interrupt Stopper) *Runner {
+func New(id string, fn Runable, interrupt Stopper) *Runner {
 	return &Runner{
 		ID:        id,
 		fn:        fn,
@@ -52,16 +52,7 @@ func NewRunner(id string, fn Runable, interrupt Stopper) *Runner {
 func (r *Runner) Run(ctx context.Context) *Result {
 	ch := make(chan *Result)
 
-	go func(ch chan<- *Result) {
-		err := r.fn()
-
-		result := &Result{
-			RunnerID:    r.ID,
-			RunnerError: err,
-		}
-		ch <- result
-		close(ch)
-	}(ch)
+	go r.doTask(ch, true)
 
 	select {
 	case result := <-ch:
@@ -73,7 +64,7 @@ func (r *Runner) Run(ctx context.Context) *Result {
 	return <-ch
 }
 
-// RunNoContext will execute the task associated to this runner asynchronously.
+// RunAsync will execute the task associated to this runner asynchronously.
 // The task will be spawned in a new goroutine and this method will finish.
 // The task's result will be written in the provided channel when it's
 // available, so you can wait for it if needed. It's up to you to decide
@@ -82,17 +73,8 @@ func (r *Runner) Run(ctx context.Context) *Result {
 //
 // To interrupt the running task, the only option is to call the `Interrupt`
 // method at some point.
-func (r *Runner) RunNoContext(ch chan<- *Result) {
-	go func(ch chan<- *Result) {
-		err := r.fn()
-
-		result := &Result{
-			RunnerID:    r.ID,
-			RunnerError: err,
-		}
-		ch <- result
-		// Do not close the channel here
-	}(ch)
+func (r *Runner) RunAsync(ch chan<- *Result) {
+	go r.doTask(ch, false)
 }
 
 // Interrupt will execute the stopper function, which should notify the task
@@ -101,4 +83,20 @@ func (r *Runner) RunNoContext(ch chan<- *Result) {
 // consequences to take a while (task might need a while to stop)
 func (r *Runner) Interrupt() {
 	r.interrupt()
+}
+
+// doTask will perform this runner's task and write the result in the provided
+// channel. The channel will be closed if requested.
+func (r *Runner) doTask(ch chan<- *Result, closeChan bool) {
+	err := r.fn()
+
+	result := &Result{
+		RunnerID:    r.ID,
+		RunnerError: err,
+	}
+	ch <- result
+
+	if closeChan {
+		close(ch)
+	}
 }
