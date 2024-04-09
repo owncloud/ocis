@@ -7,9 +7,12 @@ Since this service requires an external service (onlyoffice, for example), it wo
 ## Requirements
 
 The collaboration service requires the target document server (onlyoffice, collabora, etc) to be up and running.
-We also need reva's gateway and app provider services to be running in order to register the GRPC service for the "open in app" action.
+Some oCIS services are also required to be running in order to register the GRPC service for the "open in app" action:
+* reva's gateway
+* app provider
 
 If any of those services are down, the collaboration service won't start.
+For convenience, you might want to start the whole oCIS stack before starting the collaboration service.
 
 ## Configuration
 
