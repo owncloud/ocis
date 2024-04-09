@@ -17,10 +17,11 @@ debug:
   pprof: false
   zpages: false
 store:
-  store: memory
-  nodes: []
+  store: nats-js-kv
+  nodes:
+  - 127.0.0.1:9233
   database: postprocessing
-  table: postprocessing
+  table: ""
   ttl: 0s
   size: 0
   username: ""

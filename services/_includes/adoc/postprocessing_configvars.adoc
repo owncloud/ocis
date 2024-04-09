@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-04-09-07-48-16]
+[#deprecation-note-2024-04-09-14-59-14]
 [caption=]
 .Deprecation notes for the postprocessing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -148,7 +148,7 @@ a|`OCIS_PERSISTENT_STORE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++memory ++
+++nats-js-kv ++
 a| [subs=-attributes]
 The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
@@ -158,7 +158,7 @@ a|`OCIS_PERSISTENT_STORE_NODES` +
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
-++[] ++
+++[127.0.0.1:9233] ++
 a| [subs=-attributes]
 A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
@@ -176,7 +176,7 @@ a|`POSTPROCESSING_STORE_TABLE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++postprocessing ++
+++ ++
 a| [subs=-attributes]
 The database table the store should use.
 
