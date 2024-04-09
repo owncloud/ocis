@@ -54,6 +54,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Internal links shouldn't have a password: [#8668](https://github.com/owncloud/ocis/pull/8668)
 * Bugfix - Fix uploading via a public link: [#8702](https://github.com/owncloud/ocis/pull/8702)
 * Bugfix - Mask user email in output: [#8726](https://github.com/owncloud/ocis/issues/8726)
+* Bugfix - Fix restarting of postprocessing: [#8782](https://github.com/owncloud/ocis/pull/8782)
 * Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
@@ -171,6 +172,17 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8726
    https://github.com/cs3org/reva/pull/4603
    https://github.com/owncloud/ocis/pull/8764
+
+* Bugfix - Fix restarting of postprocessing: [#8782](https://github.com/owncloud/ocis/pull/8782)
+
+   When an upload is not found, the logic to restart postprocessing was bunked.
+   Additionally we extended the upload sessions command to be able to restart the
+   uploads without using a second command.
+
+   NOTE: This also includes a breaking fix for the deprecated `ocis storage-users
+   uploads list` command
+
+   https://github.com/owncloud/ocis/pull/8782
 
 * Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
 
