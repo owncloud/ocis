@@ -34,9 +34,9 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 	}
 
 	listReceivedSharesResponse, err := gatewayClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{})
-	if errCode := errorcode.FromCS3Status(listReceivedSharesResponse.GetStatus(), err); errCode != nil {
+	if err := errorcode.FromCS3Status(listReceivedSharesResponse.GetStatus(), err); err != nil {
 		g.logger.Error().Err(err).Msg("listing shares failed")
-		return nil, *errCode
+		return nil, err
 	}
 
 	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedSharesResponse.GetShares())

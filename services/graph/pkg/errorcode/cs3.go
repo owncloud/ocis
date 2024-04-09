@@ -17,7 +17,7 @@ import (
 //
 // This function is particularly useful when dealing with CS3 responses,
 // and a unified error handling within the application is necessary.
-func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) *Error {
+func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) error {
 	if inerr != nil {
 		return &Error{msg: inerr.Error(), errorCode: GeneralException}
 	}
@@ -65,7 +65,7 @@ func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) *E
 //
 // It takes a stat of type *provider.StatResponse, an error, and a variadic parameter of type cs3rpc.Code.
 // It invokes the FromCS3Status function with the StatResponse Status and the ignore codes.
-func FromStat(stat *provider.StatResponse, err error, ignore ...cs3rpc.Code) *Error {
+func FromStat(stat *provider.StatResponse, err error, ignore ...cs3rpc.Code) error {
 	// TODO: look into ResourceInfo to get the postprocessing state and map that to 425 status?
 	return FromCS3Status(stat.GetStatus(), err, ignore...)
 }

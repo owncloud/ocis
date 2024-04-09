@@ -290,8 +290,8 @@ func (s DriveItemPermissionsService) updatePublicLinkPermission(ctx context.Cont
 			},
 		})
 
-	if errCode := errorcode.FromCS3Status(statResp.GetStatus(), err); errCode != nil {
-		return nil, *errCode
+	if err := errorcode.FromCS3Status(statResp.GetStatus(), err); err != nil {
+		return nil, err
 	}
 
 	if newPermission.HasExpirationDateTime() {
@@ -369,8 +369,8 @@ func (s DriveItemPermissionsService) updatePublicLinkPassword(ctx context.Contex
 			},
 		},
 	})
-	if errCode := errorcode.FromCS3Status(changeLinkRes.GetStatus(), err); errCode != nil {
-		return nil, *errCode
+	if err := errorcode.FromCS3Status(changeLinkRes.GetStatus(), err); err != nil {
+		return nil, err
 	}
 	permission, err := s.libreGraphPermissionFromCS3PublicShare(changeLinkRes.GetShare())
 	if err != nil {
@@ -396,8 +396,8 @@ func (s DriveItemPermissionsService) updatePublicLink(ctx context.Context, permi
 		},
 	})
 
-	if errCode := errorcode.FromCS3Status(changeLinkRes.GetStatus(), err); errCode != nil {
-		return nil, *errCode
+	if err := errorcode.FromCS3Status(changeLinkRes.GetStatus(), err); err != nil {
+		return nil, err
 	}
 
 	permission, err := s.libreGraphPermissionFromCS3PublicShare(changeLinkRes.GetShare())

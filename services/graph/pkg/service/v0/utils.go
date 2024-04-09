@@ -3,6 +3,7 @@ package svc
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"reflect"
@@ -166,15 +167,15 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 				},
 			})
 
-			switch errCode := errorcode.FromCS3Status(shareStat.GetStatus(), err); {
-			case errCode == nil:
+			switch err := errorcode.FromCS3Status(shareStat.GetStatus(), err); {
+			case err == nil:
 				break
 			// skip ItemNotFound shares, they might have been deleted in the meantime or orphans.
-			case errCode.GetCode() == errorcode.ItemNotFound:
+			case errors.Is(err, errorcode.Error{}) && err.(errorcode.Error).GetCode() == errorcode.ItemNotFound:
 				return nil
 			default:
-				logger.Error().Err(errCode).Msg("could not stat")
-				return errCode
+				logger.Error().Err(err).Msg("could not stat")
+				return err
 			}
 
 			driveItem, err := fillDriveItemPropertiesFromReceivedShare(ctx, logger, identityCache, receivedShares)

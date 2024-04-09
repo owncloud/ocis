@@ -418,8 +418,8 @@ func (g BaseGraphService) getCS3PublicShareByID(ctx context.Context, permissionI
 			},
 		},
 	)
-	if errCode := errorcode.FromCS3Status(getPublicShareResp.GetStatus(), err); errCode != nil {
-		return nil, *errCode
+	if err := errorcode.FromCS3Status(getPublicShareResp.GetStatus(), err); err != nil {
+		return nil, err
 	}
 	return getPublicShareResp.GetShare(), nil
 }
@@ -441,8 +441,8 @@ func (g BaseGraphService) removePublicShare(ctx context.Context, permissionID st
 				},
 			},
 		})
-	if errcode := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); errcode != nil {
-		return *errcode
+	if err := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); err != nil {
+		return err
 	}
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
@@ -466,8 +466,8 @@ func (g BaseGraphService) removeUserShare(ctx context.Context, permissionID stri
 			},
 		})
 
-	if errCode := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); errCode != nil {
-		return *errCode
+	if err := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); err != nil {
+		return err
 	}
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
@@ -495,8 +495,8 @@ func (g BaseGraphService) removeSpacePermission(ctx context.Context, permissionI
 		},
 	})
 
-	if errCode := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); errCode != nil {
-		return *errCode
+	if err := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); err != nil {
+		return err
 	}
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
@@ -527,8 +527,8 @@ func (g BaseGraphService) getCS3UserShareByID(ctx context.Context, permissionID 
 				},
 			},
 		})
-	if errCode := errorcode.FromCS3Status(getShareResp.GetStatus(), err); errCode != nil {
-		return nil, *errCode
+	if err := errorcode.FromCS3Status(getShareResp.GetStatus(), err); err != nil {
+		return nil, err
 	}
 	return getShareResp.GetShare(), nil
 }
@@ -667,8 +667,8 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 	}
 
 	updateUserShareResp, err := gatewayClient.UpdateShare(ctx, &cs3UpdateShareReq)
-	if errCode := errorcode.FromCS3Status(updateUserShareResp.GetStatus(), err); errCode != nil {
-		return nil, *errCode
+	if err := errorcode.FromCS3Status(updateUserShareResp.GetStatus(), err); err != nil {
+		return nil, err
 	}
 
 	permission, err := g.cs3UserShareToPermission(ctx, updateUserShareResp.GetShare(), IsSpaceRoot(itemID))
