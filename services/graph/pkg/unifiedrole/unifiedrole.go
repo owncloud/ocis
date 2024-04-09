@@ -68,7 +68,7 @@ var legacyNames map[string]string = map[string]string{
 	UnifiedRoleManagerID:     conversions.RoleManager,
 }
 
-// NewViewerUnifiedRole creates a viewer role. `sharing` indicates if sharing permission should be added
+// NewViewerUnifiedRole creates a viewer role.
 func NewViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewViewerRole()
 	return &libregraph.UnifiedRoleDefinition{
@@ -102,7 +102,7 @@ func NewSpaceViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	}
 }
 
-// NewEditorUnifiedRole creates an editor role. `sharing` indicates if sharing permission should be added
+// NewEditorUnifiedRole creates an editor role.
 func NewEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewEditorRole()
 	return &libregraph.UnifiedRoleDefinition{
