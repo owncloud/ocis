@@ -165,7 +165,7 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
 		}
 
-		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*perm, unifiedrole.UnifiedRoleConditionOwner); role != nil {
+		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*perm, unifiedrole.UnifiedRoleConditionDrive); role != nil {
 			switch apiVersion {
 			case APIVersion_1:
 				if r := unifiedrole.GetLegacyName(*role); r != "" {
@@ -287,7 +287,17 @@ func (g BaseGraphService) cs3UserSharesToDriveItems(ctx context.Context, shares 
 			}
 			item = *itemptr
 		}
-		perm, err := g.cs3UserShareToPermission(ctx, s, false)
+
+		var condition string
+		switch {
+		case item.Root != nil:
+			condition = unifiedrole.UnifiedRoleConditionDrive
+		case item.Folder != nil:
+			condition = unifiedrole.UnifiedRoleConditionFolder
+		case item.File != nil:
+			condition = unifiedrole.UnifiedRoleConditionFile
+		}
+		perm, err := g.cs3UserShareToPermission(ctx, s, condition)
 
 		var errcode errorcode.Error
 		switch {
@@ -303,10 +313,10 @@ func (g BaseGraphService) cs3UserSharesToDriveItems(ctx context.Context, shares 
 	return driveItems, nil
 }
 
-func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *collaboration.Share, isSpacePermission bool) (*libregraph.Permission, error) {
+func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *collaboration.Share, roleCondition string) (*libregraph.Permission, error) {
 	perm := libregraph.Permission{}
 	perm.SetRoles([]string{})
-	if !isSpacePermission {
+	if roleCondition != unifiedrole.UnifiedRoleConditionDrive {
 		perm.SetId(share.GetId().GetOpaqueId())
 	}
 	grantedTo := libregraph.SharePointIdentitySet{}
@@ -322,7 +332,7 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
 		default:
 			grantedTo.SetUser(user)
-			if isSpacePermission {
+			if roleCondition == unifiedrole.UnifiedRoleConditionDrive {
 				perm.SetId("u:" + user.GetId())
 			}
 		}
@@ -337,7 +347,7 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
 		default:
 			grantedTo.SetGroup(group)
-			if isSpacePermission {
+			if roleCondition == unifiedrole.UnifiedRoleConditionDrive {
 				perm.SetId("g:" + group.GetId())
 			}
 		}
@@ -347,13 +357,9 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 	if share.GetExpiration() != nil {
 		perm.SetExpirationDateTime(cs3TimestampToTime(share.GetExpiration()))
 	}
-	condition := unifiedrole.UnifiedRoleConditionGrantee
-	if isSpacePermission {
-		condition = unifiedrole.UnifiedRoleConditionOwner
-	}
 	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
 		*share.GetPermissions().GetPermissions(),
-		condition,
+		roleCondition,
 	)
 	if role != nil {
 		perm.SetRoles([]string{role.GetId()})
@@ -534,8 +540,13 @@ func (g BaseGraphService) getCS3UserShareByID(ctx context.Context, permissionID 
 }
 
 func (g BaseGraphService) getPermissionByID(ctx context.Context, permissionID string, itemID *storageprovider.ResourceId) (*libregraph.Permission, *storageprovider.ResourceId, error) {
-	publicShare, err := g.getCS3PublicShareByID(ctx, permissionID)
 	var errcode errorcode.Error
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return nil, nil, err
+	}
+	publicShare, err := g.getCS3PublicShareByID(ctx, permissionID)
 	switch {
 	case err == nil:
 		// the id is referencing a public share
@@ -546,13 +557,7 @@ func (g BaseGraphService) getPermissionByID(ctx context.Context, permissionID st
 		return permission, publicShare.GetResourceId(), nil
 	case IsSpaceRoot(itemID):
 		// itemID is referencing a spaceroot this is a space permission. Handle
-		// that next
-		gatewayClient, err := g.gatewaySelector.Next()
-		if err != nil {
-			g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
-			return nil, nil, err
-		}
-		// get space id
+		// that here and get space id
 		resourceInfo, err := utils.GetResourceByID(ctx, itemID, gatewayClient)
 		if err != nil {
 			return nil, nil, err
@@ -573,7 +578,15 @@ func (g BaseGraphService) getPermissionByID(ctx context.Context, permissionID st
 		if err != nil {
 			return nil, nil, err
 		}
-		permission, err := g.cs3UserShareToPermission(ctx, share, false)
+		resourceInfo, err := utils.GetResourceByID(ctx, itemID, gatewayClient)
+		if err != nil {
+			return nil, nil, err
+		}
+		condition, err := roleConditionForResourceType(resourceInfo)
+		if err != nil {
+			return nil, nil, err
+		}
+		permission, err := g.cs3UserShareToPermission(ctx, share, condition)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -590,6 +603,14 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 		return nil, err
 	}
 
+	resourceInfo, err := utils.GetResourceByID(ctx, itemID, gatewayClient)
+	if err != nil {
+		return nil, err
+	}
+	condition, err := roleConditionForResourceType(resourceInfo)
+	if err != nil {
+		return nil, err
+	}
 	var cs3UpdateShareReq collaboration.UpdateShareRequest
 	// When updating a space root we need to reference the share by resourceId and grantee
 	if IsSpaceRoot(itemID) {
@@ -632,11 +653,6 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 				return nil, err
 			}
 
-			condition := unifiedrole.UnifiedRoleConditionGrantee
-			if IsSpaceRoot(itemID) {
-				condition = unifiedrole.UnifiedRoleConditionOwner
-			}
-			// FIXME: When setting permissions on a space, we need to use UnifiedRoleConditionOwner here
 			allowedResourceActions = unifiedrole.GetAllowedResourceActions(role, condition)
 			if len(allowedResourceActions) == 0 {
 				return nil, errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")
@@ -671,7 +687,7 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 		return nil, *errCode
 	}
 
-	permission, err := g.cs3UserShareToPermission(ctx, updateUserShareResp.GetShare(), IsSpaceRoot(itemID))
+	permission, err := g.cs3UserShareToPermission(ctx, updateUserShareResp.GetShare(), condition)
 	if err != nil {
 		return nil, err
 	}

@@ -176,7 +176,8 @@ var _ = Describe("sharedbyme", func() {
 			Return(&provider.StatResponse{
 				Status: status.NewOK(ctx),
 				Info: &provider.ResourceInfo{
-					Id: userShare.ResourceId,
+					Id:   userShare.ResourceId,
+					Type: provider.ResourceType_RESOURCE_TYPE_CONTAINER,
 				},
 			}, nil)
 

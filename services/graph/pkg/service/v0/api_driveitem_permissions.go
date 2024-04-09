@@ -88,10 +88,9 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 		return libregraph.Permission{}, *errCode
 	}
 
-	resourceInfo := statResponse.GetInfo()
-	condition := unifiedrole.UnifiedRoleConditionGrantee
-	if IsSpaceRoot(resourceInfo.GetId()) {
-		condition = unifiedrole.UnifiedRoleConditionOwner
+	var condition string
+	if condition, err = roleConditionForResourceType(statResponse.GetInfo()); err != nil {
+		return libregraph.Permission{}, err
 	}
 
 	unifiedRolePermissions := []*libregraph.UnifiedRolePermission{{AllowedResourceActions: invite.LibreGraphPermissionsActions}}
@@ -116,7 +115,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 	cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(unifiedRolePermissions)
 
 	createShareRequest := &collaboration.CreateShareRequest{
-		ResourceInfo: resourceInfo,
+		ResourceInfo: statResponse.GetInfo(),
 		Grant: &collaboration.ShareGrant{
 			Permissions: &collaboration.SharePermissions{
 				Permissions: cs3ResourcePermissions,
@@ -185,7 +184,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 
 	if id := createShareResponse.GetShare().GetId().GetOpaqueId(); id != "" {
 		permission.Id = conversions.ToPointer(id)
-	} else if IsSpaceRoot(resourceInfo.GetId()) {
+	} else if IsSpaceRoot(statResponse.GetInfo().GetId()) {
 		// permissions on a space root are not handled by a share manager so
 		// they don't get a share-id
 		permission.SetId(identitySetToSpacePermissionID(permission.GetGrantedToV2()))
@@ -232,9 +231,9 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 		return collectionOfPermissions, err
 	}
 
-	condition := unifiedrole.UnifiedRoleConditionGrantee
-	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
-		condition = unifiedrole.UnifiedRoleConditionOwner
+	var condition string
+	if condition, err = roleConditionForResourceType(statResponse.GetInfo()); err != nil {
+		return collectionOfPermissions, err
 	}
 
 	permissionSet := *statResponse.GetInfo().GetPermissionSet()

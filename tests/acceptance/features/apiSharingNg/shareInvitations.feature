@@ -1570,7 +1570,7 @@ Feature: Send a sharing invitations
               "message": {
                 "type": "string",
                 "enum": [
-                  "cannot set the requested permissions on that type of resource"
+                  "role not applicable to this resource"
                 ]
               }
             }
@@ -2356,9 +2356,9 @@ Feature: Send a sharing invitations
       """
     Examples:
       | permissions-role | error-message                                                                                      |
-      | Space Viewer     | space type is not eligible for sharing                                                             |
-      | Space Editor     | space type is not eligible for sharing                                                             |
-      | Manager          | space type is not eligible for sharing                                                             |
+      | Space Viewer     | role not applicable to this resource								      |
+      | Space Editor     | role not applicable to this resource                                                               |
+      | Manager          | role not applicable to this resource                                                               |
       | Co Owner         | Key: 'DriveItemInvite.Roles' Error:Field validation for 'Roles' failed on the 'available_role' tag |
 
 
