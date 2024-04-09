@@ -73,12 +73,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Initiator-IDs: [#8701](https://github.com/owncloud/ocis/pull/8701)
 * Enhancement - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
 * Enhancement - Make server side space templates production ready: [#8723](https://github.com/owncloud/ocis/pull/8723)
-* Enhancement - Update web to v9.0.0-alpha.3: [#8736](https://github.com/owncloud/ocis/pull/8736)
 * Enhancement - Sharing NG role names and descriptions: [#8743](https://github.com/owncloud/ocis/pull/8743)
 * Enhancement - Enable web extension drawio by default: [#8760](https://github.com/owncloud/ocis/pull/8760)
 * Enhancement - Remove resharing: [#8762](https://github.com/owncloud/ocis/pull/8762)
 * Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
 * Enhancement - Bump Reva: [#8795](https://github.com/owncloud/ocis/pull/8795)
+* Enhancement - Update web to v9.0.0-alpha.4: [#8812](https://github.com/owncloud/ocis/pull/8812)
 
 ## Details
 
@@ -334,11 +334,44 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8723
 
-* Enhancement - Update web to v9.0.0-alpha.3: [#8736](https://github.com/owncloud/ocis/pull/8736)
+* Enhancement - Sharing NG role names and descriptions: [#8743](https://github.com/owncloud/ocis/pull/8743)
+
+   We've adjusted the display names and descriptions of the sharing NG roles to
+   align with the previously agreed upon terms.
+
+   https://github.com/owncloud/ocis/pull/8743
+
+* Enhancement - Enable web extension drawio by default: [#8760](https://github.com/owncloud/ocis/pull/8760)
+
+   Enable web extension drawio by default
+
+   https://github.com/owncloud/ocis/pull/8760
+
+* Enhancement - Remove resharing: [#8762](https://github.com/owncloud/ocis/pull/8762)
+
+   Removed resharing feature from codebase
+
+   https://github.com/owncloud/ocis/pull/8762
+
+* Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
+
+   Send an sse when a file is touched (aka 0 byte upload)
+
+   https://github.com/owncloud/ocis/pull/8778
+
+* Enhancement - Bump Reva: [#8795](https://github.com/owncloud/ocis/pull/8795)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/8795
+   https://github.com/owncloud/ocis/pull/8701
+   https://github.com/owncloud/ocis/pull/8606
+
+* Enhancement - Update web to v9.0.0-alpha.4: [#8812](https://github.com/owncloud/ocis/pull/8812)
 
    Tags: web
 
-   We updated ownCloud Web to v9.0.0-alpha.3. Please refer to the changelog
+   We updated ownCloud Web to v9.0.0-alpha.4. Please refer to the changelog
    (linked) for details on the web release.
 
    ## Summary * Bugfix
@@ -349,8 +382,12 @@ The following sections list the changes for unreleased.
    [owncloud/web#10517](https://github.com/owncloud/web/pull/10517): Load thumbnail
    when postprocessing is finished * Bugfix
    [owncloud/web#10551](https://github.com/owncloud/web/pull/10551): Share sidebar
-   icons * Change [owncloud/web#7338](https://github.com/owncloud/web/issues/7338):
-   Remove deprecated code * Change
+   icons * Bugfix [owncloud/web#10702](https://github.com/owncloud/web/pull/10702):
+   Apply sandbox attribute to iframe in draw-io extension * Bugfix
+   [owncloud/web#10706](https://github.com/owncloud/web/pull/10706): Apply sandbox
+   attribute to iframe in app-external extension * Change
+   [owncloud/web#7338](https://github.com/owncloud/web/issues/7338): Remove
+   deprecated code * Change
    [owncloud/web#9892](https://github.com/owncloud/web/issues/9892): Remove
    skeleton app * Change
    [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Remove
@@ -392,43 +429,16 @@ The following sections list the changes for unreleased.
    nav bar state * Enhancement
    [owncloud/web#10612](https://github.com/owncloud/web/pull/10612): Remember right
    nav bar state * Enhancement
-   [owncloud/web#10558](https://github.com/owncloud/web/pull/10558): Tile sizes
+   [owncloud/web#10558](https://github.com/owncloud/web/pull/10558): Tile sizes *
+   Enhancement [owncloud/web#10709](https://github.com/owncloud/web/pull/10709):
+   Implement Server-Sent Events (SSE) for File Creation * Enhancement
+   [owncloud/web#10443](https://github.com/owncloud/web/pull/10443): Custom
+   component extension type * Enhancement
+   [owncloud/web#10443](https://github.com/owncloud/web/pull/10443): Add
+   extensionPoint concept
 
-   https://github.com/owncloud/ocis/pull/8736
-   https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.3
-
-* Enhancement - Sharing NG role names and descriptions: [#8743](https://github.com/owncloud/ocis/pull/8743)
-
-   We've adjusted the display names and descriptions of the sharing NG roles to
-   align with the previously agreed upon terms.
-
-   https://github.com/owncloud/ocis/pull/8743
-
-* Enhancement - Enable web extension drawio by default: [#8760](https://github.com/owncloud/ocis/pull/8760)
-
-   Enable web extension drawio by default
-
-   https://github.com/owncloud/ocis/pull/8760
-
-* Enhancement - Remove resharing: [#8762](https://github.com/owncloud/ocis/pull/8762)
-
-   Removed resharing feature from codebase
-
-   https://github.com/owncloud/ocis/pull/8762
-
-* Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
-
-   Send an sse when a file is touched (aka 0 byte upload)
-
-   https://github.com/owncloud/ocis/pull/8778
-
-* Enhancement - Bump Reva: [#8795](https://github.com/owncloud/ocis/pull/8795)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/8795
-   https://github.com/owncloud/ocis/pull/8701
-   https://github.com/owncloud/ocis/pull/8606
+   https://github.com/owncloud/ocis/pull/8812
+   https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.4
 
 # Changelog for [5.0.0] (2024-03-18)
 
