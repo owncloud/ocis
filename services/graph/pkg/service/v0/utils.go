@@ -177,7 +177,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 				return errCode
 			}
 
-			driveItem, err := fillDriveItemPropertiesFromReceivedShare(ctx, logger, identityCache, receivedShares)
+			driveItem, err := fillDriveItemPropertiesFromReceivedShare(ctx, logger, identityCache, receivedShares, shareStat.GetInfo())
 			if err != nil {
 				return err
 			}
@@ -313,7 +313,8 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 }
 
 func fillDriveItemPropertiesFromReceivedShare(ctx context.Context, logger *log.Logger,
-	identityCache identity.IdentityCache, receivedShares []*collaboration.ReceivedShare) (*libregraph.DriveItem, error) {
+	identityCache identity.IdentityCache, receivedShares []*collaboration.ReceivedShare,
+	resourceInfo *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
 
 	driveItem := libregraph.NewDriveItem()
 	permissions := make([]libregraph.Permission, 0, len(receivedShares))
@@ -327,7 +328,7 @@ func fillDriveItemPropertiesFromReceivedShare(ctx context.Context, logger *log.L
 			oldestReceivedShare = receivedShare
 		}
 
-		permission, err := cs3ReceivedShareToLibreGraphPermissions(ctx, logger, identityCache, receivedShare)
+		permission, err := cs3ReceivedShareToLibreGraphPermissions(ctx, logger, identityCache, receivedShare, resourceInfo)
 		if err != nil {
 			return driveItem, err
 		}
@@ -387,7 +388,8 @@ func fillDriveItemPropertiesFromReceivedShare(ctx context.Context, logger *log.L
 }
 
 func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Logger,
-	identityCache identity.IdentityCache, receivedShare *collaboration.ReceivedShare) (*libregraph.Permission, error) {
+	identityCache identity.IdentityCache, receivedShare *collaboration.ReceivedShare,
+	resourceInfo *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
 	permission := libregraph.NewPermission()
 	if id := receivedShare.GetShare().GetId().GetOpaqueId(); id != "" {
 		permission.SetId(id)
@@ -398,10 +400,11 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 	}
 
 	if permissionSet := receivedShare.GetShare().GetPermissions().GetPermissions(); permissionSet != nil {
-		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
-			*permissionSet,
-			unifiedrole.UnifiedRoleConditionGrantee,
-		)
+		condition, err := roleConditionForResourceType(resourceInfo)
+		if err != nil {
+			return nil, err
+		}
+		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*permissionSet, condition)
 
 		if role != nil {
 			permission.SetRoles([]string{role.GetId()})
@@ -432,4 +435,17 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 	}
 
 	return permission, nil
+}
+
+func roleConditionForResourceType(ri *storageprovider.ResourceInfo) (string, error) {
+	switch {
+	case utils.ResourceIDEqual(ri.GetSpace().GetRoot(), ri.GetId()):
+		return unifiedrole.UnifiedRoleConditionDrive, nil
+	case ri.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER:
+		return unifiedrole.UnifiedRoleConditionFolder, nil
+	case ri.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE:
+		return unifiedrole.UnifiedRoleConditionFile, nil
+	default:
+		return "", errorcode.New(errorcode.InvalidRequest, "unsupported resource type")
+	}
 }

@@ -28,12 +28,12 @@ const (
 	// UnifiedRoleManagerID Unified role manager id.
 	UnifiedRoleManagerID = "312c0871-5ef7-4b3a-85b6-0e4074c64049"
 
-	// UnifiedRoleConditionSelf defines constraint where the principal matches the target resource
-	UnifiedRoleConditionSelf = "@Subject.objectId == @Resource.objectId"
-	// UnifiedRoleConditionOwner defines constraints when the principal is the owner of the target resource
-	UnifiedRoleConditionOwner = "@Subject.objectId Any_of @Resource.owners"
-	// UnifiedRoleConditionGrantee does not exist in MS Graph, but we use it to express permissions on shared resources
-	UnifiedRoleConditionGrantee = "@Subject.objectId Any_of @Resource.grantee"
+	// UnifiedRoleConditionDrive defines constraint that matches a Driveroot/Spaceroot
+	UnifiedRoleConditionDrive = "exists @Resource.Root"
+	// UnifiedRoleConditionFolder defines constraints that matches a DriveItem representing a Folder
+	UnifiedRoleConditionFolder = "exists @Resource.Folder"
+	// UnifiedRoleConditionFile defines a constraint that matches a DriveItem representing a File
+	UnifiedRoleConditionFile = "exists @Resource.File"
 
 	DriveItemPermissionsCreate = "libre.graph/driveItem/permissions/create"
 	DriveItemChildrenCreate    = "libre.graph/driveItem/children/create"
@@ -78,7 +78,11 @@ func NewViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
 				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionGrantee),
+				Condition:              proto.String(UnifiedRoleConditionFile),
+			},
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFolder),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
@@ -95,7 +99,7 @@ func NewSpaceViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
 				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionOwner),
+				Condition:              proto.String(UnifiedRoleConditionDrive),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
@@ -112,7 +116,7 @@ func NewEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
 				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionGrantee),
+				Condition:              proto.String(UnifiedRoleConditionFolder),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
@@ -129,7 +133,7 @@ func NewSpaceEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
 				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionOwner),
+				Condition:              proto.String(UnifiedRoleConditionDrive),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
@@ -146,7 +150,7 @@ func NewFileEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
 				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionGrantee),
+				Condition:              proto.String(UnifiedRoleConditionFile),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
@@ -163,7 +167,7 @@ func NewUploaderUnifiedRole() *libregraph.UnifiedRoleDefinition {
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
 				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionGrantee),
+				Condition:              proto.String(UnifiedRoleConditionFolder),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
@@ -180,7 +184,7 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
 				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionOwner),
+				Condition:              proto.String(UnifiedRoleConditionDrive),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
@@ -219,18 +223,19 @@ func GetApplicableRoleDefinitionsForActions(actions []string, constraints string
 	definitions := make([]*libregraph.UnifiedRoleDefinition, 0, len(builtin))
 
 	for _, definition := range builtin {
-		definitionMatch := true
+		var definitionMatch bool
 
 		for _, permission := range definition.GetRolePermissions() {
 			if permission.GetCondition() != constraints {
-				definitionMatch = false
 				continue
 			}
 
-			for _, action := range permission.GetAllowedResourceActions() {
+			for i, action := range permission.GetAllowedResourceActions() {
 				if !slices.Contains(actions, action) {
-					definitionMatch = false
 					break
+				}
+				if i == len(permission.GetAllowedResourceActions())-1 {
+					definitionMatch = true
 				}
 			}
 
@@ -239,30 +244,33 @@ func GetApplicableRoleDefinitionsForActions(actions []string, constraints string
 			}
 		}
 
-		if !definitionMatch {
-			continue
+		if definitionMatch {
+			definitions = append(definitions, definition)
 		}
 
-		definitions = append(definitions, definition)
 	}
 
-	return WeightRoleDefinitions(definitions, descending)
+	return WeightRoleDefinitions(definitions, constraints, descending)
 }
 
 // WeightRoleDefinitions sorts the provided role definitions by the number of permissions[n].actions they grant,
 // the implementation is optimistic and assumes that the weight relies on the number of available actions.
 // descending - false - sorts the roles from least to most permissions
 // descending - true - sorts the roles from most to least permissions
-func WeightRoleDefinitions(roleDefinitions []*libregraph.UnifiedRoleDefinition, descending bool) []*libregraph.UnifiedRoleDefinition {
+func WeightRoleDefinitions(roleDefinitions []*libregraph.UnifiedRoleDefinition, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
 	slices.SortFunc(roleDefinitions, func(i, j *libregraph.UnifiedRoleDefinition) int {
 		var ia []string
 		for _, rp := range i.GetRolePermissions() {
-			ia = append(ia, rp.GetAllowedResourceActions()...)
+			if rp.GetCondition() == constraints {
+				ia = append(ia, rp.GetAllowedResourceActions()...)
+			}
 		}
 
 		var ja []string
 		for _, rp := range j.GetRolePermissions() {
-			ja = append(ja, rp.GetAllowedResourceActions()...)
+			if rp.GetCondition() == constraints {
+				ja = append(ja, rp.GetAllowedResourceActions()...)
+			}
 		}
 
 		switch descending {

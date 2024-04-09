@@ -48,8 +48,8 @@ Feature: List a sharing permissions
           },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
-            "minItems": 4,
-            "maxItems": 4,
+            "minItems": 3,
+            "maxItems": 3,
             "uniqueItems": true,
             "items": {
               "oneOf": [
@@ -136,41 +136,6 @@ Feature: List a sharing permissions
                       "type": "integer",
                       "enum": [
                         3
-                      ]
-                    },
-                    "description": {
-                      "type": "string",
-                      "enum": [
-                        "View, download and edit."
-                      ]
-                    },
-                    "displayName": {
-                      "type": "string",
-                      "enum": [
-                        "Can edit"
-                      ]
-                    },
-                    "id": {
-                      "type": "string",
-                      "enum": [
-                        "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "type": "integer",
-                      "enum": [
-                        4
                       ]
                     },
                     "description": {

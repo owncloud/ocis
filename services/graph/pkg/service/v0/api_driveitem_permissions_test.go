@@ -103,6 +103,10 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 		BeforeEach(func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			statResponse.Info = &provider.ResourceInfo{
+				Id:   &driveItemId,
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+			}
 
 			getGroupResponse = &grouppb.GetGroupResponse{
 				Status: status.NewOK(ctx),
@@ -158,7 +162,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permission.GrantedToV2.Group.GetId()).To(Equal("2"))
 		})
 
-		It("with roles (happy path)", func() {
+		It("succeeds with file roles (happy path)", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
@@ -173,11 +177,50 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.NewViewerUnifiedRole().GetId()))
 		})
 
-		It("fails with wrong role", func() {
+		It("succeeds with folder roles (happy path)", func() {
+			statResponse.Info.Type = provider.ResourceType_RESOURCE_TYPE_CONTAINER
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+			}
+			driveItemInvite.Roles = []string{unifiedrole.NewEditorUnifiedRole().GetId()}
+
+			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(permission.GetRoles()).To(HaveLen(1))
+			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.NewEditorUnifiedRole().GetId()))
+		})
+
+		It("fails with when trying to set a space role on a file", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.NewManagerUnifiedRole().GetId()}
+			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
+			Expect(permission).To(BeZero())
+		})
+
+		It("fails with when trying to set a folder role on a file", func() {
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+			}
+			driveItemInvite.Roles = []string{unifiedrole.NewEditorUnifiedRole().GetId()}
+			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
+			Expect(permission).To(BeZero())
+		})
+
+		It("fails with when trying to set a file role on a folder", func() {
+			statResponse.Info.Type = provider.ResourceType_RESOURCE_TYPE_CONTAINER
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+			}
+			driveItemInvite.Roles = []string{unifiedrole.NewFileEditorUnifiedRole().GetId()}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 
 			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
@@ -245,6 +288,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			createShareResponse = &collaboration.CreateShareResponse{
 				Status: status.NewOK(ctx),
 			}
+			statResponse.Info = &provider.ResourceInfo{}
 		})
 
 		It("adds a user to a space as expected (happy path)", func() {
@@ -253,6 +297,10 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				StorageId: "1",
 				SpaceId:   "2",
 				OpaqueId:  "3",
+			}
+			statResponse.Info.Id = listSpacesResponse.StorageSpaces[0].Root
+			statResponse.Info.Space = &provider.StorageSpace{
+				Root: listSpacesResponse.StorageSpaces[0].Root,
 			}
 
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
@@ -307,12 +355,13 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				Status: status.NewOK(ctx),
 				Shares: []*collaboration.Share{},
 			}
-		})
-		It("populates allowedValues for files that are not shared", func() {
 			statResponse.Info = &provider.ResourceInfo{
 				Id:            &itemID,
+				Type:          provider.ResourceType_RESOURCE_TYPE_FILE,
 				PermissionSet: roleconversions.NewViewerRole().CS3ResourcePermissions(),
 			}
+		})
+		It("populates allowedValues for files that are not shared", func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
 			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
@@ -322,10 +371,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
 		})
 		It("returns one permission per share", func() {
-			statResponse.Info = &provider.ResourceInfo{
-				Id:            &itemID,
-				PermissionSet: roleconversions.NewEditorRole().CS3ResourcePermissions(),
-			}
+			statResponse.Info.PermissionSet = roleconversions.NewEditorRole().CS3ResourcePermissions()
 			listSharesResponse.Shares = []*collaboration.Share{
 				{
 					Id: &collaboration.ShareId{OpaqueId: "1"},
@@ -394,6 +440,10 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					},
 				},
 			}
+			statResponse.Info = &provider.ResourceInfo{
+				Type:          provider.ResourceType_RESOURCE_TYPE_FILE,
+				PermissionSet: roleconversions.NewViewerRole().CS3ResourcePermissions(),
+			}
 		})
 
 		It("adds a user to a space as expected (happy path)", func() {
@@ -406,10 +456,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
 			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
-			statResponse.Info = &provider.ResourceInfo{
-				Id:            listSpacesResponse.StorageSpaces[0].Root,
-				PermissionSet: roleconversions.NewViewerRole().CS3ResourcePermissions(),
-			}
+			statResponse.Info.Id = listSpacesResponse.StorageSpaces[0].Root
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			permissions, err := driveItemPermissionsService.ListSpaceRootPermissions(context.Background(), driveId)
 			Expect(err).ToNot(HaveOccurred())
@@ -714,6 +761,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(res.Link.GetLibreGraphDisplayName() == TestLinkName)
 		})
 		It("updates the expiration date", func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			getPublicShareMockResponse.Share = nil
 			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
@@ -743,6 +791,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(res.GetExpirationDateTime().Equal(expiration)).To(BeTrue())
 		})
 		It("deletes the expiration date", func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			getPublicShareMockResponse.Share = nil
 			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
@@ -770,6 +819,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(ok).To(BeFalse())
 		})
 		It("fails to update the share permissions for a file share when setting a space specific role", func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			getPublicShareMockResponse.Share = nil
 			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
 			gatewayClient.On("GetPublicShare", mock.Anything, mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
@@ -788,6 +838,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(res).To(BeZero())
 		})
 		It("fails to update the space permissions for a space share when setting a file specific role", func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			getPublicShareMockResponse.Share = nil
 			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
 			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareMockResponse, nil)
@@ -809,6 +860,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(res).To(BeZero())
 		})
 		It("updates the share permissions when changing the resource permission actions", func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			getPublicShareMockResponse.Share = nil
 			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
 			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareMockResponse, nil)
