@@ -221,7 +221,7 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 	items, err := cs3ReceivedSharesToDriveItems(ctx, &s.logger, gatewayClient, s.identityCache, acceptedShares)
 	switch {
 	case err != nil:
-		return libregraph.DriveItem{}, nil
+		return libregraph.DriveItem{}, err
 	case len(items) != 1:
 		return libregraph.DriveItem{}, errorcode.New(errorcode.GeneralException, "failed to convert accepted shares into drive-item")
 	}
