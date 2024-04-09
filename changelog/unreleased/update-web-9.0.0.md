@@ -1,14 +1,16 @@
-Enhancement: Update web to v9.0.0-alpha.3
+Enhancement: Update web to v9.0.0-alpha.4
 
 Tags: web
 
-We updated ownCloud Web to v9.0.0-alpha.3. Please refer to the changelog (linked) for details on the web release.
+We updated ownCloud Web to v9.0.0-alpha.4. Please refer to the changelog (linked) for details on the web release.
 
 ## Summary
 * Bugfix [owncloud/web#10377](https://github.com/owncloud/web/pull/10377): User data not updated while altering own user
 * Bugfix [owncloud/web#10417](https://github.com/owncloud/web/pull/10417): Admin settings keyboard navigation
 * Bugfix [owncloud/web#10517](https://github.com/owncloud/web/pull/10517): Load thumbnail when postprocessing is finished
 * Bugfix [owncloud/web#10551](https://github.com/owncloud/web/pull/10551): Share sidebar icons
+* Bugfix [owncloud/web#10702](https://github.com/owncloud/web/pull/10702): Apply sandbox attribute to iframe in draw-io extension
+* Bugfix [owncloud/web#10706](https://github.com/owncloud/web/pull/10706): Apply sandbox attribute to iframe in app-external extension
 * Change [owncloud/web#7338](https://github.com/owncloud/web/issues/7338): Remove deprecated code
 * Change [owncloud/web#9892](https://github.com/owncloud/web/issues/9892): Remove skeleton app
 * Change [owncloud/web#10102](https://github.com/owncloud/web/pull/10102): Remove deprecated extension point for adding quick actions
@@ -32,6 +34,9 @@ We updated ownCloud Web to v9.0.0-alpha.3. Please refer to the changelog (linked
 * Enhancement [owncloud/web#10611](https://github.com/owncloud/web/pull/10611): Remember left nav bar state
 * Enhancement [owncloud/web#10612](https://github.com/owncloud/web/pull/10612): Remember right nav bar state
 * Enhancement [owncloud/web#10558](https://github.com/owncloud/web/pull/10558): Tile sizes
+* Enhancement [owncloud/web#10709](https://github.com/owncloud/web/pull/10709): Implement Server-Sent Events (SSE) for File Creation
+* Enhancement [owncloud/web#10443](https://github.com/owncloud/web/pull/10443): Custom component extension type
+* Enhancement [owncloud/web#10443](https://github.com/owncloud/web/pull/10443): Add extensionPoint concept
 
-https://github.com/owncloud/ocis/pull/8736
-https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.3
+https://github.com/owncloud/ocis/pull/8812
+https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.4
