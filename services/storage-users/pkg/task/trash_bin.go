@@ -26,6 +26,10 @@ func PurgeTrashBin(serviceAccountID string, deleteBefore time.Time, spaceType Sp
 		return err
 	}
 
+	gatewayClient, err = gatewaySelector.Next()
+	if err != nil {
+		return err
+	}
 	listStorageSpacesResponse, err := gatewayClient.ListStorageSpaces(ctx, &apiProvider.ListStorageSpacesRequest{
 		Filters: []*apiProvider.ListStorageSpacesRequest_Filter{
 			{
@@ -49,6 +53,10 @@ func PurgeTrashBin(serviceAccountID string, deleteBefore time.Time, spaceType Sp
 			ResourceId: storageSpace.GetRoot(),
 		}
 
+		gatewayClient, err = gatewaySelector.Next()
+		if err != nil {
+			return err
+		}
 		listRecycleResponse, err := gatewayClient.ListRecycle(ctx, &apiProvider.ListRecycleRequest{Ref: storageSpaceReference})
 		if err != nil {
 			return err
@@ -60,6 +68,10 @@ func PurgeTrashBin(serviceAccountID string, deleteBefore time.Time, spaceType Sp
 				continue
 			}
 
+			gatewayClient, err = gatewaySelector.Next()
+			if err != nil {
+				return err
+			}
 			purgeRecycleResponse, err := gatewayClient.PurgeRecycle(ctx, &apiProvider.PurgeRecycleRequest{
 				Ref: storageSpaceReference,
 				Key: recycleItem.Key,

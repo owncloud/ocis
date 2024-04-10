@@ -122,6 +122,11 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		return
 	}
 
+	gwc, err = ul.gatewaySelector.Next()
+	if err != nil {
+		ul.log.Error().Err(err).Msg("cannot get gateway client")
+		return
+	}
 	switch e := event.Event.(type) {
 	default:
 		err = errors.New("unhandled event")
@@ -196,7 +201,7 @@ func (ul *UserlogService) processEvent(event events.Event) {
 
 	// IV) send sses
 	if !ul.cfg.DisableSSE {
-		if err := ul.sendSSE(ctx, users, event, gwc); err != nil {
+		if err := ul.sendSSE(ctx, users, event, ul.gatewaySelector); err != nil {
 			ul.log.Error().Err(err).Interface("userid", users).Str("eventid", event.ID).Msg("cannot create sse event")
 		}
 	}
@@ -337,7 +342,7 @@ func (ul *UserlogService) addEventToUser(userid string, event events.Event) erro
 	})
 }
 
-func (ul *UserlogService) sendSSE(ctx context.Context, userIDs []string, event events.Event, gwc gateway.GatewayAPIClient) error {
+func (ul *UserlogService) sendSSE(ctx context.Context, userIDs []string, event events.Event, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) error {
 	m := make(map[string]events.SendSSE)
 
 	for _, userid := range userIDs {
@@ -348,7 +353,7 @@ func (ul *UserlogService) sendSSE(ctx context.Context, userIDs []string, event e
 			continue
 		}
 
-		ev, err := NewConverter(ctx, loc, gwc, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.cfg.DefaultLanguage).ConvertEvent(event.ID, event.Event)
+		ev, err := NewConverter(ctx, loc, gatewaySelector, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.cfg.DefaultLanguage).ConvertEvent(event.ID, event.Event)
 		if err != nil {
 			if utils.IsErrNotFound(err) || utils.IsErrPermissionDenied(err) {
 				// the resource was not found, we assume it is deleted

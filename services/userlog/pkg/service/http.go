@@ -51,7 +51,6 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 	ctx, err = utils.GetServiceUserContext(ul.cfg.ServiceAccount.ServiceAccountID, gwc, ul.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		ul.log.Error().Err(err).Msg("cant get service account")
@@ -59,7 +58,7 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	conv := NewConverter(ctx, r.Header.Get(HeaderAcceptLanguage), gwc, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.cfg.DefaultLanguage)
+	conv := NewConverter(ctx, r.Header.Get(HeaderAcceptLanguage), ul.gatewaySelector, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.cfg.DefaultLanguage)
 
 	var outdatedEvents []string
 	resp := GetEventResponseOC10{}
