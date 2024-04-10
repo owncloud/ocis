@@ -44,7 +44,7 @@ func isPublicShareArchive(r *http.Request) bool {
 // The app open requests can also be made in authenticated context. In these cases the PublicShareAuthenticator
 // needs to ignore the request.
 func isPublicShareAppOpen(r *http.Request) bool {
-	return strings.HasPrefix(r.URL.Path, "/app/open") &&
+	return (strings.HasPrefix(r.URL.Path, "/app/open") || strings.HasPrefix(r.URL.Path, "/app/new")) &&
 		(r.URL.Query().Get(headerShareToken) != "" || r.Header.Get(headerShareToken) != "")
 }
 
