@@ -210,7 +210,6 @@ listener:
 	return nil
 }
 
-//
 func (server *Server) handleConnection(conn net.Conn) {
 	boundDN := "" // "" == anonymous
 

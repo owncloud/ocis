@@ -1260,8 +1260,8 @@ github.com/leodido/go-urn/scim/schema
 ## explicit; go 1.13
 github.com/leonelquinteros/gotext
 github.com/leonelquinteros/gotext/plurals
-# github.com/libregraph/idm v0.4.1-0.20231213140724-56a222fb4215
-## explicit; go 1.18
+# github.com/libregraph/idm v0.4.1-0.20240410123343-a51b459380d0
+## explicit; go 1.21
 github.com/libregraph/idm
 github.com/libregraph/idm/pkg/ldapdn
 github.com/libregraph/idm/pkg/ldapentry
