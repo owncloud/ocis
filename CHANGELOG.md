@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix restarting of postprocessing: [#8782](https://github.com/owncloud/ocis/pull/8782)
 * Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
 * Bugfix - Fix removing groups from space: [#8803](https://github.com/owncloud/ocis/pull/8803)
+* Bugfix - Fix creating the drive item: [#8817](https://github.com/owncloud/ocis/pull/8817)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
@@ -205,6 +206,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8768
    https://github.com/owncloud/ocis/pull/8803
+
+* Bugfix - Fix creating the drive item: [#8817](https://github.com/owncloud/ocis/pull/8817)
+
+   We fixed the issue when creating a drive item with random item id was allowed
+
+   https://github.com/owncloud/ocis/issues/8724
+   https://github.com/owncloud/ocis/pull/8817
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
