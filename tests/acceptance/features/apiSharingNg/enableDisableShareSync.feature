@@ -21,8 +21,9 @@ Feature:  enable or disable sync of incoming shares
       | shareType       | user       |
       | permissionsRole | Viewer     |
     When user "Brian" disables sync of share "<resource>" using the Graph API
-    And user "Brian" lists the shares shared with him using the Graph API
-    Then the HTTP status code of responses on all endpoints should be "200"
+    Then the HTTP status code should be "204"
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
     {
@@ -141,7 +142,7 @@ Feature:  enable or disable sync of incoming shares
       | shareType       | group      |
       | permissionsRole | Viewer     |
     When user "Alice" disables sync of share "<resource>" using the Graph API
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "204"
     And user "Alice" should have sync disabled for share "<resource>"
     And user "Brian" should have sync enabled for share "<resource>"
     Examples:
@@ -196,8 +197,9 @@ Feature:  enable or disable sync of incoming shares
       | shareType       | user       |
       | permissionsRole | Viewer     |
     When user "Brian" disables sync of share "<resource>" using the Graph API
-    And user "Brian" lists the shares shared with him using the Graph API
-    Then the HTTP status code of responses on all endpoints should be "200"
+    Then the HTTP status code should be "204"
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
     {
@@ -288,7 +290,7 @@ Feature:  enable or disable sync of incoming shares
       | shareType       | group      |
       | permissionsRole | Viewer     |
     When user "Alice" disables sync of share "<resource>" using the Graph API
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "204"
     And user "Alice" should have sync disabled for share "<resource>"
     And user "Brian" should have sync enabled for share "<resource>"
     Examples:
