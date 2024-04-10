@@ -13,6 +13,7 @@ type Runner struct {
 	ID        string
 	fn        Runable
 	interrupt Stopper
+	finished  chan struct{}
 }
 
 // New will create a new runner.
@@ -28,6 +29,7 @@ func New(id string, fn Runable, interrupt Stopper) *Runner {
 		ID:        id,
 		fn:        fn,
 		interrupt: interrupt,
+		finished:  make(chan struct{}),
 	}
 }
 
@@ -85,10 +87,21 @@ func (r *Runner) Interrupt() {
 	r.interrupt()
 }
 
+// Finished will return a receive-only channel that can be used to know when
+// the task has finished but the result hasn't been made available yet. The
+// channel will be closed (without sending any message) when the task has finished.
+// This can be used specially with the `RunAsync` method when multiple runners
+// use the same channel: results could be waiting on your side of the channel
+func (r *Runner) Finished() <-chan struct{} {
+	return r.finished
+}
+
 // doTask will perform this runner's task and write the result in the provided
 // channel. The channel will be closed if requested.
 func (r *Runner) doTask(ch chan<- *Result, closeChan bool) {
 	err := r.fn()
+
+	close(r.finished)
 
 	result := &Result{
 		RunnerID:    r.ID,

@@ -79,11 +79,15 @@ func (gr *GroupRunner) Run(ctx context.Context) []*Result {
 	// interrupt the rest of the runners
 	for _, runner := range gr.runners {
 		if _, ok := results[runner.ID]; !ok {
-			// there might still be race conditions because the result might not have
-			// been made available even though the runner has finished. We assume
-			// that calling the `Interrupt` method multiple times and / or calling
-			// the `Interrupt` method when the task has finished is safe
-			runner.Interrupt()
+			select {
+			case <-runner.Finished():
+				// No data should be sent through the channel, so we'd be
+				// here only if the channel is closed. This means the task
+				// has finished and we don't need to interrupt. We do
+				// nothing in this case
+			default:
+				runner.Interrupt()
+			}
 		}
 	}
 
@@ -122,8 +126,13 @@ func (gr *GroupRunner) RunAsync(ch chan<- *Result) {
 //
 // As said, this will affect ALL the tasks in the group. It isn't possible to
 // try to stop just one task.
+// If a task has finished, the corresponding stopper won't be called
 func (gr *GroupRunner) Interrupt() {
 	for _, runner := range gr.runners {
-		runner.Interrupt()
+		select {
+		case <-runner.Finished():
+		default:
+			runner.Interrupt()
+		}
 	}
 }
