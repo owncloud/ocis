@@ -2356,7 +2356,7 @@ Feature: Send a sharing invitations
       """
     Examples:
       | permissions-role | error-message                                                                                      |
-      | Space Viewer     | role not applicable to this resource								      |
+      | Space Viewer     | role not applicable to this resource                                                               |
       | Space Editor     | role not applicable to this resource                                                               |
       | Manager          | role not applicable to this resource                                                               |
       | Co Owner         | Key: 'DriveItemInvite.Roles' Error:Field validation for 'Roles' failed on the 'available_role' tag |
@@ -2383,6 +2383,311 @@ Feature: Send a sharing invitations
       | shareType         | user                 |
       | permissionsAction | <permissions-action> |
     Then the HTTP status code should be "400"
+    Examples:
+      | permissions-action |
+      | permissions/create |
+      | permissions/update |
+      | permissions/delete |
+      | permissions/deny   |
+
+
+  Scenario Outline: send share invitation for project space to user with different roles using root endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    When user "Alice" sends the following share invitation using root endpoint of the Graph API:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for project space to group with different roles using root endpoint
+    Given using spaces DAV path
+    And group "grp1" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    When user "Alice" sends the following share invitation using root endpoint of the Graph API:
+      | space           | NewSpace           |
+      | sharee          | grp1               |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "group"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "grp1"
+                          ]
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: try to send share invitation for project space to multiple user with different roles using root endpoint
+    Given using spaces DAV path
+    And user "Carol" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+      | space           | NewSpace           |
+      | sharee          | Brian, Carol       |
+      | shareType       | user, user         |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "Key: 'DriveItemInvite.Recipients' Error:Field validation for 'Recipients' failed on the 'len' tag"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: try to send share invitation on personal drive to user with different roles using root endpoint
+    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "unsupported space type"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | File Editor      |
+      | Viewer           |
+      | Editor           |
+      | Uploader         |
+
+
+  Scenario Outline: try to send share invitation on shares drive to user with re-sharing permissions using root endpoint
+    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+      | space             | Shares               |
+      | sharee            | Brian                |
+      | shareType         | user                 |
+      | permissionsAction | <permissions-action> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "unsupported space type"
+              }
+            }
+          }
+        }
+      }
+      """
     Examples:
       | permissions-action |
       | permissions/create |

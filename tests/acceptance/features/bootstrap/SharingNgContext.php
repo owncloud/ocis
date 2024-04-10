@@ -865,4 +865,61 @@ class SharingNgContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * @When /^user "([^"]*)" (?:tries to send|sends) the following share invitation using root endpoint of the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userSendsTheFollowingShareInvitationForSpaceUsingRootEndPointTheGraphApi(string $user, TableNode $table):void {
+		$shareeIds = [];
+		$shareTypes = [];
+		$rows = $table->getRowsHash();
+		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
+			$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
+		} else {
+			$space = $this->spacesContext->getCreatedSpace($rows['space']);
+		}
+		$spaceId = $space['id'];
+
+		if (\array_key_exists('shareeId', $rows)) {
+			$shareeIds[] = $rows['shareeId'];
+			$shareTypes[] = $rows['shareType'];
+		} else {
+			$sharees = array_map('trim', explode(',', $rows['sharee']));
+			$shareTypes = array_map('trim', explode(',', $rows['shareType']));
+
+			foreach ($sharees as $sharee) {
+				// for non-exiting group or user, generate random id
+				$shareeIds[] = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id')
+					?: $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
+			}
+		}
+
+		$permissionsRole = $rows['permissionsRole'] ?? null;
+		$permissionsAction = $rows['permissionsAction'] ?? null;
+		$expireDate = $rows["expireDate"] ?? null;
+
+		$response = GraphHelper::sendSharingInvitationForDriveRoot(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$shareeIds,
+			$shareTypes,
+			$permissionsRole,
+			$permissionsAction,
+			$expireDate
+		);
+
+		if ($response->getStatusCode() === 200) {
+			$this->featureContext->shareNgAddToCreatedUserGroupShares($response);
+		}
+		$this->featureContext->setResponse($response);
+	}
 }

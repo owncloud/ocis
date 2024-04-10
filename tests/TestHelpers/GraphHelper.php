@@ -2040,4 +2040,63 @@ class GraphHelper {
 			self::getRequestHeaders()
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param array $shareeIds
+	 * @param array $shareTypes
+	 * @param string|null $permissionsRole
+	 * @param string|null $permissionsAction
+	 * @param string|null $expireDate
+	 *
+	 * @return ResponseInterface
+	 */
+	public static function sendSharingInvitationForDriveRoot(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $spaceId,
+		array $shareeIds,
+		array $shareTypes,
+		?string $permissionsRole,
+		?string $permissionsAction,
+		?string $expireDate
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/invite");
+
+		foreach ($shareeIds as $index => $shareeId) {
+			$shareType = $shareTypes[$index];
+			$body['recipients'][] = [
+				"@libre.graph.recipient.type" => $shareType,
+				"objectId" => $shareeId
+			];
+		}
+
+		if ($permissionsRole !== null) {
+			$roleId = self::getPermissionsRoleIdByName($permissionsRole);
+			$body['roles'] = [$roleId];
+		}
+
+		if ($permissionsAction !== null) {
+			$body['@libre.graph.permissions.actions'] = ['libre.graph/driveItem/' . $permissionsAction];
+		}
+
+		if ($expireDate !== null) {
+			$body['expirationDateTime'] = $expireDate;
+		}
+
+		return HttpRequestHelper::post(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($body)
+		);
+	}
 }
