@@ -1,4 +1,4 @@
-Feature:  mount or unmount incoming share
+Feature:  enable or disable sync of incoming shares
   As a user
   I want to have control over the share received
   So that I can filter out the files and folder shared with Me
@@ -11,7 +11,7 @@ Feature:  mount or unmount incoming share
     And using spaces DAV path
 
 
-  Scenario Outline: unmount shared resource
+  Scenario Outline: disable sync of shared resource
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Alice" has sent the following share invitation:
@@ -20,7 +20,7 @@ Feature:  mount or unmount incoming share
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    When user "Brian" unmounts share "<resource>" using the Graph API
+    When user "Brian" disables sync of share "<resource>" using the Graph API
     And user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code of responses on all endpoints should be "200"
     And the JSON data of the response should match
@@ -56,7 +56,7 @@ Feature:  mount or unmount incoming share
       | FolderToShare |
 
 
-  Scenario Outline: mount shared resource when auto-sync is disabled
+  Scenario Outline: enable sync of shared resource when auto-sync is disabled
     Given user "Brian" has disabled the auto-sync share
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Alice" has created folder "folder"
@@ -66,7 +66,7 @@ Feature:  mount or unmount incoming share
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    When user "Brian" mounts share "<resource>" offered by "Alice" from "Personal" space using the Graph API
+    When user "Brian" enables sync of share "<resource>" offered by "Alice" from "Personal" space using the Graph API
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
         """
@@ -103,7 +103,7 @@ Feature:  mount or unmount incoming share
       | sharee          | grp1       |
       | shareType       | group      |
       | permissionsRole | Viewer     |
-    When user "Alice" mounts share "<resource>" offered by "Carol" from "Personal" space using the Graph API
+    When user "Alice" enables sync of share "<resource>" offered by "Carol" from "Personal" space using the Graph API
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -140,7 +140,7 @@ Feature:  mount or unmount incoming share
       | sharee          | grp1       |
       | shareType       | group      |
       | permissionsRole | Viewer     |
-    When user "Alice" unmounts share "<resource>" using the Graph API
+    When user "Alice" disables sync of share "<resource>" using the Graph API
     Then the HTTP status code should be "200"
     And user "Alice" should have sync disabled for share "<resource>"
     And user "Brian" should have sync enabled for share "<resource>"
