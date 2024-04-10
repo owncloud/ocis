@@ -11,7 +11,7 @@ In its default configuration, Infinite Scale supports three authentication metho
 2. Implicit Flow
 3. Hybrid Flow
 
-For detailed information on Infinite Scale's support for OpenID Connect (OIDC), please consult the [OIDC section](../../ocis/identity-provider/oidc.md).
+For detailed information on Infinite Scale's support for OpenID Connect (OIDC), please consult the [OIDC section](https://owncloud.dev/ocis/identity-provider/oidc).
 To authenticate a client app using OIDC, both `client_id` and `client_secret` are essential. Infinite Scale does not offer dynamic registration. The required data for the default [ownCloud clients](https://doc.owncloud.com/server/next/admin_manual/configuration/user/oidc/oidc.html#client-ids-secrets-and-redirect-uris) can be found in the link and are availble for the following apps:
 - Desktop
 - Android
