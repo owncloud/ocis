@@ -73,11 +73,13 @@ type Provider struct {
 	validationKeys       map[string]crypto.PublicKey
 	certificates         map[string][]*x509.Certificate
 
-	browserStateCookiePath string
-	browserStateCookieName string
+	browserStateCookiePath     string
+	browserStateCookieName     string
+	browserStateCookieSameSite http.SameSite
 
-	sessionCookiePath string
-	sessionCookieName string
+	sessionCookiePath     string
+	sessionCookieName     string
+	sessionCookieSameSite http.SameSite
 
 	accessTokenDuration  time.Duration
 	idTokenDuration      time.Duration
@@ -105,11 +107,13 @@ func NewProvider(c *Config) (*Provider, error) {
 		validationKeys: make(map[string]crypto.PublicKey),
 		certificates:   make(map[string][]*x509.Certificate),
 
-		browserStateCookiePath: c.BrowserStateCookiePath,
-		browserStateCookieName: c.BrowserStateCookieName,
+		browserStateCookiePath:     c.BrowserStateCookiePath,
+		browserStateCookieName:     c.BrowserStateCookieName,
+		browserStateCookieSameSite: c.BrowserStateCookieSameSite,
 
-		sessionCookiePath: c.SessionCookiePath,
-		sessionCookieName: c.SessionCookieName,
+		sessionCookiePath:     c.SessionCookiePath,
+		sessionCookieName:     c.SessionCookieName,
+		sessionCookieSameSite: c.SessionCookieSameSite,
 
 		accessTokenDuration:  c.AccessTokenDuration,
 		idTokenDuration:      c.IDTokenDuration,

@@ -110,12 +110,18 @@ func NewIdentityManager(bs bootstrap.Bootstrap) (identity.Manager, error) {
 	activeIdentifier, err := identifier.NewIdentifier(&identifier.Config{
 		Config: config.Config,
 
-		BaseURI:         config.IssuerIdentifierURI,
-		PathPrefix:      bs.MakeURIPath(bootstrap.APITypeSignin, ""),
-		StaticFolder:    config.IdentifierClientPath,
-		LogonCookieName: "__Secure-KKT", // Kopano-Konnect-Token
-		ScopesConf:      config.IdentifierScopesConf,
-		WebAppDisabled:  config.IdentifierClientDisabled,
+		BaseURI:        config.IssuerIdentifierURI,
+		PathPrefix:     bs.MakeURIPath(bootstrap.APITypeSignin, ""),
+		StaticFolder:   config.IdentifierClientPath,
+		ScopesConf:     config.IdentifierScopesConf,
+		WebAppDisabled: config.IdentifierClientDisabled,
+
+		LogonCookieName:     "__Secure-KKT", // Kopano-Konnect-Token
+		LogonCookieSameSite: config.CookieSameSite,
+
+		ConsentCookieSameSite: config.CookieSameSite,
+
+		StateCookieSameSite: config.CookieSameSite,
 
 		AuthorizationEndpointURI: fullAuthorizationEndpointURL,
 		SignedOutEndpointURI:     fullSignedOutEndpointURL,

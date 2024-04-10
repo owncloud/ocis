@@ -18,6 +18,7 @@
 package provider
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/libregraph/lico/config"
@@ -37,11 +38,13 @@ type Config struct {
 	CheckSessionIframePath string
 	RegistrationPath       string
 
-	BrowserStateCookiePath string
-	BrowserStateCookieName string
+	BrowserStateCookiePath     string
+	BrowserStateCookieName     string
+	BrowserStateCookieSameSite http.SameSite
 
-	SessionCookiePath string
-	SessionCookieName string
+	SessionCookiePath     string
+	SessionCookieName     string
+	SessionCookieSameSite http.SameSite
 
 	AccessTokenDuration  time.Duration
 	IDTokenDuration      time.Duration

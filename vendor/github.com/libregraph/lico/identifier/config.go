@@ -18,6 +18,7 @@
 package identifier
 
 import (
+	"net/http"
 	"net/url"
 
 	"github.com/libregraph/lico/config"
@@ -28,9 +29,15 @@ import (
 type Config struct {
 	Config *config.Config
 
-	BaseURI         *url.URL
-	LogonCookieName string
-	ScopesConf      string
+	BaseURI    *url.URL
+	ScopesConf string
+
+	LogonCookieName     string
+	LogonCookieSameSite http.SameSite
+
+	ConsentCookieSameSite http.SameSite
+
+	StateCookieSameSite http.SameSite
 
 	PathPrefix     string
 	StaticFolder   string
