@@ -129,7 +129,9 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 	if filepath.IsAbs(name) {
 		return libregraph.DriveItem{}, errorcode.New(errorcode.InvalidRequest, "name cannot be an absolute path")
 	}
-	name = filepath.Clean(name)
+	if name != "" {
+		name = filepath.Clean(name)
+	}
 
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -162,6 +164,9 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 	if err != nil {
 		return libregraph.DriveItem{}, err
 	}
+	if len(receivedSharesResponse.GetShares()) == 0 {
+		return libregraph.DriveItem{}, errorcode.New(errorcode.InvalidRequest, "invalid itemID")
+	}
 
 	var errs []error
 
@@ -169,6 +174,7 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID stora
 
 	// try to accept all the received shares for this resource. So that the stat is in sync across all
 	// shares
+
 	for _, receivedShare := range receivedSharesResponse.GetShares() {
 		updateMask := &fieldmaskpb.FieldMask{Paths: []string{_fieldMaskPathState}}
 		receivedShare.State = collaboration.ShareState_SHARE_STATE_ACCEPTED
@@ -292,7 +298,7 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 	if err := StrictJSONUnmarshal(r.Body, &requestDriveItem); err != nil {
 		msg := "invalid request body"
 		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, msg)
 		return
 	}
 
@@ -301,7 +307,7 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		msg := "invalid remote item id"
 		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, msg)
 		return
 	}
 
@@ -310,7 +316,7 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		msg := "mounting share failed"
 		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, msg)
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, msg)
 		return
 	}
 
