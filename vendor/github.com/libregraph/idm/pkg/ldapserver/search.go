@@ -141,9 +141,17 @@ func parseSearchRequest(boundDN string, req *ber.Packet, controls *[]ldap.Contro
 		}
 		attributes = append(attributes, a)
 	}
-	searchReq := &ldap.SearchRequest{baseObject, scope,
-		derefAliases, sizeLimit, timeLimit,
-		typesOnly, filter, attributes, *controls}
+	searchReq := &ldap.SearchRequest{
+		BaseDN:       baseObject,
+		Scope:        scope,
+		DerefAliases: derefAliases,
+		SizeLimit:    sizeLimit,
+		TimeLimit:    timeLimit,
+		TypesOnly:    typesOnly,
+		Filter:       filter,
+		Attributes:   attributes,
+		Controls:     *controls,
+	}
 
 	return searchReq, nil
 }

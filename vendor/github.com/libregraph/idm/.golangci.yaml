@@ -40,7 +40,6 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
     - dupl
     - errcheck
     - exportloopref
@@ -60,13 +59,11 @@ linters:
     - nakedret
     - revive
     - staticcheck
-    - structcheck
     - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
 
   # don't enable:
   # - depguard - until https://github.com/OpenPeeDeeP/depguard/issues/7 gets fixed

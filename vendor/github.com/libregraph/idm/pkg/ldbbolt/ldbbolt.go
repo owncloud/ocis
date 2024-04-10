@@ -6,16 +6,16 @@
 // Package ldbbolt provides the lower-level Database functions for managing LDAP Entries
 // in a	BoltDB database. Some implementation details:
 //
-// The database is currently separated in these three buckets
+// # The database is currently separated in these three buckets
 //
-// - id2entry: This bucket contains the GOB encoded ldap.Entry instances keyed
-//             by a unique 64bit ID
+//   - id2entry: This bucket contains the GOB encoded ldap.Entry instances keyed
+//     by a unique 64bit ID
 //
-// - dn2id: This bucket is used as an index to lookup the ID of an entry by its DN. The DN
-//          is used in an normalized (case-folded) form here.
+//   - dn2id: This bucket is used as an index to lookup the ID of an entry by its DN. The DN
+//     is used in an normalized (case-folded) form here.
 //
-// - id2children: This bucket uses the entry-ids as and index and the values contain a list
-//                of the entry ids of its direct childdren
+//   - id2children: This bucket uses the entry-ids as and index and the values contain a list
+//     of the entry ids of its direct childdren
 //
 // Additional buckets will likely be added in the future to create efficient search indexes
 package ldbbolt
