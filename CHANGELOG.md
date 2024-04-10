@@ -45,6 +45,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Update reva to v2.19.4: [#8781](https://github.com/owncloud/ocis/pull/8781)
 * Bugfix - Fix restarting of postprocessing: [#8782](https://github.com/owncloud/ocis/pull/8782)
 * Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
+* Enhancement - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
 
 ## Details
 
@@ -79,6 +80,21 @@ The following sections list the changes for unreleased.
    resulted in the cache never being used.
 
    https://github.com/owncloud/ocis/pull/8799
+
+* Enhancement - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
+
+   To enhance the security of our application and prevent Cross-Site Request
+   Forgery (CSRF) attacks, we have updated the SameSite attribute of the build in
+   Identity Provider (IDP) cookies to Strict.
+
+   This change restricts the browser from sending these cookies with any cross-site
+   requests, thereby limiting the exposure of the user's session to potential
+   threats.
+
+   This update does not impact the existing functionality of the application but
+   provides an additional layer of security where needed.
+
+   https://github.com/owncloud/ocis/pull/8716
 
 # Changelog for [5.0.0] (2024-03-18)
 
