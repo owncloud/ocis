@@ -20,13 +20,13 @@ import (
 // This means that, if a task finishes naturally, the rest of the task will
 // asked to stop as well.
 type GroupRunner struct {
-	runners []*Runner
+	runners map[string]*Runner
 }
 
 // NewGroup will create a GroupRunner
 func NewGroup() *GroupRunner {
 	return &GroupRunner{
-		runners: []*Runner{},
+		runners: make(map[string]*Runner),
 	}
 }
 
@@ -35,7 +35,11 @@ func NewGroup() *GroupRunner {
 // It's mandatory that each runner in the group has an unique id, otherwise
 // there will be issues
 func (gr *GroupRunner) Add(r *Runner) {
-	gr.runners = append(gr.runners, r)
+	if _, ok := gr.runners[r.ID]; ok {
+		// a runner already exist with that id
+		panic("Trying to add a runner with an existing Id in the group")
+	}
+	gr.runners[r.ID] = r
 }
 
 // Run will execute all the tasks in the group at the same time.
