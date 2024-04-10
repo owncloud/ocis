@@ -450,10 +450,10 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @param string $sharer
-	 * @param string $shareType (user|group)
-	 * @param string $resource
+	 * @param string $shareType (share|link)
 	 * @param string $space
-	 * @param string|null $sharee can be both user or group
+	 * @param string|null $resource
+	 * @param string|null $recipient
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -462,12 +462,12 @@ class SharingNgContext implements Context {
 	public function removeSharePermission(
 		string $sharer,
 		string $shareType,
-		string $resource,
 		string $space,
-		?string $sharee = null
+		?string $resource = null,
+		?string $recipient = null
 	): ResponseInterface {
 		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
-		$itemId = $this->spacesContext->getResourceId($sharer, $space, $resource);
+		$itemId = (isset($resource)) ? $this->spacesContext->getResourceId($sharer, $space, $resource) : $this->spacesContext->getResourceId($sharer, $space, $space);
 
 		$permId = ($shareType === 'link')
 			? $this->featureContext->shareNgGetLastCreatedLinkShareID()
@@ -488,8 +488,8 @@ class SharingNgContext implements Context {
 	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from (?:file|folder|resource) "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer
-	 * @param string $shareType (user|group)
-	 * @param string $sharee can be both user or group
+	 * @param string $recipientType (user|group)
+	 * @param string $recipient can be both user or group
 	 * @param string $resource
 	 * @param string $space
 	 *
@@ -499,13 +499,36 @@ class SharingNgContext implements Context {
 	 */
 	public function userRemovesSharePermissionOfUserFromResourceOfSpaceUsingGraphAPI(
 		string $sharer,
-		string $shareType,
-		string $sharee,
+		string $recipientType,
+		string $recipient,
 		string $resource,
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, $shareType, $resource, $space)
+			$this->removeSharePermission($sharer, 'share', $space, $resource)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from space "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $sharer
+	 * @param string $recipientType (user|group)
+	 * @param string $recipient can be both user or group
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userRemovesSharePermissionOfUserFromSpaceUsingGraphAPI(
+		string $sharer,
+		string $recipientType,
+		string $recipient,
+		string $space
+	): void {
+		$this->featureContext->setResponse(
+			$this->removeSharePermission($sharer, 'share', $space)
 		);
 	}
 
@@ -526,7 +549,7 @@ class SharingNgContext implements Context {
 		string $space
 	):void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, 'link', $resource, $space)
+			$this->removeSharePermission($sharer, 'link', $space, $resource)
 		);
 	}
 
@@ -640,18 +663,19 @@ class SharingNgContext implements Context {
 		);
 		$responseBody = $this->featureContext->getJsonDecodedResponse($response);
 		$expectedValue = $status === "enabled" ? "true" : "false";
+		$actualValue = "";
 		foreach ($responseBody["value"] as $value) {
 			if ($value["remoteItem"]["name"] === $resource) {
 				// var_export converts values to their string representations
 				// e.g.: true -> 'true'
-				$actaulValue = var_export($value["@client.synchronize"], true);
+				$actualValue = var_export($value["@client.synchronize"], true);
 				break;
 			}
 		}
 		Assert::assertSame(
-			$actaulValue,
+			$actualValue,
 			$expectedValue,
-			"Expected property '@client.synchronize' to be '$expectedValue' but found '$actaulValue'"
+			"Expected property '@client.synchronize' to be '$expectedValue' but found '$actualValue'"
 		);
 	}
 }
