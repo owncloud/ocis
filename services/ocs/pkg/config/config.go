@@ -19,8 +19,7 @@ type Config struct {
 	Debug   Debug    `yaml:"debug"`
 
 	HTTP HTTP `yaml:"http"`
-	API  API  `yaml:"api"`
-	
+
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 	GrpcClient    client.Client         `yaml:"-"`
 

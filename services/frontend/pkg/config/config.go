@@ -145,6 +145,7 @@ type OCS struct {
 	PublicShareMustHavePassword          bool               `yaml:"public_sharing_share_must_have_password" env:"OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on all public shares." introductionVersion:"5.0"`
 	WriteablePublicShareMustHavePassword bool               `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares." introductionVersion:"5.0"`
 	IncludeOCMSharees                    bool               `yaml:"include_ocm_sharees" env:"FRONTEND_OCS_INCLUDE_OCM_SHAREES" desc:"Include OCM sharees when listing sharees." introductionVersion:"5.0"`
+	ShowUserEmailInResults               bool               `yaml:"show_email_in_results" env:"FRONTEND_SHOW_USER_EMAIL_IN_RESULTS;OCIS_SHOW_USER_EMAIL_IN_RESULTS" desc:"Mask user email addresses in responses. (EXPERIMENTAL)" introductionVersion:"5.1"`
 }
 
 type CacheWarmupDrivers struct {
