@@ -116,7 +116,6 @@ func DefaultConfig() *config.Config {
 			ListOCMShares:               true,
 			PublicShareMustHavePassword: true,
 			IncludeOCMSharees:           false,
-			ShowUserEmailInResults:      true,
 		},
 		Middleware: config.Middleware{
 			Auth: config.Auth{
