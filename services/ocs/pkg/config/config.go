@@ -19,7 +19,6 @@ type Config struct {
 	Debug   Debug    `yaml:"debug"`
 
 	HTTP HTTP `yaml:"http"`
-	API  API  `yaml:"api"`
 
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 	GrpcClient    client.Client         `yaml:"-"`
@@ -38,8 +37,4 @@ type SigningKeys struct {
 	TTL          time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL" desc:"Default time to live for signing keys. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
 	AuthUsername string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 	AuthPassword string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
-}
-
-type API struct {
-	ShowUserEmailInResults bool `yaml:"show_email_in_results" env:"OCIS_SHOW_USER_EMAIL_IN_RESULTS" desc:"Mask user email addresses in responses." introductionVersion:"5.1"`
 }
