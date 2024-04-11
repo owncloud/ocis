@@ -133,9 +133,9 @@ class TagContext implements Context {
 		$this->featureContext->verifyTableNodeColumns($table, ["path", "tagName"]);
 		$rows = $table->getHash();
 		foreach ($rows as $row) {
-			$resource = $row['path'];
 			$tags = explode(',', $row['tagName']);
-			$this->theUserHasCreatedFollowingTags($user, $filesOrFolders, $resource, $space, new TableNode([$tags]));
+			$response = $this->createTags($user, $filesOrFolders, $row['path'], $space, new TableNode([$tags]));
+			$this->featureContext->theHttpStatusCodeShouldBe(200, "", $response);
 		}
 	}
 
