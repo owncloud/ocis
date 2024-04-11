@@ -142,7 +142,7 @@ type OCS struct {
 	EnableDenials                        bool               `yaml:"enable_denials" env:"FRONTEND_OCS_ENABLE_DENIALS" desc:"EXPERIMENTAL: enable the feature to deny access on folders." introductionVersion:"pre5.0"`
 	ListOCMShares                        bool               `yaml:"list_ocm_shares" env:"FRONTEND_OCS_LIST_OCM_SHARES" desc:"Include OCM shares when listing shares. See the OCM service documentation for more details." introductionVersion:"5.0"`
 	PublicShareMustHavePassword          bool               `yaml:"public_sharing_share_must_have_password" env:"OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on all public shares." introductionVersion:"5.0"`
-	WriteablePublicShareMustHavePassword bool               `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares." introductionVersion:"5.0"`
+	WriteablePublicShareMustHavePassword bool               `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false." introductionVersion:"5.0"`
 	IncludeOCMSharees                    bool               `yaml:"include_ocm_sharees" env:"FRONTEND_OCS_INCLUDE_OCM_SHAREES" desc:"Include OCM sharees when listing sharees." introductionVersion:"5.0"`
 }
 
