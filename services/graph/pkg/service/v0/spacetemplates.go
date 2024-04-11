@@ -33,7 +33,7 @@ var (
 	// path to the image file
 	_imagepath = "spacetemplate/image.png"
 
-	// text for the readme.md file
+	// default description for new spaces
 	_readmeText = l10n.Template("Here you can add a description for this Space.")
 
 	// name of the readme.md file
