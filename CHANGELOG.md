@@ -1,6 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 5.0.1](#changelog-for-501-2024-04-10)
 * [Changelog for 5.0.0](#changelog-for-500-2024-03-18)
 * [Changelog for 4.0.6](#changelog-for-406-2024-02-07)
 * [Changelog for 4.0.5](#changelog-for-405-2023-12-21)
@@ -34,11 +34,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [5.0.1] (2024-04-10)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 5.0.1.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0...master
+[5.0.1]: https://github.com/owncloud/ocis/compare/v5.0.0...v5.0.1
 
 ## Summary
 
