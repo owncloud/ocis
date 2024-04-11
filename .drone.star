@@ -280,7 +280,7 @@ def main(ctx):
     # always append notification step
     pipelines.append(
         pipelineDependsOn(
-            notify(),
+            notify(ctx),
             pipelines,
         ),
     )
@@ -1908,7 +1908,11 @@ def makeGoGenerate(module):
         },
     ]
 
-def notify():
+def notify(ctx):
+    status = ["failure"]
+    if ctx.build.event == "cron":
+        status.append("success")
+
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1935,9 +1939,7 @@ def notify():
                 "refs/heads/release*",
                 "refs/tags/**",
             ],
-            "status": [
-                "failure",
-            ],
+            "status": status,
         },
     }
 
