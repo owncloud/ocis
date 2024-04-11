@@ -17,6 +17,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
@@ -167,15 +168,18 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 				},
 			})
 
-			switch err := errorcode.FromCS3Status(shareStat.GetStatus(), err); {
+			var errCode errorcode.Error
+			errors.As(errorcode.FromCS3Status(shareStat.GetStatus(), err), &errCode)
+
+			switch {
+			// skip ItemNotFound shares, they might have been deleted in the meantime or orphans.
+			case errCode.GetCode() == errorcode.ItemNotFound:
+				return nil
 			case err == nil:
 				break
-			// skip ItemNotFound shares, they might have been deleted in the meantime or orphans.
-			case errors.Is(err, errorcode.Error{}) && err.(errorcode.Error).GetCode() == errorcode.ItemNotFound:
-				return nil
 			default:
-				logger.Error().Err(err).Msg("could not stat")
-				return err
+				logger.Error().Err(errCode).Msg("could not stat")
+				return errCode
 			}
 
 			driveItem, err := fillDriveItemPropertiesFromReceivedShare(ctx, logger, identityCache, receivedShares)
