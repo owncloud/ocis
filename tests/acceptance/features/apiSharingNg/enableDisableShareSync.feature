@@ -148,3 +148,84 @@ Feature:  enable or disable sync of incoming shares
       | resource      |
       | textfile0.txt |
       | FolderToShare |
+
+
+  Scenario Outline: enable sync of shared resource from project space
+    Given user "Brian" has disabled the auto-sync share
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | NewSpace   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Brian" enables sync of share "<resource>" offered by "Alice" from "NewSpace" space using the Graph API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@client.synchronize"
+        ],
+        "properties": {
+          "@client.synchronize": {
+            "const": true
+          }
+        }
+      }
+      """
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | FolderToShare |
+
+
+  Scenario Outline: disable sync of shared resource from project space
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | NewSpace   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Brian" disables sync of share "<resource>" using the Graph API
+    And user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code of responses on all endpoints should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@client.synchronize"
+            ],
+            "properties": {
+              "@client.synchronize": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | FolderToShare |
