@@ -27,6 +27,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/stretchr/testify/mock"
+	"github.com/tidwall/gjson"
+	"google.golang.org/grpc"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
@@ -35,9 +39,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
-	"github.com/stretchr/testify/mock"
-	"github.com/tidwall/gjson"
-	"google.golang.org/grpc"
 )
 
 var _ = Describe("DriveItemPermissionsService", func() {
@@ -649,7 +650,6 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					},
 				},
 			}
-
 		})
 		It("fails when no share is found", func() {
 			getShareMockResponse.Share = nil

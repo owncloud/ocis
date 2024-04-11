@@ -166,7 +166,8 @@ func RenderError(w http.ResponseWriter, r *http.Request, err error) {
 	var errcode Error
 	if errors.As(err, &errcode) {
 		errcode.Render(w, r)
-	} else {
-		GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
 	}
+
+	GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 }

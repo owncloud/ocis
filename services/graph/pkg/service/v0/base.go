@@ -21,13 +21,14 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
-	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 // BaseGraphService implements a couple of helper functions that are

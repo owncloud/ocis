@@ -24,6 +24,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -377,7 +378,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 					Return(&collaborationv1beta1.GetReceivedShareResponse{}, errors.New("listing shares failed"))
 
 				err := drivesDriveItemService.UnmountShare(context.Background(), storageprovider.ResourceId{})
-				Expect(err).To(MatchError(&expectedError))
+				Expect(err).To(MatchError(expectedError))
 			})
 
 			It("uses the correct filters to get the shares", func() {
