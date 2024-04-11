@@ -113,6 +113,7 @@ ocs:
   public_sharing_share_must_have_password: true
   public_sharing_writeableshare_must_have_password: false
   include_ocm_sharees: false
+  show_email_in_results: true
 checksums:
   supported_types:
   - sha1

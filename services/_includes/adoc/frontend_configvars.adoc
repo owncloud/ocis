@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-04-11-00-45-14]
+[#deprecation-note-2024-04-11-08-14-14]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -327,7 +327,7 @@ The default upload protocol to use in clients. Currently only 'tus' is avaliable
 
 a|`OCIS_ENABLE_RESHARING` +
 `FRONTEND_ENABLE_RESHARING` +
-xref:deprecation-note-2024-04-11-00-45-14[Deprecation Note]
+xref:deprecation-note-2024-04-11-08-14-14[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -618,6 +618,16 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Include OCM sharees when listing sharees.
+
+a|`FRONTEND_SHOW_USER_EMAIL_IN_RESULTS` +
+`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Mask user email addresses in responses. (EXPERIMENTAL)
 
 a|`FRONTEND_CHECKSUMS_SUPPORTED_TYPES` +
 

@@ -23,7 +23,6 @@
 | OCIS_HTTP_TLS_ENABLED | bool | false | Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.|
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
-| OCIS_SHOW_USER_EMAIL_IN_RESULTS | bool | true | Mask user email addresses in responses. (EXPERIMENTAL)|
 | OCIS_CACHE_STORE<br/>OCS_PRESIGNEDURL_SIGNING_KEYS_STORE | string | nats-js-kv | The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.|
 | OCIS_CACHE_STORE_NODES<br/>OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
 | OCIS_CACHE_TTL<br/>OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL | Duration | 12h0m0s | Default time to live for signing keys. See the Environment Variable Types description for more details.|
