@@ -3,13 +3,12 @@ package gotext
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"sync"
-
-	"golang.org/x/text/language"
 
 	"github.com/leonelquinteros/gotext/plurals"
 )
@@ -21,7 +20,6 @@ type Domain struct {
 
 	// Language header
 	Language string
-	tag      language.Tag
 
 	// Plural-Forms header
 	PluralForms string
@@ -35,9 +33,9 @@ type Domain struct {
 	pluralforms plurals.Expression
 
 	// Storage
-	translations       map[string]*Translation
-	contexts           map[string]map[string]*Translation
-	pluralTranslations map[string]*Translation
+	translations        map[string]*Translation
+	contextTranslations map[string]map[string]*Translation
+	pluralTranslations  map[string]*Translation
 
 	// Sync Mutex
 	trMutex     sync.RWMutex
@@ -84,7 +82,7 @@ func NewDomain() *Domain {
 	domain.Headers = make(HeaderMap)
 	domain.headerComments = make([]string, 0)
 	domain.translations = make(map[string]*Translation)
-	domain.contexts = make(map[string]map[string]*Translation)
+	domain.contextTranslations = make(map[string]map[string]*Translation)
 	domain.pluralTranslations = make(map[string]*Translation)
 
 	return domain
@@ -142,7 +140,6 @@ func (do *Domain) parseHeaders() {
 
 	// Get/save needed headers
 	do.Language = do.Headers.Get(languageKey)
-	do.tag = language.Make(do.Language)
 	do.PluralForms = do.Headers.Get(pluralFormsKey)
 
 	// Parse Plural-Forms formula
@@ -183,14 +180,14 @@ func (do *Domain) DropStaleTranslations() {
 	defer do.trMutex.Unlock()
 	defer do.pluralMutex.Unlock()
 
-	for name, ctx := range do.contexts {
+	for name, ctx := range do.contextTranslations {
 		for id, trans := range ctx {
 			if trans.IsStale() {
 				delete(ctx, id)
 			}
 		}
 		if len(ctx) == 0 {
-			delete(do.contexts, name)
+			delete(do.contextTranslations, name)
 		}
 	}
 
@@ -312,7 +309,7 @@ func (do *Domain) SetC(id, ctx, str string) {
 	defer do.trMutex.Unlock()
 	defer do.pluralMutex.Unlock()
 
-	if context, ok := do.contexts[ctx]; ok {
+	if context, ok := do.contextTranslations[ctx]; ok {
 		if trans, hasTrans := context[id]; hasTrans {
 			trans.Set(str)
 		} else {
@@ -325,7 +322,7 @@ func (do *Domain) SetC(id, ctx, str string) {
 		trans := NewTranslation()
 		trans.ID = id
 		trans.Set(str)
-		do.contexts[ctx] = map[string]*Translation{
+		do.contextTranslations[ctx] = map[string]*Translation{
 			id: trans,
 		}
 	}
@@ -337,11 +334,11 @@ func (do *Domain) GetC(str, ctx string, vars ...interface{}) string {
 	do.trMutex.RLock()
 	defer do.trMutex.RUnlock()
 
-	if do.contexts != nil {
-		if _, ok := do.contexts[ctx]; ok {
-			if do.contexts[ctx] != nil {
-				if _, ok := do.contexts[ctx][str]; ok {
-					return Printf(do.contexts[ctx][str].Get(), vars...)
+	if do.contextTranslations != nil {
+		if _, ok := do.contextTranslations[ctx]; ok {
+			if do.contextTranslations[ctx] != nil {
+				if _, ok := do.contextTranslations[ctx][str]; ok {
+					return Printf(do.contextTranslations[ctx][str].Get(), vars...)
 				}
 			}
 		}
@@ -361,7 +358,7 @@ func (do *Domain) SetNC(id, plural, ctx string, n int, str string) {
 	defer do.trMutex.Unlock()
 	defer do.pluralMutex.Unlock()
 
-	if context, ok := do.contexts[ctx]; ok {
+	if context, ok := do.contextTranslations[ctx]; ok {
 		if trans, hasTrans := context[id]; hasTrans {
 			trans.SetN(pluralForm, str)
 		} else {
@@ -374,7 +371,7 @@ func (do *Domain) SetNC(id, plural, ctx string, n int, str string) {
 		trans := NewTranslation()
 		trans.ID = id
 		trans.SetN(pluralForm, str)
-		do.contexts[ctx] = map[string]*Translation{
+		do.contextTranslations[ctx] = map[string]*Translation{
 			id: trans,
 		}
 	}
@@ -386,11 +383,11 @@ func (do *Domain) GetNC(str, plural string, n int, ctx string, vars ...interface
 	do.trMutex.RLock()
 	defer do.trMutex.RUnlock()
 
-	if do.contexts != nil {
-		if _, ok := do.contexts[ctx]; ok {
-			if do.contexts[ctx] != nil {
-				if _, ok := do.contexts[ctx][str]; ok {
-					return Printf(do.contexts[ctx][str].GetN(do.pluralForm(n)), vars...)
+	if do.contextTranslations != nil {
+		if _, ok := do.contextTranslations[ctx]; ok {
+			if do.contextTranslations[ctx] != nil {
+				if _, ok := do.contextTranslations[ctx][str]; ok {
+					return Printf(do.contextTranslations[ctx][str].GetN(do.pluralForm(n)), vars...)
 				}
 			}
 		}
@@ -402,7 +399,51 @@ func (do *Domain) GetNC(str, plural string, n int, ctx string, vars ...interface
 	return Printf(plural, vars...)
 }
 
-//GetTranslations returns a copy of every translation in the domain. It does not support contexts.
+// IsTranslated reports whether a string is translated
+func (do *Domain) IsTranslated(str string) bool {
+	return do.IsTranslatedN(str, 0)
+}
+
+// IsTranslatedN reports whether a plural string is translated
+func (do *Domain) IsTranslatedN(str string, n int) bool {
+	do.trMutex.RLock()
+	defer do.trMutex.RUnlock()
+
+	if do.translations == nil {
+		return false
+	}
+	tr, ok := do.translations[str]
+	if !ok {
+		return false
+	}
+	return tr.IsTranslatedN(n)
+}
+
+// IsTranslatedC reports whether a context string is translated
+func (do *Domain) IsTranslatedC(str, ctx string) bool {
+	return do.IsTranslatedNC(str, 0, ctx)
+}
+
+// IsTranslatedNC reports whether a plural context string is translated
+func (do *Domain) IsTranslatedNC(str string, n int, ctx string) bool {
+	do.trMutex.RLock()
+	defer do.trMutex.RUnlock()
+
+	if do.contextTranslations == nil {
+		return false
+	}
+	translations, ok := do.contextTranslations[ctx]
+	if !ok {
+		return false
+	}
+	tr, ok := translations[str]
+	if !ok {
+		return false
+	}
+	return tr.IsTranslatedN(n)
+}
+
+// GetTranslations returns a copy of every translation in the domain. It does not support contexts.
 func (do *Domain) GetTranslations() map[string]*Translation {
 	all := make(map[string]*Translation, len(do.translations))
 
@@ -511,7 +552,7 @@ func (do *Domain) MarshalText() ([]byte, error) {
 
 	// Just as with headers, output translations in consistent order (to minimise diffs between round-trips), with (first) source reference taking priority, followed by context and finally ID
 	references := make([]SourceReference, 0)
-	for name, ctx := range do.contexts {
+	for name, ctx := range do.contextTranslations {
 		for id, trans := range ctx {
 			if id == "" {
 				continue
@@ -609,9 +650,39 @@ func (do *Domain) MarshalText() ([]byte, error) {
 }
 
 func EscapeSpecialCharacters(s string) string {
-	s = regexp.MustCompile(`([^\\])(")`).ReplaceAllString(s, "$1\\\"")  // Escape non-escaped double quotation marks
-	s = strings.ReplaceAll(s, "\n", "\"\n\"") // Convert newlines into multi-line strings
-	return s 
+	s = regexp.MustCompile(`([^\\])(")`).ReplaceAllString(s, "$1\\\"") // Escape non-escaped double quotation marks
+
+	if strings.Count(s, "\n") == 0 {
+		return s
+	}
+
+	// Handle EOL and multi-lines
+	// Only one line, but finishing with \n
+	if strings.Count(s, "\n") == 1 && strings.HasSuffix(s, "\n") {
+		return strings.ReplaceAll(s, "\n", "\\n")
+	}
+
+	elems := strings.Split(s, "\n")
+	// Skip last element for multiline which is an empty
+	var shouldEndWithEOL bool
+	if elems[len(elems)-1] == "" {
+		elems = elems[:len(elems)-1]
+		shouldEndWithEOL = true
+	}
+	data := []string{(`"`)}
+	for i, v := range elems {
+		l := fmt.Sprintf(`"%s\n"`, v)
+		// Last element without EOL
+		if i == len(elems)-1 && !shouldEndWithEOL {
+			l = fmt.Sprintf(`"%s"`, v)
+		}
+		// Remove finale " to last element as the whole string will be quoted
+		if i == len(elems)-1 {
+			l = strings.TrimSuffix(l, `"`)
+		}
+		data = append(data, l)
+	}
+	return strings.Join(data, "\n")
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface
@@ -623,7 +694,7 @@ func (do *Domain) MarshalBinary() ([]byte, error) {
 	obj.Nplurals = do.nplurals
 	obj.Plural = do.plural
 	obj.Translations = do.translations
-	obj.Contexts = do.contexts
+	obj.Contexts = do.contextTranslations
 
 	var buff bytes.Buffer
 	encoder := gob.NewEncoder(&buff)
@@ -649,7 +720,7 @@ func (do *Domain) UnmarshalBinary(data []byte) error {
 	do.nplurals = obj.Nplurals
 	do.plural = obj.Plural
 	do.translations = obj.Translations
-	do.contexts = obj.Contexts
+	do.contextTranslations = obj.Contexts
 
 	if expr, err := plurals.Compile(do.plural); err == nil {
 		do.pluralforms = expr

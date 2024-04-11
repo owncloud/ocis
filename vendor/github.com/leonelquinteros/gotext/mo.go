@@ -92,6 +92,19 @@ func (mo *Mo) GetNC(str, plural string, n int, ctx string, vars ...interface{}) 
 	return mo.domain.GetNC(str, plural, n, ctx, vars...)
 }
 
+func (mo *Mo) IsTranslated(str string) bool {
+	return mo.domain.IsTranslated(str)
+}
+func (mo *Mo) IsTranslatedN(str string, n int) bool {
+	return mo.domain.IsTranslatedN(str, n)
+}
+func (mo *Mo) IsTranslatedC(str, ctx string) bool {
+	return mo.domain.IsTranslatedC(str, ctx)
+}
+func (mo *Mo) IsTranslatedNC(str string, n int, ctx string) bool {
+	return mo.domain.IsTranslatedNC(str, n, ctx)
+}
+
 func (mo *Mo) MarshalBinary() ([]byte, error) {
 	return mo.domain.MarshalBinary()
 }
@@ -263,10 +276,10 @@ func (mo *Mo) addTranslation(msgid, msgstr []byte) {
 
 	if len(msgctxt) > 0 {
 		// With context...
-		if _, ok := mo.domain.contexts[string(msgctxt)]; !ok {
-			mo.domain.contexts[string(msgctxt)] = make(map[string]*Translation)
+		if _, ok := mo.domain.contextTranslations[string(msgctxt)]; !ok {
+			mo.domain.contextTranslations[string(msgctxt)] = make(map[string]*Translation)
 		}
-		mo.domain.contexts[string(msgctxt)][translation.ID] = translation
+		mo.domain.contextTranslations[string(msgctxt)][translation.ID] = translation
 	} else {
 		mo.domain.translations[translation.ID] = translation
 	}

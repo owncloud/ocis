@@ -111,15 +111,44 @@ func (l *Locale) findExt(dom, ext string) string {
 	return ""
 }
 
+// GetActualLanguage inspects the filesystem and decides whether to strip
+// a CC part of the ll_CC locale string.
+func (l *Locale) GetActualLanguage(dom string) string {
+	extensions := []string{"mo", "po"}
+	var fp string
+	for _, ext := range extensions {
+		// 'll' (or 'll_CC') exists, and it was specified as-is
+		fp = path.Join(l.path, l.lang, "LC_MESSAGES", dom+"."+ext)
+		if l.fileExists(fp) {
+			return l.lang
+		}
+		// 'll' exists, but 'll_CC' was specified
+		if len(l.lang) > 2 {
+			fp = path.Join(l.path, l.lang[:2], "LC_MESSAGES", dom+"."+ext)
+			if l.fileExists(fp) {
+				return l.lang[:2]
+			}
+		}
+		// 'll' (or 'll_CC') exists outside of LC_category, and it was specified as-is
+		fp = path.Join(l.path, l.lang, dom+"."+ext)
+		if l.fileExists(fp) {
+			return l.lang
+		}
+		// 'll' exists outside of LC_category, but 'll_CC' was specified
+		if len(l.lang) > 2 {
+			fp = path.Join(l.path, l.lang[:2], dom+"."+ext)
+			if l.fileExists(fp) {
+				return l.lang[:2]
+			}
+		}
+	}
+	return ""
+}
+
 func (l *Locale) fileExists(filename string) bool {
 	if l.fs != nil {
-		f, err := l.fs.Open(filename)
-		if err != nil {
-			return false
-		}
-		_, err = f.Stat()
+		_, err := fs.Stat(l.fs, filename)
 		return err == nil
-
 	}
 	_, err := os.Stat(filename)
 	return err == nil
@@ -190,6 +219,14 @@ func (l *Locale) SetDomain(dom string) {
 	l.Lock()
 	l.defaultDomain = dom
 	l.Unlock()
+}
+
+// GetLanguage is the lang getter for Locale configuration
+func (l *Locale) GetLanguage() string {
+	l.RLock()
+	lang := l.lang
+	l.RUnlock()
+	return lang
 }
 
 // Get uses a domain "default" to return the corresponding Translation of a given string.
@@ -309,6 +346,66 @@ func (l *Locale) GetTranslations() map[string]*Translation {
 	}
 
 	return all
+}
+
+// IsTranslated reports whether a string is translated
+func (l *Locale) IsTranslated(str string) bool {
+	return l.IsTranslatedND(l.GetDomain(), str, 0)
+}
+
+// IsTranslatedN reports whether a plural string is translated
+func (l *Locale) IsTranslatedN(str string, n int) bool {
+	return l.IsTranslatedND(l.GetDomain(), str, n)
+}
+
+// IsTranslatedD reports whether a domain string is translated
+func (l *Locale) IsTranslatedD(dom, str string) bool {
+	return l.IsTranslatedND(dom, str, 0)
+}
+
+// IsTranslatedND reports whether a plural domain string is translated
+func (l *Locale) IsTranslatedND(dom, str string, n int) bool {
+	l.RLock()
+	defer l.RUnlock()
+
+	if l.Domains == nil {
+		return false
+	}
+	translator, ok := l.Domains[dom]
+	if !ok {
+		return false
+	}
+	return translator.GetDomain().IsTranslatedN(str, n)
+}
+
+// IsTranslatedC reports whether a context string is translated
+func (l *Locale) IsTranslatedC(str, ctx string) bool {
+	return l.IsTranslatedNDC(l.GetDomain(), str, 0, ctx)
+}
+
+// IsTranslatedNC reports whether a plural context string is translated
+func (l *Locale) IsTranslatedNC(str string, n int, ctx string) bool {
+	return l.IsTranslatedNDC(l.GetDomain(), str, n, ctx)
+}
+
+// IsTranslatedDC reports whether a domain context string is translated
+func (l *Locale) IsTranslatedDC(dom, str, ctx string) bool {
+	return l.IsTranslatedNDC(dom, str, 0, ctx)
+}
+
+// IsTranslatedNDC reports whether a plural domain context string is translated
+func (l *Locale) IsTranslatedNDC(dom string, str string, n int, ctx string) bool {
+	l.RLock()
+	defer l.RUnlock()
+
+	if l.Domains == nil {
+		return false
+	}
+	translator, ok := l.Domains[dom]
+	if !ok {
+		return false
+	}
+	return translator.GetDomain().IsTranslatedNC(str, n, ctx)
 }
 
 // LocaleEncoding is used as intermediary storage to encode Locale objects to Gob.

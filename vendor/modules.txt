@@ -1256,7 +1256,7 @@ github.com/klauspost/cpuid/v2
 ## explicit; go 1.18
 github.com/leodido/go-urn
 github.com/leodido/go-urn/scim/schema
-# github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1
+# github.com/leonelquinteros/gotext v1.6.0
 ## explicit; go 1.13
 github.com/leonelquinteros/gotext
 github.com/leonelquinteros/gotext/plurals
