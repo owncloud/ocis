@@ -61,7 +61,7 @@
 | FRONTEND_OCS_ENABLE_DENIALS | bool | false | EXPERIMENTAL: enable the feature to deny access on folders.|
 | FRONTEND_OCS_LIST_OCM_SHARES | bool | true | Include OCM shares when listing shares. See the OCM service documentation for more details.|
 | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD | bool | true | Set this to true if you want to enforce passwords on all public shares.|
-| OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | bool | false | Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.|
+| OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | bool | false | Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false.|
 | FRONTEND_OCS_INCLUDE_OCM_SHAREES | bool | false | Include OCM sharees when listing sharees.|
 | FRONTEND_CHECKSUMS_SUPPORTED_TYPES | []string | [sha1 md5 adler32] | A list of checksum types that indicate to clients which hashes the server can use to verify upload integrity. Supported types are 'sha1', 'md5' and 'adler32'. See the Environment Variable Types description for more details.|
 | FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE | string | sha1 | The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES.|
