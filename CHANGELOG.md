@@ -1,6 +1,8 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 5.0.1](#changelog-for-501-2024-04-10)
+* [Changelog for 4.0.7](#changelog-for-407-2024-03-27)
 * [Changelog for 5.0.0](#changelog-for-500-2024-03-18)
 * [Changelog for 4.0.6](#changelog-for-406-2024-02-07)
 * [Changelog for 4.0.5](#changelog-for-405-2023-12-21)
@@ -38,7 +40,7 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.1...master
 
 ## Summary
 
@@ -454,6 +456,103 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8812
    https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.4
+
+# Changelog for [5.0.1] (2024-04-10)
+
+The following sections list the changes for 5.0.1.
+
+[5.0.1]: https://github.com/owncloud/ocis/compare/v4.0.7...v5.0.1
+
+## Summary
+
+* Bugfix - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
+* Bugfix - Update reva to v2.19.4: [#8781](https://github.com/owncloud/ocis/pull/8781)
+* Bugfix - Fix restarting of postprocessing: [#8782](https://github.com/owncloud/ocis/pull/8782)
+* Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
+
+## Details
+
+* Bugfix - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
+
+   To enhance the security of our application and prevent Cross-Site Request
+   Forgery (CSRF) attacks, we have updated the SameSite attribute of the build in
+   Identity Provider (IDP) cookies to Strict.
+
+   This change restricts the browser from sending these cookies with any cross-site
+   requests, thereby limiting the exposure of the user's session to potential
+   threats.
+
+   This update does not impact the existing functionality of the application but
+   provides an additional layer of security where needed.
+
+   This only affects cookies set by the built-in IDP. Production systems should not
+   be affected.
+
+   https://github.com/owncloud/ocis/pull/8716
+
+* Bugfix - Update reva to v2.19.4: [#8781](https://github.com/owncloud/ocis/pull/8781)
+
+   We updated reva to v2.19.4
+
+  *   Bugfix [cs3org/reva#4612](https://github.com/cs3org/reva/pull/4612): Use gateway selector in jsoncs3 to scale the service
+
+   Https://github.com/owncloud/ocis/pull/8787
+
+   We updated reva to v2.19.3
+
+  *   Bugfix[cs3org/reva#4607](https://github.com/cs3org/reva/pull/4607): Mask user email in output
+
+   https://github.com/owncloud/ocis/pull/8781
+
+* Bugfix - Fix restarting of postprocessing: [#8782](https://github.com/owncloud/ocis/pull/8782)
+
+   When an upload is not found, the logic to restart postprocessing was bunked.
+   Additionally we extended the upload sessions command to be able to restart the
+   uploads without using a second command.
+
+   NOTE: This also includes a breaking fix for the deprecated `ocis storage-users
+   uploads list` command
+
+   https://github.com/owncloud/ocis/pull/8782
+
+* Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
+
+   We fixed a problem with the config for the create personal space cache which
+   resulted in the cache never being used.
+
+   https://github.com/owncloud/ocis/pull/8799
+
+# Changelog for [4.0.7] (2024-03-27)
+
+The following sections list the changes for 4.0.7.
+
+[4.0.7]: https://github.com/owncloud/ocis/compare/v5.0.0...v4.0.7
+
+## Summary
+
+* Bugfix - Update reva to include bugfixes and improvements: [#8718](https://github.com/owncloud/ocis/pull/8718)
+* Enhancement - Update to go 1.22: [#8597](https://github.com/owncloud/ocis/pull/8597)
+
+## Details
+
+* Bugfix - Update reva to include bugfixes and improvements: [#8718](https://github.com/owncloud/ocis/pull/8718)
+
+   ## Changelog for reva 2.13.4
+
+  *   Bugfix [cs3org/reva#4398](https://github.com/cs3org/reva/pull/4398): Fix ceph build
+  *   Bugfix [cs3org/reva#4396](https://github.com/cs3org/reva/pull/4396): Allow an empty credentials chain in the auth middleware
+  *   Bugfix [cs3org/reva#4423](https://github.com/cs3org/reva/pull/4423): Fix disconnected traces
+  *   Bugfix [cs3org/reva#4590](https://github.com/cs3org/reva/pull/4590): Fix uploading via a public link
+  *   Bugfix [cs3org/reva#4470](https://github.com/cs3org/reva/pull/4470): Keep failed processing status
+  *   Enhancement [cs3org/reva#4397](https://github.com/cs3org/reva/pull/4397): Introduce UploadSessionLister interface
+
+   https://github.com/owncloud/ocis/pull/8718
+
+* Enhancement - Update to go 1.22: [#8597](https://github.com/owncloud/ocis/pull/8597)
+
+   We have updated go to version 1.22.
+
+   https://github.com/owncloud/ocis/pull/8597
 
 # Changelog for [5.0.0] (2024-03-18)
 
@@ -3388,6 +3487,7 @@ The following sections list the changes for 3.0.0.
 * Bugfix - Fix the wrong status code when appRoleAssignments is forbidden: [#6037](https://github.com/owncloud/ocis/issues/6037)
 * Bugfix - Fix Search reindexing performance regression: [#6085](https://github.com/owncloud/ocis/pull/6085)
 * Bugfix - Fix userlog panic: [#6114](https://github.com/owncloud/ocis/pull/6114)
+* Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
 * Bugfix - Fix Logout Url config name: [#6227](https://github.com/owncloud/ocis/pull/6227)
 * Bugfix - Allow selected updates on graph users: [#6233](https://github.com/owncloud/ocis/pull/6233)
 * Bugfix - Add missing response to blocked requests: [#6277](https://github.com/owncloud/ocis/pull/6277)
@@ -3612,6 +3712,13 @@ The following sections list the changes for 3.0.0.
    Userlog services paniced because of `nil` ctx. That is fixed now
 
    https://github.com/owncloud/ocis/pull/6114
+
+* Bugfix - Fix wrong compile date: [#6132](https://github.com/owncloud/ocis/pull/6132)
+
+   We fixed that current date is always printed.
+
+   https://github.com/owncloud/ocis/issues/6124
+   https://github.com/owncloud/ocis/pull/6132
 
 * Bugfix - Fix Logout Url config name: [#6227](https://github.com/owncloud/ocis/pull/6227)
 
