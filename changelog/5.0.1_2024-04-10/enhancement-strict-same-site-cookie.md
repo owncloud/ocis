@@ -1,4 +1,4 @@
-Enhancement: Make IDP cookies same site strict
+Bugfix: Make IDP cookies same site strict
 
 To enhance the security of our application and prevent Cross-Site Request Forgery (CSRF) attacks, we have updated the
 SameSite attribute of the build in Identity Provider (IDP) cookies to Strict.
@@ -8,5 +8,7 @@ thereby limiting the exposure of the user's session to potential threats.
 
 This update does not impact the existing functionality of the application but provides an additional layer of security
 where needed.
+
+This only affects cookies set by the built-in IDP. Production systems should not be affected.
 
 https://github.com/owncloud/ocis/pull/8716
