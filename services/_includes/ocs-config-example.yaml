@@ -42,8 +42,6 @@ http:
     enabled: false
     cert: ""
     key: ""
-api:
-  show_email_in_results: false
 grpc_client_tls: null
 signing_keys:
   store: nats-js-kv
