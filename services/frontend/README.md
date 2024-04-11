@@ -22,6 +22,10 @@ The datagateway endpoint, by default `/data`, forwards file up- and download req
 
 The ocs endpoint, by default `/ocs`, implements the ownCloud 10 Open Collaboration Services API by translating it into CS3 API requests. It can handle users, groups, capabilities and also implements the files sharing functionality on top of CS3. The `/ocs/v[12].php/cloud/user/signing-key` is currently handled by the dedicated [ocs](https://github.com/owncloud/ocis/tree/master/services/ocs) service.
 
+#### Event Handler
+
+The `frontend` service contains an eventhandler for handling `ocs` related events. As of now, it only listens to the `ShareCreated` event.
+
 ### Sharing
 
 Aggregating share information is one of the most time consuming operations in OCIS. The service fetches a list of either received or created shares and has to stat every resource individually. While stats are fast, the default behavior scales linearly with the number of shares.
@@ -63,15 +67,13 @@ Store specific notes:
   -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
   -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
 
-## Event Handler
-
-The `frontend` service contains an eventhandler for handling `ocs` related events. As of now, it only listens to the `ShareCreated` event.
-
 ### Auto-Accept Shares
 
 When setting the `FRONTEND_AUTO_ACCEPT_SHARES` to `true`, all incoming shares will be accepted automatically. Users can overwrite this setting individually in their profile.
 
-## The password policy
+## Passwords
+
+### The Password Policy
 
 Note that the password policy currently impacts only **public link password validation**.
 
@@ -104,7 +106,7 @@ These variables are global ocis variables because they are used not only in the 
 
 Note that a password can have a maximum length of **72 bytes**. Depending on the alphabet used, a character is encoded by 1 to 4 bytes, defining the maximum length of a password indirectly. While US-ASCII will only need one byte, Latin alphabets and also Greek or Cyrillic ones need two bytes. Three bytes are needed for characters in Chinese, Japanese and Korean etc.
 
-### The password policy capability
+### The Password Policy Capability
 
 The capabilities endpoint (e.g. https://ocis.test/ocs/v1.php/cloud/capabilities?format=json) gives you following capabilities which are relevant for the password policy:
 
@@ -126,3 +128,19 @@ The capabilities endpoint (e.g. https://ocis.test/ocs/v1.php/cloud/capabilities?
   }
 }
 ```
+
+### Password Enforcement for all Public Links
+
+For public accessible shares, independent if read only or writable, a password is enforced. To change this requirement, set the following environment variable to `false`:
+
+`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD`
+
+### Password Enforcement for Writeable Public Links
+
+For public accessible writable shares, a password can be enforced. To change the current setting, set the following environment variable to `true`:
+
+`OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
+
+Note that changing this environment variable only makes sense if\
+`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD`\
+is set to `false`.
