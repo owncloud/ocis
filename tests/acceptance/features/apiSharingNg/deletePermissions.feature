@@ -197,7 +197,7 @@ Feature: Remove access to a drive item
       | Manager          |
 
   @issue-8768
-  Scenario Outline: user removes group member from project space
+  Scenario Outline: user removes group from project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And group "group1" has been created

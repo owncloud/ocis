@@ -450,7 +450,7 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @param string $sharer
-	 * @param string $shareType (share|link)
+	 * @param string $shareType (user|group|link)
 	 * @param string $space
 	 * @param string|null $resource
 	 * @param string|null $recipient
@@ -505,7 +505,7 @@ class SharingNgContext implements Context {
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, 'share', $space, $resource)
+			$this->removeSharePermission($sharer, $recipientType, $space, $resource)
 		);
 	}
 
@@ -528,7 +528,7 @@ class SharingNgContext implements Context {
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, 'share', $space)
+			$this->removeSharePermission($sharer, $recipientType, $space)
 		);
 	}
 
