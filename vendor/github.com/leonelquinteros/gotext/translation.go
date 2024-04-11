@@ -78,3 +78,15 @@ func (t *Translation) GetN(n int) string {
 	// Return untranslated plural by default
 	return t.PluralID
 }
+
+// IsTranslated reports whether a string is translated
+func (t *Translation) IsTranslated() bool {
+	tr, ok := t.Trs[0]
+	return tr != "" && ok
+}
+
+// IsTranslatedN reports whether a plural string is translated
+func (t *Translation) IsTranslatedN(n int) bool {
+	tr, ok := t.Trs[n]
+	return tr != "" && ok
+}

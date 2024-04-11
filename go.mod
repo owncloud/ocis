@@ -55,7 +55,7 @@ require (
 	github.com/jellydator/ttlcache/v3 v3.2.0
 	github.com/jinzhu/now v1.1.5
 	github.com/justinas/alice v1.2.0
-	github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1
+	github.com/leonelquinteros/gotext v1.6.0
 	github.com/libregraph/idm v0.4.1-0.20240410123343-a51b459380d0
 	github.com/libregraph/lico v0.61.3-0.20240322112242-72cf9221d3a7
 	github.com/mitchellh/mapstructure v1.5.0

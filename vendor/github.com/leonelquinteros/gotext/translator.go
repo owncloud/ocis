@@ -61,7 +61,7 @@ func (te *TranslatorEncoding) GetTranslator() Translator {
 	po.domain.nplurals = te.Nplurals
 	po.domain.plural = te.Plural
 	po.domain.translations = te.Translations
-	po.domain.contexts = te.Contexts
+	po.domain.contextTranslations = te.Contexts
 
 	return po
 }

@@ -25,7 +25,7 @@ Example:
 
 	func main() {
 		// Create po object
-		po := gotext.NewPoTranslator()
+		po := gotext.NewPo()
 
 		// Parse .po file
 		po.ParseFile("/path/to/po/file/translations.po")
@@ -112,6 +112,19 @@ func (po *Po) SetNC(id, plural, ctx string, n int, str string) {
 }
 func (po *Po) GetNC(str, plural string, n int, ctx string, vars ...interface{}) string {
 	return po.domain.GetNC(str, plural, n, ctx, vars...)
+}
+
+func (po *Po) IsTranslated(str string) bool {
+	return po.domain.IsTranslated(str)
+}
+func (po *Po) IsTranslatedN(str string, n int) bool {
+	return po.domain.IsTranslatedN(str, n)
+}
+func (po *Po) IsTranslatedC(str, ctx string) bool {
+	return po.domain.IsTranslatedC(str, ctx)
+}
+func (po *Po) IsTranslatedNC(str string, n int, ctx string) bool {
+	return po.domain.IsTranslatedNC(str, n, ctx)
 }
 
 func (po *Po) MarshalText() ([]byte, error) {
@@ -223,10 +236,10 @@ func (po *Po) saveBuffer() {
 		po.domain.translations[po.domain.trBuffer.ID] = po.domain.trBuffer
 	} else {
 		// With context...
-		if _, ok := po.domain.contexts[po.domain.ctxBuffer]; !ok {
-			po.domain.contexts[po.domain.ctxBuffer] = make(map[string]*Translation)
+		if _, ok := po.domain.contextTranslations[po.domain.ctxBuffer]; !ok {
+			po.domain.contextTranslations[po.domain.ctxBuffer] = make(map[string]*Translation)
 		}
-		po.domain.contexts[po.domain.ctxBuffer][po.domain.trBuffer.ID] = po.domain.trBuffer
+		po.domain.contextTranslations[po.domain.ctxBuffer][po.domain.trBuffer.ID] = po.domain.trBuffer
 
 		// Cleanup current context buffer if needed
 		if po.domain.trBuffer.ID != "" {
