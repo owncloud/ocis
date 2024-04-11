@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2024-04-11T06:21:09.339217512Z
+date: 2024-04-11T06:23:39.189261022Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -70,15 +70,15 @@ When using Infinite Scale as user storage, a directory named `storage/users/uplo
 
 *   **In the rare case of a failure**, after the upload succeeded but the file was not moved to its target location, which can happen when postprocessing fails, the situation is the same as with expired uploads.
 
-Example cases for expired uploads
+Example cases for expired uploads:
 
 *   In the final step the upload blob is moved from the upload area to the final blobstore (e.g. S3). 
 
 *   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed.
 
-The admin can restart the postprocessing for this with the postprocessing cli.
+*   If the upload was technically successful, but the postprocessing step failed due to an internal error, it will not get further processed. See the procedure **Resume Post-Processing** in the `postprocessing` service documentation for details how to solve this.
 
-The storage users service can only list and clean upload sessions:
+The following commands are available to manage unfinished uploads:
 
 ```bash
 ocis storage-users uploads <command>
