@@ -3,6 +3,7 @@ package svc
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"reflect"
@@ -16,6 +17,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
@@ -166,12 +168,15 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 				},
 			})
 
-			switch errCode := errorcode.FromCS3Status(shareStat.GetStatus(), err); {
-			case errCode == nil:
-				break
+			var errCode errorcode.Error
+			errors.As(errorcode.FromCS3Status(shareStat.GetStatus(), err), &errCode)
+
+			switch {
 			// skip ItemNotFound shares, they might have been deleted in the meantime or orphans.
 			case errCode.GetCode() == errorcode.ItemNotFound:
 				return nil
+			case err == nil:
+				break
 			default:
 				logger.Error().Err(errCode).Msg("could not stat")
 				return errCode

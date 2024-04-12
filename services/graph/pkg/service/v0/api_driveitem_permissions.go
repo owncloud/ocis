@@ -83,9 +83,9 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 	}
 
 	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &resourceId}})
-	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
-		s.logger.Warn().Err(errCode).Interface("stat.res", statResponse).Msg("stat failed")
-		return libregraph.Permission{}, *errCode
+	if err := errorcode.FromStat(statResponse, err); err != nil {
+		s.logger.Warn().Err(err).Interface("stat.res", statResponse).Msg("stat failed")
+		return libregraph.Permission{}, err
 	}
 
 	var condition string
@@ -177,9 +177,9 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 	}
 
 	createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
-	if errCode := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); errCode != nil {
+	if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
 		s.logger.Debug().Err(err).Msg("share creation failed")
-		return libregraph.Permission{}, *errCode
+		return libregraph.Permission{}, err
 	}
 
 	if id := createShareResponse.GetShare().GetId().GetOpaqueId(); id != "" {
@@ -226,8 +226,8 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 	}
 
 	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
-	if errCode := errorcode.FromStat(statResponse, err); errCode != nil {
-		s.logger.Warn().Err(errCode).Interface("stat.res", statResponse).Msg("stat failed")
+	if err := errorcode.FromStat(statResponse, err); err != nil {
+		s.logger.Warn().Err(err).Interface("stat.res", statResponse).Msg("stat failed")
 		return collectionOfPermissions, err
 	}
 

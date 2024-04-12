@@ -71,11 +71,11 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 			},
 		},
 	)
-	if errCode := errorcode.FromCS3Status(getReceivedShareResponse.GetStatus(), err); errCode != nil {
-		s.logger.Debug().Err(errCode).
+	if err := errorcode.FromCS3Status(getReceivedShareResponse.GetStatus(), err); err != nil {
+		s.logger.Debug().Err(err).
 			Str("shareid", shareId).
 			Msg("failed to read share")
-		return errCode
+		return err
 	}
 
 	// Find all accepted shares for this resource

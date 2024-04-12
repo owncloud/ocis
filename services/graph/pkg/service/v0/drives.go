@@ -27,7 +27,7 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
@@ -78,7 +78,7 @@ func (g Graph) GetDrives(version APIVersion) http.HandlerFunc {
 func (g Graph) GetDrivesV1(w http.ResponseWriter, r *http.Request) {
 	spaces, errCode := g.getDrives(r, false, APIVersion_1)
 	if errCode != nil {
-		errCode.Render(w, r)
+		errorcode.RenderError(w, r, errCode)
 		return
 	}
 
@@ -99,7 +99,7 @@ func (g Graph) GetDrivesV1(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
 	spaces, errCode := g.getDrives(r, false, APIVersion_1_Beta_1)
 	if errCode != nil {
-		errCode.Render(w, r)
+		errorcode.RenderError(w, r, errCode)
 		return
 	}
 
@@ -133,7 +133,7 @@ func (g Graph) GetAllDrives(version APIVersion) http.HandlerFunc {
 func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
 	spaces, errCode := g.getDrives(r, true, APIVersion_1)
 	if errCode != nil {
-		errCode.Render(w, r)
+		errorcode.RenderError(w, r, errCode)
 		return
 	}
 
@@ -153,7 +153,7 @@ func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
 	drives, errCode := g.getDrives(r, true, APIVersion_1_Beta_1)
 	if errCode != nil {
-		errCode.Render(w, r)
+		errorcode.RenderError(w, r, errCode)
 		return
 	}
 
@@ -168,7 +168,7 @@ func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
 }
 
 // getDrives implements the Service interface.
-func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersion) ([]*libregraph.Drive, *errorcode.Error) {
+func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersion) ([]*libregraph.Drive, error) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().
 		Interface("query", r.URL.Query()).
@@ -179,20 +179,20 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get drives: query error")
-		return nil, conversions.ToPointer(errorcode.New(errorcode.InvalidRequest, err.Error()))
+		return nil, errorcode.New(errorcode.InvalidRequest, err.Error())
 	}
 	ctx := r.Context()
 
 	filters, err := generateCs3Filters(odataReq)
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get drives: error parsing filters")
-		return nil, conversions.ToPointer(errorcode.New(errorcode.NotSupported, err.Error()))
+		return nil, errorcode.New(errorcode.NotSupported, err.Error())
 	}
 	if !unrestricted {
 		user, ok := revactx.ContextGetUser(r.Context())
 		if !ok {
 			logger.Debug().Msg("could not create drive: invalid user")
-			return nil, conversions.ToPointer(errorcode.New(errorcode.AccessDenied, "invalid user"))
+			return nil, errorcode.New(errorcode.AccessDenied, "invalid user")
 		}
 		filters = append(filters, &storageprovider.ListStorageSpacesRequest_Filter{
 			Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_USER,
@@ -210,32 +210,32 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 	switch {
 	case err != nil:
 		logger.Error().Err(err).Msg("could not get drives: transport error")
-		return nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, err.Error()))
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
 			// ok, empty return
 			return nil, nil
 		}
 		logger.Debug().Str("message", res.GetStatus().GetMessage()).Msg("could not get drives: grpc error")
-		return nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, res.Status.Message))
+		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
 	webDavBaseURL, err := g.getWebDavBaseURL()
 	if err != nil {
 		logger.Error().Err(err).Str("url", webDavBaseURL.String()).Msg("could not get drives: error parsing url")
-		return nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, err.Error()))
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
 	}
 
 	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, apiVersion)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get drives: error parsing grpc response")
-		return nil, conversions.ToPointer(errorcode.New(errorcode.GeneralException, err.Error()))
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
 	}
 
 	spaces, err = sortSpaces(odataReq, spaces)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get drives: error sorting the spaces list according to query")
-		return nil, conversions.ToPointer(errorcode.New(errorcode.InvalidRequest, err.Error()))
+		return nil, errorcode.New(errorcode.InvalidRequest, err.Error())
 	}
 
 	return spaces, nil

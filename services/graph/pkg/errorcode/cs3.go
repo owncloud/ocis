@@ -17,12 +17,12 @@ import (
 //
 // This function is particularly useful when dealing with CS3 responses,
 // and a unified error handling within the application is necessary.
-func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) *Error {
+func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) error {
 	if inerr != nil {
-		return &Error{msg: inerr.Error(), errorCode: GeneralException}
+		return Error{msg: inerr.Error(), errorCode: GeneralException}
 	}
 
-	err := &Error{errorCode: GeneralException, msg: "unspecified error has occurred"}
+	err := Error{errorCode: GeneralException, msg: "unspecified error has occurred"}
 
 	if status != nil {
 		err.msg = status.GetMessage()
@@ -33,7 +33,7 @@ func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) *E
 	case slices.Contains(ignore, status.GetCode()):
 		fallthrough
 	case code == cs3rpc.Code_CODE_OK:
-		err = nil
+		return nil
 	case code == cs3rpc.Code_CODE_NOT_FOUND:
 		err.errorCode = ItemNotFound
 	case code == cs3rpc.Code_CODE_PERMISSION_DENIED:
@@ -61,11 +61,11 @@ func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) *E
 	return err
 }
 
-// FromStat transforms a *provider.StatResponse object and an error into an *Error.
+// FromStat transforms a *provider.StatResponse object and an error into an Error.
 //
 // It takes a stat of type *provider.StatResponse, an error, and a variadic parameter of type cs3rpc.Code.
 // It invokes the FromCS3Status function with the StatResponse Status and the ignore codes.
-func FromStat(stat *provider.StatResponse, err error, ignore ...cs3rpc.Code) *Error {
+func FromStat(stat *provider.StatResponse, err error, ignore ...cs3rpc.Code) error {
 	// TODO: look into ResourceInfo to get the postprocessing state and map that to 425 status?
 	return FromCS3Status(stat.GetStatus(), err, ignore...)
 }
