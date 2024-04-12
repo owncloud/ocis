@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix restarting of postprocessing: [#8782](https://github.com/owncloud/ocis/pull/8782)
 * Bugfix - Fix the create personal space cache: [#8799](https://github.com/owncloud/ocis/pull/8799)
 * Bugfix - Fix removing groups from space: [#8803](https://github.com/owncloud/ocis/pull/8803)
+* Bugfix - Validate conditions for sharing roles by resource type: [#8815](https://github.com/owncloud/ocis/pull/8815)
 * Bugfix - Fix creating the drive item: [#8817](https://github.com/owncloud/ocis/pull/8817)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
@@ -208,6 +209,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8768
    https://github.com/owncloud/ocis/pull/8803
+
+* Bugfix - Validate conditions for sharing roles by resource type: [#8815](https://github.com/owncloud/ocis/pull/8815)
+
+   We improved the validation of the allowed sharing roles for specific resource
+   type for various sharing related graph API endpoints. This allows e.g. the web
+   client to restrict the sharing roles presented to the user based on the type of
+   the resource that is being shared.
+
+   https://github.com/owncloud/ocis/issues/8331
+   https://github.com/owncloud/ocis/pull/8815
 
 * Bugfix - Fix creating the drive item: [#8817](https://github.com/owncloud/ocis/pull/8817)
 
