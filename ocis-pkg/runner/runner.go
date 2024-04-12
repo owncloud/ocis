@@ -2,6 +2,7 @@ package runner
 
 import (
 	"context"
+	"sync/atomic"
 )
 
 // Runner represents the one executing a long running task, such as a server
@@ -10,10 +11,12 @@ import (
 // Result that it will generated will contain the same ID, so we can
 // know which runner provided which result.
 type Runner struct {
-	ID        string
-	fn        Runable
-	interrupt Stopper
-	finished  chan struct{}
+	ID          string
+	fn          Runable
+	interrupt   Stopper
+	running     atomic.Bool
+	interrupted atomic.Bool
+	finished    chan struct{}
 }
 
 // New will create a new runner.
@@ -52,6 +55,12 @@ func New(id string, fn Runable, interrupt Stopper) *Runner {
 // - Use context.WithDeadline(...) or context.WithTimeout(...) to run the task
 // for a limited time
 func (r *Runner) Run(ctx context.Context) *Result {
+	if !r.running.CompareAndSwap(false, true) {
+		// If not swapped, the task is already running.
+		// Running the same task multiple times is a bug, so we panic
+		panic("Runner with id " + r.ID + " was running twice")
+	}
+
 	ch := make(chan *Result)
 
 	go r.doTask(ch, true)
@@ -60,10 +69,9 @@ func (r *Runner) Run(ctx context.Context) *Result {
 	case result := <-ch:
 		return result
 	case <-ctx.Done():
-		r.interrupt()
+		r.Interrupt()
+		return <-ch
 	}
-
-	return <-ch
 }
 
 // RunAsync will execute the task associated to this runner asynchronously.
@@ -76,6 +84,12 @@ func (r *Runner) Run(ctx context.Context) *Result {
 // To interrupt the running task, the only option is to call the `Interrupt`
 // method at some point.
 func (r *Runner) RunAsync(ch chan<- *Result) {
+	if !r.running.CompareAndSwap(false, true) {
+		// If not swapped, the task is already running.
+		// Running the same task multiple times is a bug, so we panic
+		panic("Runner with id " + r.ID + " was running twice")
+	}
+
 	go r.doTask(ch, false)
 }
 
@@ -83,8 +97,11 @@ func (r *Runner) RunAsync(ch chan<- *Result) {
 // in order for it to finish.
 // The stopper will be called immediately, although it's expected the
 // consequences to take a while (task might need a while to stop)
+// This method will be called only once. Further calls won't do anything
 func (r *Runner) Interrupt() {
-	r.interrupt()
+	if r.interrupted.CompareAndSwap(false, true) {
+		r.interrupt()
+	}
 }
 
 // Finished will return a receive-only channel that can be used to know when
