@@ -52,9 +52,10 @@ func (gr *GroupRunner) Add(r *Runner) {
 	if _, loaded := gr.runners.LoadOrStore(r.ID, r); loaded {
 		// there is already a runner with the same id, which is forbidden
 		panic("Trying to add a runner with an existing Id in the group")
-	} else {
-		gr.runnersCount++
 	}
+	// Only increase the count if a runner is stored.
+	// Currently panicking if the runner exists and is loaded
+	gr.runnersCount++
 }
 
 // Run will execute all the tasks in the group at the same time.
