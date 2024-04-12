@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-04-05 00:41+0000\n"
+"POT-Creation-Date: 2024-04-12 01:22+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Nguyễn Tiến Trình <tunglam062000@gmail.com>, 2024\n"
 "Language-Team: Vietnamese (https://app.transifex.com/owncloud-org/teams/6149/vi/)\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#. text for the readme.md file
+#. default description for new spaces
 #: pkg/service/v0/spacetemplates.go:37
 msgid "Here you can add a description for this Space."
 msgstr "Ở đây bạn có thể thêm mô tả cho không gian này."
