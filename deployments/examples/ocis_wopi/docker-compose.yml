@@ -36,7 +36,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro"
       - "certs:/certs"
     labels:
       - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
@@ -47,7 +47,7 @@ services:
       - "traefik.http.routers.traefik.tls.certresolver=http"
       - "traefik.http.routers.traefik.service=api@internal"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   ocis:
@@ -101,7 +101,7 @@ services:
       - "traefik.http.routers.ocis.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   ocis-appprovider-collabora:
@@ -129,7 +129,7 @@ services:
     volumes:
       - ocis-config:/etc/ocis
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   ocis-appprovider-onlyoffice:
@@ -162,7 +162,7 @@ services:
       - ./config/ocis-appprovider-onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   wopiserver:
@@ -188,7 +188,7 @@ services:
       - "traefik.http.routers.wopiserver.service=wopiserver"
       - "traefik.http.services.wopiserver.loadbalancer.server.port=8880"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   collabora:
@@ -211,7 +211,7 @@ services:
       - "traefik.http.routers.collabora.service=collabora"
       - "traefik.http.services.collabora.loadbalancer.server.port=9980"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   onlyoffice:
@@ -238,7 +238,7 @@ services:
       - "traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.onlyoffice.middlewares=onlyoffice"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   tika:
@@ -270,7 +270,7 @@ services:
       - "traefik.http.routers.companion.service=companion"
       - "traefik.http.services.companion.loadbalancer.server.port=3020"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   inbucket:
@@ -293,7 +293,7 @@ services:
       - "traefik.http.routers.inbucket.service=inbucket"
       - "traefik.http.services.inbucket.loadbalancer.server.port=9000"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
 volumes:
