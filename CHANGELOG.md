@@ -62,6 +62,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix removing groups from space: [#8803](https://github.com/owncloud/ocis/pull/8803)
 * Bugfix - Validate conditions for sharing roles by resource type: [#8815](https://github.com/owncloud/ocis/pull/8815)
 * Bugfix - Fix creating the drive item: [#8817](https://github.com/owncloud/ocis/pull/8817)
+* Bugfix - Fix creating new WOPI documents on public shares: [#8828](https://github.com/owncloud/ocis/pull/8828)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
@@ -226,6 +227,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8724
    https://github.com/owncloud/ocis/pull/8817
+
+* Bugfix - Fix creating new WOPI documents on public shares: [#8828](https://github.com/owncloud/ocis/pull/8828)
+
+   Creating a new Office document in a publicly shared folder is now possible.
+
+   https://github.com/owncloud/ocis/issues/8691
+   https://github.com/owncloud/ocis/pull/8828
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
