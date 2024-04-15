@@ -14,9 +14,10 @@ geekdocFilePath: 0030-user-generated-client-api-keys.md
 ## Context and Problem Statement
 
 Currently, the oCIS proxy is used to authenticate users based on an OpenID Connect access token or using basic auth.
-The current implementation is limited to a single identity provider, and we currently have no way to generate credentials for cli tools that do not yet support OpenID Connect
+The current implementation is limited to a single identity provider, and we currently have no way to generate credentials for cli tools that do not yet support OpenID Connect.
 
 The coming up calendar and contacts service (ccs) requires this because most CalDAV and CardDAV clients require basic or digest authentication.
+Also any service which is based around the concept of impersonation would require the capability to such credentials.
 
 ## Decision Drivers <!-- optional -->
 
@@ -57,30 +58,24 @@ There will be a web frontend where users can:
 An oCIS proxy authentication middleware will evaluate http authentication headers with schema basic and look up if the request is valid.
 
 #### Key generation
-The key id is an uuid. It will be used as ID in basic auth
-Upon creation the backend generates a JWT holding the generated key id, the scope and the oCIS user identification information.
-As key secret the signature part of the JWT is handed out to the user.
+The key id is an uuid. It will be used as ID in basic auth.
+Upon creation of the key id the key secret will be created by computing the signature of the key id using HS256 signing method and a private signing key.
 
+Scopes and oCIS user id will be stored in micro store implementation using the generated key id as identifier.
 
-```json
-{
-  "sub": "163463be-f070-4097-8c79-42ceac20eb1b"
-}
-```
+Example:
+User `einstein` is requesting credentials which might look like:
+key id: `fffe72b7-e076-4bf7-a4c8-bf23915dba4e`
+key secret: `D6gbcRzyVor0C9damdh_MxrFaoz006XTzE8LQNAFTIQ`
 
-The payload above with generate a JWT similar to this:
-```jwt
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNjM0NjNiZS1mMDcwLTQwOTctOGM3OS00MmNlYWMyMGViMWIifQ.PKJqy3xyZzk3hpNOLo7gqoAqt-QVDofrJ5RDEdQ-8ZU
-```
+(Note: secret is generated using `lorem` as signature key)
 
-The signature is the last segment: `PKJqy3xyZzk3hpNOLo7gqoAqt-QVDofrJ5RDEdQ-8ZU`
-
-Only the *username* `163463be-f070-4097-8c79-42ceac20eb1b` and *password* `PKJqy3xyZzk3hpNOLo7gqoAqt-QVDofrJ5RDEdQ-8ZU` are presented to the user. They can be used to grant access to applications only supporting basic auth.
 
 ### Authentication
-Key id and key secret will be read from the http authentication header and the JWT is reconstructed with the given key id.
-The JWT's signature is compared to the key secret.
-If the signatures do not match we can deny access without hitting any storage which limits the dos capabilities.
+Key id and key secret will be read from the http authentication header.
+The signature will be computed from the key id using the hs256 method and the private key.
+The computed signature will be compared to the key secret from the authentication header.
+If the signatures do not match we can deny access without hitting any storage which limits the DOS capabilities.
 If the signatures match:
 - read scope and oCIS user data from micro store
 - validate user to be enabled and still existing
