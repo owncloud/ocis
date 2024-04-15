@@ -246,9 +246,10 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 	for event := range ch {
 		switch ev := event.Event.(type) {
 		case events.PostprocessingFinished:
+			sublog := log.With().Str("event", "PostprocessingFinished").Str("uploadid", ev.UploadID).Logger()
 			session, err := fs.sessionStore.Get(ctx, ev.UploadID)
 			if err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
+				sublog.Error().Err(err).Msg("Failed to get upload")
 				continue // NOTE: since we can't get the upload, we can't delete the blob
 			}
 
@@ -256,11 +257,12 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 
 			n, err := session.Node(ctx)
 			if err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read node")
+				sublog.Error().Err(err).Msg("could not read node")
 				continue
 			}
+			sublog = log.With().Str("spaceid", session.SpaceID()).Str("nodeid", session.NodeID()).Logger()
 			if !n.Exists {
-				log.Debug().Str("uploadID", ev.UploadID).Str("nodeID", session.NodeID()).Msg("node no longer exists")
+				sublog.Debug().Msg("node no longer exists")
 				fs.sessionStore.Cleanup(ctx, session, false, false, false)
 				continue
 			}
@@ -274,7 +276,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 
 			switch ev.Outcome {
 			default:
-				log.Error().Str("outcome", string(ev.Outcome)).Str("uploadID", ev.UploadID).Msg("unknown postprocessing outcome - aborting")
+				sublog.Error().Str("outcome", string(ev.Outcome)).Msg("unknown postprocessing outcome - aborting")
 				fallthrough
 			case events.PPOutcomeAbort:
 				failed = true
@@ -283,7 +285,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				metrics.UploadSessionsAborted.Inc()
 			case events.PPOutcomeContinue:
 				if err := session.Finalize(); err != nil {
-					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not finalize upload")
+					sublog.Error().Err(err).Msg("could not finalize upload")
 					failed = true
 					revertNodeMetadata = false
 					keepUpload = true
@@ -301,7 +303,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			getParent := func() *node.Node {
 				p, err := n.Parent(ctx)
 				if err != nil {
-					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read parent")
+					sublog.Error().Err(err).Msg("could not read parent")
 					return nil
 				}
 				return p
@@ -309,15 +311,22 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 
 			now := time.Now()
 			if failed {
-				// propagate sizeDiff after failed postprocessing
-				if err := fs.tp.Propagate(ctx, n, -session.SizeDiff()); err != nil {
-					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not propagate tree size change")
+				// if no other upload session is in progress (processing id != session id) or has finished (processing id == "")
+				latestSession, err := n.ProcessingID(ctx)
+				if err != nil {
+					sublog.Error().Err(err).Msg("reading node for session failed")
+				}
+				if latestSession == session.ID() {
+					// propagate reverted sizeDiff after failed postprocessing
+					if err := fs.tp.Propagate(ctx, n, -session.SizeDiff()); err != nil {
+						sublog.Error().Err(err).Msg("could not propagate tree size change")
+					}
 				}
 			} else if p := getParent(); p != nil {
 				// update parent tmtime to propagate etag change after successful postprocessing
 				_ = p.SetTMTime(ctx, &now)
 				if err := fs.tp.Propagate(ctx, p, 0); err != nil {
-					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not propagate etag change")
+					sublog.Error().Err(err).Msg("could not propagate etag change")
 				}
 			}
 
@@ -343,22 +352,24 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 					SpaceOwner: n.SpaceOwnerOrManager(ctx),
 				},
 			); err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to publish UploadReady event")
+				sublog.Error().Err(err).Msg("Failed to publish UploadReady event")
 			}
 		case events.RestartPostprocessing:
+			sublog := log.With().Str("event", "RestartPostprocessing").Str("uploadid", ev.UploadID).Logger()
 			session, err := fs.sessionStore.Get(ctx, ev.UploadID)
 			if err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
+				sublog.Error().Err(err).Msg("Failed to get upload")
 				continue
 			}
 			n, err := session.Node(ctx)
 			if err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not read node")
+				sublog.Error().Err(err).Msg("could not read node")
 				continue
 			}
+			sublog = log.With().Str("spaceid", session.SpaceID()).Str("nodeid", session.NodeID()).Logger()
 			s, err := session.URL(ctx)
 			if err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("could not create url")
+				sublog.Error().Err(err).Msg("could not create url")
 				continue
 			}
 
@@ -374,9 +385,10 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				Filename:      session.Filename(),
 				Filesize:      uint64(session.Size()),
 			}); err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to publish BytesReceived event")
+				sublog.Error().Err(err).Msg("Failed to publish BytesReceived event")
 			}
 		case events.PostprocessingStepFinished:
+			sublog := log.With().Str("event", "PostprocessingStepFinished").Str("uploadid", ev.UploadID).Logger()
 			if ev.FinishedStep != events.PPStepAntivirus {
 				// atm we are only interested in antivirus results
 				continue
@@ -388,6 +400,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				// Should we handle this here?
 				continue
 			}
+			sublog = log.With().Str("scan_description", res.Description).Bool("infected", res.Infected).Logger()
 
 			var n *node.Node
 			switch ev.UploadID {
@@ -473,19 +486,20 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				// uploadid is not empty -> this is an async upload
 				session, err := fs.sessionStore.Get(ctx, ev.UploadID)
 				if err != nil {
-					log.Error().Err(err).Str("uploadID", ev.UploadID).Msg("Failed to get upload")
+					sublog.Error().Err(err).Msg("Failed to get upload")
 					continue
 				}
 
 				n, err = session.Node(ctx)
 				if err != nil {
-					log.Error().Err(err).Interface("uploadID", ev.UploadID).Msg("Failed to get node after scan")
+					sublog.Error().Err(err).Msg("Failed to get node after scan")
 					continue
 				}
+				sublog = log.With().Str("spaceid", session.SpaceID()).Str("nodeid", session.NodeID()).Logger()
 			}
 
 			if err := n.SetScanData(ctx, res.Description, res.Scandate); err != nil {
-				log.Error().Err(err).Str("uploadID", ev.UploadID).Interface("resourceID", res.ResourceID).Msg("Failed to set scan results")
+				sublog.Error().Err(err).Msg("Failed to set scan results")
 				continue
 			}
 

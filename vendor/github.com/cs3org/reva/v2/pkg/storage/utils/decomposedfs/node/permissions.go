@@ -168,7 +168,7 @@ func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTr
 			}
 			AddPermissions(&ap, &np)
 		} else {
-			appctx.GetLogger(ctx).Error().Err(err).Interface("node", cn.ID).Msg("error reading permissions")
+			appctx.GetLogger(ctx).Error().Err(err).Str("spaceid", cn.SpaceID).Str("nodeid", cn.ID).Msg("error reading permissions")
 			// continue with next segment
 		}
 
@@ -194,7 +194,7 @@ func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTr
 		}
 		AddPermissions(&ap, &np)
 	} else {
-		appctx.GetLogger(ctx).Error().Err(err).Interface("node", cn.ID).Msg("error reading root node permissions")
+		appctx.GetLogger(ctx).Error().Err(err).Str("spaceid", cn.SpaceID).Str("nodeid", cn.ID).Msg("error reading root node permissions")
 	}
 
 	// check if the current user is the owner
@@ -202,7 +202,7 @@ func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTr
 		return OwnerPermissions(), nil
 	}
 
-	appctx.GetLogger(ctx).Debug().Interface("permissions", ap).Interface("node", n.ID).Interface("user", u).Msg("returning agregated permissions")
+	appctx.GetLogger(ctx).Debug().Interface("permissions", ap).Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Interface("user", u).Msg("returning agregated permissions")
 	return ap, nil
 }
 

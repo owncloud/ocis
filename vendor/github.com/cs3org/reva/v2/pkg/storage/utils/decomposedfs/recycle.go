@@ -57,7 +57,7 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 	}
 	spaceID := ref.ResourceId.OpaqueId
 
-	sublog := appctx.GetLogger(ctx).With().Str("space", spaceID).Str("key", key).Str("relative_path", relativePath).Logger()
+	sublog := appctx.GetLogger(ctx).With().Str("spaceid", spaceID).Str("key", key).Str("relative_path", relativePath).Logger()
 
 	// check permissions
 	trashnode, err := fs.lu.NodeFromSpaceID(ctx, spaceID)
@@ -98,7 +98,7 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 	if attrBytes, ok := attrs[prefixes.TrashOriginAttr]; ok {
 		origin = string(attrBytes)
 	} else {
-		sublog.Error().Err(err).Str("space", spaceID).Msg("could not read origin path, skipping")
+		sublog.Error().Err(err).Str("spaceid", spaceID).Msg("could not read origin path, skipping")
 		return nil, err
 	}
 
@@ -291,14 +291,14 @@ func (fs *Decomposedfs) listTrashRoot(ctx context.Context, spaceID string) ([]*p
 							// TODO nanos
 						}
 					} else {
-						log.Error().Err(err).Str("trashRoot", trashRoot).Str("item", itemPath).Str("node", nodeID).Str("dtime", timeSuffix).Msg("could not parse time format, ignoring")
+						log.Error().Err(err).Str("trashRoot", trashRoot).Str("item", itemPath).Str("spaceid", spaceID).Str("nodeid", nodeID).Str("dtime", timeSuffix).Msg("could not parse time format, ignoring")
 					}
 
 					// lookup origin path in extended attributes
 					if attr, ok := attrs[prefixes.TrashOriginAttr]; ok {
 						item.Ref = &provider.Reference{Path: string(attr)}
 					} else {
-						log.Error().Str("trashRoot", trashRoot).Str("item", itemPath).Str("node", nodeID).Str("dtime", timeSuffix).Msg("could not read origin path")
+						log.Error().Str("trashRoot", trashRoot).Str("item", itemPath).Str("spaceid", spaceID).Str("nodeid", nodeID).Str("dtime", timeSuffix).Msg("could not read origin path")
 					}
 					select {
 					case results <- item:

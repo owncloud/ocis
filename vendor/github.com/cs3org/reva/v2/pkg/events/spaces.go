@@ -125,6 +125,22 @@ func (SpaceShared) Unmarshal(v []byte) (interface{}, error) {
 	return e, err
 }
 
+// SpaceShareUpdated is emitted when a space share is updated
+type SpaceShareUpdated struct {
+	Executant      *user.UserId
+	GranteeUserID  *user.UserId
+	GranteeGroupID *group.GroupId
+	ID             *provider.StorageSpaceId
+	Timestamp      time.Time
+}
+
+// Unmarshal to fulfill umarshaller interface
+func (SpaceShareUpdated) Unmarshal(v []byte) (interface{}, error) {
+	ev := SpaceShareUpdated{}
+	err := json.Unmarshal(v, &ev)
+	return ev, err
+}
+
 // SpaceUnshared is emitted when a space is unshared
 type SpaceUnshared struct {
 	Executant      *user.UserId

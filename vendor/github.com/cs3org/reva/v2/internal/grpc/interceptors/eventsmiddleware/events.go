@@ -123,6 +123,11 @@ func NewUnary(m map[string]interface{}) (grpc.UnaryServerInterceptor, int, error
 			if isSuccess(v) && utils.ExistsInOpaque(r.Opaque, "spacegrant") {
 				ev = SpaceShared(v, r, executantID)
 			}
+		case *provider.UpdateGrantResponse:
+			r := req.(*provider.UpdateGrantRequest)
+			if isSuccess(v) && utils.ExistsInOpaque(r.Opaque, "spacegrant") {
+				ev = SpaceShareUpdated(v, r, executantID)
+			}
 		case *provider.RemoveGrantResponse:
 			r := req.(*provider.RemoveGrantRequest)
 			if isSuccess(v) && utils.ExistsInOpaque(r.Opaque, "spacegrant") {

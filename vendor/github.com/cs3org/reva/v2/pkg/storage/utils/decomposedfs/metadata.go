@@ -42,7 +42,7 @@ func (fs *Decomposedfs) SetArbitraryMetadata(ctx context.Context, ref *provider.
 	if err != nil {
 		return errors.Wrap(err, "Decomposedfs: error resolving ref")
 	}
-	sublog := appctx.GetLogger(ctx).With().Interface("node", n).Logger()
+	sublog := appctx.GetLogger(ctx).With().Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Logger()
 
 	if !n.Exists {
 		err = errtypes.NotFound(filepath.Join(n.ParentID, n.Name))
@@ -135,7 +135,7 @@ func (fs *Decomposedfs) UnsetArbitraryMetadata(ctx context.Context, ref *provide
 	if err != nil {
 		return errors.Wrap(err, "Decomposedfs: error resolving ref")
 	}
-	sublog := appctx.GetLogger(ctx).With().Interface("node", n).Logger()
+	sublog := appctx.GetLogger(ctx).With().Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Logger()
 
 	if !n.Exists {
 		err = errtypes.NotFound(filepath.Join(n.ParentID, n.Name))

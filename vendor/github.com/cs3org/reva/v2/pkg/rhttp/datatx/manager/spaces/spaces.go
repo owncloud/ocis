@@ -80,7 +80,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 		var spaceID string
 		spaceID, r.URL.Path = router.ShiftPath(r.URL.Path)
 
-		sublog := appctx.GetLogger(ctx).With().Str("datatx", "spaces").Str("space", spaceID).Logger()
+		sublog := appctx.GetLogger(ctx).With().Str("datatx", "spaces").Str("spaceid", spaceID).Logger()
 
 		switch r.Method {
 		case "GET", "HEAD":
