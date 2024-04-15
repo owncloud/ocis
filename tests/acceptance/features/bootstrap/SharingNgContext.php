@@ -668,45 +668,15 @@ class SharingNgContext implements Context {
 		);
 	}
 
-    /**
-     * @Then user :user should be able to send share invitation with all allowed permission roles from the above response:
-     *
-     * @param string $user
-     * @param TableNode $table
-     *
-     *
-     * @throws JsonException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function userCanSendShareInvitationToUserWithAllAllowedPermissionRolesForFolder( string $user, TableNode $table)
-    {
-        // Get all the permission saved in the above response
-        // make loop through all the allowed roles
-       // Make a share invitation request
-       // Make the assertion status code and also with response was there [one item in the array]
-       // delete the share response after
-        $listPermissionResponse = $this->featureContext->getJsonDecodedResponseBodyContent();
-        if(!isset($listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'})){
-            Assert::fail('list permission did not have any permission roles allowed!');
-        }
-        Assert::assertNotEmpty($listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'});
-        $allowedPermissionRoles = $listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'};
-
-        foreach ($allowedPermissionRoles as $role) {
-            $response = $this->sendShareInvitation($user, new TableNode(array_merge($table->getTable(), [['permissionRole', $role->displayName]])));
-            var_dump($response);
-        }
-    }
 	/**
 	 * @Then user :user should be able to send share invitation with all allowed permission roles from the above response:
 	 *
 	 * @param string $user
 	 * @param TableNode $table
 	 *
-	 * @throws JsonException
-	 * @throws \GuzzleHttp\Exception\GuzzleException
-	 *
 	 * @return void
+	 * @throws Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
 	public function userCanSendShareInvitationToUserWithAllAllowedPermissionRolesForFolder(string $user, TableNode $table): void {
 		$listPermissionResponse = $this->featureContext->getJsonDecodedResponseBodyContent();
@@ -724,20 +694,20 @@ class SharingNgContext implements Context {
 		// this info is needed for log to see which roles allowed and which were not when tests fail
 		$shareInvitationRequestResult = "From the given allowed role lists from the permissions:\n";
 		$areAllSendInvitationSuccessFullForAllowedRoles = true;
+		$rows = $table->getRowsHash();
+		$resource = $rows['resource'];
+		$shareType = $rows['shareType'];
+		$space = $rows['space'];
 		foreach ($allowedPermissionRoles as $role) {
-			// we should be able to send share invitation for each of the role allowed for the files/folders which are  listed in permissions (allowed)
-			$rows = $table->getRowsHash();
-			$resource = $rows['resource'];
-			$shareType = $rows['shareType'];
-			$space = $rows['space'];
-			$roleAllowed = $role->displayName;
+			//we should be able to send share invitation for each of the role allowed for the files/folders which are  listed in permissions (allowed)
+			$roleAllowed = GraphHelper::getPermissionNameByPermissionRoleId($role->id);
 			$responseSendInvitation = $this->sendShareInvitation($user, new TableNode(array_merge($table->getTable(), [['permissionsRole', $roleAllowed]])));
 			$jsonResponseSendInvitation = $this->featureContext->getJsonDecodedResponseBodyContent($responseSendInvitation);
 			$httpsStatusCode = $responseSendInvitation->getStatusCode();
 			if ($httpsStatusCode === 200 && !empty($jsonResponseSendInvitation->value)) {
 				$shareInvitationRequestResult = $shareInvitationRequestResult . "\tShare invitation for resource '" . $resource . "' with role '" . $roleAllowed . "' was allowed.\n";
 				// remove the share so that the same user can be share for the next allowed roles
-				$removePermissionsResponse = $this->removeSharePermission($user, $shareType, $resource, $space);
+				$removePermissionsResponse = $this->removeSharePermission($user, $shareType, $space, $resource);
 				Assert::assertEquals(204, $removePermissionsResponse->getStatusCode());
 			} else {
 				$areAllSendInvitationSuccessFullForAllowedRoles = false;
