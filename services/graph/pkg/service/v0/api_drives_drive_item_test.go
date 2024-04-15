@@ -392,6 +392,9 @@ var _ = Describe("DrivesDriveItemService", func() {
 					SpaceId:   "4",
 					OpaqueId:  "5",
 				}
+				expectedShareID := collaborationv1beta1.ShareId{
+					OpaqueId: "3:4:5",
+				}
 				gatewayClient.
 					On("GetReceivedShare", mock.Anything, mock.Anything, mock.Anything).
 					Return(func(ctx context.Context, in *collaborationv1beta1.GetReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.GetReceivedShareResponse, error) {
@@ -435,7 +438,33 @@ var _ = Describe("DrivesDriveItemService", func() {
 						Expect(resourceIDs).To(HaveLen(1))
 						Expect(resourceIDs[0]).To(Equal(&expectedResourceID))
 
-						return nil, nil
+						return &collaborationv1beta1.ListReceivedSharesResponse{
+							Shares: []*collaborationv1beta1.ReceivedShare{
+								{
+									State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
+									Share: &collaborationv1beta1.Share{
+										Id: &expectedShareID,
+									},
+								},
+							},
+						}, nil
+					})
+				gatewayClient.
+					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
+					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+						Expect(in.GetUpdateMask().GetPaths()).To(Equal([]string{"state"}))
+						Expect(in.GetShare().GetState()).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_REJECTED))
+						Expect(in.GetShare().GetShare().GetId().GetOpaqueId()).To(Equal(expectedShareID.GetOpaqueId()))
+						return &collaborationv1beta1.UpdateReceivedShareResponse{
+							Status: status.NewOK(ctx),
+							Share: &collaborationv1beta1.ReceivedShare{
+								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
+								Share: &collaborationv1beta1.Share{
+									Id:         &expectedShareID,
+									ResourceId: &expectedResourceID,
+								},
+							},
+						}, nil
 					})
 
 				err := drivesDriveItemService.UnmountShare(context.Background(), driveItemResourceID)
@@ -644,7 +673,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			httpAPI.DeleteDriveItem(responseRecorder, request)
 
-			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
+			Expect(responseRecorder.Code).To(Equal(http.StatusNoContent))
 		})
 	})
 

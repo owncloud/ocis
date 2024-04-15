@@ -102,6 +102,9 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, resourceID sto
 	if err != nil {
 		return err
 	}
+	if len(receivedSharesResponse.GetShares()) == 0 {
+		return errorcode.New(errorcode.InvalidRequest, "invalid itemID")
+	}
 
 	var errs []error
 
@@ -274,7 +277,8 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
 }
 
 // CreateDriveItem creates a drive item
