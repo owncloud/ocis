@@ -148,11 +148,12 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	case events.ContainerCreated:
 		p("folder-created", e.Ref)
 	case events.ItemMoved:
-		// we are only interested in the rename case
-		if !utils.ResourceIDEqual(e.OldReference.GetResourceId(), e.Ref.GetResourceId()) || e.Ref.GetPath() == e.OldReference.GetPath() {
-			return
+		// we send a dedicated event in case the item was only renamed
+		if utils.ResourceIDEqual(e.OldReference.GetResourceId(), e.Ref.GetResourceId()) || e.Ref.GetPath() == e.OldReference.GetPath() {
+			p("item-renamed", e.Ref)
+		} else {
+			p("item-moved", e.Ref)
 		}
-		p("item-renamed", e.Ref)
 	case events.FileLocked:
 		p("file-locked", e.Ref)
 	case events.FileUnlocked:
