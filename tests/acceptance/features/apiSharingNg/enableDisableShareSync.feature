@@ -229,3 +229,69 @@ Feature:  enable or disable sync of incoming shares
       | resource      |
       | textfile0.txt |
       | FolderToShare |
+
+
+  Scenario Outline: enable a group share sync shared from Project Space by only one user in a group
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Carol" using the Graph API
+    And group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has disabled the auto-sync share
+    And user "Brian" has disabled the auto-sync share
+    And user "Carol" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Carol" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Carol" has uploaded a file inside space "NewSpace" with content "hello world" to "/textfile0.txt"
+    And user "Carol" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | NewSpace   |
+      | sharee          | grp1       |
+      | shareType       | group      |
+      | permissionsRole | Viewer     |
+    When user "Alice" enables sync of share "<resource>" offered by "Carol" from "NewSpace" space using the Graph API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@client.synchronize"
+        ],
+        "properties": {
+          "@client.synchronize": {
+            "const": true
+          }
+        }
+      }
+      """
+    And user "Alice" should have sync enabled for share "<resource>"
+    And user "Brian" should have sync disabled for share "<resource>"
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | FolderToShare |
+
+
+  Scenario Outline: disable group share sync shared from Project space by only one user in a group
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Carol" using the Graph API
+    And group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And user "Brian" has been added to group "grp1"
+    And user "Carol" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Carol" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Carol" has uploaded a file inside space "NewSpace" with content "hello world" to "/textfile0.txt"
+    And user "Carol" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | NewSpace   |
+      | sharee          | grp1       |
+      | shareType       | group      |
+      | permissionsRole | Viewer     |
+    When user "Alice" disables sync of share "<resource>" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Alice" should have sync disabled for share "<resource>"
+    And user "Brian" should have sync enabled for share "<resource>"
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | FolderToShare |
