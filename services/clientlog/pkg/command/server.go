@@ -34,6 +34,7 @@ var _registeredEvents = []events.Unmarshaller{
 	events.FileUnlocked{},
 	events.FileTouched{},
 	events.SpaceShared{},
+	events.SpaceShareUpdated{},
 	events.SpaceUnshared{},
 	events.ShareCreated{},
 	events.ShareRemoved{},

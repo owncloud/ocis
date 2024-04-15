@@ -160,6 +160,9 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	case events.SpaceShared:
 		r, _ := storagespace.ParseReference(e.ID.GetOpaqueId())
 		p("space-member-added", &r)
+	case events.SpaceShareUpdated:
+		r, _ := storagespace.ParseReference(e.ID.GetOpaqueId())
+		p("space-share-updated", &r)
 	case events.SpaceUnshared:
 		r, _ := storagespace.ParseReference(e.ID.GetOpaqueId())
 		p("space-member-removed", &r)
