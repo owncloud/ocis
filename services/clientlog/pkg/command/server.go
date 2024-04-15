@@ -33,6 +33,10 @@ var _registeredEvents = []events.Unmarshaller{
 	events.FileLocked{},
 	events.FileUnlocked{},
 	events.FileTouched{},
+	events.SpaceShared{},
+	events.SpaceUnshared{},
+	events.ShareCreated{},
+	events.ShareRemoved{},
 }
 
 // Server is the entrypoint for the server command.
