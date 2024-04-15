@@ -1648,7 +1648,7 @@ class GraphHelper {
 	}
 
 	/**
-	 * Get the role id by name
+	 * Get the role name by role id
 	 *
 	 * @param string $permissionsRoleId
 	 *

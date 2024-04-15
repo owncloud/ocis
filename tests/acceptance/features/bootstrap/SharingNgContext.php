@@ -669,7 +669,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Then user :user should be able to send share invitation with all allowed permission roles from the above response:
+	 * @Then user :user should be able to send share invitation with all allowed permission roles
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -678,17 +678,16 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function userCanSendShareInvitationToUserWithAllAllowedPermissionRolesForFolder(string $user, TableNode $table): void {
+	public function userShouldBeAbleToSendShareInvitationWithAllAllowedPermissionRoles(string $user, TableNode $table): void {
 		$listPermissionResponse = $this->featureContext->getJsonDecodedResponseBodyContent();
 		if (!isset($listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'})) {
 			Assert::fail(
-				'The response' . $listPermissionResponse .
-				'does not contain any @libre.graph.permissions.roles.allowedValues'
+                "The following response does not contain '@libre.graph.permissions.roles.allowedValues' property:\n" . $listPermissionResponse
 			);
 		}
 		Assert::assertNotEmpty(
 			$listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'},
-			'@libre.graph.permissions.roles.allowedValues in the response should not be empty!'
+            "'@libre.graph.permissions.roles.allowedValues' should not be empty"
 		);
 		$allowedPermissionRoles = $listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'};
 		// this info is needed for log to see which roles allowed and which were not when tests fail
@@ -705,13 +704,12 @@ class SharingNgContext implements Context {
 			$jsonResponseSendInvitation = $this->featureContext->getJsonDecodedResponseBodyContent($responseSendInvitation);
 			$httpsStatusCode = $responseSendInvitation->getStatusCode();
 			if ($httpsStatusCode === 200 && !empty($jsonResponseSendInvitation->value)) {
-				$shareInvitationRequestResult = $shareInvitationRequestResult . "\tShare invitation for resource '" . $resource . "' with role '" . $roleAllowed . "' was allowed.\n";
 				// remove the share so that the same user can be share for the next allowed roles
 				$removePermissionsResponse = $this->removeSharePermission($user, $shareType, $space, $resource);
 				Assert::assertEquals(204, $removePermissionsResponse->getStatusCode());
 			} else {
 				$areAllSendInvitationSuccessFullForAllowedRoles = false;
-				$shareInvitationRequestResult = $shareInvitationRequestResult . "\tShare invitation for resource '" . $resource . "' with role '" . $roleAllowed . "' failed and was not allowed.\n";
+                $shareInvitationRequestResult .= "\tShare invitation for resource '" . $resource . "' with role '" . $roleAllowed . "' failed and was not allowed.\n";
 			}
 		}
 		Assert::assertTrue($areAllSendInvitationSuccessFullForAllowedRoles, $shareInvitationRequestResult);
