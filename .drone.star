@@ -237,24 +237,26 @@ def main(ctx):
 
     pipelines = []
 
+    build_release_helpers = [
+        changelog(),
+        docs(),
+        licenseCheck(ctx),
+    ]
+
     test_pipelines = \
         codestyle(ctx) + \
         checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
+        checkStarlark() + \
+        build_release_helpers + \
         testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
-        [licenseCheck(ctx)] + \
         dockerReleases(ctx) + \
         binaryReleases(ctx)
-
-    build_release_helpers = [
-        changelog(),
-        docs(),
-    ]
 
     test_pipelines.append(
         pipelineDependsOn(
@@ -263,7 +265,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+    pipelines = test_pipelines + build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -287,7 +289,6 @@ def main(ctx):
 
     pipelines = pipelines + k6LoadTests(ctx)
 
-    pipelines += checkStarlark()
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
@@ -322,7 +323,7 @@ def testOcisAndUploadResults(ctx):
     scan_result_upload["depends_on"] = getPipelineNames([pipeline])
 
     security_scan = scanOcis(ctx)
-    return [pipeline, scan_result_upload, security_scan]
+    return [security_scan, pipeline, scan_result_upload]
 
 def testPipelines(ctx):
     pipelines = []
