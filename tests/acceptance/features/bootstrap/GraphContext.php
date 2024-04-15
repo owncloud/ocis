@@ -2624,4 +2624,27 @@ class GraphContext implements Context {
 			$this->featureContext->getJSONSchema($schemaString)
 		);
 	}
+
+	/**
+	 * @Then the JSON data of the search response should not contain user(s) email
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theJsonDataResponseShouldNotContainUserEmail(): void {
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
+		$mailValueExist = false;
+		$email = "";
+		foreach ($responseBody as $value) {
+			if (isset($value->mail)) {
+				$mailValueExist = true;
+				$email = $value->mail;
+				break;
+			}
+		}
+		Assert::assertFalse(
+			$mailValueExist,
+			"Response contains email '$email' but should not."
+		);
+	}
 }

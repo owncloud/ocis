@@ -15,40 +15,40 @@ Feature: get users
     When user "Alice" gets information of user "Brian" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "displayName",
-        "id",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "displayName": {
-          "type": "string",
-          "enum": ["Brian Murphy"]
-        },
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Brian"]
-        },
-        "accountEnabled": {
-          "type": "boolean",
-          "enum": [true]
-        },
-        "userType": {
-          "type": "string",
-          "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "displayName",
+          "id",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "const": "Brian Murphy"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Brian"
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "const": true
+          },
+          "userType": {
+            "type": "string",
+            "const": "Member"
+          }
         }
       }
-    }
-    """
+      """
 
   @issue-5125
   Scenario Outline: non-admin user tries to get the information of a user
@@ -57,28 +57,28 @@ Feature: get users
     When user "Brian" tries to get information of user "Alice" using Graph API
     Then the HTTP status code should be "401"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message":{
-              "type": "string",
-              "enum": ["Unauthorized"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "const": "Unauthorized"
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   | user-role-2 |
       | Space Admin | Space Admin |
@@ -100,75 +100,75 @@ Feature: get users
     When user "Alice" gets all users using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain the user "Alice Hansen" in the item 'value', the user-details should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["alice@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Alice"]
-        },
-        "accountEnabled": {
-          "type": "boolean",
-          "enum": [true]
-        },
-        "userType": {
-          "type": "string",
-          "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "const": "alice@example.org"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Alice"
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "const": true
+          },
+          "userType": {
+            "type": "string",
+            "const": "Member"
+          }
         }
       }
-    }
-    """
+      """
     And the JSON data of the response should contain the user "Brian Murphy" in the item 'value', the user-details should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["brian@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Brian"]
-        },
-        "accountEnabled": {
-          "type": "boolean",
-          "enum": [true]
-        },
-        "userType": {
-          "type": "string",
-          "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "const": "brian@example.org"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Brian"
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "const": true
+          },
+          "userType": {
+            "type": "string",
+            "const": "Member"
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: admin user gets all users include disabled users
@@ -177,75 +177,75 @@ Feature: get users
     When user "Alice" gets all users using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain the user "Alice Hansen" in the item 'value', the user-details should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["alice@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Alice"]
-        },
-        "accountEnabled": {
-          "type": "boolean",
-          "enum": [true]
-        },
-        "userType": {
-          "type": "string",
-          "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "const": "alice@example.org"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Alice"
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "const": true
+          },
+          "userType": {
+            "type": "string",
+            "const": "Member"
+          }
         }
       }
-    }
-    """
+      """
     And the JSON data of the response should contain the user "Brian Murphy" in the item 'value', the user-details should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["brian@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Brian"]
-        },
-        "accountEnabled": {
-          "type": "boolean",
-          "enum": [false]
-        },
-        "userType": {
-          "type": "string",
-          "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "const": "brian@example.org"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Brian"
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "const": false
+          },
+          "userType": {
+            "type": "string",
+            "const": "Member"
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario Outline: non-admin user tries to get all users
@@ -253,28 +253,28 @@ Feature: get users
     When user "Brian" tries to get all users using the Graph API
     Then the HTTP status code should be "403"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message": {
-              "type": "string",
-              "enum": ["search term too short"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "const": "search term too short"
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   |
       | Space Admin |
@@ -287,7 +287,7 @@ Feature: get users
     When the user "Alice" gets user "Brian" along with his drive information using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
+      """
       {
         "type": "object",
         "required": [
@@ -301,23 +301,23 @@ Feature: get users
         "properties": {
           "displayName": {
             "type": "string",
-            "enum": ["Brian Murphy"]
+            "const": "Brian Murphy"
           },
-          "id" : {
+          "id": {
             "type": "string",
             "pattern": "^%user_id_pattern%$"
           },
           "onPremisesSamAccountName": {
             "type": "string",
-            "enum": ["Brian"]
+            "const": "Brian"
           },
           "accountEnabled": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           },
           "userType": {
             "type": "string",
-            "enum": ["Member"]
+            "const": "Member"
           },
           "drive": {
             "type": "object",
@@ -331,21 +331,21 @@ Feature: get users
               "webUrl"
             ],
             "properties": {
-              "driveType" : {
+              "driveType": {
                 "type": "string",
-                "enum": ["personal"]
+                "const": "personal"
               },
-              "driveAlias" : {
+              "driveAlias": {
                 "type": "string",
-                "enum": ["personal/brian"]
+                "const": "personal/brian"
               },
-              "id" : {
+              "id": {
                 "type": "string",
                 "pattern": "^%space_id_pattern%$"
               },
               "name": {
                 "type": "string",
-                "enum": ["Brian Murphy"]
+                "const": "Brian Murphy"
               },
               "owner": {
                 "type": "object",
@@ -375,7 +375,7 @@ Feature: get users
                 "properties": {
                   "state": {
                     "type": "string",
-                    "enum": ["normal"]
+                    "const": "normal"
                   }
                 }
               },
@@ -388,7 +388,7 @@ Feature: get users
                 "properties": {
                   "state": {
                     "type": "string",
-                    "enum": ["normal"]
+                    "const": "normal"
                   },
                   "webDavUrl": {
                     "type": "string",
@@ -404,7 +404,7 @@ Feature: get users
           }
         }
       }
-    """
+      """
 
 
   Scenario Outline: user gets his/her own information along with drive information
@@ -412,7 +412,7 @@ Feature: get users
     When the user "Brian" gets his drive information using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
+      """
       {
         "type": "object",
         "required": [
@@ -426,23 +426,23 @@ Feature: get users
         "properties": {
           "displayName": {
             "type": "string",
-            "enum": ["Brian Murphy"]
+            "const": "Brian Murphy"
           },
-          "id" : {
+          "id": {
             "type": "string",
             "pattern": "^%user_id_pattern%$"
           },
           "onPremisesSamAccountName": {
             "type": "string",
-            "enum": ["Brian"]
+            "const": "Brian"
           },
           "accountEnabled": {
             "type": "boolean",
-            "enum": [true]
+            "const": true
           },
           "userType": {
             "type": "string",
-            "enum": ["Member"]
+            "const": "Member"
           },
           "drive": {
             "type": "object",
@@ -456,21 +456,21 @@ Feature: get users
               "webUrl"
             ],
             "properties": {
-              "driveType" : {
+              "driveType": {
                 "type": "string",
-                "enum": ["personal"]
+                "const": "personal"
               },
-              "driveAlias" : {
+              "driveAlias": {
                 "type": "string",
-                "enum": ["personal/brian"]
+                "const": "personal/brian"
               },
-              "id" : {
+              "id": {
                 "type": "string",
                 "pattern": "^%space_id_pattern%$"
               },
               "name": {
                 "type": "string",
-                "enum": ["Brian Murphy"]
+                "const": "Brian Murphy"
               },
               "owner": {
                 "type": "object",
@@ -500,7 +500,7 @@ Feature: get users
                 "properties": {
                   "state": {
                     "type": "string",
-                    "enum": ["normal"]
+                    "const": "normal"
                   }
                 }
               },
@@ -513,7 +513,7 @@ Feature: get users
                 "properties": {
                   "state": {
                     "type": "string",
-                    "enum": ["normal"]
+                    "const": "normal"
                   },
                   "webDavUrl": {
                     "type": "string",
@@ -529,7 +529,7 @@ Feature: get users
           }
         }
       }
-    """
+      """
     Examples:
       | user-role   |
       | Admin       |
@@ -547,59 +547,59 @@ Feature: get users
     When the user "Alice" gets user "Brian" along with his group information using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "onPremisesSamAccountName"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Brian"]
-        },
-        "memberOf": {
-          "type": "array",
-          "minItems": 2,
-          "maxItems": 2,
-          "uniqueItems": true,
-          "items": {
-            "oneOf": [
-              {
-                "type": "object",
-                "required": [
-                  "displayName"
-                ],
-                "properties": {
-                  "displayName": {
-                    "type": "string",
-                    "enum": ["tea-lover"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "onPremisesSamAccountName"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Brian"
+          },
+          "memberOf": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "displayName"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "type": "string",
+                      "const": "tea-lover"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "displayName"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "type": "string",
+                      "const": "coffee-lover"
+                    }
                   }
                 }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "displayName"
-                ],
-                "properties": {
-                  "displayName": {
-                    "type": "string",
-                    "enum": ["coffee-lover"]
-                  }
-                }
-              }
-            ]
+              ]
+            }
           }
         }
       }
-    }
-    """
+      """
 
   @issue-5125
   Scenario Outline: non-admin user tries to get the group information of a user
@@ -610,28 +610,28 @@ Feature: get users
     When the user "Alice" gets user "Brian" along with his group information using Graph API
     Then the HTTP status code should be "401"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message: {
-              "type": "string",
-              "enum": ["Unauthorized"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "const": "Unauthorized"
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   | user-role-2 |
       | Space Admin | Space Admin |
@@ -660,140 +660,140 @@ Feature: get users
     When the user "Alice" gets all users of the group "tea-lover" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 2,
-          "maxItems": 2,
-          "uniqueItems": true,
-          "items": {
-            "oneOf": [
-              {
-                "type": "object",
-                "required": [
-                  "id",
-                  "mail",
-                  "onPremisesSamAccountName",
-                  "accountEnabled",
-                  "userType"
-                ],
-                "properties": {
-                  "id" : {
-                    "type": "string",
-                    "pattern": "^%user_id_pattern%$"
-                  },
-                  "mail": {
-                    "type": "string",
-                    "enum": ["alice@example.org"]
-                  },
-                  "onPremisesSamAccountName": {
-                    "type": "string",
-                    "enum": ["Alice"]
-                  },
-                  "accountEnabled": {
-                    "type": "boolean",
-                    "enum": [true]
-                  },
-                  "userType": {
-                    "type": "string",
-                    "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "mail",
+                    "onPremisesSamAccountName",
+                    "accountEnabled",
+                    "userType"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "mail": {
+                      "type": "string",
+                      "const": "alice@example.org"
+                    },
+                    "onPremisesSamAccountName": {
+                      "type": "string",
+                      "const": "Alice"
+                    },
+                    "accountEnabled": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "userType": {
+                      "type": "string",
+                      "const": "Member"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "mail",
+                    "onPremisesSamAccountName",
+                    "accountEnabled"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "mail": {
+                      "type": "string",
+                      "const": "brian@example.org"
+                    },
+                    "onPremisesSamAccountName": {
+                      "type": "string",
+                      "const": "Brian"
+                    },
+                    "accountEnabled": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "userType": {
+                      "type": "string",
+                      "const": "Member"
+                    }
                   }
                 }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "id",
-                  "mail",
-                  "onPremisesSamAccountName",
-                  "accountEnabled"
-                ],
-                "properties": {
-                  "id" : {
-                    "type": "string",
-                    "pattern": "^%user_id_pattern%$"
-                  },
-                  "mail": {
-                    "type": "string",
-                    "enum": ["brian@example.org"]
-                  },
-                  "onPremisesSamAccountName": {
-                    "type": "string",
-                    "enum": ["Brian"]
-                  },
-                  "accountEnabled": {
-                    "type": "boolean",
-                    "enum": [true]
-                  },
-                  "userType": {
-                    "type": "string",
-                    "enum": ["Member"]
-                  }
-                }
-              }
-            ]
+              ]
+            }
           }
         }
       }
-    }
-    """
+      """
     And the JSON data of the response should not contain the user "Carol King" in the item 'value'
     When the user "Alice" gets all users of two groups "tea-lover,coffee-lover" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "id",
-              "mail",
-              "onPremisesSamAccountName",
-              "accountEnabled",
-              "userType"
-            ],
-            "properties": {
-              "id" : {
-                "type": "string",
-                "pattern": "^%user_id_pattern%$"
-              },
-              "mail": {
-                "type": "string",
-                "enum": ["brian@example.org"]
-              },
-              "onPremisesSamAccountName": {
-                "type": "string",
-                "enum": ["Brian"]
-              },
-              "accountEnabled": {
-                "type": "boolean",
-                "enum": [true]
-              },
-              "userType": {
-                "type": "string",
-                "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "mail",
+                "onPremisesSamAccountName",
+                "accountEnabled",
+                "userType"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "mail": {
+                  "type": "string",
+                  "const": "brian@example.org"
+                },
+                "onPremisesSamAccountName": {
+                  "type": "string",
+                  "const": "Brian"
+                },
+                "accountEnabled": {
+                  "type": "boolean",
+                  "const": true
+                },
+                "userType": {
+                  "type": "string",
+                  "const": "Member"
+                }
               }
             }
           }
         }
       }
-    }
-    """
+      """
     And the JSON data of the response should not contain the user "Carol King" in the item 'value'
     And the JSON data of the response should not contain the user "Alice Hansen" in the item 'value'
 
@@ -810,75 +810,75 @@ Feature: get users
     When the user "Alice" gets all users that are members in the group "tea-lover" or the group "coffee-lover" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain the user "Alice Hansen" in the item 'value', the user-details should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["alice@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Alice"]
-        },
-        "accountEnabled": {
-          "type": "boolean",
-          "enum": [true]
-        },
-        "userType": {
-          "type": "string",
-          "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "const": "alice@example.org"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Alice"
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "const": true
+          },
+          "userType": {
+            "type": "string",
+            "const": "Member"
+          }
         }
       }
-    }
-    """
+      """
     And the JSON data of the response should contain the user "Brian Murphy" in the item 'value', the user-details should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["brian@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Brian"]
-        },
-        "accountEnabled": {
-          "type": "boolean",
-          "enum": [true]
-        },
-        "userType": {
-          "type": "string",
-          "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "const": "brian@example.org"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Brian"
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "const": true
+          },
+          "userType": {
+            "type": "string",
+            "const": "Member"
+          }
         }
       }
-    }
-    """
+      """
     But the JSON data of the response should not contain the user "Carol King" in the item 'value'
 
 
@@ -890,28 +890,28 @@ Feature: get users
     When the user "Brian" gets all users of the group "tea-lover" using the Graph API
     Then the HTTP status code should be "403"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message": {
-              "type": "string",
-              "enum": ["search term too short"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "const": "search term too short"
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   |
       | Space Admin |
@@ -929,113 +929,113 @@ Feature: get users
     When the user "Alice" gets all users with role "Space Admin" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain the user "Brian Murphy" in the item 'value', the user-details should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["brian@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Brian"]
-        },
-        "accountEnabled": {
-          "type": "boolean",
-          "enum": [true]
-        },
-        "userType": {
-          "type": "string",
-          "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "const": "brian@example.org"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Brian"
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "const": true
+          },
+          "userType": {
+            "type": "string",
+            "const": "Member"
+          }
         }
       }
-    }
-    """
+      """
     And the JSON data of the response should contain the user "Carol King" in the item 'value', the user-details should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["carol@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Carol"]
-        },
-        "accountEnabled": {
-          "type": "boolean",
-          "enum": [true]
-        },
-        "userType": {
-          "type": "string",
-          "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "const": "carol@example.org"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Carol"
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "const": true
+          },
+          "userType": {
+            "type": "string",
+            "const": "Member"
+          }
         }
       }
-    }
-    """
+      """
     But the JSON data of the response should not contain the user "Alice Hansen" in the item 'value'
     When the user "Alice" gets all users with role "Space Admin" and member of the group "tea-lover" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain the user "Brian Murphy" in the item 'value', the user-details should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["brian@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Brian"]
-        },
-        "accountEnabled": {
-          "type": "boolean",
-          "enum": [true]
-        },
-        "userType": {
-          "type": "string",
-          "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "const": "brian@example.org"
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "const": "Brian"
+          },
+          "accountEnabled": {
+            "type": "boolean",
+            "const": true
+          },
+          "userType": {
+            "type": "string",
+            "const": "Member"
+          }
         }
       }
-    }
-    """
+      """
     But the JSON data of the response should not contain the user "Carol King" in the item 'value'
 
 
@@ -1044,28 +1044,28 @@ Feature: get users
     When the user "Alice" gets all users with role "<user-role-2>" using the Graph API
     Then the HTTP status code should be "403"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message": {
-              "type": "string",
-              "enum": ["search term too short"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "const": "search term too short"
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   | user-role-2 |
       | Space Admin | Space Admin |
@@ -1089,92 +1089,92 @@ Feature: get users
     When user "Alice" gets the personal drive information of user "Brian" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveAlias",
-        "driveType",
-        "id",
-        "name",
-        "webUrl",
-        "owner",
-        "quota",
-        "root"
-      ],
-      "properties": {
-        "driveAlias": {
-          "type": "string",
-          "enum": ["personal/brian"]
-        },
-        "driveType": {
-          "type": "string",
-          "enum": ["personal"]
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^%space_id_pattern%$"
-        },
-        "name": {
-          "type": "string",
-          "enum": ["Brian Murphy"]
-        },
-        "webUrl": {
-          "type": "string",
-          "pattern": "^%base_url%/f/%space_id_pattern%$"
-        },
-        "owner": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties": {
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": [""]
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveAlias",
+          "driveType",
+          "id",
+          "name",
+          "webUrl",
+          "owner",
+          "quota",
+          "root"
+        ],
+        "properties": {
+          "driveAlias": {
+            "type": "string",
+            "const": "personal/brian"
+          },
+          "driveType": {
+            "type": "string",
+            "const": "personal"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^%space_id_pattern%$"
+          },
+          "name": {
+            "type": "string",
+            "const": "Brian Murphy"
+          },
+          "webUrl": {
+            "type": "string",
+            "pattern": "^%base_url%/f/%space_id_pattern%$"
+          },
+          "owner": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties": {
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "const": ""
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "qouta": {
-          "type": "object",
-          "required": [
-            "state"
-          ],
-          "properties": {
-            "state": {
-              "type": "string",
-              "enum": ["normal"]
+          },
+          "qouta": {
+            "type": "object",
+            "required": [
+              "state"
+            ],
+            "properties": {
+              "state": {
+                "type": "string",
+                "const": "normal"
+              }
             }
-          }
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "webDavUrl"
-          ],
-          "properties": {
-            "webDavUrl": {
-              "type": "string",
-              "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
+          },
+          "root": {
+            "type": "object",
+            "required": [
+              "webDavUrl"
+            ],
+            "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   | user-role-2 |
       | Admin       | Admin       |
@@ -1193,33 +1193,33 @@ Feature: get users
     When user "Alice" gets the personal drive information of user "Brian" using Graph API
     Then the HTTP status code should be "404"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "code",
-            "message"
-          ],
-          "properties": {
-            "code": {
-              "type": "string",
-              "enum": ["itemNotFound"]
-            },
-            "message": {
-              "type": "string",
-              "enum": ["no drive returned from storage"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "const": "itemNotFound"
+              },
+              "message": {
+                "type": "string",
+                "const": "no drive returned from storage"
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role  | user-role-2 |
       | User       | Admin       |
@@ -1237,92 +1237,92 @@ Feature: get users
     When user "Alice" gets own personal drive information using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveAlias",
-        "driveType",
-        "id",
-        "name",
-        "webUrl",
-        "owner",
-        "quota",
-        "root"
-      ],
-      "properties": {
-        "driveAlias": {
-          "type": "string",
-          "enum": ["personal/alice"]
-        },
-        "driveType": {
-          "type": "string",
-          "enum": ["personal"]
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^%space_id_pattern%$"
-        },
-        "name": {
-          "type": "string",
-          "enum": ["Alice Hansen"]
-        },
-        "webUrl": {
-          "type": "string",
-          "pattern": "^%base_url%/f/%space_id_pattern%$"
-        },
-        "owner": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties": {
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "type": "string",
-                  "enum": [""]
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveAlias",
+          "driveType",
+          "id",
+          "name",
+          "webUrl",
+          "owner",
+          "quota",
+          "root"
+        ],
+        "properties": {
+          "driveAlias": {
+            "type": "string",
+            "const": "personal/alice"
+          },
+          "driveType": {
+            "type": "string",
+            "const": "personal"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^%space_id_pattern%$"
+          },
+          "name": {
+            "type": "string",
+            "const": "Alice Hansen"
+          },
+          "webUrl": {
+            "type": "string",
+            "pattern": "^%base_url%/f/%space_id_pattern%$"
+          },
+          "owner": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties": {
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "const": ""
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "qouta": {
-          "type": "object",
-          "required": [
-            "state"
-          ],
-          "properties": {
-            "state": {
-              "type": "string",
-              "enum": ["normal"]
+          },
+          "qouta": {
+            "type": "object",
+            "required": [
+              "state"
+            ],
+            "properties": {
+              "state": {
+                "type": "string",
+                "const": "normal"
+              }
             }
-          }
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "webDavUrl"
-          ],
-          "properties": {
-            "webDavUrl": {
-              "type": "string",
-              "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
+          },
+          "root": {
+            "type": "object",
+            "required": [
+              "webDavUrl"
+            ],
+            "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   |
       | Admin       |
@@ -1334,71 +1334,72 @@ Feature: get users
   Scenario: non-admin user searches other users by display name
     When user "Brian" searches for user "ali" using Graph API
     Then the HTTP status code should be "200"
+    And the JSON data of the search response should not contain user email
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "displayName",
-              "id",
-              "userType"
-            ],
-            "properties": {
-              "displayName": {
-                "type": "string",
-                "enum": ["Alice Hansen"]
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%user_id_pattern%$"
-              },
-              "userType": {
-                "type": "string",
-                "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "userType"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "const": "Alice Hansen"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "userType": {
+                  "type": "string",
+                  "const": "Member"
+                }
               }
             }
           }
         }
       }
-    }
-    """
+      """
 
   Scenario: non-admin user tries to search for a user by display name with less than 3 characters
     When user "Brian" tries to search for user "al" using Graph API
     Then the HTTP status code should be "403"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message": {
-              "type": "string",
-              "enum": ["search term too short"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "const": "search term too short"
+              }
             }
           }
         }
       }
-    }
-    """
+      """
 
   @issue-7990
   Scenario Outline: non-admin user tries to search for a user by display name with invalid characters/token
@@ -1406,28 +1407,28 @@ Feature: get users
     When user "Brian" tries to search for user "<user>" using Graph API
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message": {
-              "type": "string",
-              "enum": ["Token '<error-token>' is invalid"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "const": "Token '<error-token>' is invalid"
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user                  | error-token      |
       | Alice-From-Wonderland | -From-Wonderland |
@@ -1437,160 +1438,166 @@ Feature: get users
   Scenario: non-admin user searches other users by e-mail
     When user "Brian" searches for user "%22alice@example.org%22" using Graph API
     Then the HTTP status code should be "200"
+    And the JSON data of the search response should not contain user email
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "displayName",
-              "id",
-              "userType"
-            ],
-            "properties": {
-              "displayName": {
-                "type": "string",
-                "enum": ["Alice Hansen"]
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%user_id_pattern%$"
-              },
-              "userType": {
-                "type": "string",
-                "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "userType"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "const": "Alice Hansen"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "userType": {
+                  "type": "string",
+                  "const": "Member"
+                }
               }
             }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: non-admin user searches for a disabled users
     Given the user "Admin" has disabled user "Alice"
     When user "Brian" searches for user "alice" using Graph API
     Then the HTTP status code should be "200"
+    And the JSON data of the search response should not contain user email
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "displayName",
-              "id",
-              "userType"
-            ],
-            "properties": {
-              "displayName": {
-                "type": "string",
-                "enum": ["Alice Hansen"]
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%user_id_pattern%$"
-              },
-              "userType": {
-                "type": "string",
-                "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "userType"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "const": "Alice Hansen"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "userType": {
+                  "type": "string",
+                  "const": "Member"
+                }
               }
             }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: non-admin user searches for multiple users having same displayname
     Given the user "Admin" has created a new user with the following attributes:
       | userName    | another-alice                |
-      | displayName | Alice Murphy                 |
+      | displayName | Alice Hansen                 |
       | email       | another-alice@example.org    |
       | password    | containsCharacters(*:!;_+-&) |
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When user "Brian" searches for user "alice" using Graph API
     Then the HTTP status code should be "200"
+    And the JSON data of the search response should not contain users email
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 2,
-          "maxItems": 2,
-          "uniqueItems": true,
-          "items": {
-            "oneOf": [
-              {
-                "type": "object",
-                "required": [
-                  "displayName",
-                  "id",
-                  "userType"
-                ],
-                "properties": {
-                  "displayName": {
-                    "type": "string",
-                    "enum": ["Alice Hansen"]
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%user_id_pattern%$"
-                  },
-                  "userType": {
-                    "type": "string",
-                    "enum": ["Member"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "displayName",
+                    "id",
+                    "userType"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "type": "string",
+                      "const": "Alice Hansen"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "userType": {
+                      "type": "string",
+                      "const": "Member"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "displayName",
+                    "id",
+                    "userType"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "type": "string",
+                      "const": "Alice Hansen"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "userType": {
+                      "type": "string",
+                      "const": [
+                        "Admin"
+                      ]
+                    }
                   }
                 }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "displayName",
-                  "id",
-                  "userType"
-                ],
-                "properties": {
-                  "displayName": {
-                    "type": "string",
-                    "enum": ["Alice Murphy"]
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%user_id_pattern%$"
-                  },
-                  "userType": {
-                    "type": "string",
-                    "enum": ["Member"]
-                  }
-                }
-              }
-            ]
+              ]
+            }
           }
         }
       }
-    }
-    """
+      """
