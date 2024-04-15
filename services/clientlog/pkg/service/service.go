@@ -167,6 +167,9 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	case events.ShareCreated:
 		p("share-created", &provider.Reference{ResourceId: e.ItemID})
 		users, err = addSharees(ctx, users, gwc, e.GranteeUserID, e.GranteeGroupID)
+	case events.ShareUpdated:
+		p("share-updated", &provider.Reference{ResourceId: e.ItemID})
+		users, err = addSharees(ctx, users, gwc, e.GranteeUserID, e.GranteeGroupID)
 	case events.ShareRemoved:
 		p("share-removed", &provider.Reference{ResourceId: e.ItemID})
 		users, err = addSharees(ctx, users, gwc, e.GranteeUserID, e.GranteeGroupID)
