@@ -201,6 +201,13 @@ func IsStatusCodeError(err error, code rpc.Code) bool {
 	return sce.code == code
 }
 
+// IsSpaceRoot checks if the given resource info is referring to a space root
+func IsSpaceRoot(ri *storageprovider.ResourceInfo) bool {
+	f := ri.GetId()
+	s := ri.GetSpace().GetRoot()
+	return f.GetOpaqueId() == s.GetOpaqueId() && f.GetSpaceId() == s.GetSpaceId()
+}
+
 func checkStatusCode(reason string, code rpc.Code) error {
 	if code == rpc.Code_CODE_OK {
 		return nil
