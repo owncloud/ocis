@@ -140,7 +140,7 @@ config = {
         "skipExceptParts": [],
     },
     "e2eTests": {
-        "basic": {
+        "part": {
             "skip": False,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider"],  # suites to skip
