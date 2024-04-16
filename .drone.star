@@ -144,6 +144,7 @@ config = {
     },
     "rocketchat": {
         "channel": "infinitescale",
+        "channel_builds": "builds",
         "from_secret": "rocketchat_talk_webhook",
     },
     "binaryReleases": {
@@ -1911,8 +1912,10 @@ def makeGoGenerate(module):
 
 def notify(ctx):
     status = ["failure"]
+    channel = config["rocketchat"]["channel"]
     if ctx.build.event == "cron":
         status.append("success")
+        channel = config["rocketchat"]["channel_builds"]
 
     return {
         "kind": "pipeline",
@@ -1929,7 +1932,7 @@ def notify(ctx):
                     "webhook": {
                         "from_secret": config["rocketchat"]["from_secret"],
                     },
-                    "channel": config["rocketchat"]["channel"],
+                    "channel": channel,
                 },
             },
         ],
