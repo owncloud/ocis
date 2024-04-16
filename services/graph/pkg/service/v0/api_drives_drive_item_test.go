@@ -664,7 +664,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 			Expect(responseRecorder.Code).To(Equal(http.StatusUnprocessableEntity))
 
 			jsonData := gjson.Get(responseRecorder.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(ContainSubstring("must be share jail"))
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrNotAShareJail.Error()))
 		})
 
 		It("checks that the request body is valid", func() {
