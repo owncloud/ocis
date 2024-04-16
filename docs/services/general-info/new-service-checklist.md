@@ -22,8 +22,8 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
   - Use absolute references like `https://raw.githubusercontent.com/owncloud/ocis/master/services/<service-name>/md-sources/file` to make the content accessible for both README.md and owncloud.dev
     bad `<img src="https://github.com/owncloud/ocis/blob/master/services/graph/images/mermaid-graph.svg" width="500" />`  
     good `<img src="https://raw.githubusercontent.com/owncloud/ocis/master/services/graph/images/mermaid-graph.svg" width="500" />`
-- [ ] If new CLI command are introduced, that command must be described in readme.md.
-- [ ] If new global envvar is introduced, the name must start with `OCIS_`.
+- [ ] If new CLI command are introduced, that command must be described in the README.md.
+- [ ] If new global envvars are introduced, the name must start with `OCIS_`.
 - [ ] Add the service to the makefile in the ocis repo root.
 - [ ] Make the service startable for binary and individual startup:
   - For single binary add service to `ocis/pkg/runtime`
@@ -39,6 +39,8 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
 - [ ] If new envvars are introduced which serve the same purpose but in multiple services, an additional envvar must be added at the beginning of the list starting with `OCIS_` (global envvar).
 - [ ] Ensure that a service has a debug port
 - [ ] If the new service introduces a new port:
-  - the port must be added to [port-ranges.md](https://github.com/owncloud/ocis/blob/master/docs/services/general-info/port-ranges.md) and to the readme.md file.
+  - The port must be added to [port-ranges.md](https://github.com/owncloud/ocis/blob/master/docs/services/general-info/port-ranges.md) and to the README.md file.
 - [ ] Make sure to have a function `FullDefaultConfig()` in `pkg/config/defaults/defaultconfig.go` of your service. It is needed to create the documentation.
+- [ ] Add metrics to the code to enable monitoring. See the proxy service for implementation details.
+  - Plus add a monitoring documentation in the README.md file
 ```
