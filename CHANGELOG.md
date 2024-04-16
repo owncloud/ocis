@@ -85,7 +85,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Remove resharing: [#8762](https://github.com/owncloud/ocis/pull/8762)
 * Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
 * Enhancement - Bump Reva: [#8795](https://github.com/owncloud/ocis/pull/8795)
-* Enhancement - Update web to v9.0.0-alpha.4: [#8812](https://github.com/owncloud/ocis/pull/8812)
+* Enhancement - Update web to v9.0.0-alpha.5: [#8868](https://github.com/owncloud/ocis/pull/8868)
 
 ## Details
 
@@ -411,11 +411,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8701
    https://github.com/owncloud/ocis/pull/8606
 
-* Enhancement - Update web to v9.0.0-alpha.4: [#8812](https://github.com/owncloud/ocis/pull/8812)
+* Enhancement - Update web to v9.0.0-alpha.5: [#8868](https://github.com/owncloud/ocis/pull/8868)
 
    Tags: web
 
-   We updated ownCloud Web to v9.0.0-alpha.4. Please refer to the changelog
+   We updated ownCloud Web to v9.0.0-alpha.5. Please refer to the changelog
    (linked) for details on the web release.
 
    ## Summary * Bugfix
@@ -429,7 +429,11 @@ The following sections list the changes for unreleased.
    icons * Bugfix [owncloud/web#10702](https://github.com/owncloud/web/pull/10702):
    Apply sandbox attribute to iframe in draw-io extension * Bugfix
    [owncloud/web#10706](https://github.com/owncloud/web/pull/10706): Apply sandbox
-   attribute to iframe in app-external extension * Change
+   attribute to iframe in app-external extension * Bugfix
+   [owncloud/web#10760](https://github.com/owncloud/web/pull/10760): Incoming
+   notifications broken while notification center is open * Bugfix
+   [owncloud/web#10746](https://github.com/owncloud/web/pull/10746): Versions
+   loaded multiple times when opening sidebar * Change
    [owncloud/web#7338](https://github.com/owncloud/web/issues/7338): Remove
    deprecated code * Change
    [owncloud/web#9892](https://github.com/owncloud/web/issues/9892): Remove
@@ -479,10 +483,12 @@ The following sections list the changes for unreleased.
    [owncloud/web#10443](https://github.com/owncloud/web/pull/10443): Custom
    component extension type * Enhancement
    [owncloud/web#10443](https://github.com/owncloud/web/pull/10443): Add
-   extensionPoint concept
+   extensionPoint concept * Enhancement
+   [owncloud/web#10782](https://github.com/owncloud/web/pull/10782): Implement
+   Server-Sent Events (SSE) for file updates
 
-   https://github.com/owncloud/ocis/pull/8812
-   https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.4
+   https://github.com/owncloud/ocis/pull/8868
+   https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.5
 
 # Changelog for [5.0.1] (2024-04-10)
 
