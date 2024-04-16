@@ -29,6 +29,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/downloader"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
+	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
 // Config is the config for the Archiver
@@ -77,7 +78,7 @@ func (a *Archiver) CreateTar(ctx context.Context, dst io.Writer) (func(), error)
 			}
 
 			// when archiving a space we can omit the spaceroot
-			if isSpaceRoot(info) {
+			if utils.IsSpaceRoot(info) {
 				return nil
 			}
 
@@ -152,7 +153,7 @@ func (a *Archiver) CreateZip(ctx context.Context, dst io.Writer) (func(), error)
 			}
 
 			// when archiving a space we can omit the spaceroot
-			if isSpaceRoot(info) {
+			if utils.IsSpaceRoot(info) {
 				return nil
 			}
 
@@ -204,10 +205,4 @@ func (a *Archiver) CreateZip(ctx context.Context, dst io.Writer) (func(), error)
 
 	}
 	return closer, nil
-}
-
-func isSpaceRoot(info *provider.ResourceInfo) bool {
-	f := info.GetId()
-	s := info.GetSpace().GetRoot()
-	return f.GetOpaqueId() == s.GetOpaqueId() && f.GetSpaceId() == s.GetSpaceId()
 }
