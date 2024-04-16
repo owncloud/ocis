@@ -264,7 +264,15 @@ func checkIfNestedResource(ctx context.Context, ref *provider.Reference, parent 
 	if statResponse.Status.Code != rpc.Code_CODE_OK {
 		return false, statuspkg.NewErrorFromCode(statResponse.Status.Code, "auth interceptor")
 	}
-	parentPath := statResponse.Info.Path
+
+	pathResp, err := client.GetPath(ctx, &provider.GetPathRequest{ResourceId: statResponse.GetInfo().GetId()})
+	if err != nil {
+		return false, err
+	}
+	if pathResp.Status.Code != rpc.Code_CODE_OK {
+		return false, statuspkg.NewErrorFromCode(pathResp.Status.Code, "auth interceptor")
+	}
+	parentPath := pathResp.Path
 
 	childPath := ref.GetPath()
 	if childPath != "" && childPath != "." && strings.HasPrefix(childPath, parentPath) {
@@ -308,7 +316,7 @@ func checkIfNestedResource(ctx context.Context, ref *provider.Reference, parent 
 	if childStat.Status.Code != rpc.Code_CODE_OK {
 		return false, statuspkg.NewErrorFromCode(childStat.Status.Code, "auth interceptor")
 	}
-	pathResp, err := client.GetPath(ctx, &provider.GetPathRequest{ResourceId: childStat.GetInfo().GetId()})
+	pathResp, err = client.GetPath(ctx, &provider.GetPathRequest{ResourceId: childStat.GetInfo().GetId()})
 	if err != nil {
 		return false, err
 	}
