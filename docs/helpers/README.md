@@ -17,7 +17,7 @@
 
 ## Introduction
 
-`docs/helpers` contains a go program named `main.go` which creates docs by extracting information from the code using additional go programs. Individual steps (programs) can be called manually if needed. Note that not all programs are called automatically on purpose, see the [Tasks for New Releases](#tasks-for-new-releases) below. `main.go` is used by `make docs-generate` which can be called manually or by the CI. It calls the other required programs and has these main responsibilities for automatic runs:
+`docs/helpers` contains a go program named `main.go` which creates docs by extracting information from the code using additional go programs. Individual steps (programs) can be called manually if needed. Note that not all programs are called automatically on purpose, see the [Tasks for New Releases](#tasks-for-new-releases) below. `main.go` is used by `make docs-generate` which is triggered by the CI or can be called manually. It calls the other required programs and has these main responsibilities for automatic runs:
 
 - Generate docs for envvars in config structs including deprecations if there are any.
 - Extract and generate docs for `extended` envvars that are not mentioned in config structs (aka "rogue" envvars).
@@ -68,6 +68,8 @@ For details on deprecation see the [deprecating-variables](https://github.com/ow
 ## Global Envvars
 
 Global envvars are gathered by checking if the envvar is available in more than one service. The table created is similar to the service-dependent envvar table but additionally contains a column with all service names where this envvar occurs. The output is rendered in list form where each item is clickable and automatically points to the corresponding service page. The template file can be found at `docs/templates/ADOC_global.tmpl`.
+
+If global envvars do not appear in the list of globals, before checking if the code works, do a manual search in the ocis/services folder with `grep -rn OCIS_xxx` if the envvar in question appears at least twice. If the envvar only appears once, the helpers code works correct.
 
 ## Extended Envvars
 
@@ -198,8 +200,10 @@ Close before a new release gets published, but **before** a new ocis admin docs 
 
 The ocis repo contains branches which are necessary for the documentation. The `docs` branch is related to changes in master, necessary for owncloud.dev and the admin docs referencing master content when it comes to envvars and yaml files.
 
+Cases for a backport can be a typo in an envvar description you want to have fixed in a stable branch too or a file  was created after the stable branch was set up but needs to be available in that branch.
+
 When a new stable ocis release (branch) is published, like `stable-5.0`, an additional branch (including CI) is set up manually by the dev team for referencing docs content like `docs-stable-5.0` - related to envvars and yaml files only - and added to the CI.
 
 In case it is necessary to transport a change from master to a stable branch like `docs-stable-5.0`, you must backport the original changes that will create that file to the `stable-5.0` branch. The CI will then take care of creating the results in the target `docs-stable-5.0`.
 
-Cases for a backport can be a typo in an envvar description you want to have fixed in a stable branch too or a file  was created after the stable branch was set up but needs to be available in that branch.
+If the change is expected to have a bigger impact on documenation, you can locally run `make -C docs docs-generate` in the respective branch containing the changes or independently in the `stable-x.y` branch after merging to see if there are additional actions necessary and changed files may need to get checked in.
