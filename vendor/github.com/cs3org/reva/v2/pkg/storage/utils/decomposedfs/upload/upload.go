@@ -278,14 +278,12 @@ func (session *OcisSession) ConcatUploads(_ context.Context, uploads []tusd.Uplo
 func (session *OcisSession) Finalize() (err error) {
 	ctx, span := tracer.Start(session.Context(context.Background()), "Finalize")
 	defer span.End()
-	n, err := session.Node(ctx)
-	if err != nil {
-		return err
-	}
+
+	revisionNode := &node.Node{SpaceID: session.SpaceID(), BlobID: session.ID(), Blobsize: session.Size()}
 
 	// upload the data to the blobstore
 	_, subspan := tracer.Start(ctx, "WriteBlob")
-	err = session.store.tp.WriteBlob(n, session.binPath())
+	err = session.store.tp.WriteBlob(revisionNode, session.binPath())
 	subspan.End()
 	if err != nil {
 		return errors.Wrap(err, "failed to upload file to blobstore")
@@ -318,12 +316,12 @@ func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool
 	ctx := session.Context(context.Background())
 
 	if revertNodeMetadata {
+		n, err := session.Node(ctx)
+		if err != nil {
+			appctx.GetLogger(ctx).Error().Err(err).Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Str("uploadid", session.ID()).Msg("reading node for session failed")
+		}
 		if session.NodeExists() {
 			p := session.info.MetaData["versionsPath"]
-			n, err := session.Node(ctx)
-			if err != nil {
-				appctx.GetLogger(ctx).Error().Err(err).Str("sessionid", session.ID()).Msg("reading node for session failed")
-			}
 			if err := session.store.lu.CopyMetadata(ctx, p, n.InternalPath(), func(attributeName string, value []byte) (newValue []byte, copy bool) {
 				return value, strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
 					attributeName == prefixes.TypeAttr ||
@@ -339,7 +337,16 @@ func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool
 			}
 
 		} else {
-			session.removeNode(ctx)
+			// if no other upload session is in progress (processing id != session id) or has finished (processing id == "")
+			latestSession, err := n.ProcessingID(ctx)
+			if err != nil {
+				appctx.GetLogger(ctx).Error().Err(err).Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Str("uploadid", session.ID()).Msg("reading processingid for session failed")
+			}
+			if latestSession == session.ID() {
+				// actually delete the node
+				session.removeNode(ctx)
+			}
+			// FIXME else if the upload has become a revision, delete the revision, or if it is the last one, delete the node
 		}
 	}
 

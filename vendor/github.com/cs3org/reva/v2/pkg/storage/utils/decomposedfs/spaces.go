@@ -808,7 +808,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 		}
 	}
 
-	sublog := appctx.GetLogger(ctx).With().Str("space", n.SpaceRoot.ID).Logger()
+	sublog := appctx.GetLogger(ctx).With().Str("spaceid", n.SpaceID).Logger()
 
 	var err error
 	// TODO apply more filters

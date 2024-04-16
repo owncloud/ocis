@@ -1147,7 +1147,7 @@ func (h *Handler) listSharesWithOthers(w http.ResponseWriter, r *http.Request) {
 	s := r.URL.Query().Get("space")
 	spaceRef := r.URL.Query().Get("space_ref")
 	ctx := r.Context()
-	sublog := appctx.GetLogger(ctx).With().Str("path", p).Str("space", s).Str("space_ref", spaceRef).Logger()
+	sublog := appctx.GetLogger(ctx).With().Str("path", p).Str("spaceid", s).Str("space_ref", spaceRef).Logger()
 	if p != "" || s != "" || spaceRef != "" {
 		ref, err := h.extractReference(r)
 		if err != nil {

@@ -356,6 +356,18 @@ func SpaceShared(r *provider.AddGrantResponse, req *provider.AddGrantRequest, ex
 	}
 }
 
+// SpaceShareUpdated converts the response to an events
+func SpaceShareUpdated(r *provider.UpdateGrantResponse, req *provider.UpdateGrantRequest, executant *user.UserId) events.SpaceShareUpdated {
+	id := storagespace.FormatStorageID(req.Ref.ResourceId.StorageId, req.Ref.ResourceId.SpaceId)
+	return events.SpaceShareUpdated{
+		Executant:      executant,
+		GranteeUserID:  req.Grant.GetGrantee().GetUserId(),
+		GranteeGroupID: req.Grant.GetGrantee().GetGroupId(),
+		ID:             &provider.StorageSpaceId{OpaqueId: id},
+		Timestamp:      time.Now(),
+	}
+}
+
 // SpaceUnshared  converts the response to an event
 func SpaceUnshared(r *provider.RemoveGrantResponse, req *provider.RemoveGrantRequest, executant *user.UserId) events.SpaceUnshared {
 	id := storagespace.FormatStorageID(req.Ref.ResourceId.StorageId, req.Ref.ResourceId.SpaceId)

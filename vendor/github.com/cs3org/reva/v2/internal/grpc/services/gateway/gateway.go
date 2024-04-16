@@ -131,7 +131,7 @@ func (c *config) init() {
 	}
 
 	if c.CreatePersonalSpaceCacheConfig.Store == "" {
-		c.CreatePersonalSpaceCacheConfig.Store = "noop"
+		c.CreatePersonalSpaceCacheConfig.Store = "memory"
 	}
 
 	if c.CreatePersonalSpaceCacheConfig.Database == "" {
