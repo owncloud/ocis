@@ -153,7 +153,7 @@ config = {
     },
     "rocketchat": {
         "channel": "infinitescale",
-        "channel_builds": "builds",
+        "channel_cron": "builds",
         "from_secret": "rocketchat_talk_webhook",
     },
     "binaryReleases": {
@@ -1963,7 +1963,7 @@ def notify(ctx):
     channel = config["rocketchat"]["channel"]
     if ctx.build.event == "cron":
         status.append("success")
-        channel = config["rocketchat"]["channel_builds"]
+        channel = config["rocketchat"]["channel_cron"]
 
     return {
         "kind": "pipeline",
