@@ -85,6 +85,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Remove resharing: [#8762](https://github.com/owncloud/ocis/pull/8762)
 * Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
 * Enhancement - Bump Reva: [#8795](https://github.com/owncloud/ocis/pull/8795)
+* Enhancement - Sharing SSEs: [#8854](https://github.com/owncloud/ocis/pull/8854)
 * Enhancement - Update web to v9.0.0-alpha.5: [#8868](https://github.com/owncloud/ocis/pull/8868)
 
 ## Details
@@ -410,6 +411,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8795
    https://github.com/owncloud/ocis/pull/8701
    https://github.com/owncloud/ocis/pull/8606
+
+* Enhancement - Sharing SSEs: [#8854](https://github.com/owncloud/ocis/pull/8854)
+
+   Added server side events for item moved, share created/updated/removed, space
+   membership created/removed.
+
+   https://github.com/owncloud/ocis/pull/8854
 
 * Enhancement - Update web to v9.0.0-alpha.5: [#8868](https://github.com/owncloud/ocis/pull/8868)
 
