@@ -418,6 +418,7 @@ The following sections list the changes for unreleased.
    membership created/removed.
 
    https://github.com/owncloud/ocis/pull/8854
+   https://github.com/owncloud/ocis/pull/8875
 
 * Enhancement - Update web to v9.0.0-alpha.5: [#8868](https://github.com/owncloud/ocis/pull/8868)
 
