@@ -715,6 +715,26 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When user :user tries to enable share sync of a non-existent resource using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userTriesToEnablsShareSyncOfNonExistentResourceUsingTheGraphApi(string $user):void {
+		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$response =  GraphHelper::enableShareSync(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			WebDavHelper::generateUUIDv4(),
+			$shareSpaceId
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @Then /^user "([^"]*)" should have sync (enabled|disabled) for share "([^"]*)"$/
 	 *
 	 * @param string $user
