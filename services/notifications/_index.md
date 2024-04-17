@@ -1,6 +1,6 @@
 ---
 title: Notification
-date: 2024-04-17T13:33:33.584437577Z
+date: 2024-04-17T13:56:01.864857693Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/notifications
