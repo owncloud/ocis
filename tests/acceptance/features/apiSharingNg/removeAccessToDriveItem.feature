@@ -18,7 +18,7 @@ Feature: Remove access to a drive item
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    When user "Alice" removes the share permission of user "Brian" from resource "<resource>" of space "Personal" using the Graph API
+    When user "Alice" removes the access of user "Brian" from resource "<resource>" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
       | <resource> |
@@ -42,7 +42,7 @@ Feature: Remove access to a drive item
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    When user "Alice" removes the share permission of user "Brian" from resource "<resource>" of space "NewSpace" using the Graph API
+    When user "Alice" removes the access of user "Brian" from resource "<resource>" of space "NewSpace" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
       | <resource> |
@@ -67,7 +67,7 @@ Feature: Remove access to a drive item
       | sharee          | group1             |
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
-    When user "Alice" removes the share permission of group "group1" from resource "<resource>" of space "Personal" using the Graph API
+    When user "Alice" removes the access of group "group1" from resource "<resource>" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
       | <resource> |
@@ -94,7 +94,7 @@ Feature: Remove access to a drive item
       | sharee          | group1             |
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
-    When user "Alice" removes the share permission of group "group1" from resource "<resource>" of space "NewSpace" using the Graph API
+    When user "Alice" removes the access of group "group1" from resource "<resource>" of space "NewSpace" using the Graph API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
       | <resource> |
@@ -114,7 +114,7 @@ Feature: Remove access to a drive item
       | space           | Personal           |
       | permissionsRole | <permissions-role> |
       | password        | %public%           |
-    When user "Alice" removes the share permission of link from folder "FolderToShare" of space "Personal" using the Graph API
+    When user "Alice" removes the link of folder "FolderToShare" from space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     Examples:
       | permissions-role |
@@ -132,7 +132,7 @@ Feature: Remove access to a drive item
       | space           | Personal           |
       | permissionsRole | <permissions-role> |
       | password        | %public%           |
-    When user "Alice" removes the share permission of link from file "textfile.txt" of space "Personal" using the Graph API
+    When user "Alice" removes the link of file "textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     Examples:
       | permissions-role |
@@ -150,7 +150,7 @@ Feature: Remove access to a drive item
       | space           | NewSpace           |
       | permissionsRole | <permissions-role> |
       | password        | %public%           |
-    When user "Alice" removes the share permission of link from folder "FolderToShare" of space "NewSpace" using the Graph API
+    When user "Alice" removes the link of folder "FolderToShare" from space "NewSpace" using the Graph API
     Then the HTTP status code should be "204"
     Examples:
       | permissions-role |
@@ -170,7 +170,7 @@ Feature: Remove access to a drive item
       | space           | NewSpace           |
       | permissionsRole | <permissions-role> |
       | password        | %public%           |
-    When user "Alice" removes the share permission of link from file "textfile.txt" of space "NewSpace" using the Graph API
+    When user "Alice" removes the link of file "textfile.txt" from space "NewSpace" using the Graph API
     Then the HTTP status code should be "204"
     Examples:
       | permissions-role |
@@ -178,8 +178,8 @@ Feature: Remove access to a drive item
       | edit             |
       | blocksDownload   |
 
-  
-  Scenario Outline: user removes user member from project space
+
+  Scenario Outline: user removes user member from project space using permissions endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has sent the following share invitation:
@@ -187,7 +187,7 @@ Feature: Remove access to a drive item
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    When user "Alice" removes the share permission of user "Brian" from space "NewSpace" using the Graph API
+    When user "Alice" removes the access of user "Brian" from space "NewSpace" using permissions endpoint of the Graph API
     Then the HTTP status code should be "204"
     And the user "Brian" should not have a space called "NewSpace"
     Examples:
@@ -196,8 +196,8 @@ Feature: Remove access to a drive item
       | Space Editor     |
       | Manager          |
 
-  @issue-8768
-  Scenario Outline: user removes group from project space
+
+  Scenario Outline: user removes group from project space using permissions endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And group "group1" has been created
@@ -207,11 +207,11 @@ Feature: Remove access to a drive item
       | sharee          | group1              |
       | shareType       | group               |
       | permissionsRole | <permissions-role> |
-    When user "Alice" removes the share permission of group "group1" from space "NewSpace" using the Graph API
+    When user "Alice" removes the access of group "group1" from space "NewSpace" using permissions endpoint of the Graph API
     Then the HTTP status code should be "204"
     And the user "Brian" should not have a space called "NewSpace"
     Examples:
       | permissions-role |
       | Space Viewer     |
       | Space Editor     |
-      | Manager          |    
+      | Manager          |  

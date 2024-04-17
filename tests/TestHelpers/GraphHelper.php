@@ -1851,7 +1851,7 @@ class GraphHelper {
 	 *
 	 * @throws GuzzleException
 	 */
-	public static function deleteSharePermission(
+	public static function removeAccessToSpaceItem(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
@@ -1861,6 +1861,36 @@ class GraphHelper {
 		string $permissionId
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionId");
+		return HttpRequestHelper::delete(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param string $permissionId
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 */
+	public static function removeAccessToSpace(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $spaceId,
+		string $permissionId
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions/$permissionId");
 		return HttpRequestHelper::delete(
 			$url,
 			$xRequestId,
