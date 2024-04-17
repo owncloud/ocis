@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.1](#changelog-for-501-2024-04-10)
 * [Changelog for 5.0.0](#changelog-for-500-2024-03-18)
 * [Changelog for 4.0.6](#changelog-for-406-2024-02-07)
@@ -33,6 +34,35 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.1...master
+
+## Summary
+
+* Bugfix - Fix creating new WOPI documents on public shares: [#8828](https://github.com/owncloud/ocis/pull/8828)
+* Bugfix - Update reva to v2.19.5: [#8873](https://github.com/owncloud/ocis/pull/8873)
+
+## Details
+
+* Bugfix - Fix creating new WOPI documents on public shares: [#8828](https://github.com/owncloud/ocis/pull/8828)
+
+   Creating a new Office document in a publicly shared folder is now possible.
+
+   https://github.com/owncloud/ocis/issues/8691
+   https://github.com/owncloud/ocis/pull/8828
+
+* Bugfix - Update reva to v2.19.5: [#8873](https://github.com/owncloud/ocis/pull/8873)
+
+   We updated reva to v2.19.5
+
+  *   Bugfix [cs3org/reva#4626](https://github.com/cs3org/reva/pull/4626): Fix public share update
+  *   Bugfix [cs3org/reva#4634](https://github.com/cs3org/reva/pull/4634): Fix access to files withing a public link targeting a space root
+
+   https://github.com/owncloud/ocis/pull/8873
 
 # Changelog for [5.0.1] (2024-04-10)
 
