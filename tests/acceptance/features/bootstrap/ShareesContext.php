@@ -90,7 +90,7 @@ class ShareesContext implements Context {
 	 * @throws Exception
 	 */
 	public function theShareesReturnedShouldBe(string $shareeType, TableNode $shareesList):void {
-		$this->featureContext->verifyTableNodeColumnsCount($shareesList, 3);
+		$this->featureContext->verifyTableNodeColumnsCount($shareesList, 4);
 		$sharees = $shareesList->getRows();
 		$respondedArray = $this->getArrayOfShareesResponded(
 			$this->featureContext->getResponse(),
@@ -186,14 +186,16 @@ class ShareesContext implements Context {
 					$sharees[] = [
 						$innerItem['label'],
 						$innerItem['value']['shareType'],
-						$innerItem['value']['shareWith']
+						$innerItem['value']['shareWith'],
+						$innerItem['value']['shareWithAdditionalInfo']
 					];
 				}
 			} else {
 				$sharees[] = [
 					$element['label'],
 					$element['value']['shareType'],
-					$element['value']['shareWith']
+					$element['value']['shareWith'],
+					$element['value']['shareWithAdditionalInfo']
 				];
 			}
 		}

@@ -22,11 +22,11 @@ Feature: search sharees
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
-      | Sharee One | 0 | sharee1 |
+      | Sharee One | 0 | sharee1 | sharee1 |
     And the "exact groups" sharees returned should be empty
     And the "groups" sharees returned should be
-      | ShareeGroup  | 1 | ShareeGroup  |
-      | ShareeGroup2 | 1 | ShareeGroup2 |
+      | ShareeGroup  | 1 | ShareeGroup  | ShareeGroup  |
+      | ShareeGroup2 | 1 | ShareeGroup2 | ShareeGroup2 |
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
@@ -44,11 +44,11 @@ Feature: search sharees
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
-      | Sharee One | 0 | sharee1 |
+      | Sharee One | 0 | sharee1 | sharee1 |
     And the "exact groups" sharees returned should be empty
     And the "groups" sharees returned should be
-      | ShareeGroup  | 1 | ShareeGroup  |
-      | ShareeGroup2 | 1 | ShareeGroup2 |
+      | ShareeGroup  | 1 | ShareeGroup  | ShareeGroup  |
+      | ShareeGroup2 | 1 | ShareeGroup2 | ShareeGroup2 |
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
@@ -67,11 +67,11 @@ Feature: search sharees
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
-      | Sharee One | 0 | sharee1 |
+      | Sharee One | 0 | sharee1 | sharee1 |
     And the "exact groups" sharees returned should be empty
     And the "groups" sharees returned should be
-      | ShareeGroup  | 1 | ShareeGroup  |
-      | ShareeGroup2 | 1 | ShareeGroup2 |
+      | ShareeGroup  | 1 | ShareeGroup  | ShareeGroup  |
+      | ShareeGroup2 | 1 | ShareeGroup2 | ShareeGroup2 |
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
@@ -88,7 +88,7 @@ Feature: search sharees
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be
-      | Sharee One | 0 | sharee1 |
+      | Sharee One | 0 | sharee1 | sharee1 |
     And the "users" sharees returned should be empty
     And the "exact groups" sharees returned should be empty
     And the "groups" sharees returned should be empty
@@ -108,7 +108,7 @@ Feature: search sharees
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be
-      | Sharee One | 0 | sharee1 |
+      | Sharee One | 0 | sharee1 | sharee1 |
     And the "users" sharees returned should be empty
     And the "exact groups" sharees returned should be empty
     And the "groups" sharees returned should be empty
@@ -130,7 +130,7 @@ Feature: search sharees
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be empty
     And the "exact groups" sharees returned should be
-      | ShareeGroup2 | 1 | ShareeGroup2 |
+      | ShareeGroup2 | 1 | ShareeGroup2 | ShareeGroup2 |
     And the "groups" sharees returned should be empty
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
@@ -148,7 +148,7 @@ Feature: search sharees
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be
-      | Sharee One | 0 | sharee1 |
+      | Sharee One | 0 | sharee1 | sharee1 |
     And the "users" sharees returned should be empty
     And the "exact groups" sharees returned should be empty
     And the "groups" sharees returned should be empty
@@ -173,7 +173,7 @@ Feature: search sharees
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
-      | Another | 0 | another |
+      | Another | 0 | another | another |
     And the "exact groups" sharees returned should be empty
     And the "groups" sharees returned should be empty
     And the "exact remotes" sharees returned should be empty
@@ -194,14 +194,48 @@ Feature: search sharees
     And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
-      | Sharee One | 0 | sharee1 |
-      | Sharee Two | 0 | sharee2 |
+      | Sharee One | 0 | sharee1 | sharee1 |
+      | Sharee Two | 0 | sharee2 | sharee2 |
     And the "exact groups" sharees returned should be empty
     And the "groups" sharees returned should be
-      | ShareeGroup  | 1 | ShareeGroup  |
-      | ShareeGroup2 | 1 | ShareeGroup2 |
+      | ShareeGroup  | 1 | ShareeGroup  | ShareeGroup  |
+      | ShareeGroup2 | 1 | ShareeGroup2 | ShareeGroup2 |
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
+    Examples:
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
+
+  @env-config
+  Scenario Outline: search other users when OCIS_SHOW_USER_EMAIL_IN_RESULTS config is enabled
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true"
+    And using OCS API version "<ocs-api-version>"
+    When user "Alice" gets the sharees using the sharing API with parameters
+      | search   | Brian |
+      | itemType | file  |
+    Then the OCS status code should be "<ocs-status-code>"
+    And the HTTP status code should be "200"
+    And the "exact users" sharees returned should be
+      | Brian Murphy | 0 | Brian | brian@example.org |
+    Examples:
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
+
+  @env-config
+  Scenario Outline: search other users when OCIS_SHOW_USER_EMAIL_IN_RESULTS config is disabled
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "false"
+    And using OCS API version "<ocs-api-version>"
+    When user "Alice" gets the sharees using the sharing API with parameters
+      | search   | Brian |
+      | itemType | file  |
+    Then the OCS status code should be "<ocs-status-code>"
+    And the HTTP status code should be "200"
+    And the "exact users" sharees returned should be
+      | Brian Murphy | 0 | Brian | Brian |
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |

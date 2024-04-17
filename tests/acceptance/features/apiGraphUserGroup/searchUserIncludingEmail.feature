@@ -255,7 +255,8 @@ Feature: edit/search user including email
       | User Light  |
 
 
-  Scenario: non-admin user searches other users by display name
+  Scenario Outline: non-admin user searches other users by display name
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Brian" searches for user "ali" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -296,6 +297,11 @@ Feature: edit/search user including email
       }
     }
     """
+    Examples:
+      | user-role   |
+      | Space Admin |
+      | User        |
+      | User Light  |
 
   @issue-7990
   Scenario: non-admin user searches other users by e-mail
@@ -460,3 +466,16 @@ Feature: edit/search user including email
       }
     }
     """
+
+
+  Scenario Outline: search other users when OCIS_SHOW_USER_EMAIL_IN_RESULTS config is disabled
+    Given the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "false"
+    And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    When user "Alice" searches for user "Brian" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the search response should not contain user email
+    Examples:
+      | user-role   |
+      | Space Admin |
+      | User        |
+      | User Light  |
