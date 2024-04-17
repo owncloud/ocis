@@ -682,12 +682,12 @@ class SharingNgContext implements Context {
 		$listPermissionResponse = $this->featureContext->getJsonDecodedResponseBodyContent();
 		if (!isset($listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'})) {
 			Assert::fail(
-                "The following response does not contain '@libre.graph.permissions.roles.allowedValues' property:\n" . $listPermissionResponse
+				"The following response does not contain '@libre.graph.permissions.roles.allowedValues' property:\n" . $listPermissionResponse
 			);
 		}
 		Assert::assertNotEmpty(
 			$listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'},
-            "'@libre.graph.permissions.roles.allowedValues' should not be empty"
+			"'@libre.graph.permissions.roles.allowedValues' should not be empty"
 		);
 		$allowedPermissionRoles = $listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'};
 		// this info is needed for log to see which roles allowed and which were not when tests fail
@@ -709,7 +709,7 @@ class SharingNgContext implements Context {
 				Assert::assertEquals(204, $removePermissionsResponse->getStatusCode());
 			} else {
 				$areAllSendInvitationSuccessFullForAllowedRoles = false;
-                $shareInvitationRequestResult .= "\tShare invitation for resource '" . $resource . "' with role '" . $roleAllowed . "' failed and was not allowed.\n";
+				$shareInvitationRequestResult .= "\tShare invitation for resource '" . $resource . "' with role '" . $roleAllowed . "' failed and was not allowed.\n";
 			}
 		}
 		Assert::assertTrue($areAllSendInvitationSuccessFullForAllowedRoles, $shareInvitationRequestResult);

@@ -890,8 +890,6 @@ Feature: List a sharing permissions
     }
     """
 
-
-  Scenario: user send share invitation for all allowed roles defined in permission lists for a file
   @issues-8331
   Scenario: user sends share invitation with all allowed roles for a file
     Given user "Alice" has uploaded file with content "hello text" to "textfile.txt"
