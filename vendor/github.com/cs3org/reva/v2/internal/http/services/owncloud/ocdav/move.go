@@ -196,7 +196,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 		errors.HandleErrorStatus(&log, w, srcStatRes.Status)
 		return
 	}
-	if isSpaceRoot(srcStatRes.GetInfo()) {
+	if utils.IsSpaceRoot(srcStatRes.GetInfo()) {
 		log.Error().Msg("the source is disallowed")
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -219,7 +219,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 	if dstStatRes.Status.Code == rpc.Code_CODE_OK {
 		successCode = http.StatusNoContent // 204 if target already existed, see https://tools.ietf.org/html/rfc4918#section-9.9.4
 
-		if isSpaceRoot(dstStatRes.GetInfo()) {
+		if utils.IsSpaceRoot(dstStatRes.GetInfo()) {
 			log.Error().Msg("overwriting is not allowed")
 			w.WriteHeader(http.StatusBadRequest)
 			return
