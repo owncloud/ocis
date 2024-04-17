@@ -244,8 +244,8 @@ Feature: update a public link share
       | password    | %public%                  |
     And user "Alice" has updated the last public link share with
       | permissions | read |
-    And the public deletes file "CHILD/child.txt" from the last public link share using the password "%public%" and new public WebDAV API
-    And the HTTP status code of responses on all endpoints should be "403"
+    When the public deletes file "CHILD/child.txt" from the last public link share using the password "%public%" and new public WebDAV API
+    Then the HTTP status code of responses on all endpoints should be "403"
     And as "Alice" file "PARENT/CHILD/child.txt" should exist
     Examples:
       | ocs-api-version |
