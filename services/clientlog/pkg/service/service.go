@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"reflect"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -146,7 +147,7 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		p("folder-created", e.Ref)
 	case events.ItemMoved:
 		// we send a dedicated event in case the item was only renamed
-		if utils.ResourceIDEqual(e.OldReference.GetResourceId(), e.Ref.GetResourceId()) || e.Ref.GetPath() == e.OldReference.GetPath() {
+		if isRename(e.OldReference, e.Ref) {
 			p("item-renamed", e.Ref)
 		} else {
 			p("item-moved", e.Ref)
@@ -228,4 +229,13 @@ func addSharees(ctx context.Context, users []string, gwc gateway.GatewayAPIClien
 	}
 	us, err := utils.GetGroupMembers(ctx, gid.GetOpaqueId(), gwc)
 	return append(users, us...), err
+}
+
+// returns true if this is just a rename
+func isRename(o, n *provider.Reference) bool {
+	// if resourceids are different we assume it is a move
+	if !utils.ResourceIDEqual(o.GetResourceId(), n.GetResourceId()) {
+		return false
+	}
+	return filepath.Base(o.GetPath()) != filepath.Base(n.GetPath())
 }
