@@ -53,6 +53,7 @@ type Service struct {
 	gwc     gatewayv1beta1.GatewayAPIClient
 }
 
+// OpenInApp will implement the OpenInApp interface of the app provider
 func (s *Service) OpenInApp(
 	ctx context.Context,
 	req *appproviderv1beta1.OpenInAppRequest,

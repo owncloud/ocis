@@ -86,6 +86,7 @@ func Server(opts ...Option) (http.Service, error) {
 	return service, nil
 }
 
+// prepareRoutes will prepare all the implemented routes
 func prepareRoutes(r *chi.Mux, options Options) {
 	adapter := options.Adapter
 	logger := options.Logger

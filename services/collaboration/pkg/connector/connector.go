@@ -9,10 +9,12 @@ type ConnectorError struct {
 	Msg         string
 }
 
+// Error gets the error message
 func (e *ConnectorError) Error() string {
 	return e.Msg
 }
 
+// NewConnectorError creates a new connector error using the provided parameters
 func NewConnectorError(code int, msg string) *ConnectorError {
 	return &ConnectorError{
 		HttpCodeOut: code,
@@ -43,6 +45,7 @@ type Connector struct {
 	contentConnector ContentConnectorService
 }
 
+// NewConnector creates a new connector
 func NewConnector(fc FileConnectorService, cc ContentConnectorService) *Connector {
 	return &Connector{
 		fileConnector:    fc,
@@ -50,10 +53,12 @@ func NewConnector(fc FileConnectorService, cc ContentConnectorService) *Connecto
 	}
 }
 
+// GetFileConnector gets the file connector service associated to this connector
 func (c *Connector) GetFileConnector() FileConnectorService {
 	return c.fileConnector
 }
 
+// GetContentConnector gets the content connector service associated to this connector
 func (c *Connector) GetContentConnector() ContentConnectorService {
 	return c.contentConnector
 }

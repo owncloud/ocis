@@ -51,11 +51,15 @@ type FileConnectorService interface {
 	CheckFileInfo(ctx context.Context) (FileInfo, error)
 }
 
+// FileConnector implements the "File" endpoint.
+// Currently, it handles file locks and getting the file info.
+// Note that operations might return any kind of error, not just ConnectorError
 type FileConnector struct {
 	gwc gatewayv1beta1.GatewayAPIClient
 	cfg *config.Config
 }
 
+// NewFileConnector creates a new file connector
 func NewFileConnector(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *FileConnector {
 	return &FileConnector{
 		gwc: gwc,

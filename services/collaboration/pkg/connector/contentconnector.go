@@ -42,6 +42,7 @@ type ContentConnector struct {
 	cfg *config.Config
 }
 
+// NewContentConnector creates a new content connector
 func NewContentConnector(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *ContentConnector {
 	return &ContentConnector{
 		gwc: gwc,

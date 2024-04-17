@@ -17,6 +17,7 @@ type Options struct {
 	Gwc     gatewayv1beta1.GatewayAPIClient
 }
 
+// newOptions initializes the available default options.
 func newOptions(opts ...Option) Options {
 	opt := Options{}
 

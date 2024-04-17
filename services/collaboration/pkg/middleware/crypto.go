@@ -9,6 +9,9 @@ import (
 	"io"
 )
 
+// keyPadding will add the required zero padding to the provided key.
+// The resulting key will have a length of either 16, 24 or 32 bytes.
+// If the key has more than 32 bytes, only the first 32 bytes will be returned.
 func keyPadding(key []byte) []byte {
 	switch length := len(key); {
 	case length < 16:
@@ -29,6 +32,9 @@ func keyPadding(key []byte) []byte {
 	return []byte{}
 }
 
+// EncryptAES encrypts the provided plainText using the provided key.
+// AES CFB will be used as cryptographic method.
+// Use DecryptAES to decrypt the resulting string
 func EncryptAES(key []byte, plainText string) (string, error) {
 	src := []byte(plainText)
 
@@ -49,6 +55,9 @@ func EncryptAES(key []byte, plainText string) (string, error) {
 	return base64.URLEncoding.EncodeToString(cipherText), nil
 }
 
+// DecryptAES decrypts the provided string using the provided key.
+// The provided string must have been encrypted with AES CFB.
+// This method will decrypt the result from the EncryptAES method
 func DecryptAES(key []byte, securemess string) (string, error) {
 	cipherText, err := base64.URLEncoding.DecodeString(securemess)
 	if err != nil {

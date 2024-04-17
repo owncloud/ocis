@@ -21,6 +21,7 @@ const (
 	wopiContextKey key = iota
 )
 
+// WopiContext wraps all the information we need for WOPI
 type WopiContext struct {
 	AccessToken   string
 	FileReference providerv1beta1.Reference
@@ -30,6 +31,17 @@ type WopiContext struct {
 	ViewAppUrl    string
 }
 
+// WopiContextAuthMiddleware will prepare an HTTP handler to be used as
+// middleware. The handler will create a WopiContext by parsing the
+// access_token (which must be provided as part of the URL query).
+// The access_token is required.
+//
+// This middleware will add the following to the request's context:
+// * The access token as metadata for outgoing requests (for the
+// authentication against the CS3 API, the "x-access-token" header).
+// * The created WopiContext for the request
+// * A contextual zerologger containing information about the request
+// and the WopiContext
 func WopiContextAuthMiddleware(jwtSecret string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessToken := r.URL.Query().Get("access_token")

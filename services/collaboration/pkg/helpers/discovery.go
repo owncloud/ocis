@@ -13,6 +13,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// GetAppURLs gets the edit and view urls for different file types from the
+// target WOPI app (onlyoffice, collabora, etc) via their "/hosting/discovery"
+// endpoint.
 func GetAppURLs(cfg *config.Config, logger log.Logger) (map[string]map[string]string, error) {
 	wopiAppUrl := cfg.WopiApp.Addr + "/hosting/discovery"
 
@@ -58,6 +61,7 @@ func GetAppURLs(cfg *config.Config, logger log.Logger) (map[string]map[string]st
 	return appURLs, nil
 }
 
+// parseWopiDiscovery parses the response of the "/hosting/discovery" endpoint
 func parseWopiDiscovery(body io.Reader) (map[string]map[string]string, error) {
 	appURLs := make(map[string]map[string]string)
 

@@ -47,6 +47,10 @@ func NewHttpAdapterWithConnector(con ConnectorService) *HttpAdapter {
 	}
 }
 
+// GetLock adapts the "GetLock" operation for WOPI.
+// Only the request's context is needed in order to extract the WOPI context.
+// The operation's response will be sent through the response writer and
+// the headers according to the spec
 func (h *HttpAdapter) GetLock(w http.ResponseWriter, r *http.Request) {
 	fileCon := h.con.GetFileConnector()
 
@@ -63,6 +67,12 @@ func (h *HttpAdapter) GetLock(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set(HeaderWopiLock, lockID)
 }
 
+// Lock adapts the "Lock" and "UnlockAndRelock" operations for WOPI.
+// The request's context is needed in order to extract the WOPI context. In
+// addition, the "X-WOPI-Lock" and "X-WOPI-OldLock" headers might be needed"
+// (check spec)
+// The operation's response will be sent through the response writer and
+// the headers according to the spec
 func (h *HttpAdapter) Lock(w http.ResponseWriter, r *http.Request) {
 	oldLockID := r.Header.Get(HeaderWopiOldLock)
 	lockID := r.Header.Get(HeaderWopiLock)
@@ -85,6 +95,13 @@ func (h *HttpAdapter) Lock(w http.ResponseWriter, r *http.Request) {
 	// X-WOPI-Lock header isn't needed on HTTP 200
 }
 
+// RefreshLock adapts the "RefreshLock" operation for WOPI
+// The request's context is needed in order to extract the WOPI context. In
+// addition, the "X-WOPI-Lock" header is needed (check spec).
+// The lock will be refreshed to last another 30 minutes. The value is
+// hardcoded
+// The operation's response will be sent through the response writer and
+// the headers according to the spec
 func (h *HttpAdapter) RefreshLock(w http.ResponseWriter, r *http.Request) {
 	lockID := r.Header.Get(HeaderWopiLock)
 
@@ -106,6 +123,11 @@ func (h *HttpAdapter) RefreshLock(w http.ResponseWriter, r *http.Request) {
 	// X-WOPI-Lock header isn't needed on HTTP 200
 }
 
+// UnLock adapts the "Unlock" operation for WOPI
+// The request's context is needed in order to extract the WOPI context. In
+// addition, the "X-WOPI-Lock" header is needed (check spec).
+// The operation's response will be sent through the response writer and
+// the headers according to the spec
 func (h *HttpAdapter) UnLock(w http.ResponseWriter, r *http.Request) {
 	lockID := r.Header.Get(HeaderWopiLock)
 
@@ -127,6 +149,10 @@ func (h *HttpAdapter) UnLock(w http.ResponseWriter, r *http.Request) {
 	// X-WOPI-Lock header isn't needed on HTTP 200
 }
 
+// CheckFileInfo will retrieve the information of the file in json format
+// Only the request's context is needed in order to extract the WOPI context.
+// The operation's response will be sent through the response writer and
+// the headers according to the spec
 func (h *HttpAdapter) CheckFileInfo(w http.ResponseWriter, r *http.Request) {
 	fileCon := h.con.GetFileConnector()
 
@@ -165,6 +191,9 @@ func (h *HttpAdapter) CheckFileInfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetFile will download the file
+// Only the request's context is needed in order to extract the WOPI context.
+// The file's content will be written in the response writer
 func (h *HttpAdapter) GetFile(w http.ResponseWriter, r *http.Request) {
 	contentCon := h.con.GetContentConnector()
 	err := contentCon.GetFile(r.Context(), w)
@@ -178,6 +207,11 @@ func (h *HttpAdapter) GetFile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PutFile will upload the file
+// The request's context and its body are needed (content length is also
+// needed)
+// The operation's response will be sent through the response writer and
+// the headers according to the spec
 func (h *HttpAdapter) PutFile(w http.ResponseWriter, r *http.Request) {
 	lockID := r.Header.Get(HeaderWopiLock)
 
