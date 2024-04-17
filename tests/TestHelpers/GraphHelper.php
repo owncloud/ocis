@@ -1648,6 +1648,32 @@ class GraphHelper {
 	}
 
 	/**
+	 * Get the role name by role id
+	 *
+	 * @param string $permissionsRoleId
+	 *
+	 * @return string
+	 *
+	 * @throws \Exception
+	 */
+	public static function getPermissionNameByPermissionRoleId(
+		string $permissionsRoleId
+	): string {
+		switch ($permissionsRoleId) {
+			case 'b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5':
+				return 'Viewer';
+			case 'fb6c3e19-e378-47e5-b277-9732f9de6e21':
+				return 'Editor';
+			case '2d00ce52-1fc2-4dbc-8b95-a73b73395f5a':
+				return 'File Editor';
+			case '1c996275-f1c9-4e71-abdf-a42f6495e960':
+				return 'Uploader';
+			default:
+				throw new \Exception('Role ' . $permissionsRoleId . ' not found');
+		}
+	}
+
+	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
 	 * @param string $user

@@ -889,3 +889,27 @@ Feature: List a sharing permissions
       }
     }
     """
+
+  @issues-8331
+  Scenario: user sends share invitation with all allowed roles for a file
+    Given user "Alice" has uploaded file with content "hello text" to "textfile.txt"
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" gets permissions list for file "textfile.txt" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Alice" should be able to send share invitation with all allowed permission roles
+      | resource     | textfile.txt |
+      | space        | Personal     |
+      | sharee       | Brian        |
+      | shareType    | user         |
+
+  @issues-8331
+  Scenario: user sends share invitation with all allowed roles for a folder
+    Given user "Alice" has created folder "folder"
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" gets permissions list for folder "folder" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Alice" should be able to send share invitation with all allowed permission roles
+      | resource     | folder   |
+      | space        | Personal |
+      | sharee       | Brian    |
+      | shareType    | user     |

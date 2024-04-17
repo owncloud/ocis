@@ -667,4 +667,51 @@ class SharingNgContext implements Context {
 			"Expected property '@client.synchronize' to be '$expectedValue' but found '$actualValue'"
 		);
 	}
+
+	/**
+	 * @Then user :user should be able to send share invitation with all allowed permission roles
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userShouldBeAbleToSendShareInvitationWithAllAllowedPermissionRoles(string $user, TableNode $table): void {
+		$listPermissionResponse = $this->featureContext->getJsonDecodedResponseBodyContent();
+		if (!isset($listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'})) {
+			Assert::fail(
+				"The following response does not contain '@libre.graph.permissions.roles.allowedValues' property:\n" . $listPermissionResponse
+			);
+		}
+		Assert::assertNotEmpty(
+			$listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'},
+			"'@libre.graph.permissions.roles.allowedValues' should not be empty"
+		);
+		$allowedPermissionRoles = $listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'};
+		// this info is needed for log to see which roles allowed and which were not when tests fail
+		$shareInvitationRequestResult = "From the given allowed role lists from the permissions:\n";
+		$areAllSendInvitationSuccessFullForAllowedRoles = true;
+		$rows = $table->getRowsHash();
+		$resource = $rows['resource'];
+		$shareType = $rows['shareType'];
+		$space = $rows['space'];
+		foreach ($allowedPermissionRoles as $role) {
+			//we should be able to send share invitation for each of the role allowed for the files/folders which are  listed in permissions (allowed)
+			$roleAllowed = GraphHelper::getPermissionNameByPermissionRoleId($role->id);
+			$responseSendInvitation = $this->sendShareInvitation($user, new TableNode(array_merge($table->getTable(), [['permissionsRole', $roleAllowed]])));
+			$jsonResponseSendInvitation = $this->featureContext->getJsonDecodedResponseBodyContent($responseSendInvitation);
+			$httpsStatusCode = $responseSendInvitation->getStatusCode();
+			if ($httpsStatusCode === 200 && !empty($jsonResponseSendInvitation->value)) {
+				// remove the share so that the same user can be share for the next allowed roles
+				$removePermissionsResponse = $this->removeSharePermission($user, $shareType, $space, $resource);
+				Assert::assertEquals(204, $removePermissionsResponse->getStatusCode());
+			} else {
+				$areAllSendInvitationSuccessFullForAllowedRoles = false;
+				$shareInvitationRequestResult .= "\tShare invitation for resource '" . $resource . "' with role '" . $roleAllowed . "' failed and was not allowed.\n";
+			}
+		}
+		Assert::assertTrue($areAllSendInvitationSuccessFullForAllowedRoles, $shareInvitationRequestResult);
+	}
 }
