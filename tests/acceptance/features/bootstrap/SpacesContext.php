@@ -3495,7 +3495,7 @@ class SpacesContext implements Context {
 		string $value
 	):void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->webDavPropertiesContext->asUserFolderShouldContainAPropertyWithValue($user, $resourceName, $property, $value);
+		$this->webDavPropertiesContext->checkPropertyOfAFolder($user, $resourceName, $property, $value);
 	}
 
 	/**
