@@ -1983,4 +1983,31 @@ class GraphHelper {
 			\json_encode($body)
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getDrivePermissionsList(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $spaceId
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
 }
