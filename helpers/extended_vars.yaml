@@ -53,7 +53,7 @@ variables:
   do_ignore: false
 - rawname: _registryAddressEnv
   path: ocis-pkg/natsjsregistry/registry.go:145
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_ADDRESS
   type: string
   default_value: 127.0.0.1:9233
@@ -70,7 +70,7 @@ variables:
   do_ignore: true
 - rawname: _registryPasswordEnv
   path: ocis-pkg/natsjsregistry/registry.go:163
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_AUTH_PASSWORD
   type: string
   default_value: ""
@@ -78,7 +78,7 @@ variables:
   do_ignore: false
 - rawname: _registryUsernameEnv
   path: ocis-pkg/natsjsregistry/registry.go:163
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_AUTH_USERNAME
   type: string
   default_value: ""
@@ -112,6 +112,30 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
+- rawname: _registryAddressEnv
+  path: ocis-pkg/natsjsregistry/registry.go:165
+  foundincode: true
+  name: _registryAddressEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryPasswordEnv
+  path: ocis-pkg/natsjsregistry/registry.go:193
+  foundincode: true
+  name: _registryPasswordEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryUsernameEnv
+  path: ocis-pkg/natsjsregistry/registry.go:193
+  foundincode: true
+  name: _registryUsernameEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:382
   foundincode: true
