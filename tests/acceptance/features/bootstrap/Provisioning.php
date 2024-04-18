@@ -2213,6 +2213,7 @@ trait Provisioning {
 		$normalizedUsername = $this->normalizeUsername($user);
 		if (\array_key_exists($normalizedUsername, $this->createdUsers)) {
 			$this->createdUsers[$normalizedUsername]['shouldExist'] = false;
+			$this->createdUsers[$normalizedUsername]['possibleToDelete'] = false;
 		}
 	}
 
@@ -2316,7 +2317,8 @@ trait Provisioning {
 			if ($this->isTestingWithLdap()) {
 				$this->deleteLdapGroup($group);
 			} else {
-				$this->graphContext->adminDeletesGroupUsingTheGraphApi($group);
+				$response = $this->graphContext->deleteGroupWithName($group);
+				$this->theHTTPStatusCodeShouldBe(204, "", $response);
 			}
 		} catch (Exception $e) {
 			\error_log(
@@ -2623,6 +2625,7 @@ trait Provisioning {
 	public function rememberThatGroupIsNotExpectedToExist(string $group):void {
 		if (\array_key_exists($group, $this->createdGroups)) {
 			$this->createdGroups[$group]['shouldExist'] = false;
+			$this->createdGroups[$group]['possibleToDelete'] = false;
 		}
 	}
 
@@ -3121,8 +3124,10 @@ trait Provisioning {
 		if ($this->isTestingWithLdap()) {
 			$this->deleteLdapGroup($group);
 		} else {
-			$this->graphContext->adminDeletesGroupUsingTheGraphApi($group);
+			$response = $this->graphContext->deleteGroupWithName($group);
+			$this->theHTTPStatusCodeShouldBe(204, "", $response);
 		}
+		$this->rememberThatGroupIsNotExpectedToExist($group);
 		$this->groupShouldNotExist($group);
 	}
 
@@ -4247,22 +4252,24 @@ trait Provisioning {
 		$previousServer = $this->currentServer;
 		$this->usingServer('LOCAL');
 		foreach ($this->createdGroups as $group => $groupData) {
-			if ($this->isTestingWithLdap()) {
-				$this->cleanupGroup((string)$group);
-			} else {
-				$this->graphContext->adminDeletesGroupWithGroupId(
-					$groupData['id']
-				);
+			if ($groupData["possibleToDelete"]) {
+				if ($this->isTestingWithLdap()) {
+					$this->cleanupGroup((string)$group);
+				} else {
+					$response = $this->graphContext->deleteGroupWithId($groupData['id']);
+					$this->theHTTPStatusCodeShouldBe(204, "", $response);
+				}
 			}
 		}
 		$this->usingServer('REMOTE');
 		foreach ($this->createdRemoteGroups as $remoteGroup => $groupData) {
-			if ($this->isTestingWithLdap()) {
-				$this->cleanupGroup((string)$remoteGroup);
-			} else {
-				$this->graphContext->adminDeletesGroupWithGroupId(
-					$groupData['id']
-				);
+			if ($groupData["possibleToDelete"]) {
+				if ($this->isTestingWithLdap()) {
+					$this->cleanupGroup((string)$remoteGroup);
+				} else {
+					$response = $this->graphContext->deleteGroupWithId($groupData['id']);
+					$this->theHTTPStatusCodeShouldBe(204, "", $response);
+				}
 			}
 		}
 		$this->usingServer($previousServer);
