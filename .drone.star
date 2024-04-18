@@ -207,6 +207,25 @@ DRONE_HTTP_PROXY_ENV = {
     },
 }
 
+def cephService():
+    return {
+        "name": "ceph",
+        "image": "ceph/daemon",
+        "pull": "always",
+        "environment": {
+            "CEPH_DAEMON": "demo",
+            "NETWORK_AUTO_DETECT": "4",
+            "MON_IP": "0.0.0.0",
+            "CEPH_PUBLIC_NETWORK": "0.0.0.0/0",
+            "RGW_CIVETWEB_PORT": "4000 ",
+            "RGW_NAME": "ceph",
+            "CEPH_DEMO_UID": "test-user",
+            "CEPH_DEMO_ACCESS_KEY": "test",
+            "CEPH_DEMO_SECRET_KEY": "test",
+            "CEPH_DEMO_BUCKET": "test",
+        },
+    }
+
 def pipelineDependsOn(pipeline, dependant_pipelines):
     if "depends_on" in pipeline.keys():
         pipeline["depends_on"] = pipeline["depends_on"] + getPipelineNames(dependant_pipelines)
@@ -275,7 +294,10 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines
+    ceph_pipelines = \
+        cephPipelines(ctx)
+
+    pipelines = test_pipelines + build_release_pipelines + ceph_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -301,6 +323,45 @@ def main(ctx):
 
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
+
+def cephPipeline(name, steps):
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": name,
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": steps,
+        "services": [cephService()],
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/**",
+                "refs/pull/**",
+            ],
+        },
+    }
+
+def cephPipelines(ctx):
+    return [
+        cephPipeline(
+            "ceph",
+            buildOcisBinaryForTesting(ctx)["steps"] +
+            restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
+            ocisServer("ocis", 4, [], []) +
+            [
+                {
+                    "name": "wait-for-ceph",
+                    "image": OC_CI_GOLANG,
+                    "commands": [
+                        "sleep 10",
+                    ],
+                },
+            ],
+        ),
+    ]
 
 def cachePipeline(name, steps):
     return {
