@@ -21,6 +21,7 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
@@ -60,7 +61,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 * @throws Exception
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function createLinkShare(string $user, TableNode $body): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
@@ -159,7 +160,7 @@ class SharingNgContext implements Context {
 	 * @return ResponseInterface
 	 *
 	 * @throws JsonException
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 * @throws Exception
 	 */
 	public function sendShareInvitation(string $user, TableNode $table, string $fileId = null): ResponseInterface {
@@ -230,7 +231,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return void
 	 * @throws Exception
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userHasSentTheFollowingShareInvitation(string $user, TableNode $table): void {
 		$response = $this->sendShareInvitation($user, $table);
@@ -247,7 +248,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return void
 	 * @throws Exception
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
 		$this->featureContext->setResponse(
@@ -319,7 +320,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return void
 	 * @throws JsonException
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userSendsTheFollowingShareInvitationWithFileIdUsingTheGraphApi(string $user, string $fileId, TableNode $table): void {
 		$this->featureContext->setResponse(
@@ -334,7 +335,7 @@ class SharingNgContext implements Context {
 	 * @param TableNode|null $body
 	 *
 	 * @return void
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode  $body):void {
 		$response = $this->createLinkShare($user, $body);
@@ -348,7 +349,7 @@ class SharingNgContext implements Context {
 	 * @param TableNode|null $body
 	 *
 	 * @return void
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userHasCreatedTheFollowingLinkShare(string $user, TableNode  $body): void {
 		$response = $this->createLinkShare($user, $body);
@@ -418,7 +419,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return void
 	 * @throws Exception
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userSetsOrUpdatesFollowingPasswordForLastLinkShareUsingTheGraphApi(string $user, TableNode  $body):void {
 		$bodyRows = $body->getRowsHash();
@@ -495,7 +496,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return void
 	 * @throws JsonException
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userRemovesSharePermissionOfUserFromResourceOfSpaceUsingGraphAPI(
 		string $sharer,
@@ -519,7 +520,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return void
 	 * @throws JsonException
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userRemovesSharePermissionOfUserFromSpaceUsingGraphAPI(
 		string $sharer,
@@ -641,7 +642,7 @@ class SharingNgContext implements Context {
 	 * @param string $resource
 	 *
 	 * @return void
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userShouldHaveSyncEnabledOrDisabledForShare(string $user, string $status, string $resource):void {
 		$response = GraphHelper::getSharesSharedWithMe(
@@ -676,7 +677,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return void
 	 * @throws Exception
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userShouldBeAbleToSendShareInvitationWithAllAllowedPermissionRoles(string $user, TableNode $table): void {
 		$listPermissionResponse = $this->featureContext->getJsonDecodedResponseBodyContent();
@@ -713,5 +714,29 @@ class SharingNgContext implements Context {
 			}
 		}
 		Assert::assertTrue($areAllSendInvitationSuccessFullForAllowedRoles, $shareInvitationRequestResult);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" (?:tries to list|lists) the permissions of space "([^"]*)" using root endpoint of the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 *
+	 */
+	public function userListsThePermissionsOfDriveUsingRootEndPointOFTheGraphApi(string $user, string $space):void {
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+
+		$response = GraphHelper::getDrivePermissionsList(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId
+		);
+		$this->featureContext->setResponse($response);
 	}
 }

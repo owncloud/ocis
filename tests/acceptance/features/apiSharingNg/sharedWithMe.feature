@@ -19,7 +19,7 @@ Feature: an user gets the resources shared to them
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
-      | permissionsRole | Viewer        | 
+      | permissionsRole | Viewer        |
     When user "Brian" lists the shares shared with him after clearing user cache using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -3540,7 +3540,7 @@ Feature: an user gets the resources shared to them
       }
       """
 
-
+  @issue-8027
   Scenario: user lists the file shared with them from project space
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
