@@ -180,3 +180,15 @@ In case you want to run ownCloud Web from a development branch together with thi
 5. Start the deployment example as described above in the `Local setup` section.
 
 For app provider frontend development in `web` you can find the source code in `web/packages/web-app-external`. Some parts of the integration live in `web/packages/web-app-files`.
+
+## Using Podman
+
+Podman doesn't have a "local" log driver. Also it's docker-compatibility socket does live in a different location, especially when running a rootless podman.
+
+Using the following settings you can run the deployment with a recent podman version:
+
+```bash
+LOG_DRIVER=journald \
+DOCKER_SOCKET_PATH=/run/user/1000/podman/podman.sock \
+podman compose start
+```
