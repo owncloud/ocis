@@ -201,7 +201,7 @@ class SharingNgContext implements Context {
 				} elseif ($shareType === "group") {
 					$shareeId = $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
 				}
-				// for non-exiting group or user, generate random id
+				// for non-existing group or user, generate random id
 				$shareeIds[] = $shareeId ?: WebDavHelper::generateUUIDv4();
 			}
 		}
