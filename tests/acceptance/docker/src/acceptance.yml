@@ -1,6 +1,6 @@
 services:
   acceptance-tests:
-    image: owncloudci/php:7.4
+    image: owncloudci/php:8.2
     working_dir: /drone/src
     command: /bin/bash /test/run-tests.sh
     environment:
