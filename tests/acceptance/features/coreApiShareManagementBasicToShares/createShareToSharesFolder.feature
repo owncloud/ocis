@@ -533,7 +533,7 @@ Feature: sharing
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
     And user "Alice" has shared file "textfile0.txt" with user "Carol"
-    And the administrator has deleted user "Brian" using the provisioning API
+    And user "Brian" has been deleted
     When user "Alice" gets all the shares of the file "textfile0.txt" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"

@@ -206,7 +206,7 @@ Feature: files and folders exist in the trashbin after being deleted
     And user "Brian" has been created with default attributes and without skeleton files
     And user "testtrashbin102" has deleted file "/textfile0.txt"
     And user "testtrashbin102" has deleted file "/textfile2.txt"
-    And the administrator has deleted user "testtrashbin102" using the provisioning API
+    And user "testtrashbin102" has been deleted
     And user "testtrashbin102" has been created with default attributes and without skeleton files
     And user "testtrashbin102" has uploaded file "filesForUpload/textfile.txt" to "/textfile3.txt"
     And user "testtrashbin102" has deleted file "/textfile3.txt"

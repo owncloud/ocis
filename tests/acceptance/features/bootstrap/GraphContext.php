@@ -1042,20 +1042,10 @@ class GraphContext implements Context {
 	public function userDeletesGroupUsingTheGraphApi(string $group, ?string $user = null): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$response = $this->deleteGroupWithId($groupId, $user);
+		if ($response->getStatusCode() === 204){
+			$this->featureContext->rememberThatGroupIsNotExpectedToExist($group);
+		}
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @Given the administrator has deleted group :group
-	 *
-	 * @param string $group
-	 *
-	 * @return void
-	 */
-	public function theAdministratorHasDeletedGroup(string $group): void {
-		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		$response = $this->deleteGroupWithId($groupId);
-		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**
