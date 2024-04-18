@@ -198,7 +198,7 @@ class SharingNgContext implements Context {
 				$shareeId = "";
 				if ($shareType === "user") {
 					$shareeId = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
-				} else if ($shareType === "group") {
+				} elseif ($shareType === "group") {
 					$shareeId = $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
 				}
 				// for non-exiting group or user, generate random id
