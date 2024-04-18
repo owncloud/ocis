@@ -1,5 +1,5 @@
 Bugfix: Nats reconnects
 
-Natsjs kv registry could not handle reconnects correctly. This fixes it.
+We fixed the reconnect handling of the natjs kv registry.
 
 https://github.com/owncloud/ocis/pull/8880
