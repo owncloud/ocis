@@ -222,18 +222,11 @@ trait Provisioning {
 		$usersList = $this->getCreatedUsers();
 		$normalizedUsername = $this->normalizeUsername($user);
 		if (\array_key_exists($normalizedUsername, $usersList)) {
-			// provide attributes only if the user exists
-			if ($usersList[$normalizedUsername]["shouldExist"]) {
-				if (\array_key_exists($attribute, $usersList[$normalizedUsername])) {
-					return $usersList[$normalizedUsername][$attribute];
-				} else {
-					throw new Exception(
-						__METHOD__ . ": User '$user' has no attribute with name '$attribute'."
-					);
-				}
+			if (\array_key_exists($attribute, $usersList[$normalizedUsername])) {
+				return $usersList[$normalizedUsername][$attribute];
 			} else {
 				throw new Exception(
-					__METHOD__ . ": User '$user' has been deleted."
+					__METHOD__ . ": User '$user' has no attribute with name '$attribute'."
 				);
 			}
 		} else {
@@ -251,18 +244,11 @@ trait Provisioning {
 	public function getAttributeOfCreatedGroup(string $group, string $attribute) {
 		$groupsList = $this->getCreatedGroups();
 		if (\array_key_exists($group, $groupsList)) {
-			// provide attributes only if the group exists
-			if ($groupsList[$group]["shouldExist"]) {
-				if (\array_key_exists($attribute, $groupsList[$group])) {
-					return $groupsList[$group][$attribute];
-				} else {
-					throw new Exception(
-						__METHOD__ . ": Group '$group' has no attribute with name '$attribute'."
-					);
-				}
+			if (\array_key_exists($attribute, $groupsList[$group])) {
+				return $groupsList[$group][$attribute];
 			} else {
 				throw new Exception(
-					__METHOD__ . ": Group '$group' has been deleted."
+					__METHOD__ . ": Group '$group' has no attribute with name '$attribute'."
 				);
 			}
 		} else {
@@ -1362,22 +1348,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @Given /^the administrator has deleted user "([^"]*)" using the provisioning API$/
-	 *
-	 * @param string|null $user
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasDeletedUserUsingTheProvisioningApi(?string $user):void {
-		$user = $this->getActualUsername($user);
-		$response =  $this->deleteUser($user);
-		$this->theHttpStatusCodeShouldBe(204, "", $response);
-		WebDavHelper::removeSpaceIdReferenceForUser($user);
-		$this->userShouldNotExist($user);
-	}
-
-	/**
 	 * @When /^the administrator deletes user "([^"]*)" using the provisioning API$/
 	 *
 	 * @param string $user
@@ -1929,8 +1899,10 @@ trait Provisioning {
 			} else {
 				$response = $this->deleteUser($user);
 				$this->theHTTPStatusCodeShouldBe(204, "", $response);
+				WebDavHelper::removeSpaceIdReferenceForUser($user);
 			}
 		}
+		$this->rememberThatUserIsNotExpectedToExist($user);
 		$this->userShouldNotExist($user);
 	}
 
@@ -2213,6 +2185,7 @@ trait Provisioning {
 		$normalizedUsername = $this->normalizeUsername($user);
 		if (\array_key_exists($normalizedUsername, $this->createdUsers)) {
 			$this->createdUsers[$normalizedUsername]['shouldExist'] = false;
+			$this->createdUsers[$normalizedUsername]['possibleToDelete'] = false;
 		}
 	}
 
@@ -2316,7 +2289,8 @@ trait Provisioning {
 			if ($this->isTestingWithLdap()) {
 				$this->deleteLdapGroup($group);
 			} else {
-				$this->graphContext->adminDeletesGroupUsingTheGraphApi($group);
+				$response = $this->graphContext->deleteGroupWithName($group);
+				$this->theHTTPStatusCodeShouldBe(204, "", $response);
 			}
 		} catch (Exception $e) {
 			\error_log(
@@ -2623,6 +2597,7 @@ trait Provisioning {
 	public function rememberThatGroupIsNotExpectedToExist(string $group):void {
 		if (\array_key_exists($group, $this->createdGroups)) {
 			$this->createdGroups[$group]['shouldExist'] = false;
+			$this->createdGroups[$group]['possibleToDelete'] = false;
 		}
 	}
 
@@ -3121,8 +3096,10 @@ trait Provisioning {
 		if ($this->isTestingWithLdap()) {
 			$this->deleteLdapGroup($group);
 		} else {
-			$this->graphContext->adminDeletesGroupUsingTheGraphApi($group);
+			$response = $this->graphContext->deleteGroupWithName($group);
+			$this->theHTTPStatusCodeShouldBe(204, "", $response);
 		}
+		$this->rememberThatGroupIsNotExpectedToExist($group);
 		$this->groupShouldNotExist($group);
 	}
 
@@ -4247,22 +4224,24 @@ trait Provisioning {
 		$previousServer = $this->currentServer;
 		$this->usingServer('LOCAL');
 		foreach ($this->createdGroups as $group => $groupData) {
-			if ($this->isTestingWithLdap()) {
-				$this->cleanupGroup((string)$group);
-			} else {
-				$this->graphContext->adminDeletesGroupWithGroupId(
-					$groupData['id']
-				);
+			if ($groupData["possibleToDelete"]) {
+				if ($this->isTestingWithLdap()) {
+					$this->cleanupGroup((string)$group);
+				} else {
+					$response = $this->graphContext->deleteGroupWithId($groupData['id']);
+					$this->theHTTPStatusCodeShouldBe(204, "", $response);
+				}
 			}
 		}
 		$this->usingServer('REMOTE');
 		foreach ($this->createdRemoteGroups as $remoteGroup => $groupData) {
-			if ($this->isTestingWithLdap()) {
-				$this->cleanupGroup((string)$remoteGroup);
-			} else {
-				$this->graphContext->adminDeletesGroupWithGroupId(
-					$groupData['id']
-				);
+			if ($groupData["possibleToDelete"]) {
+				if ($this->isTestingWithLdap()) {
+					$this->cleanupGroup((string)$remoteGroup);
+				} else {
+					$response = $this->graphContext->deleteGroupWithId($groupData['id']);
+					$this->theHTTPStatusCodeShouldBe(204, "", $response);
+				}
 			}
 		}
 		$this->usingServer($previousServer);

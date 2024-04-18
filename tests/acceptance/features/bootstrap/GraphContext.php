@@ -274,7 +274,7 @@ class GraphContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function userDeletesGroupWithGroupId(
+	public function deleteGroupWithId(
 		string $groupId,
 		?string $user = null
 	): ResponseInterface {
@@ -290,30 +290,17 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @param string $groupId
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function adminDeletesGroupWithGroupId(
-		string $groupId
-	): void {
-		$response = $this->userDeletesGroupWithGroupId($groupId);
-		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
-	}
-
-	/**
 	 * @param string $group
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function adminDeletesGroupUsingTheGraphApi(
+	public function deleteGroupWithName(
 		string $group
-	): void {
+	): ResponseInterface {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		$this->adminDeletesGroupWithGroupId($groupId);
+		return $this->deleteGroupWithId($groupId);
 	}
 
 	/**
@@ -1054,21 +1041,11 @@ class GraphContext implements Context {
 	 */
 	public function userDeletesGroupUsingTheGraphApi(string $group, ?string $user = null): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		$response = $this->userDeletesGroupWithGroupId($groupId, $user);
+		$response = $this->deleteGroupWithId($groupId, $user);
+		if ($response->getStatusCode() === 204) {
+			$this->featureContext->rememberThatGroupIsNotExpectedToExist($group);
+		}
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @Given the administrator has deleted group :group
-	 *
-	 * @param string $group
-	 *
-	 * @return void
-	 */
-	public function theAdministratorHasDeletedGroup(string $group): void {
-		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		$response = $this->userDeletesGroupWithGroupId($groupId);
-		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**

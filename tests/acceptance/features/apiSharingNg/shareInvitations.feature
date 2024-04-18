@@ -863,7 +863,7 @@ Feature: Send a sharing invitations
       | Carol    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    And the administrator has deleted group "grp1"
+    And group "grp1" has been deleted
     When user "Alice" sends the following share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |

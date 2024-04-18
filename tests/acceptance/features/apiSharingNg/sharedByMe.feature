@@ -1463,7 +1463,7 @@ Feature: resources shared by user
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    And the administrator has deleted user "Brian" using the provisioning API
+    And user "Brian" has been deleted
     When user "Alice" lists the shares shared by her after clearing user cache using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
