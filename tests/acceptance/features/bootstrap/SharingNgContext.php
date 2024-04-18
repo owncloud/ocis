@@ -460,7 +460,7 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function removeSharePermission(
+	public function removeAccessToSpaceItem(
 		string $sharer,
 		string $shareType,
 		string $space,
@@ -474,7 +474,7 @@ class SharingNgContext implements Context {
 			? $this->featureContext->shareNgGetLastCreatedLinkShareID()
 			: $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		return
-			GraphHelper::deleteSharePermission(
+			GraphHelper::removeAccessToSpaceItem(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$sharer,
@@ -486,7 +486,39 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from (?:file|folder|resource) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 * @param string $sharer
+	 * @param string $shareType (user|group|link)
+	 * @param string $space
+	 * @param string|null $recipient
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function removeAccessToSpace(
+		string $sharer,
+		string $shareType,
+		string $space,
+		?string $recipient = null
+	): ResponseInterface {
+		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
+
+		$permId = ($shareType === 'link')
+			? $this->featureContext->shareNgGetLastCreatedLinkShareID()
+			: $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		return
+			GraphHelper::removeAccessToSpace(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$sharer,
+				$this->featureContext->getPasswordForUser($sharer),
+				$spaceId,
+				$permId
+			);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" removes the access of (user|group) "([^"]*)" from (?:file|folder|resource) "([^"]*)" of space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer
 	 * @param string $recipientType (user|group)
@@ -498,7 +530,7 @@ class SharingNgContext implements Context {
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	public function userRemovesSharePermissionOfUserFromResourceOfSpaceUsingGraphAPI(
+	public function userRemovesAccessOfUserOrGroupFromResourceOfSpaceUsingGraphAPI(
 		string $sharer,
 		string $recipientType,
 		string $recipient,
@@ -506,12 +538,12 @@ class SharingNgContext implements Context {
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, $recipientType, $space, $resource)
+			$this->removeAccessToSpaceItem($sharer, $recipientType, $space, $resource)
 		);
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the share permission of (user|group) "([^"]*)" from space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" removes the access of (user|group) "([^"]*)" from space "([^"]*)" using permissions endpoint of the Graph API$/
 	 *
 	 * @param string $sharer
 	 * @param string $recipientType (user|group)
@@ -522,19 +554,19 @@ class SharingNgContext implements Context {
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	public function userRemovesSharePermissionOfUserFromSpaceUsingGraphAPI(
+	public function userRemovesAccessOfUserOrGroupFromSpaceUsingPermissionsEndpointOfGraphAPI(
 		string $sharer,
 		string $recipientType,
 		string $recipient,
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, $recipientType, $space)
+			$this->removeAccessToSpaceItem($sharer, $recipientType, $space)
 		);
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the share permission of link from (?:file|folder) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" removes the link of (?:file|folder) "([^"]*)" from space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer
 	 * @param string $resource
@@ -550,7 +582,49 @@ class SharingNgContext implements Context {
 		string $space
 	):void {
 		$this->featureContext->setResponse(
-			$this->removeSharePermission($sharer, 'link', $space, $resource)
+			$this->removeAccessToSpaceItem($sharer, 'link', $space, $resource)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" removes the access of (user|group) "([^"]*)" from space "([^"]*)" using root endpoint of the Graph API$/
+	 *
+	 * @param string $sharer
+	 * @param string $recipientType (user|group)
+	 * @param string $recipient can be both user or group
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userRemovesAccessOfUserOrGroupFromSpaceUsingGraphAPI(
+		string $sharer,
+		string $recipientType,
+		string $recipient,
+		string $space
+	): void {
+		$this->featureContext->setResponse(
+			$this->removeAccessToSpace($sharer, $recipientType, $space)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" removes the link from space "([^"]*)" using root endpoint of the Graph API$/
+	 *
+	 * @param string $sharer
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userRemovesLinkFromSpaceUsingRootEndpointOfGraphAPI(
+		string $sharer,
+		string $space
+	):void {
+		$this->featureContext->setResponse(
+			$this->removeAccessToSpace($sharer, 'link', $space)
 		);
 	}
 
@@ -706,7 +780,7 @@ class SharingNgContext implements Context {
 			$httpsStatusCode = $responseSendInvitation->getStatusCode();
 			if ($httpsStatusCode === 200 && !empty($jsonResponseSendInvitation->value)) {
 				// remove the share so that the same user can be share for the next allowed roles
-				$removePermissionsResponse = $this->removeSharePermission($user, $shareType, $space, $resource);
+				$removePermissionsResponse = $this->removeAccessToSpaceItem($user, $shareType, $space, $resource);
 				Assert::assertEquals(204, $removePermissionsResponse->getStatusCode());
 			} else {
 				$areAllSendInvitationSuccessFullForAllowedRoles = false;

@@ -250,10 +250,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg/linkShare.feature:586](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L586)
 - [apiSharingNg/linkShare.feature:587](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L587)
 - [apiSharingNg/linkShare.feature:659](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/linkShare.feature#L659)
-- [apiSharingNg/deletePermissions.feature:125](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L125)
-- [apiSharingNg/deletePermissions.feature:141](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L141)
-- [apiSharingNg/deletePermissions.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L161)
-- [apiSharingNg/deletePermissions.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/deletePermissions.feature#L179)
+- [apiSharingNg/removeAccessToDriveItem.feature:125](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/removeAccessToDriveItem.feature#L125)
+- [apiSharingNg/removeAccessToDriveItem.feature:141](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/removeAccessToDriveItem.feature#L141)
+- [apiSharingNg/removeAccessToDriveItem.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/removeAccessToDriveItem.feature#L161)
+- [apiSharingNg/removeAccessToDriveItem.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/removeAccessToDriveItem.feature#L179)
 
 ### [sharee (editor role) MOVE a file by file-id into same shared folder returns 403](https://github.com/owncloud/ocis/issues/7617)
 
