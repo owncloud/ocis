@@ -4,7 +4,6 @@ Tags: web
 
 We updated ownCloud Web to v9.0.0-alpha.5. Please refer to the changelog (linked) for details on the web release.
 
-## Summary
 * Bugfix [owncloud/web#10377](https://github.com/owncloud/web/pull/10377): User data not updated while altering own user
 * Bugfix [owncloud/web#10417](https://github.com/owncloud/web/pull/10417): Admin settings keyboard navigation
 * Bugfix [owncloud/web#10517](https://github.com/owncloud/web/pull/10517): Load thumbnail when postprocessing is finished
