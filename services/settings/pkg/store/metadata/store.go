@@ -7,6 +7,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/gofrs/uuid"
 	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -139,8 +140,18 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 		if err != nil {
 			return err
 		}
-		if len(assIDs) > 0 {
+
+		adminUserID := accountUUID == s.cfg.AdminUserID
+		if len(assIDs) > 0 && !adminUserID {
 			// There is already a role assignment for this ID, skip to the next
+			continue
+		}
+		// for the adminUserID we need to check if the user has the admin role every time
+		if adminUserID {
+			err = s.userMustHaveAdminRole(accountUUID, assIDs, mdc)
+			if err != nil {
+				return err
+			}
 			continue
 		}
 
@@ -161,6 +172,64 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 	}
 
 	s.mdc = mdc
+	return nil
+}
+
+func (s *Store) userMustHaveAdminRole(accountUUID string, assIDs []string, mdc MetadataClient) error {
+	ctx := context.TODO()
+	var hasAdminRole bool
+
+	// load the assignments from the store and check if the admin role is already assigned
+	for _, assID := range assIDs {
+		b, err := mdc.SimpleDownload(ctx, assignmentPath(accountUUID, assID))
+		switch err.(type) {
+		case nil:
+			// continue
+		case errtypes.NotFound:
+			continue
+		default:
+			return err
+		}
+
+		a := &settingsmsg.UserRoleAssignment{}
+		err = json.Unmarshal(b, a)
+		if err != nil {
+			return err
+		}
+
+		if a.RoleId == defaults.BundleUUIDRoleAdmin {
+			hasAdminRole = true
+		}
+	}
+
+	// delete old role assignment and set admin role
+	if !hasAdminRole {
+		err := mdc.Delete(ctx, accountPath(accountUUID))
+		switch err.(type) {
+		case nil:
+			// continue
+		case errtypes.NotFound:
+			// already gone, continue
+		default:
+			return err
+		}
+
+		err = mdc.MakeDirIfNotExist(ctx, accountPath(accountUUID))
+		if err != nil {
+			return err
+		}
+
+		ass := &settingsmsg.UserRoleAssignment{
+			Id:          uuid.Must(uuid.NewV4()).String(),
+			AccountUuid: accountUUID,
+			RoleId:      defaults.BundleUUIDRoleAdmin,
+		}
+		b, err := json.Marshal(ass)
+		if err != nil {
+			return err
+		}
+		return mdc.SimpleUpload(ctx, assignmentPath(accountUUID, ass.Id), b)
+	}
 	return nil
 }
 
