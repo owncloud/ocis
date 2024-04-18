@@ -1,6 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 5.0.2](#changelog-for-502-2024-04-17)
 * [Changelog for 5.0.1](#changelog-for-501-2024-04-10)
 * [Changelog for 4.0.7](#changelog-for-407-2024-03-27)
 * [Changelog for 5.0.0](#changelog-for-500-2024-03-18)
@@ -14,8 +15,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -40,7 +41,7 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.1...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.2...master
 
 ## Summary
 
@@ -498,6 +499,35 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8868
    https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.5
+
+# Changelog for [5.0.2] (2024-04-17)
+
+The following sections list the changes for 5.0.2.
+
+[5.0.2]: https://github.com/owncloud/ocis/compare/v5.0.1...v5.0.2
+
+## Summary
+
+* Bugfix - Fix creating new WOPI documents on public shares: [#8828](https://github.com/owncloud/ocis/pull/8828)
+* Bugfix - Update reva to v2.19.5: [#8873](https://github.com/owncloud/ocis/pull/8873)
+
+## Details
+
+* Bugfix - Fix creating new WOPI documents on public shares: [#8828](https://github.com/owncloud/ocis/pull/8828)
+
+   Creating a new Office document in a publicly shared folder is now possible.
+
+   https://github.com/owncloud/ocis/issues/8691
+   https://github.com/owncloud/ocis/pull/8828
+
+* Bugfix - Update reva to v2.19.5: [#8873](https://github.com/owncloud/ocis/pull/8873)
+
+   We updated reva to v2.19.5
+
+  *   Bugfix [cs3org/reva#4626](https://github.com/cs3org/reva/pull/4626): Fix public share update
+  *   Bugfix [cs3org/reva#4634](https://github.com/cs3org/reva/pull/4634): Fix access to files withing a public link targeting a space root
+
+   https://github.com/owncloud/ocis/pull/8873
 
 # Changelog for [5.0.1] (2024-04-10)
 
@@ -7805,7 +7835,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -7979,29 +8009,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -8174,6 +8186,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
