@@ -223,6 +223,7 @@ type LinkRemoved struct {
 	ShareID    *link.PublicShareId
 	ShareToken string
 	Timestamp  *types.Timestamp
+	ItemID     *provider.ResourceId
 }
 
 // Unmarshal to fulfill umarshaller interface

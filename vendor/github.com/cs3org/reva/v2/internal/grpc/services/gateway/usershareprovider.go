@@ -45,9 +45,9 @@ func (s *svc) CreateShare(ctx context.Context, req *collaboration.CreateShareReq
 }
 
 func (s *svc) RemoveShare(ctx context.Context, req *collaboration.RemoveShareRequest) (*collaboration.RemoveShareResponse, error) {
-	key := req.Ref.GetKey()
+	key := req.GetRef().GetKey()
 	if !s.c.UseCommonSpaceRootShareLogic && shareIsSpaceRoot(key) {
-		return s.removeSpaceShare(ctx, key.ResourceId, key.Grantee)
+		return s.removeSpaceShare(ctx, key.GetResourceId(), key.GetGrantee())
 	}
 	return s.removeShare(ctx, req)
 }
@@ -149,7 +149,7 @@ func (s *svc) updateShare(ctx context.Context, req *collaboration.UpdateShareReq
 		if updateGrantStatus.Code != rpc.Code_CODE_OK {
 			return &collaboration.UpdateShareResponse{
 				Status: updateGrantStatus,
-				Share:  res.Share,
+				Share:  res.GetShare(),
 			}, nil
 		}
 	}
@@ -835,11 +835,11 @@ func isEqualGrantee(a, b *provider.Grantee) bool {
 	var aID, bID string
 	switch a.Type {
 	case provider.GranteeType_GRANTEE_TYPE_GROUP:
-		aID = a.GetGroupId().OpaqueId
-		bID = b.GetGroupId().OpaqueId
+		aID = a.GetGroupId().GetOpaqueId()
+		bID = b.GetGroupId().GetOpaqueId()
 	case provider.GranteeType_GRANTEE_TYPE_USER:
-		aID = a.GetUserId().OpaqueId
-		bID = b.GetUserId().OpaqueId
+		aID = a.GetUserId().GetOpaqueId()
+		bID = b.GetUserId().GetOpaqueId()
 	}
 	return aID == bID
 }

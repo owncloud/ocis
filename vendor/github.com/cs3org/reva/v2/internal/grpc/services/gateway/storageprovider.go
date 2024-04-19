@@ -250,14 +250,14 @@ func (s *svc) ListStorageSpaces(ctx context.Context, req *provider.ListStorageSp
 	for _, f := range req.Filters {
 		switch f.Type {
 		case provider.ListStorageSpacesRequest_Filter_TYPE_ID:
-			sid, spid, oid, err := storagespace.SplitID(f.GetId().OpaqueId)
+			sid, spid, oid, err := storagespace.SplitID(f.GetId().GetOpaqueId())
 			if err != nil {
 				continue
 			}
 			filters["storage_id"], filters["space_id"], filters["opaque_id"] = sid, spid, oid
 		case provider.ListStorageSpacesRequest_Filter_TYPE_OWNER:
-			filters["owner_idp"] = f.GetOwner().Idp
-			filters["owner_id"] = f.GetOwner().OpaqueId
+			filters["owner_idp"] = f.GetOwner().GetIdp()
+			filters["owner_id"] = f.GetOwner().GetOpaqueId()
 		case provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE:
 			filters["space_type"] = f.GetSpaceType()
 		case provider.ListStorageSpacesRequest_Filter_TYPE_USER:
@@ -339,7 +339,7 @@ func (s *svc) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorag
 		_, purge = opaque.Map["purge"]
 	}
 
-	rid, err := storagespace.ParseID(req.Id.OpaqueId)
+	rid, err := storagespace.ParseID(req.GetId().GetOpaqueId())
 	if err != nil {
 		return &provider.DeleteStorageSpaceResponse{
 			Status: status.NewStatusFromErrType(ctx, fmt.Sprintf("gateway could not parse space id %s", req.GetId().GetOpaqueId()), err),
@@ -361,7 +361,7 @@ func (s *svc) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorag
 		}, nil
 	}
 
-	id := &provider.ResourceId{OpaqueId: req.Id.OpaqueId}
+	id := &provider.ResourceId{OpaqueId: req.GetId().GetOpaqueId()}
 	s.providerCache.RemoveListStorageProviders(id)
 
 	if dsRes.Status.Code != rpc.Code_CODE_OK {
@@ -1221,11 +1221,11 @@ func unwrap(ref *provider.Reference, mountPoint string, root *provider.ResourceI
 
 	return &provider.Reference{
 		ResourceId: &provider.ResourceId{
-			StorageId: ref.ResourceId.StorageId,
-			SpaceId:   ref.ResourceId.SpaceId,
-			OpaqueId:  ref.ResourceId.OpaqueId,
+			StorageId: ref.GetResourceId().GetStorageId(),
+			SpaceId:   ref.GetResourceId().GetSpaceId(),
+			OpaqueId:  ref.GetResourceId().GetOpaqueId(),
 		},
-		Path: ref.Path,
+		Path: ref.GetPath(),
 	}
 }
 
