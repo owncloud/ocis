@@ -2,10 +2,15 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
+	"testing"
 
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	. "github.com/onsi/gomega"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config/defaults"
+	rdefaults "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
 const (
@@ -111,4 +116,75 @@ func (m *MockedMetadataClient) IDExists(id string) bool {
 // IDHasContent returns true if the value stored under id has the given content (converted to string)
 func (m *MockedMetadataClient) IDHasContent(id string, content []byte) bool {
 	return string(m.data[id]) == string(content)
+}
+
+// TestAdminUserIDInit test the happy path during initialization
+func TestAdminUserIDInit(t *testing.T) {
+	RegisterTestingT(t)
+	s := &Store{
+		cfg: defaults.DefaultConfig(),
+	}
+	s.cfg.Bundles = rdefaults.GenerateBundlesDefaultRoles()
+	s.cfg.AdminUserID = "admin"
+
+	// the first assignment is always happening during the initialisation of the metadata client
+	err := NewMDC(s)
+	Expect(err).To(BeNil())
+
+	assID, err := s.mdc.ReadDir(context.TODO(), accountPath(s.cfg.AdminUserID))
+	Expect(len(assID)).To(Equal(1))
+	ass, err := s.mdc.SimpleDownload(context.TODO(), assignmentPath(s.cfg.AdminUserID, assID[0]))
+	Expect(ass).ToNot(BeNil())
+
+	assignment := &settingsmsg.UserRoleAssignment{}
+	err = json.Unmarshal(ass, assignment)
+	Expect(err).To(BeNil())
+	Expect(assignment.RoleId).To(Equal(rdefaults.BundleUUIDRoleAdmin))
+}
+
+// TestAdminUserIDUpdate test the update on following initialisations
+func TestAdminUserIDUpdate(t *testing.T) {
+	RegisterTestingT(t)
+	s := &Store{
+		cfg: defaults.DefaultConfig(),
+	}
+	s.cfg.Bundles = rdefaults.GenerateBundlesDefaultRoles()
+	s.cfg.AdminUserID = "admin"
+
+	// the first assignment is always happening during the initialisation of the metadata client
+	err := NewMDC(s)
+	Expect(err).To(BeNil())
+
+	// read assignment
+	assID, err := s.mdc.ReadDir(context.TODO(), accountPath(s.cfg.AdminUserID))
+	Expect(len(assID)).To(Equal(1))
+
+	// set assignment to user role
+	userRoleAssignment := &settingsmsg.UserRoleAssignment{
+		AccountUuid: s.cfg.AdminUserID,
+		RoleId:      rdefaults.BundleUUIDRoleUser,
+	}
+	b, err := json.Marshal(userRoleAssignment)
+	err = s.mdc.Delete(context.TODO(), assignmentPath(s.cfg.AdminUserID, assID[0]))
+	Expect(err).To(BeNil())
+	err = s.mdc.SimpleUpload(context.TODO(), assignmentPath(s.cfg.AdminUserID, assID[0]), b)
+	Expect(err).To(BeNil())
+
+	// this happens on every Read / Write on the store
+	// the actual init is only done if the metadata client has not been initialized before
+	// this normally needs a restart of the service
+	err = s.initMetadataClient(s.mdc)
+	Expect(err).To(BeNil())
+
+	// read assignment id, changes every time the assignment is written
+	assID, err = s.mdc.ReadDir(context.TODO(), accountPath(s.cfg.AdminUserID))
+	Expect(len(assID)).To(Equal(1))
+
+	// check if the assignment is the admin role again
+	ass, err := s.mdc.SimpleDownload(context.TODO(), assignmentPath(s.cfg.AdminUserID, assID[0]))
+	Expect(ass).ToNot(BeNil())
+	assignment := &settingsmsg.UserRoleAssignment{}
+	err = json.Unmarshal(ass, assignment)
+	Expect(err).To(BeNil())
+	Expect(assignment.RoleId).To(Equal(rdefaults.BundleUUIDRoleAdmin))
 }
