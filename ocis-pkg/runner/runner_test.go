@@ -44,7 +44,7 @@ var _ = Describe("Runner", func() {
 			// channel, so the task can finish
 			// Worst case, the task will finish after 15 secs
 			ch := make(chan error)
-			r := runner.New("run001", TimedTask(ch, 15*time.Second), func() {
+			r := runner.New("run001", 30*time.Second, TimedTask(ch, 15*time.Second), func() {
 				ch <- nil
 				close(ch)
 			})
@@ -76,7 +76,7 @@ var _ = Describe("Runner", func() {
 			// channel, so the task can finish
 			// Worst case, the task will finish after 15 secs
 			ch := make(chan error)
-			r := runner.New("run001", TimedTask(ch, 15*time.Second), func() {
+			r := runner.New("run001", 30*time.Second, TimedTask(ch, 15*time.Second), func() {
 				ch <- nil
 				close(ch)
 			})
@@ -106,7 +106,7 @@ var _ = Describe("Runner", func() {
 
 		It("Task finishes naturally", func(ctx SpecContext) {
 			e := errors.New("overslept!")
-			r := runner.New("run002", func() error {
+			r := runner.New("run002", 30*time.Second, func() error {
 				time.Sleep(50 * time.Millisecond)
 				return e
 			}, func() {
@@ -134,7 +134,7 @@ var _ = Describe("Runner", func() {
 		}, SpecTimeout(5*time.Second))
 
 		It("Task doesn't finish", func(ctx SpecContext) {
-			r := runner.New("run003", func() error {
+			r := runner.New("run003", 30*time.Second, func() error {
 				time.Sleep(20 * time.Second)
 				return nil
 			}, func() {
@@ -156,9 +156,37 @@ var _ = Describe("Runner", func() {
 			Consistently(ctx, ch2).WithTimeout(4500 * time.Millisecond).ShouldNot(Receive())
 		}, SpecTimeout(5*time.Second))
 
+		It("Task doesn't finish and times out", func(ctx SpecContext) {
+			r := runner.New("run003", 3*time.Second, func() error {
+				time.Sleep(20 * time.Second)
+				return nil
+			}, func() {
+			})
+
+			// context will be done in 1 second
+			myCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
+			defer cancel()
+
+			ch2 := make(chan *runner.Result)
+			go func(ch2 chan *runner.Result) {
+				ch2 <- r.Run(myCtx)
+				close(ch2)
+			}(ch2)
+
+			var expectedResult *runner.Result
+			// Task will finish naturally in 60 secs
+			// Task's context will finish in 1 sec, but task won't receive
+			// the notification and it will keep going
+			// Task will time out in 3 seconds after being interrupted (when
+			// context is done), so test should finish in 4 seconds
+			Eventually(ctx, ch2).Should(Receive(&expectedResult))
+			Expect(expectedResult.RunnerID).To(Equal("run003"))
+			Expect(expectedResult.RunnerError.Error()).To(ContainSubstring("timed out"))
+		}, SpecTimeout(5*time.Second))
+
 		It("Run mutiple times panics", func(ctx SpecContext) {
 			e := errors.New("overslept!")
-			r := runner.New("run002", func() error {
+			r := runner.New("run002", 30*time.Second, func() error {
 				time.Sleep(50 * time.Millisecond)
 				return e
 			}, func() {
@@ -180,7 +208,7 @@ var _ = Describe("Runner", func() {
 			ch := make(chan *runner.Result)
 			e := errors.New("Task has finished")
 
-			r := runner.New("run004", func() error {
+			r := runner.New("run004", 30*time.Second, func() error {
 				time.Sleep(50 * time.Millisecond)
 				return e
 			}, func() {
@@ -199,7 +227,7 @@ var _ = Describe("Runner", func() {
 			ch := make(chan *runner.Result)
 			e := errors.New("Task has finished")
 
-			r := runner.New("run004", func() error {
+			r := runner.New("run004", 30*time.Second, func() error {
 				time.Sleep(50 * time.Millisecond)
 				return e
 			}, func() {
@@ -217,7 +245,7 @@ var _ = Describe("Runner", func() {
 			e := errors.New("Task interrupted")
 
 			taskCh := make(chan error)
-			r := runner.New("run005", TimedTask(taskCh, 20*time.Second), func() {
+			r := runner.New("run005", 30*time.Second, TimedTask(taskCh, 20*time.Second), func() {
 				taskCh <- e
 				close(taskCh)
 			})
@@ -233,12 +261,33 @@ var _ = Describe("Runner", func() {
 			Eventually(ctx, ch).Should(Receive(Equal(expectedResult)))
 		}, SpecTimeout(5*time.Second))
 
+		It("Interrupt async times out", func(ctx SpecContext) {
+			ch := make(chan *runner.Result)
+			e := errors.New("Task interrupted")
+
+			r := runner.New("run005", 3*time.Second, func() error {
+				time.Sleep(30 * time.Second)
+				return e
+			}, func() {
+			})
+
+			r.RunAsync(ch)
+			r.Interrupt()
+
+			var expectedResult *runner.Result
+
+			// Task will timeout after 3 second of receiving the interruption
+			Eventually(ctx, ch).Should(Receive(&expectedResult))
+			Expect(expectedResult.RunnerID).To(Equal("run005"))
+			Expect(expectedResult.RunnerError.Error()).To(ContainSubstring("timed out"))
+		}, SpecTimeout(5*time.Second))
+
 		It("Interrupt async multiple times", func(ctx SpecContext) {
 			ch := make(chan *runner.Result)
 			e := errors.New("Task interrupted")
 
 			taskCh := make(chan error)
-			r := runner.New("run005", TimedTask(taskCh, 20*time.Second), func() {
+			r := runner.New("run005", 30*time.Second, TimedTask(taskCh, 20*time.Second), func() {
 				taskCh <- e
 				close(taskCh)
 			})
@@ -260,7 +309,7 @@ var _ = Describe("Runner", func() {
 	Describe("Finished", func() {
 		It("Finish channel closes", func(ctx SpecContext) {
 
-			r := runner.New("run006", func() error {
+			r := runner.New("run006", 30*time.Second, func() error {
 				time.Sleep(50 * time.Millisecond)
 				return nil
 			}, func() {

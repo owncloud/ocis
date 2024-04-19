@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestGraph(t *testing.T) {
+func TestRunner(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Runner Suite")
 }

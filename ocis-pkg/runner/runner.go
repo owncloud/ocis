@@ -2,7 +2,9 @@ package runner
 
 import (
 	"context"
+	"fmt"
 	"sync/atomic"
+	"time"
 )
 
 // Runner represents the one executing a long running task, such as a server
@@ -10,13 +12,18 @@ import (
 // The ID of the runner is public to make identification easier, and the
 // Result that it will generated will contain the same ID, so we can
 // know which runner provided which result.
+//
+// Runners are intended to be used only once. Reusing them isn't possible.
+// You'd need to create a new runner if you want to rerun the same task.
 type Runner struct {
-	ID          string
-	fn          Runable
-	interrupt   Stopper
-	running     atomic.Bool
-	interrupted atomic.Bool
-	finished    chan struct{}
+	ID            string
+	interruptDur  time.Duration
+	fn            Runable
+	interrupt     Stopper
+	running       atomic.Bool
+	interrupted   atomic.Bool
+	interruptedCh chan time.Duration
+	finished      chan struct{}
 }
 
 // New will create a new runner.
@@ -24,15 +31,24 @@ type Runner struct {
 // otherwise undefined behavior might occur), and will run the provided
 // runable task, using the "interrupt" function to stop that task if needed.
 //
+// The interrupt duration will be used to ensure the runner doesn't block
+// forever. The interrupt duration will be used to start a timeout when the
+// runner gets interrupted (either the context of the `Run` method is done
+// or this runner's `Interrupt` method is called). If the timeout is reached,
+// a timeout result will be returned instead of whatever result the task should
+// be returning.
+//
 // Note that it's your responsibility to provide a proper stopper for the task.
 // The runner will just call that method assuming it will be enough to
 // eventually stop the task at some point.
-func New(id string, fn Runable, interrupt Stopper) *Runner {
+func New(id string, interruptDur time.Duration, fn Runable, interrupt Stopper) *Runner {
 	return &Runner{
-		ID:        id,
-		fn:        fn,
-		interrupt: interrupt,
-		finished:  make(chan struct{}),
+		ID:            id,
+		interruptDur:  interruptDur,
+		fn:            fn,
+		interrupt:     interrupt,
+		interruptedCh: make(chan time.Duration),
+		finished:      make(chan struct{}),
 	}
 }
 
@@ -48,6 +64,11 @@ func New(id string, fn Runable, interrupt Stopper) *Runner {
 // make the task to eventually complete.
 //
 // Once the task finishes, the result will be returned.
+// When the context is done, or if the runner is interrupted, a timeout will
+// start using the provided "interrupt duration". If this timeout is reached,
+// a timeout result will be returned instead of the one from the task. This is
+// intended to prevent blocking the main thread indefinitely. A suitable
+// duration should be used depending on the task, usually 5, 10 or 30 secs
 //
 // Some nice things you can do:
 // - Use signal.NotifyContext(...) to call the stopper and provide a clean
@@ -97,9 +118,24 @@ func (r *Runner) RunAsync(ch chan<- *Result) {
 // in order for it to finish.
 // The stopper will be called immediately, although it's expected the
 // consequences to take a while (task might need a while to stop)
+// A timeout will start using the provided "interrupt duration". Once that
+// timeout is reached, the task must provide a result with a timeout error.
+// Note that, even after returning the timeout result, the task could still
+// be being executed and consuming resource.
 // This method will be called only once. Further calls won't do anything
 func (r *Runner) Interrupt() {
 	if r.interrupted.CompareAndSwap(false, true) {
+		go func() {
+			select {
+			case <-r.Finished():
+				// Task finished -> runner should be delivering the result
+			case <-time.After(r.interruptDur):
+				// timeout reached -> send it through the channel so our runner
+				// can abort
+				r.interruptedCh <- r.interruptDur
+				close(r.interruptedCh)
+			}
+		}()
 		r.interrupt()
 	}
 }
@@ -115,17 +151,41 @@ func (r *Runner) Finished() <-chan struct{} {
 
 // doTask will perform this runner's task and write the result in the provided
 // channel. The channel will be closed if requested.
+// A result will be provided when either the task finishes naturally or we
+// reach the timeout after being interrupted
 func (r *Runner) doTask(ch chan<- *Result, closeChan bool) {
-	err := r.fn()
+	tmpCh := make(chan *Result)
 
-	close(r.finished)
+	// spawn the task and return the result in a temporary channel
+	go func(tmpCh chan *Result) {
+		err := r.fn()
 
-	result := &Result{
-		RunnerID:    r.ID,
-		RunnerError: err,
+		close(r.finished)
+
+		result := &Result{
+			RunnerID:    r.ID,
+			RunnerError: err,
+		}
+		tmpCh <- result
+
+		close(tmpCh)
+	}(tmpCh)
+
+	// wait for the result in the temporary channel or until we get the
+	// interrupted signal
+	var result *Result
+	select {
+	case d := <-r.interruptedCh:
+		result = &Result{
+			RunnerID:    r.ID,
+			RunnerError: fmt.Errorf("runner %s timed out after waiting for %s", r.ID, d.String()),
+		}
+	case result = <-tmpCh:
+		// Just assign the received value, nothing else to do
 	}
-	ch <- result
 
+	// send the result
+	ch <- result
 	if closeChan {
 		close(ch)
 	}
