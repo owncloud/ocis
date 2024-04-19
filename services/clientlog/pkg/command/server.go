@@ -39,6 +39,9 @@ var _registeredEvents = []events.Unmarshaller{
 	events.ShareCreated{},
 	events.ShareRemoved{},
 	events.ShareUpdated{},
+	events.LinkCreated{},
+	events.LinkUpdated{},
+	events.LinkRemoved{},
 }
 
 // Server is the entrypoint for the server command.

@@ -177,6 +177,12 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	case events.ShareRemoved:
 		p("share-removed", &provider.Reference{ResourceId: e.ItemID})
 		users, err = addSharees(ctx, users, gwc, e.GranteeUserID, e.GranteeGroupID)
+	case events.LinkCreated:
+		p("link-created", &provider.Reference{ResourceId: e.ItemID})
+	case events.LinkUpdated:
+		p("link-updated", &provider.Reference{ResourceId: e.ItemID})
+	case events.LinkRemoved:
+		p("link-removed", &provider.Reference{ResourceId: e.ItemID})
 	}
 
 	if err != nil {
