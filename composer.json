@@ -2,7 +2,7 @@
   "name": "owncloud/ocis",
   "config" : {
     "platform": {
-      "php": "7.4"
+      "php": "8.2"
     },
     "vendor-dir": "./vendor-php",
     "allow-plugins": {
