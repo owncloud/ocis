@@ -27,6 +27,8 @@ const (
 	UnifiedRoleUploaderID = "1c996275-f1c9-4e71-abdf-a42f6495e960"
 	// UnifiedRoleManagerID Unified role manager id.
 	UnifiedRoleManagerID = "312c0871-5ef7-4b3a-85b6-0e4074c64049"
+	// UnifiedRoleSecureViewerID Unified role secure viewer id.
+	UnifiedRoleSecureViewerID = "aa97fe03-7980-45ac-9e50-b325749fd7e6"
 
 	// UnifiedRoleConditionDrive defines constraint that matches a Driveroot/Spaceroot
 	UnifiedRoleConditionDrive = "exists @Resource.Root"
@@ -60,12 +62,13 @@ var legacyNames map[string]string = map[string]string{
 	UnifiedRoleViewerID: conversions.RoleViewer,
 	// one V1 api the "spaceviewer" role was call "viewer" and the "spaceeditor" was "editor",
 	// we need to stay compatible with that
-	UnifiedRoleSpaceViewerID: "viewer",
-	UnifiedRoleSpaceEditorID: "editor",
-	UnifiedRoleEditorID:      conversions.RoleEditor,
-	UnifiedRoleFileEditorID:  conversions.RoleFileEditor,
-	UnifiedRoleUploaderID:    conversions.RoleUploader,
-	UnifiedRoleManagerID:     conversions.RoleManager,
+	UnifiedRoleSpaceViewerID:  "viewer",
+	UnifiedRoleSpaceEditorID:  "editor",
+	UnifiedRoleEditorID:       conversions.RoleEditor,
+	UnifiedRoleFileEditorID:   conversions.RoleFileEditor,
+	UnifiedRoleUploaderID:     conversions.RoleUploader,
+	UnifiedRoleManagerID:      conversions.RoleManager,
+	UnifiedRoleSecureViewerID: conversions.RoleSecureViewer,
 }
 
 // NewViewerUnifiedRole creates a viewer role.
@@ -191,6 +194,31 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	}
 }
 
+// NewSecureViewerUnifiedRole creates a secure viewer role
+func NewSecureViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
+	r := conversions.NewSecureViewerRole()
+	return &libregraph.UnifiedRoleDefinition{
+		Id:          proto.String(UnifiedRoleSecureViewerID),
+		Description: proto.String("View only documents, images and PDFs. Watermarks will be applied."),
+		DisplayName: displayName(r),
+		RolePermissions: []libregraph.UnifiedRolePermission{
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFile),
+			},
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFolder),
+			},
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionDrive),
+			},
+		},
+		LibreGraphWeight: proto.Int32(0),
+	}
+}
+
 // NewUnifiedRoleFromID returns a unified role definition from the provided id
 func NewUnifiedRoleFromID(id string) (*libregraph.UnifiedRoleDefinition, error) {
 	for _, definition := range GetBuiltinRoleDefinitionList() {
@@ -213,6 +241,7 @@ func GetBuiltinRoleDefinitionList() []*libregraph.UnifiedRoleDefinition {
 		NewFileEditorUnifiedRole(),
 		NewUploaderUnifiedRole(),
 		NewManagerUnifiedRole(),
+		NewSecureViewerUnifiedRole(),
 	}
 }
 
@@ -476,6 +505,8 @@ func displayName(role *conversions.Role) *string {
 		displayName = "Can upload"
 	case conversions.RoleManager:
 		displayName = "Can manage"
+	case conversions.RoleSecureViewer:
+		displayName = "Can view (secure)"
 	default:
 		return nil
 	}

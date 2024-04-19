@@ -31,6 +31,9 @@ var _ = Describe("unifiedroles", func() {
 		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole(), unifiedrole.UnifiedRoleConditionDrive),
 		Entry(rConversions.RoleSpaceViewer, rConversions.NewSpaceViewerRole(), unifiedrole.NewSpaceViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionDrive),
 		Entry(rConversions.RoleSpaceEditor, rConversions.NewSpaceEditorRole(), unifiedrole.NewSpaceEditorUnifiedRole(), unifiedrole.UnifiedRoleConditionDrive),
+		Entry(rConversions.RoleSecureViewer, rConversions.NewSecureViewerRole(), unifiedrole.NewSecureViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionFile),
+		Entry(rConversions.RoleSecureViewer, rConversions.NewSecureViewerRole(), unifiedrole.NewSecureViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionFolder),
+		Entry(rConversions.RoleSecureViewer, rConversions.NewSecureViewerRole(), unifiedrole.NewSecureViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionDrive),
 	)
 
 	DescribeTable("UnifiedRolePermissionsToCS3ResourcePermissions",
@@ -54,6 +57,7 @@ var _ = Describe("unifiedroles", func() {
 		Entry(rConversions.RoleEditor, rConversions.NewEditorRole(), unifiedrole.NewEditorUnifiedRole(), true),
 		Entry(rConversions.RoleFileEditor, rConversions.NewFileEditorRole(), unifiedrole.NewFileEditorUnifiedRole(), true),
 		Entry(rConversions.RoleManager, rConversions.NewManagerRole(), unifiedrole.NewManagerUnifiedRole(), true),
+		Entry(rConversions.RoleSecureViewer, rConversions.NewSecureViewerRole(), unifiedrole.NewSecureViewerUnifiedRole(), true),
 		Entry("no match", rConversions.NewFileEditorRole(), unifiedrole.NewManagerUnifiedRole(), false),
 	)
 
@@ -135,6 +139,7 @@ var _ = Describe("unifiedroles", func() {
 				rolesToAction(unifiedrole.NewViewerUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionFolder,
 				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
 				},
 			),
@@ -144,6 +149,7 @@ var _ = Describe("unifiedroles", func() {
 				rolesToAction(unifiedrole.NewViewerUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionFile,
 				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
 				},
 			),
@@ -153,6 +159,7 @@ var _ = Describe("unifiedroles", func() {
 				rolesToAction(unifiedrole.NewFileEditorUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionFile,
 				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
 					unifiedrole.NewFileEditorUnifiedRole(),
 				},
@@ -163,6 +170,7 @@ var _ = Describe("unifiedroles", func() {
 				rolesToAction(unifiedrole.NewEditorUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionFolder,
 				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewUploaderUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
 					unifiedrole.NewEditorUnifiedRole(),
@@ -174,6 +182,7 @@ var _ = Describe("unifiedroles", func() {
 				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList()...),
 				unifiedrole.UnifiedRoleConditionFile,
 				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
 					unifiedrole.NewFileEditorUnifiedRole(),
 				},
@@ -184,6 +193,7 @@ var _ = Describe("unifiedroles", func() {
 				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList()...),
 				unifiedrole.UnifiedRoleConditionFolder,
 				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewUploaderUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
 					unifiedrole.NewEditorUnifiedRole(),
@@ -195,6 +205,7 @@ var _ = Describe("unifiedroles", func() {
 				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList()...),
 				unifiedrole.UnifiedRoleConditionDrive,
 				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewSpaceViewerUnifiedRole(),
 					unifiedrole.NewSpaceEditorUnifiedRole(),
 					unifiedrole.NewManagerUnifiedRole(),
