@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix unmount item from share: [#8827](https://github.com/owncloud/ocis/pull/8827)
 * Bugfix - Fix creating new WOPI documents on public shares: [#8828](https://github.com/owncloud/ocis/pull/8828)
 * Bugfix - Nats reconnects: [#8880](https://github.com/owncloud/ocis/pull/8880)
+* Bugfix - Update the admin user role assignment to enforce the config: [#8897](https://github.com/owncloud/ocis/pull/8897)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
@@ -251,6 +252,16 @@ The following sections list the changes for unreleased.
    We fixed the reconnect handling of the natjs kv registry.
 
    https://github.com/owncloud/ocis/pull/8880
+
+* Bugfix - Update the admin user role assignment to enforce the config: [#8897](https://github.com/owncloud/ocis/pull/8897)
+
+   The admin user role assigment was not updated after the first assignment. We now
+   read the assigned role during init and update the admin user ID accordingly if
+   the role is not assigned. This is especially needed when the OCIS_ADMIN_USER_ID
+   is set after the autoprovisioning of the admin user when it originates from an
+   external Identity Provider.
+
+   https://github.com/owncloud/ocis/pull/8897
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
