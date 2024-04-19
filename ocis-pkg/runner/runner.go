@@ -31,8 +31,10 @@ type Runner struct {
 // otherwise undefined behavior might occur), and will run the provided
 // runable task, using the "interrupt" function to stop that task if needed.
 //
-// The interrupt duration will be used to ensure the runner doesn't block
-// forever. The interrupt duration will be used to start a timeout when the
+// The interrupt duration, which can be set through the `WithInterruptDuration`
+// option, will be used to ensure the runner doesn't block forever. If the
+// option isn't suplied, the default value will be used.
+// The interrupt duration will be used to start a timeout when the
 // runner gets interrupted (either the context of the `Run` method is done
 // or this runner's `Interrupt` method is called). If the timeout is reached,
 // a timeout result will be returned instead of whatever result the task should
@@ -41,10 +43,18 @@ type Runner struct {
 // Note that it's your responsibility to provide a proper stopper for the task.
 // The runner will just call that method assuming it will be enough to
 // eventually stop the task at some point.
-func New(id string, interruptDur time.Duration, fn Runable, interrupt Stopper) *Runner {
+func New(id string, fn Runable, interrupt Stopper, opts ...Option) *Runner {
+	options := Options{
+		InterruptDuration: DefaultInterruptDuration,
+	}
+
+	for _, o := range opts {
+		o(&options)
+	}
+
 	return &Runner{
 		ID:            id,
-		interruptDur:  interruptDur,
+		interruptDur:  options.InterruptDuration,
 		fn:            fn,
 		interrupt:     interrupt,
 		interruptedCh: make(chan time.Duration),

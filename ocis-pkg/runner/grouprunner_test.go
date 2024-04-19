@@ -19,14 +19,14 @@ var _ = Describe("GroupRunner", func() {
 
 		task1Ch := make(chan error)
 		task1 := TimedTask(task1Ch, 30*time.Second)
-		gr.Add(runner.New("task1", 30*time.Second, task1, func() {
+		gr.Add(runner.New("task1", task1, func() {
 			task1Ch <- nil
 			close(task1Ch)
 		}))
 
 		task2Ch := make(chan error)
 		task2 := TimedTask(task2Ch, 20*time.Second)
-		gr.Add(runner.New("task2", 30*time.Second, task2, func() {
+		gr.Add(runner.New("task2", task2, func() {
 			task2Ch <- nil
 			close(task2Ch)
 		}))
@@ -35,7 +35,7 @@ var _ = Describe("GroupRunner", func() {
 	Describe("Add", func() {
 		It("Duplicated runner id panics", func() {
 			Expect(func() {
-				gr.Add(runner.New("task1", 30*time.Second, func() error {
+				gr.Add(runner.New("task1", func() error {
 					time.Sleep(6 * time.Second)
 					return nil
 				}, func() {
@@ -64,7 +64,7 @@ var _ = Describe("GroupRunner", func() {
 			task3Ch := make(chan error)
 			task3 := TimedTask(task3Ch, 15*time.Second)
 			Expect(func() {
-				gr.Add(runner.New("task3", 30*time.Second, task3, func() {
+				gr.Add(runner.New("task3", task3, func() {
 					task3Ch <- nil
 					close(task3Ch)
 				}))
@@ -78,7 +78,7 @@ var _ = Describe("GroupRunner", func() {
 			Expect(func() {
 				task3Ch := make(chan error)
 				task3 := TimedTask(task3Ch, 15*time.Second)
-				gr.Add(runner.New("task3", 30*time.Second, task3, func() {
+				gr.Add(runner.New("task3", task3, func() {
 					task3Ch <- nil
 					close(task3Ch)
 				}))
@@ -90,7 +90,7 @@ var _ = Describe("GroupRunner", func() {
 		It("Context is done", func(ctx SpecContext) {
 			task3Ch := make(chan error)
 			task3 := TimedTask(task3Ch, 15*time.Second)
-			gr.Add(runner.New("task3", 30*time.Second, task3, func() {
+			gr.Add(runner.New("task3", task3, func() {
 				task3Ch <- nil
 				close(task3Ch)
 			}))
@@ -117,7 +117,7 @@ var _ = Describe("GroupRunner", func() {
 		It("One task finishes early", func(ctx SpecContext) {
 			task3Ch := make(chan error)
 			task3 := TimedTask(task3Ch, 1*time.Second)
-			gr.Add(runner.New("task3", 30*time.Second, task3, func() {
+			gr.Add(runner.New("task3", task3, func() {
 				task3Ch <- nil
 				close(task3Ch)
 			}))
@@ -157,7 +157,7 @@ var _ = Describe("GroupRunner", func() {
 		It("Wait in channel", func(ctx SpecContext) {
 			task3Ch := make(chan error)
 			task3 := TimedTask(task3Ch, 1*time.Second)
-			gr.Add(runner.New("task3", 30*time.Second, task3, func() {
+			gr.Add(runner.New("task3", task3, func() {
 				task3Ch <- nil
 				close(task3Ch)
 			}))
@@ -182,7 +182,7 @@ var _ = Describe("GroupRunner", func() {
 		It("Interrupt async", func(ctx SpecContext) {
 			task3Ch := make(chan error)
 			task3 := TimedTask(task3Ch, 15*time.Second)
-			gr.Add(runner.New("task3", 30*time.Second, task3, func() {
+			gr.Add(runner.New("task3", task3, func() {
 				task3Ch <- nil
 				close(task3Ch)
 			}))

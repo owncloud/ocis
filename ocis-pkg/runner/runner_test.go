@@ -44,7 +44,7 @@ var _ = Describe("Runner", func() {
 			// channel, so the task can finish
 			// Worst case, the task will finish after 15 secs
 			ch := make(chan error)
-			r := runner.New("run001", 30*time.Second, TimedTask(ch, 15*time.Second), func() {
+			r := runner.New("run001", TimedTask(ch, 15*time.Second), func() {
 				ch <- nil
 				close(ch)
 			})
@@ -76,7 +76,7 @@ var _ = Describe("Runner", func() {
 			// channel, so the task can finish
 			// Worst case, the task will finish after 15 secs
 			ch := make(chan error)
-			r := runner.New("run001", 30*time.Second, TimedTask(ch, 15*time.Second), func() {
+			r := runner.New("run001", TimedTask(ch, 15*time.Second), func() {
 				ch <- nil
 				close(ch)
 			})
@@ -106,7 +106,7 @@ var _ = Describe("Runner", func() {
 
 		It("Task finishes naturally", func(ctx SpecContext) {
 			e := errors.New("overslept!")
-			r := runner.New("run002", 30*time.Second, func() error {
+			r := runner.New("run002", func() error {
 				time.Sleep(50 * time.Millisecond)
 				return e
 			}, func() {
@@ -134,7 +134,7 @@ var _ = Describe("Runner", func() {
 		}, SpecTimeout(5*time.Second))
 
 		It("Task doesn't finish", func(ctx SpecContext) {
-			r := runner.New("run003", 30*time.Second, func() error {
+			r := runner.New("run003", func() error {
 				time.Sleep(20 * time.Second)
 				return nil
 			}, func() {
@@ -157,11 +157,11 @@ var _ = Describe("Runner", func() {
 		}, SpecTimeout(5*time.Second))
 
 		It("Task doesn't finish and times out", func(ctx SpecContext) {
-			r := runner.New("run003", 3*time.Second, func() error {
+			r := runner.New("run003", func() error {
 				time.Sleep(20 * time.Second)
 				return nil
 			}, func() {
-			})
+			}, runner.WithInterruptDuration(3*time.Second))
 
 			// context will be done in 1 second
 			myCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
@@ -186,7 +186,7 @@ var _ = Describe("Runner", func() {
 
 		It("Run mutiple times panics", func(ctx SpecContext) {
 			e := errors.New("overslept!")
-			r := runner.New("run002", 30*time.Second, func() error {
+			r := runner.New("run002", func() error {
 				time.Sleep(50 * time.Millisecond)
 				return e
 			}, func() {
@@ -208,7 +208,7 @@ var _ = Describe("Runner", func() {
 			ch := make(chan *runner.Result)
 			e := errors.New("Task has finished")
 
-			r := runner.New("run004", 30*time.Second, func() error {
+			r := runner.New("run004", func() error {
 				time.Sleep(50 * time.Millisecond)
 				return e
 			}, func() {
@@ -227,7 +227,7 @@ var _ = Describe("Runner", func() {
 			ch := make(chan *runner.Result)
 			e := errors.New("Task has finished")
 
-			r := runner.New("run004", 30*time.Second, func() error {
+			r := runner.New("run004", func() error {
 				time.Sleep(50 * time.Millisecond)
 				return e
 			}, func() {
@@ -245,7 +245,7 @@ var _ = Describe("Runner", func() {
 			e := errors.New("Task interrupted")
 
 			taskCh := make(chan error)
-			r := runner.New("run005", 30*time.Second, TimedTask(taskCh, 20*time.Second), func() {
+			r := runner.New("run005", TimedTask(taskCh, 20*time.Second), func() {
 				taskCh <- e
 				close(taskCh)
 			})
@@ -265,11 +265,11 @@ var _ = Describe("Runner", func() {
 			ch := make(chan *runner.Result)
 			e := errors.New("Task interrupted")
 
-			r := runner.New("run005", 3*time.Second, func() error {
+			r := runner.New("run005", func() error {
 				time.Sleep(30 * time.Second)
 				return e
 			}, func() {
-			})
+			}, runner.WithInterruptDuration(3*time.Second))
 
 			r.RunAsync(ch)
 			r.Interrupt()
@@ -287,7 +287,7 @@ var _ = Describe("Runner", func() {
 			e := errors.New("Task interrupted")
 
 			taskCh := make(chan error)
-			r := runner.New("run005", 30*time.Second, TimedTask(taskCh, 20*time.Second), func() {
+			r := runner.New("run005", TimedTask(taskCh, 20*time.Second), func() {
 				taskCh <- e
 				close(taskCh)
 			})
@@ -309,7 +309,7 @@ var _ = Describe("Runner", func() {
 	Describe("Finished", func() {
 		It("Finish channel closes", func(ctx SpecContext) {
 
-			r := runner.New("run006", 30*time.Second, func() error {
+			r := runner.New("run006", func() error {
 				time.Sleep(50 * time.Millisecond)
 				return nil
 			}, func() {
