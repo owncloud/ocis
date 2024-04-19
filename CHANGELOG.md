@@ -90,6 +90,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Reva: [#8795](https://github.com/owncloud/ocis/pull/8795)
 * Enhancement - Sharing SSEs: [#8854](https://github.com/owncloud/ocis/pull/8854)
 * Enhancement - Update web to v9.0.0-alpha.5: [#8868](https://github.com/owncloud/ocis/pull/8868)
+* Enhancement - Add Link SSEs: [#8908](https://github.com/owncloud/ocis/pull/8908)
 
 ## Details
 
@@ -517,6 +518,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8868
    https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.5
+
+* Enhancement - Add Link SSEs: [#8908](https://github.com/owncloud/ocis/pull/8908)
+
+   Add sses for link created/updated/removed.
+
+   https://github.com/owncloud/ocis/pull/8908
 
 # Changelog for [5.0.2] (2024-04-17)
 
