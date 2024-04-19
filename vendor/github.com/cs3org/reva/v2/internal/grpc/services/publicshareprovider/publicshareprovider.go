@@ -372,6 +372,7 @@ func (s *service) RemovePublicShare(ctx context.Context, req *link.RemovePublicS
 		}, err
 	}
 	return &link.RemovePublicShareResponse{
+		Opaque: utils.AppendJSONToOpaque(nil, "resourceid", ps.GetResourceId()),
 		Status: status.NewOK(ctx),
 	}, nil
 }

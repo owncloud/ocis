@@ -179,11 +179,14 @@ func LinkAccessFailed(r *link.GetPublicShareByTokenResponse, req *link.GetPublic
 
 // LinkRemoved converts the response to an event
 func LinkRemoved(r *link.RemovePublicShareResponse, req *link.RemovePublicShareRequest, executant *user.UserId) events.LinkRemoved {
+	var rid *provider.ResourceId
+	_ = utils.ReadJSONFromOpaque(r.Opaque, "resourceid", &rid)
 	return events.LinkRemoved{
 		Executant:  executant,
 		ShareID:    req.Ref.GetId(),
 		ShareToken: req.Ref.GetToken(),
 		Timestamp:  utils.TSNow(),
+		ItemID:     rid,
 	}
 }
 
