@@ -1862,3 +1862,24 @@ Feature: List a sharing permissions
         }
       }
       """
+
+  @issue-8922
+  Scenario: user lists the permissions of Shares drive using permissions endpoint
+    When user "Alice" lists the permissions of space "Shares" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.roles.allowedValues"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 0
+          }
+        }
+      }
+      """
