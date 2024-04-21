@@ -17,6 +17,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
     
+    
 
 a| `CS3_MACHINE_AUTH_API_KEY` +
 a| [subs=-attributes]
@@ -25,7 +26,6 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++ ++
-    
 
 a| `MICRO_LOG_LEVEL` +
 a| [subs=-attributes]
