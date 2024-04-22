@@ -5,19 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
-	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -25,11 +18,14 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
+	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 )
 
@@ -47,790 +43,815 @@ var _ = Describe("DrivesDriveItemService", func() {
 		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
 		gatewaySelector.On("Next").Return(gatewayClient, nil)
 
-		cache := identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
-
-		service, err := svc.NewDrivesDriveItemService(logger, gatewaySelector, cache)
+		service, err := svc.NewDrivesDriveItemService(logger, gatewaySelector)
 		Expect(err).ToNot(HaveOccurred())
 		drivesDriveItemService = service
 	})
 
-	Describe("UnmountShare", func() {
-		It("handles gateway selector related errors", func() {
-			gatewaySelector.ExpectedCalls = nil
+	var _ = Describe("GetSharesByResourceID", func() {
+		It("uses the correct filters to list received shares", func() {
+			resourceID := &storageprovider.ResourceId{
+				StorageId: "1",
+				OpaqueId:  "2",
+				SpaceId:   "3",
+			}
+			state := collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED
 
-			expectedError := errors.New("obtaining next gatewayClient failed")
-			gatewaySelector.On("Next").Return(gatewayClient, expectedError)
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.ListReceivedSharesRequest, option ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+					Expect(request.Filters).To(HaveLen(2))
+					Expect(request.Filters[0].Term.(*collaborationv1beta1.Filter_ResourceId).ResourceId).To(Equal(resourceID))
+					Expect(request.Filters[1].Term.(*collaborationv1beta1.Filter_State).State).To(Equal(state))
+					return nil, nil
+				}).
+				Once()
 
-			_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "")
-			Expect(err).To(MatchError(expectedError))
-		})
-
-		Describe("gateway client share listing", func() {
-			It("handles share listing errors", func() {
-				expectedError := errors.New("listing shares failed")
-				gatewayClient.
-					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
-					Return(&collaborationv1beta1.ListReceivedSharesResponse{}, expectedError)
-
-				_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "")
-				Expect(err).To(MatchError(expectedError))
-			})
-
-			It("uses the correct filters to get the shares", func() {
-				expectedResourceID := storageprovider.ResourceId{
-					StorageId: "1",
-					OpaqueId:  "2",
-					SpaceId:   "3",
-				}
-				expectedShareID := collaborationv1beta1.ShareId{
-					OpaqueId: "1:2:3",
-				}
-				gatewayClient.
-					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-						Expect(in.Filters).To(HaveLen(3))
-
-						var shareStates []collaborationv1beta1.ShareState
-						var resourceIDs []*storageprovider.ResourceId
-
-						for _, filter := range in.Filters {
-							switch filter.Term.(type) {
-							case *collaborationv1beta1.Filter_State:
-								shareStates = append(shareStates, filter.GetState())
-							case *collaborationv1beta1.Filter_ResourceId:
-								resourceIDs = append(resourceIDs, filter.GetResourceId())
-							}
-						}
-
-						Expect(shareStates).To(HaveLen(2))
-						Expect(shareStates).To(ContainElements(
-							collaborationv1beta1.ShareState_SHARE_STATE_PENDING,
-							collaborationv1beta1.ShareState_SHARE_STATE_REJECTED,
-						))
-
-						Expect(resourceIDs).To(HaveLen(1))
-						Expect(resourceIDs[0]).To(Equal(&expectedResourceID))
-
-						return &collaborationv1beta1.ListReceivedSharesResponse{
-							Shares: []*collaborationv1beta1.ReceivedShare{
-								{
-									State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING,
-									Share: &collaborationv1beta1.Share{
-										Id: &expectedShareID,
-									},
-								},
-							},
-						}, nil
-					})
-				gatewayClient.
-					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
-						Expect(in.GetUpdateMask().GetPaths()).To(Equal([]string{"state"}))
-						Expect(in.GetShare().GetState()).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED))
-						Expect(in.GetShare().GetShare().GetId().GetOpaqueId()).To(Equal(expectedShareID.GetOpaqueId()))
-						return &collaborationv1beta1.UpdateReceivedShareResponse{
-							Status: status.NewOK(ctx),
-							Share: &collaborationv1beta1.ReceivedShare{
-								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-								Share: &collaborationv1beta1.Share{
-									Id:         &expectedShareID,
-									ResourceId: &expectedResourceID,
-								},
-							},
-						}, nil
-					})
-
-				_, err := drivesDriveItemService.MountShare(context.Background(), expectedResourceID, "")
-				Expect(err).ToNot(HaveOccurred())
+			_, _ = drivesDriveItemService.GetSharesByResourceID(context.Background(), resourceID, []*collaborationv1beta1.Filter{
+				{
+					Type: collaborationv1beta1.Filter_TYPE_STATE,
+					Term: &collaborationv1beta1.Filter_State{
+						State: state,
+					},
+				},
 			})
 		})
 
-		Describe("gateway client share update", func() {
-			It("updates the share state to be accepted", func() {
-				expectedShareID := collaborationv1beta1.ShareId{
-					OpaqueId: "1:2:3",
-				}
-				expectedResourceID := storageprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
+		It("fails on ancestor error", func() {
+			someErr := errors.New("some error")
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				Return(nil, someErr).
+				Once()
 
-				gatewayClient.
-					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-						return &collaborationv1beta1.ListReceivedSharesResponse{
-							Shares: []*collaborationv1beta1.ReceivedShare{
-								{
-									State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING,
-									Share: &collaborationv1beta1.Share{
-										Id: &expectedShareID,
-									},
-								},
-							},
-						}, nil
-					})
+			_, err := drivesDriveItemService.GetSharesByResourceID(context.Background(), &storageprovider.ResourceId{}, []*collaborationv1beta1.Filter{})
+			Expect(err).To(MatchError(someErr))
+		})
 
-				gatewayClient.
-					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
-						Expect(in.GetUpdateMask().GetPaths()).To(Equal([]string{"state"}))
-						Expect(in.GetShare().GetState()).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED))
-						Expect(in.GetShare().GetShare().GetId().GetOpaqueId()).To(Equal(expectedShareID.GetOpaqueId()))
-						return &collaborationv1beta1.UpdateReceivedShareResponse{
-							Status: status.NewOK(ctx),
-							Share: &collaborationv1beta1.ReceivedShare{
-								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-								Share: &collaborationv1beta1.Share{
-									Id:         &expectedShareID,
-									ResourceId: &expectedResourceID,
-								},
-							},
-						}, nil
-					})
+		It("fails if no shares are found", func() {
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				Return(nil, nil).
+				Once()
 
-				_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "")
-				Expect(err).ToNot(HaveOccurred())
-			})
+			_, err := drivesDriveItemService.GetSharesByResourceID(context.Background(), &storageprovider.ResourceId{}, []*collaborationv1beta1.Filter{})
+			Expect(err).To(MatchError(svc.ErrNoShares))
+		})
 
-			It("updates the mountPoint", func() {
-				expectedShareID := collaborationv1beta1.ShareId{
-					OpaqueId: "1:2:3",
-				}
-				expectedResourceID := storageprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
+		It("successfully returns shares", func() {
+			givenShares := []*collaborationv1beta1.ReceivedShare{
+				{State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING},
+				{State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED},
+				{State: collaborationv1beta1.ShareState_SHARE_STATE_REJECTED},
+			}
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				Return(&collaborationv1beta1.ListReceivedSharesResponse{
+					Status: status.NewOK(context.Background()),
+					Shares: givenShares,
+				}, nil).
+				Once()
 
-				gatewayClient.
-					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-						return &collaborationv1beta1.ListReceivedSharesResponse{
-							Shares: []*collaborationv1beta1.ReceivedShare{
-								{},
-							},
-						}, nil
-					})
-
-				gatewayClient.
-					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
-						Expect(in.GetUpdateMask().GetPaths()).To(HaveLen(2))
-						Expect(in.GetUpdateMask().GetPaths()).To(ContainElements("mount_point"))
-						Expect(in.GetShare().GetMountPoint().GetPath()).To(Equal("new name"))
-						return &collaborationv1beta1.UpdateReceivedShareResponse{
-							Status: status.NewOK(ctx),
-							Share: &collaborationv1beta1.ReceivedShare{
-								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-								Share: &collaborationv1beta1.Share{
-									Id:         &expectedShareID,
-									ResourceId: &expectedResourceID,
-								},
-								MountPoint: in.GetShare().GetMountPoint(),
-							},
-						}, nil
-					})
-
-				di, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "new name")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(di[0].GetMountPoint().GetPath()).To(Equal("new name"))
-			})
-
-			It("succeeds when any of the shares was accepted", func() {
-				expectedResourceID := storageprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
-
-				gatewayClient.
-					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-						return &collaborationv1beta1.ListReceivedSharesResponse{
-							Shares: []*collaborationv1beta1.ReceivedShare{
-								{},
-								{},
-								{},
-							},
-						}, nil
-					})
-
-				var calls int
-				gatewayClient.
-					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
-						calls++
-						Expect(calls).To(BeNumerically("<=", 3))
-
-						if calls <= 2 {
-							return nil, fmt.Errorf("error %d", calls)
-						}
-
-						return &collaborationv1beta1.UpdateReceivedShareResponse{
-							Status: status.NewOK(ctx),
-							Share: &collaborationv1beta1.ReceivedShare{
-								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-								Share: &collaborationv1beta1.Share{
-									Id: &collaborationv1beta1.ShareId{
-										OpaqueId: strconv.Itoa(calls),
-									},
-									ResourceId: &expectedResourceID,
-								},
-							},
-						}, nil
-					})
-
-				di, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "new name")
-				Expect(err).To(BeNil())
-				Expect(di[0].GetShare().GetId().GetOpaqueId()).To(Equal(expectedResourceID.OpaqueId))
-			})
-			It("errors when none of the shares can be accepted", func() {
-				gatewayClient.
-					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-						return &collaborationv1beta1.ListReceivedSharesResponse{
-							Shares: []*collaborationv1beta1.ReceivedShare{
-								{},
-								{},
-								{},
-							},
-						}, nil
-					})
-
-				var calls int
-				gatewayClient.
-					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
-						calls++
-						Expect(calls).To(BeNumerically("<=", 3))
-						return nil, fmt.Errorf("error %d", calls)
-					})
-
-				_, err := drivesDriveItemService.MountShare(context.Background(), storageprovider.ResourceId{}, "new name")
-				Expect(fmt.Sprint(err)).To(ContainSubstring("error 1"))
-				Expect(fmt.Sprint(err)).To(ContainSubstring("error 2"))
-				Expect(fmt.Sprint(err)).To(ContainSubstring("error 3"))
-			})
+			shares, err := drivesDriveItemService.GetSharesByResourceID(context.Background(), &storageprovider.ResourceId{}, []*collaborationv1beta1.Filter{})
+			Expect(err).To(BeNil())
+			Expect(shares).To(Equal(givenShares))
 		})
 	})
 
-	Describe("UnmountShare", func() {
-		It("handles gateway selector related errors", func() {
-			gatewaySelector.ExpectedCalls = nil
+	var _ = Describe("GetShareAndSiblings", func() {
+		It("fails if share lookup reports an error", func() {
+			someErr := errors.New("some error")
+			gatewayClient.
+				EXPECT().
+				GetReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				Return(nil, someErr).
+				Once()
 
-			expectedError := errors.New("obtaining next gatewayClient failed")
-			gatewaySelector.On("Next").Return(gatewayClient, expectedError)
+			_, err := drivesDriveItemService.GetShareAndSiblings(context.Background(), &collaborationv1beta1.ShareId{}, nil)
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+		})
+
+		It("fails if share lookup does not report an error but the status is off", func() {
+			someErr := errors.New("some error")
+			gatewayClient.
+				EXPECT().
+				GetReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				Return(&collaborationv1beta1.GetReceivedShareResponse{
+					Status: status.NewNotFound(context.Background(), someErr.Error()),
+				}, nil).
+				Once()
+
+			_, err := drivesDriveItemService.GetShareAndSiblings(context.Background(), &collaborationv1beta1.ShareId{}, nil)
+			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, someErr.Error())))
+		})
+
+		It("successfully returns shares", func() {
+			gatewayClient.
+				EXPECT().
+				GetReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				Return(&collaborationv1beta1.GetReceivedShareResponse{
+					Status: status.NewOK(context.Background()),
+				}, nil).
+				Once()
+
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				Return(&collaborationv1beta1.ListReceivedSharesResponse{
+					Status: status.NewOK(context.Background()),
+					Shares: make([]*collaborationv1beta1.ReceivedShare, 3),
+				}, nil).
+				Once()
+
+			shares, err := drivesDriveItemService.GetShareAndSiblings(context.Background(), &collaborationv1beta1.ShareId{}, nil)
+			Expect(err).To(BeNil())
+			Expect(shares).To(HaveLen(3))
+		})
+	})
+
+	var _ = Describe("UpdateShare", func() {
+		It("fails without an updater", func() {
+			_, err := drivesDriveItemService.UpdateShare(context.Background(), &collaborationv1beta1.ReceivedShare{}, nil)
+			Expect(err).To(MatchError(svc.ErrNoUpdater))
+		})
+
+		It("fails without updates", func() {
+			_, err := drivesDriveItemService.UpdateShare(context.Background(), &collaborationv1beta1.ReceivedShare{}, func(*collaborationv1beta1.ReceivedShare, *collaborationv1beta1.UpdateReceivedShareRequest) {})
+			Expect(err).To(MatchError(svc.ErrNoUpdates))
+		})
+
+		It("fails if share updates reports an error", func() {
+			someErr := errors.New("some error")
+			gatewayClient.
+				EXPECT().
+				UpdateReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				Return(nil, someErr).
+				Once()
+
+			_, err := drivesDriveItemService.UpdateShare(context.Background(), &collaborationv1beta1.ReceivedShare{}, func(_ *collaborationv1beta1.ReceivedShare, request *collaborationv1beta1.UpdateReceivedShareRequest) {
+				request.Share.State = collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED
+				request.UpdateMask.Paths = append(request.UpdateMask.Paths, "state")
+			})
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+		})
+
+		It("fails if share update does not report an error but the status is off", func() {
+			someErr := errors.New("some error")
+			gatewayClient.
+				EXPECT().
+				UpdateReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				Return(&collaborationv1beta1.UpdateReceivedShareResponse{
+					Status: status.NewNotFound(context.Background(), someErr.Error()),
+				}, nil).
+				Once()
+
+			_, err := drivesDriveItemService.UpdateShare(context.Background(), &collaborationv1beta1.ReceivedShare{}, func(_ *collaborationv1beta1.ReceivedShare, request *collaborationv1beta1.UpdateReceivedShareRequest) {
+				request.Share.State = collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED
+				request.UpdateMask.Paths = append(request.UpdateMask.Paths, "state")
+			})
+			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, someErr.Error())))
+		})
+	})
+
+	var _ = Describe("UpdateShares", func() {
+		It("reports some error if one or multiple shares could not be updated, successfully updates the rest", func() {
+			someErr := errors.New("some error")
+			gatewayClient.
+				EXPECT().
+				UpdateReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.UpdateReceivedShareRequest, option ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+					if request.GetShare().GetShare().GetId() != nil {
+						return &collaborationv1beta1.UpdateReceivedShareResponse{
+							Status: status.NewOK(ctx),
+						}, nil
+					}
+
+					return nil, someErr
+				}).
+				Times(3)
+
+			shares, err := drivesDriveItemService.UpdateShares(context.Background(), []*collaborationv1beta1.ReceivedShare{
+				{},
+				{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}},
+				{},
+			}, func(_ *collaborationv1beta1.ReceivedShare, request *collaborationv1beta1.UpdateReceivedShareRequest) {
+				request.Share.State = collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED
+				request.UpdateMask.Paths = append(request.UpdateMask.Paths, "state")
+			})
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+			Expect(err.(interface{ Unwrap() []error }).Unwrap()).To(HaveLen(2))
+			Expect(shares).To(HaveLen(1))
+		})
+	})
+
+	var _ = Describe("UnmountShare", func() {
+		It("fails if get share and siblings reports an error", func() {
+			someErr := errors.New("some error")
+			gatewayClient.
+				EXPECT().
+				GetReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				Return(nil, someErr).
+				Once()
 
 			err := drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{})
-			Expect(err).To(MatchError(expectedError))
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
 		})
 
-		Describe("gateway client share listing", func() {
-			It("handles share listing errors", func() {
-				expectedError := errorcode.New(errorcode.GeneralException, "listing shares failed")
-				gatewayClient.
-					On("GetReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(&collaborationv1beta1.GetReceivedShareResponse{}, errors.New("listing shares failed"))
+		It("requests only accepted shares to be unmounted", func() {
+			gatewayClient.
+				EXPECT().
+				GetReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				Return(&collaborationv1beta1.GetReceivedShareResponse{
+					Status: status.NewOK(context.Background()),
+				}, nil).
+				Once()
 
-				err := drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{OpaqueId: "1"})
-				Expect(err).To(MatchError(expectedError))
-			})
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.ListReceivedSharesRequest, option ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+					Expect(request.Filters).To(HaveLen(2))
+					Expect(request.Filters[0].Type).To(Equal(collaborationv1beta1.Filter_TYPE_RESOURCE_ID))
+					Expect(request.Filters[1].Term.(*collaborationv1beta1.Filter_State).State).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED))
+					return nil, nil
+				}).
+				Once()
 
-			It("uses the correct filters to get the shares", func() {
-				shareID := &collaborationv1beta1.ShareId{
-					OpaqueId: "3:4:5",
-				}
-				expectedResourceID := storageprovider.ResourceId{
-					StorageId: "3",
-					SpaceId:   "4",
-					OpaqueId:  "5",
-				}
-				expectedShareID := collaborationv1beta1.ShareId{
-					OpaqueId: "3:4:5",
-				}
-				gatewayClient.
-					On("GetReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.GetReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.GetReceivedShareResponse, error) {
-						Expect(in.Ref.GetId().GetOpaqueId()).To(Equal(shareID.GetOpaqueId()))
-						return &collaborationv1beta1.GetReceivedShareResponse{
-							Status: status.NewOK(ctx),
-							Share: &collaborationv1beta1.ReceivedShare{
-								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-								Share: &collaborationv1beta1.Share{
-									Id: &collaborationv1beta1.ShareId{
-										OpaqueId: shareID.GetOpaqueId(),
-									},
-									ResourceId: &expectedResourceID,
-								},
-							},
-						}, nil
-					})
-
-				gatewayClient.
-					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-						Expect(in.Filters).To(HaveLen(2))
-
-						var shareStates []collaborationv1beta1.ShareState
-						var resourceIDs []*storageprovider.ResourceId
-
-						for _, filter := range in.Filters {
-							switch filter.Term.(type) {
-							case *collaborationv1beta1.Filter_State:
-								shareStates = append(shareStates, filter.GetState())
-							case *collaborationv1beta1.Filter_ResourceId:
-								resourceIDs = append(resourceIDs, filter.GetResourceId())
-							}
-						}
-
-						Expect(shareStates).To(HaveLen(1))
-						Expect(shareStates).To(ContainElements(
-							collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-						))
-
-						Expect(resourceIDs).To(HaveLen(1))
-						Expect(resourceIDs[0]).To(Equal(&expectedResourceID))
-
-						return &collaborationv1beta1.ListReceivedSharesResponse{
-							Shares: []*collaborationv1beta1.ReceivedShare{
-								{
-									State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-									Share: &collaborationv1beta1.Share{
-										Id: &expectedShareID,
-									},
-								},
-							},
-						}, nil
-					})
-				gatewayClient.
-					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
-						Expect(in.GetUpdateMask().GetPaths()).To(Equal([]string{"state"}))
-						Expect(in.GetShare().GetState()).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_REJECTED))
-						Expect(in.GetShare().GetShare().GetId().GetOpaqueId()).To(Equal(expectedShareID.GetOpaqueId()))
-						return &collaborationv1beta1.UpdateReceivedShareResponse{
-							Status: status.NewOK(ctx),
-							Share: &collaborationv1beta1.ReceivedShare{
-								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-								Share: &collaborationv1beta1.Share{
-									Id:         &expectedShareID,
-									ResourceId: &expectedResourceID,
-								},
-							},
-						}, nil
-					})
-
-				err := drivesDriveItemService.UnmountShare(context.Background(), shareID)
-				Expect(err).ToNot(HaveOccurred())
-			})
+			_ = drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{})
 		})
 
-		Describe("gateway client share update", func() {
-			It("updates the share state to be rejected", func() {
-				expectedShareID := collaborationv1beta1.ShareId{
-					OpaqueId: "1$2!3",
-				}
-				gatewayClient.
-					On("GetReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.GetReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.GetReceivedShareResponse, error) {
-						return &collaborationv1beta1.GetReceivedShareResponse{
-							Status: status.NewOK(ctx),
-							Share: &collaborationv1beta1.ReceivedShare{
-								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-								Share: &collaborationv1beta1.Share{
-									Id: &expectedShareID,
-								},
-							},
-						}, nil
-					})
-				gatewayClient.
-					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-						return &collaborationv1beta1.ListReceivedSharesResponse{
-							Shares: []*collaborationv1beta1.ReceivedShare{
-								{
-									State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING,
-									Share: &collaborationv1beta1.Share{
-										Id: &expectedShareID,
-									},
-								},
-							},
-						}, nil
-					})
+		It("reports some error if one or multiple shares could not be unmounted", func() {
+			gatewayClient.
+				EXPECT().
+				GetReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				Return(&collaborationv1beta1.GetReceivedShareResponse{
+					Status: status.NewOK(context.Background()),
+				}, nil).
+				Once()
 
-				gatewayClient.
-					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
-						Expect(in.GetUpdateMask().GetPaths()).To(Equal([]string{"state"}))
-						Expect(in.GetShare().GetState()).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_REJECTED))
-						Expect(in.GetShare().GetShare().GetId().GetOpaqueId()).To(Equal(expectedShareID.GetOpaqueId()))
-						return &collaborationv1beta1.UpdateReceivedShareResponse{
-							Status: &cs3rpc.Status{Code: cs3rpc.Code_CODE_OK},
-						}, nil
-					})
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				Return(&collaborationv1beta1.ListReceivedSharesResponse{
+					Status: status.NewOK(context.Background()),
+					Shares: []*collaborationv1beta1.ReceivedShare{
+						{},
+						{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}},
+						{},
+					},
+				}, nil).
+				Once()
 
-				err := drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{OpaqueId: "1"})
-				Expect(err).ToNot(HaveOccurred())
-			})
-			It("succeeds when all shares could be rejected", func() {
-				gatewayClient.
-					On("GetReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.GetReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.GetReceivedShareResponse, error) {
-						return &collaborationv1beta1.GetReceivedShareResponse{
-							Status: status.NewOK(ctx),
-							Share: &collaborationv1beta1.ReceivedShare{
-								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-							},
-						}, nil
-					})
-				gatewayClient.
-					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-						return &collaborationv1beta1.ListReceivedSharesResponse{
-							Shares: []*collaborationv1beta1.ReceivedShare{
-								{},
-								{},
-								{},
-							},
-						}, nil
-					})
-
-				var calls int
-				gatewayClient.
-					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
-						calls++
+			someErr := errors.New("some error")
+			gatewayClient.
+				EXPECT().
+				UpdateReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.UpdateReceivedShareRequest, option ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+					if request.GetShare().GetShare().GetId() != nil {
 						return &collaborationv1beta1.UpdateReceivedShareResponse{
 							Status: status.NewOK(ctx),
 						}, nil
-					})
+					}
 
-				err := drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{OpaqueId: "1"})
-				Expect(calls).To(Equal(3))
-				Expect(err).ToNot(HaveOccurred())
-			})
+					return nil, someErr
+				}).
+				Times(3)
 
-			It("bubbles errors when any share fails rejecting", func() {
-				gatewayClient.
-					On("GetReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.GetReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.GetReceivedShareResponse, error) {
-						return &collaborationv1beta1.GetReceivedShareResponse{
-							Status: status.NewOK(ctx),
-							Share: &collaborationv1beta1.ReceivedShare{
-								State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED,
-							},
-						}, nil
-					})
-				gatewayClient.
-					On("ListReceivedShares", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.ListReceivedSharesRequest, opts ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-						return &collaborationv1beta1.ListReceivedSharesResponse{
-							Shares: []*collaborationv1beta1.ReceivedShare{
-								{},
-								{},
-								{},
-							},
-						}, nil
-					})
+			err := drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{})
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+			Expect(err.(interface{ Unwrap() []error }).Unwrap()).To(HaveLen(2))
+		})
+	})
 
-				var calls int
-				gatewayClient.
-					On("UpdateReceivedShare", mock.Anything, mock.Anything, mock.Anything).
-					Return(func(ctx context.Context, in *collaborationv1beta1.UpdateReceivedShareRequest, opts ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
-						calls++
-						Expect(calls).To(BeNumerically("<=", 3))
+	var _ = Describe("MountShare", func() {
+		It("fails if name is interpreted as absolute path", func() {
+			_, _ = gatewaySelector.Next() // make mockery call count happy
+			_, err := drivesDriveItemService.MountShare(context.Background(), nil, "/some")
+			Expect(err).To(MatchError(svc.ErrAbsoluteNamePath))
+		})
 
-						if calls <= 2 {
-							return nil, fmt.Errorf("error %d", calls)
-						}
+		It("uses the correct filters to list received shares", func() {
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.ListReceivedSharesRequest, option ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+					Expect(request.Filters).To(HaveLen(3))
+					Expect(request.Filters[0].Type).To(Equal(collaborationv1beta1.Filter_TYPE_RESOURCE_ID))
+					Expect(request.Filters[1].Term.(*collaborationv1beta1.Filter_State).State).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_PENDING))
+					Expect(request.Filters[2].Term.(*collaborationv1beta1.Filter_State).State).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_REJECTED))
+					return nil, nil
+				}).
+				Once()
 
-						return &collaborationv1beta1.UpdateReceivedShareResponse{
-							Status: status.NewOK(ctx),
-						}, nil
-					})
+			_, _ = drivesDriveItemService.MountShare(context.Background(), nil, "some")
+		})
 
-				err := drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{OpaqueId: "1"})
-				errs := err.(interface{ Unwrap() []error }).Unwrap()
-				Expect(errs).To(HaveLen(2))
+		It("fails if the update instructions produce as many errors as there are shares", func() {
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				Return(&collaborationv1beta1.ListReceivedSharesResponse{
+					Status: status.NewOK(context.Background()),
+					Shares: []*collaborationv1beta1.ReceivedShare{
+						{},
+						{},
+						{},
+					},
+				}, nil).
+				Once()
 
-				var err1 errorcode.Error
-				Expect(errors.As(errs[0], &err1)).To(BeTrue())
-				Expect(err1).To(MatchError(errorcode.New(errorcode.GeneralException, "error 1")))
+			someErr := errors.New("some error")
+			gatewayClient.
+				EXPECT().
+				UpdateReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				Return(nil, someErr).
+				Times(3)
 
-				var err2 errorcode.Error
-				Expect(errors.As(errs[1], &err2)).To(BeTrue())
-				Expect(err2).To(MatchError(errorcode.New(errorcode.GeneralException, "error 2")))
-			})
+			shares, err := drivesDriveItemService.MountShare(context.Background(), nil, "some")
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+			Expect(err.(interface{ Unwrap() []error }).Unwrap()).To(HaveLen(3))
+			Expect(shares).To(HaveLen(0))
+		})
+
+		It("reports no errors if not all mount requests fail", func() {
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				Return(&collaborationv1beta1.ListReceivedSharesResponse{
+					Status: status.NewOK(context.Background()),
+					Shares: []*collaborationv1beta1.ReceivedShare{
+						{},
+						{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}},
+						{},
+					},
+				}, nil).
+				Once()
+
+			someErr := errors.New("some error")
+			gatewayClient.
+				EXPECT().
+				UpdateReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.UpdateReceivedShareRequest, option ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+					if request.GetShare().GetShare().GetId() == nil {
+						return nil, someErr
+					}
+
+					Expect(request.GetShare().GetState()).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED))
+					Expect(request.GetShare().GetMountPoint().GetPath()).To(Equal("some"))
+
+					return &collaborationv1beta1.UpdateReceivedShareResponse{
+						Status: status.NewOK(ctx),
+					}, nil
+				}).
+				Times(3)
+
+			shares, err := drivesDriveItemService.MountShare(context.Background(), nil, "some")
+			Expect(err).To(BeNil())
+			Expect(shares).To(HaveLen(1))
 		})
 	})
 })
 
 var _ = Describe("DrivesDriveItemApi", func() {
 	var (
-		mockDrivesDriveItemService *mocks.DrivesDriveItemProvider
-		mockBaseGraphService       *mocks.BaseGraphProvider
-		httpAPI                    svc.DrivesDriveItemApi
-		rCTX                       *chi.Context
+		drivesDriveItemProvider *mocks.DrivesDriveItemProvider
+		baseGraphProvider       *mocks.BaseGraphProvider
+		drivesDriveItemApi      svc.DrivesDriveItemApi
+		rCTX                    *chi.Context
 	)
 
 	BeforeEach(func() {
 		logger := log.NewLogger()
 
-		mockBaseGraphService = mocks.NewBaseGraphProvider(GinkgoT())
+		baseGraphProvider = mocks.NewBaseGraphProvider(GinkgoT())
 
-		mockDrivesDriveItemService = mocks.NewDrivesDriveItemProvider(GinkgoT())
-		api, err := svc.NewDrivesDriveItemApi(mockDrivesDriveItemService, mockBaseGraphService, logger)
+		drivesDriveItemProvider = mocks.NewDrivesDriveItemProvider(GinkgoT())
+		api, err := svc.NewDrivesDriveItemApi(drivesDriveItemProvider, baseGraphProvider, logger)
 		Expect(err).ToNot(HaveOccurred())
 
-		httpAPI = api
+		drivesDriveItemApi = api
 
 		rCTX = chi.NewRouteContext()
-		rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
 	})
 
-	checkDriveIDAndItemIDValidation := func(handler http.HandlerFunc) {
-		rCTX.URLParams.Add("driveID", "1$2")
-		rCTX.URLParams.Add("itemID", "3$4!5")
+	failOnInvalidDriveIDOrItemID := func(handler http.HandlerFunc) {
+		It("fails on invalid itemID or driveID", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "invalid")
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest(http.MethodPost, "/", nil).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+			handler(w, r)
+			Expect(w.Code).To(Equal(http.StatusUnprocessableEntity))
 
-		responseRecorder := httptest.NewRecorder()
-		request := httptest.NewRequest(http.MethodPost, "/", nil).
-			WithContext(
-				context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
-			)
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrInvalidDriveIDOrItemID.Error()))
+		})
+	}
 
-		handler(responseRecorder, request)
+	failOninvalidDriveItemBody := func(handler http.HandlerFunc) {
+		It("fails if the request body is not a valid DriveItem", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
 
-		Expect(responseRecorder.Code).To(Equal(http.StatusUnprocessableEntity))
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest(http.MethodPost, "/", nil).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+			handler(w, r)
+			Expect(w.Code).To(Equal(http.StatusUnprocessableEntity))
 
-		jsonData := gjson.Get(responseRecorder.Body.String(), "error")
-		Expect(jsonData.Get("message").String()).To(Equal("invalid driveID or itemID"))
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrInvalidRequestBody.Error()))
+		})
+	}
+
+	failOnNonShareJailDriveID := func(handler http.HandlerFunc) {
+		It("fails on non share jail driveID", func() {
+			rCTX.URLParams.Add("driveID", "1$2")
+			rCTX.URLParams.Add("itemID", "1$2!3")
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest(http.MethodPost, "/", nil).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+			handler(w, r)
+			Expect(w.Code).To(Equal(http.StatusUnprocessableEntity))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrNotAShareJail.Error()))
+		})
 	}
 
 	Describe("DeleteDriveItem", func() {
-		It("validates the driveID and itemID url param", func() {
-			checkDriveIDAndItemIDValidation(httpAPI.DeleteDriveItem)
+		failOnInvalidDriveIDOrItemID(drivesDriveItemApi.DeleteDriveItem)
+
+		failOnNonShareJailDriveID(drivesDriveItemApi.DeleteDriveItem)
+
+		It("fails if unmounting the share fails", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest(http.MethodPost, "/", nil).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			drivesDriveItemProvider.
+				EXPECT().
+				UnmountShare(mock.Anything, mock.Anything).
+				Return(errors.New("some error")).
+				Once()
+
+			drivesDriveItemApi.DeleteDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrUnmountShare.Error()))
 		})
 
-		It("uses the UnmountShare provider implementation", func() {
-			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!a0ca6a90-a365-4782-871e-d44447bbc668")
-			responseRecorder := httptest.NewRecorder()
-
-			request := httptest.NewRequest(http.MethodDelete, "/", nil).
+		It("successfully unmounts the share", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest(http.MethodPost, "/", nil).
 				WithContext(
 					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
 				)
 
-			onUnmountShare := mockDrivesDriveItemService.On("UnmountShare", mock.Anything, mock.Anything)
-			onUnmountShare.
-				Return(func(ctx context.Context, shareID *collaborationv1beta1.ShareId) error {
-					return errors.New("any")
-				}).Once()
+			drivesDriveItemProvider.
+				EXPECT().
+				UnmountShare(mock.Anything, mock.Anything).
+				Return(nil).
+				Once()
 
-			httpAPI.DeleteDriveItem(responseRecorder, request)
-
-			Expect(responseRecorder.Code).To(Equal(http.StatusFailedDependency))
-
-			jsonData := gjson.Get(responseRecorder.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal("unmounting share failed"))
-
-			// happy path
-			responseRecorder = httptest.NewRecorder()
-
-			onUnmountShare.
-				Return(func(ctx context.Context, shareID *collaborationv1beta1.ShareId) error {
-					Expect(shareID.GetOpaqueId()).To(Equal("a0ca6a90-a365-4782-871e-d44447bbc668"))
-					return nil
-				}).Once()
-
-			httpAPI.DeleteDriveItem(responseRecorder, request)
-
-			Expect(responseRecorder.Code).To(Equal(http.StatusNoContent))
-		})
-	})
-
-	Describe("CreateDriveItem", func() {
-		It("checks if the idemID and driveID is in share jail", func() {
-			rCTX.URLParams.Add("driveID", "1$2")
-
-			responseRecorder := httptest.NewRecorder()
-			request := httptest.NewRequest(http.MethodPost, "/", nil).
-				WithContext(
-					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
-				)
-
-			httpAPI.CreateDriveItem(responseRecorder, request)
-
-			Expect(responseRecorder.Code).To(Equal(http.StatusUnprocessableEntity))
-
-			jsonData := gjson.Get(responseRecorder.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrNotAShareJail.Error()))
-		})
-
-		It("checks that the request body is valid", func() {
-			responseRecorder := httptest.NewRecorder()
-			request := httptest.NewRequest(http.MethodPost, "/", nil).
-				WithContext(
-					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
-				)
-
-			httpAPI.CreateDriveItem(responseRecorder, request)
-
-			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
-
-			jsonData := gjson.Get(responseRecorder.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal("invalid request body"))
-
-			// valid drive item, but invalid remote item id
-			driveItem := libregraph.DriveItem{}
-
-			driveItemJson, err := json.Marshal(driveItem)
-			Expect(err).ToNot(HaveOccurred())
-
-			responseRecorder = httptest.NewRecorder()
-
-			request = httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
-				WithContext(
-					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
-				)
-
-			httpAPI.CreateDriveItem(responseRecorder, request)
-
-			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
-
-			jsonData = gjson.Get(responseRecorder.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal("invalid remote item id"))
-		})
-
-		It("uses the MountShare provider implementation", func() {
-			driveItemName := "a name"
-			remoteItemID := "d66d28d8-3558-4f0f-ba2a-34a7185b806d$831997cf-a531-491b-ae72-9037739f04e9!c131a84c-7506-46b4-8e5e-60c56382da3b"
-			driveItem := libregraph.DriveItem{
-				Name: &driveItemName,
-				RemoteItem: &libregraph.RemoteItem{
-					Id: &remoteItemID,
-				},
-			}
-
-			driveItemJson, err := json.Marshal(driveItem)
-			Expect(err).ToNot(HaveOccurred())
-
-			responseRecorder := httptest.NewRecorder()
-
-			request := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
-				WithContext(
-					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
-				)
-
-			onMountShare := mockDrivesDriveItemService.On("MountShare", mock.Anything, mock.Anything, mock.Anything)
-			onMountShare.
-				Return(func(ctx context.Context, resourceID storageprovider.ResourceId, name string) ([]*collaborationv1beta1.ReceivedShare, error) {
-					return nil, errors.New("any")
-				}).Once()
-
-			httpAPI.CreateDriveItem(responseRecorder, request)
-
-			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
-
-			jsonData := gjson.Get(responseRecorder.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal("mounting share failed"))
-
-			// happy path
-			responseRecorder = httptest.NewRecorder()
-
-			request = httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
-				WithContext(
-					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
-				)
-
-			onMountShare.
-				Return(func(ctx context.Context, resourceID storageprovider.ResourceId, name string) ([]*collaborationv1beta1.ReceivedShare, error) {
-					Expect(storagespace.FormatResourceID(resourceID)).To(Equal(remoteItemID))
-					Expect(driveItemName).To(Equal(name))
-					return nil, nil
-				}).Once()
-
-			mockBaseGraphService.On("CS3ReceivedSharesToDriveItems", mock.Anything, mock.Anything).
-				Return([]libregraph.DriveItem{{}}, nil).Once()
-
-			httpAPI.CreateDriveItem(responseRecorder, request)
-
-			Expect(responseRecorder.Code).To(Equal(http.StatusCreated))
+			drivesDriveItemApi.DeleteDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusNoContent))
 		})
 	})
 
 	Describe("UpdateDriveItem", func() {
-		It("fails without a valid driveID || itemID", func() {
-			checkDriveIDAndItemIDValidation(httpAPI.UpdateDriveItem)
-		})
+		failOnInvalidDriveIDOrItemID(drivesDriveItemApi.UpdateDriveItem)
 
-		It("fails without a valid shareJail", func() {
-			rCTX.URLParams.Add("driveID", "1$2!3")
-			rCTX.URLParams.Add("itemID", "1$2!3")
-			responseRecorder := httptest.NewRecorder()
+		failOnNonShareJailDriveID(drivesDriveItemApi.UpdateDriveItem)
 
-			request := httptest.NewRequest(http.MethodPut, "/", nil).
-				WithContext(
-					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
-				)
+		failOninvalidDriveItemBody(drivesDriveItemApi.UpdateDriveItem)
 
-			httpAPI.UpdateDriveItem(responseRecorder, request)
-			Expect(responseRecorder.Code).To(Equal(http.StatusUnprocessableEntity))
-		})
-
-		It("fails without a valid request body", func() {
-			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
-			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
-			responseRecorder := httptest.NewRecorder()
-
-			request := httptest.NewRequest(http.MethodPut, "/", nil).
-				WithContext(
-					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
-				)
-
-			httpAPI.UpdateDriveItem(responseRecorder, request)
-			Expect(responseRecorder.Code).To(Equal(http.StatusUnprocessableEntity))
-
-			jsonData := gjson.Get(responseRecorder.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal("invalid request body"))
-		})
-
-		It("updates the share", func() {
+		It("fails if retrieving the share ans siblings fails", func() {
 			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
 			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
 
-			responseRecorder := httptest.NewRecorder()
+			w := httptest.NewRecorder()
 
-			request := httptest.NewRequest(http.MethodPut, "/", strings.NewReader(`{"@UI.Hidden":true}`)).
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{})
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
 				WithContext(
 					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
 				)
 
-			onUnmountShare := mockDrivesDriveItemService.On("UpdateShare", mock.Anything, mock.Anything, mock.Anything)
-			onUnmountShare.
-				Return(func(context.Context, *collaborationv1beta1.ShareId, *svc.ShareUpdateInstruction) (*collaborationv1beta1.ReceivedShare, error) {
-					return nil, errors.New("any")
-				}).Once()
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShareAndSiblings(mock.Anything, mock.Anything, mock.Anything).
+				Return(nil, errors.New("some error")).
+				Once()
 
-			httpAPI.UpdateDriveItem(responseRecorder, request)
-			Expect(responseRecorder.Code).To(Equal(http.StatusFailedDependency))
+			drivesDriveItemApi.UpdateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusFailedDependency))
 
-			onUnmountShare.
-				Return(func(context.Context, *collaborationv1beta1.ShareId, *svc.ShareUpdateInstruction) (*collaborationv1beta1.ReceivedShare, error) {
-					return &collaborationv1beta1.ReceivedShare{
-						Hidden: true,
-					}, nil
-				}).Once()
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrGetShareAndSiblings.Error()))
+		})
 
-			responseRecorder = httptest.NewRecorder()
+		It("fails if updating the share fails", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
 
-			request = httptest.NewRequest(http.MethodPut, "/", strings.NewReader(`{"@UI.Hidden":true}`)).
+			w := httptest.NewRecorder()
+
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{})
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
 				WithContext(
 					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
 				)
 
-			httpAPI.UpdateDriveItem(responseRecorder, request)
-			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShareAndSiblings(mock.Anything, mock.Anything, mock.Anything).
+				Return(nil, nil).
+				Once()
+
+			drivesDriveItemProvider.
+				EXPECT().
+				UpdateShares(mock.Anything, mock.Anything, mock.Anything).
+				Return(nil, errors.New("some error")).
+				Once()
+
+			drivesDriveItemApi.UpdateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrUpdateShares.Error()))
+		})
+
+		It("fails if no shares are updated", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+
+			w := httptest.NewRecorder()
+
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{
+				UIHidden: conversions.ToPointer(true),
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShareAndSiblings(mock.Anything, mock.Anything, mock.Anything).
+				Return([]*collaborationv1beta1.ReceivedShare{}, nil).
+				Once()
+
+			drivesDriveItemProvider.
+				EXPECT().
+				UpdateShares(mock.Anything, mock.Anything, mock.Anything).
+				Return([]*collaborationv1beta1.ReceivedShare{}, nil).
+				Once()
+
+			drivesDriveItemApi.UpdateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrUpdateShares.Error()))
+		})
+
+		It("successfully updates the share", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+
+			w := httptest.NewRecorder()
+
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{
+				UIHidden: conversions.ToPointer(true),
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			share := &collaborationv1beta1.ReceivedShare{
+				Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{
+					OpaqueId: "123",
+				}},
+			}
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShareAndSiblings(mock.Anything, mock.Anything, mock.Anything).
+				Return([]*collaborationv1beta1.ReceivedShare{share}, nil).
+				Once()
+
+			drivesDriveItemProvider.
+				EXPECT().
+				UpdateShares(mock.Anything, mock.Anything, mock.Anything).
+				RunAndReturn(func(ctx context.Context, shares []*collaborationv1beta1.ReceivedShare, closure svc.UpdateShareClosure) ([]*collaborationv1beta1.ReceivedShare, error) {
+
+					updateReceivedShareRequest := &collaborationv1beta1.UpdateReceivedShareRequest{
+						Share: &collaborationv1beta1.ReceivedShare{
+							Share: &collaborationv1beta1.Share{
+								Id: share.GetShare().GetId(),
+							},
+						},
+						UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{}},
+					}
+
+					closure(share, updateReceivedShareRequest)
+
+					Expect(shares).To(HaveLen(1))
+					Expect(updateReceivedShareRequest.GetShare().GetHidden()).To(BeTrue())
+					Expect(updateReceivedShareRequest.GetUpdateMask().GetPaths()).To(HaveLen(1))
+					Expect(updateReceivedShareRequest.GetUpdateMask().GetPaths()).To(ContainElements("hidden"))
+
+					return shares, nil
+				}).
+				Once()
+
+			drivesDriveItemApi.UpdateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusOK))
+		})
+	})
+
+	Describe("CreateDriveItem", func() {
+		It("fails without a driveID", func() {
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest(http.MethodPost, "/", nil).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+			drivesDriveItemApi.CreateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusUnprocessableEntity))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrInvalidDriveIDOrItemID.Error()))
+		})
+
+		failOnNonShareJailDriveID(drivesDriveItemApi.CreateDriveItem)
+
+		failOninvalidDriveItemBody(drivesDriveItemApi.CreateDriveItem)
+
+		It("fails on invalid request body id", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+
+			w := httptest.NewRecorder()
+
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{})
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			drivesDriveItemApi.CreateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrInvalidID.Error()))
+		})
+
+		It("fails if mounting the share fails", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+
+			w := httptest.NewRecorder()
+
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{
+				RemoteItem: &libregraph.RemoteItem{
+					Id: conversions.ToPointer("123"),
+				},
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			drivesDriveItemProvider.
+				EXPECT().
+				MountShare(mock.Anything, mock.Anything, mock.Anything).
+				Return(nil, errors.New("some error")).
+				Once()
+
+			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			drivesDriveItemApi.CreateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrMountShare.Error()))
+		})
+
+		It("fails if drive item conversion fails", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+
+			w := httptest.NewRecorder()
+
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{
+				RemoteItem: &libregraph.RemoteItem{
+					Id: conversions.ToPointer("123"),
+				},
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			drivesDriveItemProvider.
+				EXPECT().
+				MountShare(mock.Anything, mock.Anything, mock.Anything).
+				Return(nil, nil)
+
+			baseGraphProvider.
+				EXPECT().
+				CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
+				Return(nil, errors.New("some error")).
+				Once()
+
+			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			drivesDriveItemApi.CreateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
+
+			//
+			baseGraphProvider.
+				EXPECT().
+				CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
+				Return(nil, nil).
+				Once()
+
+			r = httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			drivesDriveItemApi.CreateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+
+			jsonData = gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
+		})
+
+		It("successfully creates the drive item", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+
+			w := httptest.NewRecorder()
+
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{
+				RemoteItem: &libregraph.RemoteItem{
+					Id: conversions.ToPointer("123"),
+				},
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			drivesDriveItemProvider.
+				EXPECT().
+				MountShare(mock.Anything, mock.Anything, mock.Anything).
+				Return(nil, nil)
+
+			baseGraphProvider.
+				EXPECT().
+				CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
+				Return([]libregraph.DriveItem{{}}, nil).
+				Once()
+
+			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			drivesDriveItemApi.CreateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusCreated))
 		})
 	})
 })

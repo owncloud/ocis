@@ -12,9 +12,10 @@ import (
 	cs3User "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"golang.org/x/sync/errgroup"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
@@ -459,18 +460,11 @@ func roleConditionForResourceType(ri *storageprovider.ResourceInfo) (string, err
 	}
 }
 
-// GetShareID returns a valid share ID from the given resource ID.
-// Basically, it just checks if the given ID has an opaque ID that is
-// compatible with the id format defined by storagespace package.
-func GetShareID(shareID storageprovider.ResourceId) (*collaboration.ShareId, error) {
-	if _, err := storagespace.ParseID(shareID.GetOpaqueId()); err != nil {
-		return nil, err
-	}
-
-	// This is a bit of a hack.
-	// We should not rely on a specific format of the item id.
-	// But currently there is no other way to get the ShareID.
+// ExtractShareIdFromResourceId is a bit of a hack.
+// We should not rely on a specific format of the item id.
+// But currently there is no other way to get the ShareID.
+func ExtractShareIdFromResourceId(rid storageprovider.ResourceId) *collaboration.ShareId {
 	return &collaboration.ShareId{
-		OpaqueId: shareID.GetOpaqueId(),
-	}, nil
+		OpaqueId: rid.GetOpaqueId(),
+	}
 }

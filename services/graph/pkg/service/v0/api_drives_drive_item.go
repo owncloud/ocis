@@ -18,7 +18,6 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 )
 
 const (
@@ -28,109 +27,91 @@ const (
 )
 
 var (
-	ErrNoChanges     = errors.New("no changes specified")
+	// ErrNoUpdates is returned when no updates are provided
+	ErrNoUpdates = errors.New("no updates")
+
+	// ErrNoUpdater is returned when no updater is provided
+	ErrNoUpdater = errors.New("no updater")
+
+	// ErrNoShares is returned when no shares are found
+	ErrNoShares = errors.New("no shares found")
+
+	// ErrAbsoluteNamePath is returned when the name is an absolute path
+	ErrAbsoluteNamePath = errors.New("name cannot be an absolute path")
+
+	// ErrNotAShareJail is returned when the driveID does not belong to a share jail
 	ErrNotAShareJail = errors.New("id does not belong to a share jail")
+
+	// ErrInvalidDriveIDOrItemID is returned when the driveID or itemID is invalid
+	ErrInvalidDriveIDOrItemID = errors.New("invalid driveID or itemID")
+
+	// ErrInvalidRequestBody is returned when the request body is invalid
+	ErrInvalidRequestBody = errors.New("invalid request body")
+
+	// ErrUnmountShare is returned when unmounting a share fails
+	ErrUnmountShare = errors.New("unmounting share failed")
+
+	// ErrMountShare is returned when mounting a share fails
+	ErrMountShare = errors.New("mounting share failed")
+
+	// ErrGetShareAndSiblings is returned when getting the share and siblings fails
+	ErrGetShareAndSiblings = errors.New("failed to get share and siblings")
+
+	// ErrUpdateShares is returned when updating shares fails
+	ErrUpdateShares = errors.New("failed to update share")
+
+	// ErrInvalidID is returned when the id is invalid
+	ErrInvalidID = errors.New("invalid id")
+
+	// ErrDriveItemConversion is returned when converting to drive items fails
+	ErrDriveItemConversion = errors.New("converting to drive items failed")
 )
 
-// DrivesDriveItemProvider is the interface that needs to be implemented by the individual space service
-type DrivesDriveItemProvider interface {
-	MountShare(ctx context.Context, resourceID storageprovider.ResourceId, name string) ([]*collaboration.ReceivedShare, error)
-	UnmountShare(ctx context.Context, shareID *collaboration.ShareId) error
-	UpdateShare(ctx context.Context, shareID *collaboration.ShareId, instructions *ShareUpdateInstruction) (*collaboration.ReceivedShare, error)
-}
+type (
+	// UpdateShareClosure is a closure that injects required updates into the update request
+	UpdateShareClosure func(share *collaboration.ReceivedShare, request *collaboration.UpdateReceivedShareRequest)
 
-// ShareUpdateInstruction is a helper struct to build the update instruction for a share
-type ShareUpdateInstruction struct {
-	changes    []string
-	hidden     bool
-	mountPoint *storageprovider.Reference
-	state      collaboration.ShareState
-}
+	// DrivesDriveItemProvider is the interface that needs to be implemented by the individual space service
+	DrivesDriveItemProvider interface {
+		// MountShare mounts a share
+		MountShare(ctx context.Context, resourceID *storageprovider.ResourceId, name string) ([]*collaboration.ReceivedShare, error)
 
-// State sets the state of the share
-func (i *ShareUpdateInstruction) State(state collaboration.ShareState) *ShareUpdateInstruction {
-	i.changes = append(i.changes, _fieldMaskPathState)
-	i.state = state
+		// UnmountShare unmounts a share
+		UnmountShare(ctx context.Context, shareID *collaboration.ShareId) error
 
-	return i
-}
+		// UpdateShares updates multiple shares
+		UpdateShares(ctx context.Context, shares []*collaboration.ReceivedShare, updater UpdateShareClosure) ([]*collaboration.ReceivedShare, error)
 
-// MountPoint sets the mount point of the share
-func (i *ShareUpdateInstruction) MountPoint(mountPoint *storageprovider.Reference) *ShareUpdateInstruction {
-	i.changes = append(i.changes, _fieldMaskPathMountPoint)
-	i.mountPoint = mountPoint
+		// UpdateShare updates a single share
+		UpdateShare(ctx context.Context, share *collaboration.ReceivedShare, updater UpdateShareClosure) (*collaboration.ReceivedShare, error)
 
-	return i
-}
+		// GetShareAndSiblings returns the share and all its siblings
+		GetShareAndSiblings(ctx context.Context, shareID *collaboration.ShareId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error)
 
-// Hidden sets the visibility of the share
-func (i *ShareUpdateInstruction) Hidden(hidden bool) *ShareUpdateInstruction {
-	i.changes = append(i.changes, _fieldMaskPathHidden)
-	i.hidden = hidden
-
-	return i
-}
+		// GetSharesByResourceID returns all shares for a given resourceID
+		GetSharesByResourceID(ctx context.Context, resourceID *storageprovider.ResourceId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error)
+	}
+)
 
 // DrivesDriveItemService contains the production business logic for everything that relates to drives
 type DrivesDriveItemService struct {
 	logger          log.Logger
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-	identityCache   identity.IdentityCache
 }
 
 // NewDrivesDriveItemService creates a new DrivesDriveItemService
-func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache) (DrivesDriveItemService, error) {
+func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (DrivesDriveItemService, error) {
 	return DrivesDriveItemService{
 		logger:          log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
 		gatewaySelector: gatewaySelector,
-		identityCache:   identityCache,
 	}, nil
 }
 
-// UpdateShare updates the visibility of a share
-func (s DrivesDriveItemService) UpdateShare(ctx context.Context, shareID *collaboration.ShareId, instructions *ShareUpdateInstruction) (*collaboration.ReceivedShare, error) {
-	if len(instructions.changes) == 0 {
-		return nil, ErrNoChanges
-	}
-
-	updateReceivedShareRequest := &collaboration.UpdateReceivedShareRequest{
-		Share: &collaboration.ReceivedShare{
-			Share: &collaboration.Share{
-				Id: shareID,
-			},
-		},
-		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{}},
-	}
-
-	for _, c := range instructions.changes {
-		switch c {
-		case _fieldMaskPathState:
-			updateReceivedShareRequest.Share.State = instructions.state
-		case _fieldMaskPathMountPoint:
-			updateReceivedShareRequest.Share.MountPoint = instructions.mountPoint
-		case _fieldMaskPathHidden:
-			updateReceivedShareRequest.Share.Hidden = instructions.hidden
-		default:
-			continue
-		}
-
-		updateReceivedShareRequest.UpdateMask.Paths = append(updateReceivedShareRequest.UpdateMask.Paths, c)
-	}
-
+// GetShareAndSiblings returns the share and all its siblings
+func (s DrivesDriveItemService) GetShareAndSiblings(ctx context.Context, shareID *collaboration.ShareId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return nil, err
-	}
-
-	updateReceivedShareResponse, err := gatewayClient.UpdateReceivedShare(ctx, updateReceivedShareRequest)
-	return updateReceivedShareResponse.GetShare(), errorcode.FromCS3Status(updateReceivedShareResponse.GetStatus(), err)
-}
-
-// UnmountShare unmounts a share from the sharejail
-func (s DrivesDriveItemService) UnmountShare(ctx context.Context, shareID *collaboration.ShareId) error {
-	gatewayClient, err := s.gatewaySelector.Next()
-	if err != nil {
-		return err
 	}
 
 	// Now, find out the resourceID of the shared resource
@@ -144,144 +125,175 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, shareID *colla
 		},
 	)
 	if err := errorcode.FromCS3Status(getReceivedShareResponse.GetStatus(), err); err != nil {
-		s.logger.Debug().Err(err).
-			Str("shareID", shareID.GetOpaqueId()).
-			Msg("failed to read share")
-		return err
+		return nil, err
 	}
 
-	// Find all accepted shares for this resource
-	gatewayClient, err = s.gatewaySelector.Next()
-	if err != nil {
-		return err
-	}
-	receivedSharesResponse, err := gatewayClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
-		Filters: []*collaboration.Filter{
-			{
-				Type: collaboration.Filter_TYPE_STATE,
-				Term: &collaboration.Filter_State{
-					State: collaboration.ShareState_SHARE_STATE_ACCEPTED,
-				},
-			},
-			{
-				Type: collaboration.Filter_TYPE_RESOURCE_ID,
-				Term: &collaboration.Filter_ResourceId{
-					ResourceId: getReceivedShareResponse.GetShare().GetShare().GetResourceId(),
-				},
-			},
-		},
-	})
-	if err != nil {
-		return err
-	}
-	if len(receivedSharesResponse.GetShares()) == 0 {
-		return errorcode.New(errorcode.InvalidRequest, "invalid itemID")
-	}
-
-	var errs []error
-
-	// Reject all the shares for this resource
-	for _, receivedShare := range receivedSharesResponse.GetShares() {
-		if _, err := s.UpdateShare(
-			ctx,
-			receivedShare.GetShare().GetId(),
-			(&ShareUpdateInstruction{}).
-				State(collaboration.ShareState_SHARE_STATE_REJECTED),
-		); err != nil {
-			errs = append(errs, err)
-		}
-	}
-
-	return errors.Join(errs...)
+	return s.GetSharesByResourceID(ctx, getReceivedShareResponse.GetShare().GetShare().GetResourceId(), filters)
 }
 
-// MountShare mounts a share
-func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID storageprovider.ResourceId, name string) ([]*collaboration.ReceivedShare, error) {
-	if filepath.IsAbs(name) {
-		return nil, errorcode.New(errorcode.InvalidRequest, "name cannot be an absolute path")
-	}
-
-	if name != "" {
-		name = filepath.Clean(name)
-	}
-
+// GetSharesByResourceID returns all shares for a given resourceID
+func (s DrivesDriveItemService) GetSharesByResourceID(ctx context.Context, resourceID *storageprovider.ResourceId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
+	// Find all accepted shares for this resource
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return nil, err
 	}
 
-	// Get all shares that the user has received for this resource. There might be multiple
 	receivedSharesResponse, err := gatewayClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
-		Filters: []*collaboration.Filter{
-			{
-				Type: collaboration.Filter_TYPE_STATE,
-				Term: &collaboration.Filter_State{
-					State: collaboration.ShareState_SHARE_STATE_PENDING,
-				},
-			},
-			{
-				Type: collaboration.Filter_TYPE_STATE,
-				Term: &collaboration.Filter_State{
-					State: collaboration.ShareState_SHARE_STATE_REJECTED,
-				},
-			},
+		Filters: append([]*collaboration.Filter{
 			{
 				Type: collaboration.Filter_TYPE_RESOURCE_ID,
 				Term: &collaboration.Filter_ResourceId{
-					ResourceId: &resourceID,
+					ResourceId: resourceID,
 				},
 			},
-		},
+		}, filters...),
 	})
 	switch {
 	case err != nil:
 		return nil, err
 	case len(receivedSharesResponse.GetShares()) == 0:
-		return nil, errorcode.New(errorcode.InvalidRequest, "invalid itemID")
+		return nil, ErrNoShares
+	default:
+		return receivedSharesResponse.GetShares(), errorcode.FromCS3Status(receivedSharesResponse.GetStatus(), err)
 	}
+}
 
-	receivedShares := receivedSharesResponse.GetShares()
-	errs := make([]error, 0, len(receivedShares))
-	acceptedShares := make([]*collaboration.ReceivedShare, 0, len(receivedShares))
+// UpdateShares updates multiple shares;
+// it could happen that some shares are updated and some are not,
+// this will return a list of updated shares and a list of errors;
+// there is no guarantee that all updates are successful
+func (s DrivesDriveItemService) UpdateShares(ctx context.Context, shares []*collaboration.ReceivedShare, updater UpdateShareClosure) ([]*collaboration.ReceivedShare, error) {
+	errs := make([]error, 0, len(shares))
+	updatedShares := make([]*collaboration.ReceivedShare, 0, len(shares))
 
-	// try to accept all the received shares for this resource. So that the stat is in sync across all
-	// shares
-	for _, receivedShare := range receivedShares {
-		updateInstruction := &ShareUpdateInstruction{}
-		updateInstruction.State(collaboration.ShareState_SHARE_STATE_ACCEPTED)
-
-		// only update if mountPoint name is not empty and the path has changed
-		if name != "" {
-			mountPoint := receivedShare.GetMountPoint()
-			if mountPoint == nil {
-				mountPoint = &storageprovider.Reference{}
-			}
-
-			if filepath.Clean(mountPoint.GetPath()) != name {
-				mountPoint.Path = name
-				updateInstruction.MountPoint(mountPoint)
-			}
-		}
-
+	for _, share := range shares {
 		updatedShare, err := s.UpdateShare(
 			ctx,
-			receivedShare.GetShare().GetId(),
-			updateInstruction,
+			share,
+			updater,
 		)
 		if err != nil {
 			errs = append(errs, err)
 			continue
 		}
 
-		acceptedShares = append(acceptedShares, updatedShare)
+		updatedShares = append(updatedShares, updatedShare)
 	}
 
-	if len(receivedSharesResponse.GetShares()) == len(errs) {
-		// none of the received shares could be accepted. This is an error. Return it.
-		return acceptedShares, errors.Join(errs...)
+	return updatedShares, errors.Join(errs...)
+}
+
+// UpdateShare updates a single share
+func (s DrivesDriveItemService) UpdateShare(ctx context.Context, share *collaboration.ReceivedShare, updater UpdateShareClosure) (*collaboration.ReceivedShare, error) {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
 	}
 
-	return acceptedShares, nil
+	updateReceivedShareRequest := &collaboration.UpdateReceivedShareRequest{
+		Share: &collaboration.ReceivedShare{
+			Share: &collaboration.Share{
+				Id: share.GetShare().GetId(),
+			},
+		},
+		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{}},
+	}
+
+	switch updater {
+	case nil:
+		return nil, ErrNoUpdater
+	default:
+		updater(share, updateReceivedShareRequest)
+	}
+
+	if len(updateReceivedShareRequest.GetUpdateMask().GetPaths()) == 0 {
+		return nil, ErrNoUpdates
+	}
+
+	updateReceivedShareResponse, err := gatewayClient.UpdateReceivedShare(ctx, updateReceivedShareRequest)
+	return updateReceivedShareResponse.GetShare(), errorcode.FromCS3Status(updateReceivedShareResponse.GetStatus(), err)
+}
+
+// UnmountShare unmounts a share
+func (s DrivesDriveItemService) UnmountShare(ctx context.Context, shareID *collaboration.ShareId) error {
+	availableShares, err := s.GetShareAndSiblings(ctx, shareID, []*collaboration.Filter{
+		{
+			Type: collaboration.Filter_TYPE_STATE,
+			Term: &collaboration.Filter_State{
+				State: collaboration.ShareState_SHARE_STATE_ACCEPTED,
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = s.UpdateShares(ctx, availableShares, func(_ *collaboration.ReceivedShare, request *collaboration.UpdateReceivedShareRequest) {
+		request.Share.State = collaboration.ShareState_SHARE_STATE_REJECTED
+		request.UpdateMask.Paths = append(request.UpdateMask.Paths, _fieldMaskPathState)
+	})
+
+	return err
+}
+
+// MountShare mounts a share, there is no guarantee that all siblings will be mounted
+// in some rare cases it could happen that none of the siblings could be mounted,
+// then the error will be returned
+func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID *storageprovider.ResourceId, name string) ([]*collaboration.ReceivedShare, error) {
+	if filepath.IsAbs(name) {
+		return nil, ErrAbsoluteNamePath
+	}
+
+	if name != "" {
+		name = filepath.Clean(name)
+	}
+
+	availableShares, err := s.GetSharesByResourceID(ctx, resourceID, []*collaboration.Filter{
+		{
+			Type: collaboration.Filter_TYPE_STATE,
+			Term: &collaboration.Filter_State{
+				State: collaboration.ShareState_SHARE_STATE_PENDING,
+			},
+		},
+		{
+			Type: collaboration.Filter_TYPE_STATE,
+			Term: &collaboration.Filter_State{
+				State: collaboration.ShareState_SHARE_STATE_REJECTED,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	updatedShares, err := s.UpdateShares(ctx, availableShares, func(share *collaboration.ReceivedShare, request *collaboration.UpdateReceivedShareRequest) {
+		request.Share.State = collaboration.ShareState_SHARE_STATE_ACCEPTED
+		request.UpdateMask.Paths = append(request.UpdateMask.Paths, _fieldMaskPathState)
+
+		// only update if mountPoint name is not empty and the path has changed
+		if name != "" {
+			mountPoint := share.GetMountPoint()
+			if mountPoint == nil {
+				mountPoint = &storageprovider.Reference{}
+			}
+
+			if filepath.Clean(mountPoint.GetPath()) != name {
+				mountPoint.Path = name
+				request.Share.MountPoint = mountPoint
+				request.UpdateMask.Paths = append(request.UpdateMask.Paths, _fieldMaskPathMountPoint)
+			}
+		}
+	})
+
+	errs, ok := err.(interface{ Unwrap() []error })
+	if ok && len(errs.Unwrap()) == len(availableShares) {
+		// none of the received shares could be accepted.
+		// this is an error, return it.
+		return nil, err
+	}
+
+	return updatedShares, nil
 }
 
 // DrivesDriveItemApi is the api that registers the http endpoints which expose needed operation to the graph api.
@@ -306,9 +318,8 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 	ctx := r.Context()
 	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
-		msg := "invalid driveID or itemID"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		api.logger.Debug().Err(err).Msg(ErrInvalidDriveIDOrItemID.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrInvalidDriveIDOrItemID.Error())
 		return
 	}
 
@@ -318,17 +329,10 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	shareID, err := GetShareID(itemID)
-	if err != nil {
-		msg := "invalid shareID"
-		api.logger.Debug().Interface("driveID", driveID).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
-	}
-
+	shareID := ExtractShareIdFromResourceId(itemID)
 	if err := api.drivesDriveItemService.UnmountShare(ctx, shareID); err != nil {
-		msg := "unmounting share failed"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, msg)
+		api.logger.Debug().Err(err).Msg(ErrUnmountShare.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrUnmountShare.Error())
 		return
 	}
 
@@ -340,9 +344,8 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 func (api DrivesDriveItemApi) UpdateDriveItem(w http.ResponseWriter, r *http.Request) {
 	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
-		msg := "invalid driveID or itemID"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		api.logger.Debug().Err(err).Msg(ErrInvalidDriveIDOrItemID.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrInvalidDriveIDOrItemID.Error())
 		return
 	}
 
@@ -352,38 +355,43 @@ func (api DrivesDriveItemApi) UpdateDriveItem(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	shareID, err := GetShareID(itemID)
-	if err != nil {
-		msg := "invalid shareID"
-		api.logger.Debug().Interface("driveID", driveID).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
-	}
-
+	shareID := ExtractShareIdFromResourceId(itemID)
 	requestDriveItem := libregraph.DriveItem{}
 	if err := StrictJSONUnmarshal(r.Body, &requestDriveItem); err != nil {
-		msg := "invalid request body"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, msg)
+		api.logger.Debug().Err(err).Msg(ErrInvalidRequestBody.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrInvalidRequestBody.Error())
 		return
 	}
 
-	updatedShare, err := api.drivesDriveItemService.UpdateShare(
-		r.Context(),
-		shareID,
-		(&ShareUpdateInstruction{}).
-			Hidden(requestDriveItem.GetUIHidden()),
-	)
-
+	availableShares, err := api.drivesDriveItemService.GetShareAndSiblings(r.Context(), shareID, nil)
 	if err != nil {
-		msg := "failed to update share"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, msg)
+		api.logger.Debug().Err(err).Msg(ErrGetShareAndSiblings.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrGetShareAndSiblings.Error())
+		return
+	}
+
+	updatedShares, err := api.drivesDriveItemService.UpdateShares(
+		r.Context(),
+		availableShares,
+		func(_ *collaboration.ReceivedShare, request *collaboration.UpdateReceivedShareRequest) {
+			request.GetShare().Hidden = requestDriveItem.GetUIHidden()
+			request.UpdateMask.Paths = append(request.UpdateMask.Paths, _fieldMaskPathHidden)
+		},
+	)
+	switch {
+	case err != nil:
+		break
+	case len(updatedShares) == 0:
+		err = ErrNoShares
+	}
+	if err != nil {
+		api.logger.Debug().Err(err).Msg(ErrUpdateShares.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrUpdateShares.Error())
 		return
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, updatedShare)
-
+	render.JSON(w, r, updatedShares[0])
 }
 
 // CreateDriveItem creates a drive item
@@ -391,8 +399,8 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 	ctx := r.Context()
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
-		api.logger.Debug().Err(err).Msg("invalid driveID")
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, "invalid driveID")
+		api.logger.Debug().Err(err).Msg(ErrInvalidDriveIDOrItemID.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrInvalidDriveIDOrItemID.Error())
 		return
 	}
 
@@ -404,27 +412,24 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 
 	requestDriveItem := libregraph.DriveItem{}
 	if err := StrictJSONUnmarshal(r.Body, &requestDriveItem); err != nil {
-		msg := "invalid request body"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, msg)
+		api.logger.Debug().Err(err).Msg(ErrInvalidRequestBody.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrInvalidRequestBody.Error())
 		return
 	}
 
 	remoteItem := requestDriveItem.GetRemoteItem()
 	resourceId, err := storagespace.ParseID(remoteItem.GetId())
 	if err != nil {
-		msg := "invalid remote item id"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, msg)
+		api.logger.Debug().Err(err).Msg(ErrInvalidID.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, ErrInvalidID.Error())
 		return
 	}
 
 	mountedShares, err := api.drivesDriveItemService.
-		MountShare(ctx, resourceId, requestDriveItem.GetName())
+		MountShare(ctx, &resourceId, requestDriveItem.GetName())
 	if err != nil {
-		msg := "mounting share failed"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, msg)
+		api.logger.Debug().Err(err).Msg(ErrMountShare.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, ErrMountShare.Error())
 		return
 	}
 
@@ -433,12 +438,11 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 	case err != nil:
 		break
 	case len(driveItems) != 1:
-		err = errorcode.New(errorcode.GeneralException, "failed to convert accepted shares into drive-item")
+		err = ErrDriveItemConversion
 	}
 	if err != nil {
-		msg := "converting received shares to drive items failed"
-		api.logger.Debug().Err(err).Msg(msg)
-		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, msg)
+		api.logger.Debug().Err(err).Msg(ErrDriveItemConversion.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrDriveItemConversion.Error())
 		return
 	}
 

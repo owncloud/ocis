@@ -199,7 +199,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		requireAdmin = options.RequireAdminMiddleware
 	}
 
-	drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger, options.GatewaySelector, identityCache)
+	drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger, options.GatewaySelector)
 	if err != nil {
 		return svc, err
 	}
