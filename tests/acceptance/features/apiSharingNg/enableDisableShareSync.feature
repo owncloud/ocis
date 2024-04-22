@@ -297,3 +297,40 @@ Feature:  enable or disable sync of incoming shares
       | resource      |
       | textfile0.txt |
       | FolderToShare |
+
+  @issue-8724
+  Scenario: try to enable share sync of a non-existent resource
+    When user "Brian" tries to enable share sync of a non-existent resource using the Graph API
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code" : {
+                "const": "invalidRequest"
+              },
+              "innererror" : {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message" : {
+                "const": "mounting share failed"
+              }
+            }
+          }
+        }
+      }
+      """
