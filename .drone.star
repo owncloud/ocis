@@ -13,6 +13,7 @@ OC_CI_CLAMAVD = "owncloudci/clamavd"
 OC_CI_DRONE_ANSIBLE = "owncloudci/drone-ansible:latest"
 OC_CI_DRONE_SKIP_PIPELINE = "owncloudci/drone-skip-pipeline"
 OC_CI_GOLANG = "owncloudci/golang:1.22"
+OC_CI_CEPH = "quay.io/ceph/daemon:latest"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
@@ -210,7 +211,7 @@ DRONE_HTTP_PROXY_ENV = {
 def cephService():
     return {
         "name": "ceph",
-        "image": "ceph/daemon",
+        "image": OC_CI_CEPH,
         "pull": "always",
         "environment": {
             "CEPH_DAEMON": "demo",
@@ -223,6 +224,8 @@ def cephService():
             "CEPH_DEMO_ACCESS_KEY": "test",
             "CEPH_DEMO_SECRET_KEY": "test",
             "CEPH_DEMO_BUCKET": "test",
+            "CEPHFS_CREATE": "1",
+            "CEPHFS_NAME": "cephfs",
         },
     }
 
@@ -350,13 +353,22 @@ def cephPipelines(ctx):
             "ceph",
             buildOcisBinaryForTesting(ctx)["steps"] +
             restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-            ocisServer("ocis", 4, [], []) +
+            ocisServer("ceph", 4, [], []) +
             [
                 {
                     "name": "wait-for-ceph",
                     "image": OC_CI_GOLANG,
                     "commands": [
                         "sleep 10",
+                    ],
+                },
+                {
+                    "name": "curl-ceph",
+                    "image": OC_CI_ALPINE,
+                    "commands": [
+                        "sleep 60",
+                        "apk add --no-cache curl",
+                        "curl -v -X PUT 'http://ceph:5000'",
                     ],
                 },
             ],
@@ -2127,22 +2139,41 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "depends_on": depends_on,
     }
 
-    return [
-        {
-            "name": "ocis-server",
-            "image": OC_CI_GOLANG,
-            "detach": True,
-            "environment": environment,
-            "user": user,
-            "commands": [
-                "%s init --insecure true" % ocis_bin,
-                "cat $OCIS_CONFIG_DIR/ocis.yaml",
-            ] + (wrapper_commands),
-            "volumes": volumes,
-            "depends_on": depends_on,
-        },
-        wait_for_ocis,
-    ]
+    if storage == "ceph":
+        return [
+            {
+                "name": "ocis-server",
+                "image": OC_CI_GOLANG,
+                "detach": True,
+                "environment": environment,
+                "user": user,
+                "commands": [
+                    "apk add --no-cache ceph18",
+                    "%s init --insecure true" % ocis_bin,
+                    "cat $OCIS_CONFIG_DIR/ocis.yaml",
+                ] + (wrapper_commands),
+                "volumes": volumes,
+                "depends_on": depends_on,
+            },
+            wait_for_ocis,
+        ]
+    if storage != "ceph":
+        return [
+            {
+                "name": "ocis-server",
+                "image": OC_CI_GOLANG,
+                "detach": True,
+                "environment": environment,
+                "user": user,
+                "commands": [
+                    "%s init --insecure true" % ocis_bin,
+                    "cat $OCIS_CONFIG_DIR/ocis.yaml",
+                ] + (wrapper_commands),
+                "volumes": volumes,
+                "depends_on": depends_on,
+            },
+            wait_for_ocis,
+        ]
 
 def middlewareService():
     return [{
