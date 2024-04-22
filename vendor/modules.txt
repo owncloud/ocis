@@ -366,7 +366,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.19.2-0.20240419134937-8a636c82c1cf
+# github.com/cs3org/reva/v2 v2.19.2-0.20240422133703-f92da96ffe67
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
