@@ -171,7 +171,7 @@ Feature: List a sharing permissions
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    When user "Alice" lists the permissions of space "new-space" using the Graph API
+    When user "Alice" lists the permissions of space "new-space" using permissions endpoint of the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -304,7 +304,7 @@ Feature: List a sharing permissions
       | permissionsRole | view      |
       | password        | %public%  |
       | resource        | new-space |
-    When user "Alice" lists the permissions of space "new-space" using the Graph API
+    When user "Alice" lists the permissions of space "new-space" using permissions endpoint of the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -1131,6 +1131,171 @@ Feature: List a sharing permissions
                 "type": "string",
                 "pattern": "stat: error: not found: %file_id_pattern%$"
               }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: member with viewer role lists the permissions of a project space using permissions endpoint
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has sent the following share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
+    When user "Brian" lists the permissions of space "new-space" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues",
+          "value"
+        ],
+        "properties": {
+          "@libre.graph.permissions.actions.allowedValues": {
+            "const": [
+              "libre.graph/driveItem/path/read",
+              "libre.graph/driveItem/quota/read",
+              "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/permissions/read",
+              "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/deleted/read",
+              "libre.graph/driveItem/basic/read"
+            ]
+          },
+          "@libre.graph.permissions.roles.allowedValues": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "oneOf":  [
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "const": 1
+                    },
+                    "description": {
+                      "const": "View and download."
+                    },
+                    "displayName": {
+                      "const": "Can view"
+                    },
+                    "id": {
+                      "const": "a8d5fe5e-96e3-418d-825b-534dbdf22b99"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf":[
+                {
+                  "type": "object",
+                  "required": [
+                    "grantedToV2",
+                    "id",
+                    "roles"
+                  ],
+                  "properties": {
+                    "grantedToV2": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["displayName","id"],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%user_id_pattern%$"
+                            },
+                            "displayName": {
+                              "const": "Brian Murphy"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^u:%user_id_pattern%$"
+                    },
+                    "roles": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "string",
+                        "pattern": "^%role_id_pattern%$"
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "grantedToV2",
+                    "id",
+                    "roles"
+                  ],
+                  "properties": {
+                    "grantedToV2": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["displayName","id"],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%user_id_pattern%$"
+                            },
+                            "displayName": {
+                              "const": "Alice Hansen"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^u:%user_id_pattern%$"
+                    },
+                    "roles": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "string",
+                        "pattern": "^%role_id_pattern%$"
+                      }
+                    }
+                  }
+                }
+              ]
             }
           }
         }

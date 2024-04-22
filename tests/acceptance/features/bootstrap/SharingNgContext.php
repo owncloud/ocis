@@ -138,7 +138,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" lists the permissions of space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" lists the permissions of space "([^"]*)" using permissions endpoint of the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $space
