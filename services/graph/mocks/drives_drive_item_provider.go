@@ -87,66 +87,6 @@ func (_c *DrivesDriveItemProvider_GetShareAndSiblings_Call) RunAndReturn(run fun
 	return _c
 }
 
-// GetSharesByResourceID provides a mock function with given fields: ctx, resourceID, filters
-func (_m *DrivesDriveItemProvider) GetSharesByResourceID(ctx context.Context, resourceID *providerv1beta1.ResourceId, filters []*collaborationv1beta1.Filter) ([]*collaborationv1beta1.ReceivedShare, error) {
-	ret := _m.Called(ctx, resourceID, filters)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetSharesByResourceID")
-	}
-
-	var r0 []*collaborationv1beta1.ReceivedShare
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, []*collaborationv1beta1.Filter) ([]*collaborationv1beta1.ReceivedShare, error)); ok {
-		return rf(ctx, resourceID, filters)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, []*collaborationv1beta1.Filter) []*collaborationv1beta1.ReceivedShare); ok {
-		r0 = rf(ctx, resourceID, filters)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*collaborationv1beta1.ReceivedShare)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, []*collaborationv1beta1.Filter) error); ok {
-		r1 = rf(ctx, resourceID, filters)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// DrivesDriveItemProvider_GetSharesByResourceID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSharesByResourceID'
-type DrivesDriveItemProvider_GetSharesByResourceID_Call struct {
-	*mock.Call
-}
-
-// GetSharesByResourceID is a helper method to define mock.On call
-//   - ctx context.Context
-//   - resourceID *providerv1beta1.ResourceId
-//   - filters []*collaborationv1beta1.Filter
-func (_e *DrivesDriveItemProvider_Expecter) GetSharesByResourceID(ctx interface{}, resourceID interface{}, filters interface{}) *DrivesDriveItemProvider_GetSharesByResourceID_Call {
-	return &DrivesDriveItemProvider_GetSharesByResourceID_Call{Call: _e.mock.On("GetSharesByResourceID", ctx, resourceID, filters)}
-}
-
-func (_c *DrivesDriveItemProvider_GetSharesByResourceID_Call) Run(run func(ctx context.Context, resourceID *providerv1beta1.ResourceId, filters []*collaborationv1beta1.Filter)) *DrivesDriveItemProvider_GetSharesByResourceID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].([]*collaborationv1beta1.Filter))
-	})
-	return _c
-}
-
-func (_c *DrivesDriveItemProvider_GetSharesByResourceID_Call) Return(_a0 []*collaborationv1beta1.ReceivedShare, _a1 error) *DrivesDriveItemProvider_GetSharesByResourceID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *DrivesDriveItemProvider_GetSharesByResourceID_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, []*collaborationv1beta1.Filter) ([]*collaborationv1beta1.ReceivedShare, error)) *DrivesDriveItemProvider_GetSharesByResourceID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // MountShare provides a mock function with given fields: ctx, resourceID, name
 func (_m *DrivesDriveItemProvider) MountShare(ctx context.Context, resourceID *providerv1beta1.ResourceId, name string) ([]*collaborationv1beta1.ReceivedShare, error) {
 	ret := _m.Called(ctx, resourceID, name)
@@ -250,66 +190,6 @@ func (_c *DrivesDriveItemProvider_UnmountShare_Call) Return(_a0 error) *DrivesDr
 }
 
 func (_c *DrivesDriveItemProvider_UnmountShare_Call) RunAndReturn(run func(context.Context, *collaborationv1beta1.ShareId) error) *DrivesDriveItemProvider_UnmountShare_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// UpdateShare provides a mock function with given fields: ctx, share, updater
-func (_m *DrivesDriveItemProvider) UpdateShare(ctx context.Context, share *collaborationv1beta1.ReceivedShare, updater svc.UpdateShareClosure) (*collaborationv1beta1.ReceivedShare, error) {
-	ret := _m.Called(ctx, share, updater)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateShare")
-	}
-
-	var r0 *collaborationv1beta1.ReceivedShare
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *collaborationv1beta1.ReceivedShare, svc.UpdateShareClosure) (*collaborationv1beta1.ReceivedShare, error)); ok {
-		return rf(ctx, share, updater)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, *collaborationv1beta1.ReceivedShare, svc.UpdateShareClosure) *collaborationv1beta1.ReceivedShare); ok {
-		r0 = rf(ctx, share, updater)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*collaborationv1beta1.ReceivedShare)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, *collaborationv1beta1.ReceivedShare, svc.UpdateShareClosure) error); ok {
-		r1 = rf(ctx, share, updater)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// DrivesDriveItemProvider_UpdateShare_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateShare'
-type DrivesDriveItemProvider_UpdateShare_Call struct {
-	*mock.Call
-}
-
-// UpdateShare is a helper method to define mock.On call
-//   - ctx context.Context
-//   - share *collaborationv1beta1.ReceivedShare
-//   - updater svc.UpdateShareClosure
-func (_e *DrivesDriveItemProvider_Expecter) UpdateShare(ctx interface{}, share interface{}, updater interface{}) *DrivesDriveItemProvider_UpdateShare_Call {
-	return &DrivesDriveItemProvider_UpdateShare_Call{Call: _e.mock.On("UpdateShare", ctx, share, updater)}
-}
-
-func (_c *DrivesDriveItemProvider_UpdateShare_Call) Run(run func(ctx context.Context, share *collaborationv1beta1.ReceivedShare, updater svc.UpdateShareClosure)) *DrivesDriveItemProvider_UpdateShare_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*collaborationv1beta1.ReceivedShare), args[2].(svc.UpdateShareClosure))
-	})
-	return _c
-}
-
-func (_c *DrivesDriveItemProvider_UpdateShare_Call) Return(_a0 *collaborationv1beta1.ReceivedShare, _a1 error) *DrivesDriveItemProvider_UpdateShare_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *DrivesDriveItemProvider_UpdateShare_Call) RunAndReturn(run func(context.Context, *collaborationv1beta1.ReceivedShare, svc.UpdateShareClosure) (*collaborationv1beta1.ReceivedShare, error)) *DrivesDriveItemProvider_UpdateShare_Call {
 	_c.Call.Return(run)
 	return _c
 }

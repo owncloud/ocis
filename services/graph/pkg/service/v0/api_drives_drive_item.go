@@ -82,14 +82,8 @@ type (
 		// UpdateShares updates multiple shares
 		UpdateShares(ctx context.Context, shares []*collaboration.ReceivedShare, updater UpdateShareClosure) ([]*collaboration.ReceivedShare, error)
 
-		// UpdateShare updates a single share
-		UpdateShare(ctx context.Context, share *collaboration.ReceivedShare, updater UpdateShareClosure) (*collaboration.ReceivedShare, error)
-
 		// GetShareAndSiblings returns the share and all its siblings
 		GetShareAndSiblings(ctx context.Context, shareID *collaboration.ShareId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error)
-
-		// GetSharesByResourceID returns all shares for a given resourceID
-		GetSharesByResourceID(ctx context.Context, resourceID *storageprovider.ResourceId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error)
 	}
 )
 
