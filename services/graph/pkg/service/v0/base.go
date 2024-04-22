@@ -31,6 +31,11 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
+// BaseGraphProvider is the interface that wraps shared methods between the different graph providers
+type BaseGraphProvider interface {
+	CS3ReceivedSharesToDriveItems(ctx context.Context, receivedShares []*collaboration.ReceivedShare) ([]libregraph.DriveItem, error)
+}
+
 // BaseGraphService implements a couple of helper functions that are
 // shared between the different graph services
 type BaseGraphService struct {
@@ -70,6 +75,15 @@ func (g BaseGraphService) getDriveItem(ctx context.Context, ref storageprovider.
 		return nil, fmt.Errorf("could not stat %s: %s", refStr, res.GetStatus().GetMessage())
 	}
 	return cs3ResourceToDriveItem(g.logger, res.GetInfo())
+}
+
+func (g BaseGraphService) CS3ReceivedSharesToDriveItems(ctx context.Context, receivedShares []*collaboration.ReceivedShare) ([]libregraph.DriveItem, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares)
 }
 
 func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace, apiVersion APIVersion) []libregraph.Permission {

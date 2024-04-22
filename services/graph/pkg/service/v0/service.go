@@ -36,58 +36,58 @@ const (
 )
 
 // Service defines the service handlers.
-type Service interface {
-	ServeHTTP(http.ResponseWriter, *http.Request)
+type Service interface { //nolint:interfacebloat
+	ServeHTTP(w http.ResponseWriter, r *http.Request)
 
 	ListApplications(w http.ResponseWriter, r *http.Request)
-	GetApplication(http.ResponseWriter, *http.Request)
+	GetApplication(w http.ResponseWriter, r *http.Request)
 
-	GetMe(http.ResponseWriter, *http.Request)
-	GetUsers(http.ResponseWriter, *http.Request)
-	GetUser(http.ResponseWriter, *http.Request)
-	PostUser(http.ResponseWriter, *http.Request)
-	DeleteUser(http.ResponseWriter, *http.Request)
-	PatchUser(http.ResponseWriter, *http.Request)
-	ChangeOwnPassword(http.ResponseWriter, *http.Request)
+	GetMe(w http.ResponseWriter, r *http.Request)
+	GetUsers(w http.ResponseWriter, r *http.Request)
+	GetUser(w http.ResponseWriter, r *http.Request)
+	PostUser(w http.ResponseWriter, r *http.Request)
+	DeleteUser(w http.ResponseWriter, r *http.Request)
+	PatchUser(w http.ResponseWriter, r *http.Request)
+	ChangeOwnPassword(w http.ResponseWriter, r *http.Request)
 
-	ListAppRoleAssignments(http.ResponseWriter, *http.Request)
-	CreateAppRoleAssignment(http.ResponseWriter, *http.Request)
-	DeleteAppRoleAssignment(http.ResponseWriter, *http.Request)
+	ListAppRoleAssignments(w http.ResponseWriter, r *http.Request)
+	CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request)
+	DeleteAppRoleAssignment(w http.ResponseWriter, r *http.Request)
 
-	GetGroups(http.ResponseWriter, *http.Request)
-	GetGroup(http.ResponseWriter, *http.Request)
-	PostGroup(http.ResponseWriter, *http.Request)
-	PatchGroup(http.ResponseWriter, *http.Request)
-	DeleteGroup(http.ResponseWriter, *http.Request)
-	GetGroupMembers(http.ResponseWriter, *http.Request)
-	PostGroupMember(http.ResponseWriter, *http.Request)
-	DeleteGroupMember(http.ResponseWriter, *http.Request)
+	GetGroups(w http.ResponseWriter, r *http.Request)
+	GetGroup(w http.ResponseWriter, r *http.Request)
+	PostGroup(w http.ResponseWriter, r *http.Request)
+	PatchGroup(w http.ResponseWriter, r *http.Request)
+	DeleteGroup(w http.ResponseWriter, r *http.Request)
+	GetGroupMembers(w http.ResponseWriter, r *http.Request)
+	PostGroupMember(w http.ResponseWriter, r *http.Request)
+	DeleteGroupMember(w http.ResponseWriter, r *http.Request)
 
-	GetEducationSchools(http.ResponseWriter, *http.Request)
-	GetEducationSchool(http.ResponseWriter, *http.Request)
-	PostEducationSchool(http.ResponseWriter, *http.Request)
-	PatchEducationSchool(http.ResponseWriter, *http.Request)
-	DeleteEducationSchool(http.ResponseWriter, *http.Request)
-	GetEducationSchoolUsers(http.ResponseWriter, *http.Request)
-	PostEducationSchoolUser(http.ResponseWriter, *http.Request)
-	DeleteEducationSchoolUser(http.ResponseWriter, *http.Request)
-	GetEducationSchoolClasses(http.ResponseWriter, *http.Request)
-	PostEducationSchoolClass(http.ResponseWriter, *http.Request)
-	DeleteEducationSchoolClass(http.ResponseWriter, *http.Request)
+	GetEducationSchools(w http.ResponseWriter, r *http.Request)
+	GetEducationSchool(w http.ResponseWriter, r *http.Request)
+	PostEducationSchool(w http.ResponseWriter, r *http.Request)
+	PatchEducationSchool(w http.ResponseWriter, r *http.Request)
+	DeleteEducationSchool(w http.ResponseWriter, r *http.Request)
+	GetEducationSchoolUsers(w http.ResponseWriter, r *http.Request)
+	PostEducationSchoolUser(w http.ResponseWriter, r *http.Request)
+	DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Request)
+	GetEducationSchoolClasses(w http.ResponseWriter, r *http.Request)
+	PostEducationSchoolClass(w http.ResponseWriter, r *http.Request)
+	DeleteEducationSchoolClass(w http.ResponseWriter, r *http.Request)
 
-	GetEducationClasses(http.ResponseWriter, *http.Request)
-	GetEducationClass(http.ResponseWriter, *http.Request)
-	PostEducationClass(http.ResponseWriter, *http.Request)
-	PatchEducationClass(http.ResponseWriter, *http.Request)
+	GetEducationClasses(w http.ResponseWriter, r *http.Request)
+	GetEducationClass(w http.ResponseWriter, r *http.Request)
+	PostEducationClass(w http.ResponseWriter, r *http.Request)
+	PatchEducationClass(w http.ResponseWriter, r *http.Request)
 	DeleteEducationClass(w http.ResponseWriter, r *http.Request)
 	GetEducationClassMembers(w http.ResponseWriter, r *http.Request)
 	PostEducationClassMember(w http.ResponseWriter, r *http.Request)
 
-	GetEducationUsers(http.ResponseWriter, *http.Request)
-	GetEducationUser(http.ResponseWriter, *http.Request)
-	PostEducationUser(http.ResponseWriter, *http.Request)
-	DeleteEducationUser(http.ResponseWriter, *http.Request)
-	PatchEducationUser(http.ResponseWriter, *http.Request)
+	GetEducationUsers(w http.ResponseWriter, r *http.Request)
+	GetEducationUser(w http.ResponseWriter, r *http.Request)
+	PostEducationUser(w http.ResponseWriter, r *http.Request)
+	DeleteEducationUser(w http.ResponseWriter, r *http.Request)
+	PatchEducationUser(w http.ResponseWriter, r *http.Request)
 	DeleteEducationClassMember(w http.ResponseWriter, r *http.Request)
 
 	GetEducationClassTeachers(w http.ResponseWriter, r *http.Request)
@@ -118,7 +118,7 @@ type Service interface {
 }
 
 // NewService returns a service implementation for Service.
-func NewService(opts ...Option) (Graph, error) {
+func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 	options := newOptions(opts...)
 
 	m := chi.NewMux()
@@ -199,12 +199,12 @@ func NewService(opts ...Option) (Graph, error) {
 		requireAdmin = options.RequireAdminMiddleware
 	}
 
-	drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger, options.GatewaySelector, identityCache)
+	drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger, options.GatewaySelector)
 	if err != nil {
 		return svc, err
 	}
 
-	drivesDriveItemApi, err := NewDrivesDriveItemApi(drivesDriveItemService, options.Logger)
+	drivesDriveItemApi, err := NewDrivesDriveItemApi(drivesDriveItemService, svc.BaseGraphService, options.Logger)
 	if err != nil {
 		return svc, err
 	}
@@ -247,6 +247,7 @@ func NewService(opts ...Option) (Graph, error) {
 						})
 					})
 					r.Route("/items/{itemID}", func(r chi.Router) {
+						r.Patch("/", drivesDriveItemApi.UpdateDriveItem)
 						r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
 						r.Post("/invite", driveItemPermissionsApi.Invite)
 						r.Post("/createLink", driveItemPermissionsApi.CreateLink)

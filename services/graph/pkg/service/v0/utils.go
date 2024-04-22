@@ -12,9 +12,10 @@ import (
 	cs3User "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"golang.org/x/sync/errgroup"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
@@ -153,6 +154,10 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 
 	receivedSharesByResourceID := make(map[string][]*collaboration.ReceivedShare, len(receivedShares))
 	for _, receivedShare := range receivedShares {
+		if receivedShare == nil {
+			continue
+		}
+
 		rIDStr := storagespace.FormatResourceID(*receivedShare.GetShare().GetResourceId())
 		receivedSharesByResourceID[rIDStr] = append(receivedSharesByResourceID[rIDStr], receivedShare)
 	}
@@ -452,5 +457,14 @@ func roleConditionForResourceType(ri *storageprovider.ResourceInfo) (string, err
 		return unifiedrole.UnifiedRoleConditionFile, nil
 	default:
 		return "", errorcode.New(errorcode.InvalidRequest, "unsupported resource type")
+	}
+}
+
+// ExtractShareIdFromResourceId is a bit of a hack.
+// We should not rely on a specific format of the item id.
+// But currently there is no other way to get the ShareID.
+func ExtractShareIdFromResourceId(rid storageprovider.ResourceId) *collaboration.ShareId {
+	return &collaboration.ShareId{
+		OpaqueId: rid.GetOpaqueId(),
 	}
 }
