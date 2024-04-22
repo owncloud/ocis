@@ -185,6 +185,15 @@ class FeatureContext extends BehatVariablesContext {
 	private bool $dbConversion = false;
 
 	public const SHARES_SPACE_ID = 'a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668';
+	private bool $sharingNg;
+
+	/**
+	 * @return bool
+	 */
+	public function getSharingNgValue(): bool {
+		return $this->sharingNg;
+	}
+
 	/**
 	 * @param bool $value
 	 *
@@ -1007,6 +1016,13 @@ class FeatureContext extends BehatVariablesContext {
 			$this->guzzleClientHeaders,
 			$guzzleClientHeaders
 		);
+	}
+
+	/**
+	 * @Given using sharingNg
+	 */
+	public function usingSharingng(): void {
+		$this->sharingNg = true;
 	}
 
 	/**
