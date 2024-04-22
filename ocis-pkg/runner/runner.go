@@ -2,7 +2,6 @@ package runner
 
 import (
 	"context"
-	"fmt"
 	"sync/atomic"
 	"time"
 )
@@ -188,7 +187,7 @@ func (r *Runner) doTask(ch chan<- *Result, closeChan bool) {
 	case d := <-r.interruptedCh:
 		result = &Result{
 			RunnerID:    r.ID,
-			RunnerError: fmt.Errorf("runner %s timed out after waiting for %s", r.ID, d.String()),
+			RunnerError: NewTimeoutError(r.ID, d),
 		}
 	case result = <-tmpCh:
 		// Just assign the received value, nothing else to do

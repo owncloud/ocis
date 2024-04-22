@@ -1,5 +1,10 @@
 package runner
 
+import (
+	"strings"
+	"time"
+)
+
 // Runable represent a task that can be executed by the Runner.
 // It expected to be a long running task with an indefinite execution time,
 // so it's suitable for servers or services.
@@ -32,4 +37,30 @@ type Stopper func()
 type Result struct {
 	RunnerID    string
 	RunnerError error
+}
+
+// TimeoutError is an error that should be used for timeouts.
+// It implements the `error` interface
+type TimeoutError struct {
+	RunnerID string
+	Duration time.Duration
+}
+
+// NewTimeoutError creates a new timeout error. Both runnerID and duration
+// will be used in the error message
+func NewTimeoutError(runnerID string, duration time.Duration) *TimeoutError {
+	return &TimeoutError{
+		RunnerID: runnerID,
+		Duration: duration,
+	}
+}
+
+// Error generates the message for this particular error.
+func (te *TimeoutError) Error() string {
+	var sb strings.Builder
+	sb.WriteString("Runner ")
+	sb.WriteString(te.RunnerID)
+	sb.WriteString(" timed out after waiting for ")
+	sb.WriteString(te.Duration.String())
+	return sb.String()
 }

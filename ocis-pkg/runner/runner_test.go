@@ -181,7 +181,11 @@ var _ = Describe("Runner", func() {
 			// context is done), so test should finish in 4 seconds
 			Eventually(ctx, ch2).Should(Receive(&expectedResult))
 			Expect(expectedResult.RunnerID).To(Equal("run003"))
-			Expect(expectedResult.RunnerError.Error()).To(ContainSubstring("timed out"))
+
+			var timeoutError *runner.TimeoutError
+			Expect(errors.As(expectedResult.RunnerError, &timeoutError)).To(BeTrue())
+			Expect(timeoutError.RunnerID).To(Equal("run003"))
+			Expect(timeoutError.Duration).To(Equal(3 * time.Second))
 		}, SpecTimeout(5*time.Second))
 
 		It("Run mutiple times panics", func(ctx SpecContext) {
