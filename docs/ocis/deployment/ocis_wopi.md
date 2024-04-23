@@ -173,9 +173,10 @@ In case you want to run ownCloud Web from a development branch together with thi
    - /your/local/path/to/web/dist/:/web/dist:ro
    ```
    Make sure to point to the `dist` folder inside your local copy of the web repository.
-4. Set the oCIS environment variable `WEB_ASSET_PATH` in the `environment` section of the `ocis` service, so that it uses your mounted dist folder for the web assets, instead of the assets that are embedded into oCIS.
+4. Set the oCIS environment variables `WEB_ASSET_CORE_PATH` and `WEB_ASSET_APPS_PATH` in the `environment` section of the `ocis` service, so that it uses your mounted dist folder for the web assets, instead of the assets that are embedded into oCIS.
    ```yaml
-   WEB_ASSET_PATH: "/web/dist"
+   WEB_ASSET_CORE_PATH: "/web/dist"
+   WEB_ASSET_APPS_PATH: "/web/dist"
    ```
 5. Start the deployment example as described above in the `Local setup` section.
 
