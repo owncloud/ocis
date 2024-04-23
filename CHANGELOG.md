@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.2](#changelog-for-502-2024-04-17)
 * [Changelog for 5.0.1](#changelog-for-501-2024-04-10)
 * [Changelog for 5.0.0](#changelog-for-500-2024-03-18)
@@ -34,6 +35,29 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.2...master
+
+## Summary
+
+* Bugfix - Update the admin user role assignment to enforce the config: [#8918](https://github.com/owncloud/ocis/pull/8918)
+
+## Details
+
+* Bugfix - Update the admin user role assignment to enforce the config: [#8918](https://github.com/owncloud/ocis/pull/8918)
+
+   The admin user role assigment was not updated after the first assignment. We now
+   read the assigned role during init and update the admin user ID accordingly if
+   the role is not assigned. This is especially needed when the OCIS_ADMIN_USER_ID
+   is set after the autoprovisioning of the admin user when it originates from an
+   external Identity Provider.
+
+   https://github.com/owncloud/ocis/pull/8918
+   https://github.com/owncloud/ocis/pull/8897
 
 # Changelog for [5.0.2] (2024-04-17)
 
