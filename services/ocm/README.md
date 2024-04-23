@@ -19,7 +19,7 @@ The `ocm` services implements an invitation workflow which needs to be followed 
 
 The list of trusted instances is managed by the `ocmproviderauthorizer` service. The only supported backend currently is `json` which stores the list in a json file on disk.
 
-Example `providers.json` file:
+Example `ocmproviders.json` file:
 ```
 [
     {
@@ -43,7 +43,7 @@ Example `providers.json` file:
                 "host": "example.com"
             }
         ]
-    },
+    }
 ]
 ```
 
