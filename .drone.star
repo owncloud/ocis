@@ -1079,7 +1079,7 @@ def uiTests(ctx):
 
     # For ordinary PRs, always run the "minimal" UI test pipeline
     # That has its own expected-failures file, and we always want to know that it is correct,
-    if (ctx.build.event != "tag"):
+    if (ctx.build.event != "tag" and ctx.build.event != "cron" and "full-ci" not in ctx.build.title.lower()):
         pipelines.append(uiTestPipeline(ctx, filterTags, 1, 2, "ocis", "smoke"))
         pipelines.append(uiTestPipeline(ctx, filterTags, 2, 2, "ocis", "smoke"))
 
