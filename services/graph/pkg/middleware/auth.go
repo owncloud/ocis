@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/cs3org/reva/v2/pkg/auth/scope"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
@@ -75,13 +76,19 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 
 			ctx = revactx.ContextSetToken(ctx, t)
 			ctx = revactx.ContextSetUser(ctx, u)
-			ctx = gmmetadata.Set(ctx, opkgm.AccountID, u.Id.OpaqueId)
-			if u.Opaque != nil && u.Opaque.Map != nil {
-				if roles, ok := u.Opaque.Map["roles"]; ok {
-					ctx = gmmetadata.Set(ctx, opkgm.RoleIDs, string(roles.Value))
+			ctx = gmmetadata.Set(ctx, opkgm.AccountID, u.GetId().GetOpaqueId())
+			if m := u.GetOpaque().GetMap(); m != nil {
+				if roles, ok := m["roles"]; ok {
+					ctx = gmmetadata.Set(ctx, opkgm.RoleIDs, string(roles.GetValue()))
 				}
 			}
 			ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
+
+			initiatorID := r.Header.Get(ctxpkg.InitiatorHeader)
+			if initiatorID != "" {
+				ctx = ctxpkg.ContextSetInitiator(ctx, initiatorID)
+				ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorID)
+			}
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
