@@ -36,6 +36,9 @@ var (
 	// ErrNoShares is returned when no shares are found
 	ErrNoShares = errors.New("no shares found")
 
+	// ErrNoShare is returned when no share is found
+	ErrNoShare = errors.New("no shares found")
+
 	// ErrAbsoluteNamePath is returned when the name is an absolute path
 	ErrAbsoluteNamePath = errors.New("name cannot be an absolute path")
 
@@ -82,8 +85,11 @@ type (
 		// UpdateShares updates multiple shares
 		UpdateShares(ctx context.Context, shares []*collaboration.ReceivedShare, updater UpdateShareClosure) ([]*collaboration.ReceivedShare, error)
 
-		// GetShareAndSiblings returns the share and all its siblings
-		GetShareAndSiblings(ctx context.Context, shareID *collaboration.ShareId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error)
+		// GetShare returns the share
+		GetShare(ctx context.Context, shareID *collaboration.ShareId) (*collaboration.ReceivedShare, error)
+
+		// GetShares returns all shares for a given resourceID
+		GetShares(ctx context.Context, resourceID *storageprovider.ResourceId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error)
 	}
 )
 
@@ -101,8 +107,7 @@ func NewDrivesDriveItemService(logger log.Logger, gatewaySelector pool.Selectabl
 	}, nil
 }
 
-// GetShareAndSiblings returns the share and all its siblings
-func (s DrivesDriveItemService) GetShareAndSiblings(ctx context.Context, shareID *collaboration.ShareId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
+func (s DrivesDriveItemService) GetShare(ctx context.Context, shareID *collaboration.ShareId) (*collaboration.ReceivedShare, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return nil, err
@@ -118,15 +123,12 @@ func (s DrivesDriveItemService) GetShareAndSiblings(ctx context.Context, shareID
 			},
 		},
 	)
-	if err := errorcode.FromCS3Status(getReceivedShareResponse.GetStatus(), err); err != nil {
-		return nil, err
-	}
 
-	return s.GetSharesByResourceID(ctx, getReceivedShareResponse.GetShare().GetShare().GetResourceId(), filters)
+	return getReceivedShareResponse.GetShare(), errorcode.FromCS3Status(getReceivedShareResponse.GetStatus(), err)
 }
 
-// GetSharesByResourceID returns all shares for a given resourceID
-func (s DrivesDriveItemService) GetSharesByResourceID(ctx context.Context, resourceID *storageprovider.ResourceId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
+// GetShares returns all shares for a given resourceID
+func (s DrivesDriveItemService) GetShares(ctx context.Context, resourceID *storageprovider.ResourceId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
 	// Find all accepted shares for this resource
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -211,7 +213,12 @@ func (s DrivesDriveItemService) UpdateShare(ctx context.Context, share *collabor
 
 // UnmountShare unmounts a share
 func (s DrivesDriveItemService) UnmountShare(ctx context.Context, shareID *collaboration.ShareId) error {
-	availableShares, err := s.GetShareAndSiblings(ctx, shareID, []*collaboration.Filter{
+	share, err := s.GetShare(ctx, shareID)
+	if err != nil {
+		return err
+	}
+
+	availableShares, err := s.GetShares(ctx, share.GetShare().GetResourceId(), []*collaboration.Filter{
 		{
 			Type: collaboration.Filter_TYPE_STATE,
 			Term: &collaboration.Filter_State{
@@ -243,7 +250,7 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID *stor
 		name = filepath.Clean(name)
 	}
 
-	availableShares, err := s.GetSharesByResourceID(ctx, resourceID, []*collaboration.Filter{
+	availableShares, err := s.GetShares(ctx, resourceID, []*collaboration.Filter{
 		{
 			Type: collaboration.Filter_TYPE_STATE,
 			Term: &collaboration.Filter_State{
@@ -357,7 +364,14 @@ func (api DrivesDriveItemApi) UpdateDriveItem(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	availableShares, err := api.drivesDriveItemService.GetShareAndSiblings(r.Context(), shareID, nil)
+	share, err := api.drivesDriveItemService.GetShare(r.Context(), shareID)
+	if err != nil {
+		api.logger.Debug().Err(err).Msg(ErrNoShare.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrNoShare.Error())
+		return
+	}
+
+	availableShares, err := api.drivesDriveItemService.GetShares(r.Context(), share.GetShare().GetResourceId(), nil)
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrGetShareAndSiblings.Error())
 		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrGetShareAndSiblings.Error())

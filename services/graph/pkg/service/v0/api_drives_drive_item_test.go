@@ -41,14 +41,28 @@ var _ = Describe("DrivesDriveItemService", func() {
 		gatewayClient = cs3mocks.NewGatewayAPIClient(GinkgoT())
 
 		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
-		gatewaySelector.On("Next").Return(gatewayClient, nil)
+		gatewaySelector.EXPECT().Next().Return(gatewayClient, nil)
 
 		service, err := svc.NewDrivesDriveItemService(logger, gatewaySelector)
 		Expect(err).ToNot(HaveOccurred())
 		drivesDriveItemService = service
 	})
 
-	var _ = Describe("GetSharesByResourceID", func() {
+	failOnFailingGatewayClientRotation := func(f func() error) {
+		It("fails if obtaining the next gateway client fails", func() {
+			someErr := errors.New("some error")
+			gatewaySelector.EXPECT().Next().Unset()
+			gatewaySelector.EXPECT().Next().Return(gatewayClient, someErr).Times(1)
+			Expect(f()).To(MatchError(someErr))
+		})
+	}
+
+	var _ = Describe("GetShares", func() {
+		failOnFailingGatewayClientRotation(func() error {
+			_, err := drivesDriveItemService.GetShares(context.Background(), nil, nil)
+			return err
+		})
+
 		It("uses the correct filters to list received shares", func() {
 			resourceID := &storageprovider.ResourceId{
 				StorageId: "1",
@@ -68,7 +82,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				}).
 				Once()
 
-			_, _ = drivesDriveItemService.GetSharesByResourceID(context.Background(), resourceID, []*collaborationv1beta1.Filter{
+			_, _ = drivesDriveItemService.GetShares(context.Background(), resourceID, []*collaborationv1beta1.Filter{
 				{
 					Type: collaborationv1beta1.Filter_TYPE_STATE,
 					Term: &collaborationv1beta1.Filter_State{
@@ -86,7 +100,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				Return(nil, someErr).
 				Once()
 
-			_, err := drivesDriveItemService.GetSharesByResourceID(context.Background(), &storageprovider.ResourceId{}, []*collaborationv1beta1.Filter{})
+			_, err := drivesDriveItemService.GetShares(context.Background(), &storageprovider.ResourceId{}, []*collaborationv1beta1.Filter{})
 			Expect(err).To(MatchError(someErr))
 		})
 
@@ -97,7 +111,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				Return(nil, nil).
 				Once()
 
-			_, err := drivesDriveItemService.GetSharesByResourceID(context.Background(), &storageprovider.ResourceId{}, []*collaborationv1beta1.Filter{})
+			_, err := drivesDriveItemService.GetShares(context.Background(), &storageprovider.ResourceId{}, []*collaborationv1beta1.Filter{})
 			Expect(err).To(MatchError(svc.ErrNoShares))
 		})
 
@@ -116,13 +130,18 @@ var _ = Describe("DrivesDriveItemService", func() {
 				}, nil).
 				Once()
 
-			shares, err := drivesDriveItemService.GetSharesByResourceID(context.Background(), &storageprovider.ResourceId{}, []*collaborationv1beta1.Filter{})
+			shares, err := drivesDriveItemService.GetShares(context.Background(), &storageprovider.ResourceId{}, []*collaborationv1beta1.Filter{})
 			Expect(err).To(BeNil())
 			Expect(shares).To(Equal(givenShares))
 		})
 	})
 
-	var _ = Describe("GetShareAndSiblings", func() {
+	var _ = Describe("GetShare", func() {
+		failOnFailingGatewayClientRotation(func() error {
+			_, err := drivesDriveItemService.GetShare(context.Background(), nil)
+			return err
+		})
+
 		It("fails if share lookup reports an error", func() {
 			someErr := errors.New("some error")
 			gatewayClient.
@@ -131,7 +150,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				Return(nil, someErr).
 				Once()
 
-			_, err := drivesDriveItemService.GetShareAndSiblings(context.Background(), &collaborationv1beta1.ShareId{}, nil)
+			_, err := drivesDriveItemService.GetShare(context.Background(), &collaborationv1beta1.ShareId{})
 			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
 		})
 
@@ -145,35 +164,38 @@ var _ = Describe("DrivesDriveItemService", func() {
 				}, nil).
 				Once()
 
-			_, err := drivesDriveItemService.GetShareAndSiblings(context.Background(), &collaborationv1beta1.ShareId{}, nil)
+			_, err := drivesDriveItemService.GetShare(context.Background(), &collaborationv1beta1.ShareId{})
 			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, someErr.Error())))
 		})
 
-		It("successfully returns shares", func() {
+		It("successfully returns a share", func() {
 			gatewayClient.
 				EXPECT().
 				GetReceivedShare(context.Background(), mock.Anything, mock.Anything).
 				Return(&collaborationv1beta1.GetReceivedShareResponse{
 					Status: status.NewOK(context.Background()),
+					Share: &collaborationv1beta1.ReceivedShare{
+						Share: &collaborationv1beta1.Share{
+							Id: &collaborationv1beta1.ShareId{
+								OpaqueId: "123",
+							},
+						},
+					},
 				}, nil).
 				Once()
 
-			gatewayClient.
-				EXPECT().
-				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
-				Return(&collaborationv1beta1.ListReceivedSharesResponse{
-					Status: status.NewOK(context.Background()),
-					Shares: make([]*collaborationv1beta1.ReceivedShare, 3),
-				}, nil).
-				Once()
-
-			shares, err := drivesDriveItemService.GetShareAndSiblings(context.Background(), &collaborationv1beta1.ShareId{}, nil)
+			share, err := drivesDriveItemService.GetShare(context.Background(), &collaborationv1beta1.ShareId{})
 			Expect(err).To(BeNil())
-			Expect(shares).To(HaveLen(3))
+			Expect(share.GetShare().GetId().GetOpaqueId()).To(Equal("123"))
 		})
 	})
 
 	var _ = Describe("UpdateShare", func() {
+		failOnFailingGatewayClientRotation(func() error {
+			_, err := drivesDriveItemService.UpdateShare(context.Background(), nil, nil)
+			return err
+		})
+
 		It("fails without an updater", func() {
 			_, err := drivesDriveItemService.UpdateShare(context.Background(), &collaborationv1beta1.ReceivedShare{}, nil)
 			Expect(err).To(MatchError(svc.ErrNoUpdater))
@@ -544,7 +566,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 		failOninvalidDriveItemBody(drivesDriveItemApi.UpdateDriveItem)
 
-		It("fails if retrieving the share ans siblings fails", func() {
+		It("fails if retrieving the share fails", func() {
 			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
 			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
 
@@ -560,7 +582,40 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			drivesDriveItemProvider.
 				EXPECT().
-				GetShareAndSiblings(mock.Anything, mock.Anything, mock.Anything).
+				GetShare(mock.Anything, mock.Anything).
+				Return(nil, errors.New("some error")).
+				Once()
+
+			drivesDriveItemApi.UpdateDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrNoShare.Error()))
+		})
+
+		It("fails if retrieving the shares fail", func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+
+			w := httptest.NewRecorder()
+
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{})
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShare(mock.Anything, mock.Anything).
+				Return(nil, nil).
+				Once()
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShares(mock.Anything, mock.Anything, mock.Anything).
 				Return(nil, errors.New("some error")).
 				Once()
 
@@ -587,7 +642,13 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			drivesDriveItemProvider.
 				EXPECT().
-				GetShareAndSiblings(mock.Anything, mock.Anything, mock.Anything).
+				GetShare(mock.Anything, mock.Anything).
+				Return(nil, nil).
+				Once()
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShares(mock.Anything, mock.Anything, mock.Anything).
 				Return(nil, nil).
 				Once()
 
@@ -622,7 +683,13 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			drivesDriveItemProvider.
 				EXPECT().
-				GetShareAndSiblings(mock.Anything, mock.Anything, mock.Anything).
+				GetShare(mock.Anything, mock.Anything).
+				Return(nil, nil).
+				Once()
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShares(mock.Anything, mock.Anything, mock.Anything).
 				Return([]*collaborationv1beta1.ReceivedShare{}, nil).
 				Once()
 
@@ -663,7 +730,13 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			drivesDriveItemProvider.
 				EXPECT().
-				GetShareAndSiblings(mock.Anything, mock.Anything, mock.Anything).
+				GetShare(mock.Anything, mock.Anything).
+				Return(nil, nil).
+				Once()
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShares(mock.Anything, mock.Anything, mock.Anything).
 				Return([]*collaborationv1beta1.ReceivedShare{share}, nil).
 				Once()
 
