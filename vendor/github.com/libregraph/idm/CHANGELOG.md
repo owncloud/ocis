@@ -4,7 +4,54 @@
 
 
 
-## v0.4.0 (2022-11-30)
+## v0.5.0 (2024-04-17)
+
+- Bump github.com/go-ldap/ldap/v3 from 3.4.7 to 3.4.8
+- Bump github.com/go-ldap/ldap/v3 from 3.4.6 to 3.4.7
+- Bump google.golang.org/protobuf from 1.32.0 to 1.33.0
+- Bump golangci-lint action to v4
+- Remove deprecated linters from config
+- Bump required go version to 1.21 + go mod tidy
+- Bump github.com/prometheus/client_golang from 1.18.0 to 1.19.0
+- Bump go.etcd.io/bbolt from 1.3.8 to 1.3.9
+- Bump github.com/prometheus/client_golang from 1.17.0 to 1.18.0
+- Bump github.com/go-logr/logr from 1.3.0 to 1.4.1
+- Bump golang.org/x/crypto from 0.14.0 to 0.17.0
+- Fix the DN comparison in a ServerFilterScope
+- Bump golang.org/x/text from 0.13.0 to 0.14.0
+- Bump github.com/spf13/cobra from 1.7.0 to 1.8.0
+- Bump github.com/go-logr/logr from 1.2.4 to 1.3.0
+- Bump go.etcd.io/bbolt from 1.3.7 to 1.3.8
+- Bump github.com/alexedwards/argon2id
+- Bump github.com/prometheus/client_golang from 1.16.0 to 1.17.0
+- Bump github.com/prometheus/client_golang from 1.15.1 to 1.16.0
+- Bump github.com/go-ldap/ldap/v3 from 3.4.5 to 3.4.6
+- Bump github.com/go-asn1-ber/asn1-ber from 1.5.4 to 1.5.5
+- Bump golang.org/x/text from 0.12.0 to 0.13.0
+- Bump golang.org/x/text from 0.11.0 to 0.12.0
+- Bump golang.org/x/text from 0.10.0 to 0.11.0
+- Bump golang.org/x/text from 0.9.0 to 0.10.0
+- Bump github.com/go-ldap/ldap/v3 from 3.4.4 to 3.4.5
+- Bump github.com/sirupsen/logrus from 1.9.2 to 1.9.3
+- Bump github.com/sirupsen/logrus from 1.9.1 to 1.9.2
+- Bump github.com/sirupsen/logrus from 1.9.0 to 1.9.1
+- Bump github.com/prometheus/client_golang from 1.15.0 to 1.15.1
+- Bump github.com/prometheus/client_golang from 1.14.0 to 1.15.0
+- Bump golang.org/x/text from 0.8.0 to 0.9.0
+- Bump github.com/spf13/cobra from 1.6.1 to 1.7.0
+- Bump github.com/go-logr/logr from 1.2.3 to 1.2.4
+- Bump golang.org/x/text from 0.7.0 to 0.8.0
+- Fix ModifyDN operation in boltdb backend
+- Add support for ModifyDN
+- Fix error behaviour when receiving unsupported operation
+- Bump golang.org/x/text from 0.6.0 to 0.7.0
+- Bump required go version to 1.18 + go mod tidy
+- Bump go.etcd.io/bbolt from 1.3.6 to 1.3.7
+- Bump golang.org/x/text from 0.5.0 to 0.6.0
+- Bump golang.org/x/text from 0.4.0 to 0.5.0
+
+
+## v0.4.0 (2022-12-01)
 
 - Migrate to Go rndm module from GitHub
 - Bump github.com/prometheus/client_golang from 1.13.0 to 1.14.0

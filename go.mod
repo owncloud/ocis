@@ -24,7 +24,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.3
-	github.com/go-ldap/ldap/v3 v3.4.7
+	github.com/go-ldap/ldap/v3 v3.4.8
 	github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
 	github.com/go-micro/plugins/v4/client/grpc v1.2.1
 	github.com/go-micro/plugins/v4/logger/zerolog v1.2.0
@@ -56,7 +56,7 @@ require (
 	github.com/jinzhu/now v1.1.5
 	github.com/justinas/alice v1.2.0
 	github.com/leonelquinteros/gotext v1.6.0
-	github.com/libregraph/idm v0.4.1-0.20240410123343-a51b459380d0
+	github.com/libregraph/idm v0.5.0
 	github.com/libregraph/lico v0.61.3-0.20240322112242-72cf9221d3a7
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mna/pigeon v1.2.1
