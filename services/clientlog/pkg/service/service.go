@@ -248,7 +248,7 @@ func addShareeData(ctx context.Context, gwc gateway.GatewayAPIClient, fe FileEve
 		return users, fe, err
 	}
 
-	fe.AffectedUserIDs = users
+	fe.AffectedUserIDs = us
 
 	// TODO: this list can get long. Should we add a limit? If yes, how big?
 	for _, u := range us {
