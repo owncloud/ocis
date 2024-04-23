@@ -1079,3 +1079,18 @@ Feature: List a sharing permissions
       | drive    |
       | Personal |
       | Shares   |
+
+
+  Scenario: user sends share invitation with all allowed roles for a file in project space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile.txt"
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" gets permissions list for file "textfile.txt" of the space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Alice" should be able to send share invitation with all allowed permission roles
+      | resource     | textfile.txt |
+      | space        | new-space    |
+      | sharee       | Brian        |
+      | shareType    | user         |
