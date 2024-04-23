@@ -15,8 +15,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -81,7 +81,6 @@ The following sections list the changes for unreleased.
 * Enhancement - Add the spaceID to sse: [#8614](https://github.com/owncloud/ocis/pull/8614)
 * Enhancement - The graph endpoints for listing permission works for spaces now: [#8642](https://github.com/owncloud/ocis/pull/8642)
 * Enhancement - Bump keycloak: [#8687](https://github.com/owncloud/ocis/pull/8687)
-* Enhancement - Initiator-IDs: [#8701](https://github.com/owncloud/ocis/pull/8701)
 * Enhancement - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
 * Enhancement - Make server side space templates production ready: [#8723](https://github.com/owncloud/ocis/pull/8723)
 * Enhancement - Sharing NG role names and descriptions: [#8743](https://github.com/owncloud/ocis/pull/8743)
@@ -94,6 +93,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add Link SSEs: [#8908](https://github.com/owncloud/ocis/pull/8908)
 * Enhancement - ShareeIDs in SSEs: [#8915](https://github.com/owncloud/ocis/pull/8915)
 * Enhancement - Bump Reva: [#8917](https://github.com/owncloud/ocis/pull/8917)
+* Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
 
 ## Details
 
@@ -377,15 +377,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8569
    https://github.com/owncloud/ocis/pull/8687
 
-* Enhancement - Initiator-IDs: [#8701](https://github.com/owncloud/ocis/pull/8701)
-
-   Allows sending a header `Initiator-ID` on http requests. This id will be added
-   to sse events so clients can figure out if their particular instance was
-   triggering the event. Additionally this adds the etag of the file/folder to all
-   sse events.
-
-   https://github.com/owncloud/ocis/pull/8701
-
 * Enhancement - Make IDP cookies same site strict: [#8716](https://github.com/owncloud/ocis/pull/8716)
 
    To enhance the security of our application and prevent Cross-Site Request
@@ -555,6 +546,16 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8795
    https://github.com/owncloud/ocis/pull/8701
    https://github.com/owncloud/ocis/pull/8606
+
+* Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
+
+   Allows sending a header `Initiator-ID` on http requests. This id will be added
+   to sse events so clients can figure out if their particular instance was
+   triggering the event. Additionally this adds the etag of the file/folder to all
+   sse events.
+
+   https://github.com/owncloud/ocis/pull/8936
+   https://github.com/owncloud/ocis/pull/8701
 
 # Changelog for [5.0.2] (2024-04-17)
 
@@ -7891,7 +7892,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -8065,29 +8066,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -8260,6 +8243,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
