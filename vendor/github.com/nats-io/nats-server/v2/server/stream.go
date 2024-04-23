@@ -854,6 +854,11 @@ func (mset *stream) setLeader(isLeader bool) error {
 		mset.leader = _EMPTY_
 	}
 	mset.mu.Unlock()
+
+	// If we are interest based make sure to check consumers.
+	// This is to make sure we process any outstanding acks.
+	mset.checkInterestState()
+
 	return nil
 }
 
@@ -1282,7 +1287,7 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 				return StreamConfig{}, NewJSMirrorInvalidSubjectFilterError()
 			}
 			for inner, innertr := range cfg.Mirror.SubjectTransforms {
-				if inner != outer && subjectIsSubsetMatch(tr.Source, innertr.Source) {
+				if inner != outer && SubjectsCollide(tr.Source, innertr.Source) {
 					return StreamConfig{}, NewJSMirrorOverlappingSubjectFiltersError()
 				}
 			}
@@ -2217,7 +2222,7 @@ func (mset *stream) processInboundMirrorMsg(m *inMsg) bool {
 		var needsRetry bool
 		// Flow controls have reply subjects.
 		if m.rply != _EMPTY_ {
-			mset.handleFlowControl(mset.mirror, m)
+			mset.handleFlowControl(m)
 		} else {
 			// For idle heartbeats make sure we did not miss anything and check if we are considered stalled.
 			if ldseq := parseInt64(getHeader(JSLastConsumerSeq, m.hdr)); ldseq > 0 && uint64(ldseq) != mset.mirror.dseq {
@@ -3143,7 +3148,7 @@ func (mset *stream) sendFlowControlReply(reply string) {
 
 // handleFlowControl will properly handle flow control messages for both R==1 and R>1.
 // Lock should be held.
-func (mset *stream) handleFlowControl(si *sourceInfo, m *inMsg) {
+func (mset *stream) handleFlowControl(m *inMsg) {
 	// If we are clustered we will send the flow control message through the replication stack.
 	if mset.isClustered() {
 		mset.node.Propose(encodeStreamMsg(_EMPTY_, m.rply, m.hdr, nil, 0, 0))
@@ -3179,7 +3184,7 @@ func (mset *stream) processInboundSourceMsg(si *sourceInfo, m *inMsg) bool {
 		var needsRetry bool
 		// Flow controls have reply subjects.
 		if m.rply != _EMPTY_ {
-			mset.handleFlowControl(si, m)
+			mset.handleFlowControl(m)
 		} else {
 			// For idle heartbeats make sure we did not miss anything.
 			if ldseq := parseInt64(getHeader(JSLastConsumerSeq, m.hdr)); ldseq > 0 && uint64(ldseq) != si.dseq {
@@ -3231,6 +3236,9 @@ func (mset *stream) processInboundSourceMsg(si *sourceInfo, m *inMsg) bool {
 	// If we are daisy chained here make sure to remove the original one.
 	if len(hdr) > 0 {
 		hdr = removeHeaderIfPresent(hdr, JSStreamSource)
+
+		// Remove any Nats-Expected- headers as we don't want to validate them.
+		hdr = removeHeaderIfPrefixPresent(hdr, "Nats-Expected-")
 	}
 	// Hold onto the origin reply which has all the metadata.
 	hdr = genHeader(hdr, JSStreamSource, si.genSourceHeader(m.rply))
@@ -3999,7 +4007,7 @@ func (mset *stream) queueInboundMsg(subj, rply string, hdr, msg []byte) {
 }
 
 var dgPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return &directGetReq{}
 	},
 }
@@ -4151,6 +4159,7 @@ var (
 	errMsgIdDuplicate    = errors.New("msgid is duplicate")
 	errStreamClosed      = errors.New("stream closed")
 	errInvalidMsgHandler = errors.New("undefined message handler")
+	errStreamMismatch    = errors.New("expected stream does not match")
 )
 
 // processJetStreamMsg is where we try to actually process the stream msg.
@@ -4269,23 +4278,28 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 					b, _ := json.Marshal(resp)
 					outq.sendMsg(reply, b)
 				}
-				return errors.New("expected stream does not match")
+				return errStreamMismatch
 			}
 		}
 
-		// Dedupe detection.
+		// Dedupe detection. This is done at the cluster level for dedupe detectiom above the
+		// lower layers. But we still need to pull out the msgId.
 		if msgId = getMsgId(hdr); msgId != _EMPTY_ {
-			if dde := mset.checkMsgId(msgId); dde != nil {
-				mset.mu.Unlock()
-				bumpCLFS()
-				if canRespond {
-					response := append(pubAck, strconv.FormatUint(dde.seq, 10)...)
-					response = append(response, ",\"duplicate\": true}"...)
-					outq.sendMsg(reply, response)
+			// Do real check only if not clustered or traceOnly flag is set.
+			if !isClustered {
+				if dde := mset.checkMsgId(msgId); dde != nil {
+					mset.mu.Unlock()
+					bumpCLFS()
+					if canRespond {
+						response := append(pubAck, strconv.FormatUint(dde.seq, 10)...)
+						response = append(response, ",\"duplicate\": true}"...)
+						outq.sendMsg(reply, response)
+					}
+					return errMsgIdDuplicate
 				}
-				return errMsgIdDuplicate
 			}
 		}
+
 		// Expected last sequence per subject.
 		// If we are clustered we have prechecked seq > 0.
 		if seq, exists := getExpectedLastSeqPerSubject(hdr); exists {
@@ -4547,8 +4561,18 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 	}
 
 	// If we have a msgId make sure to save.
+	// This will replace our estimate from the cluster layer if we are clustered.
 	if msgId != _EMPTY_ {
-		mset.storeMsgIdLocked(&ddentry{msgId, seq, ts})
+		if isClustered && isLeader && mset.ddmap != nil {
+			if dde := mset.ddmap[msgId]; dde != nil {
+				dde.seq, dde.ts = seq, ts
+			} else {
+				mset.storeMsgIdLocked(&ddentry{msgId, seq, ts})
+			}
+		} else {
+			// R1 or not leader..
+			mset.storeMsgIdLocked(&ddentry{msgId, seq, ts})
+		}
 	}
 
 	// If here we succeeded in storing the message.
@@ -4981,9 +5005,7 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 	accName := jsa.account.Name
 	jsa.mu.Unlock()
 
-	// Mark as closed, kick monitor and collect consumers first.
-	mset.closed.Store(true)
-
+	// Kick monitor and collect consumers first.
 	mset.mu.Lock()
 	// Signal to the monitor loop.
 	// Can't use qch here.
@@ -5044,6 +5066,9 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 	if deleteFlag && advisory {
 		mset.sendDeleteAdvisoryLocked()
 	}
+
+	// Mark closed.
+	mset.closed.Store(true)
 
 	// Quit channel, do this after sending the delete advisory
 	if mset.qch != nil {
@@ -5176,25 +5201,95 @@ func (mset *stream) getPublicConsumers() []*consumer {
 }
 
 // Will check for interest retention and make sure messages
-// that have been acked are processed.
+// that have been acked are processed and removed.
+// This will check the ack floors of all consumers, and adjust our first sequence accordingly.
 func (mset *stream) checkInterestState() {
-	if mset == nil {
+	if mset == nil || !mset.isInterestRetention() {
+		// If we are limits based nothing to do.
 		return
 	}
-	mset.mu.RLock()
-	// If we are limits based nothing to do.
-	if mset.cfg.Retention == LimitsPolicy {
-		mset.mu.RUnlock()
-		return
-	}
-	consumers := make([]*consumer, 0, len(mset.consumers))
-	for _, o := range mset.consumers {
-		consumers = append(consumers, o)
-	}
-	mset.mu.RUnlock()
+
+	var zeroAcks []*consumer
+	var lowAckFloor uint64 = math.MaxUint64
+	consumers := mset.getConsumers()
+
 	for _, o := range consumers {
 		o.checkStateForInterestStream()
+
+		o.mu.Lock()
+		if o.isLeader() {
+			// We need to account for consumers with ack floor of zero.
+			// We will collect them and see if we need to check pending below.
+			if o.asflr == 0 {
+				zeroAcks = append(zeroAcks, o)
+			} else if o.asflr < lowAckFloor {
+				lowAckFloor = o.asflr
+			}
+		} else {
+			// We are a follower so only have the store state, so read that in.
+			state, err := o.store.State()
+			if err != nil {
+				// On error we will not have enough information to process correctly so bail.
+				o.mu.Unlock()
+				return
+			}
+			// We need to account for consumers with ack floor of zero.
+			if state.AckFloor.Stream == 0 {
+				zeroAcks = append(zeroAcks, o)
+			} else if state.AckFloor.Stream < lowAckFloor {
+				lowAckFloor = state.AckFloor.Stream
+			}
+			// We are a follower here but if we detect a drift from when we were previous leader correct here.
+			if o.asflr > state.AckFloor.Stream || o.sseq > state.Delivered.Stream+1 {
+				o.applyState(state)
+			}
+		}
+		o.mu.Unlock()
 	}
+
+	// If nothing was set we can bail.
+	if lowAckFloor == math.MaxUint64 {
+		return
+	}
+
+	// Hold stream write lock in case we need to purge.
+	mset.mu.Lock()
+	defer mset.mu.Unlock()
+
+	// Capture our current state.
+	var state StreamState
+	mset.store.FastState(&state)
+
+	if lowAckFloor < math.MaxUint64 && lowAckFloor > state.FirstSeq {
+		// Check if we had any zeroAcks, we will need to check them.
+		for _, o := range zeroAcks {
+			var np uint64
+			o.mu.RLock()
+			if o.isLeader() {
+				np = uint64(o.numPending())
+			} else {
+				np, _ = o.calculateNumPending()
+			}
+			o.mu.RUnlock()
+			// This means we have pending and can not remove anything at this time.
+			if np > 0 {
+				return
+			}
+		}
+		if lowAckFloor <= state.LastSeq {
+			// Purge the stream to lowest ack floor + 1
+			mset.store.PurgeEx(_EMPTY_, lowAckFloor+1, 0)
+		} else {
+			// Here we have a low ack floor higher then our last seq.
+			// So we will just do normal purge.
+			mset.store.Purge()
+		}
+	}
+	// Make sure to reset our local lseq.
+	mset.store.FastState(&state)
+	mset.lseq = state.LastSeq
+	// Also make sure we clear any pending acks.
+	mset.clearAllPreAcksBelowFloor(state.FirstSeq)
 }
 
 func (mset *stream) isInterestRetention() bool {
@@ -5285,6 +5380,7 @@ func (mset *stream) swapSigSubs(o *consumer, newFilters []string) {
 
 	if o.closed || o.mset == nil {
 		o.mu.Unlock()
+		mset.clsMu.Unlock()
 		return
 	}
 
@@ -5384,8 +5480,6 @@ func (mset *stream) Store() StreamStore {
 // Lock should be held.
 func (mset *stream) partitionUnique(name string, partitions []string) bool {
 	for _, partition := range partitions {
-		psa := [32]string{}
-		pts := tokenizeSubjectIntoSlice(psa[:0], partition)
 		for n, o := range mset.consumers {
 			// Skip the consumer being checked.
 			if n == name {
@@ -5395,8 +5489,7 @@ func (mset *stream) partitionUnique(name string, partitions []string) bool {
 				return false
 			}
 			for _, filter := range o.subjf {
-				if isSubsetMatchTokenized(pts, filter.tokenizedSubject) ||
-					isSubsetMatchTokenized(filter.tokenizedSubject, pts) {
+				if SubjectsCollide(partition, filter.subject) {
 					return false
 				}
 			}
@@ -5559,19 +5652,22 @@ func (mset *stream) ackMsg(o *consumer, seq uint64) {
 		return
 	}
 
+	store := mset.store
 	var state StreamState
-	mset.store.FastState(&state)
-
-	// Make sure this sequence is not below our first sequence.
-	if seq < state.FirstSeq {
-		mset.clearPreAck(o, seq)
-		mset.mu.Unlock()
-		return
-	}
+	store.FastState(&state)
 
 	// If this has arrived before we have processed the message itself.
 	if seq > state.LastSeq {
 		mset.registerPreAck(o, seq)
+		mset.mu.Unlock()
+		return
+	}
+
+	// Always clear pre-ack if here.
+	mset.clearPreAck(o, seq)
+
+	// Make sure this sequence is not below our first sequence.
+	if seq < state.FirstSeq {
 		mset.mu.Unlock()
 		return
 	}
@@ -5593,7 +5689,7 @@ func (mset *stream) ackMsg(o *consumer, seq uint64) {
 	}
 
 	// If we are here we should attempt to remove.
-	if _, err := mset.store.RemoveMsg(seq); err == ErrStoreEOF {
+	if _, err := store.RemoveMsg(seq); err == ErrStoreEOF {
 		// This should not happen, but being pedantic.
 		mset.registerPreAckLock(o, seq)
 	}
