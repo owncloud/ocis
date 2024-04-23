@@ -91,6 +91,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Sharing SSEs: [#8854](https://github.com/owncloud/ocis/pull/8854)
 * Enhancement - Update web to v9.0.0-alpha.5: [#8868](https://github.com/owncloud/ocis/pull/8868)
 * Enhancement - Add Link SSEs: [#8908](https://github.com/owncloud/ocis/pull/8908)
+* Enhancement - ShareeIDs in SSEs: [#8915](https://github.com/owncloud/ocis/pull/8915)
 * Enhancement - Bump Reva: [#8917](https://github.com/owncloud/ocis/pull/8917)
 
 ## Details
@@ -531,6 +532,13 @@ The following sections list the changes for unreleased.
    Add sses for link created/updated/removed.
 
    https://github.com/owncloud/ocis/pull/8908
+
+* Enhancement - ShareeIDs in SSEs: [#8915](https://github.com/owncloud/ocis/pull/8915)
+
+   We will now send a list of userIDs (one or in case of a group share multiple) on
+   share related SSEs
+
+   https://github.com/owncloud/ocis/pull/8915
 
 * Enhancement - Bump Reva: [#8917](https://github.com/owncloud/ocis/pull/8917)
 
