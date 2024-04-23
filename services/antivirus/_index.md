@@ -1,6 +1,6 @@
 ---
 title: Antivirus
-date: 2024-04-23T06:31:26.58282275Z
+date: 2024-04-23T06:38:42.540033164Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/antivirus
