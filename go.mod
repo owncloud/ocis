@@ -225,7 +225,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v1.8.9 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1 // indirect
+	github.com/google/pprof v0.0.0-20211008130755-947d60d73cc0 // indirect
 	github.com/google/renameio/v2 v2.0.0 // indirect
 	github.com/gookit/color v1.5.4 // indirect
 	github.com/gookit/goutil v0.6.15 // indirect
@@ -359,7 +359,7 @@ replace github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20
 
 replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf
 
-replace github.com/cs3org/reva/v2 => github.com/aduffeck/reva 034a8cf4a5c9a3186a8bba7366934e619be8390a
+replace github.com/cs3org/reva/v2 => github.com/aduffeck/reva/v2 v2.0.0-20240423063125-034a8cf4a5c9
 
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details

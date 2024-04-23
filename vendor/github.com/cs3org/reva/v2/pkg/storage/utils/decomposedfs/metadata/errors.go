@@ -19,6 +19,7 @@
 package metadata
 
 import (
+	"io/fs"
 	"os"
 	"syscall"
 
@@ -46,6 +47,16 @@ func IsAttrUnset(err error) bool {
 	if xerr, ok := errors.Cause(err).(*xattr.Error); ok {
 		if serr, ok2 := xerr.Err.(syscall.Errno); ok2 {
 			return serr == xattr.ENOATTR
+		}
+	}
+	return false
+}
+
+// The os error is buried inside the fs.PathError error
+func IsNotDir(err error) bool {
+	if perr, ok := errors.Cause(err).(*fs.PathError); ok {
+		if serr, ok2 := perr.Err.(syscall.Errno); ok2 {
+			return serr == syscall.ENOTDIR
 		}
 	}
 	return false
