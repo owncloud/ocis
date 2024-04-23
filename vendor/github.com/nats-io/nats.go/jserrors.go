@@ -51,7 +51,7 @@ var (
 	// ErrStreamSourceMultipleSubjectTransformsNotSupported is returned when the connected nats-server version does not support setting
 	// the stream sources. If this error is returned when executing AddStream(), the stream with invalid
 	// configuration was already created in the server.
-	ErrStreamSourceMultipleSubjectTransformsNotSupported JetStreamError = &jsError{message: "stream sourceing with multiple subject transforms not supported by nats-server"}
+	ErrStreamSourceMultipleSubjectTransformsNotSupported JetStreamError = &jsError{message: "stream sourcing with multiple subject transforms not supported by nats-server"}
 
 	// ErrConsumerNotFound is an error returned when consumer with given name does not exist.
 	ErrConsumerNotFound JetStreamError = &jsError{apiErr: &APIError{ErrorCode: JSErrCodeConsumerNotFound, Description: "consumer not found", Code: 404}}
@@ -140,6 +140,9 @@ var (
 
 	// ErrNoHeartbeat is returned when no heartbeat is received from server when sending requests with pull consumer.
 	ErrNoHeartbeat JetStreamError = &jsError{message: "no heartbeat received"}
+
+	// ErrSubscriptionClosed is returned when attempting to send pull request to a closed subscription
+	ErrSubscriptionClosed JetStreamError = &jsError{message: "subscription closed"}
 
 	// DEPRECATED: ErrInvalidDurableName is no longer returned and will be removed in future releases.
 	// Use ErrInvalidConsumerName instead.

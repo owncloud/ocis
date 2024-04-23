@@ -126,23 +126,27 @@ func (ms *memStore) storeRawMsg(subj string, hdr, msg []byte, seq uint64, ts int
 		if asl && ms.cfg.DiscardNewPer {
 			return ErrMaxMsgsPerSubject
 		}
-		if ms.cfg.MaxMsgs > 0 && ms.state.Msgs >= uint64(ms.cfg.MaxMsgs) {
-			// If we are tracking max messages per subject and are at the limit we will replace, so this is ok.
-			if !asl {
-				return ErrMaxMsgs
+		// If we are discard new and limits policy and clustered, we do the enforcement
+		// above and should not disqualify the message here since it could cause replicas to drift.
+		if ms.cfg.Retention == LimitsPolicy || ms.cfg.Replicas == 1 {
+			if ms.cfg.MaxMsgs > 0 && ms.state.Msgs >= uint64(ms.cfg.MaxMsgs) {
+				// If we are tracking max messages per subject and are at the limit we will replace, so this is ok.
+				if !asl {
+					return ErrMaxMsgs
+				}
 			}
-		}
-		if ms.cfg.MaxBytes > 0 && ms.state.Bytes+memStoreMsgSize(subj, hdr, msg) >= uint64(ms.cfg.MaxBytes) {
-			if !asl {
-				return ErrMaxBytes
-			}
-			// If we are here we are at a subject maximum, need to determine if dropping last message gives us enough room.
-			if ss.firstNeedsUpdate {
-				ms.recalculateFirstForSubj(subj, ss.First, ss)
-			}
-			sm, ok := ms.msgs[ss.First]
-			if !ok || memStoreMsgSize(sm.subj, sm.hdr, sm.msg) < memStoreMsgSize(subj, hdr, msg) {
-				return ErrMaxBytes
+			if ms.cfg.MaxBytes > 0 && ms.state.Bytes+memStoreMsgSize(subj, hdr, msg) >= uint64(ms.cfg.MaxBytes) {
+				if !asl {
+					return ErrMaxBytes
+				}
+				// If we are here we are at a subject maximum, need to determine if dropping last message gives us enough room.
+				if ss.firstNeedsUpdate {
+					ms.recalculateFirstForSubj(subj, ss.First, ss)
+				}
+				sm, ok := ms.msgs[ss.First]
+				if !ok || memStoreMsgSize(sm.subj, sm.hdr, sm.msg) < memStoreMsgSize(subj, hdr, msg) {
+					return ErrMaxBytes
+				}
 			}
 		}
 	}
@@ -794,15 +798,15 @@ func (ms *memStore) Compact(seq uint64) (uint64, error) {
 	ms.mu.Lock()
 	cb := ms.scb
 	if seq <= ms.state.LastSeq {
-		sm, ok := ms.msgs[seq]
-		if !ok {
-			ms.mu.Unlock()
-			return 0, ErrStoreMsgNotFound
-		}
 		fseq := ms.state.FirstSeq
-		ms.state.FirstSeq = seq
-		ms.state.FirstTime = time.Unix(0, sm.ts).UTC()
-
+		// Determine new first sequence.
+		for ; seq <= ms.state.LastSeq; seq++ {
+			if sm, ok := ms.msgs[seq]; ok {
+				ms.state.FirstSeq = seq
+				ms.state.FirstTime = time.Unix(0, sm.ts).UTC()
+				break
+			}
+		}
 		for seq := seq - 1; seq >= fseq; seq-- {
 			if sm := ms.msgs[seq]; sm != nil {
 				bytes += memStoreMsgSize(sm.subj, sm.hdr, sm.msg)
@@ -985,6 +989,40 @@ func (ms *memStore) LoadLastMsg(subject string, smp *StoreMsg) (*StoreMsg, error
 	return smp, nil
 }
 
+// LoadNextMsgMulti will find the next message matching any entry in the sublist.
+func (ms *memStore) LoadNextMsgMulti(sl *Sublist, start uint64, smp *StoreMsg) (sm *StoreMsg, skip uint64, err error) {
+	// TODO(dlc) - for now simple linear walk to get started.
+	ms.mu.RLock()
+	defer ms.mu.RUnlock()
+
+	if start < ms.state.FirstSeq {
+		start = ms.state.FirstSeq
+	}
+
+	// If past the end no results.
+	if start > ms.state.LastSeq || ms.state.Msgs == 0 {
+		return nil, ms.state.LastSeq, ErrStoreEOF
+	}
+
+	// Initial setup.
+	fseq, lseq := start, ms.state.LastSeq
+
+	for nseq := fseq; nseq <= lseq; nseq++ {
+		sm, ok := ms.msgs[nseq]
+		if !ok {
+			continue
+		}
+		if r := sl.Match(sm.subj); len(r.psubs) > 0 {
+			if smp == nil {
+				smp = new(StoreMsg)
+			}
+			sm.copy(smp)
+			return smp, nseq, nil
+		}
+	}
+	return nil, ms.state.LastSeq, ErrStoreEOF
+}
+
 // LoadNextMsg will find the next message matching the filter subject starting at the start sequence.
 // The filter subject can be a wildcard.
 func (ms *memStore) LoadNextMsg(filter string, wc bool, start uint64, smp *StoreMsg) (*StoreMsg, uint64, error) {
@@ -996,7 +1034,7 @@ func (ms *memStore) LoadNextMsg(filter string, wc bool, start uint64, smp *Store
 	}
 
 	// If past the end no results.
-	if start > ms.state.LastSeq {
+	if start > ms.state.LastSeq || ms.state.Msgs == 0 {
 		return nil, ms.state.LastSeq, ErrStoreEOF
 	}
 
@@ -1005,7 +1043,7 @@ func (ms *memStore) LoadNextMsg(filter string, wc bool, start uint64, smp *Store
 	}
 	isAll := filter == fwcs
 
-	// Skip scan of ms.fss is number of messages in the block are less than
+	// Skip scan of ms.fss if number of messages in the block are less than
 	// 1/2 the number of subjects in ms.fss. Or we have a wc and lots of fss entries.
 	const linearScanMaxFSS = 256
 	doLinearScan := isAll || 2*int(ms.state.LastSeq-start) < ms.fss.Size() || (wc && ms.fss.Size() > linearScanMaxFSS)
@@ -1638,7 +1676,7 @@ func (o *consumerMemStore) stateWithCopy(doCopy bool) (*ConsumerState, error) {
 	return state, nil
 }
 
-// EncodeState for this consumer store.
+// EncodedState for this consumer store.
 func (o *consumerMemStore) EncodedState() ([]byte, error) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
