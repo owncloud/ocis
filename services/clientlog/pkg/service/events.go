@@ -7,4 +7,7 @@ type FileEvent struct {
 	SpaceID      string `json:"spaceid"`
 	InitiatorID  string `json:"initiatorid"`
 	Etag         string `json:"etag"`
+
+	// Only in case of sharing (refactor this into separate struct when more fields are needed)
+	AffectedUserIDs []string `json:"affecteduserids"`
 }

@@ -99,90 +99,62 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		data   interface{}
 	)
 
-	p := func(typ string, ref *provider.Reference) {
+	fileEv := func(typ string, ref *provider.Reference) {
 		evType = typ
 		users, data, err = processFileEvent(ctx, ref, gwc, event.InitiatorID)
+	}
+
+	shareEv := func(typ string, ref *provider.Reference, uid *user.UserId, gid *group.GroupId) {
+		evType = typ
+		users, data, err = processShareEvent(ctx, ref, gwc, event.InitiatorID, uid, gid)
 	}
 
 	switch e := event.Event.(type) {
 	default:
 		err = errors.New("unhandled event")
 	case events.UploadReady:
-		p("postprocessing-finished", e.FileRef)
+		fileEv("postprocessing-finished", e.FileRef)
 	case events.ItemTrashed:
 		evType = "item-trashed"
-
-		var resp *provider.ListRecycleResponse
-		resp, err = gwc.ListRecycle(ctx, &provider.ListRecycleRequest{
-			Ref: e.Ref,
-		})
-		if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
-			cl.log.Error().Err(err).Interface("event", event).Str("status code", resp.GetStatus().GetMessage()).Msg("error listing recycle")
-			return
-		}
-
-		for _, item := range resp.GetRecycleItems() {
-			if item.GetKey() == e.ID.GetOpaqueId() {
-
-				data = FileEvent{
-					ItemID: storagespace.FormatResourceID(*e.ID),
-					// TODO: check with web if parentID is needed
-					// ParentItemID: storagespace.FormatResourceID(*item.GetRef().GetResourceId()),
-					SpaceID:     storagespace.FormatStorageID(e.ID.GetStorageId(), e.ID.GetSpaceId()),
-					InitiatorID: event.InitiatorID,
-				}
-
-				gwc, err = cl.gatewaySelector.Next()
-				if err != nil {
-					cl.log.Error().Err(err).Interface("event", event).Msg("error getting gateway client")
-					return
-				}
-				users, err = utils.GetSpaceMembers(ctx, e.ID.GetSpaceId(), gwc, utils.ViewerRole)
-				break
-			}
-		}
+		users, data, err = processItemTrashedEvent(ctx, e.Ref, gwc, event.InitiatorID, e.ID)
 	case events.ItemRestored:
-		p("item-restored", e.Ref)
+		fileEv("item-restored", e.Ref)
 	case events.ContainerCreated:
-		p("folder-created", e.Ref)
+		fileEv("folder-created", e.Ref)
 	case events.ItemMoved:
 		// we send a dedicated event in case the item was only renamed
 		if isRename(e.OldReference, e.Ref) {
-			p("item-renamed", e.Ref)
+			fileEv("item-renamed", e.Ref)
 		} else {
-			p("item-moved", e.Ref)
+			fileEv("item-moved", e.Ref)
 		}
 	case events.FileLocked:
-		p("file-locked", e.Ref)
+		fileEv("file-locked", e.Ref)
 	case events.FileUnlocked:
-		p("file-unlocked", e.Ref)
+		fileEv("file-unlocked", e.Ref)
 	case events.FileTouched:
-		p("file-touched", e.Ref)
+		fileEv("file-touched", e.Ref)
 	case events.SpaceShared:
 		r, _ := storagespace.ParseReference(e.ID.GetOpaqueId())
-		p("space-member-added", &r)
+		shareEv("space-member-added", &r, e.GranteeUserID, e.GranteeGroupID)
 	case events.SpaceShareUpdated:
 		r, _ := storagespace.ParseReference(e.ID.GetOpaqueId())
-		p("space-share-updated", &r)
+		shareEv("space-share-updated", &r, e.GranteeUserID, e.GranteeGroupID)
 	case events.SpaceUnshared:
 		r, _ := storagespace.ParseReference(e.ID.GetOpaqueId())
-		p("space-member-removed", &r)
-		users, err = addSharees(ctx, users, gwc, e.GranteeUserID, e.GranteeGroupID)
+		shareEv("space-member-removed", &r, e.GranteeUserID, e.GranteeGroupID)
 	case events.ShareCreated:
-		p("share-created", &provider.Reference{ResourceId: e.ItemID})
-		users, err = addSharees(ctx, users, gwc, e.GranteeUserID, e.GranteeGroupID)
+		shareEv("share-created", &provider.Reference{ResourceId: e.ItemID}, e.GranteeUserID, e.GranteeGroupID)
 	case events.ShareUpdated:
-		p("share-updated", &provider.Reference{ResourceId: e.ItemID})
-		users, err = addSharees(ctx, users, gwc, e.GranteeUserID, e.GranteeGroupID)
+		shareEv("share-updated", &provider.Reference{ResourceId: e.ItemID}, e.GranteeUserID, e.GranteeGroupID)
 	case events.ShareRemoved:
-		p("share-removed", &provider.Reference{ResourceId: e.ItemID})
-		users, err = addSharees(ctx, users, gwc, e.GranteeUserID, e.GranteeGroupID)
+		shareEv("share-removed", &provider.Reference{ResourceId: e.ItemID}, e.GranteeUserID, e.GranteeGroupID)
 	case events.LinkCreated:
-		p("link-created", &provider.Reference{ResourceId: e.ItemID})
+		fileEv("link-created", &provider.Reference{ResourceId: e.ItemID})
 	case events.LinkUpdated:
-		p("link-updated", &provider.Reference{ResourceId: e.ItemID})
+		fileEv("link-updated", &provider.Reference{ResourceId: e.ItemID})
 	case events.LinkRemoved:
-		p("link-removed", &provider.Reference{ResourceId: e.ItemID})
+		fileEv("link-removed", &provider.Reference{ResourceId: e.ItemID})
 	}
 
 	if err != nil {
@@ -210,6 +182,7 @@ func (cl *ClientlogService) sendSSE(userIDs []string, evType string, data interf
 	})
 }
 
+// process file related events
 func processFileEvent(ctx context.Context, ref *provider.Reference, gwc gateway.GatewayAPIClient, initiatorid string) ([]string, FileEvent, error) {
 	info, err := utils.GetResource(ctx, ref, gwc)
 	if err != nil {
@@ -228,13 +201,78 @@ func processFileEvent(ctx context.Context, ref *provider.Reference, gwc gateway.
 	return users, data, err
 }
 
-// adds userid to users slice or gets members of groupid and adds them to users slice
-func addSharees(ctx context.Context, users []string, gwc gateway.GatewayAPIClient, uid *user.UserId, gid *group.GroupId) ([]string, error) {
-	if uid != nil {
-		return append(users, uid.GetOpaqueId()), nil
+// process share related events
+func processShareEvent(ctx context.Context, ref *provider.Reference, gwc gateway.GatewayAPIClient, initiatorid string, shareeID *user.UserId, shareeGroupID *group.GroupId) ([]string, FileEvent, error) {
+	users, data, err := processFileEvent(ctx, ref, gwc, initiatorid)
+	if err != nil {
+		return users, data, err
 	}
-	us, err := utils.GetGroupMembers(ctx, gid.GetOpaqueId(), gwc)
-	return append(users, us...), err
+
+	return addShareeData(ctx, gwc, data, users, shareeID, shareeGroupID)
+}
+
+// custom logic for item trashed event
+func processItemTrashedEvent(ctx context.Context, ref *provider.Reference, gwc gateway.GatewayAPIClient, initiatorid string, itemID *provider.ResourceId) ([]string, FileEvent, error) {
+	resp, err := gwc.ListRecycle(ctx, &provider.ListRecycleRequest{
+		Ref: ref,
+	})
+	if err != nil {
+		return nil, FileEvent{}, err
+	}
+	if resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return nil, FileEvent{}, fmt.Errorf("error listing recycle: %s", resp.GetStatus().GetMessage())
+	}
+
+	for _, item := range resp.GetRecycleItems() {
+		if item.GetKey() == itemID.GetOpaqueId() {
+
+			data := FileEvent{
+				ItemID: storagespace.FormatResourceID(*itemID),
+				// TODO: check with web if parentID is needed
+				// ParentItemID: storagespace.FormatResourceID(*item.GetRef().GetResourceId()),
+				SpaceID:     storagespace.FormatStorageID(itemID.GetStorageId(), itemID.GetSpaceId()),
+				InitiatorID: initiatorid,
+			}
+
+			users, err := utils.GetSpaceMembers(ctx, itemID.GetSpaceId(), gwc, utils.ViewerRole)
+			return users, data, err
+		}
+	}
+	return nil, FileEvent{}, errors.New("item not found in recycle bin")
+}
+
+// adds share related data to the FileEvent
+func addShareeData(ctx context.Context, gwc gateway.GatewayAPIClient, fe FileEvent, users []string, shareeID *user.UserId, shareeGroupID *group.GroupId) ([]string, FileEvent, error) {
+	us, err := resolveID(ctx, gwc, shareeID, shareeGroupID)
+	if err != nil {
+		return users, fe, err
+	}
+
+	fe.AffectedUserIDs = users
+
+	// TODO: this list can get long. Should we add a limit? If yes, how big?
+	for _, u := range us {
+		users = appendUnique(users, u)
+	}
+	return users, fe, nil
+}
+
+// returns the user or the members of the affected group
+func resolveID(ctx context.Context, gwc gateway.GatewayAPIClient, uid *user.UserId, gid *group.GroupId) ([]string, error) {
+	if uid != nil {
+		return []string{uid.GetOpaqueId()}, nil
+	}
+	return utils.GetGroupMembers(ctx, gid.GetOpaqueId(), gwc)
+}
+
+// returns users or append(users, user)
+func appendUnique(users []string, user string) []string {
+	for _, u := range users {
+		if u == user {
+			return users
+		}
+	}
+	return append(users, user)
 }
 
 // returns true if this is just a rename
