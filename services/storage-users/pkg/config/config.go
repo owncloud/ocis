@@ -126,9 +126,11 @@ type OCISDriver struct {
 	// PersonalSpaceAliasTemplate  contains the template used to construct
 	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
 	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct personal space aliases." introductionVersion:"pre5.0"`
+	PersonalSpacePathTemplate  string `yaml:"personalspacepath_template" env:"STORAGE_USERS_OCIS_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots."`
 	// GeneralSpaceAliasTemplate contains the template used to construct
 	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
 	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template" env:"STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct general space aliases." introductionVersion:"pre5.0"`
+	GeneralSpacePathTemplate  string `yaml:"generalspacepath_template" env:"STORAGE_USERS_OCIS_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots."`
 	// ShareFolder defines the name of the folder jailing all shares
 	ShareFolder             string `yaml:"share_folder" env:"STORAGE_USERS_OCIS_SHARE_FOLDER" desc:"Name of the folder jailing all shares." introductionVersion:"pre5.0"`
 	MaxAcquireLockCycles    int    `yaml:"max_acquire_lock_cycles" env:"STORAGE_USERS_OCIS_MAX_ACQUIRE_LOCK_CYCLES" desc:"When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value will be used." introductionVersion:"pre5.0"`
@@ -161,9 +163,11 @@ type S3NGDriver struct {
 	// PersonalSpaceAliasTemplate  contains the template used to construct
 	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
 	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct personal space aliases." introductionVersion:"pre5.0"`
+	PersonalSpacePathTemplate  string `yaml:"personalspacepath_template" env:"STORAGE_USERS_S3NG_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots."`
 	// GeneralSpaceAliasTemplate contains the template used to construct
 	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
 	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template" env:"STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct general space aliases." introductionVersion:"pre5.0"`
+	GeneralSpacePathTemplate  string `yaml:"generalspacepath_template" env:"STORAGE_USERS_S3NG_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots."`
 	// ShareFolder defines the name of the folder jailing all shares
 	ShareFolder             string `yaml:"share_folder" env:"STORAGE_USERS_S3NG_SHARE_FOLDER" desc:"Name of the folder jailing all shares." introductionVersion:"pre5.0"`
 	MaxAcquireLockCycles    int    `yaml:"max_acquire_lock_cycles" env:"STORAGE_USERS_S3NG_MAX_ACQUIRE_LOCK_CYCLES" desc:"When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used." introductionVersion:"pre5.0"`
@@ -190,10 +194,10 @@ type OwnCloudSQLDriver struct {
 // PosixDriver is the storage driver configuration when using 'posix' storage driver
 type PosixDriver struct {
 	// Root is the absolute path to the location of the data
-	Root                string `yaml:"root" env:"STORAGE_USERS_POSIX_ROOT" desc:"The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud."`
-	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_POSIX_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory."`
-	ProjectLayout       string `yaml:"project_layout" env:"STORAGE_USERS_POSIX_PROJECT_LAYOUT" desc:"Template string for the project spaces storage layout."`
-	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'."`
+	Root                      string `yaml:"root" env:"STORAGE_USERS_POSIX_ROOT" desc:"The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud."`
+	PersonalSpacePathTemplate string `yaml:"personalspacepath_template" env:"STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots."`
+	GeneralSpacePathTemplate  string `yaml:"generalspacepath_template" env:"STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots."`
+	PermissionsEndpoint       string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'."`
 
 	WatchType               string `yaml:"watch_type" env:"STORAGE_USERS_POSIX_WATCH_TYPE" desc:"Type of the watcher to use for getting notified about changes to the filesystem. Currently available options are 'inotifywait' (default) and 'gpfsfileauditlogging'."`
 	WatchPath               string `yaml:"watch_path" env:"STORAGE_USERS_POSIX_WATCH_PATH" desc:"Path to the watch directory/file. Only applies to the 'gpfsfileauditlogling' watcher, in which case it is the path of the file audit log file."`
