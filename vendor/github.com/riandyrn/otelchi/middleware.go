@@ -10,8 +10,8 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 
-	otelcontrib "go.opentelemetry.io/contrib"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
+	"go.opentelemetry.io/otel/semconv/v1.17.0/httpconv"
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
@@ -32,32 +32,35 @@ func Middleware(serverName string, opts ...Option) func(next http.Handler) http.
 	}
 	tracer := cfg.TracerProvider.Tracer(
 		tracerName,
-		oteltrace.WithInstrumentationVersion(otelcontrib.SemVersion()),
+		oteltrace.WithInstrumentationVersion(Version()),
 	)
 	if cfg.Propagators == nil {
 		cfg.Propagators = otel.GetTextMapPropagator()
 	}
+
 	return func(handler http.Handler) http.Handler {
 		return traceware{
-			serverName:          serverName,
-			tracer:              tracer,
-			propagators:         cfg.Propagators,
-			handler:             handler,
-			chiRoutes:           cfg.ChiRoutes,
-			reqMethodInSpanName: cfg.RequestMethodInSpanName,
-			filter:              cfg.Filter,
+			serverName:             serverName,
+			tracer:                 tracer,
+			propagators:            cfg.Propagators,
+			handler:                handler,
+			chiRoutes:              cfg.ChiRoutes,
+			reqMethodInSpanName:    cfg.RequestMethodInSpanName,
+			filter:                 cfg.Filter,
+			traceResponseHeaderKey: cfg.TraceResponseHeaderKey,
 		}
 	}
 }
 
 type traceware struct {
-	serverName          string
-	tracer              oteltrace.Tracer
-	propagators         propagation.TextMapPropagator
-	handler             http.Handler
-	chiRoutes           chi.Routes
-	reqMethodInSpanName bool
-	filter              func(r *http.Request) bool
+	serverName             string
+	tracer                 oteltrace.Tracer
+	propagators            propagation.TextMapPropagator
+	handler                http.Handler
+	chiRoutes              chi.Routes
+	reqMethodInSpanName    bool
+	filter                 func(r *http.Request) bool
+	traceResponseHeaderKey string
 }
 
 type recordingResponseWriter struct {
@@ -75,13 +78,12 @@ var rrwPool = &sync.Pool{
 func getRRW(writer http.ResponseWriter) *recordingResponseWriter {
 	rrw := rrwPool.Get().(*recordingResponseWriter)
 	rrw.written = false
-	rrw.status = 0
+	rrw.status = http.StatusOK
 	rrw.writer = httpsnoop.Wrap(writer, httpsnoop.Hooks{
 		Write: func(next httpsnoop.WriteFunc) httpsnoop.WriteFunc {
 			return func(b []byte) (int, error) {
 				if !rrw.written {
 					rrw.written = true
-					rrw.status = http.StatusOK
 				}
 				return next(b)
 			}
@@ -125,22 +127,28 @@ func (tw traceware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// if we have access to chi routes, we could extract the route pattern beforehand.
 	spanName := ""
 	routePattern := ""
+	spanAttributes := httpconv.ServerRequest(tw.serverName, r)
+
 	if tw.chiRoutes != nil {
 		rctx := chi.NewRouteContext()
 		if tw.chiRoutes.Match(rctx, r.Method, r.URL.Path) {
 			routePattern = rctx.RoutePattern()
 			spanName = addPrefixToSpanName(tw.reqMethodInSpanName, r.Method, routePattern)
+			spanAttributes = append(spanAttributes, semconv.HTTPRoute(routePattern))
 		}
 	}
 
 	ctx, span := tw.tracer.Start(
 		ctx, spanName,
-		oteltrace.WithAttributes(semconv.NetAttributesFromHTTPRequest("tcp", r)...),
-		oteltrace.WithAttributes(semconv.EndUserAttributesFromHTTPRequest(r)...),
-		oteltrace.WithAttributes(semconv.HTTPServerAttributesFromHTTPRequest(tw.serverName, routePattern, r)...),
+		oteltrace.WithAttributes(spanAttributes...),
 		oteltrace.WithSpanKind(oteltrace.SpanKindServer),
 	)
 	defer span.End()
+
+	// put trace_id to response header only when WithTraceResponseHeaderKey is used
+	if len(tw.traceResponseHeaderKey) > 0 && span.SpanContext().HasTraceID() {
+		w.Header().Add(tw.traceResponseHeaderKey, span.SpanContext().TraceID().String())
+	}
 
 	// get recording response writer
 	rrw := getRRW(w)
@@ -150,26 +158,26 @@ func (tw traceware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r = r.WithContext(ctx)
 	tw.handler.ServeHTTP(rrw.writer, r)
 
-	// set span name & http route attribute if necessary
+	// set span name & http route attribute if route pattern cannot be determined
+	// during span creation
 	if len(routePattern) == 0 {
 		routePattern = chi.RouteContext(r.Context()).RoutePattern()
-		span.SetAttributes(semconv.HTTPRouteKey.String(routePattern))
+		span.SetAttributes(semconv.HTTPRoute(routePattern))
 
 		spanName = addPrefixToSpanName(tw.reqMethodInSpanName, r.Method, routePattern)
 		span.SetName(spanName)
 	}
 
 	// set status code attribute
-	span.SetAttributes(semconv.HTTPStatusCodeKey.Int(rrw.status))
+	span.SetAttributes(semconv.HTTPStatusCode(rrw.status))
 
 	// set span status
-	spanStatus, spanMessage := semconv.SpanStatusFromHTTPStatusCode(rrw.status)
-	span.SetStatus(spanStatus, spanMessage)
+	span.SetStatus(httpconv.ServerStatus(rrw.status))
 }
 
 func addPrefixToSpanName(shouldAdd bool, prefix, spanName string) string {
 	// in chi v5.0.8, the root route will be returned has an empty string
-	// (see github.com/go-chi/chi/v5@v5.0.8/context.go:126)
+	// (see https://github.com/go-chi/chi/blob/v5.0.8/context.go#L126)
 	if spanName == "" {
 		spanName = "/"
 	}
