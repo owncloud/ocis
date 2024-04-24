@@ -113,6 +113,10 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	default:
 		err = errors.New("unhandled event")
 	case events.UploadReady:
+		if e.Failed {
+			// we don't inform about failed uploads yet
+			return
+		}
 		fileEv("postprocessing-finished", e.FileRef)
 	case events.ItemTrashed:
 		evType = "item-trashed"
