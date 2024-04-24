@@ -48,6 +48,8 @@ type DriveItem struct {
 	Image          *Image          `json:"image,omitempty"`
 	Photo          *Photo          `json:"photo,omitempty"`
 	Location       *GeoCoordinates `json:"location,omitempty"`
+	// Collection containing ThumbnailSet objects associated with the item. Read-only. Nullable.
+	Thumbnails []ThumbnailSet `json:"thumbnails,omitempty"`
 	// If this property is non-null, it indicates that the driveItem is the top-most driveItem in the drive.
 	Root          map[string]interface{} `json:"root,omitempty"`
 	Trash         *Trash                 `json:"trash,omitempty"`
@@ -694,6 +696,38 @@ func (o *DriveItem) SetLocation(v GeoCoordinates) {
 	o.Location = &v
 }
 
+// GetThumbnails returns the Thumbnails field value if set, zero value otherwise.
+func (o *DriveItem) GetThumbnails() []ThumbnailSet {
+	if o == nil || IsNil(o.Thumbnails) {
+		var ret []ThumbnailSet
+		return ret
+	}
+	return o.Thumbnails
+}
+
+// GetThumbnailsOk returns a tuple with the Thumbnails field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DriveItem) GetThumbnailsOk() ([]ThumbnailSet, bool) {
+	if o == nil || IsNil(o.Thumbnails) {
+		return nil, false
+	}
+	return o.Thumbnails, true
+}
+
+// HasThumbnails returns a boolean if a field has been set.
+func (o *DriveItem) HasThumbnails() bool {
+	if o != nil && !IsNil(o.Thumbnails) {
+		return true
+	}
+
+	return false
+}
+
+// SetThumbnails gets a reference to the given []ThumbnailSet and assigns it to the Thumbnails field.
+func (o *DriveItem) SetThumbnails(v []ThumbnailSet) {
+	o.Thumbnails = v
+}
+
 // GetRoot returns the Root field value if set, zero value otherwise.
 func (o *DriveItem) GetRoot() map[string]interface{} {
 	if o == nil || IsNil(o.Root) {
@@ -1144,6 +1178,9 @@ func (o DriveItem) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Location) {
 		toSerialize["location"] = o.Location
+	}
+	if !IsNil(o.Thumbnails) {
+		toSerialize["thumbnails"] = o.Thumbnails
 	}
 	if !IsNil(o.Root) {
 		toSerialize["root"] = o.Root

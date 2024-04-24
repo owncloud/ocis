@@ -25,10 +25,12 @@ type Permission struct {
 	// Indicates whether the password is set for this permission. This property only appears in the response. Optional. Read-only.
 	HasPassword *bool `json:"hasPassword,omitempty"`
 	// An optional expiration date which limits the permission in time.
-	ExpirationDateTime NullableTime           `json:"expirationDateTime,omitempty"`
-	GrantedToV2        *SharePointIdentitySet `json:"grantedToV2,omitempty"`
-	Link               *SharingLink           `json:"link,omitempty"`
-	Roles              []string               `json:"roles,omitempty"`
+	ExpirationDateTime NullableTime `json:"expirationDateTime,omitempty"`
+	// An optional creation date. Libregraph only.
+	CreatedDateTime NullableTime           `json:"createdDateTime,omitempty"`
+	GrantedToV2     *SharePointIdentitySet `json:"grantedToV2,omitempty"`
+	Link            *SharingLink           `json:"link,omitempty"`
+	Roles           []string               `json:"roles,omitempty"`
 	// For link type permissions, the details of the identity to whom permission was granted. This could be used to grant access to a an external user that can be identified by email, aka guest accounts.
 	// Deprecated
 	GrantedToIdentities []IdentitySet `json:"grantedToIdentities,omitempty"`
@@ -159,6 +161,49 @@ func (o *Permission) SetExpirationDateTimeNil() {
 // UnsetExpirationDateTime ensures that no value is present for ExpirationDateTime, not even an explicit nil
 func (o *Permission) UnsetExpirationDateTime() {
 	o.ExpirationDateTime.Unset()
+}
+
+// GetCreatedDateTime returns the CreatedDateTime field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *Permission) GetCreatedDateTime() time.Time {
+	if o == nil || IsNil(o.CreatedDateTime.Get()) {
+		var ret time.Time
+		return ret
+	}
+	return *o.CreatedDateTime.Get()
+}
+
+// GetCreatedDateTimeOk returns a tuple with the CreatedDateTime field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *Permission) GetCreatedDateTimeOk() (*time.Time, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.CreatedDateTime.Get(), o.CreatedDateTime.IsSet()
+}
+
+// HasCreatedDateTime returns a boolean if a field has been set.
+func (o *Permission) HasCreatedDateTime() bool {
+	if o != nil && o.CreatedDateTime.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetCreatedDateTime gets a reference to the given NullableTime and assigns it to the CreatedDateTime field.
+func (o *Permission) SetCreatedDateTime(v time.Time) {
+	o.CreatedDateTime.Set(&v)
+}
+
+// SetCreatedDateTimeNil sets the value for CreatedDateTime to be an explicit nil
+func (o *Permission) SetCreatedDateTimeNil() {
+	o.CreatedDateTime.Set(nil)
+}
+
+// UnsetCreatedDateTime ensures that no value is present for CreatedDateTime, not even an explicit nil
+func (o *Permission) UnsetCreatedDateTime() {
+	o.CreatedDateTime.Unset()
 }
 
 // GetGrantedToV2 returns the GrantedToV2 field value if set, zero value otherwise.
@@ -374,6 +419,9 @@ func (o Permission) ToMap() (map[string]interface{}, error) {
 	}
 	if o.ExpirationDateTime.IsSet() {
 		toSerialize["expirationDateTime"] = o.ExpirationDateTime.Get()
+	}
+	if o.CreatedDateTime.IsSet() {
+		toSerialize["createdDateTime"] = o.CreatedDateTime.Get()
 	}
 	if !IsNil(o.GrantedToV2) {
 		toSerialize["grantedToV2"] = o.GrantedToV2

@@ -16,12 +16,13 @@ import (
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
+
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
@@ -223,6 +224,11 @@ func (g BaseGraphService) libreGraphPermissionFromCS3PublicShare(createdLink *li
 		perm.SetExpirationDateTime(cs3TimestampToTime(createdLink.GetExpiration()).UTC())
 	}
 
+	// set cTime
+	if createdLink.GetCtime() != nil {
+		perm.SetCreatedDateTime(cs3TimestampToTime(createdLink.GetCtime()).UTC())
+	}
+
 	perm.SetHasPassword(createdLink.GetPasswordProtected())
 
 	return perm, nil
@@ -371,6 +377,10 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 	// set expiration date
 	if share.GetExpiration() != nil {
 		perm.SetExpirationDateTime(cs3TimestampToTime(share.GetExpiration()))
+	}
+	// set cTime
+	if share.GetCtime() != nil {
+		perm.SetCreatedDateTime(cs3TimestampToTime(share.GetCtime()))
 	}
 	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
 		*share.GetPermissions().GetPermissions(),
