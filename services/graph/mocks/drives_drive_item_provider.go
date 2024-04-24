@@ -86,12 +86,12 @@ func (_c *DrivesDriveItemProvider_GetShare_Call) RunAndReturn(run func(context.C
 	return _c
 }
 
-// GetShares provides a mock function with given fields: ctx, resourceID, filters
-func (_m *DrivesDriveItemProvider) GetShares(ctx context.Context, resourceID *providerv1beta1.ResourceId, filters []*collaborationv1beta1.Filter) ([]*collaborationv1beta1.ReceivedShare, error) {
+// GetSharesForResource provides a mock function with given fields: ctx, resourceID, filters
+func (_m *DrivesDriveItemProvider) GetSharesForResource(ctx context.Context, resourceID *providerv1beta1.ResourceId, filters []*collaborationv1beta1.Filter) ([]*collaborationv1beta1.ReceivedShare, error) {
 	ret := _m.Called(ctx, resourceID, filters)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetShares")
+		panic("no return value specified for GetSharesForResource")
 	}
 
 	var r0 []*collaborationv1beta1.ReceivedShare
@@ -116,32 +116,32 @@ func (_m *DrivesDriveItemProvider) GetShares(ctx context.Context, resourceID *pr
 	return r0, r1
 }
 
-// DrivesDriveItemProvider_GetShares_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetShares'
-type DrivesDriveItemProvider_GetShares_Call struct {
+// DrivesDriveItemProvider_GetSharesForResource_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSharesForResource'
+type DrivesDriveItemProvider_GetSharesForResource_Call struct {
 	*mock.Call
 }
 
-// GetShares is a helper method to define mock.On call
+// GetSharesForResource is a helper method to define mock.On call
 //   - ctx context.Context
 //   - resourceID *providerv1beta1.ResourceId
 //   - filters []*collaborationv1beta1.Filter
-func (_e *DrivesDriveItemProvider_Expecter) GetShares(ctx interface{}, resourceID interface{}, filters interface{}) *DrivesDriveItemProvider_GetShares_Call {
-	return &DrivesDriveItemProvider_GetShares_Call{Call: _e.mock.On("GetShares", ctx, resourceID, filters)}
+func (_e *DrivesDriveItemProvider_Expecter) GetSharesForResource(ctx interface{}, resourceID interface{}, filters interface{}) *DrivesDriveItemProvider_GetSharesForResource_Call {
+	return &DrivesDriveItemProvider_GetSharesForResource_Call{Call: _e.mock.On("GetSharesForResource", ctx, resourceID, filters)}
 }
 
-func (_c *DrivesDriveItemProvider_GetShares_Call) Run(run func(ctx context.Context, resourceID *providerv1beta1.ResourceId, filters []*collaborationv1beta1.Filter)) *DrivesDriveItemProvider_GetShares_Call {
+func (_c *DrivesDriveItemProvider_GetSharesForResource_Call) Run(run func(ctx context.Context, resourceID *providerv1beta1.ResourceId, filters []*collaborationv1beta1.Filter)) *DrivesDriveItemProvider_GetSharesForResource_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].([]*collaborationv1beta1.Filter))
 	})
 	return _c
 }
 
-func (_c *DrivesDriveItemProvider_GetShares_Call) Return(_a0 []*collaborationv1beta1.ReceivedShare, _a1 error) *DrivesDriveItemProvider_GetShares_Call {
+func (_c *DrivesDriveItemProvider_GetSharesForResource_Call) Return(_a0 []*collaborationv1beta1.ReceivedShare, _a1 error) *DrivesDriveItemProvider_GetSharesForResource_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *DrivesDriveItemProvider_GetShares_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, []*collaborationv1beta1.Filter) ([]*collaborationv1beta1.ReceivedShare, error)) *DrivesDriveItemProvider_GetShares_Call {
+func (_c *DrivesDriveItemProvider_GetSharesForResource_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, []*collaborationv1beta1.Filter) ([]*collaborationv1beta1.ReceivedShare, error)) *DrivesDriveItemProvider_GetSharesForResource_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -84,8 +84,8 @@ type (
 		// GetShare returns the share
 		GetShare(ctx context.Context, shareID *collaboration.ShareId) (*collaboration.ReceivedShare, error)
 
-		// GetShares returns all shares for a given resourceID
-		GetShares(ctx context.Context, resourceID *storageprovider.ResourceId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error)
+		// GetSharesForResource returns all shares for a given resourceID
+		GetSharesForResource(ctx context.Context, resourceID *storageprovider.ResourceId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error)
 	}
 )
 
@@ -123,8 +123,8 @@ func (s DrivesDriveItemService) GetShare(ctx context.Context, shareID *collabora
 	return getReceivedShareResponse.GetShare(), errorcode.FromCS3Status(getReceivedShareResponse.GetStatus(), err)
 }
 
-// GetShares returns all shares for a given resourceID
-func (s DrivesDriveItemService) GetShares(ctx context.Context, resourceID *storageprovider.ResourceId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
+// GetSharesForResource returns all shares for a given resourceID
+func (s DrivesDriveItemService) GetSharesForResource(ctx context.Context, resourceID *storageprovider.ResourceId, filters []*collaboration.Filter) ([]*collaboration.ReceivedShare, error) {
 	// Find all accepted shares for this resource
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -214,7 +214,7 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, shareID *colla
 		return err
 	}
 
-	availableShares, err := s.GetShares(ctx, share.GetShare().GetResourceId(), []*collaboration.Filter{
+	availableShares, err := s.GetSharesForResource(ctx, share.GetShare().GetResourceId(), []*collaboration.Filter{
 		{
 			Type: collaboration.Filter_TYPE_STATE,
 			Term: &collaboration.Filter_State{
@@ -246,7 +246,7 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID *stor
 		name = filepath.Clean(name)
 	}
 
-	availableShares, err := s.GetShares(ctx, resourceID, []*collaboration.Filter{
+	availableShares, err := s.GetSharesForResource(ctx, resourceID, []*collaboration.Filter{
 		{
 			Type: collaboration.Filter_TYPE_STATE,
 			Term: &collaboration.Filter_State{
@@ -360,7 +360,7 @@ func (api DrivesDriveItemApi) GetDriveItem(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	availableShares, err := api.drivesDriveItemService.GetShares(r.Context(), share.GetShare().GetResourceId(), nil)
+	availableShares, err := api.drivesDriveItemService.GetSharesForResource(r.Context(), share.GetShare().GetResourceId(), nil)
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrNoShares.Error())
 		ErrNoShares.Render(w, r)
@@ -414,7 +414,7 @@ func (api DrivesDriveItemApi) UpdateDriveItem(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	availableShares, err := api.drivesDriveItemService.GetShares(r.Context(), share.GetShare().GetResourceId(), nil)
+	availableShares, err := api.drivesDriveItemService.GetSharesForResource(r.Context(), share.GetShare().GetResourceId(), nil)
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrNoShares.Error())
 		ErrNoShares.Render(w, r)
