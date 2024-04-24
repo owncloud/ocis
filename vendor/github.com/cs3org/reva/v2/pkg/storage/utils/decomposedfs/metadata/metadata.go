@@ -35,6 +35,8 @@ func init() {
 
 var errUnconfiguredError = errors.New("no metadata backend configured. Bailing out")
 
+type UnlockFunc func() error
+
 // Backend defines the interface for file attribute backends
 type Backend interface {
 	Name() string
@@ -48,6 +50,7 @@ type Backend interface {
 	SetMultiple(ctx context.Context, path string, attribs map[string][]byte, acquireLock bool) error
 	Remove(ctx context.Context, path, key string, acquireLock bool) error
 
+	Lock(path string) (UnlockFunc, error)
 	Purge(path string) error
 	Rename(oldPath, newPath string) error
 	IsMetaFile(path string) bool
@@ -97,6 +100,11 @@ func (NullBackend) SetMultiple(ctx context.Context, path string, attribs map[str
 // Remove removes an extended attribute key
 func (NullBackend) Remove(ctx context.Context, path string, key string, acquireLock bool) error {
 	return errUnconfiguredError
+}
+
+// Lock locks the metadata for the given path
+func (NullBackend) Lock(path string) (UnlockFunc, error) {
+	return nil, nil
 }
 
 // IsMetaFile returns whether the given path represents a meta file

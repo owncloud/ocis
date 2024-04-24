@@ -113,13 +113,13 @@ func (b XattrsBackend) Set(ctx context.Context, path string, key string, val []b
 }
 
 // SetMultiple sets a set of attribute for the given path
-func (XattrsBackend) SetMultiple(ctx context.Context, path string, attribs map[string][]byte, acquireLock bool) (err error) {
+func (b XattrsBackend) SetMultiple(ctx context.Context, path string, attribs map[string][]byte, acquireLock bool) (err error) {
 	if acquireLock {
 		err := os.MkdirAll(filepath.Dir(path), 0600)
 		if err != nil {
 			return err
 		}
-		lockedFile, err := lockedfile.OpenFile(path+filelocks.LockFileSuffix, os.O_CREATE|os.O_WRONLY, 0600)
+		lockedFile, err := lockedfile.OpenFile(b.LockfilePath(path), os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
 			return err
 		}
@@ -172,6 +172,22 @@ func (XattrsBackend) MetadataPath(path string) string { return path }
 
 // LockfilePath returns the path of the lock file
 func (XattrsBackend) LockfilePath(path string) string { return path + ".mlock" }
+
+// Lock locks the metadata for the given path
+func (b XattrsBackend) Lock(path string) (UnlockFunc, error) {
+	metaLockPath := b.LockfilePath(path)
+	mlock, err := lockedfile.OpenFile(metaLockPath, os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return nil, err
+	}
+	return func() error {
+		err := mlock.Close()
+		if err != nil {
+			return err
+		}
+		return os.Remove(metaLockPath)
+	}, nil
+}
 
 func cleanupLockfile(f *lockedfile.File) {
 	_ = f.Close()

@@ -34,6 +34,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
@@ -68,7 +69,6 @@ type Tree struct {
 
 	options *options.Options
 
-	// used to cache symlink lookups for child names to node ids
 	idCache store.Store
 }
 
@@ -662,6 +662,49 @@ func (t *Tree) PurgeRecycleItemFunc(ctx context.Context, spaceid, key string, pa
 	return rn, fn, nil
 }
 
+// InitNewNode initializes a new node
+func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (metadata.UnlockFunc, error) {
+	// create folder structure (if needed)
+	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
+		return nil, err
+	}
+
+	// create and write lock new node metadata
+	unlock, err := t.lookup.MetadataBackend().Lock(n.InternalPath())
+	if err != nil {
+		return nil, err
+	}
+
+	// we also need to touch the actual node file here it stores the mtime of the resource
+	h, err := os.OpenFile(n.InternalPath(), os.O_CREATE|os.O_EXCL, 0600)
+	if err != nil {
+		return unlock, err
+	}
+	h.Close()
+
+	if _, err := node.CheckQuota(ctx, n.SpaceRoot, false, 0, fsize); err != nil {
+		return unlock, err
+	}
+
+	// link child name to parent if it is new
+	childNameLink := filepath.Join(n.ParentPath(), n.Name)
+	relativeNodePath := filepath.Join("../../../../../", lookup.Pathify(n.ID, 4, 2))
+	log := appctx.GetLogger(ctx).With().Str("childNameLink", childNameLink).Str("relativeNodePath", relativeNodePath).Logger()
+	log.Info().Msg("initNewNode: creating symlink")
+
+	if err = os.Symlink(relativeNodePath, childNameLink); err != nil {
+		log.Info().Err(err).Msg("initNewNode: symlink failed")
+		if errors.Is(err, fs.ErrExist) {
+			log.Info().Err(err).Msg("initNewNode: symlink already exists")
+			return unlock, errtypes.AlreadyExists(n.Name)
+		}
+		return unlock, errors.Wrap(err, "Decomposedfs: could not symlink child entry")
+	}
+	log.Info().Msg("initNewNode: symlink created")
+
+	return unlock, nil
+}
+
 func (t *Tree) removeNode(ctx context.Context, path, timeSuffix string, n *node.Node) error {
 	logger := appctx.GetLogger(ctx)
 
@@ -764,6 +807,29 @@ func (t *Tree) DeleteBlob(node *node.Node) error {
 	}
 
 	return t.blobstore.Delete(node)
+}
+
+// BuildSpaceIDIndexEntry returns the entry for the space id index
+func (t *Tree) BuildSpaceIDIndexEntry(spaceID, nodeID string) string {
+	return "../../../spaces/" + lookup.Pathify(spaceID, 1, 2) + "/nodes/" + lookup.Pathify(spaceID, 4, 2)
+}
+
+// ResolveSpaceIDIndexEntry returns the node id for the space id index entry
+func (t *Tree) ResolveSpaceIDIndexEntry(_, entry string) (string, string, error) {
+	return ReadSpaceAndNodeFromIndexLink(entry)
+}
+
+// ReadSpaceAndNodeFromIndexLink reads a symlink and parses space and node id if the link has the correct format, eg:
+// ../../spaces/4c/510ada-c86b-4815-8820-42cdf82c3d51/nodes/4c/51/0a/da/-c86b-4815-8820-42cdf82c3d51
+// ../../spaces/4c/510ada-c86b-4815-8820-42cdf82c3d51/nodes/4c/51/0a/da/-c86b-4815-8820-42cdf82c3d51.T.2022-02-24T12:35:18.196484592Z
+func ReadSpaceAndNodeFromIndexLink(link string) (string, string, error) {
+	// ../../../spaces/sp/ace-id/nodes/sh/or/tn/od/eid
+	// 0  1  2  3      4  5      6     7  8  9  10  11
+	parts := strings.Split(link, string(filepath.Separator))
+	if len(parts) != 12 || parts[0] != ".." || parts[1] != ".." || parts[2] != ".." || parts[3] != "spaces" || parts[6] != "nodes" {
+		return "", "", errtypes.InternalError("malformed link")
+	}
+	return strings.Join(parts[4:6], ""), strings.Join(parts[7:12], ""), nil
 }
 
 // TODO check if node exists?

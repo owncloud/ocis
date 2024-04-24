@@ -87,6 +87,23 @@ func (lu *Lookup) ReadBlobIDAttr(ctx context.Context, path string) (string, erro
 	}
 	return string(attr), nil
 }
+func readChildNodeFromLink(path string) (string, error) {
+	link, err := os.Readlink(path)
+	if err != nil {
+		return "", err
+	}
+	nodeID := strings.TrimLeft(link, "/.")
+	nodeID = strings.ReplaceAll(nodeID, "/", "")
+	return nodeID, nil
+}
+
+func (lu *Lookup) NodeIDFromParentAndName(ctx context.Context, parent *node.Node, name string) (string, error) {
+	nodeID, err := readChildNodeFromLink(filepath.Join(parent.InternalPath(), name))
+	if err != nil {
+		return "", errors.Wrap(err, "decomposedfs: Wrap: readlink error")
+	}
+	return nodeID, nil
+}
 
 // TypeFromPath returns the type of the node at the given path
 func (lu *Lookup) TypeFromPath(ctx context.Context, path string) provider.ResourceType {

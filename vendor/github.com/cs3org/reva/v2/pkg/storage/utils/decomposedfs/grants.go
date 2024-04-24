@@ -327,7 +327,7 @@ func (fs *Decomposedfs) storeGrant(ctx context.Context, n *node.Node, g *provide
 	}
 
 	// update the indexes only after successfully setting the grant
-	err := fs.updateIndexes(ctx, g.GetGrantee(), spaceType, n.ID)
+	err := fs.updateIndexes(ctx, g.GetGrantee(), spaceType, n.SpaceID, n.ID)
 	if err != nil {
 		return err
 	}

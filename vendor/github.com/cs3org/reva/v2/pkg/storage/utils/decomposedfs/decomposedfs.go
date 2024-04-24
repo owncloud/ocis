@@ -211,7 +211,7 @@ func New(o *options.Options, aspects aspects.Aspects) (storage.FS, error) {
 		userSpaceIndex:  userSpaceIndex,
 		groupSpaceIndex: groupSpaceIndex,
 		spaceTypeIndex:  spaceTypeIndex,
-		sessionStore:    upload.NewSessionStore(aspects.Lookup, aspects.Tree, o.Root, aspects.EventStream, o.AsyncFileUploads, o.Tokens),
+		sessionStore:    upload.NewSessionStore(aspects.Lookup, aspects.Tree, o.Root, aspects.EventStream, o.AsyncFileUploads, o.Tokens, aspects.DisableVersioning),
 	}
 
 	if o.AsyncFileUploads {

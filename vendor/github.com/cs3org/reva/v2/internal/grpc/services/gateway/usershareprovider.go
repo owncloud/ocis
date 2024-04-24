@@ -191,9 +191,7 @@ func (s *svc) updateSpaceShare(ctx context.Context, req *collaboration.UpdateSha
 				return nil, errors.Wrap(err, "gateway: error getting grant to remove from storage")
 			}
 			if !isSpaceManagerRemaining(listGrantRes.GetGrants(), grant.GetGrantee()) {
-				return &collaboration.UpdateShareResponse{
-					Status: status.NewPermissionDenied(ctx, errtypes.PermissionDenied(""), "can't remove the last manager"),
-				}, nil
+				return nil, errors.New("gateway: can't remove the last manager")
 			}
 		}
 		st, err = s.updateGrant(ctx, req.GetShare().GetResourceId(), grant, opaque)
@@ -479,7 +477,8 @@ func (s *svc) removeGrant(ctx context.Context, id *provider.ResourceId, g *provi
 		return nil, errors.Wrap(err, "gateway: error calling RemoveGrant")
 	}
 	if grantRes.Status.Code != rpc.Code_CODE_OK {
-		return grantRes.GetStatus(), nil
+		return status.NewInternal(ctx,
+			"error removing storage grant"), nil
 	}
 
 	return status.NewOK(ctx), nil
@@ -724,9 +723,7 @@ func (s *svc) removeSpaceShare(ctx context.Context, ref *provider.ResourceId, gr
 	}
 
 	if len(listGrantRes.Grants) == 1 || !isSpaceManagerRemaining(listGrantRes.Grants, grantee) {
-		return &collaboration.RemoveShareResponse{
-			Status: status.NewPermissionDenied(ctx, errtypes.PermissionDenied(""), "can't remove the last manager"),
-		}, nil
+		return nil, errors.New("gateway: can't remove the last manager")
 	}
 
 	// TODO: change CS3 APIs

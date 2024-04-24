@@ -304,6 +304,22 @@ func (MessagePackBackend) MetadataPath(path string) string { return path + ".mpk
 // LockfilePath returns the path of the lock file
 func (MessagePackBackend) LockfilePath(path string) string { return path + ".mlock" }
 
+// Lock locks the metadata for the given path
+func (b MessagePackBackend) Lock(path string) (UnlockFunc, error) {
+	metaLockPath := b.LockfilePath(path)
+	mlock, err := lockedfile.OpenFile(metaLockPath, os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return nil, err
+	}
+	return func() error {
+		err := mlock.Close()
+		if err != nil {
+			return err
+		}
+		return os.Remove(metaLockPath)
+	}, nil
+}
+
 func (b MessagePackBackend) cacheKey(path string) string {
 	// rootPath is guaranteed to have no trailing slash
 	// the cache key shouldn't begin with a slash as some stores drop it which can cause

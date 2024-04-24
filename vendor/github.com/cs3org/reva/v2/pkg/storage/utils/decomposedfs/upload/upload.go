@@ -20,12 +20,9 @@ package upload
 
 import (
 	"context"
-	"crypto/md5"
-	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
 	"hash"
-	"hash/adler32"
 	"io"
 	"io/fs"
 	"os"
@@ -51,27 +48,6 @@ var tracer trace.Tracer
 
 func init() {
 	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/upload")
-}
-
-// Tree is used to manage a tree hierarchy
-type Tree interface {
-	Setup() error
-
-	GetMD(ctx context.Context, node *node.Node) (os.FileInfo, error)
-	ListFolder(ctx context.Context, node *node.Node) ([]*node.Node, error)
-	// CreateHome(owner *userpb.UserId) (n *node.Node, err error)
-	CreateDir(ctx context.Context, node *node.Node) (err error)
-	// CreateReference(ctx context.Context, node *node.Node, targetURI *url.URL) error
-	Move(ctx context.Context, oldNode *node.Node, newNode *node.Node) (err error)
-	Delete(ctx context.Context, node *node.Node) (err error)
-	RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPath string, target *node.Node) (*node.Node, *node.Node, func() error, error)
-	PurgeRecycleItemFunc(ctx context.Context, spaceid, key, purgePath string) (*node.Node, func() error, error)
-
-	WriteBlob(node *node.Node, binPath string) error
-	ReadBlob(node *node.Node) (io.ReadCloser, error)
-	DeleteBlob(node *node.Node) error
-
-	Propagate(ctx context.Context, node *node.Node, sizeDiff int64) (err error)
 }
 
 var defaultFilePerm = os.FileMode(0664)
@@ -131,37 +107,13 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 
 	ctx = ctxpkg.ContextSetInitiator(ctx, session.InitiatorID())
 
-	// calculate the checksum of the written bytes
-	// they will all be written to the metadata later, so we cannot omit any of them
-	// TODO only calculate the checksum in sync that was requested to match, the rest could be async ... but the tests currently expect all to be present
-	// TODO the hashes all implement BinaryMarshaler so we could try to persist the state for resumable upload. we would neet do keep track of the copied bytes ...
-	sha1h := sha1.New()
-	md5h := md5.New()
-	adler32h := adler32.New()
-	{
-		_, subspan := tracer.Start(ctx, "os.Open")
-		f, err := os.Open(session.binPath())
-		subspan.End()
-		if err != nil {
-			// we can continue if no oc checksum header is set
-			log.Info().Err(err).Str("binPath", session.binPath()).Msg("error opening binPath")
-		}
-		defer f.Close()
-
-		r1 := io.TeeReader(f, sha1h)
-		r2 := io.TeeReader(r1, md5h)
-
-		_, subspan = tracer.Start(ctx, "io.Copy")
-		_, err = io.Copy(adler32h, r2)
-		subspan.End()
-		if err != nil {
-			log.Info().Err(err).Msg("error copying checksums")
-		}
+	sha1h, md5h, adler32h, err := node.CalculateChecksums(ctx, session.binPath())
+	if err != nil {
+		log.Info().Err(err).Msg("error copying checksums")
 	}
 
 	// compare if they match the sent checksum
 	// TODO the tus checksum extension would do this on every chunk, but I currently don't see an easy way to pass in the requested checksum. for now we do it in FinishUpload which is also called for chunked uploads
-	var err error
 	if session.info.MetaData["checksum"] != "" {
 		var err error
 		parts := strings.SplitN(session.info.MetaData["checksum"], " ", 2)
