@@ -366,7 +366,9 @@ def cephPipelines(ctx):
     return [
         cephPipeline(
             "ceph",
-            buildOcisBinaryForTesting(ctx)["steps"] +
+            makeGoGenerate("") +
+            makeNodeGenerate("") +
+            build() +
             [
                 {
                     "name": "wait-for-ceph",
@@ -376,7 +378,7 @@ def cephPipelines(ctx):
                     ],
                 },
             ] +
-            ocisServer("ceph", 4, [], ["wait-for-ceph"]),
+            ocisServer("ceph", 4, [], ["build", "wait-for-ceph"]),
         ),
     ]
 
@@ -2153,24 +2155,21 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
                 "detach": True,
                 "environment": environment,
                 "user": user,
-                "volume": [
-                    stepVolumeCeph,
-                ],
                 "commands": [
-                    "apk add --no-cache ceph18-base",
+                    "apk add --no-cache ceph18-fuse",
                     #"sudo mkdir -p /etc/ceph",
                     #"cat /etc/ceph/ceph.conf | grep -E 'global|fsid|mon host' | sudo tee /etc/ceph/ceph.conf",
                     #"cp ceph-local:/etc/ceph/ceph.client.admin.keyring /etc/ceph/ceph.client.admin.keyring",
                     #"/etc/ceph/ceph.client.admin.keyring",
-                    "ls /etc/ceph",
-                    "sleep 30",
-                    "export fsid=$(cat /etc/ceph/ceph.conf | grep fsid | cut -c8-); echo $fsid",
-                    "mount -t ceph admin@${fsid}.cephfs=/ /var/lib/ocis/",
+                    "export fsid=$(cat /etc/ceph/ceph.conf | grep fsid | cut -c8-); echo $fsid; ceph-fuse -id $fsid -m ceph:6789 -r / /mnt/",
+                    "ls /mnt",
+                    #"mount -t ceph admin@${fsid}.cephfs=/ /var/lib/ocis/",
                     "df -h",
+                    "sleep 30",
                     "%s init --insecure true" % ocis_bin,
                     "cat $OCIS_CONFIG_DIR/ocis.yaml",
                 ] + (wrapper_commands),
-                "volumes": volumes,
+                "volumes": volumes + [stepVolumeCeph],
                 "depends_on": depends_on,
             },
             wait_for_ocis,
