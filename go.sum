@@ -798,6 +798,8 @@ github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym
 github.com/CiscoM31/godata v1.0.10 h1:DZdJ6M8QNh4HquvDDOqNLu6h77Wl86KGK7Qlbmb90sk=
 github.com/CiscoM31/godata v1.0.10/go.mod h1:ZMiT6JuD3Rm83HEtiTx4JEChsd25YCrxchKGag/sdTc=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
+github.com/DeepDiver1975/secure v0.0.0-20240424132259-5b29166734cb h1:Ugrv7ivJ035zunmhmGEBSXL76tyxRNH5XaBSQUTqf38=
+github.com/DeepDiver1975/secure v0.0.0-20240424132259-5b29166734cb/go.mod h1:BmF5hyM6tXczk3MpQkFf1hpKSRqCyhqcbiQtiAF7+40=
 github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c/go.mod h1:X0CRv0ky0k6m906ixxpzmDRLvX58TFUKS2eePweuyxk=
 github.com/KimMachineGun/automemlimit v0.5.0 h1:BeOe+BbJc8L5chL3OwzVYjVzyvPALdd5wxVVOWuUZmQ=
 github.com/KimMachineGun/automemlimit v0.5.0/go.mod h1:di3GCKiu9Y+1fs92erCbUvKzPkNyViN3mA0vti/ykEQ=
@@ -2037,8 +2039,6 @@ github.com/tus/tusd v1.13.0 h1:W7rtb1XPSpde/GPZAgdfUS3vus2Jt2KmckS6OUd3CU8=
 github.com/tus/tusd v1.13.0/go.mod h1:1tX4CDGlx8koHGFJdSaJ5ybUIm2NeVloJgZEPSKRcQA=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=
 github.com/uber-go/atomic v1.3.2/go.mod h1:/Ct5t2lcmbJ4OSe/waGBoaVvVqtO0bmtfVNex1PFV8g=
-github.com/unrolled/secure v1.14.0 h1:u9vJTU/pR4Bny0ntLUMxdfLtmIRGvQf2sEFuA0TG9AE=
-github.com/unrolled/secure v1.14.0/go.mod h1:BmF5hyM6tXczk3MpQkFf1hpKSRqCyhqcbiQtiAF7+40=
 github.com/urfave/cli v1.22.4/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/XcUArI=
 github.com/urfave/cli/v2 v2.27.1 h1:8xSQ6szndafKVRmfyeUMxkNUJQMjL1F2zmsZ+qHpfho=
