@@ -274,15 +274,14 @@ func (c cs3backend) libregraphUserFromClaims(ctx context.Context, claims map[str
 	} else {
 		return user, fmt.Errorf("Missing claim '%s' (displayName)", c.autoProvisionClaims.DisplayName)
 	}
-	if mail, ok := claims[c.autoProvisionClaims.Email].(string); ok {
-		user.SetMail(mail)
-	} else {
-		return user, fmt.Errorf("Missing claim '%s' (mail)", c.autoProvisionClaims.Email)
-	}
 	if username, ok := claims[c.autoProvisionClaims.Username].(string); ok {
 		user.SetOnPremisesSamAccountName(username)
 	} else {
 		return user, fmt.Errorf("Missing claim '%s' (username)", c.autoProvisionClaims.Username)
+	}
+	// Email is optional so we don't need an 'else' here
+	if mail, ok := claims[c.autoProvisionClaims.Email].(string); ok {
+		user.SetMail(mail)
 	}
 	return user, nil
 }
