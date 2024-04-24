@@ -628,7 +628,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return void
 	 * @throws JsonException
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userRemovesAccessOfUserOrGroupFromSpaceUsingGraphAPI(
 		string $sharer,
@@ -873,11 +873,10 @@ class SharingNgContext implements Context {
 	 * @param TableNode $table
 	 *
 	 * @return void
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
-	public function userSendsTheFollowingShareInvitationForSpaceUsingRootEndPointTheGraphApi(string $user, TableNode $table):void {
+	public function userSendsTheFollowingShareInvitationUsingRootEndPointTheGraphApi(string $user, TableNode $table):void {
 		$shareeIds = [];
-		$shareTypes = [];
 		$rows = $table->getRowsHash();
 		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
 			$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
@@ -886,25 +885,31 @@ class SharingNgContext implements Context {
 		}
 		$spaceId = $space['id'];
 
-		if (\array_key_exists('shareeId', $rows)) {
-			$shareeIds[] = $rows['shareeId'];
-			$shareTypes[] = $rows['shareType'];
-		} else {
-			$sharees = array_map('trim', explode(',', $rows['sharee']));
-			$shareTypes = array_map('trim', explode(',', $rows['shareType']));
+		$sharees = array_map('trim', explode(',', $rows['sharee']));
+		$shareTypes = array_map('trim', explode(',', $rows['shareType']));
 
-			foreach ($sharees as $sharee) {
-				// for non-exiting group or user, generate random id
-				$shareeIds[] = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id')
-					?: $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
+		foreach ($sharees as $index => $sharee) {
+			$shareType = $shareTypes[$index];
+			if ($sharee === "") {
+				// set empty value to $shareeIds
+				$shareeIds[] = "";
+				continue;
 			}
+			$shareeId = "";
+			if ($shareType === "user") {
+				$shareeId = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
+			} elseif ($shareType === "group") {
+				$shareeId = $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
+			}
+			// for non-existing group or user, generate random id
+			$shareeIds[] = $shareeId ?: WebDavHelper::generateUUIDv4();
 		}
 
 		$permissionsRole = $rows['permissionsRole'] ?? null;
 		$permissionsAction = $rows['permissionsAction'] ?? null;
 		$expireDate = $rows["expireDate"] ?? null;
 
-		$response = GraphHelper::sendSharingInvitationForDriveRoot(
+		$response = GraphHelper::sendSharingInvitationForDrive(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
@@ -917,9 +922,6 @@ class SharingNgContext implements Context {
 			$expireDate
 		);
 
-		if ($response->getStatusCode() === 200) {
-			$this->featureContext->shareNgAddToCreatedUserGroupShares($response);
-		}
 		$this->featureContext->setResponse($response);
 	}
 }

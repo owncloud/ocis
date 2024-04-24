@@ -1674,6 +1674,48 @@ class GraphHelper {
 	}
 
 	/**
+	 * @param array $shareeIds
+	 * @param array $shareTypes
+	 * @param string|null $permissionsRole
+	 * @param string|null $permissionsAction
+	 * @param string|null $expireDate
+	 *
+	 * @return array
+	 * @throws \Exception
+	 */
+	public static function createShareInviteBody(
+		array $shareeIds,
+		array $shareTypes,
+		?string $permissionsRole,
+		?string $permissionsAction,
+		?string $expireDate
+	): array {
+		$body = [];
+
+		foreach ($shareeIds as $index => $shareeId) {
+			$shareType = $shareTypes[$index];
+			$body['recipients'][] = [
+				"@libre.graph.recipient.type" => $shareType,
+				"objectId" => $shareeId
+			];
+		}
+
+		if ($permissionsRole !== null) {
+			$roleId = self::getPermissionsRoleIdByName($permissionsRole);
+			$body['roles'] = [$roleId];
+		}
+
+		if ($permissionsAction !== null) {
+			$body['@libre.graph.permissions.actions'] = ['libre.graph/driveItem/' . $permissionsAction];
+		}
+
+		if ($expireDate !== null) {
+			$body['expirationDateTime'] = $expireDate;
+		}
+		return $body;
+	}
+
+	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
 	 * @param string $user
@@ -1704,28 +1746,7 @@ class GraphHelper {
 		?string $expireDate
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
-		$body = [];
-
-		foreach ($shareeIds as $index => $shareeId) {
-			$shareType = $shareTypes[$index];
-			$body['recipients'][] = [
-				"@libre.graph.recipient.type" => $shareType,
-				"objectId" => $shareeId
-			];
-		}
-
-		if ($permissionsRole !== null) {
-			$roleId = self::getPermissionsRoleIdByName($permissionsRole);
-			$body['roles'] = [$roleId];
-		}
-
-		if ($permissionsAction !== null) {
-			$body['@libre.graph.permissions.actions'] = ['libre.graph/driveItem/' . $permissionsAction];
-		}
-
-		if ($expireDate !== null) {
-			$body['expirationDateTime'] = $expireDate;
-		}
+		$body = self::createShareInviteBody($shareeIds, $shareTypes, $permissionsRole, $permissionsAction, $expireDate);
 
 		return HttpRequestHelper::post(
 			$url,
@@ -2054,8 +2075,9 @@ class GraphHelper {
 	 * @param string|null $expireDate
 	 *
 	 * @return ResponseInterface
+	 * @throws \Exception|GuzzleException
 	 */
-	public static function sendSharingInvitationForDriveRoot(
+	public static function sendSharingInvitationForDrive(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
@@ -2068,27 +2090,7 @@ class GraphHelper {
 		?string $expireDate
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/invite");
-
-		foreach ($shareeIds as $index => $shareeId) {
-			$shareType = $shareTypes[$index];
-			$body['recipients'][] = [
-				"@libre.graph.recipient.type" => $shareType,
-				"objectId" => $shareeId
-			];
-		}
-
-		if ($permissionsRole !== null) {
-			$roleId = self::getPermissionsRoleIdByName($permissionsRole);
-			$body['roles'] = [$roleId];
-		}
-
-		if ($permissionsAction !== null) {
-			$body['@libre.graph.permissions.actions'] = ['libre.graph/driveItem/' . $permissionsAction];
-		}
-
-		if ($expireDate !== null) {
-			$body['expirationDateTime'] = $expireDate;
-		}
+		$body = self::createShareInviteBody($shareeIds, $shareTypes, $permissionsRole, $permissionsAction, $expireDate);
 
 		return HttpRequestHelper::post(
 			$url,
