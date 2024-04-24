@@ -337,6 +337,53 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 	render.NoContent(w, r)
 }
 
+// GetDriveItem get a drive item
+func (api DrivesDriveItemApi) GetDriveItem(w http.ResponseWriter, r *http.Request) {
+	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
+	if err != nil {
+		api.logger.Debug().Err(err).Msg(ErrInvalidDriveIDOrItemID.Error())
+		ErrInvalidDriveIDOrItemID.Render(w, r)
+		return
+	}
+
+	if !IsShareJail(driveID) {
+		api.logger.Debug().Interface("driveID", driveID).Msg(ErrNotAShareJail.Error())
+		ErrNotAShareJail.Render(w, r)
+		return
+	}
+
+	shareID := ExtractShareIdFromResourceId(itemID)
+	share, err := api.drivesDriveItemService.GetShare(r.Context(), shareID)
+	if err != nil {
+		api.logger.Debug().Err(err).Msg(ErrNoShares.Error())
+		ErrNoShares.Render(w, r)
+		return
+	}
+
+	availableShares, err := api.drivesDriveItemService.GetShares(r.Context(), share.GetShare().GetResourceId(), nil)
+	if err != nil {
+		api.logger.Debug().Err(err).Msg(ErrNoShares.Error())
+		ErrNoShares.Render(w, r)
+		return
+	}
+
+	driveItems, err := api.baseGraphService.CS3ReceivedSharesToDriveItems(r.Context(), availableShares)
+	switch {
+	case err != nil:
+		break
+	case len(driveItems) != 1:
+		err = ErrDriveItemConversion
+	}
+	if err != nil {
+		api.logger.Debug().Err(err).Msg(ErrDriveItemConversion.Error())
+		ErrDriveItemConversion.Render(w, r)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, driveItems[0])
+}
+
 // UpdateDriveItem updates a drive item, currently only the visibility of the share is updated
 func (api DrivesDriveItemApi) UpdateDriveItem(w http.ResponseWriter, r *http.Request) {
 	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
