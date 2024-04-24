@@ -470,10 +470,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
 				)
 			handler(w, r)
-			Expect(w.Code).To(Equal(http.StatusUnprocessableEntity))
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrInvalidDriveIDOrItemID.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrInvalidDriveIDOrItemID.Error()))
 		})
 	}
 
@@ -488,10 +488,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
 				)
 			handler(w, r)
-			Expect(w.Code).To(Equal(http.StatusUnprocessableEntity))
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrInvalidRequestBody.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrInvalidRequestBody.Error()))
 		})
 	}
 
@@ -505,10 +505,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
 				)
 			handler(w, r)
-			Expect(w.Code).To(Equal(http.StatusUnprocessableEntity))
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrNotAShareJail.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrNotAShareJail.Error()))
 		})
 	}
 
@@ -533,10 +533,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				Once()
 
 			drivesDriveItemApi.DeleteDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrUnmountShare.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrUnmountShare.Error()))
 		})
 
 		It("successfully unmounts the share", func() {
@@ -587,10 +587,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				Once()
 
 			drivesDriveItemApi.UpdateDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+			Expect(w.Code).To(Equal(http.StatusNotFound))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrNoShare.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrNoShares.Error()))
 		})
 
 		It("fails if retrieving the shares fail", func() {
@@ -620,10 +620,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				Once()
 
 			drivesDriveItemApi.UpdateDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+			Expect(w.Code).To(Equal(http.StatusNotFound))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrGetShareAndSiblings.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrNoShares.Error()))
 		})
 
 		It("fails if updating the share fails", func() {
@@ -659,10 +659,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				Once()
 
 			drivesDriveItemApi.UpdateDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrUpdateShares.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrUpdateShares.Error()))
 		})
 
 		It("fails if no shares are updated", func() {
@@ -700,10 +700,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				Once()
 
 			drivesDriveItemApi.UpdateDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrUpdateShares.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrUpdateShares.Error()))
 		})
 
 		It("successfully updates the share", func() {
@@ -778,10 +778,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
 				)
 			drivesDriveItemApi.CreateDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusUnprocessableEntity))
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrInvalidDriveIDOrItemID.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrInvalidDriveIDOrItemID.Error()))
 		})
 
 		failOnNonShareJailDriveID(drivesDriveItemApi.CreateDriveItem)
@@ -806,7 +806,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrInvalidID.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrInvalidID.Error()))
 		})
 
 		It("fails if mounting the share fails", func() {
@@ -837,7 +837,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrMountShare.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrMountShare.Error()))
 		})
 
 		It("fails if drive item conversion fails", func() {
@@ -870,10 +870,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				)
 
 			drivesDriveItemApi.CreateDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
 
 			//
 			baseGraphProvider.
@@ -888,10 +888,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				)
 
 			drivesDriveItemApi.CreateDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusFailedDependency))
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData = gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
 		})
 
 		It("successfully creates the drive item", func() {
