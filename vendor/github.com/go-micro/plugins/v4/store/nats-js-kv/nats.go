@@ -30,6 +30,7 @@ type natsStore struct {
 	sync.Once
 	sync.RWMutex
 
+	encoding    string
 	ttl         time.Duration
 	storageType nats.StorageType
 	description string
@@ -143,6 +144,10 @@ func (n *natsStore) setOption(opts ...store.Option) {
 		n.description = text
 	}
 
+	if encoding, ok := n.opts.Context.Value(keyEncodeOptionsKey{}).(string); ok {
+		n.encoding = encoding
+	}
+
 	// Assign store option server addresses to nats options
 	if len(n.opts.Nodes) > 0 {
 		n.nopts.Url = ""
@@ -238,8 +243,8 @@ func (n *natsStore) Write(rec *store.Record, opts ...store.WriteOption) error {
 		return errors.Wrap(err, "Failed to marshal object")
 	}
 
-	if _, err := store.Put(NatsKey(opt.Table, rec.Key), b); err != nil {
-		return errors.Wrapf(err, "Failed to store data in bucket '%s'", NatsKey(opt.Table, rec.Key))
+	if _, err := store.Put(n.NatsKey(opt.Table, rec.Key), b); err != nil {
+		return errors.Wrapf(err, "Failed to store data in bucket '%s'", n.NatsKey(opt.Table, rec.Key))
 	}
 
 	return nil
@@ -280,7 +285,7 @@ func (n *natsStore) Delete(key string, opts ...store.DeleteOption) error {
 		return ErrBucketNotFound
 	}
 
-	if err := store.Delete(NatsKey(opt.Table, key)); err != nil {
+	if err := store.Delete(n.NatsKey(opt.Table, key)); err != nil {
 		return errors.Wrap(err, "Failed to delete data")
 	}
 
@@ -415,7 +420,7 @@ func (n *natsStore) getRecord(bucket nats.KeyValue, key string) (*store.Record, 
 
 func (n *natsStore) natsKeys(bucket nats.KeyValue, table, key string, prefix, suffix bool) ([]string, error) {
 	if !suffix && !prefix {
-		return []string{NatsKey(table, key)}, nil
+		return []string{n.NatsKey(table, key)}, nil
 	}
 
 	toS := func(s string, b bool) string {
@@ -449,7 +454,7 @@ func (n *natsStore) getKeys(bucket nats.KeyValue, table string, prefix, suffix s
 	microKeys := make([]string, 0, len(names))
 
 	for _, k := range names {
-		mkey, ok := MicroKeyFilter(table, k, prefix, suffix)
+		mkey, ok := n.MicroKeyFilter(table, k, prefix, suffix)
 		if !ok {
 			continue
 		}
