@@ -41,6 +41,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 func (h *Handler) getGrantee(ctx context.Context, name string) (provider.Grantee, error) {
@@ -108,8 +109,10 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 	// The viewer role doesn't have the ListGrants permission so we set it here.
 	permissions.ListGrants = true
 
+	fieldmask := []string{}
 	expireDate := r.PostFormValue("expireDate")
 	var expirationTs *types.Timestamp
+	fieldmask = append(fieldmask, "expiration")
 	if expireDate != "" {
 		expiration, err := time.Parse(_iso8601, expireDate)
 		if err != nil {
@@ -125,6 +128,7 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 			Seconds: uint64(expiration.UnixNano() / int64(time.Second)),
 			Nanos:   uint32(expiration.UnixNano() % int64(time.Second)),
 		}
+		fieldmask = append(fieldmask, "expiration")
 	}
 
 	ref := provider.Reference{ResourceId: info.GetId()}
@@ -154,6 +158,9 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 	// we have to send the update request to the gateway to give it a chance to invalidate its cache
 	// TODO the gateway no longer should cache stuff because invalidation is to expensive. The decomposedfs already has a better cache.
 	if granteeExists(lgRes.Grants, grantee) {
+		if permissions != nil {
+			fieldmask = append(fieldmask, "permissions")
+		}
 		updateShareReq := &collaborationv1beta1.UpdateShareRequest{
 			// TODO: change CS3 APIs
 			Opaque: &types.Opaque{
@@ -168,6 +175,9 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 				},
 				Grantee:    &grantee,
 				Expiration: expirationTs,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{
+				Paths: fieldmask,
 			},
 		}
 		updateShareReq.Opaque = utils.AppendPlainToOpaque(updateShareReq.Opaque, "spacetype", info.GetSpace().GetSpaceType())

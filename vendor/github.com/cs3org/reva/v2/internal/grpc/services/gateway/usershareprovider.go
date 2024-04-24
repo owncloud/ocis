@@ -20,6 +20,7 @@ package gateway
 
 import (
 	"context"
+	"slices"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -158,6 +159,9 @@ func (s *svc) updateShare(ctx context.Context, req *collaboration.UpdateShareReq
 }
 
 func (s *svc) updateSpaceShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
+	if req.GetShare().GetGrantee() == nil {
+		return &collaboration.UpdateShareResponse{Status: status.NewInvalid(ctx, "updating requires a received grantee object")}, nil
+	}
 	// If the share is a denial we call  denyGrant instead.
 	var st *rpc.Status
 	var err error
@@ -169,32 +173,47 @@ func (s *svc) updateSpaceShare(ctx context.Context, req *collaboration.UpdateSha
 	}
 	utils.AppendPlainToOpaque(opaque, "spacetype", utils.ReadPlainFromOpaque(req.Opaque, "spacetype"))
 
-	creator := ctxpkg.ContextMustGetUser(ctx)
-	grant := &provider.Grant{
-		Grantee:     req.GetShare().GetGrantee(),
-		Permissions: req.GetShare().GetPermissions().GetPermissions(),
-		Expiration:  req.GetShare().GetExpiration(),
-		Creator:     creator.GetId(),
-	}
 	if grants.PermissionsEqual(req.Share.GetPermissions().GetPermissions(), &provider.ResourcePermissions{}) {
 		st, err = s.denyGrant(ctx, req.GetShare().GetResourceId(), req.GetShare().GetGrantee(), opaque)
 		if err != nil {
 			return nil, errors.Wrap(err, "gateway: error denying grant in storage")
 		}
 	} else {
-		if !grant.Permissions.RemoveGrant {
+		listGrantRes, err := s.listGrants(ctx, req.GetShare().GetResourceId())
+		if err != nil {
+			return nil, errors.Wrap(err, "gateway: error getting grant to remove from storage")
+		}
+		existsGrant := s.getGranteeGrant(listGrantRes.GetGrants(), req.GetShare().GetGrantee())
+
+		if !slices.Contains(req.GetUpdateMask().GetPaths(), "permissions") {
+			req.Share.Permissions = &collaboration.SharePermissions{Permissions: existsGrant.GetPermissions()}
+		}
+
+		if !slices.Contains(req.GetUpdateMask().GetPaths(), "expiration") {
+			req.Share.Expiration = existsGrant.GetExpiration()
+		}
+
+		grant := &provider.Grant{
+			Grantee:     req.GetShare().GetGrantee(),
+			Permissions: req.GetShare().GetPermissions().GetPermissions(),
+			Expiration:  req.GetShare().GetExpiration(),
+			Creator:     ctxpkg.ContextMustGetUser(ctx).GetId(),
+		}
+
+		if grant.GetPermissions() == nil {
+			return &collaboration.UpdateShareResponse{Status: status.NewInvalid(ctx, "updating requires a received permission object")}, nil
+		}
+
+		if !grant.GetPermissions().GetRemoveGrant() {
 			// this request might remove Manager Permissions so we need to
 			// check if there is at least one manager remaining of the
 			// resource.
-			listGrantRes, err := s.listGrants(ctx, req.GetShare().GetResourceId())
-			if err != nil {
-				return nil, errors.Wrap(err, "gateway: error getting grant to remove from storage")
-			}
 			if !isSpaceManagerRemaining(listGrantRes.GetGrants(), grant.GetGrantee()) {
 				return &collaboration.UpdateShareResponse{
 					Status: status.NewPermissionDenied(ctx, errtypes.PermissionDenied(""), "can't remove the last manager"),
 				}, nil
 			}
+
 		}
 		st, err = s.updateGrant(ctx, req.GetShare().GetResourceId(), grant, opaque)
 		if err != nil {
@@ -521,6 +540,15 @@ func (s *svc) listGrants(ctx context.Context, id *provider.ResourceId) (*provide
 			nil
 	}
 	return grantRes, nil
+}
+
+func (s *svc) getGranteeGrant(grants []*provider.Grant, grantee *provider.Grantee) *provider.Grant {
+	for _, g := range grants {
+		if isEqualGrantee(g.Grantee, grantee) {
+			return g
+		}
+	}
+	return nil
 }
 
 func (s *svc) addShare(ctx context.Context, req *collaboration.CreateShareRequest) (*collaboration.CreateShareResponse, error) {

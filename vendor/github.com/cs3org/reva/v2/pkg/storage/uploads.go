@@ -76,6 +76,9 @@ type UploadSession interface {
 
 	// Purge allows completely removing an upload. Should emit a PostprocessingFinished event with a Delete outcome
 	Purge(ctx context.Context) error
+
+	// ScanData returns the scan data for the UploadSession
+	ScanData() (string, time.Time)
 }
 
 // UploadSessionFilter can be used to filter upload sessions
