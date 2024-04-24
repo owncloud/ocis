@@ -117,12 +117,12 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string) (
 		if res.Status.Code == rpcv1beta1.Code_CODE_NOT_FOUND {
 			return nil, "", ErrAccountNotFound
 		}
-		return nil, "", fmt.Errorf("could not get user by claim %v with value %v : %s ", claim, value, res.Status.Message)
+		return nil, "", fmt.Errorf("could not get user by claim %v with value %v : %s ", claim, value, res.GetStatus().GetMessage())
 	}
 
 	user := res.User
 
-	return user, res.Token, nil
+	return user, res.GetToken(), nil
 }
 
 func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error) {
@@ -141,7 +141,7 @@ func (c *cs3backend) Authenticate(ctx context.Context, username string, password
 	case err != nil:
 		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, %w", username, err)
 	case res.Status.Code != rpcv1beta1.Code_CODE_OK:
-		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, got code: %d", username, res.Status.Code)
+		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, got code: %d", username, res.GetStatus().GetCode())
 	}
 
 	return res.User, res.Token, nil
@@ -167,10 +167,10 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 		return nil, err
 	}
 	if authRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
-		return nil, fmt.Errorf("error authenticating service user: %s", authRes.Status.Message)
+		return nil, fmt.Errorf("error authenticating service user: %s", authRes.GetStatus().GetMessage())
 	}
 
-	lgClient, err := c.setupLibregraphClient(newctx, authRes.Token)
+	lgClient, err := c.setupLibregraphClient(newctx, authRes.GetToken())
 	if err != nil {
 		c.logger.Error().Err(err).Msg("Error setting up libregraph client.")
 		return nil, err
