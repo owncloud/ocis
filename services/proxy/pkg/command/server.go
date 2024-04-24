@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/staticroutes"
-
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/store"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
@@ -18,8 +18,6 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -39,6 +37,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/server/debug"
 	proxyHTTP "github.com/owncloud/ocis/v2/services/proxy/pkg/server/http"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/staticroutes"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	ocisstore "github.com/owncloud/ocis/v2/services/store/pkg/store"
@@ -227,6 +226,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 			backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
 			backend.WithOIDCissuer(cfg.OIDC.Issuer),
 			backend.WithServiceAccount(cfg.ServiceAccount),
+			backend.WithAutoProvisionClaims(cfg.AutoProvisionClaims),
 		)
 	default:
 		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)

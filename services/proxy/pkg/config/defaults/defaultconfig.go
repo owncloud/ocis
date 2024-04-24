@@ -84,6 +84,11 @@ func DefaultConfig() *config.Config {
 		UserOIDCClaim:         "preferred_username",
 		UserCS3Claim:          "username",
 		AutoprovisionAccounts: false,
+		AutoProvisionClaims: config.AutoProvisionClaims{
+			Username:    "preferred_username",
+			Email:       "email",
+			DisplayName: "name",
+		},
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,
 		CSPConfigFileLocation: "",

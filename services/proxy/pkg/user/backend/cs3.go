@@ -16,7 +16,6 @@ import (
 	"go-micro.dev/v4/selector"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
@@ -32,11 +31,12 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	logger            log.Logger
-	gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
-	machineAuthAPIKey string
-	oidcISS           string
-	serviceAccount    config.ServiceAccount
+	logger              log.Logger
+	gatewaySelector     pool.Selectable[gateway.GatewayAPIClient]
+	machineAuthAPIKey   string
+	oidcISS             string
+	serviceAccount      config.ServiceAccount
+	autoProvisionClaims config.AutoProvisionClaims
 }
 
 // WithLogger sets the logger option
@@ -71,6 +71,12 @@ func WithOIDCissuer(oidcISS string) Option {
 func WithServiceAccount(c config.ServiceAccount) Option {
 	return func(o *Options) {
 		o.serviceAccount = c
+	}
+}
+
+func WithAutoProvisionClaims(claims config.AutoProvisionClaims) Option {
+	return func(o *Options) {
+		o.autoProvisionClaims = claims
 	}
 }
 
@@ -262,22 +268,22 @@ func (c cs3backend) isAlreadyExists(resp *http.Response) (bool, error) {
 }
 
 func (c cs3backend) libregraphUserFromClaims(ctx context.Context, claims map[string]interface{}) (libregraph.User, error) {
-	var ok bool
-	var dn, mail, username string
 	user := libregraph.User{}
-	if dn, ok = claims[oidc.Name].(string); !ok {
-		return user, fmt.Errorf("Missing claim '%s'", oidc.Name)
+	if dn, ok := claims[c.autoProvisionClaims.DisplayName].(string); ok {
+		user.SetDisplayName(dn)
+	} else {
+		return user, fmt.Errorf("Missing claim '%s' (displayName)", c.autoProvisionClaims.DisplayName)
 	}
-	if mail, ok = claims[oidc.Email].(string); !ok {
-		return user, fmt.Errorf("Missing claim '%s'", oidc.Email)
+	if mail, ok := claims[c.autoProvisionClaims.Email].(string); ok {
+		user.SetMail(mail)
+	} else {
+		return user, fmt.Errorf("Missing claim '%s' (mail)", c.autoProvisionClaims.Email)
 	}
-	if username, ok = claims[oidc.PreferredUsername].(string); !ok {
-		c.logger.Warn().Str("claim", oidc.PreferredUsername).Msg("Missing claim for username, falling back to email address")
-		username = mail
+	if username, ok := claims[c.autoProvisionClaims.Username].(string); ok {
+		user.SetOnPremisesSamAccountName(username)
+	} else {
+		return user, fmt.Errorf("Missing claim '%s' (username)", c.autoProvisionClaims.Username)
 	}
-	user.DisplayName = &dn
-	user.OnPremisesSamAccountName = &username
-	user.Mail = &mail
 	return user, nil
 }
 
