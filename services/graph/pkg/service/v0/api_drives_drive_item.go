@@ -382,20 +382,27 @@ func (api DrivesDriveItemApi) UpdateDriveItem(w http.ResponseWriter, r *http.Req
 			request.UpdateMask.Paths = append(request.UpdateMask.Paths, _fieldMaskPathHidden)
 		},
 	)
-	switch {
-	case err != nil:
-		break
-	case len(updatedShares) == 0:
-		err = ErrNoShares
-	}
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrUpdateShares.Error())
 		ErrUpdateShares.Render(w, r)
 		return
 	}
 
+	driveItems, err := api.baseGraphService.CS3ReceivedSharesToDriveItems(r.Context(), updatedShares)
+	switch {
+	case err != nil:
+		break
+	case len(driveItems) != 1:
+		err = ErrDriveItemConversion
+	}
+	if err != nil {
+		api.logger.Debug().Err(err).Msg(ErrDriveItemConversion.Error())
+		ErrDriveItemConversion.Render(w, r)
+		return
+	}
+
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, updatedShares[0])
+	render.JSON(w, r, driveItems[0])
 }
 
 // CreateDriveItem creates a drive item

@@ -699,11 +699,17 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				Return([]*collaborationv1beta1.ReceivedShare{}, nil).
 				Once()
 
+			baseGraphProvider.
+				EXPECT().
+				CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
+				Return(nil, nil).
+				Once()
+
 			drivesDriveItemApi.UpdateDriveItem(w, r)
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrUpdateShares.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
 		})
 
 		It("successfully updates the share", func() {
@@ -744,7 +750,6 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				EXPECT().
 				UpdateShares(mock.Anything, mock.Anything, mock.Anything).
 				RunAndReturn(func(ctx context.Context, shares []*collaborationv1beta1.ReceivedShare, closure svc.UpdateShareClosure) ([]*collaborationv1beta1.ReceivedShare, error) {
-
 					updateReceivedShareRequest := &collaborationv1beta1.UpdateReceivedShareRequest{
 						Share: &collaborationv1beta1.ReceivedShare{
 							Share: &collaborationv1beta1.Share{
@@ -763,6 +768,12 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 					return shares, nil
 				}).
+				Once()
+
+			baseGraphProvider.
+				EXPECT().
+				CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
+				Return([]libregraph.DriveItem{{}}, nil).
 				Once()
 
 			drivesDriveItemApi.UpdateDriveItem(w, r)
