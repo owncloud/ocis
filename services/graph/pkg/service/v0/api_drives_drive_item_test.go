@@ -22,6 +22,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
@@ -665,51 +666,80 @@ var _ = Describe("DrivesDriveItemApi", func() {
 			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrUpdateShares.Error()))
 		})
 
-		It("fails if no shares are updated", func() {
-			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
-			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+		var _ = Describe("UpdateDriveItem", func() {
+			var (
+				driveItemJson []byte
+				w             *httptest.ResponseRecorder
+			)
 
-			w := httptest.NewRecorder()
+			BeforeEach(func() {
+				rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+				rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
 
-			driveItemJson, err := json.Marshal(libregraph.DriveItem{
-				UIHidden: conversions.ToPointer(true),
+				w = httptest.NewRecorder()
+
+				dJson, err := json.Marshal(libregraph.DriveItem{
+					UIHidden: conversions.ToPointer(true),
+				})
+				Expect(err).ToNot(HaveOccurred())
+
+				driveItemJson = dJson
+
+				drivesDriveItemProvider.
+					EXPECT().
+					GetShare(mock.Anything, mock.Anything).
+					Return(nil, nil).
+					Once()
+
+				drivesDriveItemProvider.
+					EXPECT().
+					GetShares(mock.Anything, mock.Anything, mock.Anything).
+					Return([]*collaborationv1beta1.ReceivedShare{}, nil).
+					Once()
+
+				drivesDriveItemProvider.
+					EXPECT().
+					UpdateShares(mock.Anything, mock.Anything, mock.Anything).
+					Return([]*collaborationv1beta1.ReceivedShare{}, nil).
+					Once()
 			})
-			Expect(err).ToNot(HaveOccurred())
 
-			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
-				WithContext(
-					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
-				)
+			It("fails if share to drive conversion reports an error", func() {
+				baseGraphProvider.
+					EXPECT().
+					CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
+					Return(nil, errors.New("some error")).
+					Once()
 
-			drivesDriveItemProvider.
-				EXPECT().
-				GetShare(mock.Anything, mock.Anything).
-				Return(nil, nil).
-				Once()
+				r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
+					WithContext(
+						context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+					)
 
-			drivesDriveItemProvider.
-				EXPECT().
-				GetShares(mock.Anything, mock.Anything, mock.Anything).
-				Return([]*collaborationv1beta1.ReceivedShare{}, nil).
-				Once()
+				drivesDriveItemApi.UpdateDriveItem(w, r)
+				Expect(w.Code).To(Equal(http.StatusBadRequest))
 
-			drivesDriveItemProvider.
-				EXPECT().
-				UpdateShares(mock.Anything, mock.Anything, mock.Anything).
-				Return([]*collaborationv1beta1.ReceivedShare{}, nil).
-				Once()
+				jsonData := gjson.Get(w.Body.String(), "error")
+				Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
+			})
+			It("fails if share to drive conversion returns more or less than 1 drive item", func() {
+				baseGraphProvider.
+					EXPECT().
+					CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
+					Return(nil, nil).
+					Once()
 
-			baseGraphProvider.
-				EXPECT().
-				CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
-				Return(nil, nil).
-				Once()
+				r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(driveItemJson)).
+					WithContext(
+						context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+					)
 
-			drivesDriveItemApi.UpdateDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusBadRequest))
+				drivesDriveItemApi.UpdateDriveItem(w, r)
+				Expect(w.Code).To(Equal(http.StatusBadRequest))
 
-			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
+				jsonData := gjson.Get(w.Body.String(), "error")
+				Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
+			})
 		})
 
 		It("successfully updates the share", func() {
