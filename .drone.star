@@ -189,6 +189,12 @@ stepVolumeCeph = \
         "path": "/etc/ceph",
     }
 
+stepVolumeFuse = \
+    {
+        "name": "fuse",
+        "path": "/dev/fuse",
+    }
+
 pipelineVolumeCeph = \
     {
         "name": "ceph_etc",
@@ -2155,13 +2161,15 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
                 "detach": True,
                 "environment": environment,
                 "user": user,
+                "cap_add": "SYS_ADMIN",
                 "commands": [
                     "apk add --no-cache ceph18-fuse",
                     #"sudo mkdir -p /etc/ceph",
                     #"cat /etc/ceph/ceph.conf | grep -E 'global|fsid|mon host' | sudo tee /etc/ceph/ceph.conf",
                     #"cp ceph-local:/etc/ceph/ceph.client.admin.keyring /etc/ceph/ceph.client.admin.keyring",
                     #"/etc/ceph/ceph.client.admin.keyring",
-                    "export fsid=$(cat /etc/ceph/ceph.conf | grep fsid | cut -c8-); echo $fsid; mount -t fuse.ceph admin@$fsid.cephfs=/ /var/lib/ocis/",
+                    "mkdir -p /var/lib/ocis",
+                    "export fsid=$(cat /etc/ceph/ceph.conf | grep fsid | cut -c8-); echo $fsid; ceph-fuse --id admin --client-fs cephfs /var/lib/ocis/",
                     #"ceph-fuse -id $fsid -m ceph:6789 -r / /mnt/",
                     "ls /mnt",
                     #"mount -t ceph admin@${fsid}.cephfs=/ /var/lib/ocis/",
@@ -2170,7 +2178,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
                     "%s init --insecure true" % ocis_bin,
                     "cat $OCIS_CONFIG_DIR/ocis.yaml",
                 ] + (wrapper_commands),
-                "volumes": volumes + [stepVolumeCeph],
+                "volumes": volumes + [stepVolumeCeph, stepVolumeFuse],
                 "depends_on": depends_on,
             },
             wait_for_ocis,
