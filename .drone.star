@@ -13,7 +13,7 @@ OC_CI_CLAMAVD = "owncloudci/clamavd"
 OC_CI_DRONE_ANSIBLE = "owncloudci/drone-ansible:latest"
 OC_CI_DRONE_SKIP_PIPELINE = "owncloudci/drone-skip-pipeline"
 OC_CI_GOLANG = "owncloudci/golang:1.22"
-OC_CI_CEPH = "quay.io/ceph/daemon:latest"
+OC_CI_CEPH = "ceph/daemon:latest"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
@@ -183,6 +183,18 @@ pipelineVolumeGo = \
         "temp": {},
     }
 
+stepVolumeCeph = \
+    {
+        "name": "ceph_etc",
+        "path": "/etc/ceph",
+    }
+
+pipelineVolumeCeph = \
+    {
+        "name": "ceph_etc",
+        "temp": {},
+    }
+
 # minio mc environment variables
 MINIO_MC_ENV = {
     "CACHE_BUCKET": {
@@ -213,6 +225,9 @@ def cephService():
         "name": "ceph",
         "image": OC_CI_CEPH,
         "pull": "always",
+        "volumes": [
+            stepVolumeCeph,
+        ],
         "environment": {
             "CEPH_DAEMON": "demo",
             "NETWORK_AUTO_DETECT": "4",
@@ -224,8 +239,6 @@ def cephService():
             "CEPH_DEMO_ACCESS_KEY": "test",
             "CEPH_DEMO_SECRET_KEY": "test",
             "CEPH_DEMO_BUCKET": "test",
-            "CEPHFS_CREATE": "1",
-            "CEPHFS_NAME": "cephfs",
         },
     }
 
@@ -300,7 +313,8 @@ def main(ctx):
     ceph_pipelines = \
         cephPipelines(ctx)
 
-    pipelines = test_pipelines + build_release_pipelines + ceph_pipelines
+    #pipelines = test_pipelines + build_release_pipelines + ceph_pipelines
+    pipelines = ceph_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -336,6 +350,7 @@ def cephPipeline(name, steps):
             "os": "linux",
             "arch": "amd64",
         },
+        "volumes": [pipelineVolumeCeph],
         "steps": steps,
         "services": [cephService()],
         "trigger": {
@@ -352,26 +367,16 @@ def cephPipelines(ctx):
         cephPipeline(
             "ceph",
             buildOcisBinaryForTesting(ctx)["steps"] +
-            restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-            ocisServer("ceph", 4, [], []) +
             [
                 {
                     "name": "wait-for-ceph",
                     "image": OC_CI_GOLANG,
                     "commands": [
-                        "sleep 10",
+                        "timeout 300 bash -c 'until curl http://ceph:5000 --output /dev/null --silent --head --fail ; do sleep 1; done'",
                     ],
                 },
-                {
-                    "name": "curl-ceph",
-                    "image": OC_CI_ALPINE,
-                    "commands": [
-                        "sleep 60",
-                        "apk add --no-cache curl",
-                        "curl -v -X PUT 'http://ceph:5000'",
-                    ],
-                },
-            ],
+            ] +
+            ocisServer("ceph", 4, [], ["wait-for-ceph"]),
         ),
     ]
 
@@ -391,6 +396,7 @@ def cachePipeline(name, steps):
                 "refs/pull/**",
             ],
         },
+        "volumes": [pipelineVolumeGo],
     }
 
 def buildWebCache(ctx):
@@ -2147,8 +2153,20 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
                 "detach": True,
                 "environment": environment,
                 "user": user,
+                "volume": [
+                    stepVolumeCeph,
+                ],
                 "commands": [
-                    "apk add --no-cache ceph18",
+                    "apk add --no-cache ceph18-base",
+                    #"sudo mkdir -p /etc/ceph",
+                    #"cat /etc/ceph/ceph.conf | grep -E 'global|fsid|mon host' | sudo tee /etc/ceph/ceph.conf",
+                    #"cp ceph-local:/etc/ceph/ceph.client.admin.keyring /etc/ceph/ceph.client.admin.keyring",
+                    #"/etc/ceph/ceph.client.admin.keyring",
+                    "ls /etc/ceph",
+                    "sleep 30",
+                    "export fsid=$(cat /etc/ceph/ceph.conf | grep fsid | cut -c8-); echo $fsid",
+                    "mount -t ceph admin@${fsid}.cephfs=/ /var/lib/ocis/",
+                    "df -h",
                     "%s init --insecure true" % ocis_bin,
                     "cat $OCIS_CONFIG_DIR/ocis.yaml",
                 ] + (wrapper_commands),
