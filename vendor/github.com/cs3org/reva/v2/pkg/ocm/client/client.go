@@ -272,7 +272,7 @@ func (c *OCMClient) Discovery(ctx context.Context, endpoint string) (*Capabiliti
 	defer resp.Body.Close()
 
 	var cap Capabilities
-	if err := json.NewDecoder(resp.Body).Decode(&c); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&cap); err != nil {
 		return nil, err
 	}
 
