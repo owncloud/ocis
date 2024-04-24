@@ -95,7 +95,7 @@ Feature: antivirus
       | permissionsRole    | edit                     |
       | password           | %public%                 |
       | expirationDateTime | 2040-01-01T23:59:59.000Z |
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" using the WebDAV API
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
@@ -120,7 +120,7 @@ Feature: antivirus
       | permissionsRole    | edit                     |
       | password           | %public%                 |
       | expirationDateTime | 2040-01-01T23:59:59.000Z |
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" using the WebDAV API
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
@@ -372,14 +372,13 @@ Feature: antivirus
   Scenario Outline: try to overwrite a file with the virus content in a public link share
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And using <dav-path-version> DAV path
-    And using sharingNg
+    And using SharingNG
     And user "Alice" has uploaded file with content "hello" to "test.txt"
     And user "Alice" has created the following link share:
       | resource        | test.txt |
       | space           | Personal |
       | permissionsRole | edit     |
-      | password        | %public% |
-    When the public overwrites file "test.txt" with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" using the "new" WebDAV API
+    When the public overwrites file "test.txt" with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" using the new WebDAV API
     Then the HTTP status code should be "204"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                   |

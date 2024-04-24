@@ -1689,7 +1689,6 @@ class PublicWebDavContext implements Context {
 	 * @param bool $autoRename
 	 * @param array $additionalHeaders
 	 * @param string $publicWebDAVAPIVersion
-	 * @param bool $shareNg
 	 *
 	 * @return ResponseInterface|null
 	 */
@@ -1700,14 +1699,12 @@ class PublicWebDavContext implements Context {
 		bool $autoRename = false,
 		array $additionalHeaders = [],
 		string $publicWebDAVAPIVersion = "old",
-		bool $shareNg = false
 	):?ResponseInterface {
 		if ($publicWebDAVAPIVersion === "old") {
 			return null;
 		}
 		$password = $this->featureContext->getActualPassword($password);
-		$shareNg = $this->featureContext->getSharingNgValue();
-		if ($shareNg) {
+		if ($this->featureContext->isUsingSharingNG()) {
 			$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
 		} else {
 			$token = $this->featureContext->getLastCreatedPublicShareToken();
