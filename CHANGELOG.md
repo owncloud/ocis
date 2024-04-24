@@ -546,6 +546,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8795
    https://github.com/owncloud/ocis/pull/8701
    https://github.com/owncloud/ocis/pull/8606
+   https://github.com/owncloud/ocis/pull/8937
 
 * Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
 
