@@ -811,6 +811,177 @@ var _ = Describe("DrivesDriveItemApi", func() {
 		})
 	})
 
+	Describe("GetDriveItem", func() {
+		BeforeEach(func() {
+			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
+			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
+		})
+
+		failOnInvalidDriveIDOrItemID(drivesDriveItemApi.GetDriveItem)
+
+		failOnNonShareJailDriveID(drivesDriveItemApi.GetDriveItem)
+
+		It("fails if retrieving the share fails", func() {
+			w := httptest.NewRecorder()
+
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{})
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShare(mock.Anything, mock.Anything).
+				Return(nil, errors.New("some error")).
+				Once()
+
+			drivesDriveItemApi.GetDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusNotFound))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrNoShares.Error()))
+		})
+
+		It("fails if retrieving the shares fail", func() {
+			w := httptest.NewRecorder()
+
+			driveItemJson, err := json.Marshal(libregraph.DriveItem{})
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShare(mock.Anything, mock.Anything).
+				Return(nil, nil).
+				Once()
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShares(mock.Anything, mock.Anything, mock.Anything).
+				Return(nil, errors.New("some error")).
+				Once()
+
+			drivesDriveItemApi.GetDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusNotFound))
+
+			jsonData := gjson.Get(w.Body.String(), "error")
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrNoShares.Error()))
+		})
+
+		Describe("returning the share", func() {
+			var (
+				w *httptest.ResponseRecorder
+				r *http.Request
+			)
+
+			BeforeEach(func() {
+				w = httptest.NewRecorder()
+
+				driveItemJson, _ := json.Marshal(libregraph.DriveItem{
+					UIHidden: conversions.ToPointer(true),
+				})
+
+				r = httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(driveItemJson)).
+					WithContext(
+						context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+					)
+
+				share := &collaborationv1beta1.ReceivedShare{
+					Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{
+						OpaqueId: "123",
+					}},
+				}
+
+				drivesDriveItemProvider.
+					EXPECT().
+					GetShare(mock.Anything, mock.Anything).
+					Return(nil, nil).
+					Once()
+
+				drivesDriveItemProvider.
+					EXPECT().
+					GetShares(mock.Anything, mock.Anything, mock.Anything).
+					Return([]*collaborationv1beta1.ReceivedShare{share}, nil).
+					Once()
+			})
+
+			It("fails if more that one share found", func() {
+				baseGraphProvider.
+					EXPECT().
+					CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
+					Return([]libregraph.DriveItem{{}, {}}, nil).
+					Once()
+
+				drivesDriveItemApi.GetDriveItem(w, r)
+				Expect(w.Code).To(Equal(http.StatusBadRequest))
+
+				jsonData := gjson.Get(w.Body.String(), "error")
+				Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
+			})
+
+			It("fails if no shares are found", func() {
+				baseGraphProvider.
+					EXPECT().
+					CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
+					Return(nil, errors.New("some error")).
+					Once()
+
+				drivesDriveItemApi.GetDriveItem(w, r)
+				Expect(w.Code).To(Equal(http.StatusBadRequest))
+
+				jsonData := gjson.Get(w.Body.String(), "error")
+				Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrDriveItemConversion.Error()))
+			})
+		})
+
+		It("successfully returns the share", func() {
+			w := httptest.NewRecorder()
+
+			driveItemJson, _ := json.Marshal(libregraph.DriveItem{
+				UIHidden: conversions.ToPointer(true),
+			})
+
+			r := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(driveItemJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+
+			share := &collaborationv1beta1.ReceivedShare{
+				Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{
+					OpaqueId: "123",
+				}},
+			}
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShare(mock.Anything, mock.Anything).
+				Return(nil, nil).
+				Once()
+
+			drivesDriveItemProvider.
+				EXPECT().
+				GetShares(mock.Anything, mock.Anything, mock.Anything).
+				Return([]*collaborationv1beta1.ReceivedShare{share}, nil).
+				Once()
+
+			baseGraphProvider.
+				EXPECT().
+				CS3ReceivedSharesToDriveItems(mock.Anything, mock.Anything).
+				Return([]libregraph.DriveItem{{}}, nil).
+				Once()
+
+			drivesDriveItemApi.GetDriveItem(w, r)
+			Expect(w.Code).To(Equal(http.StatusOK))
+		})
+	})
+
 	Describe("CreateDriveItem", func() {
 		It("fails without a driveID", func() {
 			w := httptest.NewRecorder()
