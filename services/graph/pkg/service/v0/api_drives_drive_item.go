@@ -33,41 +33,37 @@ var (
 	// ErrNoUpdater is returned when no updater is provided
 	ErrNoUpdater = errors.New("no updater")
 
-	// ErrNoShares is returned when no shares are found
-	ErrNoShares = errors.New("no shares found")
-
-	// ErrNoShare is returned when no share is found
-	ErrNoShare = errors.New("no shares found")
-
 	// ErrAbsoluteNamePath is returned when the name is an absolute path
 	ErrAbsoluteNamePath = errors.New("name cannot be an absolute path")
 
+	// ErrCode errors
+
 	// ErrNotAShareJail is returned when the driveID does not belong to a share jail
-	ErrNotAShareJail = errors.New("id does not belong to a share jail")
+	ErrNotAShareJail = errorcode.New(errorcode.InvalidRequest, "id does not belong to a share jail")
 
 	// ErrInvalidDriveIDOrItemID is returned when the driveID or itemID is invalid
-	ErrInvalidDriveIDOrItemID = errors.New("invalid driveID or itemID")
+	ErrInvalidDriveIDOrItemID = errorcode.New(errorcode.InvalidRequest, "invalid driveID or itemID")
 
 	// ErrInvalidRequestBody is returned when the request body is invalid
-	ErrInvalidRequestBody = errors.New("invalid request body")
+	ErrInvalidRequestBody = errorcode.New(errorcode.InvalidRequest, "invalid request body")
 
 	// ErrUnmountShare is returned when unmounting a share fails
-	ErrUnmountShare = errors.New("unmounting share failed")
+	ErrUnmountShare = errorcode.New(errorcode.InvalidRequest, "unmounting share failed")
 
 	// ErrMountShare is returned when mounting a share fails
-	ErrMountShare = errors.New("mounting share failed")
-
-	// ErrGetShareAndSiblings is returned when getting the share and siblings fails
-	ErrGetShareAndSiblings = errors.New("failed to get share and siblings")
+	ErrMountShare = errorcode.New(errorcode.InvalidRequest, "mounting share failed")
 
 	// ErrUpdateShares is returned when updating shares fails
-	ErrUpdateShares = errors.New("failed to update share")
+	ErrUpdateShares = errorcode.New(errorcode.InvalidRequest, "failed to update share")
 
 	// ErrInvalidID is returned when the id is invalid
-	ErrInvalidID = errors.New("invalid id")
+	ErrInvalidID = errorcode.New(errorcode.InvalidRequest, "invalid id")
 
 	// ErrDriveItemConversion is returned when converting to drive items fails
-	ErrDriveItemConversion = errors.New("converting to drive items failed")
+	ErrDriveItemConversion = errorcode.New(errorcode.InvalidRequest, "converting to drive items failed")
+
+	// ErrNoShares is returned when no shares are found
+	ErrNoShares = errorcode.New(errorcode.ItemNotFound, "no shares found")
 )
 
 type (
@@ -320,20 +316,20 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrInvalidDriveIDOrItemID.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrInvalidDriveIDOrItemID.Error())
+		ErrInvalidDriveIDOrItemID.Render(w, r)
 		return
 	}
 
 	if !IsShareJail(driveID) {
 		api.logger.Debug().Interface("driveID", driveID).Msg(ErrNotAShareJail.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrNotAShareJail.Error())
+		ErrNotAShareJail.Render(w, r)
 		return
 	}
 
 	shareID := ExtractShareIdFromResourceId(itemID)
 	if err := api.drivesDriveItemService.UnmountShare(ctx, shareID); err != nil {
 		api.logger.Debug().Err(err).Msg(ErrUnmountShare.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrUnmountShare.Error())
+		ErrUnmountShare.Render(w, r)
 		return
 	}
 
@@ -346,13 +342,13 @@ func (api DrivesDriveItemApi) UpdateDriveItem(w http.ResponseWriter, r *http.Req
 	driveID, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrInvalidDriveIDOrItemID.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrInvalidDriveIDOrItemID.Error())
+		ErrInvalidDriveIDOrItemID.Render(w, r)
 		return
 	}
 
 	if !IsShareJail(driveID) {
 		api.logger.Debug().Interface("driveID", driveID).Msg(ErrNotAShareJail.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrNotAShareJail.Error())
+		ErrNotAShareJail.Render(w, r)
 		return
 	}
 
@@ -360,21 +356,21 @@ func (api DrivesDriveItemApi) UpdateDriveItem(w http.ResponseWriter, r *http.Req
 	requestDriveItem := libregraph.DriveItem{}
 	if err := StrictJSONUnmarshal(r.Body, &requestDriveItem); err != nil {
 		api.logger.Debug().Err(err).Msg(ErrInvalidRequestBody.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrInvalidRequestBody.Error())
+		ErrInvalidRequestBody.Render(w, r)
 		return
 	}
 
 	share, err := api.drivesDriveItemService.GetShare(r.Context(), shareID)
 	if err != nil {
-		api.logger.Debug().Err(err).Msg(ErrNoShare.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrNoShare.Error())
+		api.logger.Debug().Err(err).Msg(ErrNoShares.Error())
+		ErrNoShares.Render(w, r)
 		return
 	}
 
 	availableShares, err := api.drivesDriveItemService.GetShares(r.Context(), share.GetShare().GetResourceId(), nil)
 	if err != nil {
-		api.logger.Debug().Err(err).Msg(ErrGetShareAndSiblings.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrGetShareAndSiblings.Error())
+		api.logger.Debug().Err(err).Msg(ErrNoShares.Error())
+		ErrNoShares.Render(w, r)
 		return
 	}
 
@@ -394,7 +390,7 @@ func (api DrivesDriveItemApi) UpdateDriveItem(w http.ResponseWriter, r *http.Req
 	}
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrUpdateShares.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrUpdateShares.Error())
+		ErrUpdateShares.Render(w, r)
 		return
 	}
 
@@ -408,28 +404,29 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrInvalidDriveIDOrItemID.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrInvalidDriveIDOrItemID.Error())
+		ErrInvalidDriveIDOrItemID.Render(w, r)
 		return
 	}
 
 	if !IsShareJail(driveID) {
 		api.logger.Debug().Interface("driveID", driveID).Msg(ErrNotAShareJail.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrNotAShareJail.Error())
+		ErrNotAShareJail.Render(w, r)
 		return
 	}
 
 	requestDriveItem := libregraph.DriveItem{}
 	if err := StrictJSONUnmarshal(r.Body, &requestDriveItem); err != nil {
 		api.logger.Debug().Err(err).Msg(ErrInvalidRequestBody.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusUnprocessableEntity, ErrInvalidRequestBody.Error())
+		ErrInvalidRequestBody.Render(w, r)
 		return
+
 	}
 
 	remoteItem := requestDriveItem.GetRemoteItem()
 	resourceId, err := storagespace.ParseID(remoteItem.GetId())
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrInvalidID.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, ErrInvalidID.Error())
+		ErrInvalidID.Render(w, r)
 		return
 	}
 
@@ -437,7 +434,7 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 		MountShare(ctx, &resourceId, requestDriveItem.GetName())
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrMountShare.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, ErrMountShare.Error())
+		ErrMountShare.Render(w, r)
 		return
 	}
 
@@ -450,7 +447,7 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 	}
 	if err != nil {
 		api.logger.Debug().Err(err).Msg(ErrDriveItemConversion.Error())
-		errorcode.InvalidRequest.Render(w, r, http.StatusFailedDependency, ErrDriveItemConversion.Error())
+		ErrDriveItemConversion.Render(w, r)
 		return
 	}
 
