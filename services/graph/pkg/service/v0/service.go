@@ -247,6 +247,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 						})
 					})
 					r.Route("/items/{itemID}", func(r chi.Router) {
+						r.Get("/", drivesDriveItemApi.GetDriveItem)
 						r.Patch("/", drivesDriveItemApi.UpdateDriveItem)
 						r.Delete("/", drivesDriveItemApi.DeleteDriveItem)
 						r.Post("/invite", driveItemPermissionsApi.Invite)
