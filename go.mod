@@ -75,7 +75,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/client_golang v1.19.0
 	github.com/r3labs/sse/v2 v2.10.0
-	github.com/riandyrn/otelchi v0.5.1
+	github.com/riandyrn/otelchi v0.7.0
 	github.com/rogpeppe/go-internal v1.12.0
 	github.com/rs/zerolog v1.32.0
 	github.com/shamaton/msgpack/v2 v2.2.0
@@ -329,7 +329,6 @@ require (
 	go.etcd.io/etcd/client/pkg/v3 v3.5.12 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.12 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	go.opentelemetry.io/contrib v1.0.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.48.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.25.0 // indirect
 	go.opentelemetry.io/otel/metric v1.25.0 // indirect
