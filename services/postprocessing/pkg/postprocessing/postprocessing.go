@@ -22,6 +22,7 @@ type Postprocessing struct {
 	Status      Status
 	Failures    int
 	InitiatorID string
+	Finished    bool
 
 	config config.Postprocessing
 }
