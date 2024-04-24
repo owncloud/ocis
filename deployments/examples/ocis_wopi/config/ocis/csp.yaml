@@ -7,6 +7,8 @@ directives:
     - '''none'''
   font-src:
     - '''self'''
+  frame-ancestors:
+    - '''none'''
   frame-src:
     - '''self'''
     - 'https://embed.diagrams.net/'

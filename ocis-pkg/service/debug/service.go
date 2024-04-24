@@ -68,7 +68,6 @@ func NewService(opts ...Option) *http.Server {
 				cors.AllowedHeaders(dopts.CorsAllowedHeaders),
 				cors.AllowCredentials(dopts.CorsAllowCredentials),
 			),
-			middleware.Secure,
 			middleware.Version(
 				dopts.Name,
 				dopts.Version,

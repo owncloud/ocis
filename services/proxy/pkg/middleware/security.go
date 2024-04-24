@@ -42,6 +42,7 @@ func Security(cspConfig *config.CSP) func(h http.Handler) http.Handler {
 		ContentSecurityPolicy:   cspBuilder.MustBuild(),
 		ContentTypeNosniff:      true,
 		CustomFrameOptionsValue: "SAMEORIGIN",
+		FrameDeny:               true,
 		ReferrerPolicy:          "strict-origin-when-cross-origin",
 		STSSeconds:              315360000,
 		STSPreload:              true,
