@@ -153,6 +153,32 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" tries to list the permissions of space "([^"]*)" owned by "([^"]*)" using permissions endpoint of the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $space
+	 * @param string $spaceOwner
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userTriesToListThePermissionsOfSpaceUsingPermissionsEndpointOfTheGraphApi(string $user, string $space, string $spaceOwner):void {
+		$spaceId = ($this->spacesContext->getSpaceByName($spaceOwner, $space))["id"];
+		$itemId = $this->spacesContext->getResourceId($spaceOwner, $space, '');
+		
+		$this->featureContext->setResponse(
+			GraphHelper::getPermissionsList(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId,
+				$itemId
+			)
+		);
+	}
+
+	/**
 	 * @param string $user
 	 * @param TableNode $table
 	 * @param string|null $fileId
