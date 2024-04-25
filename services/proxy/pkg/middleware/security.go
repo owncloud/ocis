@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/a8m/envsubst"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/unrolled/secure"
 	"github.com/unrolled/secure/cspbuilder"
@@ -15,6 +16,13 @@ func LoadCSPConfig(proxyCfg *config.Config) (*config.CSP, error) {
 	if err != nil {
 		return nil, err
 	}
+	// replace env vars ..
+	yamlContent, err = envsubst.Bytes(yamlContent)
+	if err != nil {
+		return nil, err
+	}
+
+	// read yaml
 	cspConfig := config.CSP{}
 	err = yaml.Unmarshal(yamlContent, &cspConfig)
 	if err != nil {

@@ -12,14 +12,14 @@ directives:
   frame-src:
     - '''self'''
     - 'https://embed.diagrams.net/'
-    - 'https://onlyoffice.owncloud.test/'
-    - 'https://collabora.owncloud.test/'
+    - 'https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}/'
+    - 'https://${COLLABORA_DOMAIN:-collabora.owncloud.test}/'
   img-src:
     - '''self'''
     - 'data:'
     - 'blob:'
-    - 'https://onlyoffice.owncloud.test/'
-    - 'https://collabora.owncloud.test/'
+    - 'https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}/'
+    - 'https://${COLLABORA_DOMAIN:-collabora.owncloud.test}/'
   manifest-src:
     - '''self'''
   media-src:

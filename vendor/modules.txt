@@ -69,6 +69,10 @@ github.com/ProtonMail/go-crypto/openpgp/s2k
 github.com/RoaringBitmap/roaring
 github.com/RoaringBitmap/roaring/internal
 github.com/RoaringBitmap/roaring/roaring64
+# github.com/a8m/envsubst v1.4.2
+## explicit; go 1.17
+github.com/a8m/envsubst
+github.com/a8m/envsubst/parse
 # github.com/agnivade/levenshtein v1.1.1
 ## explicit; go 1.13
 github.com/agnivade/levenshtein
