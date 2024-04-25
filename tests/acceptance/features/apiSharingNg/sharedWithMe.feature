@@ -3981,7 +3981,184 @@ Feature: an user gets the resources shared to them
     """
 
 
-  Scenario: user lists the folder shared with them from project space after the sharer is disabled
+  Scenario: sharee lists the file share after the sharer is disabled (Personal space)
+    Given user "Alice" has uploaded file with content "hello" to "textfile0.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And the user "Admin" has disabled user "Alice"
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "textfile0.txt" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "@UI.Hidden",
+          "@client.synchronize",
+          "createdBy",
+          "eTag",
+          "file",
+          "id",
+          "name",
+          "parentReference",
+          "remoteItem",
+          "size"
+        ],
+        "properties": {
+          "@UI.Hidden": {
+            "const": false
+          },
+          "@client.synchronize": {
+            "const": true
+          },
+          "createdBy": {
+            "type": "object",
+            "required": ["user"],
+            "properties": {
+              "user": {
+                "type": "object",
+                "required": ["displayName", "id"],
+                "properties": {
+                  "displayName": {
+                    "const": "Alice Hansen"
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "const": "textfile0.txt"
+          },
+          "parentReference": {
+            "type": "object",
+            "required": [
+              "driveId",
+              "driveType",
+              "id"
+            ],
+            "properties": {
+              "driveType": {
+                "const": "virtual"
+              }
+            }
+          },
+          "remoteItem": {
+            "type": "object",
+            "required": [
+              "createdBy",
+              "eTag",
+              "file",
+              "id",
+              "name",
+              "parentReference",
+              "permissions",
+              "size"
+            ],
+            "properties": {
+              "createdBy": {
+                "type": "object",
+                "required": ["user"],
+                "properties": {
+                  "user": {
+                    "type": "object",
+                    "required": ["id", "displayName"],
+                    "properties": {
+                      "displayName": {
+                        "const": "Alice Hansen"
+                      }
+                    }
+                  }
+                }
+              },
+              "name": {
+                "const": "textfile0.txt"
+              },
+              "parentReference": {
+                "type": "object",
+                "required": ["driveId", "driveType"],
+                "properties": {
+                  "driveType": {
+                    "const": "personal"
+                  }
+                }
+              },
+              "permissions": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "grantedToV2",
+                    "id",
+                    "invitation",
+                    "roles"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%permissions_id_pattern%$"
+                    },
+                    "grantedToV2": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["displayName", "id"],
+                          "properties": {
+                            "displayName": {
+                              "const": "Brian Murphy"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "invitation": {
+                      "type": "object",
+                      "required": ["invitedBy"],
+                      "properties": {
+                        "invitedBy": {
+                          "type": "object",
+                          "required": ["user"],
+                          "properties": {
+                            "user": {
+                              "type": "object",
+                              "required": ["displayName", "id"],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "roles": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "string",
+                        "pattern": "^%role_id_pattern%$"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharee lists the folder share after the sharer is disabled (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
@@ -4191,7 +4368,7 @@ Feature: an user gets the resources shared to them
     """
 
   @env-config @8314
-  Scenario: user lists the folder shared with them from project space after the sharer is deleted
+  Scenario: sharee lists the folder share after sharer is deleted (Project space)
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -4402,7 +4579,7 @@ Feature: an user gets the resources shared to them
     """
 
 
-  Scenario: user lists the file shared with them from personal space after the sharer is deleted
+  Scenario: sharee lists the file share after sharer is deleted (Personal space)
     Given user "Alice" has uploaded file with content "hello" to "textfile0.txt"
     And user "Alice" has sent the following share invitation:
       | resource        | textfile0.txt |
@@ -4429,7 +4606,7 @@ Feature: an user gets the resources shared to them
     """
 
 
-  Scenario: user lists the folder shared with them from personal space after the sharer is deleted
+  Scenario: sharee lists the folder share after sharer is deleted (Personal space)
     Given user "Alice" has created folder "folder"
     And user "Alice" has sent the following share invitation:
       | resource        | folder   |
@@ -4458,7 +4635,7 @@ Feature: an user gets the resources shared to them
     """
 
   @env-config @8314
-  Scenario: user lists the file shared with them from project space after the sharer is deleted
+  Scenario: sharee lists the file share with after sharer is deleted (Project space)
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
