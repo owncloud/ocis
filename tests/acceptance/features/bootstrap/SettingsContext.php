@@ -541,5 +541,6 @@ class SettingsContext implements Context {
 			"Expected response status code should be 201",
 			$response
 		);
+		$this->featureContext->rememberUserAutoSyncSetting($user, false);
 	}
 }

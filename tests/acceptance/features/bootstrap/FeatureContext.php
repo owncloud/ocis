@@ -167,6 +167,39 @@ class FeatureContext extends BehatVariablesContext {
 	private array $lastHttpStatusCodesArray = [];
 	private array $lastOCSStatusCodesArray = [];
 
+	/**
+	 * Store for auto-sync settings for users
+	 */
+	private array $autoSyncSettings = [];
+
+	/**
+	 * @param string $user
+	 *
+	 * @return bool
+	 */
+	public function getUserAutoSyncSetting(string $user): bool {
+		if (\array_key_exists($user, $this->autoSyncSettings)) {
+			return $this->autoSyncSettings[$user];
+		}
+		// auto-sync is enabled by default
+		return true;
+	}
+
+	/**
+	 * @param string $user
+	 * @param bool $value
+	 *
+	 * @return void
+	 */
+	public function rememberUserAutoSyncSetting(string $user, bool $value): void {
+		$this->autoSyncSettings[$user] = $value;
+	}
+
+	/**
+	 * this is set true for db conversion tests
+	 */
+	private bool $dbConversion = false;
+
 	public const SHARES_SPACE_ID = 'a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668';
 	private bool $useSharingNG = false;
 
