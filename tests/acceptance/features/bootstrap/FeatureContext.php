@@ -181,8 +181,10 @@ class FeatureContext extends BehatVariablesContext {
 		if (\array_key_exists($user, $this->autoSyncSettings)) {
 			return $this->autoSyncSettings[$user];
 		}
-		// auto-sync is enabled by default
-		return true;
+		$autoSyncSetting = $this->settingsContext->getAutoAcceptSharesSettingValue($user);
+		$this->autoSyncSettings[$user] = $autoSyncSetting;
+
+		return $autoSyncSetting;
 	}
 
 	/**
@@ -1465,15 +1467,12 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @param ResponseInterface|null $response
 	 *
-	 * @return object
+	 * @return mixed
 	 */
-	public function getJsonDecodedResponseBodyContent(ResponseInterface $response = null):?object {
+	public function getJsonDecodedResponseBodyContent(ResponseInterface $response = null): mixed {
 		$response = $response ?? $this->response;
-		if ($response !== null) {
-			$response->getBody()->rewind();
-			return json_decode($response->getBody()->getContents());
-		}
-		return null;
+		$response->getBody()->rewind();
+		return json_decode($response->getBody()->getContents(), null, 512, JSON_THROW_ON_ERROR);
 	}
 
 	/**
@@ -2440,12 +2439,14 @@ class FeatureContext extends BehatVariablesContext {
 		$this->ocsContext = new OCSContext();
 		$this->authContext = new AuthContext();
 		$this->tusContext = new TUSContext();
+		$this->settingsContext = new SettingsContext();
 		$this->ocsContext->before($scope);
 		$this->authContext->setUpScenario($scope);
 		$this->tusContext->setUpScenario($scope);
 		$environment->registerContext($this->ocsContext);
 		$environment->registerContext($this->authContext);
 		$environment->registerContext($this->tusContext);
+		$environment->registerContext($this->settingsContext);
 		$scenarioLine = $scope->getScenario()->getLine();
 		$featureFile = $scope->getFeature()->getFile();
 		$suiteName = $scope->getSuite()->getName();

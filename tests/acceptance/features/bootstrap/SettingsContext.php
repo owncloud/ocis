@@ -360,6 +360,37 @@ class SettingsContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 *
+	 * @return bool
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function getAutoAcceptSharesSettingValue(string $user): bool {
+		$response = $this->sendRequestGetSettingsValuesList($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201",
+			$response
+		);
+
+		$body = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+
+		if (empty($body)) {
+			return true;
+		}
+
+		foreach ($body->values as $value) {
+			if ($value->identifier->setting === "auto-accept-shares") {
+				return $value->value->boolValue;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * @When /^user "([^"]*)" lists values-list with headers using the Settings API$/
 	 *
 	 * @param string $user
