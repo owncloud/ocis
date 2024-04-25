@@ -239,3 +239,54 @@ Feature: accessing files using file id
       | dav-path                          |
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: user who is member of group gets content of a shared file in project space when sync is disabled
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has disabled the auto-sync share
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Admin" has created a group "grp1" using the Graph API
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | new-space    |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    When user "Brian" sends HTTP method "GET" to URL "<dav-path>"
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "some content"
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: user who is member of group gets content of a file from shared folder in project space when sync is disabled
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has disabled the auto-sync share
+    And user "Alice" has created a folder "uploadFolder" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "uploadFolder/textfile.txt"
+    And we save it into "FILEID"
+    And user "Admin" has created a group "grp1" using the Graph API
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | new-space    |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    When user "Brian" sends HTTP method "GET" to URL "<dav-path>"
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "some content"
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
