@@ -825,9 +825,12 @@ class SharingNgContext implements Context {
 		$shareInvitationRequestResult = "From the given allowed role lists from the permissions:\n";
 		$areAllSendInvitationSuccessFullForAllowedRoles = true;
 		$rows = $table->getRowsHash();
-		$resource = $rows['resource'];
+		// when sending share invitation for a project space, the resource to be shared is project space itself. So resource can be put as empty
+		$resource = $rows['resource'] ?? '';
 		$shareType = $rows['shareType'];
 		$space = $rows['space'];
+		//this details is needed for result logging purpose to determine whether the resource shared is a resource or a project space
+		$resourceDetail = ($resource) ? "resource '" . $resource : "space '" . $space;
 		foreach ($allowedPermissionRoles as $role) {
 			//we should be able to send share invitation for each of the role allowed for the files/folders which are  listed in permissions (allowed)
 			$roleAllowed = GraphHelper::getPermissionNameByPermissionRoleId($role->id);
@@ -840,7 +843,7 @@ class SharingNgContext implements Context {
 				Assert::assertEquals(204, $removePermissionsResponse->getStatusCode());
 			} else {
 				$areAllSendInvitationSuccessFullForAllowedRoles = false;
-				$shareInvitationRequestResult .= "\tShare invitation for resource '" . $resource . "' with role '" . $roleAllowed . "' failed and was not allowed.\n";
+				$shareInvitationRequestResult .= "\tShare invitation for " . $resourceDetail . "' with role '" . $roleAllowed . "' failed and was not allowed.\n";
 			}
 		}
 		Assert::assertTrue($areAllSendInvitationSuccessFullForAllowedRoles, $shareInvitationRequestResult);

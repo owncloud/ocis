@@ -1081,6 +1081,19 @@ Feature: List a sharing permissions
       | Shares   |
 
 
+  Scenario: space admin share invitation with all allowed roles for a project space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" lists the permissions of space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Alice" should be able to send share invitation with all allowed permission roles
+      | space        | new-space    |
+      | sharee       | Brian        |
+      | shareType    | user         |
+
+
   Scenario: user sends share invitation with all allowed roles for a file in project space
     Given using spaces DAV path
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
