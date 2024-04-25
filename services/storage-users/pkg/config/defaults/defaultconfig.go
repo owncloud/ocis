@@ -142,6 +142,7 @@ func DefaultConfig() *config.Config {
 				AsyncUploads:               true,
 			},
 			Posix: config.PosixDriver{
+				UseSpaceGroups:            false,
 				PersonalSpacePathTemplate: "users/{{.User.Username}}",
 				GeneralSpacePathTemplate:  "projects/{{.SpaceId}}",
 				PermissionsEndpoint:       "com.owncloud.api.settings",

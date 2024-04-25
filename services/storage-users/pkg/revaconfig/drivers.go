@@ -104,7 +104,7 @@ func Posix(cfg *config.Config) map[string]interface{} {
 			"cache_auth_username":       cfg.IDCache.AuthUsername,
 			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
-
+		"use_space_groups":           cfg.Drivers.Posix.UseSpaceGroups,
 		"watch_type":                 cfg.Drivers.Posix.WatchType,
 		"watch_path":                 cfg.Drivers.Posix.WatchPath,
 		"watch_folder_kafka_brokers": cfg.Drivers.Posix.WatchFolderKafkaBrokers,
