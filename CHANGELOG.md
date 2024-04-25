@@ -68,6 +68,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Nats reconnects: [#8880](https://github.com/owncloud/ocis/pull/8880)
 * Bugfix - Update the admin user role assignment to enforce the config: [#8897](https://github.com/owncloud/ocis/pull/8897)
 * Bugfix - Fix affected users on sses: [#8928](https://github.com/owncloud/ocis/pull/8928)
+* Bugfix - Fix well-known rewrite endpoint: [#8946](https://github.com/owncloud/ocis/pull/8946)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
@@ -273,6 +274,11 @@ The following sections list the changes for unreleased.
    The AffectedUsers field of sses now only reports affected users.
 
    https://github.com/owncloud/ocis/pull/8928
+
+* Bugfix - Fix well-known rewrite endpoint: [#8946](https://github.com/owncloud/ocis/pull/8946)
+
+   https://github.com/owncloud/ocis/issues/8703
+   https://github.com/owncloud/ocis/pull/8946
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
