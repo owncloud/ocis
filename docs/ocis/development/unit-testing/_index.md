@@ -1,7 +1,7 @@
 ---
 title: "Unit Testing"
 date: 2024-04-25T00:00:00+00:00
-weight: 37
+weight: 5
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/development/unit-testing
 geekdocFilePath: _index.md
@@ -16,7 +16,7 @@ Go is a statically typed language, which makes it easy to write unit tests. The 
 - [Gomega](https://onsi.github.io/gomega/) - A matcher/assertion library for Ginkgo.
 - [GoDog](https://github.com/cucumber/godog) - A Behavior-Driven Development framework for Go which uses Gherkin.
 
-In ocis we generally use [Ginkgo](https://onsi.github.io/ginkgo/) framework for testing. To keep thins consistent, we would encourage you to use the same. In some cases, where you feel the need for a more verbose or more "code oriented" approach, you can also use the testing package from the standard library without ginkgo.
+In oCIS we generally use [Ginkgo](https://onsi.github.io/ginkgo/) framework for testing. To keep things consistent, we would encourage you to use the same. In some cases, where you feel the need for a more verbose or more "code oriented" approach, you can also use the testing package from the standard library without ginkgo.
 
 ## 1 Ginkgo
 
@@ -59,7 +59,7 @@ Describe("Public Share Provider", func() {
 })
 ```
 
-### How to use it in ocis
+### How to use it in oCIS
 
 {{< button relref="testing-ginkgo" size="large" >}}{{< icon "gdoc_arrow_right_alt" >}} Read more{{< /button >}}
 

@@ -1,7 +1,7 @@
 ---
 title: "Testing with Ginkgo"
 date: 2024-04-25T00:00:00+00:00
-weight: 37
+weight: 10
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/development/unit-testing
 geekdocFilePath: testing-ginkgo.md
@@ -10,7 +10,7 @@ geekdocFilePath: testing-ginkgo.md
 
 {{< toc >}}
 
-In this section we try to enable developers to write tests in ocis using Ginkgo and Gomega and explain how to mock other microservices to also cover some integration tests. The full documentation of the tools can be found on the [Ginkgo](https://onsi.github.io/ginkgo/) and [Gomega](https://onsi.github.io/gomega/) websites.
+In this section we try to enable developers to write tests in oCIS using Ginkgo and Gomega and explain how to mock other microservices to also cover some integration tests. The full documentation of the tools can be found on the [Ginkgo](https://onsi.github.io/ginkgo/) and [Gomega](https://onsi.github.io/gomega/) websites.
 
 {{% hint type=tip icon=gdoc_link title="Reading the documentation" %}}
 This page provides only a basic introduction to get started with Ginkgo and Gomega. For more detailed information, please refer to the official documentation.
@@ -280,3 +280,116 @@ You can run the tests in watch mode to follow a test-driven development approach
 ```bash
 ginkgo watch
 ```
+
+## Mocking
+
+In oCIS, we use the `mockery` tool to generate mocks for interfaces. [Mockery](https://vektra.github.io/mockery/latest/) is a simple tool that generates mock implementations of Go interfaces. It is useful for writing tests against interfaces instead of concrete types. We can use it to mock requests to other microservices to cover some integration tests. We should already have a number of mocks in the project. The mocks are configured on the packages level in the `.mockery.yaml` files.
+
+**Example file:**
+
+```yaml
+with-expecter: true
+filename: "{{.InterfaceName | snakecase }}.go"
+dir: "{{.PackageName}}/mocks"
+mockname: "{{.InterfaceName}}"
+outpkg: "mocks"
+packages:
+    github.com/owncloud/ocis/v2/ocis-pkg/oidc:
+        interfaces:
+            OIDCClient:
+```
+
+We should add missing mocks to this file and define the interfaces we want to mock. After that, we can generate the mocks by running `mockery` in the repo, it will find all the `.mockery.yaml` files and generate the mocks for the interfaces defined in them.
+
+Our mocks are generated with the setting `with-expecter: true`. This allows us to use type-safe methods to generate the call expectations by simply calling `EXPECT()` on the mock object.
+
+{{% hint type="tip" title="Type safe mock identifiers" %}}
+By using `EXPECT()` on the mock object, we can work with type-safe methods to generate the call expectations.
+{{% /hint %}}
+
+**Example of a mocked gateway client**
+
+In our oCIS services we need to use a gateway pool selector to get the gateway client.
+
+We should always use the constructor on a new mock like `gatewayClient = cs3mocks.NewGatewayAPIClient(GinkgoT())`. This brings us two advantages:
+
+- The `AssertExpectations` method is registered to be called at the end of the tests via `t.Cleanup()` method.
+- The `testing.TB` interface is registered on the `mock.Mock` so that tests don't panic when a call on the mock is unexpected.
+
+```go
+package publicshareprovider_test
+
+import (
+    "context"
+    "time"
+
+
+    "github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+    cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+    . "github.com/onsi/ginkgo/v2"
+    . "github.com/onsi/gomega"
+    "google.golang.org/grpc"
+)
+
+var _ = Describe("PublicShareProvider", func() {
+    // declare in container nodes
+    var (
+        gatewayClient   *cs3mocks.GatewayAPIClient
+        gatewaySelector pool.Selector
+    )
+
+    BeforeEach(func() {
+        // initialize in setup nodes
+        pool.RemoveSelector("GatewaySelector" + "any")
+        // create a new mock client
+        gatewayClient = cs3mocks.NewGatewayAPIClient(GinkgoT())
+        gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
+            "GatewaySelector",
+            "any",
+            func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+                return gatewayClient
+            },
+        )
+    })
+    Context("The user has the permission to create public shares", func() {
+        BeforeEeach(func() {
+            // set up the mock
+            // this is implicitly creating the expectation that it will be called Once()
+            // this will throw an error if the method is not called
+            gatewayClient.
+                EXPECT().
+                CheckPermission(
+                    mock.Anything,
+                    mock.Anything,
+                ).
+                Return(checkPermissionResponse, nil)
+        })
+        It("should return a public share", func() {
+            // call the method
+            req := &link.CreatePublicShareRequest{
+                ResourceInfo: &providerpb.ResourceInfo{
+                    Owner: &userpb.UserId{
+                        OpaqueId: "alice",
+                    },
+                    Path: "./NewFolder/file.txt",
+                },
+                Grant: &link.Grant{
+                    Permissions: &link.PublicSharePermissions{
+                        Permissions: linkPermissions,
+                    },
+                    Password: "SecretPassw0rd!",
+                },
+                Description: "test",
+            }
+            res, err := provider.CreatePublicShare(ctx, req)
+            Expect(err).ToNot(HaveOccurred())
+            Expect(res.GetStatus().GetCode()).To(Equal(rpc.Code_CODE_OK))
+            Expect(res.GetShare()).To(Equal(createdLink))
+        })
+    })
+})
+```
+
+{{% hint type="tip" title="Mocking in oCIS" %}}
+Use the constructor on new mocks to register the `AssertExpectations` method to be called at the end of the tests via the `t.Cleanup()` method.
+{{% /hint %}}
