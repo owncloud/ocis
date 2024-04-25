@@ -12,7 +12,7 @@ Feature: resources shared by user
       | Brian    |
 
 
-  Scenario: sharer lists the shared file (Personal space)
+  Scenario: sharer lists the file share (Personal space)
     Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
       | resource        | textfile.txt |
@@ -135,7 +135,7 @@ Feature: resources shared by user
     """
 
 
-  Scenario: sharer lists the shared file shared from inside a folder (Personal space)
+  Scenario: sharer lists the file share shared from inside a folder (Personal space)
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "FolderToShare/textfile.txt"
     And user "Alice" has sent the following share invitation:
@@ -259,7 +259,7 @@ Feature: resources shared by user
     """
 
 
-  Scenario: sharer lists the shared folder (Personal space)
+  Scenario: sharer lists the folder share (Personal space)
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has sent the following share invitation:
       | resource        | FolderToShare |
@@ -375,7 +375,7 @@ Feature: resources shared by user
     """
 
 
-  Scenario: sharer lists the shared file and folder (Personal space)
+  Scenario: sharer lists the file and folder shares (Personal space)
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following share invitation:
@@ -609,7 +609,7 @@ Feature: resources shared by user
     """
 
 
-  Scenario: sharer lists the shared file and folder shared to group (Personal space)
+  Scenario: sharer lists the file and folder shares shared to group (Personal space)
     Given group "grp1" has been created
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
@@ -628,199 +628,199 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name",
-        "size"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "const": "personal"
-            },
-            "path": {
-              "const": "/"
-            },
-            "name": {
-              "const": "/"
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": ["group"],
-                "properties": {
-                  "group": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%group_id_pattern%$"
-                      },
-                      "displayName": {
-                        "const": "grp1"
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "personal"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": ["group"],
+                  "properties": {
+                    "group": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%group_id_pattern%$"
+                        },
+                        "displayName": {
+                          "const": "grp1"
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "const": "textfile.txt"
           }
-        },
-        "name": {
-          "const": "textfile.txt"
         }
       }
-    }
-    """
+      """
     And the JSON data of the response should contain resource "FolderToShare" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "const": "personal"
-            },
-            "path": {
-              "const": "/"
-            },
-            "name": {
-              "const": "/"
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": ["group"],
-                "properties": {
-                  "group": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "const": "grp1"
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "personal"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": ["group"],
+                  "properties": {
+                    "group": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "const": "grp1"
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "const": "FolderToShare"
           }
-        },
-        "name": {
-          "const": "FolderToShare"
         }
       }
-    }
-    """
+      """
 
 
-  Scenario: sharer lists the shared file (Project space)
+  Scenario: sharer lists the file share (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
@@ -946,7 +946,7 @@ Feature: resources shared by user
     """
 
 
-  Scenario: sharer lists the shared file shared from inside a folder (Project space)
+  Scenario: sharer lists the file share shared from inside a folder (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
@@ -1073,7 +1073,7 @@ Feature: resources shared by user
     """
 
 
-  Scenario: sharer lists the shared folder (Project space)
+  Scenario: sharer lists the folder share (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
@@ -1192,7 +1192,7 @@ Feature: resources shared by user
     """
 
 
-  Scenario: sharer lists the shared file and folder (Project space)
+  Scenario: sharer lists the file and folder shares (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
@@ -1429,7 +1429,7 @@ Feature: resources shared by user
     """
 
 
-  Scenario: sharer lists the shared file and folder shared to group (Project space)
+  Scenario: sharer lists the file and folder shares shared to group (Project space)
     Given group "grp1" has been created
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -1643,7 +1643,7 @@ Feature: resources shared by user
     """
 
   @env-config
-  Scenario: sharer lists the shared file after sharee (user) is deleted (Personal space)
+  Scenario: sharer lists the file share after sharee (user) is deleted (Personal space)
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
@@ -1674,7 +1674,7 @@ Feature: resources shared by user
     """
 
   @env-config
-  Scenario: sharer lists the shared file after sharee (group) is deleted (Personal space)
+  Scenario: sharer lists the file share after sharee (group) is deleted (Personal space)
     Given the config "GRAPH_SPACES_GROUPS_CACHE_TTL" has been set to "1"
     And group "grp1" has been created
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
@@ -1706,7 +1706,7 @@ Feature: resources shared by user
     """
 
   @env-config
-  Scenario: sharer lists the shared file after sharee is disabled (Personal space)
+  Scenario: sharer lists the file share after sharee is disabled (Personal space)
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
@@ -1795,7 +1795,7 @@ Feature: resources shared by user
       """
 
   @env-config
-  Scenario: sharer lists the shared file after sharee (user) is deleted (Project space)
+  Scenario: sharer lists the file share after sharee (user) is deleted (Project space)
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -1828,7 +1828,7 @@ Feature: resources shared by user
       """
 
   @env-config
-  Scenario: sharer lists the shared file after sharee (group) is deleted (Project space)
+  Scenario: sharer lists the file share after sharee (group) is deleted (Project space)
     Given the config "GRAPH_SPACES_GROUPS_CACHE_TTL" has been set to "1"
     And using spaces DAV path
     And group "grp1" has been created
@@ -1862,7 +1862,7 @@ Feature: resources shared by user
       """
 
   @env-config
-  Scenario: sharer lists the shared file after sharee is disabled (Project space)
+  Scenario: sharer lists the file share after sharee is disabled (Project space)
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
