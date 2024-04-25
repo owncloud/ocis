@@ -80,10 +80,30 @@ Feature: download multiple resources bundled into an archive
     And user "Alice" has uploaded file with content "some data" to "/my_data/textfile2.txt"
     And user "Alice" has created folder "more_data"
     And user "Alice" has uploaded file with content "more data" to "/more_data/an_other_file.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Alice" has shared file "textfile1.txt" with user "Brian"
-    And user "Alice" has shared folder "my_data" with user "Brian"
-    And user "Alice" has shared folder "more_data" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following share invitation:
+      | resource        | my_data  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And user "Alice" has sent the following share invitation:
+      | resource        | more_data |
+      | space           | Personal  |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
     When user "Brian" downloads the archive of these items using the resource ids
       | /Shares/textfile0.txt |
       | /Shares/textfile1.txt |
@@ -106,10 +126,30 @@ Feature: download multiple resources bundled into an archive
     And user "Alice" has uploaded file with content "some data" to "/my_data/textfile2.txt"
     And user "Alice" has created folder "more_data"
     And user "Alice" has uploaded file with content "more data" to "/more_data/an_other_file.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Alice" has shared file "textfile1.txt" with user "Brian"
-    And user "Alice" has shared folder "my_data" with user "Brian"
-    And user "Alice" has shared folder "more_data" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following share invitation:
+      | resource        | my_data  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And user "Alice" has sent the following share invitation:
+      | resource        | more_data |
+      | space           | Personal  |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
     When user "Brian" downloads the archive of "/Shares" using the resource id and setting these headers
       | header     | value        |
       | User-Agent | <user-agent> |
