@@ -225,7 +225,7 @@ golangci-lint:
 
 .PHONY: ci-golangci-lint
 ci-golangci-lint: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run --modules-download-mode vendor --timeout 15m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
+	$(GOLANGCI_LINT) run --modules-download-mode vendor --timeout 15m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml services/graph/pkg/...
 
 .PHONY: golangci-lint-fix
 golangci-lint-fix:
