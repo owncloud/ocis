@@ -36,7 +36,7 @@ require (
 	github.com/go-micro/plugins/v4/registry/nats v1.2.2-0.20230723205323-1ada01245674
 	github.com/go-micro/plugins/v4/server/grpc v1.2.0
 	github.com/go-micro/plugins/v4/server/http v1.2.2
-	github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-00010101000000-000000000000
+	github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-20231226212146-94a49ba3e06e
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0
 	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.2.0
 	github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry v1.2.0
@@ -351,8 +351,6 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
-
-replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20231207143248-4d424e3ae348
 
 replace github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
 
