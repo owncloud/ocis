@@ -1525,3 +1525,43 @@ Feature: List a sharing permissions
       | space     | new-space |
       | sharee    | Brian     |
       | shareType | user      |
+
+
+  Scenario: try to list the permissions of other user's personal space
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Brian" tries to list the permissions of space "Personal" owned by "Alice" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "itemNotFound"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "pattern": "stat: error: not found: %file_id_pattern%$"
+              }
+            }
+          }
+        }
+      }
+      """
