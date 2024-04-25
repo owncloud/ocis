@@ -4,10 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/staticroutes"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/staticroutes"
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
@@ -134,12 +135,13 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 
 			lh := staticroutes.StaticRouteHandler{
-				Prefix:        cfg.HTTP.Root,
-				UserInfoCache: userInfoCache,
-				Logger:        logger,
-				Config:        *cfg,
-				OidcClient:    oidcClient,
-				Proxy:         rp,
+				Prefix:         cfg.HTTP.Root,
+				UserInfoCache:  userInfoCache,
+				Logger:         logger,
+				Config:         *cfg,
+				OidcClient:     oidcClient,
+				OidcHttpClient: oidcHTTPClient,
+				Proxy:          rp,
 			}
 			if err != nil {
 				return fmt.Errorf("failed to initialize reverse proxy: %w", err)

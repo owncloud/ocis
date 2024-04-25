@@ -2,8 +2,6 @@ package staticroutes
 
 import (
 	"net/http"
-	"net/url"
-	"path"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -21,8 +19,6 @@ type StaticRouteHandler struct {
 	Config         config.Config
 	OidcClient     oidc.OIDCClient
 	OidcHttpClient *http.Client
-
-	oidcURL *url.URL
 }
 
 type jse struct {
@@ -31,8 +27,6 @@ type jse struct {
 }
 
 func (s *StaticRouteHandler) Handler() http.Handler {
-	s.oidcURL, _ = url.Parse(s.Config.OIDC.Issuer)
-	s.oidcURL.Path = path.Join(s.oidcURL.Path, wellKnownPath)
 	m := chi.NewMux()
 	m.Route(s.Prefix, func(r chi.Router) {
 
@@ -41,7 +35,7 @@ func (s *StaticRouteHandler) Handler() http.Handler {
 
 		// openid .well-known
 		if s.Config.OIDC.RewriteWellKnown {
-			r.Get("/.well-known/openid-configuration", s.oIDCWellKnownRewrite)
+			r.Get("/.well-known/openid-configuration", s.oIDCWellKnownRewrite(s.Config.OIDC.Issuer))
 		}
 
 		// Send all requests to the proxy handler
