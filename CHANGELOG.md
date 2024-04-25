@@ -94,6 +94,7 @@ The following sections list the changes for unreleased.
 * Enhancement - ShareeIDs in SSEs: [#8915](https://github.com/owncloud/ocis/pull/8915)
 * Enhancement - Bump Reva: [#8917](https://github.com/owncloud/ocis/pull/8917)
 * Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
+* Enhancement - Bump nats-js-kv pkg: [#8953](https://github.com/owncloud/ocis/pull/8953)
 
 ## Details
 
@@ -557,6 +558,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8936
    https://github.com/owncloud/ocis/pull/8701
+
+* Enhancement - Bump nats-js-kv pkg: [#8953](https://github.com/owncloud/ocis/pull/8953)
+
+   Uses official nats-js-kv package now. Moves away from custom fork.
+
+   https://github.com/owncloud/ocis/pull/8953
 
 # Changelog for [5.0.2] (2024-04-17)
 
