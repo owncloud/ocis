@@ -1453,7 +1453,7 @@ Feature: resources shared by user
     """
 
   @env-config
-  Scenario: user lists shared resources for deleted sharee
+  Scenario: sharer lists shared resources from Personal space after sharee (user) is deleted
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
@@ -1484,7 +1484,7 @@ Feature: resources shared by user
     """
 
   @env-config
-  Scenario: user lists shared resources for deleted group
+  Scenario: sharer lists shared resources from Personal space after sharee (group) is deleted
     Given the config "GRAPH_SPACES_GROUPS_CACHE_TTL" has been set to "1"
     And group "grp1" has been created
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
@@ -1510,6 +1510,252 @@ Feature: resources shared by user
           "type": "array",
           "minItems":0,
           "maxItems":0
+        }
+      }
+    }
+    """
+
+  @env-config
+  Scenario: sharer lists shared resources from Project space after sharee (user) is deleted
+    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And user "Brian" has been deleted
+    When user "Alice" lists the shares shared by her after clearing user cache using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems":0,
+            "maxItems":0
+          }
+        }
+      }
+      """
+
+  @env-config
+  Scenario: sharer lists shared resources from Personal space after sharee (group) is deleted
+    Given the config "GRAPH_SPACES_GROUPS_CACHE_TTL" has been set to "1"
+    And using spaces DAV path
+    And group "grp1" has been created
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | new-space    |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    And group "grp1" has been deleted
+    When user "Alice" lists the shares shared by her after clearing group cache using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems":0,
+            "maxItems":0
+          }
+        }
+      }
+      """
+
+  @env-config
+  Scenario: sharer lists shared resources from Personal space after sharee is disabled
+    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And the user "Admin" has disabled user "Brian"
+    When user "Alice" lists the shares shared by her after clearing user cache using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name"
+        ],
+        "properties": {
+          "parentReference": {
+            "type": "object",
+            "required": [
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
+            ],
+            "properties": {
+              "driveType": {
+                "const": "personal"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": ["user"],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "const": "Brian Murphy"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "type": "string",
+            "const": "textfile.txt"
+          }
+        }
+      }
+      """
+
+  @env-config
+  Scenario: sharer lists shared resources from Project space after sharee is disabled
+    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And the user "Admin" has disabled user "Brian"
+    When user "Alice" lists the shares shared by her after clearing user cache using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
+      """
+    {
+      "type": "object",
+      "required": [
+        "parentReference",
+        "permissions",
+        "name"
+      ],
+      "properties": {
+        "parentReference": {
+          "type": "object",
+          "required": [
+            "driveId",
+            "driveType",
+            "path",
+            "name",
+            "id"
+          ],
+          "properties": {
+            "driveType": {
+              "const": "project"
+            }
+          }
+        },
+        "permissions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "grantedToV2",
+              "id",
+              "roles"
+            ],
+            "properties": {
+              "grantedToV2": {
+                "type": "object",
+                "required": ["user"],
+                "properties": {
+                  "user": {
+                    "type": "object",
+                    "required": [
+                      "displayName",
+                      "id"
+                    ],
+                    "properties": {
+                      "displayName": {
+                        "const": "Brian Murphy"
+                      }
+                    }
+                  }
+                }
+              },
+              "roles": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {
+                  "type": "string",
+                  "pattern": "^%role_id_pattern%$"
+                }
+              }
+            }
+          }
+        },
+        "name": {
+          "const": "textfile.txt"
         }
       }
     }
