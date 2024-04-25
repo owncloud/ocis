@@ -4070,6 +4070,98 @@ Feature: an user gets the resources shared to them
     }
     """
 
+  @issue-8471
+  Scenario: sharee lists the same name file and folder shares received from different projects (Project space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "space-moon" with the default quota using the Graph API
+    And user "Alice" has created a folder "folder" in space "space-moon"
+    And user "Alice" has uploaded a file inside space "space-moon" with content "hello world" to "textfile.txt"
+    And user "Alice" has created a space "space-mars" with the default quota using the Graph API
+    And user "Alice" has created a folder "folder" in space "space-mars"
+    And user "Alice" has uploaded a file inside space "space-mars" with content "hello world" to "textfile.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | space-moon   |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And user "Alice" has sent the following share invitation:
+      | resource        | folder     |
+      | space           | space-moon |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | space-mars   |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And user "Alice" has sent the following share invitation:
+      | resource        | folder     |
+      | space           | space-mars |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": {
+                    "name": {
+                      "const": "folder"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": {
+                    "name": {
+                      "const": "folder (1)"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": {
+                    "name": {
+                      "const": "textfile.txt"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": {
+                    "name": {
+                      "const": "textfile (1).txt"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
 
   Scenario: sharee lists the file share after sharer is deleted (Personal space)
     Given user "Alice" has uploaded file with content "hello" to "textfile0.txt"
