@@ -15,8 +15,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [Downloaded /Shares tar contains resource (files|folder) with leading / in Response](https://github.com/owncloud/ocis/issues/4636)
 
-- [apiArchiver/downloadById.feature:125](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L125)
-- [apiArchiver/downloadById.feature:126](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L126)
+- [apiArchiver/downloadById.feature:165](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L165)
+- [apiArchiver/downloadById.feature:166](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L166)
 
 ### [PROPFIND on accepted shares with identical names containing brackets exit with 404](https://github.com/owncloud/ocis/issues/4421)
 

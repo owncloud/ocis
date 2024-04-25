@@ -101,6 +101,7 @@ default:
         - OCSContext:
         - PublicWebDavContext:
         - GraphContext:
+        - SharingNgContext:
 
     apiGraph:
       paths:
