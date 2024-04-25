@@ -2165,17 +2165,12 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
                 "cap_add": "SYS_ADMIN",
                 "commands": [
                     "apk add --no-cache ceph18-fuse linux-edge",
-                    #"sudo mkdir -p /etc/ceph",
-                    #"cat /etc/ceph/ceph.conf | grep -E 'global|fsid|mon host' | sudo tee /etc/ceph/ceph.conf",
-                    #"cp ceph-local:/etc/ceph/ceph.client.admin.keyring /etc/ceph/ceph.client.admin.keyring",
-                    #"/etc/ceph/ceph.client.admin.keyring",
+                    # Dirty hack to match the kernel version of the host with the one in the container
                     "ln -s /lib/modules/$(ls /lib/modules) $(modprobe fuse 2>&1|grep FATAL|sed -e 's/.*directory //')",
                     "modprobe fuse",
                     "mkdir -p /var/lib/ocis",
                     "export fsid=$(cat /etc/ceph/ceph.conf | grep fsid | cut -c8-); echo $fsid; ceph-fuse --id admin --client-fs cephfs /var/lib/ocis/",
-                    #"ceph-fuse -id $fsid -m ceph:6789 -r / /mnt/",
                     "ls /mnt",
-                    #"mount -t ceph admin@${fsid}.cephfs=/ /var/lib/ocis/",
                     "df -h",
                     "sleep 30",
                     "%s init --insecure true" % ocis_bin,
