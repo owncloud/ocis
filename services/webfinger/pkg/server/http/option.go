@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"go.opentelemetry.io/otel/trace/noop"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/config"
@@ -36,13 +37,6 @@ func newOptions(opts ...Option) Options {
 	return opt
 }
 
-// Name provides a name for the service.
-func Name(val string) Option {
-	return func(o *Options) {
-		o.Name = val
-	}
-}
-
 // Logger provides a function to set the logger option.
 func Logger(val log.Logger) Option {
 	return func(o *Options) {
@@ -64,20 +58,6 @@ func Config(val *config.Config) Option {
 	}
 }
 
-// Flags provides a function to set the flags option.
-func Flags(val []cli.Flag) Option {
-	return func(o *Options) {
-		o.Flags = append(o.Flags, val...)
-	}
-}
-
-// Namespace provides a function to set the namespace option.
-func Namespace(val string) Option {
-	return func(o *Options) {
-		o.Namespace = val
-	}
-}
-
 // Service provides a function to set the service option.
 func Service(val svc.Service) Option {
 	return func(o *Options) {
@@ -91,7 +71,7 @@ func TraceProvider(traceProvider trace.TracerProvider) Option {
 		if traceProvider != nil {
 			o.TraceProvider = traceProvider
 		} else {
-			o.TraceProvider = trace.NewNoopTracerProvider()
+			o.TraceProvider = noop.NewTracerProvider()
 		}
 	}
 }
