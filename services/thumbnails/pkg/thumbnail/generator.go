@@ -7,7 +7,7 @@ import (
 	"image/gif"
 	"strings"
 
-	"github.com/disintegration/imaging"
+	"github.com/kovidgoyal/imaging"
 )
 
 // Generator generates a web friendly file version.
