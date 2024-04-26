@@ -88,6 +88,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Ability to Change Share Item Visibility in Graph API: [#8750](https://github.com/owncloud/ocis/pull/8750)
 * Enhancement - Enable web extension drawio by default: [#8760](https://github.com/owncloud/ocis/pull/8760)
 * Enhancement - Remove resharing: [#8762](https://github.com/owncloud/ocis/pull/8762)
+* Enhancement - Add CSP and other security related headers to oCIS: [#8777](https://github.com/owncloud/ocis/pull/8777)
 * Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
 * Enhancement - Sharing SSEs: [#8854](https://github.com/owncloud/ocis/pull/8854)
 * Enhancement - Update web to v9.0.0-alpha.5: [#8868](https://github.com/owncloud/ocis/pull/8868)
@@ -438,6 +439,12 @@ The following sections list the changes for unreleased.
    Removed resharing feature from codebase
 
    https://github.com/owncloud/ocis/pull/8762
+
+* Enhancement - Add CSP and other security related headers to oCIS: [#8777](https://github.com/owncloud/ocis/pull/8777)
+
+   General hardening of oCIS
+
+   https://github.com/owncloud/ocis/pull/8777
 
 * Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
 
