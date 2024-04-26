@@ -45,6 +45,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Update the admin user role assignment to enforce the config: [#8918](https://github.com/owncloud/ocis/pull/8918)
+* Bugfix - Crash when processing crafted TIFF files: [#8981](https://github.com/owncloud/ocis/pull/8981)
 
 ## Details
 
@@ -58,6 +59,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8918
    https://github.com/owncloud/ocis/pull/8897
+
+* Bugfix - Crash when processing crafted TIFF files: [#8981](https://github.com/owncloud/ocis/pull/8981)
+
+   Fix for a vulnerability with low severity in disintegration/imaging.
+
+   https://github.com/owncloud/ocis/pull/8981
+   https://github.com/advisories/GHSA-q7pp-wcgr-pffx
 
 # Changelog for [5.0.2] (2024-04-17)
 
