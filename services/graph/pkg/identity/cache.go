@@ -110,6 +110,33 @@ func (cache IdentityCache) GetUser(ctx context.Context, userid string) (libregra
 	return user, nil
 }
 
+// GetAcceptedUser looks up a user by id, if the user is not cached, yet it will do a lookup via the CS3 API
+func (cache IdentityCache) GetAcceptedUser(ctx context.Context, userid string) (libregraph.User, error) {
+	var user libregraph.User
+	if item := cache.users.Get(userid); item == nil {
+		gatewayClient, err := cache.gatewaySelector.Next()
+		if err != nil {
+			return libregraph.User{}, errorcode.New(errorcode.GeneralException, err.Error())
+		}
+		cs3UserID := &cs3User.UserId{
+			OpaqueId: userid,
+		}
+		u, err := revautils.GetAcceptedUserWithContext(ctx, cs3UserID, gatewayClient)
+		if err != nil {
+			if revautils.IsErrNotFound(err) {
+				return libregraph.User{}, ErrNotFound
+			}
+			return libregraph.User{}, errorcode.New(errorcode.GeneralException, err.Error())
+		}
+		user = *CreateUserModelFromCS3(u)
+		cache.users.Set(userid, user, ttlcache.DefaultTTL)
+
+	} else {
+		user = item.Value()
+	}
+	return user, nil
+}
+
 // GetGroup looks up a group by id, if the group is not cached, yet it will do a lookup via the CS3 API
 func (cache IdentityCache) GetGroup(ctx context.Context, groupID string) (libregraph.Group, error) {
 	var group libregraph.Group

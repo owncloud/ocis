@@ -8,6 +8,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -80,6 +82,9 @@ type (
 	DrivesDriveItemProvider interface {
 		// MountShare mounts a share
 		MountShare(ctx context.Context, resourceID *storageprovider.ResourceId, name string) ([]*collaboration.ReceivedShare, error)
+
+		// MountOCMShare mounts an OCM share
+		MountOCMShare(ctx context.Context, resourceID *storageprovider.ResourceId /*, name string*/) ([]*ocm.ReceivedShare, error)
 
 		// UnmountShare unmounts a share
 		UnmountShare(ctx context.Context, shareID *collaboration.ShareId) error
@@ -516,21 +521,43 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	mountedShares, err := api.drivesDriveItemService.MountShare(ctx, &resourceId, requestDriveItem.GetName())
-	if err != nil {
-		api.logger.Debug().Err(err).Msg(ErrMountShare.Error())
+	var driveItems []libregraph.DriveItem
+	switch {
+	case resourceId.GetStorageId() == utils.OCMStorageProviderID:
+		var mountedOcmShares []*ocm.ReceivedShare
+		mountedOcmShares, err = api.drivesDriveItemService.MountOCMShare(ctx, &resourceId /*, requestDriveItem.GetName()*/)
+		if err != nil {
+			api.logger.Debug().Err(err).Msg(ErrMountShare.Error())
 
-		switch e, ok := errorcode.ToError(err); {
-		case ok && e.GetOrigin() == errorcode.ErrorOriginCS3 && e.GetCode() == errorcode.ItemNotFound:
-			ErrDriveItemConversion.Render(w, r)
-		default:
-			errorcode.RenderError(w, r, err)
+			switch e, ok := errorcode.ToError(err); {
+			case ok && e.GetOrigin() == errorcode.ErrorOriginCS3 && e.GetCode() == errorcode.ItemNotFound:
+				ErrDriveItemConversion.Render(w, r)
+			default:
+				errorcode.RenderError(w, r, err)
+			}
+
+			return
 		}
+		driveItems, err = api.baseGraphService.CS3ReceivedOCMSharesToDriveItems(ctx, mountedOcmShares)
+	default:
+		var mountedShares []*collaboration.ReceivedShare
+		// Get all shares that the user has received for this resource. There might be multiple
+		mountedShares, err = api.drivesDriveItemService.MountShare(ctx, &resourceId, requestDriveItem.GetName())
+		if err != nil {
+			api.logger.Debug().Err(err).Msg(ErrMountShare.Error())
 
-		return
+			switch e, ok := errorcode.ToError(err); {
+			case ok && e.GetOrigin() == errorcode.ErrorOriginCS3 && e.GetCode() == errorcode.ItemNotFound:
+				ErrDriveItemConversion.Render(w, r)
+			default:
+				errorcode.RenderError(w, r, err)
+			}
+
+			return
+		}
+		driveItems, err = api.baseGraphService.CS3ReceivedSharesToDriveItems(ctx, mountedShares)
 	}
 
-	driveItems, err := api.baseGraphService.CS3ReceivedSharesToDriveItems(ctx, mountedShares)
 	switch {
 	case err != nil:
 		break

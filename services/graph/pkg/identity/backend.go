@@ -110,6 +110,12 @@ func CreateUserModelFromCS3(u *cs3user.User) *libregraph.User {
 		u.Id = &cs3user.UserId{}
 	}
 	return &libregraph.User{
+		Identities: []libregraph.ObjectIdentity{
+			{
+				Issuer:           &u.GetId().Idp,
+				IssuerAssignedId: &u.GetId().OpaqueId,
+			},
+		},
 		DisplayName:              &u.DisplayName,
 		Mail:                     &u.Mail,
 		OnPremisesSamAccountName: &u.Username,

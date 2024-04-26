@@ -9,7 +9,6 @@ import (
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
-	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -17,7 +16,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 )
@@ -66,14 +64,14 @@ func (s DriveItemPermissionsService) CreateLink(ctx context.Context, driveItemID
 	if isSet {
 		expireTime := parseAndFillUpTime(expirationDate)
 		if expireTime == nil {
-			s.logger.Debug().Interface("createLink", createLink).Msg(err.Error())
+			s.logger.Debug().Interface("createLink", createLink).Send()
 			return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "invalid expiration date")
 		}
 		req.GetGrant().Expiration = expireTime
 	}
 
 	// set displayname and password protected as arbitrary metadata
-	req.ResourceInfo.ArbitraryMetadata = &providerv1beta1.ArbitraryMetadata{
+	req.ResourceInfo.ArbitraryMetadata = &storageprovider.ArbitraryMetadata{
 		Metadata: map[string]string{
 			"name":      createLink.GetDisplayName(),
 			"quicklink": strconv.FormatBool(createLink.GetLibreGraphQuickLink()),
@@ -274,7 +272,7 @@ func (api DriveItemPermissionsApi) SetSpaceRootLinkPassword(w http.ResponseWrite
 	render.JSON(w, r, newPermission)
 }
 
-func (s DriveItemPermissionsService) updatePublicLinkPermission(ctx context.Context, permissionID string, itemID *providerv1beta1.ResourceId, newPermission *libregraph.Permission) (perm *libregraph.Permission, err error) {
+func (s DriveItemPermissionsService) updatePublicLinkPermission(ctx context.Context, permissionID string, itemID *storageprovider.ResourceId, newPermission *libregraph.Permission) (perm *libregraph.Permission, err error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		s.logger.Error().Err(err).Msg("could not select next gateway client")
@@ -283,8 +281,8 @@ func (s DriveItemPermissionsService) updatePublicLinkPermission(ctx context.Cont
 
 	statResp, err := gatewayClient.Stat(
 		ctx,
-		&providerv1beta1.StatRequest{
-			Ref: &providerv1beta1.Reference{
+		&storageprovider.StatRequest{
+			Ref: &storageprovider.Reference{
 				ResourceId: itemID,
 				Path:       ".",
 			},
@@ -326,6 +324,9 @@ func (s DriveItemPermissionsService) updatePublicLinkPermission(ctx context.Cont
 			},
 			statResp.GetInfo().GetType(),
 		)
+		if err != nil {
+			return nil, err
+		}
 		update := &link.UpdatePublicShareRequest_Update{
 			Type: link.UpdatePublicShareRequest_Update_TYPE_PERMISSIONS,
 			Grant: &link.Grant{

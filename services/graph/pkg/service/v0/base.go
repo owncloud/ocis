@@ -10,10 +10,10 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
+	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -35,6 +35,7 @@ import (
 // BaseGraphProvider is the interface that wraps shared methods between the different graph providers
 type BaseGraphProvider interface {
 	CS3ReceivedSharesToDriveItems(ctx context.Context, receivedShares []*collaboration.ReceivedShare) ([]libregraph.DriveItem, error)
+	CS3ReceivedOCMSharesToDriveItems(ctx context.Context, receivedOCMShares []*ocm.ReceivedShare) ([]libregraph.DriveItem, error)
 }
 
 // BaseGraphService implements a couple of helper functions that are
@@ -71,7 +72,7 @@ func (g BaseGraphService) getDriveItem(ctx context.Context, ref storageprovider.
 	if err != nil {
 		return nil, err
 	}
-	if res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
+	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		refStr, _ := storagespace.FormatReference(&ref)
 		return nil, fmt.Errorf("could not stat %s: %s", refStr, res.GetStatus().GetMessage())
 	}
@@ -85,6 +86,15 @@ func (g BaseGraphService) CS3ReceivedSharesToDriveItems(ctx context.Context, rec
 	}
 
 	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares)
+}
+
+func (g BaseGraphService) CS3ReceivedOCMSharesToDriveItems(ctx context.Context, receivedShares []*ocm.ReceivedShare) ([]libregraph.DriveItem, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return cs3ReceivedOCMSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares)
 }
 
 func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace, apiVersion APIVersion) []libregraph.Permission {

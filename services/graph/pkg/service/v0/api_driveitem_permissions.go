@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"slices"
@@ -9,18 +10,20 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
+	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/publicshare"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -117,15 +120,6 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 	objectID := driveRecipient.GetObjectId()
 	cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(unifiedRolePermissions)
 
-	createShareRequest := &collaboration.CreateShareRequest{
-		ResourceInfo: statResponse.GetInfo(),
-		Grant: &collaboration.ShareGrant{
-			Permissions: &collaboration.SharePermissions{
-				Permissions: cs3ResourcePermissions,
-			},
-		},
-	}
-
 	permission := &libregraph.Permission{}
 	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, condition); role != nil {
 		permission.Roles = []string{role.GetId()}
@@ -135,6 +129,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 		permission.LibreGraphPermissionsActions = unifiedrole.CS3ResourcePermissionsToLibregraphActions(*cs3ResourcePermissions)
 	}
 
+	var shareid string
+	var expiration *types.Timestamp
 	switch driveRecipient.GetLibreGraphRecipientType() {
 	case "group":
 		group, err := s.identityCache.GetGroup(ctx, objectID)
@@ -142,30 +138,33 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 			s.logger.Debug().Err(err).Interface("groupId", objectID).Msg("failed group lookup")
 			return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, err.Error())
 		}
-		createShareRequest.GetGrant().Grantee = &storageprovider.Grantee{
-			Type: storageprovider.GranteeType_GRANTEE_TYPE_GROUP,
-			Id: &storageprovider.Grantee_GroupId{GroupId: &grouppb.GroupId{
-				OpaqueId: group.GetId(),
-			}},
-		}
 		permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
 			Group: &libregraph.Identity{
 				DisplayName: group.GetDisplayName(),
 				Id:          conversions.ToPointer(group.GetId()),
 			},
 		}
+		createShareRequest := createShareRequestToGroup(group, statResponse.GetInfo(), cs3ResourcePermissions)
+		if invite.ExpirationDateTime != nil {
+			createShareRequest.GetGrant().Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
+		}
+		createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
+		if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
+			s.logger.Debug().Err(err).Msg("share creation failed")
+			return libregraph.Permission{}, err
+		}
+		shareid = createShareResponse.GetShare().GetId().GetOpaqueId()
+		expiration = createShareResponse.GetShare().GetExpiration()
 	default:
+		federated := false
 		user, err := s.identityCache.GetUser(ctx, objectID)
+		if errors.Is(err, identity.ErrNotFound) && s.config.IncludeOCMSharees {
+			user, err = s.identityCache.GetAcceptedUser(ctx, objectID)
+			federated = true
+		}
 		if err != nil {
 			s.logger.Debug().Err(err).Interface("userId", objectID).Msg("failed user lookup")
 			return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, err.Error())
-		}
-
-		createShareRequest.GetGrant().Grantee = &storageprovider.Grantee{
-			Type: storageprovider.GranteeType_GRANTEE_TYPE_USER,
-			Id: &storageprovider.Grantee_UserId{UserId: &userpb.UserId{
-				OpaqueId: user.GetId(),
-			}},
 		}
 		permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
 			User: &libregraph.Identity{
@@ -173,31 +172,115 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId stor
 				Id:          conversions.ToPointer(user.GetId()),
 			},
 		}
+
+		if federated {
+			if len(user.Identities) < 1 {
+				return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "user has no federated identity")
+			}
+			providerInfoResp, err := gatewayClient.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
+				Domain: *user.Identities[0].Issuer,
+			})
+			if err := errorcode.FromCS3Status(providerInfoResp.GetStatus(), err); err != nil {
+				s.logger.Error().Err(err).Msg("getting provider info failed")
+				return libregraph.Permission{}, err
+			}
+
+			createShareRequest := createShareRequestToFederatedUser(user, statResponse.GetInfo().GetId(), providerInfoResp.ProviderInfo, cs3ResourcePermissions)
+			if invite.ExpirationDateTime != nil {
+				createShareRequest.Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
+			}
+			createShareResponse, err := gatewayClient.CreateOCMShare(ctx, createShareRequest)
+			if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
+				s.logger.Error().Err(err).Msg("share creation failed")
+				return libregraph.Permission{}, err
+			}
+			shareid = createShareResponse.GetShare().GetId().GetOpaqueId()
+			expiration = createShareResponse.GetShare().GetExpiration()
+		} else {
+			createShareRequest := createShareRequestToUser(user, statResponse.GetInfo(), cs3ResourcePermissions)
+			if invite.ExpirationDateTime != nil {
+				createShareRequest.GetGrant().Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
+			}
+			createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
+			if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
+				s.logger.Error().Err(err).Msg("share creation failed")
+				return libregraph.Permission{}, err
+			}
+			shareid = createShareResponse.GetShare().GetId().GetOpaqueId()
+			expiration = createShareResponse.GetShare().GetExpiration()
+		}
+
 	}
 
-	if invite.ExpirationDateTime != nil {
-		createShareRequest.GetGrant().Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
-	}
-
-	createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
-	if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
-		s.logger.Debug().Err(err).Msg("share creation failed")
-		return libregraph.Permission{}, err
-	}
-
-	if id := createShareResponse.GetShare().GetId().GetOpaqueId(); id != "" {
-		permission.Id = conversions.ToPointer(id)
+	if shareid != "" {
+		permission.Id = conversions.ToPointer(shareid)
 	} else if IsSpaceRoot(statResponse.GetInfo().GetId()) {
 		// permissions on a space root are not handled by a share manager so
 		// they don't get a share-id
 		permission.SetId(identitySetToSpacePermissionID(permission.GetGrantedToV2()))
 	}
 
-	if expiration := createShareResponse.GetShare().GetExpiration(); expiration != nil {
+	if expiration != nil {
 		permission.SetExpirationDateTime(utils.TSToTime(expiration))
 	}
 
 	return *permission, nil
+}
+
+func createShareRequestToGroup(group libregraph.Group, info *storageprovider.ResourceInfo, cs3ResourcePermissions *storageprovider.ResourcePermissions) *collaboration.CreateShareRequest {
+	return &collaboration.CreateShareRequest{
+		ResourceInfo: info,
+		Grant: &collaboration.ShareGrant{
+			Grantee: &storageprovider.Grantee{
+				Type: storageprovider.GranteeType_GRANTEE_TYPE_GROUP,
+				Id: &storageprovider.Grantee_GroupId{GroupId: &grouppb.GroupId{
+					OpaqueId: group.GetId(),
+				}},
+			},
+			Permissions: &collaboration.SharePermissions{
+				Permissions: cs3ResourcePermissions,
+			},
+		},
+	}
+}
+func createShareRequestToUser(user libregraph.User, info *storageprovider.ResourceInfo, cs3ResourcePermissions *storageprovider.ResourcePermissions) *collaboration.CreateShareRequest {
+	return &collaboration.CreateShareRequest{
+		ResourceInfo: info,
+		Grant: &collaboration.ShareGrant{
+			Grantee: &storageprovider.Grantee{
+				Type: storageprovider.GranteeType_GRANTEE_TYPE_USER,
+				Id: &storageprovider.Grantee_UserId{UserId: &userpb.UserId{
+					OpaqueId: user.GetId(),
+				}},
+			},
+			Permissions: &collaboration.SharePermissions{
+				Permissions: cs3ResourcePermissions,
+			},
+		},
+	}
+}
+func createShareRequestToFederatedUser(user libregraph.User, resourceId *storageprovider.ResourceId, providerInfo *ocmprovider.ProviderInfo, cs3ResourcePermissions *storageprovider.ResourcePermissions) *ocm.CreateOCMShareRequest {
+	return &ocm.CreateOCMShareRequest{
+		ResourceId: resourceId,
+		Grantee: &storageprovider.Grantee{
+			Type: storageprovider.GranteeType_GRANTEE_TYPE_USER,
+			Id: &storageprovider.Grantee_UserId{UserId: &userpb.UserId{
+				Type:     userpb.UserType_USER_TYPE_FEDERATED,
+				OpaqueId: user.GetId(),
+				Idp:      providerInfo.Domain, // the domain is persisted in the grant as u:{opaqueid}:{domain}
+			}},
+		},
+		RecipientMeshProvider: providerInfo,
+		AccessMethods: []*ocm.AccessMethod{
+			{
+				Term: &ocm.AccessMethod_WebdavOptions{
+					WebdavOptions: &ocm.WebDAVAccessMethod{
+						Permissions: cs3ResourcePermissions,
+					},
+				},
+			},
+		},
+	}
 }
 
 // SpaceRootInvite handles invitation request on project spaces

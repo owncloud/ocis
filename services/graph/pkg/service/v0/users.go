@@ -13,28 +13,24 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
-
-	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
-
 	"github.com/CiscoM31/godata"
+	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/utils"
-
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+	"github.com/google/uuid"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
-	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	ocissettingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
 // GetMe implements the Service interface.
@@ -107,7 +103,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Graph) fetchAppRoleAssignments(ctx context.Context, accountuuid string) ([]libregraph.AppRoleAssignment, error) {
-	lrar, err := g.roleService.ListRoleAssignments(ctx, &settings.ListRoleAssignmentsRequest{
+	lrar, err := g.roleService.ListRoleAssignments(ctx, &settingssvc.ListRoleAssignmentsRequest{
 		AccountUuid: accountuuid,
 	})
 	if err != nil {
@@ -258,6 +254,34 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		users, err = g.identityBackend.GetUsers(r.Context(), odataReq)
 	}
 
+	if g.config.IncludeOCMSharees {
+		gwc, err := g.gatewaySelector.Next()
+		if err != nil {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
+		term, err := identity.GetSearchValues(odataReq.Query)
+		if err != nil {
+			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		remoteUsersRes, err := gwc.FindAcceptedUsers(r.Context(), &invitepb.FindAcceptedUsersRequest{Filter: term})
+		if err != nil {
+			// TODO grpc FindAcceptedUsers call failed
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if remoteUsersRes.Status.Code != cs3rpc.Code_CODE_OK {
+			// TODO "error searching remote users"
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, remoteUsersRes.Status.Message)
+			return
+		}
+		for _, user := range remoteUsersRes.GetAcceptedUsers() {
+			users = append(users, identity.CreateUserModelFromCS3(user))
+		}
+	}
+
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users from backend")
 		var errcode errorcode.Error
@@ -391,7 +415,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	if g.roleService != nil && g.config.API.AssignDefaultUserRole {
 		// All users get the user role by default currently.
 		// to all new users for now, as create Account request does not have any role field
-		if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
+		if _, err = g.roleService.AssignRoleToUser(r.Context(), &settingssvc.AssignRoleToUserRequest{
 			AccountUuid: *u.Id,
 			RoleId:      ocissettingssvc.BundleUUIDRoleUser,
 		}); err != nil {
@@ -816,7 +840,7 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 			}
 			vID = tvID.String()
 		}
-		_, err = g.valueService.SaveValue(r.Context(), &settings.SaveValueRequest{
+		_, err = g.valueService.SaveValue(r.Context(), &settingssvc.SaveValueRequest{
 			Value: &settingsmsg.Value{
 				Id:          vID,
 				BundleId:    defaults.BundleUUIDProfile,
