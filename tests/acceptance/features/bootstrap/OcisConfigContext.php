@@ -25,21 +25,20 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\OcisConfigHelper;
 use PHPUnit\Framework\Assert;
-use TestHelpers\UploadHelper;
 
 /**
  * steps needed to re-configure oCIS server
  */
 class OcisConfigContext implements Context {
 	/**
-	 * @Given async upload has been enabled with post processing delayed to :delayTime seconds
+	 * @Given async upload has been enabled with post-processing delayed to :delayTime seconds
 	 *
 	 * @param string $delayTime
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function asyncUploadHasbeenEnabledWithDelayedPostProcessing(string $delayTime): void {
+	public function asyncUploadHasBeenEnabledWithDelayedPostProcessing(string $delayTime): void {
 		$envs = [
 			"OCIS_ASYNC_UPLOADS" => true,
 			"OCIS_EVENTS_ENABLE_TLS" => false,

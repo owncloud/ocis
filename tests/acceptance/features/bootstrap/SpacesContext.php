@@ -215,9 +215,8 @@ class SpacesContext implements Context {
 			$listSpacesFn = 'listAllAvailableSpacesOfUser';
 		}
 
-		// Sometimes listing available spaces might not return newly created/shared spaces
-		// so we try again until we find the space or we reach the max number of retries (i.e. 10)
-		$tryAgain = false;
+		// Sometimes listing available spaces might not return newly created/shared spaces.
+		// So we try again until we find the space or we reach the max number of retries (i.e. 10)
 		$retried = 0;
 		do {
 			// empty the available spaces array
@@ -611,6 +610,7 @@ class SpacesContext implements Context {
 			$headersTable,
 			['header', 'value']
 		);
+		$headers = [];
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
@@ -1492,7 +1492,7 @@ class SpacesContext implements Context {
 		string $newDescription
 	): void {
 		$bodyData = ["description" => $newDescription];
-		$response = $this->updateSpace($user, $spaceName, $bodyData, '');
+		$response = $this->updateSpace($user, $spaceName, $bodyData);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
@@ -1541,7 +1541,7 @@ class SpacesContext implements Context {
 		int $newQuota
 	): void {
 		$bodyData = ["quota" => ["total" => $newQuota]];
-		$response = $this->updateSpace($user, $spaceName, $bodyData, '');
+		$response = $this->updateSpace($user, $spaceName, $bodyData);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
@@ -1991,7 +1991,7 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fileDestination = $this->escapePath(\ltrim($fileDestination, "/"));
 		if ($endPath && str_contains($endPath, 'remote.php')) {
-			// this is check for when we want to test with the endpoint having `remote.php` in  space webdav
+			// this is a check for when we want to test with the endpoint having `remote.php` in space webdav
 			// by default spaces webdav is '/dav/spaces'
 			return $this->featureContext->getBaseUrl() . '/remote.php/dav/spaces/' . $space['id'] . '/' . $fileDestination;
 		}
@@ -2088,9 +2088,8 @@ class SpacesContext implements Context {
 		if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
 			$suffix = $this->getSpaceIdByName($user, $sourceSpace) . "/";
 		}
-		$fullUrl = $baseUrl . \rtrim($destinationPath, "/") . "/{$suffix}{$source}";
+		$fullUrl = $baseUrl . \rtrim($destinationPath, "/") . "/$suffix$source";
 
-		$destinationId = "";
 		if ($destinationType === "space") {
 			$destinationId = $this->getSpaceIdByName($user, $destinationName);
 		} else {
@@ -2853,7 +2852,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * User get all objects in the trash of project space
+	 * User gets all objects in the trash of project space
 	 *
 	 * Method "getTrashbinContentFromResponseXml" borrowed from core repository
 	 * and return array like:
@@ -3167,7 +3166,7 @@ class SpacesContext implements Context {
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function userGetsEtagOfElementInASpace(string $user, string $space, string $path) {
+	public function userGetsEtagOfElementInASpace(string $user, string $space, string $path): string {
 		$this->setSpaceIDByName($user, $space);
 		$xmlObject = $this->webDavPropertiesContext->storeEtagOfElement($user, $path);
 		return $this->featureContext->getEtagFromResponseXmlObject($xmlObject);
@@ -3421,7 +3420,6 @@ class SpacesContext implements Context {
 		string $shouldOrNot,
 		string $fileName = ''
 	): void {
-		$body = '';
 		if (!empty($fileName)) {
 			$body = $this->getFileId($user, $spaceName, $fileName);
 		} else {
@@ -3529,10 +3527,9 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has stored id of (file|folder) "([^"]*)" of the space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has stored id of (?:file|folder) "([^"]*)" of the space "([^"]*)"$/
 	 *
 	 * @param string $user
-	 * @param string $fileOrFolder
 	 * @param string $path
 	 * @param string $spaceName
 	 *
@@ -3540,9 +3537,9 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function userHasStoredIdOfPathOfTheSpace(string $user, string $fileOrFolder, string $path, string $spaceName): void {
+	public function userHasStoredIdOfPathOfTheSpace(string $user, string $path, string $spaceName): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->userStoresFileIdForPath($user, $fileOrFolder, $path);
+		$this->featureContext->userStoresFileIdForPath($user, $path);
 	}
 
 	/**
@@ -3650,11 +3647,12 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function userSendsPropfindRequestToSpaceWithHeaders(string $user, string $spaceName, $headersTable): void {
+	public function userSendsPropfindRequestToSpaceWithHeaders(string $user, string $spaceName, TableNode $headersTable): void {
 		$this->featureContext->verifyTableNodeColumns(
 			$headersTable,
 			['header', 'value']
 		);
+		$headers = [];
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
@@ -3850,6 +3848,7 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);
+		$driveItemId = '';
 		$jsonResponseBody = $this->featureContext->getJsonDecodedResponseBodyContent($jsonResponse);
 		foreach ($jsonResponseBody->value as $value) {
 			if ($value->name === "$resource") {

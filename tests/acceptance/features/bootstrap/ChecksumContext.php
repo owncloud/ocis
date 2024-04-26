@@ -398,7 +398,7 @@ class ChecksumContext implements Context {
 		Assert::assertFalse(
 			$isHeader,
 			"Expected no checksum header but got "
-			. $this->featureContext->getResponse()->getHeader('OC-Checksum')
+			. print_r($this->featureContext->getResponse()->getHeader('OC-Checksum'), true)
 		);
 	}
 

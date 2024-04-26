@@ -94,12 +94,12 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @param string $user
-	 * @param string $fileOrFolder   (file|folder)
+	 * @param string $fileOrFolder (file|folder)
 	 * @param string $space
-	 * @param string $resource
+	 * @param string|null $resource
 	 *
 	 * @return ResponseInterface
-	 * @throws Exception
+	 * @throws GuzzleException
 	 */
 	public function getPermissionsList(string $user, string $fileOrFolder, string $space, ?string $resource = ''):ResponseInterface {
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
@@ -131,7 +131,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsPermissionsListForResourceOfTheSpaceUsingTheGraphiAPI(string $user, string $fileOrFolder, string $resource, string $space):void {
+	public function userGetsPermissionsListForResourceOfTheSpaceUsingTheGraphAPI(string $user, string $fileOrFolder, string $resource, string $space):void {
 		$this->featureContext->setResponse(
 			$this->getPermissionsList($user, $fileOrFolder, $space, $resource)
 		);
@@ -146,7 +146,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userListsThePermissionsOfSpaceUsingTheGraphApi($user, $space):void {
+	public function userListsThePermissionsOfSpaceUsingTheGraphApi(string $user, string $space):void {
 		$this->featureContext->setResponse(
 			$this->getPermissionsList($user, 'folder', $space)
 		);
@@ -211,6 +211,8 @@ class SharingNgContext implements Context {
 				$itemId = $this->spacesContext->getResourceId($user, $rows['space'], $resource);
 			}
 		}
+
+		$shareeIds = [];
 
 		if (\array_key_exists('shareeId', $rows)) {
 			$shareeIds[] = $rows['shareeId'];
@@ -832,7 +834,7 @@ class SharingNgContext implements Context {
 		//this details is needed for result logging purpose to determine whether the resource shared is a resource or a project space
 		$resourceDetail = ($resource) ? "resource '" . $resource : "space '" . $space;
 		foreach ($allowedPermissionRoles as $role) {
-			//we should be able to send share invitation for each of the role allowed for the files/folders which are  listed in permissions (allowed)
+			//we should be able to send share invitation for each of the role allowed for the files/folders which are listed in permissions (allowed)
 			$roleAllowed = GraphHelper::getPermissionNameByPermissionRoleId($role->id);
 			$responseSendInvitation = $this->sendShareInvitation($user, new TableNode(array_merge($table->getTable(), [['permissionsRole', $roleAllowed]])));
 			$jsonResponseSendInvitation = $this->featureContext->getJsonDecodedResponseBodyContent($responseSendInvitation);

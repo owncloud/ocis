@@ -195,12 +195,12 @@ class SearchContext implements Context {
 			null,
 			true
 		);
-		foreach ($elementRows as $index => $expectedFile) {
+		foreach ($elementRows as $expectedFile) {
 			$filename = $expectedFile[0];
 			$content = $foundEntries[$filename];
 			// Extract the content between the <mark> tags
 			preg_match('/<mark>(.*?)<\/mark>/s', $content, $matches);
-			$actualContent = isset($matches[1]) ? $matches[1] : '';
+			$actualContent = $matches[1] ?? '';
 
 			// Remove any leading/trailing whitespace for comparison
 			$actualContent = trim($actualContent);

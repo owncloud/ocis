@@ -24,7 +24,6 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
-use TestHelpers\OcsApiHelper;
 use TestHelpers\UserHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\OcisHelper;
@@ -519,7 +518,7 @@ trait Provisioning {
 	}
 
 	/**
-	 * prepares suitable nested array with user-attributes for multiple users to be created
+	 * prepares a suitable nested array with user-attributes for multiple users to be created
 	 *
 	 * @param boolean $setDefaultAttributes
 	 * @param array $table
@@ -558,7 +557,7 @@ trait Provisioning {
 			} else {
 				$userAttribute['password'] = $this->getPasswordForUser($row['username']);
 			}
-			// Add request body to the bodies array. we will use that later to loop through created users.
+			// Add request body to the bodies array. We will use that later to loop through created users.
 			$usersAttributes[] = $userAttribute;
 		}
 		return $usersAttributes;
@@ -799,7 +798,6 @@ trait Provisioning {
 				$attributesToCreateUser['userid'] = $userAttributes['userid'];
 				$attributesToCreateUser['password'] = $userAttributes['password'];
 				$attributesToCreateUser['displayname'] = $userAttributes['displayName'];
-				$attributesToCreateUser['username'] = $userAttributes['userid'];
 				if ($userAttributes['email'] === null) {
 					Assert::assertArrayHasKey(
 						'userid',
@@ -3669,7 +3667,7 @@ trait Provisioning {
 	public function theDisplayNameOfUserShouldBe(string $user, string $displayname):void {
 		$actualUser = $this->getActualUsername($user);
 		$response = $this->retrieveUserInformationAsAdminUsingProvisioningApi($actualUser);
-		$actualDisplayName = $this->getDisplayNameFromResponse($response, $displayname);
+		$actualDisplayName = $this->getDisplayNameFromResponse($response);
 		Assert::assertEquals(
 			$displayname,
 			$actualDisplayName
@@ -4360,48 +4358,5 @@ trait Provisioning {
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * sets the skeletondirectory according to the type
-	 *
-	 * @param string $skeletonType can be "tiny", "small", "large" OR empty.
-	 *                             If an empty string is given, the current
-	 *                             setting will not be changed
-	 *
-	 * @return string skeleton folder before the change
-	 * @throws Exception
-	 */
-	private function setSkeletonDirByType(string $skeletonType): string {
-		$originalSkeletonPath = \getenv("SKELETON_DIR");
-		if ($originalSkeletonPath === false) {
-			$originalSkeletonPath = '';
-		}
-		if ($skeletonType !== '') {
-			$skeletonDirName = $skeletonType . "Skeleton";
-			$newSkeletonPath = \dirname($originalSkeletonPath) . '/' . $skeletonDirName;
-			\putenv(
-				"SKELETON_DIR=" . $newSkeletonPath
-			);
-		}
-		return $originalSkeletonPath;
-	}
-
-	/**
-	 * sets the skeletondirectory
-	 *
-	 * @param string $skeletonDir Full path of the skeleton directory
-	 *                            If an empty string is given, the current
-	 *                            setting will not be changed
-	 *
-	 * @return string skeleton folder before the change
-	 * @throws Exception
-	 */
-	private function setSkeletonDir(string $skeletonDir): string {
-		$originalSkeletonPath = \getenv("SKELETON_DIR");
-		if ($skeletonDir !== '') {
-			\putenv("SKELETON_DIR=" . $skeletonDir);
-		}
-		return $originalSkeletonPath;
 	}
 }

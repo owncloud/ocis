@@ -155,8 +155,7 @@ class SettingsContext implements Context {
 	 */
 	public function getRoleIdByRoleName(string $user, string $role): string {
 		// Sometimes the response body is not complete and results invalid json.
-		// so we try again until we get a valid json.
-		$tryAgain = false;
+		// So we try again until we get a valid json.
 		$retried = 0;
 		do {
 			$response = $this->getRoles($user);
@@ -376,6 +375,7 @@ class SettingsContext implements Context {
 			$headersTable,
 			['header', 'value']
 		);
+		$headers = [];
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
@@ -409,6 +409,8 @@ class SettingsContext implements Context {
 				return $value["value"]["listValue"]["values"][0]["stringValue"];
 			}
 		}
+		// if a language setting was still not found, return English
+		return "en";
 	}
 
 	/**

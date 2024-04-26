@@ -150,7 +150,7 @@ class TUSContext implements Context {
 		'Upload-Offset' => $offset
 		];
 		$headers = empty($extraHeaders) ? $headers : array_merge($headers, $extraHeaders);
-	
+
 		return HttpRequestHelper::sendRequest(
 			$this->resourceLocation,
 			$this->featureContext->getStepLineRef(),
@@ -304,18 +304,18 @@ class TUSContext implements Context {
 		string $content,
 		string $destination
 	): void {
-		$tmpfname = $this->writeDataToTempFile($content);
+		$temporaryFileName = $this->writeDataToTempFile($content);
 		try {
 			$this->uploadFileUsingTus(
 				$user,
-				\basename($tmpfname),
+				\basename($temporaryFileName),
 				$destination
 			);
 			$this->featureContext->setLastUploadDeleteTime(\time());
 		} catch (Exception $e) {
 			Assert::assertStringContainsString('TusPhp\Exception\FileException: Unable to create resource', (string)$e);
 		}
-		\unlink($tmpfname);
+		\unlink($temporaryFileName);
 	}
 
 	/**
@@ -341,16 +341,16 @@ class TUSContext implements Context {
 		?int    $noOfChunks,
 		string  $destination
 	): void {
-		$tmpfname = $this->writeDataToTempFile($content);
+		$temporaryFileName = $this->writeDataToTempFile($content);
 		$this->uploadFileUsingTus(
 			$user,
-			\basename($tmpfname),
+			\basename($temporaryFileName),
 			$destination,
 			[],
 			$noOfChunks
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
-		\unlink($tmpfname);
+		\unlink($temporaryFileName);
 	}
 
 	/**
@@ -390,20 +390,20 @@ class TUSContext implements Context {
 	 * @throws Exception
 	 */
 	public function writeDataToTempFile(string $content): string {
-		$tmpfname = \tempnam(
+		$temporaryFileName = \tempnam(
 			$this->featureContext->acceptanceTestsDirLocation(),
 			"tus-upload-test-"
 		);
-		if ($tmpfname === false) {
+		if ($temporaryFileName === false) {
 			throw new \Exception("could not create a temporary filename");
 		}
-		$tempfile = \fopen($tmpfname, "w");
-		if ($tempfile === false) {
-			throw new \Exception("could not open " . $tmpfname . " for write");
+		$temporaryFile = \fopen($temporaryFileName, "w");
+		if ($temporaryFile === false) {
+			throw new \Exception("could not open " . $temporaryFileName . " for write");
 		}
-		\fwrite($tempfile, $content);
-		\fclose($tempfile);
-		return $tmpfname;
+		\fwrite($temporaryFile, $content);
+		\fclose($temporaryFile);
+		return $temporaryFileName;
 	}
 
 	/**
@@ -449,24 +449,23 @@ class TUSContext implements Context {
 	 *
 	 * @return void
 	 * @throws Exception
-	 * @throws GuzzleException
 	 */
 	public function userUploadsWithCreatesWithUpload(
 		string $user,
 		string $source,
 		string $content
 	): void {
-		$tmpfname = $this->writeDataToTempFile($content);
+		$temporaryFileName = $this->writeDataToTempFile($content);
 		$this->uploadFileUsingTus(
 			$user,
-			\basename($tmpfname),
+			\basename($temporaryFileName),
 			$source,
 			[],
 			1,
 			-1
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
-		\unlink($tmpfname);
+		\unlink($temporaryFileName);
 	}
 
 	/**

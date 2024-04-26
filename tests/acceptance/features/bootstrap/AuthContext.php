@@ -24,16 +24,13 @@ use TestHelpers\HttpRequestHelper;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Context\Context;
 use TestHelpers\SetupHelper;
-use \Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ResponseInterface;
 use TestHelpers\WebDavHelper;
 
 /**
  * Authentication functions
  */
 class AuthContext implements Context {
-	private string $clientToken;
-	private string $appToken;
-	private array $appTokens;
 	private FeatureContext $featureContext;
 
 	/**
@@ -548,12 +545,12 @@ class AuthContext implements Context {
 	 *
 	 * @param string $asUser
 	 * @param string $method
-	 * @param string $body
+	 * @param string|null $body
 	 * @param string $ofUser
 	 * @param TableNode $table
 	 *
 	 * @return void
-	 * @throws Exception
+	 * @throws JsonException
 	 */
 	public function userRequestsTheseEndpointsIncludingBodyUsingPasswordOfUser(string $asUser, string $method, ?string $body, string $ofUser, TableNode $table):void {
 		$asUser = $this->featureContext->getActualUsername($asUser);

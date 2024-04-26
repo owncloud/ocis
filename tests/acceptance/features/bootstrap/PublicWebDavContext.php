@@ -1262,7 +1262,6 @@ class PublicWebDavContext implements Context {
 		string $password,
 		string $expectedHttpCode
 	):void {
-		$filename = "";
 		if ($publicWebDAVAPIVersion === "old") {
 			return;
 		}
