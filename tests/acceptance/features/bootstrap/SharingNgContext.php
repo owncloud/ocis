@@ -800,7 +800,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Then user :user should be able to send share invitation with all allowed permission roles
+	 * @Then user :user should be able to send share the following invitation with all allowed permission roles
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -809,7 +809,7 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userShouldBeAbleToSendShareInvitationWithAllAllowedPermissionRoles(string $user, TableNode $table): void {
+	public function userShouldBeAbleToSendShareTheFollowingInvitationWithAllAllowedPermissionRoles(string $user, TableNode $table): void {
 		$listPermissionResponse = $this->featureContext->getJsonDecodedResponseBodyContent();
 		if (!isset($listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'})) {
 			Assert::fail(
