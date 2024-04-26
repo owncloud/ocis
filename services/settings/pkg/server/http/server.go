@@ -52,7 +52,6 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		cors.AllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
 		cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 	))
-	mux.Use(middleware.Secure)
 	mux.Use(middleware.ExtractAccountUUID(
 		account.Logger(options.Logger),
 		account.JWTSecret(options.Config.TokenManager.JWTSecret)),

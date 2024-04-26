@@ -79,7 +79,6 @@ func Server(opts ...Option) (http.Service, error) {
 			cors.AllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
 			cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 		),
-		middleware.Secure,
 	}
 	// how do we secure the api?
 	var requireAdminMiddleware func(stdhttp.Handler) stdhttp.Handler

@@ -88,8 +88,10 @@ services:
       MICRO_REGISTRY_ADDRESS: 127.0.0.1:9233
       NATS_NATS_HOST: 0.0.0.0
       NATS_NATS_PORT: 9233
+      PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp.yaml
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
+      - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
       - ./config/ocis/${COMPANION_WEB_CONFIG_FILE_NAME:-web.yaml}:/etc/ocis/web.yaml
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis

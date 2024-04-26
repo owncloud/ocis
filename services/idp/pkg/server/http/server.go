@@ -61,7 +61,6 @@ func Server(opts ...Option) (http.Service, error) {
 			chimiddleware.RequestID,
 			middleware.TraceContext,
 			middleware.NoCache,
-			middleware.Secure,
 			middleware.Version(
 				options.Config.Service.Name,
 				version.GetString(),

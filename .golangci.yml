@@ -49,6 +49,7 @@ linters-settings:
     replace-allow-list:
       - github.com/studio-b12/gowebdav
       - github.com/egirna/icap-client
+      - github.com/unrolled/secure
   interfacebloat:
     max: 15
 

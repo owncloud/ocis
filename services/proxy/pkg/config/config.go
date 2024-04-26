@@ -42,6 +42,7 @@ type Config struct {
 	BackendHTTPSCACert    string             `yaml:"backend_https_cacert" env:"PROXY_HTTPS_CACERT" desc:"Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services." introductionVersion:"pre5.0"`
 	AuthMiddleware        AuthMiddleware     `yaml:"auth_middleware"`
 	PoliciesMiddleware    PoliciesMiddleware `yaml:"policies_middleware"`
+	CSPConfigFileLocation string             `yaml:"csp_config_file_location" env:"PROXY_CSP_CONFIG_FILE_LOCATION" desc:"The location of the CSP configuration file." introductionVersion:"6.0"`
 
 	Context context.Context `yaml:"-" json:"-"`
 }
@@ -140,7 +141,7 @@ type RoleAssignment struct {
 	OIDCRoleMapper OIDCRoleMapper `yaml:"oidc_role_mapper"`
 }
 
-// OIDCRoleMapper contains the configuration for the "oidc" role assignment driber
+// OIDCRoleMapper contains the configuration for the "oidc" role assignment driver
 type OIDCRoleMapper struct {
 	RoleClaim string        `yaml:"role_claim" env:"PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM" desc:"The OIDC claim used to create the users role assignment." introductionVersion:"pre5.0"`
 	RolesMap  []RoleMapping `yaml:"role_mapping" desc:"A list of mappings of ocis role names to PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM claim values. This setting can only be configured in the configuration file and not via environment variables."`

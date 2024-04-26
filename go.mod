@@ -9,6 +9,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.9.0
 	github.com/Nerzal/gocloak/v13 v13.9.0
+	github.com/a8m/envsubst v1.4.2
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.4.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
@@ -86,6 +87,7 @@ require (
 	github.com/thejerf/suture/v4 v4.0.5
 	github.com/tidwall/gjson v1.17.1
 	github.com/tus/tusd v1.13.0
+	github.com/unrolled/secure v1.14.0
 	github.com/urfave/cli/v2 v2.27.1
 	github.com/xhit/go-simple-mail/v2 v2.16.0
 	go-micro.dev/v4 v4.10.2
@@ -354,6 +356,8 @@ require (
 replace github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
 
 replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf
+
+replace github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240424132259-5b29166734cb
 
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
