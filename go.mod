@@ -15,7 +15,6 @@ require (
 	github.com/cs3org/go-cs3apis v0.0.0-20231023073225-7748710e0781
 	github.com/cs3org/reva/v2 v2.19.5
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
-	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
 	github.com/gabriel-vasile/mimetype v1.4.3
@@ -54,6 +53,7 @@ require (
 	github.com/jellydator/ttlcache/v3 v3.2.0
 	github.com/jinzhu/now v1.1.5
 	github.com/justinas/alice v1.2.0
+	github.com/kovidgoyal/imaging v1.6.3
 	github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1
 	github.com/libregraph/idm v0.4.1-0.20231213140724-56a222fb4215
 	github.com/libregraph/lico v0.61.3-0.20240322112242-72cf9221d3a7

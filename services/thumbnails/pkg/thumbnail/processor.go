@@ -4,7 +4,7 @@ import (
 	"image"
 	"strings"
 
-	"github.com/disintegration/imaging"
+	"github.com/kovidgoyal/imaging"
 )
 
 // Processor processes the thumbnail by applying different transformations to it.
@@ -13,7 +13,7 @@ type Processor interface {
 	Process(img image.Image, width, height int, filter imaging.ResampleFilter) *image.NRGBA
 }
 
-// DefinableProcessor is the most simple processor, it holds a replaceable image converter function.
+// DefinableProcessor is the simplest processor, it holds a replaceable image converter function.
 type DefinableProcessor struct {
 	Slug      string
 	Converter func(img image.Image, width, height int, filter imaging.ResampleFilter) *image.NRGBA

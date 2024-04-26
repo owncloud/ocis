@@ -3,7 +3,7 @@ package thumbnail_test
 import (
 	"testing"
 
-	"github.com/disintegration/imaging"
+	"github.com/kovidgoyal/imaging"
 	tAssert "github.com/stretchr/testify/assert"
 
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail"
