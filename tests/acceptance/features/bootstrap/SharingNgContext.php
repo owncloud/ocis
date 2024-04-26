@@ -628,7 +628,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return void
 	 * @throws JsonException
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userRemovesAccessOfUserOrGroupFromSpaceUsingGraphAPI(
 		string $sharer,
@@ -863,6 +863,65 @@ class SharingNgContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId
 		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" (?:tries to send|sends) the following share invitation using root endpoint of the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userSendsTheFollowingShareInvitationUsingRootEndPointTheGraphApi(string $user, TableNode $table):void {
+		$shareeIds = [];
+		$rows = $table->getRowsHash();
+		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
+			$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
+		} else {
+			$space = $this->spacesContext->getCreatedSpace($rows['space']);
+		}
+		$spaceId = $space['id'];
+
+		$sharees = array_map('trim', explode(',', $rows['sharee']));
+		$shareTypes = array_map('trim', explode(',', $rows['shareType']));
+
+		foreach ($sharees as $index => $sharee) {
+			$shareType = $shareTypes[$index];
+			if ($sharee === "") {
+				// set empty value to $shareeIds
+				$shareeIds[] = "";
+				continue;
+			}
+			$shareeId = "";
+			if ($shareType === "user") {
+				$shareeId = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
+			} elseif ($shareType === "group") {
+				$shareeId = $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
+			}
+			// for non-existing group or user, generate random id
+			$shareeIds[] = $shareeId ?: WebDavHelper::generateUUIDv4();
+		}
+
+		$permissionsRole = $rows['permissionsRole'] ?? null;
+		$permissionsAction = $rows['permissionsAction'] ?? null;
+		$expireDate = $rows["expireDate"] ?? null;
+
+		$response = GraphHelper::sendSharingInvitationForDrive(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$shareeIds,
+			$shareTypes,
+			$permissionsRole,
+			$permissionsAction,
+			$expireDate
+		);
+
 		$this->featureContext->setResponse($response);
 	}
 }
