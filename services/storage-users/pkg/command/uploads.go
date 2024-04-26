@@ -191,6 +191,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			if c.Bool("json") {
 				for _, u := range uploads {
 					ref := u.Reference()
+					sr, sd := u.ScanData()
 					s := struct {
 						ID         string         `json:"id"`
 						Space      string         `json:"space"`
@@ -201,6 +202,8 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 						SpaceOwner *userpb.UserId `json:"spaceowner,omitempty"`
 						Expires    time.Time      `json:"expires"`
 						Processing bool           `json:"processing"`
+						ScanDate   time.Time      `json:"virus_scan_date"`
+						ScanResult string         `json:"virus_scan_result"`
 					}{
 						Space:      ref.GetResourceId().GetSpaceId(),
 						ID:         u.ID(),
@@ -211,6 +214,8 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 						SpaceOwner: u.SpaceOwner(),
 						Expires:    u.Expires(),
 						Processing: u.IsProcessing(),
+						ScanDate:   sd,
+						ScanResult: sr,
 					}
 					j, err := json.Marshal(s)
 					if err != nil {
@@ -236,10 +241,11 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 
 				// start a table
 				table = tw.NewWriter(os.Stdout)
-				table.SetHeader([]string{"Space", "Upload Id", "Name", "Offset", "Size", "Executant", "Owner", "Expires", "Processing"})
+				table.SetHeader([]string{"Space", "Upload Id", "Name", "Offset", "Size", "Executant", "Owner", "Expires", "Processing", "Scan Date", "Scan Result"})
 				table.SetAutoFormatHeaders(false)
 
 				for _, u := range uploads {
+					sr, sd := u.ScanData()
 					table.Append([]string{
 						u.Reference().ResourceId.GetSpaceId(),
 						u.ID(),
@@ -250,6 +256,8 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 						u.SpaceOwner().GetOpaqueId(),
 						u.Expires().Format(time.RFC3339),
 						strconv.FormatBool(u.IsProcessing()),
+						sd.Format(time.RFC3339),
+						sr,
 					})
 
 					if c.Bool("restart") {
