@@ -9,11 +9,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/webfinger"
 )
 
-const (
-	OwnCloudInstanceRel = "http://webfinger.owncloud/rel/server-instance"
-	OpenIDConnectRel    = "http://openid.net/specs/connect/1.0/issuer"
-)
-
 // Service defines the extension handlers.
 type Service interface {
 	// Webfinger is the endpoint for retrieving various href relations.
@@ -78,7 +73,7 @@ type svc struct {
 }
 
 // TODO implement different implementations:
-// static one returning the href or a configureable domain
+// static one returning the href or a configurable domain
 // regex one returning different instances based on the regex that matches
 // claim one that reads a claim and then fetches the instance?
 // that is actually two interfaces / steps:

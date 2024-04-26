@@ -22,7 +22,7 @@ func OpenIDDiscovery(href string) service.RelationProvider {
 	}
 }
 
-func (l *openIDDiscovery) Add(ctx context.Context, jrd *webfinger.JSONResourceDescriptor) {
+func (l *openIDDiscovery) Add(_ context.Context, jrd *webfinger.JSONResourceDescriptor) {
 	if jrd == nil {
 		jrd = &webfinger.JSONResourceDescriptor{}
 	}

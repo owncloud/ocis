@@ -26,7 +26,7 @@ func Server(opts ...Option) (ohttp.Service, error) {
 	options := newOptions(opts...)
 	service := options.Service
 
-	svc, err := ohttp.NewService(
+	newService, err := ohttp.NewService(
 		ohttp.TLSConfig(options.Config.HTTP.TLS),
 		ohttp.Logger(options.Logger),
 		ohttp.Namespace(options.Config.HTTP.Namespace),
@@ -98,13 +98,13 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		r.Get("/.well-known/webfinger", WebfingerHandler(service))
 	})
 
-	err = micro.RegisterHandler(svc.Server(), mux)
+	err = micro.RegisterHandler(newService.Server(), mux)
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("failed to register the handler")
 	}
 
-	svc.Init()
-	return svc, nil
+	newService.Init()
+	return newService, nil
 }
 
 func WebfingerHandler(service svc.Service) func(w http.ResponseWriter, r *http.Request) {

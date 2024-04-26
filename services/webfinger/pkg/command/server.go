@@ -44,17 +44,17 @@ func Server(cfg *config.Config) *cli.Command {
 					}
 					return context.WithCancel(cfg.Context)
 				}()
-				metrics = metrics.New(metrics.Logger(logger))
+				m = metrics.New(metrics.Logger(logger))
 			)
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(version.GetString()).Set(1)
+			m.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			{
 				relationProviders, err := getRelationProviders(cfg)
 				if err != nil {
-					logger.Error().Err(err).Msg("relation providier init")
+					logger.Error().Err(err).Msg("relation provider init")
 					return err
 				}
 
@@ -67,7 +67,7 @@ func Server(cfg *config.Config) *cli.Command {
 					logger.Error().Err(err).Msg("handler init")
 					return err
 				}
-				svc = service.NewInstrument(svc, metrics)
+				svc = service.NewInstrument(svc, m)
 				svc = service.NewLogging(svc, logger) // this logs service specific data
 				svc = service.NewTracing(svc, traceProvider)
 
