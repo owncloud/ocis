@@ -301,7 +301,7 @@ Feature:  enable or disable sync of incoming shares
   @issue-8724
   Scenario: try to enable share sync of a non-existent resource
     Given user "Brian" has disabled the auto-sync share
-    When user "Brian" tries to enable share sync of a nonexistent resource using the Graph API
+    When user "Brian" tries to enable share sync of a resource "nonexistent" using the Graph API
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -339,7 +339,7 @@ Feature:  enable or disable sync of incoming shares
 
   Scenario: try to enable share sync with empty resource id
     Given user "Brian" has disabled the auto-sync share
-    When user "Brian" tries to enable share sync with "" resource id using the Graph API
+    When user "Brian" tries to enable share sync of a resource "" using the Graph API
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """

@@ -741,8 +741,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When user :user tries to enable share sync of a :resource resource using the Graph API
-	 * @When user :user tries to enable share sync with :resource resource id using the Graph API
+	 * @When user :user tries to enable share sync of a resource :resource using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $resource
