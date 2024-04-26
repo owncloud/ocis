@@ -102,7 +102,7 @@ require (
 	golang.org/x/image v0.15.0
 	golang.org/x/net v0.24.0
 	golang.org/x/oauth2 v0.19.0
-	golang.org/x/sync v0.6.0
+	golang.org/x/sync v0.7.0
 	golang.org/x/term v0.19.0
 	golang.org/x/text v0.14.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240227224415-6ceb2ff114de
