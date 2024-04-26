@@ -60,3 +60,4 @@
 | PROXY_INSECURE_BACKENDS | bool | false | Disable TLS certificate validation for all HTTP backend connections.|
 | PROXY_HTTPS_CACERT | string |  | Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services.|
 | PROXY_POLICIES_QUERY | string |  | Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Rules default to deny if the variable was not found.|
+| PROXY_CSP_CONFIG_FILE_LOCATION | string |  | The location of the CSP configuration file.|

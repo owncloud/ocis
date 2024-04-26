@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-04-26-07-02-37]
+[#deprecation-note-2024-04-26-07-14-38]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -574,5 +574,14 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Rules default to deny if the variable was not found.
+
+a|`PROXY_CSP_CONFIG_FILE_LOCATION` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The location of the CSP configuration file.
 |===
 

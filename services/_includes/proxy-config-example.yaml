@@ -179,3 +179,4 @@ auth_middleware:
   credentials_by_user_agent: {}
 policies_middleware:
   query: ""
+csp_config_file_location: ""
