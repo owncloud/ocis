@@ -616,539 +616,6 @@ Feature: an user gets the resources shared to them
     """
     {
       "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "createdBy",
-              "eTag",
-              "file",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem",
-              "size"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
-              },
-              "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
-              },
-              "createdBy": {
-                "type": "object",
-                "required": ["user"],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": ["displayName", "id"],
-                    "properties": {
-                      "displayName": {
-                        "type": "string",
-                        "enum": ["Alice Hansen"]
-                      },
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      }
-                    }
-                  }
-                }
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "file": {
-                "type": "object",
-                "required": ["mimeType"],
-                "properties": {
-                  "mimeType": {
-                    "type": "string",
-                    "enum": ["text/plain"]
-                  }
-                }
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "type": "string",
-                "enum": [
-                  "textfile0.txt"
-                ]
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "createdBy",
-                  "eTag",
-                  "file",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions",
-                  "size"
-                ],
-                "properties": {
-                  "createdBy": {
-                    "type": "object",
-                    "required": ["user"],
-                    "properties": {
-                      "user": {
-                        "type": "object",
-                        "required": [
-                          "id",
-                          "displayName"
-                        ],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%user_id_pattern%$"
-                          },
-                          "displayName": {
-                            "type": "string",
-                            "enum": ["Alice Hansen"]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "file": {
-                    "type": "object",
-                    "required": ["mimeType"],
-                    "properties": {
-                      "mimeType": {
-                        "type": "string",
-                        "enum": ["text/plain"]
-                      }
-                    }
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "enum": ["textfile0.txt"]
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "%space_id_pattern%"
-                      },
-                      "driveType" : {
-                        "type": "string",
-                        "enum": ["personal"]
-                      }
-                    }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "maxItems": 1,
-                    "minItems": 1,
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
-                      ],
-                      "properties": {
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["group"],
-                          "properties":{
-                            "group": {
-                              "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
-                              "properties": {
-                                "displayName": {
-                                  "type": "string",
-                                  "enum": ["grp1"]
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "id": {
-                          "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
-                        },
-                        "invitation": {
-                          "type": "object",
-                          "required": ["invitedBy"],
-                          "properties": {
-                            "user":{
-                              "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
-                              "properties": {
-                                "displayName": {
-                                  "type": "string",
-                                  "enum": ["Alice Hansen"]
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "roles": {
-                          "type": "array",
-                          "minItems": 1,
-                          "maxItems": 1,
-                          "items": {
-                            "type": "string",
-                            "pattern": "^%role_id_pattern%$"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "size": {
-                    "type": "number",
-                    "enum": [5]
-                  }
-                }
-              },
-              "size": {
-                "type": "number",
-                "enum": [5]
-              }
-            }
-          }
-        }
-      }
-    }
-    """
-
-
-  Scenario: sharee lists the folder share received via group invitation (Personal space)
-    Given using spaces DAV path
-    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And  user "Alice" has created folder "folder"
-    And user "Alice" has created a group "grp1" using the Graph API
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
-      | resource        | folder   |
-      | space           | Personal |
-      | sharee          | grp1     |
-      | shareType       | group    |
-      | permissionsRole | Viewer   |
-    When user "Brian" lists the shares shared with him using the Graph API
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "createdBy",
-              "eTag",
-              "folder",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
-              },
-              "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
-              },
-              "createdBy": {
-                "type": "object",
-                "required": ["user"],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": ["displayName", "id"],
-                    "properties": {
-                      "displayName": {
-                        "type": "string",
-                        "enum": ["Alice Hansen"]
-                      },
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      }
-                    }
-                  }
-                }
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "type": "string",
-                "enum": ["folder"]
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "createdBy",
-                  "eTag",
-                  "folder",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions"
-                ],
-                "properties": {
-                  "createdBy": {
-                    "type": "object",
-                    "required": ["user"],
-                    "properties": {
-                      "user": {
-                        "type": "object",
-                        "required": ["id","displayName"],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%user_id_pattern%$"
-                          },
-                          "displayName": {
-                            "type": "string",
-                            "enum": ["Alice Hansen"]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "enum": ["folder"]
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": ["driveId","driveType"],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "%space_id_pattern%"
-                      },
-                      "driveType" : {
-                        "type": "string",
-                        "enum": ["personal"]
-                      }
-                    }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "maxItems": 1,
-                    "minItems": 1,
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
-                      ],
-                      "properties": {
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["group"],
-                          "properties":{
-                            "group": {
-                              "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
-                              "properties": {
-                                "displayName": {
-                                  "type": "string",
-                                  "enum": ["grp1"]
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "id": {
-                          "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
-                        },
-                        "invitation": {
-                          "type": "object",
-                          "required": ["invitedBy"],
-                          "properties": {
-                            "user":{
-                              "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
-                              "properties": {
-                                "displayName": {
-                                  "type": "string",
-                                  "enum": ["Alice Hansen"]
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "roles": {
-                          "type": "array",
-                          "minItems": 1,
-                          "maxItems": 1,
-                          "items": {
-                            "type": "string",
-                            "pattern": "^%role_id_pattern%$"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    """
-
-
-  Scenario: sharee list the same file shares received via user and group invitation (Personal space)
-    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And user "Alice" has uploaded file with content "hello" to "textfile0.txt"
-    And user "Alice" has created a group "grp1" using the Graph API
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
-      | resource        | textfile0.txt |
-      | space           | Personal      |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
-    And user "Alice" has sent the following share invitation:
-      | resource        | textfile0.txt |
-      | space           | Personal      |
-      | sharee          | grp1          |
-      | shareType       | group         |
-      | permissionsRole | Viewer        |
-    When user "Brian" lists the shares shared with him using the Graph API
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-    """
-    {
-      "type": "object",
       "required": [
         "value"
       ],
@@ -1333,6 +800,537 @@ Feature: an user gets the resources shared to them
                   },
                   "permissions": {
                     "type": "array",
+                    "maxItems": 1,
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "grantedToV2",
+                        "id",
+                        "invitation",
+                        "roles"
+                      ],
+                      "properties": {
+                        "grantedToV2": {
+                          "type": "object",
+                          "required": ["group"],
+                          "properties":{
+                            "group": {
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "const": "grp1"
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%permissions_id_pattern%$"
+                        },
+                        "invitation": {
+                          "type": "object",
+                          "required": ["invitedBy"],
+                          "properties": {
+                            "user":{
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "roles": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 1,
+                          "items": {
+                            "type": "string",
+                            "pattern": "^%role_id_pattern%$"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "size": {
+                    "enum": [
+                      5
+                    ]
+                  }
+                }
+              },
+              "size": {
+                "enum": [
+                  5
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+
+  Scenario: sharee lists the folder share received via group invitation (Personal space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And  user "Alice" has created folder "folder"
+    And user "Alice" has created a group "grp1" using the Graph API
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has sent the following share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": ["value"],
+      "properties": {
+        "value": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@UI.Hidden",
+              "@client.synchronize",
+              "createdBy",
+              "eTag",
+              "folder",
+              "id",
+              "lastModifiedDateTime",
+              "name",
+              "parentReference",
+              "remoteItem"
+            ],
+            "properties": {
+              "@UI.Hidden":{
+                "type": "boolean",
+                "enum": [false]
+              },
+              "@client.synchronize":{
+                "type": "boolean",
+                "enum": [true]
+              },
+              "createdBy": {
+                "type": "object",
+                "required": ["user"],
+                "properties": {
+                  "user": {
+                    "type": "object",
+                    "required": ["displayName", "id"],
+                    "properties": {
+                      "displayName": {
+                        "const": "Alice Hansen"
+                      },
+                      "id": {
+                        "type": "string",
+                        "pattern": "^%user_id_pattern%$"
+                      }
+                    }
+                  }
+                }
+              },
+              "eTag": {
+                "type": "string",
+                "pattern": "%etag_pattern%"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%share_id_pattern%$"
+              },
+              "name": {
+                "const": "folder"
+              },
+              "parentReference": {
+                "type": "object",
+                "required": [
+                  "driveId",
+                  "driveType",
+                  "id"
+                ],
+                "properties": {
+                  "driveId": {
+                    "type": "string",
+                    "pattern": "^%space_id_pattern%$"
+                  },
+                  "driveType" : {
+                    "type": "string",
+                    "enum": ["virtual"]
+                  },
+                  "id" : {
+                    "type": "string",
+                    "pattern": "%space_id_pattern%"
+                  }
+                }
+              },
+              "remoteItem": {
+                "type": "object",
+                "required": [
+                  "createdBy",
+                  "eTag",
+                  "folder",
+                  "id",
+                  "lastModifiedDateTime",
+                  "name",
+                  "parentReference",
+                  "permissions"
+                ],
+                "properties": {
+                  "createdBy": {
+                    "type": "object",
+                    "required": ["user"],
+                    "properties": {
+                      "user": {
+                        "type": "object",
+                        "required": ["id", "displayName"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^%user_id_pattern%$"
+                          },
+                          "displayName": {
+                            "const": "Alice Hansen"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "eTag": {
+                    "type": "string",
+                    "pattern": "%etag_pattern%"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%file_id_pattern%$"
+                  },
+                  "name": {
+                    "const": "folder"
+                  },
+                  "parentReference": {
+                    "type": "object",
+                    "required": [
+                      "driveId",
+                      "driveType"
+                    ],
+                    "properties": {
+                      "driveId": {
+                        "type": "string",
+                        "pattern": "%space_id_pattern%"
+                      },
+                      "driveType" : {
+                        "const": "personal"
+                      }
+                    }
+                  },
+                  "permissions": {
+                    "type": "array",
+                    "maxItems": 1,
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "grantedToV2",
+                        "id",
+                        "invitation",
+                        "roles"
+                      ],
+                      "properties": {
+                        "grantedToV2": {
+                          "type": "object",
+                          "required": ["group"],
+                          "properties":{
+                            "group": {
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "const": "grp1"
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%permissions_id_pattern%$"
+                        },
+                        "invitation": {
+                          "type": "object",
+                          "required": ["invitedBy"],
+                          "properties": {
+                            "user":{
+                              "type": "object",
+                              "required": [
+                                "displayName",
+                                "id"
+                              ],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "roles": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 1,
+                          "items": {
+                            "type": "string",
+                            "pattern": "^%role_id_pattern%$"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+
+  Scenario: sharee list the same file shares received via user and group invitation (Personal space)
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has uploaded file with content "hello" to "textfile0.txt"
+    And user "Alice" has created a group "grp1" using the Graph API
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "@UI.Hidden",
+              "@client.synchronize",
+              "createdBy",
+              "eTag",
+              "file",
+              "id",
+              "lastModifiedDateTime",
+              "name",
+              "parentReference",
+              "remoteItem",
+              "size"
+            ],
+            "properties": {
+              "@UI.Hidden":{
+                "type": "boolean",
+                "enum": [false]
+              },
+              "@client.synchronize":{
+                "type": "boolean",
+                "enum": [true]
+              },
+              "createdBy": {
+                "type": "object",
+                "required": [
+                  "user"
+                ],
+                "properties": {
+                  "user": {
+                    "type": "object",
+                    "required": ["displayName", "id"],
+                    "properties": {
+                      "displayName": {
+                        "type": "string",
+                        "enum": ["Alice Hansen"]
+                      },
+                      "id": {
+                        "type": "string",
+                        "pattern": "^%user_id_pattern%$"
+                      }
+                    }
+                  }
+                }
+              },
+              "eTag": {
+                "type": "string",
+                "pattern": "%etag_pattern%"
+              },
+              "file": {
+                "type": "object",
+                "required": ["mimeType"],
+                "properties": {
+                  "mimeType": {
+                    "const": "text/plain"
+                  }
+                }
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%share_id_pattern%$"
+              },
+              "name": {
+                "const": "textfile0.txt"
+              },
+              "parentReference": {
+                "type": "object",
+                "required": [
+                  "driveId",
+                  "driveType",
+                  "id"
+                ],
+                "properties": {
+                  "driveId": {
+                    "type": "string",
+                    "pattern": "^%space_id_pattern%$"
+                  },
+                  "driveType" : {
+                    "type": "string",
+                    "enum": ["virtual"]
+                  },
+                  "id" : {
+                    "type": "string",
+                    "pattern": "%space_id_pattern%"
+                  }
+                }
+              },
+              "remoteItem": {
+                "type": "object",
+                "required": [
+                  "createdBy",
+                  "eTag",
+                  "file",
+                  "id",
+                  "lastModifiedDateTime",
+                  "name",
+                  "parentReference",
+                  "permissions",
+                  "size"
+                ],
+                "properties": {
+                  "createdBy": {
+                    "type": "object",
+                    "required": [
+                      "user"
+                    ],
+                    "properties": {
+                      "user": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "displayName"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^%user_id_pattern%$"
+                          },
+                          "displayName": {
+                            "type": "string",
+                            "enum": [
+                              "Alice Hansen"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "eTag": {
+                    "type": "string",
+                    "pattern": "%etag_pattern%"
+                  },
+                  "file": {
+                    "type": "object",
+                    "required": ["mimeType"],
+                    "properties": {
+                      "mimeType": {
+                        "const": "text/plain"
+                      }
+                    }
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%file_id_pattern%$"
+                  },
+                  "name": {
+                    "const": "textfile0.txt"
+                  },
+                  "parentReference": {
+                    "type": "object",
+                    "required": [
+                      "driveId",
+                      "driveType"
+                    ],
+                    "properties": {
+                      "driveId": {
+                        "type": "string",
+                        "pattern": "%space_id_pattern%"
+                      },
+                      "driveType" : {
+                        "type": "string",
+                        "enum": ["personal"]
+                      }
+                    }
+                  },
+                  "permissions": {
+                    "type": "array",
                     "minItems": 2,
                     "maxItems": 2,
                     "uniqueItems": true,
@@ -1490,18 +1488,12 @@ Feature: an user gets the resources shared to them
                     }
                   },
                   "size": {
-                    "type": "number",
-                    "enum": [
-                      5
-                    ]
+                    "const": 5
                   }
                 }
               },
               "size": {
-                "type": "number",
-                "enum": [
-                  5
-                ]
+                "const": 5
               }
             }
           }
@@ -1567,17 +1559,14 @@ Feature: an user gets the resources shared to them
               },
               "createdBy": {
                 "type": "object",
-                "required": [
-                  "user"
-                ],
+                "required": ["user"],
                 "properties": {
                   "user": {
                     "type": "object",
                     "required": ["displayName", "id"],
                     "properties": {
                       "displayName": {
-                        "type": "string",
-                        "enum": ["Alice Hansen"]
+                        "const": "Alice Hansen"
                       },
                       "id": {
                         "type": "string",
@@ -1591,7 +1580,9 @@ Feature: an user gets the resources shared to them
                 "type": "string",
                 "pattern": "%etag_pattern%"
               },
-              "folder": {},
+              "folder": {
+                "const": {}
+              },
               "id": {
                 "type": "string",
                 "pattern": "^%share_id_pattern%$"
@@ -1639,26 +1630,18 @@ Feature: an user gets the resources shared to them
                 "properties": {
                   "createdBy": {
                     "type": "object",
-                    "required": [
-                      "user"
-                    ],
+                    "required": ["user"],
                     "properties": {
                       "user": {
                         "type": "object",
-                        "required": [
-                          "id",
-                          "displayName"
-                        ],
+                        "required": ["id", "displayName"],
                         "properties": {
                           "id": {
                             "type": "string",
                             "pattern": "^%user_id_pattern%$"
                           },
                           "displayName": {
-                            "type": "string",
-                            "enum": [
-                              "Alice Hansen"
-                            ]
+                            "const": "Alice Hansen"
                           }
                         }
                       }
@@ -1691,8 +1674,7 @@ Feature: an user gets the resources shared to them
                         "pattern": "%space_id_pattern%"
                       },
                       "driveType" : {
-                        "type": "string",
-                        "enum": ["personal"]
+                        "const": "personal"
                       }
                     }
                   },
@@ -1911,12 +1893,10 @@ Feature: an user gets the resources shared to them
                   ],
                   "properties": {
                     "@UI.Hidden": {
-                      "type": "boolean",
-                      "enum": [false]
+                      "const": false
                     },
                     "@client.synchronize": {
-                      "type": "boolean",
-                      "enum": [true]
+                      "const": true
                     },
                     "createdBy": {
                       "type": "object",
@@ -1927,16 +1907,14 @@ Feature: an user gets the resources shared to them
                           "required": ["displayName", "id"],
                           "properties": {
                             "displayName": {
-                              "type": "string",
-                              "enum": ["Carol King"]
+                              "const": "Carol King"
                             }
                           }
                         }
                       }
                     },
                     "name": {
-                      "type": "string",
-                      "enum": ["textfile (1).txt"]
+                      "const": "textfile (1).txt"
                     },
                     "remoteItem": {
                       "type": "object",
@@ -1960,16 +1938,14 @@ Feature: an user gets the resources shared to them
                               "required": ["displayName","id"],
                               "properties": {
                                 "displayName": {
-                                  "type": "string",
-                                  "enum": ["Carol King"]
+                                  "const": "Carol King"
                                 }
                               }
                             }
                           }
                         },
                         "name": {
-                          "type": "string",
-                          "enum": ["textfile.txt"]
+                          "const": "textfile.txt"
                         },
                         "permissions": {
                           "type": "array",
@@ -1988,8 +1964,7 @@ Feature: an user gets the resources shared to them
                                     "required": ["displayName", "id"],
                                     "properties": {
                                       "displayName": {
-                                        "type": "string",
-                                        "enum": ["Brian Murphy"]
+                                        "const": "Brian Murphy"
                                       }
                                     }
                                   }
@@ -2008,8 +1983,7 @@ Feature: an user gets the resources shared to them
                                         "required": ["displayName", "id"],
                                         "properties": {
                                           "displayName": {
-                                            "type": "string",
-                                            "enum": ["Carol King"]
+                                            "const": "Carol King"
                                           }
                                         }
                                       }
@@ -2040,12 +2014,10 @@ Feature: an user gets the resources shared to them
                   ],
                   "properties": {
                     "@UI.Hidden": {
-                      "type": "boolean",
-                      "enum": [false]
+                      "const": false
                     },
                     "@client.synchronize": {
-                      "type": "boolean",
-                      "enum": [true]
+                      "const": true
                     },
                     "createdBy": {
                       "type": "object",
@@ -2056,16 +2028,14 @@ Feature: an user gets the resources shared to them
                           "required": ["displayName", "id"],
                           "properties": {
                             "displayName": {
-                              "type": "string",
-                              "enum": ["Alice Hansen"]
+                              "const": "Alice Hansen"
                             }
                           }
                         }
                       }
                     },
                     "name": {
-                      "type": "string",
-                      "enum": ["textfile.txt"]
+                      "const": "textfile.txt"
                     },
                     "remoteItem": {
                       "type": "object",
@@ -2097,8 +2067,7 @@ Feature: an user gets the resources shared to them
                           }
                         },
                         "name": {
-                          "type": "string",
-                          "enum": ["textfile.txt"]
+                          "const": "textfile.txt"
                         },
                         "permissions": {
                           "type": "array",
@@ -2117,8 +2086,7 @@ Feature: an user gets the resources shared to them
                                     "required": ["displayName", "id"],
                                     "properties": {
                                       "displayName": {
-                                        "type": "string",
-                                        "enum": ["Brian Murphy"]
+                                        "const": "Brian Murphy"
                                       }
                                     }
                                   }
@@ -2137,8 +2105,7 @@ Feature: an user gets the resources shared to them
                                         "required": ["displayName", "id"],
                                         "properties": {
                                           "displayName": {
-                                            "type": "string",
-                                            "enum": ["Alice Hansen"]
+                                            "const": "Alice Hansen"
                                           }
                                         }
                                       }
@@ -2208,12 +2175,10 @@ Feature: an user gets the resources shared to them
                   ],
                   "properties": {
                     "@UI.Hidden": {
-                      "type": "boolean",
-                      "enum": [false]
+                      "const": false
                     },
                     "@client.synchronize": {
-                      "type": "boolean",
-                      "enum": [true]
+                      "const": true
                     },
                     "createdBy": {
                       "type": "object",
@@ -2224,16 +2189,14 @@ Feature: an user gets the resources shared to them
                           "required": ["displayName", "id"],
                           "properties": {
                             "displayName": {
-                              "type": "string",
-                              "enum": ["Carol King"]
+                              "const": "Carol King"
                             }
                           }
                         }
                       }
                     },
                     "name": {
-                      "type": "string",
-                      "enum": ["folderToShare (1)"]
+                      "const": "folderToShare (1)"
                     },
                     "remoteItem": {
                       "type": "object",
@@ -2257,16 +2220,14 @@ Feature: an user gets the resources shared to them
                               "required": ["displayName","id"],
                               "properties": {
                                 "displayName": {
-                                  "type": "string",
-                                  "enum": ["Carol King"]
+                                  "const": "Carol King"
                                 }
                               }
                             }
                           }
                         },
                         "name": {
-                          "type": "string",
-                          "enum": ["folderToShare"]
+                          "const": "folderToShare"
                         },
                         "permissions": {
                           "type": "array",
@@ -2285,8 +2246,7 @@ Feature: an user gets the resources shared to them
                                     "required": ["displayName", "id"],
                                     "properties": {
                                       "displayName": {
-                                        "type": "string",
-                                        "enum": ["Brian Murphy"]
+                                        "const": "Brian Murphy"
                                       }
                                     }
                                   }
@@ -2305,8 +2265,7 @@ Feature: an user gets the resources shared to them
                                         "required": ["displayName", "id"],
                                         "properties": {
                                           "displayName": {
-                                            "type": "string",
-                                            "enum": ["Carol King"]
+                                            "const": "Carol King"
                                           }
                                         }
                                       }
@@ -2337,12 +2296,10 @@ Feature: an user gets the resources shared to them
                   ],
                   "properties": {
                     "@UI.Hidden": {
-                      "type": "boolean",
-                      "enum": [false]
+                      "const": false
                     },
                     "@client.synchronize": {
-                      "type": "boolean",
-                      "enum": [true]
+                      "const": true
                     },
                     "createdBy": {
                       "type": "object",
@@ -2353,16 +2310,14 @@ Feature: an user gets the resources shared to them
                           "required": ["displayName", "id"],
                           "properties": {
                             "displayName": {
-                              "type": "string",
-                              "enum": ["Alice Hansen"]
+                              "const": "Alice Hansen"
                             }
                           }
                         }
                       }
                     },
                     "name": {
-                      "type": "string",
-                      "enum": ["folderToShare"]
+                      "const": "folderToShare"
                     },
                     "remoteItem": {
                       "type": "object",
@@ -2386,16 +2341,14 @@ Feature: an user gets the resources shared to them
                               "required": ["displayName", "id"],
                               "properties": {
                                 "displayName": {
-                                  "type": "string",
-                                  "enum": ["Alice Hansen"]
+                                  "const": "Alice Hansen"
                                 }
                               }
                             }
                           }
                         },
                         "name": {
-                          "type": "string",
-                          "enum": ["folderToShare"]
+                          "const": "folderToShare"
                         },
                         "permissions": {
                           "type": "array",
@@ -2414,8 +2367,7 @@ Feature: an user gets the resources shared to them
                                     "required": ["displayName", "id"],
                                     "properties": {
                                       "displayName": {
-                                        "type": "string",
-                                        "enum": ["Brian Murphy"]
+                                        "const": "Brian Murphy"
                                       }
                                     }
                                   }
@@ -2434,8 +2386,7 @@ Feature: an user gets the resources shared to them
                                         "required": ["displayName", "id"],
                                         "properties": {
                                           "displayName": {
-                                            "type": "string",
-                                            "enum": ["Alice Hansen"]
+                                            "const": "Alice Hansen"
                                           }
                                         }
                                       }
@@ -2569,8 +2520,8 @@ Feature: an user gets the resources shared to them
       "properties": {
         "value": {
           "type": "array",
-          "maxItems": 1,
           "minItems": 1,
+          "maxItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -2587,10 +2538,12 @@ Feature: an user gets the resources shared to them
             ],
             "properties": {
               "@UI.Hidden":{
-                "const": false
+                "type": "boolean",
+                "enum": [false]
               },
               "@client.synchronize":{
-                "const": true
+                "type": "boolean",
+                "enum": [true]
               },
               "eTag": {
                 "type": "string",
@@ -2626,7 +2579,8 @@ Feature: an user gets the resources shared to them
                     "pattern": "^%space_id_pattern%$"
                   },
                   "driveType" : {
-                    "const": "virtual"
+                    "type": "string",
+                    "enum": ["virtual"]
                   },
                   "id" : {
                     "type": "string",
@@ -2686,8 +2640,8 @@ Feature: an user gets the resources shared to them
                   },
                   "permissions": {
                     "type": "array",
-                    "maxItems": 1,
                     "minItems": 1,
+                    "maxItems": 1,
                     "items": {
                       "type": "object",
                       "required": [
@@ -2707,6 +2661,7 @@ Feature: an user gets the resources shared to them
                           "properties": {
                             "user": {
                               "type": "object",
+                              "required": ["displayName", "id"],
                               "properties": {
                                 "displayName": {
                                   "const": "Brian Murphy"
@@ -2715,11 +2670,7 @@ Feature: an user gets the resources shared to them
                                   "type": "string",
                                   "pattern":"^%user_id_pattern%$"
                                 }
-                              },
-                              "required": [
-                                "displayName",
-                                "id"
-                              ]
+                              }
                             }
                           }
                         },
@@ -2733,10 +2684,7 @@ Feature: an user gets the resources shared to them
                               "properties": {
                                 "user": {
                                   "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
+                                  "required": ["displayName", "id"],
                                   "properties": {
                                     "displayName": {
                                       "const": "Alice Hansen"
@@ -3029,12 +2977,10 @@ Feature: an user gets the resources shared to them
             ],
             "properties": {
               "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
+                "const": true
               },
               "eTag": {
                 "type": "string",
@@ -3045,8 +2991,7 @@ Feature: an user gets the resources shared to them
                 "required": ["mimeType"],
                 "properties": {
                   "mimeType": {
-                    "type": "string",
-                    "enum": ["text/plain"]
+                    "const": "text/plain"
                   }
                 }
               },
@@ -3055,8 +3000,7 @@ Feature: an user gets the resources shared to them
                 "pattern": "^%share_id_pattern%$"
               },
               "name": {
-                "type": "string",
-                "enum": ["textfile0.txt"]
+                "const": "textfile0.txt"
               },
               "parentReference": {
                 "type": "object",
@@ -3071,8 +3015,7 @@ Feature: an user gets the resources shared to them
                     "pattern": "^%space_id_pattern%$"
                   },
                   "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
+                    "const": "virtual"
                   },
                   "id" : {
                     "type": "string",
@@ -3101,8 +3044,7 @@ Feature: an user gets the resources shared to them
                     "required": ["mimeType"],
                     "properties": {
                       "mimeType": {
-                        "type": "string",
-                        "enum": ["text/plain"]
+                        "const": "text/plain"
                       }
                     }
                   },
@@ -3111,23 +3053,18 @@ Feature: an user gets the resources shared to them
                     "pattern": "^%file_id_pattern%$"
                   },
                   "name": {
-                    "type": "string",
-                    "enum": ["textfile0.txt"]
+                    "const": "textfile0.txt"
                   },
                   "parentReference": {
                     "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
+                    "required": ["driveId", "driveType"],
                     "properties": {
                       "driveId": {
                         "type": "string",
                         "pattern": "%space_id_pattern%"
                       },
                       "driveType" : {
-                        "type": "string",
-                        "enum": ["project"]
+                        "const": "project"
                       }
                     }
                   },
@@ -3150,14 +3087,10 @@ Feature: an user gets the resources shared to them
                           "properties":{
                             "group": {
                               "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
+                              "required": ["displayName", "id"],
                               "properties": {
                                 "displayName": {
-                                  "type": "string",
-                                  "enum": ["grp1"]
+                                  "const": "grp1"
                                 },
                                 "id": {
                                   "type": "string",
@@ -3177,14 +3110,10 @@ Feature: an user gets the resources shared to them
                           "properties": {
                             "user":{
                               "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
+                              "required": ["displayName", "id"],
                               "properties": {
                                 "displayName": {
-                                  "type": "string",
-                                  "enum": ["Alice Hansen"]
+                                  "const": "Alice Hansen"
                                 },
                                 "id": {
                                   "type": "string",
@@ -3207,14 +3136,12 @@ Feature: an user gets the resources shared to them
                     }
                   },
                   "size": {
-                    "type": "number",
-                    "enum": [11]
+                    "const": 11
                   }
                 }
               },
               "size": {
-                "type": "number",
-                "enum": [11]
+                "const": 11
               }
             }
           }
@@ -3264,12 +3191,10 @@ Feature: an user gets the resources shared to them
             ],
             "properties": {
               "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
+                "const": true
               },
               "eTag": {
                 "type": "string",
@@ -3280,8 +3205,7 @@ Feature: an user gets the resources shared to them
                 "pattern": "^%share_id_pattern%$"
               },
               "name": {
-                "type": "string",
-                "enum": ["folder"]
+                "const": "folder"
               },
               "parentReference": {
                 "type": "object",
@@ -3296,8 +3220,7 @@ Feature: an user gets the resources shared to them
                     "pattern": "^%space_id_pattern%$"
                   },
                   "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
+                    "const": "virtual"
                   },
                   "id" : {
                     "type": "string",
@@ -3326,8 +3249,7 @@ Feature: an user gets the resources shared to them
                     "pattern": "^%file_id_pattern%$"
                   },
                   "name": {
-                    "type": "string",
-                    "enum": ["folder"]
+                    "const": "folder"
                   },
                   "parentReference": {
                     "type": "object",
@@ -3341,8 +3263,7 @@ Feature: an user gets the resources shared to them
                         "pattern": "%space_id_pattern%"
                       },
                       "driveType" : {
-                        "type": "string",
-                        "enum": ["project"]
+                        "const": "project"
                       }
                     }
                   },
@@ -3365,14 +3286,10 @@ Feature: an user gets the resources shared to them
                           "properties":{
                             "group": {
                               "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
+                              "required": ["displayName", "id"],
                               "properties": {
                                 "displayName": {
-                                  "type": "string",
-                                  "enum": ["grp1"]
+                                  "const": "grp1"
                                 },
                                 "id": {
                                   "type": "string",
@@ -3392,14 +3309,10 @@ Feature: an user gets the resources shared to them
                           "properties": {
                             "user":{
                               "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
+                              "required": ["displayName", "id"],
                               "properties": {
                                 "displayName": {
-                                  "type": "string",
-                                  "enum": ["Alice Hansen"]
+                                  "const": "Alice Hansen"
                                 },
                                 "id": {
                                   "type": "string",
@@ -3456,9 +3369,7 @@ Feature: an user gets the resources shared to them
     """
     {
       "type": "object",
-      "required": [
-        "value"
-      ],
+      "required": ["value"],
       "properties": {
         "value": {
           "type": "array",
@@ -3480,12 +3391,10 @@ Feature: an user gets the resources shared to them
             ],
             "properties": {
               "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
+                "const": true
               },
               "eTag": {
                 "type": "string",
@@ -3496,8 +3405,7 @@ Feature: an user gets the resources shared to them
                 "required": ["mimeType"],
                 "properties": {
                   "mimeType": {
-                    "type": "string",
-                    "enum": ["text/plain"]
+                    "const": "text/plain"
                   }
                 }
               },
@@ -3506,10 +3414,7 @@ Feature: an user gets the resources shared to them
                 "pattern": "^%share_id_pattern%$"
               },
               "name": {
-                "type": "string",
-                "enum": [
-                  "textfile0.txt"
-                ]
+                "const": "textfile0.txt"
               },
               "parentReference": {
                 "type": "object",
@@ -3524,8 +3429,7 @@ Feature: an user gets the resources shared to them
                     "pattern": "^%space_id_pattern%$"
                   },
                   "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
+                    "const": "virtual"
                   },
                   "id" : {
                     "type": "string",
@@ -3555,8 +3459,7 @@ Feature: an user gets the resources shared to them
                     "required": ["mimeType"],
                     "properties": {
                       "mimeType": {
-                        "type": "string",
-                        "enum": ["text/plain"]
+                        "const": "text/plain"
                       }
                     }
                   },
@@ -3565,10 +3468,7 @@ Feature: an user gets the resources shared to them
                     "pattern": "^%file_id_pattern%$"
                   },
                   "name": {
-                    "type": "string",
-                    "enum": [
-                      "textfile0.txt"
-                    ]
+                    "const": "textfile0.txt"
                   },
                   "parentReference": {
                     "type": "object",
@@ -3582,8 +3482,7 @@ Feature: an user gets the resources shared to them
                         "pattern": "%space_id_pattern%"
                       },
                       "driveType" : {
-                        "type": "string",
-                        "enum": ["project"]
+                        "const": "project"
                       }
                     }
                   },
@@ -3605,20 +3504,14 @@ Feature: an user gets the resources shared to them
                           "properties": {
                             "grantedToV2": {
                               "type": "object",
-                              "required": [
-                                "group"
-                              ],
+                              "required": ["group"],
                               "properties":{
                                 "group": {
                                   "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
+                                  "required": ["displayName", "id"],
                                   "properties": {
                                     "displayName": {
-                                      "type": "string",
-                                      "enum": ["grp1"]
+                                      "const": "grp1"
                                     },
                                     "id": {
                                       "type": "string",
@@ -3634,20 +3527,14 @@ Feature: an user gets the resources shared to them
                             },
                             "invitation": {
                               "type": "object",
-                              "required": [
-                                "invitedBy"
-                              ],
+                              "required": ["invitedBy"],
                               "properties": {
                                 "user":{
                                   "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
+                                  "required": ["displayName", "id"],
                                   "properties": {
                                     "displayName": {
-                                      "type": "string",
-                                      "enum": ["Alice Hansen"]
+                                      "const": "Alice Hansen"
                                     },
                                     "id": {
                                       "type": "string",
@@ -3679,20 +3566,14 @@ Feature: an user gets the resources shared to them
                           "properties": {
                             "grantedToV2": {
                               "type": "object",
-                              "required": [
-                                "user"
-                              ],
+                              "required": ["user"],
                               "properties":{
                                 "user": {
                                   "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
+                                  "required": ["displayName", "id"],
                                   "properties": {
                                     "displayName": {
-                                      "type": "string",
-                                      "enum": ["Brian Murphy"]
+                                      "const": "Brian Murphy"
                                     },
                                     "id": {
                                       "type": "string",
@@ -3708,20 +3589,14 @@ Feature: an user gets the resources shared to them
                             },
                             "invitation": {
                               "type": "object",
-                              "required": [
-                                "invitedBy"
-                              ],
+                              "required": ["invitedBy"],
                               "properties": {
                                 "user":{
                                   "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
+                                  "required": ["displayName", "id"],
                                   "properties": {
                                     "displayName": {
-                                      "type": "string",
-                                      "enum": ["Alice Hansen"]
+                                      "const": "Alice Hansen"
                                     },
                                     "id": {
                                       "type": "string",
@@ -3746,18 +3621,12 @@ Feature: an user gets the resources shared to them
                     }
                   },
                   "size": {
-                    "type": "number",
-                    "enum": [
-                      11
-                    ]
+                    "const": 11
                   }
                 }
               },
                 "size": {
-                "type": "number",
-                "enum": [
-                  11
-                ]
+                "const": 11
               }
             }
           }
@@ -3792,9 +3661,7 @@ Feature: an user gets the resources shared to them
     """
     {
       "type": "object",
-      "required": [
-        "value"
-      ],
+      "required": ["value"],
       "properties": {
         "value": {
           "type": "array",
@@ -3815,27 +3682,24 @@ Feature: an user gets the resources shared to them
             ],
             "properties": {
               "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
+                "const": false
               },
               "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
+                "const": true
               },
               "eTag": {
                 "type": "string",
                 "pattern": "%etag_pattern%"
               },
-              "folder": {},
+              "folder": {
+                "const": {}
+              },
               "id": {
                 "type": "string",
                 "pattern": "^%share_id_pattern%$"
               },
               "name": {
-                "type": "string",
-                "enum": [
-                  "folder"
-                ]
+                "const": "folder"
               },
               "parentReference": {
                 "type": "object",
@@ -3850,8 +3714,7 @@ Feature: an user gets the resources shared to them
                     "pattern": "^%space_id_pattern%$"
                   },
                   "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
+                    "const": "virtual"
                   },
                   "id" : {
                     "type": "string",
@@ -3875,16 +3738,15 @@ Feature: an user gets the resources shared to them
                     "type": "string",
                     "pattern": "%etag_pattern%"
                   },
-                  "folder": {},
+                  "folder": {
+                    "const": {}
+                  },
                   "id": {
                     "type": "string",
                     "pattern": "^%file_id_pattern%$"
                   },
                   "name": {
-                    "type": "string",
-                    "enum": [
-                      "folder"
-                    ]
+                    "const": "folder"
                   },
                   "parentReference": {
                     "type": "object",
@@ -3898,8 +3760,7 @@ Feature: an user gets the resources shared to them
                         "pattern": "%space_id_pattern%"
                       },
                       "driveType" : {
-                        "type": "string",
-                        "enum": ["project"]
+                        "const": "project"
                       }
                     }
                   },
@@ -3921,20 +3782,14 @@ Feature: an user gets the resources shared to them
                           "properties": {
                             "grantedToV2": {
                               "type": "object",
-                              "required": [
-                                "group"
-                              ],
+                              "required": ["group"],
                               "properties":{
                                 "group": {
                                   "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
+                                  "required": ["displayName", "id"],
                                   "properties": {
                                     "displayName": {
-                                      "type": "string",
-                                      "enum": ["grp1"]
+                                      "const": "grp1"
                                     },
                                     "id": {
                                       "type": "string",
@@ -3950,20 +3805,14 @@ Feature: an user gets the resources shared to them
                             },
                             "invitation": {
                               "type": "object",
-                              "required": [
-                                "invitedBy"
-                              ],
+                              "required": ["invitedBy"],
                               "properties": {
                                 "user":{
                                   "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
+                                  "required": ["displayName", "id"],
                                   "properties": {
                                     "displayName": {
-                                      "type": "string",
-                                      "enum": ["Alice Hansen"]
+                                      "const": "Alice Hansen"
                                     },
                                     "id": {
                                       "type": "string",
@@ -3995,20 +3844,14 @@ Feature: an user gets the resources shared to them
                           "properties": {
                             "grantedToV2": {
                               "type": "object",
-                              "required": [
-                                "user"
-                              ],
+                              "required": ["user"],
                               "properties":{
                                 "user": {
                                   "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
+                                  "required": ["displayName", "id"],
                                   "properties": {
                                     "displayName": {
-                                      "type": "string",
-                                      "enum": ["Brian Murphy"]
+                                      "const": "Brian Murphy"
                                     },
                                     "id": {
                                       "type": "string",
@@ -4024,20 +3867,14 @@ Feature: an user gets the resources shared to them
                             },
                             "invitation": {
                               "type": "object",
-                              "required": [
-                                "invitedBy"
-                              ],
+                              "required": ["invitedBy"],
                               "properties": {
                                 "user":{
                                   "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
+                                  "required": ["displayName", "id"],
                                   "properties": {
                                     "displayName": {
-                                      "type": "string",
-                                      "enum": ["Alice Hansen"]
+                                      "const": "Alice Hansen"
                                     },
                                     "id": {
                                       "type": "string",
@@ -4395,7 +4232,7 @@ Feature: an user gets the resources shared to them
       }
       """
 
-  @env-config @8314
+  @env-config @issue-8314
   Scenario: sharee lists the folder share after sharer is deleted (Project space)
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And using spaces DAV path
@@ -4606,7 +4443,7 @@ Feature: an user gets the resources shared to them
     }
     """
 
-  @env-config @8314
+  @env-config @issue-8314
   Scenario: sharee lists the file share with after sharer is deleted (Project space)
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And using spaces DAV path
