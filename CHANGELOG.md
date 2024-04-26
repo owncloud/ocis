@@ -46,6 +46,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix an error when lock/unlock a public shared file: [#8472](https://github.com/owncloud/ocis/pull/8472)
+* Bugfix - Fix the docker-compose wopi: [#8483](https://github.com/owncloud/ocis/pull/8483)
 * Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
 * Bugfix - Correct the default mapping of roles: [#8534](https://github.com/owncloud/ocis/pull/8534)
 * Bugfix - Fix graph drive invite: [#8538](https://github.com/owncloud/ocis/pull/8538)
@@ -107,6 +108,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7785
    https://github.com/owncloud/ocis/pull/8472
+
+* Bugfix - Fix the docker-compose wopi: [#8483](https://github.com/owncloud/ocis/pull/8483)
+
+   We fixed an issue when Collabora is not available time by time after running the
+   docker-compose wopi deployment
+
+   https://github.com/owncloud/ocis/issues/8474
+   https://github.com/owncloud/ocis/pull/8483
 
 * Bugfix - Fix remove/update share permissions: [#8529](https://github.com/owncloud/ocis/pull/8529)
 
