@@ -88,8 +88,9 @@ func Server(cfg *config.Config) *cli.Command {
 					}
 					return err
 				}, func(err error) {
-					logger.Info().
-						Str("transport", "http").
+					logger.Error().
+						Err(err).
+						Str("server", "http").
 						Msg("Shutting down server")
 
 					cancel()

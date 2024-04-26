@@ -73,7 +73,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}, func(err error) {
 				logger.Error().
 					Err(err).
-					Str("server", cfg.Service.Name).
+					Str("server", "reva").
 					Msg("Shutting down server")
 
 				cancel()

@@ -73,8 +73,11 @@ func Server(cfg *config.Config) *cli.Command {
 					Msg("Error initializing http service")
 				return fmt.Errorf("could not initialize http service: %w", err)
 			}
-			servers.Add(httpServer.Run, func(_ error) {
-				logger.Info().Str("server", "http").Msg("Shutting down server")
+			servers.Add(httpServer.Run, func(err error) {
+				logger.Error().
+					Err(err).
+					Str("server", "http").
+					Msg("shutting down server")
 				cancel()
 				os.Exit(1)
 			})
@@ -90,7 +93,10 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.TraceProvider(traceProvider),
 			)
 			servers.Add(grpcServer.Run, func(_ error) {
-				logger.Info().Str("server", "grpc").Msg("Shutting down server")
+				logger.Error().
+					Err(err).
+					Str("server", "grpc").
+					Msg("shutting down server")
 				cancel()
 				os.Exit(1)
 			})

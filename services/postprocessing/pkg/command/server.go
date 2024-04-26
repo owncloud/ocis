@@ -85,6 +85,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}, func(err error) {
 					logger.Error().
 						Err(err).
+						Str("server", "http").
 						Msg("Shutting down server")
 					cancel()
 					os.Exit(1)
