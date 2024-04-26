@@ -12,7 +12,7 @@ import (
 	"mime"
 	"strings"
 
-	"github.com/disintegration/imaging"
+	"github.com/kovidgoyal/imaging"
 	"github.com/pkg/errors"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"

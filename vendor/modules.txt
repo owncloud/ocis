@@ -758,9 +758,6 @@ github.com/dgryski/go-rendezvous
 # github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 ## explicit; go 1.18
 github.com/dhowden/tag
-# github.com/disintegration/imaging v1.6.2
-## explicit
-github.com/disintegration/imaging
 # github.com/dlclark/regexp2 v1.4.0
 ## explicit
 github.com/dlclark/regexp2
@@ -1256,6 +1253,9 @@ github.com/klauspost/compress/s2
 # github.com/klauspost/cpuid/v2 v2.2.6
 ## explicit; go 1.15
 github.com/klauspost/cpuid/v2
+# github.com/kovidgoyal/imaging v1.6.3
+## explicit; go 1.21
+github.com/kovidgoyal/imaging
 # github.com/leodido/go-urn v1.4.0
 ## explicit; go 1.18
 github.com/leodido/go-urn
