@@ -128,8 +128,32 @@ Feature: Remove access to a drive
     When user "Brian" removes the access of user "Carol" from space "NewSpace" using permissions endpoint of the Graph API
     Then the HTTP status code should be "<status-code>"
     And the user "Carol" <shouldOrNot> have a space called "NewSpace"
-     Examples:
+    Examples:
       | permissions-role | status-code | shouldOrNot |
       | Space Viewer     | 403         | should      |
       | Space Editor     | 403         | should      |
       | Manager          | 204         | should not  |
+
+
+  Scenario: user cannot remove himself from the project space if he is the last manager
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    When user "Alice" tries to remove the access of user "Alice" from space "NewSpace" using root endpoint of the Graph API
+    Then the HTTP status code should be "403"
+    And the user "Alice" should have a space called "NewSpace"
+
+
+  Scenario: user of a group cannot remove own group from project space if it is the last manager
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And group "group1" has been created
+    And user "Brian" has been added to group "group1"
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has sent the following share invitation:
+      | space           | NewSpace |
+      | sharee          | group1   |
+      | shareType       | group    |
+      | permissionsRole | Manager  |
+    And user "Alice" has removed the access of user "Alice" from space "NewSpace"
+    When user "Brian" tries to remove the access of group "group1" from space "NewSpace" using root endpoint of the Graph API
+    Then the HTTP status code should be "403"
+    And the user "Brian" should have a space called "NewSpace"
