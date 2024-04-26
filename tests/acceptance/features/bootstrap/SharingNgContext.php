@@ -165,7 +165,7 @@ class SharingNgContext implements Context {
 	public function userTriesToListThePermissionsOfSpaceUsingPermissionsEndpointOfTheGraphApi(string $user, string $space, string $spaceOwner):void {
 		$spaceId = ($this->spacesContext->getSpaceByName($spaceOwner, $space))["id"];
 		$itemId = $this->spacesContext->getResourceId($spaceOwner, $space, '');
-		
+
 		$this->featureContext->setResponse(
 			GraphHelper::getPermissionsList(
 				$this->featureContext->getBaseUrl(),
@@ -741,20 +741,24 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When user :user tries to enable share sync of a non-existent resource using the Graph API
+	 * @When user :user tries to enable share sync of a resource :resource using the Graph API
 	 *
 	 * @param string $user
+	 * @param string $resource
 	 *
 	 * @return void
+	 * @throws Exception|GuzzleException
 	 */
-	public function userTriesToEnablsShareSyncOfNonExistentResourceUsingTheGraphApi(string $user):void {
+	public function userTriesToEnableShareSyncOfResourceUsingTheGraphApi(string $user, string $resource):void {
 		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$itemId = ($resource === 'nonexistent') ? WebDavHelper::generateUUIDv4() : '';
+
 		$response =  GraphHelper::enableShareSync(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
-			WebDavHelper::generateUUIDv4(),
+			$itemId,
 			$shareSpaceId
 		);
 		$this->featureContext->setResponse($response);
