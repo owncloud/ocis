@@ -1,6 +1,6 @@
 ---
 title: OCM
-date: 2024-04-29T15:15:59.292236003Z
+date: 2024-04-29T15:17:04.225641447Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/ocm
@@ -40,7 +40,7 @@ The `ocm` services implements an invitation workflow which needs to be followed 
 
 The list of trusted instances is managed by the `ocmproviderauthorizer` service. The only supported backend currently is `json` which stores the list in a json file on disk.
 
-Example `providers.json` file:
+Example `ocmproviders.json` file:
 ```
 [
     {
@@ -64,7 +64,7 @@ Example `providers.json` file:
                 "host": "example.com"
             }
         ]
-    },
+    }
 ]
 ```
 
