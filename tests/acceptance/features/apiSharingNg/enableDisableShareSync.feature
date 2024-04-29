@@ -641,3 +641,40 @@ Feature:  enable or disable sync of incoming shares
         }
       }
       """
+
+
+  Scenario: try to disable share sync of a non-existent resource
+    When user "Brian" tries to disable share sync of a resource "nonexistent" using the Graph API
+    Then the HTTP status code should be "422"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code" : {
+                "const": "invalidRequest"
+              },
+              "innererror" : {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message" : {
+                "const": "invalid driveID or itemID"
+              }
+            }
+          }
+        }
+      }
+      """
