@@ -39,6 +39,11 @@ import (
 
 // TODO(labkode): add multi-phase commit logic when commit share or commit ref is enabled.
 func (s *svc) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareRequest) (*ocm.CreateOCMShareResponse, error) {
+	if len(req.AccessMethods) == 0 {
+		return &ocm.CreateOCMShareResponse{
+			Status: status.NewInvalidArg(ctx, "access methods cannot be empty"),
+		}, nil
+	}
 	c, err := pool.GetOCMShareProviderClient(s.c.OCMShareProviderEndpoint)
 	if err != nil {
 		return &ocm.CreateOCMShareResponse{
@@ -48,7 +53,7 @@ func (s *svc) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareRequest
 
 	res, err := c.CreateOCMShare(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "gateway: error calling CreateShare")
+		return nil, errors.Wrap(err, "gateway: error calling CreateOCMShare")
 	}
 
 	status, err := s.addGrant(ctx, req.ResourceId, req.Grantee, req.AccessMethods[0].GetWebdavOptions().Permissions, req.Expiration, nil)
@@ -78,7 +83,7 @@ func (s *svc) RemoveOCMShare(ctx context.Context, req *ocm.RemoveOCMShareRequest
 
 	res, err := c.RemoveOCMShare(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "gateway: error calling RemoveShare")
+		return nil, errors.Wrap(err, "gateway: error calling RemoveOCMShare")
 	}
 
 	return res, nil
@@ -102,7 +107,7 @@ func (s *svc) getOCMShare(ctx context.Context, req *ocm.GetOCMShareRequest) (*oc
 
 	res, err := c.GetOCMShare(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "gateway: error calling GetShare")
+		return nil, errors.Wrap(err, "gateway: error calling GetOCMShare")
 	}
 
 	return res, nil
@@ -134,7 +139,7 @@ func (s *svc) ListOCMShares(ctx context.Context, req *ocm.ListOCMSharesRequest) 
 
 	res, err := c.ListOCMShares(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "gateway: error calling ListShares")
+		return nil, errors.Wrap(err, "gateway: error calling ListOCMShares")
 	}
 
 	return res, nil
@@ -151,7 +156,7 @@ func (s *svc) UpdateOCMShare(ctx context.Context, req *ocm.UpdateOCMShareRequest
 
 	res, err := c.UpdateOCMShare(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "gateway: error calling UpdateShare")
+		return nil, errors.Wrap(err, "gateway: error calling UpdateOCMShare")
 	}
 
 	return res, nil
@@ -168,7 +173,7 @@ func (s *svc) ListReceivedOCMShares(ctx context.Context, req *ocm.ListReceivedOC
 
 	res, err := c.ListReceivedOCMShares(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "gateway: error calling ListReceivedShares")
+		return nil, errors.Wrap(err, "gateway: error calling ListReceivedOCMShares")
 	}
 
 	return res, nil
@@ -223,7 +228,7 @@ func (s *svc) UpdateReceivedOCMShare(ctx context.Context, req *ocm.UpdateReceive
 
 	res, err := c.UpdateReceivedOCMShare(ctx, req)
 	if err != nil {
-		log.Err(err).Msg("gateway: error calling UpdateReceivedShare")
+		log.Err(err).Msg("gateway: error calling UpdateReceivedOCMShare")
 		return &ocm.UpdateReceivedOCMShareResponse{
 			Status: &rpc.Status{
 				Code: rpc.Code_CODE_INTERNAL,
@@ -256,7 +261,7 @@ func (s *svc) UpdateReceivedOCMShare(ctx context.Context, req *ocm.UpdateReceive
 	// handle transfer in case it has not already been accepted
 	if s.isTransferShare(share) && req.GetShare().State == ocm.ShareState_SHARE_STATE_ACCEPTED {
 		if share.State == ocm.ShareState_SHARE_STATE_ACCEPTED {
-			log.Err(err).Msg("gateway: error calling UpdateReceivedShare, share already accepted.")
+			log.Err(err).Msg("gateway: error calling UpdateReceivedOCMShare, share already accepted.")
 			return &ocm.UpdateReceivedOCMShareResponse{
 				Status: &rpc.Status{
 					Code:    rpc.Code_CODE_FAILED_PRECONDITION,
@@ -268,7 +273,7 @@ func (s *svc) UpdateReceivedOCMShare(ctx context.Context, req *ocm.UpdateReceive
 		transferDestinationPath, err := s.getTransferDestinationPath(ctx, req)
 		if err != nil {
 			if err != nil {
-				log.Err(err).Msg("gateway: error calling UpdateReceivedShare")
+				log.Err(err).Msg("gateway: error calling UpdateReceivedOCMShare")
 				return &ocm.UpdateReceivedOCMShareResponse{
 					Status: &rpc.Status{
 						Code: rpc.Code_CODE_INTERNAL,
@@ -279,7 +284,7 @@ func (s *svc) UpdateReceivedOCMShare(ctx context.Context, req *ocm.UpdateReceive
 
 		error := s.handleTransfer(ctx, share, transferDestinationPath)
 		if error != nil {
-			log.Err(error).Msg("gateway: error handling transfer in UpdateReceivedShare")
+			log.Err(error).Msg("gateway: error handling transfer in UpdateReceivedOCMShare")
 			return &ocm.UpdateReceivedOCMShareResponse{
 				Status: &rpc.Status{
 					Code: rpc.Code_CODE_INTERNAL,
@@ -309,17 +314,17 @@ func (s *svc) handleTransfer(ctx context.Context, share *ocm.ReceivedShare, tran
 	}
 	destWebdavEndpoint, err := s.getWebdavEndpoint(ctx, granteeIdp)
 	if err != nil {
-		log.Err(err).Msg("gateway: error calling UpdateReceivedShare")
+		log.Err(err).Msg("gateway: error calling UpdateReceivedOCMShare")
 		return err
 	}
 	destWebdavEndpointURL, err := url.Parse(destWebdavEndpoint)
 	if err != nil {
-		log.Err(err).Msg("gateway: error calling UpdateReceivedShare: unable to parse webdav endpoint \"" + destWebdavEndpoint + "\" into URL structure")
+		log.Err(err).Msg("gateway: error calling UpdateReceivedOCMShare: unable to parse webdav endpoint \"" + destWebdavEndpoint + "\" into URL structure")
 		return err
 	}
 	destWebdavHost, err := s.getWebdavHost(ctx, granteeIdp)
 	if err != nil {
-		log.Err(err).Msg("gateway: error calling UpdateReceivedShare")
+		log.Err(err).Msg("gateway: error calling UpdateReceivedOCMShare")
 		return err
 	}
 	var dstWebdavURLString string
@@ -330,7 +335,7 @@ func (s *svc) handleTransfer(ctx context.Context, share *ocm.ReceivedShare, tran
 	}
 	dstWebdavHostURL, err := url.Parse(dstWebdavURLString)
 	if err != nil {
-		log.Err(err).Msg("gateway: error calling UpdateReceivedShare: unable to parse webdav service host \"" + dstWebdavURLString + "\" into URL structure")
+		log.Err(err).Msg("gateway: error calling UpdateReceivedOCMShare: unable to parse webdav service host \"" + dstWebdavURLString + "\" into URL structure")
 		return err
 	}
 	destServiceHost := dstWebdavHostURL.Host + dstWebdavHostURL.Path
@@ -393,7 +398,7 @@ func (s *svc) GetReceivedOCMShare(ctx context.Context, req *ocm.GetReceivedOCMSh
 
 	res, err := c.GetReceivedOCMShare(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "gateway: error calling GetReceivedShare")
+		return nil, errors.Wrap(err, "gateway: error calling GetReceivedOCMShare")
 	}
 
 	return res, nil

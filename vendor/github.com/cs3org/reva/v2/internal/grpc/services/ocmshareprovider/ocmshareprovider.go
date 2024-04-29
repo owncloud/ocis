@@ -171,9 +171,9 @@ func getResourceType(info *providerpb.ResourceInfo) string {
 	return "unknown"
 }
 
-func (s *service) webdavURL(ctx context.Context, share *ocm.Share) string {
+func (s *service) webdavURL(_ context.Context, share *ocm.Share) string {
 	// the url is in the form of https://cernbox.cern.ch/remote.php/dav/ocm/token
-	p, _ := url.JoinPath(s.conf.WebDAVEndpoint, "/dav/ocm", share.Token)
+	p, _ := url.JoinPath(s.conf.WebDAVEndpoint, "/dav/ocm", share.GetId().GetOpaqueId())
 	return p
 }
 

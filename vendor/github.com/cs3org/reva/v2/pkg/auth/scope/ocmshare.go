@@ -28,6 +28,7 @@ import (
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	ocmv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	registry "github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1"
@@ -123,6 +124,13 @@ func ocmShareScope(_ context.Context, scope *authpb.Scope, resource interface{},
 		return true, nil
 	case *provider.ListStorageSpacesRequest:
 		return true, nil
+		// FIXME why do we need to add them? I think the whole listing of received OCM shares change might be unnecessary ... need to reevaluate that after switching the dav namespace for from /ocm back to /public
+	case *ocmv1beta1.ListReceivedOCMSharesRequest:
+		return true, nil
+	case *ocmv1beta1.ListOCMSharesRequest:
+		return true, nil
+	case *collaboration.ListReceivedSharesRequest:
+		return true, nil
 
 	case *ocmv1beta1.GetOCMShareRequest:
 		return checkOCMShareRef(&share, v.GetRef()), nil
@@ -136,24 +144,24 @@ func ocmShareScope(_ context.Context, scope *authpb.Scope, resource interface{},
 
 func checkStorageRefForOCMShare(s *ocmv1beta1.Share, r *provider.Reference, ns string) bool {
 	if r.ResourceId != nil {
-		return utils.ResourceIDEqual(s.ResourceId, r.GetResourceId()) || strings.HasPrefix(r.ResourceId.OpaqueId, s.Token)
+		return utils.ResourceIDEqual(s.ResourceId, r.GetResourceId()) || strings.HasPrefix(r.ResourceId.OpaqueId, s.GetId().GetOpaqueId())
 	}
 
 	// FIXME: the paths here are hardcoded
-	if strings.HasPrefix(r.GetPath(), "/public/"+s.Token) {
+	if strings.HasPrefix(r.GetPath(), "/public/"+s.GetId().GetOpaqueId()) {
 		return true
 	}
-	return strings.HasPrefix(r.GetPath(), filepath.Join(ns, s.Token))
+	return strings.HasPrefix(r.GetPath(), filepath.Join(ns, s.GetId().GetOpaqueId()))
 }
 
 func checkOCMShareRef(s *ocmv1beta1.Share, ref *ocmv1beta1.ShareReference) bool {
-	return ref.GetToken() == s.Token
+	return ref.GetId().GetOpaqueId() == s.GetId().GetOpaqueId()
 }
 
 // AddOCMShareScope adds the scope to allow access to an OCM share and the share resource.
 func AddOCMShareScope(share *ocmv1beta1.Share, role authpb.Role, scopes map[string]*authpb.Scope) (map[string]*authpb.Scope, error) {
-	// Create a new "scope share" to only expose the required fields `ResourceId` and `Token` to the scope.
-	scopeShare := ocmv1beta1.Share{ResourceId: share.ResourceId, Token: share.Token}
+	// Create a new "scope share" to only expose the required fields `ResourceId`, `Id` and `Token` to the scope.
+	scopeShare := ocmv1beta1.Share{ResourceId: share.ResourceId, Id: share.GetId(), Token: share.Token}
 	val, err := utils.MarshalProtoV1ToJSON(&scopeShare)
 	if err != nil {
 		return nil, err

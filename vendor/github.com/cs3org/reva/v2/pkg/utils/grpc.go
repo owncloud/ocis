@@ -9,11 +9,11 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	invitev1beta1 "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
 	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 
 	"google.golang.org/grpc/metadata"
 )
@@ -58,7 +58,7 @@ func GetServiceUserContextWithContext(ctx context.Context, gwc gateway.GatewayAP
 		return nil, err
 	}
 
-	return metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, authRes.Token), nil
+	return metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, authRes.Token), nil
 }
 
 // GetUser gets the specified user
@@ -76,9 +76,23 @@ func GetUserWithContext(ctx context.Context, userID *user.UserId, gwc gateway.Ga
 
 	if err := checkStatusCode("getting user", getUserResponse.GetStatus().GetCode()); err != nil {
 		return nil, err
+
+	}
+	return getUserResponse.GetUser(), nil
+}
+
+// GetUserWithContext gets the specified accepted user
+func GetAcceptedUserWithContext(ctx context.Context, userID *user.UserId, gwc gateway.GatewayAPIClient) (*user.User, error) {
+	getAcceptedUserResponse, err := gwc.GetAcceptedUser(ctx, &invitev1beta1.GetAcceptedUserRequest{RemoteUserId: userID})
+	if err != nil {
+		return nil, err
 	}
 
-	return getUserResponse.GetUser(), nil
+	if err := checkStatusCode("getting accepted user", getAcceptedUserResponse.GetStatus().GetCode()); err != nil {
+		return nil, err
+	}
+
+	return getAcceptedUserResponse.GetRemoteUser(), nil
 }
 
 // GetSpace returns the given space
