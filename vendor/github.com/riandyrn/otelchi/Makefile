@@ -1,6 +1,6 @@
 .PHONY: *
 
-GO_VERSIONS="1.18 1.19 1.20"
+GO_VERSIONS="1.19 1.20 1.21"
 
 # This is the command that will be used to run the tests
 go-test:

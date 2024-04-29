@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-package internal // import "go.opentelemetry.io/otel/semconv/internal/v2"
+package internal // import "go.opentelemetry.io/otel/semconv/internal/v4"
 
 import (
 	"fmt"
@@ -19,7 +19,8 @@ type HTTPConv struct {
 
 	EnduserIDKey                 attribute.Key
 	HTTPClientIPKey              attribute.Key
-	HTTPFlavorKey                attribute.Key
+	NetProtocolNameKey           attribute.Key
+	NetProtocolVersionKey        attribute.Key
 	HTTPMethodKey                attribute.Key
 	HTTPRequestContentLengthKey  attribute.Key
 	HTTPResponseContentLengthKey attribute.Key
@@ -29,7 +30,7 @@ type HTTPConv struct {
 	HTTPStatusCodeKey            attribute.Key
 	HTTPTargetKey                attribute.Key
 	HTTPURLKey                   attribute.Key
-	HTTPUserAgentKey             attribute.Key
+	UserAgentOriginalKey         attribute.Key
 }
 
 // ClientResponse returns attributes for an HTTP response received by a client
@@ -110,7 +111,7 @@ func (c *HTTPConv) ClientRequest(req *http.Request) []attribute.KeyValue {
 	}
 
 	if useragent != "" {
-		attrs = append(attrs, c.HTTPUserAgentKey.String(useragent))
+		attrs = append(attrs, c.UserAgentOriginalKey.String(useragent))
 	}
 
 	if l := req.ContentLength; l > 0 {
@@ -209,7 +210,7 @@ func (c *HTTPConv) ServerRequest(server string, req *http.Request) []attribute.K
 	}
 
 	if useragent != "" {
-		attrs = append(attrs, c.HTTPUserAgentKey.String(useragent))
+		attrs = append(attrs, c.UserAgentOriginalKey.String(useragent))
 	}
 
 	if hasUserID {
@@ -240,15 +241,15 @@ func (c *HTTPConv) scheme(https bool) attribute.KeyValue { // nolint:revive
 func (c *HTTPConv) proto(proto string) attribute.KeyValue {
 	switch proto {
 	case "HTTP/1.0":
-		return c.HTTPFlavorKey.String("1.0")
+		return c.NetProtocolVersionKey.String("1.0")
 	case "HTTP/1.1":
-		return c.HTTPFlavorKey.String("1.1")
+		return c.NetProtocolVersionKey.String("1.1")
 	case "HTTP/2":
-		return c.HTTPFlavorKey.String("2.0")
+		return c.NetProtocolVersionKey.String("2.0")
 	case "HTTP/3":
-		return c.HTTPFlavorKey.String("3.0")
+		return c.NetProtocolVersionKey.String("3.0")
 	default:
-		return c.HTTPFlavorKey.String(proto)
+		return c.NetProtocolNameKey.String(proto)
 	}
 }
 

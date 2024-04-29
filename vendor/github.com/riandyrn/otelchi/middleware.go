@@ -10,8 +10,8 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 
-	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
-	"go.opentelemetry.io/otel/semconv/v1.17.0/httpconv"
+	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
+	"go.opentelemetry.io/otel/semconv/v1.20.0/httpconv"
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
@@ -48,6 +48,7 @@ func Middleware(serverName string, opts ...Option) func(next http.Handler) http.
 			reqMethodInSpanName:    cfg.RequestMethodInSpanName,
 			filter:                 cfg.Filter,
 			traceResponseHeaderKey: cfg.TraceResponseHeaderKey,
+			publicEndpointFn:       cfg.PublicEndpointFn,
 		}
 	}
 }
@@ -61,6 +62,7 @@ type traceware struct {
 	reqMethodInSpanName    bool
 	filter                 func(r *http.Request) bool
 	traceResponseHeaderKey string
+	publicEndpointFn       func(r *http.Request) bool
 }
 
 type recordingResponseWriter struct {
@@ -138,11 +140,35 @@ func (tw traceware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	ctx, span := tw.tracer.Start(
-		ctx, spanName,
+	// define span start options
+	spanOpts := []oteltrace.SpanStartOption{
 		oteltrace.WithAttributes(spanAttributes...),
 		oteltrace.WithSpanKind(oteltrace.SpanKindServer),
-	)
+	}
+
+	if tw.publicEndpointFn != nil && tw.publicEndpointFn(r) {
+		// mark span as the root span
+		spanOpts = append(spanOpts, oteltrace.WithNewRoot())
+
+		// linking incoming span context to the root span, we need to
+		// ensure if the incoming span context is valid (because it is
+		// possible for us to receive invalid span context due to various
+		// reason such as bug or context propagation error) and it is
+		// coming from another service (remote) before linking it to the
+		// root span
+		spanCtx := oteltrace.SpanContextFromContext(ctx)
+		if spanCtx.IsValid() && spanCtx.IsRemote() {
+			spanOpts = append(
+				spanOpts,
+				oteltrace.WithLinks(oteltrace.Link{
+					SpanContext: spanCtx,
+				}),
+			)
+		}
+	}
+
+	// start span
+	ctx, span := tw.tracer.Start(ctx, spanName, spanOpts...)
 	defer span.End()
 
 	// put trace_id to response header only when WithTraceResponseHeaderKey is used
