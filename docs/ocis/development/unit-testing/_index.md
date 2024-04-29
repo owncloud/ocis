@@ -36,6 +36,8 @@ Using a framework like [Ginkgo](https://onsi.github.io/ginkgo/) brings many adva
 ### Cons
 
 - Sometimes it can be difficult to get started with
+- Asynchronous behaviour brings more complexity to tests.
+- Not compatible with broadly known `testify` package
 
 ### Example
 
