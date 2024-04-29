@@ -101,6 +101,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
 * Enhancement - Improve infected file handling: [#8947](https://github.com/owncloud/ocis/pull/8947)
 * Enhancement - Bump nats-js-kv pkg: [#8953](https://github.com/owncloud/ocis/pull/8953)
+* Enhancement - Graph permission created date time: [#8954](https://github.com/owncloud/ocis/pull/8954)
 * Enhancement - Bump Reva: [#9002](https://github.com/owncloud/ocis/pull/9002)
 
 ## Details
@@ -575,6 +576,13 @@ The following sections list the changes for unreleased.
    Uses official nats-js-kv package now. Moves away from custom fork.
 
    https://github.com/owncloud/ocis/pull/8953
+
+* Enhancement - Graph permission created date time: [#8954](https://github.com/owncloud/ocis/pull/8954)
+
+   We've added the created date time to graph permission objects.
+
+   https://github.com/owncloud/ocis/issues/8749
+   https://github.com/owncloud/ocis/pull/8954
 
 * Enhancement - Bump Reva: [#9002](https://github.com/owncloud/ocis/pull/9002)
 
