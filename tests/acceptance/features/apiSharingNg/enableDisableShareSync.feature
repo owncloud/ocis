@@ -678,3 +678,8 @@ Feature:  enable or disable sync of incoming shares
         }
       }
       """
+
+
+  Scenario: try to disable share sync with empty resource id
+    When user "Brian" tries to disable share sync of a resource "" using the Graph API
+    Then the HTTP status code should be "404"
