@@ -1952,8 +1952,8 @@ go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc/inte
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/internal/semconv
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/internal/semconvutil
-# go.opentelemetry.io/contrib/zpages v0.49.0
-## explicit; go 1.20
+# go.opentelemetry.io/contrib/zpages v0.51.0
+## explicit; go 1.21
 go.opentelemetry.io/contrib/zpages
 go.opentelemetry.io/contrib/zpages/internal
 # go.opentelemetry.io/otel v1.26.0
