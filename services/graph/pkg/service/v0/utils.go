@@ -409,6 +409,10 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 		permission.SetExpirationDateTime(cs3TimestampToTime(expiration))
 	}
 
+	if cTime := receivedShare.GetShare().GetCtime(); cTime != nil {
+		permission.SetCreatedDateTime(cs3TimestampToTime(cTime))
+	}
+
 	if permissionSet := receivedShare.GetShare().GetPermissions().GetPermissions(); permissionSet != nil {
 		condition, err := roleConditionForResourceType(resourceInfo)
 		if err != nil {
