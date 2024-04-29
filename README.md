@@ -44,7 +44,7 @@ Infinite Scale allows the following ownCloud clients:
 *   [iOS](https://github.com/owncloud/ios-app) and
 *   [Desktop](https://github.com/owncloud/client/)
 
-to synchronize and share file spaces with a scalable server backend based on [reva](https://reva.link/) using open and well defined APIs like [WebDAV](http://www.webdav.org/) and [CS3](https://github.com/cs3org/cs3apis/).
+to synchronize and share file spaces with a scalable server backend based on [reva](https://reva.link/) using open and well-defined APIs like [WebDAV](http://www.webdav.org/) and [CS3](https://github.com/cs3org/cs3apis/).
 
 ### Web Office Applications
 
@@ -62,11 +62,11 @@ Users are authenticated via [OpenID Connect](https://openid.net/connect/) using 
 
 ### Installation
 
-With focus on easy install and operation, Infinite Scale is delivered as single binary or container that allows scaling from a Raspberry Pi to a Kubernetes cluster by changing the configuration and starting multiple services as needed. The multiservice architecture allows tailoring the functionality to your needs and reusing services that may already be in place like when using Keycloak. See the details below for various installation options.
+With focus on easy install and operation, Infinite Scale is delivered as a single binary or container that allows scaling from a Raspberry Pi to a Kubernetes cluster by changing the configuration and starting multiple services as needed. The multiservice architecture allows tailoring the functionality to your needs and reusing services that may already be in place like when using Keycloak. See the details below for various installation options.
 
 ## Important Readings
 
-Before starting to set up an instance, we **highly** recommend reading the  [Prerequisites](https://doc.owncloud.com/ocis/next/prerequisites/prerequisites.html), the [Deployment](https://doc.owncloud.com/ocis/next/deployment/) section and especially the [General Information](https://doc.owncloud.com/ocis/next/deployment/general/general-info.html) page describing and explaining information that is valid for all deployment types.
+Before starting to set up an instance, we **highly** recommend reading the [Prerequisites](https://doc.owncloud.com/ocis/next/prerequisites/prerequisites.html), the [Deployment](https://doc.owncloud.com/ocis/next/deployment/) section and especially the [General Information](https://doc.owncloud.com/ocis/next/deployment/general/general-info.html) page describing and explaining information that is valid for all deployment types.
 
 ## Run ownCloud Infinite Scale
 
@@ -76,7 +76,7 @@ See the [Quick Guide](https://doc.owncloud.com/ocis/next/quickguide/quickguide.h
 
 ### Use the ocis Repo as Source
 
-Use this method to run an instance with the latest code. This is only recommended for development purposes. The minimum go version required is 1.22. Note that you need as prerequisite a C compile environment installed because some dependences like reva have components that require c-go libraries/tool-chains. The command installing for debian based systems is: `sudo apt install build-essentials`. To build and run a local instance with demo users:
+Use this method to run an instance with the latest code. This is only recommended for development purposes. The minimum go version required is 1.22. Note that you need, as a prerequisite, a C compile environment installed because some dependencies like reva have components that require c-go libraries/tool-chains. The command installing for debian based systems is: `sudo apt install build-essentials`. To build and run a local instance with demo users:
 
 ```console
 # get the source
@@ -115,9 +115,9 @@ If you find a security issue, please contact [security@owncloud.com](mailto:secu
 
 ## Contributing
 
-We are _very_ happy that oCIS does not require a Contributor License Agreement (CLA) as it is [Apache 2.0 licensed](LICENSE). We hope this will make it easier to contribute code. If you want to get in touch, most of the developers hang out in our [matrix channel](https://app.element.io/#/room/#ocis:matrix.org), our [rocket chat channel](https://talk.owncloud.com/channel/infinitescale) or reach out to  the [ownCloud central forum](https://central.owncloud.org/).
+We are _very_ happy that oCIS does not require a Contributor License Agreement (CLA) as it is [Apache 2.0 licensed](LICENSE). We hope this will make it easier to contribute code. If you want to get in touch, most of the developers hang out in our [matrix channel](https://app.element.io/#/room/#ocis:matrix.org), our [rocket chat channel](https://talk.owncloud.com/channel/infinitescale) or reach out to the [ownCloud central forum](https://central.owncloud.org/).
 
-Infinite Scale is carefully internationalized so that everyone, no matter what language they speak, has a great experience. To achieve this we rely on the help of volunteer translators. If you want to help, you can find the projects behind the following links:
+Infinite Scale is carefully internationalized so that everyone, no matter what language they speak, has a great experience. To achieve this, we rely on the help of volunteer translators. If you want to help, you can find the projects behind the following links:
  [Transifex for ownCloud web](https://app.transifex.com/owncloud-org/owncloud-web/translate/) and [Transifex for ownCloud](https://app.transifex.com/owncloud-org/owncloud/translate/) (Select the resource by filtering for `ocis-`).
 
 Please always refer to our [Contribution Guidelines](https://github.com/owncloud/ocis/blob/master/CONTRIBUTING.md).
