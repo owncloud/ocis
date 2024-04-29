@@ -1,4 +1,6 @@
 // Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 // Copyright 2017, OpenCensus Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +60,6 @@ func parseTemplate(name string) *template.Template {
 	return template.Must(template.New(name).Funcs(templateFunctions).Parse(string(text)))
 }
 
-//nolint:gosec // G203: The used method does not auto-escape HTML. Tracked under https://github.com/open-telemetry/opentelemetry-go-contrib/issues/4451.
 func spanRowFormatter(r spanRow) template.HTML {
 	if !r.SpanContext.IsValid() {
 		return ""
@@ -67,10 +68,21 @@ func spanRowFormatter(r spanRow) template.HTML {
 	if r.SpanContext.IsSampled() {
 		col = "blue"
 	}
+
+	tpl := fmt.Sprintf(
+		`trace_id: <b style="color:%s">%s</b> span_id: %s`,
+		col,
+		r.SpanContext.TraceID(),
+		r.SpanContext.SpanID(),
+	)
 	if r.ParentSpanContext.IsValid() {
-		return template.HTML(fmt.Sprintf(`trace_id: <b style="color:%s">%s</b> span_id: %s parent_span_id: %s`, col, r.SpanContext.TraceID(), r.SpanContext.SpanID(), r.ParentSpanContext.SpanID()))
+		tpl += fmt.Sprintf(` parent_span_id: %s`, r.ParentSpanContext.SpanID())
 	}
-	return template.HTML(fmt.Sprintf(`trace_id: <b style="color:%s">%s</b> span_id: %s`, col, r.SpanContext.TraceID(), r.SpanContext.SpanID()))
+
+	//nolint:gosec // G203: None of the dynamic attributes (TraceID/SpanID) can
+	// contain characters that need escaping so this lint issue is a false
+	// positive.
+	return template.HTML(tpl)
 }
 
 func even(x int) bool {
