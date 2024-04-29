@@ -94,6 +94,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
 * Enhancement - Sharing SSEs: [#8854](https://github.com/owncloud/ocis/pull/8854)
 * Enhancement - Update web to v9.0.0-alpha.5: [#8868](https://github.com/owncloud/ocis/pull/8868)
+* Enhancement - Secure viewer share role: [#8907](https://github.com/owncloud/ocis/pull/8907)
 * Enhancement - Add Link SSEs: [#8908](https://github.com/owncloud/ocis/pull/8908)
 * Enhancement - ShareeIDs in SSEs: [#8915](https://github.com/owncloud/ocis/pull/8915)
 * Enhancement - Bump Reva: [#8917](https://github.com/owncloud/ocis/pull/8917)
@@ -555,6 +556,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8868
    https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.5
+
+* Enhancement - Secure viewer share role: [#8907](https://github.com/owncloud/ocis/pull/8907)
+
+   A new share role "Secure viewer" has been added. This role is applicable for
+   files, folders and spaces and only allows viewing them (and their content).
+
+   https://github.com/owncloud/ocis/pull/8907
 
 * Enhancement - Add Link SSEs: [#8908](https://github.com/owncloud/ocis/pull/8908)
 
