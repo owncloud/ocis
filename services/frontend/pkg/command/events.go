@@ -56,20 +56,21 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 		return err
 	}
 
+	traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+	if err != nil {
+		l.Error().Err(err).Msg("cannot initialize tracing")
+		return err
+	}
+
 	gatewaySelector, err := pool.GatewaySelector(
 		cfg.Reva.Address,
 		pool.WithTLSCACert(cfg.GRPCClientTLS.CACert),
 		pool.WithTLSMode(tm),
 		pool.WithRegistry(registry.GetRegistry()),
+		pool.WithTracerProvider(traceProvider),
 	)
 	if err != nil {
 		l.Error().Err(err).Msg("cannot get gateway selector")
-		return err
-	}
-
-	traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
-	if err != nil {
-		l.Error().Err(err).Msg("cannot initialize tracing")
 		return err
 	}
 

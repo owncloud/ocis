@@ -88,6 +88,9 @@ func (cache IdentityCache) GetUser(ctx context.Context, userid string) (libregra
 	var user libregraph.User
 	if item := cache.users.Get(userid); item == nil {
 		gatewayClient, err := cache.gatewaySelector.Next()
+		if err != nil {
+			return libregraph.User{}, errorcode.New(errorcode.GeneralException, err.Error())
+		}
 		cs3UserID := &cs3User.UserId{
 			OpaqueId: userid,
 		}

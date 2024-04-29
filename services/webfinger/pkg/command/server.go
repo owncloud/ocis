@@ -82,7 +82,7 @@ func Server(cfg *config.Config) *cli.Command {
 				if err != nil {
 					logger.Info().
 						Err(err).
-						Str("transport", "http").
+						Str("server", "http").
 						Msg("Failed to initialize server")
 
 					return err
@@ -93,7 +93,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}, func(err error) {
 					logger.Error().
 						Err(err).
-						Str("transport", "http").
+						Str("server", "http").
 						Msg("Shutting down server")
 
 					cancel()

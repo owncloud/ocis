@@ -109,7 +109,10 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			gr.Add(httpServer.Run, func(_ error) {
-				logger.Info().Str("server", "http").Msg("shutting down server")
+				logger.Error().
+					Err(err).
+					Str("server", "http").
+					Msg("Shutting down server")
 				cancel()
 			})
 
