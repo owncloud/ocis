@@ -86,16 +86,17 @@ Feature: antivirus
       | spaces           |
 
 
-  Scenario Outline: upload a file with the virus to a public share
+  Scenario Outline: public uploads a file with the virus to a public share
     Given using <dav-path-version> DAV path
+    And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And using SharingNG
     And user "Alice" has created folder "/uploadFolder"
     And user "Alice" has created the following link share:
       | resource           | uploadFolder             |
       | space              | Personal                 |
       | permissionsRole    | edit                     |
-      | password           | %public%                 |
       | expirationDateTime | 2040-01-01T23:59:59.000Z |
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" using the WebDAV API
+    When the public uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" inside last link shared folder using the new WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
@@ -111,8 +112,9 @@ Feature: antivirus
       | spaces           | eicar_com.zip | virusFile2.zip |
 
 
-  Scenario Outline: upload a file with the virus to a password-protected public share
+  Scenario Outline: public uploads a file with the virus to a password-protected public share
     Given using <dav-path-version> DAV path
+    And using SharingNG
     And user "Alice" has created folder "/uploadFolder"
     And user "Alice" has created the following link share:
       | resource           | uploadFolder             |
@@ -120,7 +122,7 @@ Feature: antivirus
       | permissionsRole    | edit                     |
       | password           | %public%                 |
       | expirationDateTime | 2040-01-01T23:59:59.000Z |
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" using the WebDAV API
+    When the public uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" inside last link shared folder with password "%public%" using the new WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
