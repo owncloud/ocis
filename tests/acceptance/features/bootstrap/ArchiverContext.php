@@ -27,7 +27,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\SetupHelper;
 use PHPUnit\Framework\Assert;
-use \Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ResponseInterface;
 
 require_once 'bootstrap.php';
 

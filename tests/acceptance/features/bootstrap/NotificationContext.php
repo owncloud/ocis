@@ -247,15 +247,14 @@ class NotificationContext implements Context {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" should have "([^"]*)" notifications$/
+	 * @Then /^there should be "([^"]*)" notifications$/
 	 *
-	 * @param string $user
 	 * @param int $numberOfNotification
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldHaveNotifications(string $user, int $numberOfNotification): void {
+	public function userShouldHaveNotifications(int $numberOfNotification): void {
 		if (!isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
 			throw new Exception("Notification is empty");
 		}
@@ -264,7 +263,7 @@ class NotificationContext implements Context {
 		Assert::assertEquals(
 			$numberOfNotification,
 			$actualNumber,
-			"Expected number of notification was '$numberOfNotification', but got '$actualNumber'"
+			"Expected number of notifications was '$numberOfNotification', but got '$actualNumber'"
 		);
 	}
 
@@ -351,7 +350,7 @@ class NotificationContext implements Context {
 			}
 		} else {
 			$responseBodyArray[] = $this->featureContext->getJsonDecodedResponseBodyContent($response);
-			Assert::fail("Response should contain notification but found: $responseBodyArray");
+			Assert::fail("Response should contain notification but found: " . print_r($responseBodyArray, true));
 		}
 		return $responseBodyArray;
 	}
@@ -368,8 +367,8 @@ class NotificationContext implements Context {
 	 */
 	public function userShouldGetANotificationWithMessage(string $user, string $subject, TableNode $table):void {
 		$count = 0;
-		// sometimes the test might try to get notification before the notification is created by the server
-		// in order to prevent test from failing because of that try to list the notifications again
+		// Sometimes the test might try to get the notifications before the server has created the notification.
+		// To prevent the test from failing because of that, try to list the notifications again
 		do {
 			if ($count > 0) {
 				\sleep(1);
@@ -418,9 +417,9 @@ class NotificationContext implements Context {
 			$this->userDeletesNotificationOfResourceAndSubject($user, $resource, $subject);
 			$this->featureContext->theHTTPStatusCodeShouldBe(200);
 		} elseif (\count($notification) === 0) {
-			throw new \Exception("Response doesn't contain any notification with resource '$resource' and subject '$subject'.\n$notification");
+			throw new \Exception("Response doesn't contain any notification with resource '$resource' and subject '$subject'.\n" . print_r($notification, true));
 		} else {
-			throw new \Exception("Response contains more than one notification with resource '$resource' and subject '$subject'.\n$notification");
+			throw new \Exception("Response contains more than one notification with resource '$resource' and subject '$subject'.\n" . print_r($notification, true));
 		}
 	}
 
@@ -472,9 +471,7 @@ class NotificationContext implements Context {
 						[$this->spacesContext, "getSpaceIdByName"],
 					"parameter" => [$sender, $spaceName]
 				],
-			],
-			null,
-			null
+			]
 		);
 		$this->assertEmailContains($user, $expectedEmailBodyContent);
 	}
@@ -527,11 +524,11 @@ class NotificationContext implements Context {
 	public function clearInbucketMessages():void {
 		try {
 			if (!empty($this->featureContext->emailRecipients)) {
-				foreach ($this->featureContext->emailRecipients as $emailRecipent) {
+				foreach ($this->featureContext->emailRecipients as $emailRecipient) {
 					EmailHelper::deleteAllEmailsForAMailbox(
 						EmailHelper::getLocalEmailUrl(),
 						$this->featureContext->getStepLineRef(),
-						$emailRecipent
+						$emailRecipient
 					);
 				}
 			}
@@ -568,8 +565,7 @@ class NotificationContext implements Context {
 			'POST',
 			$this->globalNotificationEndpointPath,
 			$this->featureContext->getStepLineRef(),
-			json_encode($payload),
-			2
+			json_encode($payload)
 		);
 	}
 
@@ -635,8 +631,7 @@ class NotificationContext implements Context {
 			'DELETE',
 			$this->globalNotificationEndpointPath,
 			$this->featureContext->getStepLineRef(),
-			json_encode($payload),
-			2
+			json_encode($payload)
 		);
 		$this->featureContext->setResponse($response);
 	}

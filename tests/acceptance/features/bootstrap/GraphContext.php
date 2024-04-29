@@ -140,7 +140,7 @@ class GraphContext implements Context {
 	public function theUserChangesTheUserNameOfUserToUsingTheGraphApi(string $byUser, string $user, string $userName): void {
 		$response = $this->editUserUsingTheGraphApi($byUser, $user, $userName);
 		$this->featureContext->setResponse($response);
-		// need add user to list to delete him after test
+		// need to add user to list to delete him after test
 		if (!empty($userName)) {
 			$this->featureContext->addUserToCreatedUsersList($userName, $this->featureContext->getUserPassword($user));
 		}
@@ -324,7 +324,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * remove user from group
+	 * remove user from a group
 	 *
 	 * @param string $group
 	 * @param string $user
@@ -675,7 +675,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * returns a list of members in group
+	 * returns a list of members in a group
 	 *
 	 * @param string $group
 	 *
@@ -761,7 +761,6 @@ class GraphContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $group
-	 * @param bool $checkResult
 	 *
 	 * @return void
 	 * @throws Exception
@@ -769,8 +768,7 @@ class GraphContext implements Context {
 	 */
 	public function adminHasAddedUserToGroupUsingTheGraphApi(
 		string $user,
-		string $group,
-		bool $checkResult = true
+		string $group
 	): void {
 		$response = $this->addUserToGroup($group, $user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, '', $response);
@@ -1887,7 +1885,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userSearchesForGroupUsingGraphApi($user, $searchTerm):void {
+	public function userSearchesForGroupUsingGraphApi(string $user, string $searchTerm):void {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$this->featureContext->setResponse(
 			GraphHelper::searchGroup(
@@ -2242,7 +2240,7 @@ class GraphContext implements Context {
 	 * @param PyStringNode|null $schemaString
 	 *
 	 * @return void
-	 * @throws GuzzleException
+	 * @throws Exception
 	 *
 	 */
 	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(string $eventType, ?string $spaceType=null, PyStringNode $schemaString=null): void {
@@ -2324,7 +2322,7 @@ class GraphContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function getAssignedRole(string $user) {
+	public function getAssignedRole(string $user): ResponseInterface {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $this->featureContext->getUserIdByUserName($user);
 		return (
 			GraphHelper::getAssignedRole(

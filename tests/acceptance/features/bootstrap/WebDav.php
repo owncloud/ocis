@@ -68,7 +68,7 @@ trait WebDav {
 	 * add resource created by admin in an array
 	 * This array is used while cleaning up the resource created by admin during test run
 	 * As of now it tracks only for (files|folder) creation
-	 * This can be expanded and modified to track other actions like (upload, deleted ..)
+	 * This can be expanded and modified to track other actions like (upload, deleted.)
 	 */
 	private array $adminResources = [];
 
@@ -169,7 +169,7 @@ trait WebDav {
 	 * @return boolean
 	 */
 	public function isEtagValid(string $eTag): bool {
-		if (\preg_match("/^\"[a-f0-9:\.]{1,32}\"$/", $eTag)
+		if (\preg_match("/^\"[a-f0-9:.]{1,32}\"$/", $eTag)
 		) {
 			return true;
 		} else {
@@ -647,8 +647,8 @@ trait WebDav {
 	):void {
 		$user = $this->getActualUsername($user);
 		foreach ($table->getHash() as $row) {
-			// Allow the "filename" column to be optionally be called "foldername"
-			// to help readability of scenarios that test moving folders
+			// Allow the "filename" column to optionally be called "foldername"
+			// to help the readability of scenarios that test moving folders
 			$targetName = $row['foldername'] ?? $row['filename'];
 			$this->userMovesFileUsingTheAPI(
 				$user,
@@ -2231,7 +2231,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userOnHasUploadedAFileTo(string $user, string $server, string $source, string $destination):void {
-		$this->userOnUploadsAFileTo($user, $server, $source, $destination, true);
+		$this->userOnUploadsAFileTo($user, $server, $source, $destination);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$source' to '$destination' for user '$user' on server '$server'"
@@ -2919,8 +2919,7 @@ trait WebDav {
 			$user,
 			$destination,
 			'a',
-			$bytes,
-			$isGivenStep
+			$bytes
 		);
 	}
 
@@ -2936,7 +2935,7 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function userHasUploadedFileToEndingWithOfSizeBytes(string $user, string $destination, string $text, string $bytes):void {
-		$this->userUploadsAFileToEndingWithOfSizeBytes($user, $destination, $text, $bytes, true);
+		$this->userUploadsAFileToEndingWithOfSizeBytes($user, $destination, $text, $bytes);
 		$expectedElements = new TableNode([["$destination"]]);
 		$this->checkElementList($user, $expectedElements);
 	}
@@ -3528,7 +3527,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function fileHasBeenDeleted(string $file, string $user):void {
-		$this->userHasDeletedResource($user, "deleted", "file", $file);
+		$this->userHasDeletedResource($user, "deleted");
 	}
 
 	/**
@@ -3636,15 +3635,14 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given /^the user has deleted (file|folder) "([^"]*)"$/
+	 * @Given /^the user has deleted (?:file|folder) "([^"]*)"$/
 	 *
-	 * @param string $fileOrFolder
 	 * @param string $file
 	 *
 	 * @return void
 	 */
-	public function theUserHasDeletedFile(string $fileOrFolder, string $file):void {
-		$this->userHasDeletedResource($this->getCurrentUser(), $fileOrFolder, $file);
+	public function theUserHasDeletedFile(string $file):void {
+		$this->userHasDeletedResource($this->getCurrentUser(), $file);
 	}
 
 	/**
@@ -3970,7 +3968,7 @@ trait WebDav {
 	 * @param string $user
 	 * @param int $num
 	 * @param int $total
-	 * @param string $data
+	 * @param string|null $data
 	 * @param string $destination
 	 *
 	 * @return void
@@ -4810,7 +4808,7 @@ trait WebDav {
 			foreach ($elementList as $element) {
 				$element = \substr((string)$element, \strlen($davPrefix));
 				if ($checkEachDelete) {
-					$this->userHasDeletedResource($user, "deleted", "file", $element);
+					$this->userHasDeletedResource($user, $element);
 				} else {
 					$this->userDeletesFile($user, $element);
 				}
@@ -4916,7 +4914,7 @@ trait WebDav {
 		Assert::assertNotEquals(
 			$newResponseBodyContents,
 			// different users can download files before and after an update is made to a file
-			// previous response content is fetched from user response body content array for that user
+			// previous response content is fetched from the user response body content array entry for that user
 			$this->userResponseBodyContents[$user],
 			__METHOD__ . " previous and current previews content is same but expected to be different",
 		);
@@ -5175,7 +5173,7 @@ trait WebDav {
 		Assert::assertNotEquals(
 			$newResponseBodyContents,
 			// different users can download files before and after an update is made to a file
-			// previous response content is fetched from user response body content array for that user
+			// previous response content is fetched from the user response body content array entry for that user
 			$this->userResponseBodyContents[$user],
 			__METHOD__ . " previous and current previews content is same but expected to be different",
 		);
@@ -5206,16 +5204,15 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has stored id of (file|folder) "([^"]*)"$/
-	 * @When /^user "([^"]*)" stores id of (file|folder) "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has stored id of (?:file|folder) "([^"]*)"$/
+	 * @When /^user "([^"]*)" stores id of (?:file|folder) "([^"]*)"$/
 	 *
 	 * @param string $user
-	 * @param string $fileOrFolder
 	 * @param string $path
 	 *
 	 * @return void
 	 */
-	public function userStoresFileIdForPath(string $user, string $fileOrFolder, string $path):void {
+	public function userStoresFileIdForPath(string $user, string $path):void {
 		$this->storedFileID = $this->getFileIdForPath($user, $path);
 	}
 
@@ -5774,7 +5771,7 @@ trait WebDav {
 			$shareRootXml = $item->xpath("d:propstat//oc:shareroot");
 			$href = \str_replace($spacesBaseUrl, "", $href);
 			$resourcePath = $href;
-			// do not try to parse the resouce path
+			// do not try to parse the resource path
 			// if the item to search is space itself
 			if (!GraphHelper::isSpaceId($entryNameToSearch ?? '')) {
 				$resourcePath = \substr($href, \strpos($href, '/') + 1);
@@ -5785,8 +5782,8 @@ trait WebDav {
 			}
 			$resourcePath = \rawurldecode($resourcePath);
 			if ($entryNameToSearch === $resourcePath) {
-				// If searching for single entry,
-				// we return an SimpleXmlElement of found item
+				// If searching for a single entry,
+				// we return a SimpleXmlElement of found item
 				return $item;
 			}
 			if ($searchForHighlightString) {

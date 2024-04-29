@@ -285,7 +285,7 @@ Feature: Notification
     And user "Alice" has disabled a space "notification checking"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
-    And user "Brian" should have "2" notifications
+    And there should be "2" notifications
     And the JSON response should contain a notification message with the subject "Space disabled" and the message-details should match
       """
       {
@@ -462,4 +462,4 @@ Feature: Notification
     And user "Alice" has disabled a space "notification checking"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
-    And user "Brian" should have "2" notifications
+    And there should be "2" notifications

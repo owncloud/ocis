@@ -124,7 +124,7 @@ class TrashbinContext implements Context {
 					'href' => (string) $href,
 					'name' => isset($name[0]) ? (string) $name[0] : null,
 					'mtime' => isset($mtime[0]) ? (string) $mtime[0] : null,
-					'collection' => isset($collection[0]) ? $collection[0] : false,
+					'collection' => $collection[0] ?? false,
 					'original-location' => isset($originalLocation[0]) ? (string) $originalLocation[0] : null
 				];
 			},
@@ -283,7 +283,7 @@ class TrashbinContext implements Context {
 			) {
 				// A top href (maybe without even the username) has been returned
 				// in the response. That should never happen, or have been filtered out
-				// by code above.
+				// by the code above.
 				throw new Exception(
 					__METHOD__ . " Error: unexpected href in trashbin propfind at level $level: '$trashbinRef'"
 				);
@@ -298,7 +298,7 @@ class TrashbinContext implements Context {
 					$depth,
 					$level + 1
 				);
-				// filter the collection element. We only want the members.
+				// Filter the collection element. We only want the members.
 				$nextFiles = \array_filter(
 					$nextFiles,
 					static function ($element) use ($user, $trashbinRef) {
@@ -598,9 +598,7 @@ class TrashbinContext implements Context {
 	 * @param string $user
 	 * @param string $originalPath
 	 *
-	 * @return int the number of items that were matched and requested for delete
-	 * @throws JsonException
-	 * @throws Exception
+	 * @return void
 	 */
 	public function userTriesToDeleteFileWithOriginalPathFromTrashbinUsingTrashbinAPI(string $user, string $originalPath):void {
 		$responseArray = $this->tryToDeleteFileFromTrashbin($user, $originalPath);
@@ -623,6 +621,7 @@ class TrashbinContext implements Context {
 		$listing = $this->listTrashbinFolder($user);
 		$originalPath = \trim($originalPath, '/');
 
+		$responseArray = [];
 		foreach ($listing as $entry) {
 			// The entry for the trashbin root can have original-location null.
 			// That is reasonable, because the trashbin root is not something that can be restored.
@@ -730,7 +729,7 @@ class TrashbinContext implements Context {
 			$listing = [];
 		}
 
-		// query was on the main element ?
+		// query was on the main element?
 		if (\count($sections) === 1) {
 			// already found, return
 			return;

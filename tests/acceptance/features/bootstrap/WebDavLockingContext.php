@@ -51,11 +51,13 @@ class WebDavLockingContext implements Context {
 	 * @param string $user
 	 * @param string $file
 	 * @param TableNode $properties table with no heading with | property | value |
-	 * @param string $fullUrl
+	 * @param string|null $fullUrl
 	 * @param boolean $public if the file is in a public share or not
 	 * @param boolean $expectToSucceed
 	 *
 	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
 	private function lockFile(
 		string $user,

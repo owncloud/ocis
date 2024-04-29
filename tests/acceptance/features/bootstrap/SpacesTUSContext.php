@@ -224,7 +224,6 @@ class SpacesTUSContext implements Context {
 				$mtime = date('Y-m' . '-01', strtotime('-1 year'));
 				break;
 			default:
-				$mtime;
 		}
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
 		$mtime = new DateTime($mtime);

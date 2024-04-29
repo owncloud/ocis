@@ -188,7 +188,7 @@ class WebDavPropertiesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $propertyName
-	 * @param string $namespace namespace in form of "x1='http://whatever.org/ns'"
+	 * @param string $namespace namespace in the form of "x1='http://whatever.org/ns'"
 	 * @param string $path
 	 *
 	 * @return void
@@ -258,7 +258,7 @@ class WebDavPropertiesContext implements Context {
 	/**
 	 * @param string $user user id who sets the property
 	 * @param string $propertyName name of property in Clark notation
-	 * @param string $namespace namespace in form of "x1='http://whatever.org/ns'"
+	 * @param string $namespace namespace in the form of "x1='http://whatever.org/ns'"
 	 * @param string $path path on which to set properties to
 	 * @param string $propertyValue property value
 	 *
@@ -291,7 +291,7 @@ class WebDavPropertiesContext implements Context {
 	 *
 	 * @param string $user user id who sets the property
 	 * @param string $propertyName name of property in Clark notation
-	 * @param string $namespace namespace in form of "x1='http://whatever.org/ns'"
+	 * @param string $namespace namespace in the form of "x1='http://whatever.org/ns'"
 	 * @param string $path path on which to set properties to
 	 * @param string $propertyValue property value
 	 *
@@ -320,7 +320,7 @@ class WebDavPropertiesContext implements Context {
 	 *
 	 * @param string $user user id who sets the property
 	 * @param string $propertyName name of property in Clark notation
-	 * @param string $namespace namespace in form of "x1='http://whatever.org/ns'"
+	 * @param string $namespace namespace in the form of "x1='http://whatever.org/ns'"
 	 * @param string $path path on which to set properties to
 	 * @param string $propertyValue property value
 	 *
@@ -690,11 +690,10 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
-	 * @param <type> $xmlResponse
+	 * @param SimpleXMLElement $xmlResponse
 	 * @param string $xpath
 	 *
 	 * @return string
-	 * @throws Exception
 	 */
 	public function getXmlItemByXpath(
 		SimpleXMLElement $xmlResponse,
@@ -913,10 +912,9 @@ class WebDavPropertiesContext implements Context {
 	 * @param string $path
 	 * @param string $property
 	 * @param string $expectedValue
-	 * @param string $altExpectedValue
+	 * @param string|null $altExpectedValue
 	 *
 	 * @return void
-	 * @throws Exception
 	 */
 	public function asUserFolderShouldContainAPropertyWithValueOrWithValue(
 		string $user,
@@ -1134,9 +1132,9 @@ class WebDavPropertiesContext implements Context {
 	 * only supports new DAV version
 	 *
 	 * @param string $username
-	 * @param TableNode $expectedPropTable with following columns:
+	 * @param TableNode $expectedPropTable with the following columns:
 	 *                                     resource: full path of resource(file/folder/entry) from root of your oc storage
-	 *                                     property: expected name of property to be asserted, eg: status, href, customPropName
+	 *                                     property: expected name of property to be asserted, e.g.: status, href, customPropName
 	 *                                     value: expected value of expected property
 	 *
 	 * @return void
@@ -1147,13 +1145,13 @@ class WebDavPropertiesContext implements Context {
 		$this->featureContext->verifyTableNodeColumns($expectedPropTable, ['resource', 'propertyName', 'propertyValue']);
 		$responseXmlObject = $this->featureContext->getResponseXml();
 
-		$hrefSplittedUptoUsername = \explode("/", (string)$responseXmlObject->xpath("//d:href")[0]);
-		$xmlHrefSplittedArray = \array_slice(
-			$hrefSplittedUptoUsername,
+		$hrefSplitUptoUsername = \explode("/", (string)$responseXmlObject->xpath("//d:href")[0]);
+		$xmlHrefSplitArray = \array_slice(
+			$hrefSplitUptoUsername,
 			0,
-			\array_search($username, $hrefSplittedUptoUsername) + 1
+			\array_search($username, $hrefSplitUptoUsername) + 1
 		);
-		$xmlHref = \implode("/", $xmlHrefSplittedArray);
+		$xmlHref = \implode("/", $xmlHrefSplitArray);
 		foreach ($expectedPropTable->getColumnsHash() as $col) {
 			if ($col["propertyName"] === "status") {
 				$xmlPart = $responseXmlObject->xpath(

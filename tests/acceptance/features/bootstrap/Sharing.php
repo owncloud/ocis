@@ -229,7 +229,7 @@ trait Sharing {
 	}
 
 	/**
-	 * Split given permissions string each separated with "," into array of strings
+	 * Split given permissions string each separated with "," into an array of strings
 	 *
 	 * @param string $str
 	 *
@@ -662,16 +662,15 @@ trait Sharing {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" should not be able to create a public link share of (file|folder) "([^"]*)" using the sharing API$/
+	 * @Then /^user "([^"]*)" should not be able to create a public link share of (?:file|folder) "([^"]*)" using the sharing API$/
 	 *
 	 * @param string $sharer
-	 * @param string $entry
 	 * @param string $filepath
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function shouldNotBeAbleToCreatePublicLinkShare(string $sharer, string $entry, string $filepath):void {
+	public function shouldNotBeAbleToCreatePublicLinkShare(string $sharer, string $filepath):void {
 		$this->createAPublicShare($sharer, $filepath);
 		Assert::assertEquals(
 			404,
@@ -964,7 +963,7 @@ trait Sharing {
 		if (($contentExpected === "ANY_VALUE")
 			|| (($contentExpected === "A_TOKEN") && (\strlen($value) === 15))
 			|| (($contentExpected === "A_NUMBER") && \is_numeric($value))
-			|| (($contentExpected === "A_STRING") && \is_string($value) && $value !== "")
+			|| (($contentExpected === "A_STRING") && $value !== "")
 			|| (($contentExpected === "AN_URL") && $this->isAPublicLinkUrl($value))
 			|| (($field === 'remote') && (\rtrim($value, "/") === $contentExpected))
 			|| ($contentExpected === $value)
@@ -1585,11 +1584,10 @@ trait Sharing {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" should not be able to share (file|folder|entry) "([^"]*)" with (user|group) "([^"]*)"(?: with permissions (\d+))? using the sharing API$/
-	 * @Then /^user "([^"]*)" should not be able to share (file|folder|entry) "([^"]*)" with (user|group) "([^"]*)" with permissions "([^"]*)" using the sharing API$/
+	 * @Then /^user "([^"]*)" should not be able to share (?:file|folder|entry) "([^"]*)" with (user|group) "([^"]*)"(?: with permissions (\d+))? using the sharing API$/
+	 * @Then /^user "([^"]*)" should not be able to share (?:file|folder|entry) "([^"]*)" with (user|group) "([^"]*)" with permissions "([^"]*)" using the sharing API$/
 	 *
 	 * @param string $sharer
-	 * @param string $entry
 	 * @param string $filepath
 	 * @param string $userOrGroupShareType
 	 * @param string $sharee
@@ -1600,7 +1598,6 @@ trait Sharing {
 	 */
 	public function userTriesToShareFileUsingTheSharingApi(
 		string $sharer,
-		string $entry,
 		string $filepath,
 		string $userOrGroupShareType,
 		string $sharee,
@@ -1624,11 +1621,10 @@ trait Sharing {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" should be able to share (file|folder|entry) "([^"]*)" with (user|group) "([^"]*)"(?: with permissions (\d+))? using the sharing API$/
-	 * @Then /^user "([^"]*)" should be able to share (file|folder|entry) "([^"]*)" with (user|group) "([^"]*)" with permissions "([^"]*)" using the sharing API$/
+	 * @Then /^user "([^"]*)" should be able to share (?:file|folder|entry) "([^"]*)" with (user|group) "([^"]*)"(?: with permissions (\d+))? using the sharing API$/
+	 * @Then /^user "([^"]*)" should be able to share (?:file|folder|entry) "([^"]*)" with (user|group) "([^"]*)" with permissions "([^"]*)" using the sharing API$/
 	 *
 	 * @param string $sharer
-	 * @param string $entry
 	 * @param string $filepath
 	 * @param string $userOrGroupShareType
 	 * @param string $sharee
@@ -1639,7 +1635,6 @@ trait Sharing {
 	 */
 	public function userShouldBeAbleToShareUsingTheSharingApi(
 		string $sharer,
-		string $entry,
 		string $filepath,
 		string $userOrGroupShareType,
 		string $sharee,
@@ -2236,10 +2231,10 @@ trait Sharing {
 
 		$this->getShareData($user, $share_id);
 		foreach ($bodyRows as $field => $value) {
-			if ($type === "user" && \in_array($field, ["share_with"])) {
+			if ($type === "user" && $field == "share_with") {
 				$value = $this->getActualUsername($value);
 			}
-			if (\in_array($field, ["uid_owner"])) {
+			if ($field == "uid_owner") {
 				$value = $this->getActualUsername($value);
 			}
 			$value = $this->replaceValuesFromTable($field, $value);
@@ -2454,8 +2449,8 @@ trait Sharing {
 					$value = (explode("$", $value))[1];
 				}
 				if ($field === "space_id") {
-					$exploadedSpaceId = explode("$", $value);
-					$value = $exploadedSpaceId[0] . "$" . $exploadedSpaceId[1] . "!" . $exploadedSpaceId[1];
+					$explodedSpaceId = explode("$", $value);
+					$value = $explodedSpaceId[0] . "$" . $explodedSpaceId[1] . "!" . $explodedSpaceId[1];
 				}
 			}
 			$value = $this->getActualUsername($value);
@@ -2609,7 +2604,7 @@ trait Sharing {
 			$errorMessage,
 			(string) $receivedErrorMessage[0],
 			"Expected error message was '$errorMessage' but got '"
-			. (string) $receivedErrorMessage[0]
+			. $receivedErrorMessage[0]
 			. "'"
 		);
 	}
@@ -2715,16 +2710,15 @@ trait Sharing {
 	}
 
 	/**
-	 * @Then /^as user "([^"]*)" the (file|folder) "([^"]*)" should not have any shares$/
+	 * @Then /^as user "([^"]*)" the (?:file|folder) "([^"]*)" should not have any shares$/
 	 *
 	 * @param string $user
-	 * @param string $entry
 	 * @param string $path
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkPublicSharesAreEmpty(string $user, string $entry, string $path):void {
+	public function checkPublicSharesAreEmpty(string $user, string $path):void {
 		$user = $this->getActualUsername($user);
 		$response = $this->getShares($user, $path);
 		//It shouldn't have public shares

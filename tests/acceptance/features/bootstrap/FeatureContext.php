@@ -30,7 +30,6 @@ use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Hook\Scope\BeforeSuiteScope;
-use Behat\Testwork\Hook\Scope\AfterSuiteScope;
 use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
@@ -60,17 +59,17 @@ class FeatureContext extends BehatVariablesContext {
 	 * json schema validator keywords
 	 * See: https://json-schema.org/draft-06/draft-wright-json-schema-validation-01#rfc.section.6
 	 */
-	private array $jsonSchemaValidators = [];
+	private array $jsonSchemaValidators;
 
 	/**
 	 * Unix timestamp seconds
 	 */
 	private int $scenarioStartTime;
-	private string $adminUsername = '';
-	private string $adminPassword = '';
+	private string $adminUsername;
+	private string $adminPassword;
 	private string $adminDisplayName = '';
 	private string $adminEmailAddress = '';
-	private string $originalAdminPassword = '';
+	private string $originalAdminPassword;
 
 	/**
 	 * An array of values of replacement values of user attributes.
@@ -80,55 +79,55 @@ class FeatureContext extends BehatVariablesContext {
 	 * Key is the username, value is an array of user attributes
 	 */
 	private ?array $userReplacements = null;
-	private string $regularUserPassword = '';
-	private string $alt1UserPassword = '';
-	private string $alt2UserPassword = '';
-	private string $alt3UserPassword = '';
-	private string $alt4UserPassword = '';
+	private string $regularUserPassword;
+	private string $alt1UserPassword;
+	private string $alt2UserPassword;
+	private string $alt3UserPassword;
+	private string $alt4UserPassword;
 
 	/**
 	 * The password to use in tests that create a sub-admin user
 	 */
-	private string $subAdminPassword = '';
+	private string $subAdminPassword;
 
 	/**
 	 * The password to use in tests that create another admin user
 	 */
-	private string $alternateAdminPassword = '';
+	private string $alternateAdminPassword;
 
 	/**
 	 * The password to use in tests that create public link shares
 	 */
-	private string $publicLinkSharePassword = '';
-	private string $ocPath = '';
+	private string $publicLinkSharePassword;
+	private string $ocPath;
 
 	/**
 	 * Location of the root folder of ownCloud on the local server under test
 	 */
 	private ?string $localServerRoot = null;
 	private string $currentUser = '';
-	private string $currentServer = '';
+	private string $currentServer;
 
 	/**
 	 * The base URL of the current server under test,
 	 * without any terminating slash
 	 * e.g. http://localhost:8080
 	 */
-	private string $baseUrl = '';
+	private string $baseUrl;
 
 	/**
 	 * The base URL of the local server under test,
 	 * without any terminating slash
 	 * e.g. http://localhost:8080
 	 */
-	private string $localBaseUrl = '';
+	private string $localBaseUrl;
 
 	/**
 	 * The base URL of the remote (federated) server under test,
 	 * without any terminating slash
 	 * e.g. http://localhost:8180
 	 */
-	private string $remoteBaseUrl = '';
+	private string $remoteBaseUrl;
 
 	/**
 	 * The suite name, feature name and scenario line number.
@@ -149,7 +148,7 @@ class FeatureContext extends BehatVariablesContext {
 	/**
 	 * @var boolean true if TEST_SERVER_FED_URL is defined
 	 */
-	private bool $federatedServerExists = false;
+	private bool $federatedServerExists;
 	private int $ocsApiVersion = 1;
 	private ?ResponseInterface $response = null;
 	private string $responseUser = '';
@@ -1407,9 +1406,11 @@ class FeatureContext extends BehatVariablesContext {
 	 * @param string $user
 	 * @param string $verb
 	 * @param string $url
-	 * @param string $headersTable
+	 * @param TableNode $headersTable
 	 *
 	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
 	public function userSendsHTTPMethodToUrlWithHeaders(string $user, string $verb, string $url, TableNode $headersTable): void {
 		$this->verifyTableNodeColumns(
@@ -3597,18 +3598,6 @@ class FeatureContext extends BehatVariablesContext {
 			WebDavHelper::$spacesIdRef = [];
 		}
 		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
-	}
-
-	/**
-	 * @BeforeSuite
-	 *
-	 * @param BeforeSuiteScope $scope
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public static function useBigFileIDs(BeforeSuiteScope $scope): void {
-		return;
 	}
 
 	/**

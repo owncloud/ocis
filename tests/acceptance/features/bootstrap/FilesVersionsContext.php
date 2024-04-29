@@ -462,7 +462,7 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
-	 * returns the result parsed into an SimpleXMLElement
+	 * returns the result parsed into a SimpleXMLElement
 	 * with a registered namespace with 'd' as prefix and 'DAV:' as namespace
 	 *
 	 * @param string $user
