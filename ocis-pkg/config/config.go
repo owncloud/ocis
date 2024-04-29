@@ -11,6 +11,7 @@ import (
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/config"
 	authservice "github.com/owncloud/ocis/v2/services/auth-service/pkg/config"
 	clientlog "github.com/owncloud/ocis/v2/services/clientlog/pkg/config"
+	collaboration "github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	eventhistory "github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/config"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config"
@@ -88,6 +89,7 @@ type Config struct {
 	AuthMachine       *authmachine.Config    `yaml:"auth_machine"`
 	AuthService       *authservice.Config    `yaml:"auth_service"`
 	Clientlog         *clientlog.Config      `yaml:"clientlog"`
+	Collaboration     *collaboration.Config  `yaml:"collaboration"`
 	EventHistory      *eventhistory.Config   `yaml:"eventhistory"`
 	Frontend          *frontend.Config       `yaml:"frontend"`
 	Gateway           *gateway.Config        `yaml:"gateway"`
