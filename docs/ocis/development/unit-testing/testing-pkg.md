@@ -22,28 +22,27 @@ package divide
 import "strconv"
 
 // If the number is divisible by 3, write "Yes" otherwise, the number
-func IsDevisible(input int) string {
-    isDevisible:= (input % 3) == 0
-    if isDevisible {
+func IsDivisible(input int) string {
+    if  (input % 3) == 0 {
         return "Yes"
     }
     return strconv.Itoa(input)
 }
 ```
 
-To test the `IsDevisible` function, create a file `divide_test.go` in the same directory as `divide.go`. The test file should have the same package name as the package being tested.
+To test the `IsDivisible` function, create a file `divide_test.go` in the same directory as `divide.go`. The test file should have the same package name as the package being tested.
 
 A test function in Go starts with `Test` and takes `*testing.T` as the only parameter. In most cases, you will name the unit test `Test[NameOfFunction]`. The testing package provides tools to interact with the test workflow, such as `t.Errorf`, which indicates that the test failed by displaying an error message on the console.
 
-The test function for the `IsDevisible` function could look like this
+The test function for the `IsDivisible` function could look like this
 
 ```go
 package divide
 
 import "testing"
 
-func TestDevide3(t *testing.T) {
-    result := IsDevisible(3)
+func TestDivide3(t *testing.T) {
+    result := IsDivisible(3)
     if result != "Yes" {
         t.Errorf("Result was incorrect, got: %s, want: %s.", result, "Foo")
     }
@@ -64,15 +63,15 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-func TestDevide3(t *testing.T) {
-    result := IsDevisible(3)
+func TestDivide3(t *testing.T) {
+    result := IsDivisible(3)
     assert.Equal(t, "Yes", result)
 }
 ```
 
 ### Table Driven Example
 
-Write Table Drive Tests to test multiple inputs.
+Write Table Driven Tests to test multiple inputs.
 
 ```go
 package divide
@@ -83,7 +82,7 @@ import (
 )
 
 
-func TestIsDevisibleTableDriven(t *testing.T) {
+func TestIsDivisibleTableDriven(t *testing.T) {
 	// Defining the columns of the table
 	var tests = []struct {
 		name string
@@ -100,7 +99,7 @@ func TestIsDevisibleTableDriven(t *testing.T) {
 	// The execution loop
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
-            answer := IsDevisible(tt.input)
+            answer := IsDivisible(tt.input)
             assert.Equal(t, tt.want, answer)
         })
     }

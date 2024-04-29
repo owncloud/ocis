@@ -46,7 +46,7 @@ Generating ginkgo test suite bootstrap for parser in:
 
 ```
 
-This command creates a file a `parser_suite_test.go` file in the parser directory. This file contains the test suite for the parser package.
+This command creates a `parser_suite_test.go` file in the parser directory. This file contains the test suite for the parser package.
 
 ```go
 package parser_test
