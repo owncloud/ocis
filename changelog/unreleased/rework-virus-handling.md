@@ -1,4 +1,4 @@
-Enhancement: Improve infected file handling
+Bugfix: Fix infected file handling
 
 Reworks virus handling. Shows scandate and outcome on ocis storage-users uploads sessions. Avoids retrying infected files on ocis postprocessing restart.
 
