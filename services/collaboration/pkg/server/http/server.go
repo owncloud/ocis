@@ -62,7 +62,6 @@ func Server(opts ...Option) (http.Service, error) {
 				cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 			),
 		*/
-		middleware.Secure,
 	}
 
 	mux := chi.NewMux()
