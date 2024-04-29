@@ -373,3 +373,43 @@ Feature:  enable or disable sync of incoming shares
         }
       }
       """
+
+
+  Scenario: try to enable share sync with not shared resource id
+    Given user "Brian" has disabled the auto-sync share
+    And user "Alice" has uploaded file with content "some data" to "/fileNotShared.txt"
+    And we save it into "FILEID"
+    When user "Brian" tries to enable share sync of a resource "<<FILEID>>" using the Graph API
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code" : {
+                "const": "invalidRequest"
+              },
+              "innererror" : {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message" : {
+                "const": "mounting share failed"
+              }
+            }
+          }
+        }
+      }
+      """
