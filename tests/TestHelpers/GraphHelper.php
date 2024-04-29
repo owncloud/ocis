@@ -1642,6 +1642,8 @@ class GraphHelper {
 				return '1c996275-f1c9-4e71-abdf-a42f6495e960';
 			case 'Manager':
 				return '312c0871-5ef7-4b3a-85b6-0e4074c64049';
+			case 'Secure viewer':
+				return 'aa97fe03-7980-45ac-9e50-b325749fd7e6';
 			default:
 				throw new \Exception('Role ' . $permissionsRole . ' not found');
 		}
@@ -1674,6 +1676,8 @@ class GraphHelper {
 				return 'Space Editor';
 			case '312c0871-5ef7-4b3a-85b6-0e4074c64049':
 				return 'Manager';
+			case 'aa97fe03-7980-45ac-9e50-b325749fd7e6':
+				return 'Secure viewer';
 			default:
 				throw new \Exception('Permission role id: ' . $permissionsRoleId . ' not found');
 		}
