@@ -335,7 +335,7 @@ github.com/coreos/go-systemd/v22/journal
 # github.com/cornelk/hashmap v1.0.8
 ## explicit; go 1.19
 github.com/cornelk/hashmap
-# github.com/cpuguy83/go-md2man/v2 v2.0.3
+# github.com/cpuguy83/go-md2man/v2 v2.0.4
 ## explicit; go 1.11
 github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/crewjam/httperr v0.2.0
@@ -1801,7 +1801,7 @@ github.com/tus/tusd/pkg/handler
 ## explicit; go 1.13
 github.com/unrolled/secure
 github.com/unrolled/secure/cspbuilder
-# github.com/urfave/cli/v2 v2.27.1
+# github.com/urfave/cli/v2 v2.27.2
 ## explicit; go 1.18
 github.com/urfave/cli/v2
 # github.com/wk8/go-ordered-map v1.0.0
@@ -1822,8 +1822,8 @@ github.com/xhit/go-simple-mail/v2
 # github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e
 ## explicit; go 1.19
 github.com/xo/terminfo
-# github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673
-## explicit
+# github.com/xrash/smetrics v0.0.0-20240312152122-5f08fbb34913
+## explicit; go 1.15.0
 github.com/xrash/smetrics
 # github.com/yashtewari/glob-intersection v0.2.0
 ## explicit; go 1.17
