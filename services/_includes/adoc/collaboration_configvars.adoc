@@ -1,0 +1,281 @@
+// set the attribute to true or leave empty, true without any quotes.
+
+:show-deprecation: false
+
+ifeval::[{show-deprecation} == true]
+
+[#deprecation-note-2024-04-29-11-57-54]
+[caption=]
+.Deprecation notes for the collaboration service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacement
+|===
+
+endif::[]
+
+[caption=]
+.Environment variables for the collaboration service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Description
+
+a|`COLLABORATION_APP_NAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++WOPI app ++
+a| [subs=-attributes]
+The name of the app
+
+a|`COLLABORATION_APP_DESCRIPTION` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++Open office documents with a WOPI app ++
+a| [subs=-attributes]
+App description
+
+a|`COLLABORATION_APP_ICON` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++image-edit ++
+a| [subs=-attributes]
+Icon for the app
+
+a|`COLLABORATION_APP_LOCKNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.github.owncloud.collaboration ++
+a| [subs=-attributes]
+Name for the app lock
+
+a|`OCIS_JWT_SECRET` +
+`COLLABORATION_JWT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++AVf0ZpRoEDyGqrJnHJOtWYcU0YpTyFTN ++
+a| [subs=-attributes]
+Used as JWT token and to encrypt access token.
+
+a|`COLLABORATION_GRPC_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++0.0.0.0:9301 ++
+a| [subs=-attributes]
+The bind address of the GRPC service.
+
+a|`COLLABORATION_HTTP_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9300 ++
+a| [subs=-attributes]
+The external address of the collaboration service wihout a leading scheme. Either use an IP address or a hostname (127.0.0.1:9301 or wopi.private.prv). The configured 'Scheme' in another envvar will be used to finally build the public URL along with this address.
+
+a|`COLLABORATION_HTTP_BINDADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++0.0.0.0:9300 ++
+a| [subs=-attributes]
+The bind address of the HTTP service. Use '<ip-address>:<port>', for example, '127.0.0.1:9301' or '0.0.0.0:9301'.
+
+a|`COLLABORATION_HTTP_SCHEME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https ++
+a| [subs=-attributes]
+The scheme to use for the HTTP address, which is either 'http' or 'https'.
+
+a|`OCIS_HTTP_TLS_ENABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.
+
+a|`OCIS_HTTP_TLS_CERTIFICATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the http services.
+
+a|`OCIS_HTTP_TLS_KEY` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
+
+a|`COLLABORATION_WOPIAPP_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://127.0.0.1:8080 ++
+a| [subs=-attributes]
+The URL where the WOPI app is located, such as \https://127.0.0.1:8080.
+
+a|`COLLABORATION_WOPIAPP_INSECURE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Skip TLS certificate verification when connecting to the WOPI app
+
+a|`COLLABORATION_CS3API_DATAGATEWAY_INSECURE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Connect to the CS3API data gateway insecurely.
+
+a|`OCIS_TRACING_ENABLED` +
+`COLLABORATION_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`COLLABORATION_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`COLLABORATION_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`COLLABORATION_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+
+a|`OCIS_LOG_LEVEL` +
+`COLLABORATION_LOG_LEVEL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
+
+a|`OCIS_LOG_PRETTY` +
+`COLLABORATION_LOG_PRETTY` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates pretty log output.
+
+a|`OCIS_LOG_COLOR` +
+`COLLABORATION_LOG_COLOR` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates colorized log output.
+
+a|`OCIS_LOG_FILE` +
+`COLLABORATION_LOG_FILE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+
+a|`COLLABORATION_DEBUG_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9304 ++
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+
+a|`COLLABORATION_DEBUG_TOKEN` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Token to secure the metrics endpoint.
+
+a|`COLLABORATION_DEBUG_PPROF` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling.
+
+a|`COLLABORATION_DEBUG_ZPAGES` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
+|===
+
