@@ -73,7 +73,7 @@ With the bootstrap complete, you can now run your tests using the `ginkgo` comma
 ```bash
 ginkgo
 
-Running Suite: Parser Suite - <loca-path>/ocis/ocis-pkg/config/parser
+Running Suite: Parser Suite - <local-path>/ocis/ocis-pkg/config/parser
 ===============================================================================================
 Random Seed: 1714076559
 

@@ -44,7 +44,7 @@ import "testing"
 func TestDivide3(t *testing.T) {
     result := IsDivisible(3)
     if result != "Yes" {
-        t.Errorf("Result was incorrect, got: %s, want: %s.", result, "Foo")
+        t.Errorf("Result was incorrect, got: %s, want: %s.", result, "Yes")
     }
 }
 ```
