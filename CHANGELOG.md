@@ -92,6 +92,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Remove resharing: [#8762](https://github.com/owncloud/ocis/pull/8762)
 * Enhancement - Add CSP and other security related headers to oCIS: [#8777](https://github.com/owncloud/ocis/pull/8777)
 * Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
+* Enhancement - Prepare runners to start the services: [#8802](https://github.com/owncloud/ocis/pull/8802)
 * Enhancement - Sharing SSEs: [#8854](https://github.com/owncloud/ocis/pull/8854)
 * Enhancement - Update web to v9.0.0-alpha.5: [#8868](https://github.com/owncloud/ocis/pull/8868)
 * Enhancement - Secure viewer share role: [#8907](https://github.com/owncloud/ocis/pull/8907)
@@ -469,6 +470,13 @@ The following sections list the changes for unreleased.
    Send an sse when a file is touched (aka 0 byte upload)
 
    https://github.com/owncloud/ocis/pull/8778
+
+* Enhancement - Prepare runners to start the services: [#8802](https://github.com/owncloud/ocis/pull/8802)
+
+   The runners will improve and make service startup easier. The runner's behavior
+   is more predictable with clear expectations.
+
+   https://github.com/owncloud/ocis/pull/8802
 
 * Enhancement - Sharing SSEs: [#8854](https://github.com/owncloud/ocis/pull/8854)
 
