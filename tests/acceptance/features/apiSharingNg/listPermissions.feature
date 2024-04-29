@@ -896,7 +896,7 @@ Feature: List a sharing permissions
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" gets permissions list for file "textfile.txt" of the space "Personal" using the Graph API
     Then the HTTP status code should be "200"
-    And user "Alice" should be able to send share invitation with all allowed permission roles
+    And user "Alice" should be able to send share the following invitation with all allowed permission roles
       | resource     | textfile.txt |
       | space        | Personal     |
       | sharee       | Brian        |
@@ -908,7 +908,7 @@ Feature: List a sharing permissions
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" gets permissions list for folder "folder" of the space "Personal" using the Graph API
     Then the HTTP status code should be "200"
-    And user "Alice" should be able to send share invitation with all allowed permission roles
+    And user "Alice" should be able to send share the following invitation with all allowed permission roles
       | resource     | folder   |
       | space        | Personal |
       | sharee       | Brian    |
@@ -1081,6 +1081,19 @@ Feature: List a sharing permissions
       | Shares   |
 
 
+  Scenario: space admin invites to a project space with all allowed roles
+    Given using spaces DAV path
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" lists the permissions of space "new-space" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "200"
+    And user "Alice" should be able to send share the following invitation with all allowed permission roles
+      | space        | new-space    |
+      | sharee       | Brian        |
+      | shareType    | user         |
+
+
   Scenario: user sends share invitation with all allowed roles for a file in project space
     Given using spaces DAV path
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
@@ -1089,7 +1102,7 @@ Feature: List a sharing permissions
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" gets permissions list for file "textfile.txt" of the space "new-space" using the Graph API
     Then the HTTP status code should be "200"
-    And user "Alice" should be able to send share invitation with all allowed permission roles
+    And user "Alice" should be able to send share the following invitation with all allowed permission roles
       | resource     | textfile.txt |
       | space        | new-space    |
       | sharee       | Brian        |
@@ -1311,7 +1324,7 @@ Feature: List a sharing permissions
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" gets permissions list for folder "folder" of the space "new-space" using the Graph API
     Then the HTTP status code should be "200"
-    And user "Alice" should be able to send share invitation with all allowed permission roles
+    And user "Alice" should be able to send share the following invitation with all allowed permission roles
       | resource  | folder    |
       | space     | new-space |
       | sharee    | Brian     |

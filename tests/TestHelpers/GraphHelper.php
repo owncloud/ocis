@@ -1668,8 +1668,14 @@ class GraphHelper {
 				return 'File Editor';
 			case '1c996275-f1c9-4e71-abdf-a42f6495e960':
 				return 'Uploader';
+			case 'a8d5fe5e-96e3-418d-825b-534dbdf22b99':
+				return 'Space Viewer';
+			case '58c63c02-1d89-4572-916a-870abc5a1b7d':
+				return 'Space Editor';
+			case '312c0871-5ef7-4b3a-85b6-0e4074c64049':
+				return 'Manager';
 			default:
-				throw new \Exception('Role ' . $permissionsRoleId . ' not found');
+				throw new \Exception('Permission role id: ' . $permissionsRoleId . ' not found');
 		}
 	}
 
