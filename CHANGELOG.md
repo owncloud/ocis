@@ -99,6 +99,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add Link SSEs: [#8908](https://github.com/owncloud/ocis/pull/8908)
 * Enhancement - ShareeIDs in SSEs: [#8915](https://github.com/owncloud/ocis/pull/8915)
 * Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
+* Enhancement - Improve infected file handling: [#8947](https://github.com/owncloud/ocis/pull/8947)
 * Enhancement - Bump nats-js-kv pkg: [#8953](https://github.com/owncloud/ocis/pull/8953)
 * Enhancement - Bump Reva: [#9002](https://github.com/owncloud/ocis/pull/9002)
 
@@ -594,6 +595,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8936
    https://github.com/owncloud/ocis/pull/8701
+
+* Enhancement - Improve infected file handling: [#8947](https://github.com/owncloud/ocis/pull/8947)
+
+   Reworks virus handling.Shows scandate and outcome on ocis storage-users uploads
+   sessions. Avoids retrying infected files on ocis postprocessing restart.
+
+   https://github.com/owncloud/ocis/pull/8947
 
 * Enhancement - Bump nats-js-kv pkg: [#8953](https://github.com/owncloud/ocis/pull/8953)
 
