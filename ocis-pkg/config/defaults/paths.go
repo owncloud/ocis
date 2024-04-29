@@ -6,12 +6,10 @@ import (
 	"path"
 )
 
-const ()
-
 var (
-	// switch between modes
+	// BaseDataPathType switch between modes
 	BaseDataPathType = "homedir" // or "path"
-	// default data path
+	// BaseDataPathValue default data path
 	BaseDataPathValue = "/var/lib/ocis"
 )
 
@@ -42,9 +40,9 @@ func BaseDataPath() string {
 }
 
 var (
-	// switch between modes
+	// BaseConfigPathType switch between modes
 	BaseConfigPathType = "homedir" // or "path"
-	// default config path
+	// BaseConfigPathValue default config path
 	BaseConfigPathValue = "/etc/ocis"
 )
 
