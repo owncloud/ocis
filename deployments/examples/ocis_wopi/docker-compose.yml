@@ -110,10 +110,6 @@ services:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    user: "0" # needed for apk add in entrypoint script
-    entrypoint:
-      - /bin/sh
-      - /entrypoint-override.sh
     command: app-provider server
     environment:
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
@@ -134,22 +130,20 @@ services:
       # share the registry with the ocis container
       MICRO_REGISTRY_ADDRESS: ocis:9233
     volumes:
-      - ./config/ocis-appprovider-collabora/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
     depends_on:
-      - ocis
+      ocis:
+        condition: service_started
+      collabora:
+        condition: service_healthy
 
   ocis-appprovider-onlyoffice:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    user: "0" # needed for apk add in entrypoint script
-    entrypoint:
-      - /bin/sh
-      - /entrypoint-override.sh
     #command: app-provider server
     environment:
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
@@ -170,13 +164,15 @@ services:
       # share the registry with the ocis container
       MICRO_REGISTRY_ADDRESS: ocis:9233
     volumes:
-      - ./config/ocis-appprovider-onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
     depends_on:
-      - ocis
+      ocis:
+        condition: service_started
+      onlyoffice:
+        condition: service_healthy
 
   wopiserver:
     image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v10.3.0}
@@ -226,6 +222,8 @@ services:
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9980/hosting/discovery"]
 
   onlyoffice:
     image: onlyoffice/documentserver:7.5.0
@@ -253,6 +251,8 @@ services:
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/hosting/discovery"]
 
   tika:
     image: ${TIKA_IMAGE:-apache/tika:latest-full}
