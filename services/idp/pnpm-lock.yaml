@@ -147,7 +147,7 @@ devDependencies:
     version: 7.32.0
   eslint-config-react-app:
     specifier: ^6.0.0
-    version: 6.0.0(@typescript-eslint/eslint-plugin@4.33.0)(@typescript-eslint/parser@4.33.0)(babel-eslint@10.1.0)(eslint-plugin-flowtype@5.10.0)(eslint-plugin-import@2.28.1)(eslint-plugin-jest@24.7.0)(eslint-plugin-jsx-a11y@6.7.1)(eslint-plugin-react-hooks@4.6.0)(eslint-plugin-react@7.33.2)(eslint-plugin-testing-library@3.10.2)(eslint@7.32.0)(typescript@4.9.5)
+    version: 6.0.0(@typescript-eslint/eslint-plugin@4.33.0)(@typescript-eslint/parser@4.33.0)(babel-eslint@10.1.0)(eslint-plugin-flowtype@5.10.0)(eslint-plugin-import@2.28.1)(eslint-plugin-jest@24.7.0)(eslint-plugin-jsx-a11y@6.7.1)(eslint-plugin-react-hooks@4.6.2)(eslint-plugin-react@7.33.2)(eslint-plugin-testing-library@3.10.2)(eslint@7.32.0)(typescript@4.9.5)
   eslint-loader:
     specifier: ^4.0.2
     version: 4.0.2(eslint@7.32.0)(webpack@4.47.0)
@@ -170,8 +170,8 @@ devDependencies:
     specifier: ^7.33.2
     version: 7.33.2(eslint@7.32.0)
   eslint-plugin-react-hooks:
-    specifier: ^4.6.0
-    version: 4.6.0(eslint@7.32.0)
+    specifier: ^4.6.2
+    version: 4.6.2(eslint@7.32.0)
   eslint-plugin-testing-library:
     specifier: ^3.10.2
     version: 3.10.2(eslint@7.32.0)(typescript@4.9.5)
@@ -5578,7 +5578,7 @@ packages:
     optionalDependencies:
       source-map: 0.6.1
 
-  /eslint-config-react-app@6.0.0(@typescript-eslint/eslint-plugin@4.33.0)(@typescript-eslint/parser@4.33.0)(babel-eslint@10.1.0)(eslint-plugin-flowtype@5.10.0)(eslint-plugin-import@2.28.1)(eslint-plugin-jest@24.7.0)(eslint-plugin-jsx-a11y@6.7.1)(eslint-plugin-react-hooks@4.6.0)(eslint-plugin-react@7.33.2)(eslint-plugin-testing-library@3.10.2)(eslint@7.32.0)(typescript@4.9.5):
+  /eslint-config-react-app@6.0.0(@typescript-eslint/eslint-plugin@4.33.0)(@typescript-eslint/parser@4.33.0)(babel-eslint@10.1.0)(eslint-plugin-flowtype@5.10.0)(eslint-plugin-import@2.28.1)(eslint-plugin-jest@24.7.0)(eslint-plugin-jsx-a11y@6.7.1)(eslint-plugin-react-hooks@4.6.2)(eslint-plugin-react@7.33.2)(eslint-plugin-testing-library@3.10.2)(eslint@7.32.0)(typescript@4.9.5):
     resolution: {integrity: sha512-bpoAAC+YRfzq0dsTk+6v9aHm/uqnDwayNAXleMypGl6CpxI9oXXscVHo4fk3eJPIn+rsbtNetB4r/ZIidFIE8A==}
     engines: {node: ^10.12.0 || >=12.0.0}
     peerDependencies:
@@ -5612,7 +5612,7 @@ packages:
       eslint-plugin-jest: 24.7.0(@typescript-eslint/eslint-plugin@4.33.0)(eslint@7.32.0)(typescript@4.9.5)
       eslint-plugin-jsx-a11y: 6.7.1(eslint@7.32.0)
       eslint-plugin-react: 7.33.2(eslint@7.32.0)
-      eslint-plugin-react-hooks: 4.6.0(eslint@7.32.0)
+      eslint-plugin-react-hooks: 4.6.2(eslint@7.32.0)
       eslint-plugin-testing-library: 3.10.2(eslint@7.32.0)(typescript@4.9.5)
       typescript: 4.9.5
     dev: true
@@ -5770,8 +5770,8 @@ packages:
       semver: 6.3.1
     dev: true
 
-  /eslint-plugin-react-hooks@4.6.0(eslint@7.32.0):
-    resolution: {integrity: sha512-oFc7Itz9Qxh2x4gNHStv3BqJq54ExXmfC+a1NjAta66IAN87Wu0R/QArgIS9qKzX3dXKPI9H5crl9QchNMY9+g==}
+  /eslint-plugin-react-hooks@4.6.2(eslint@7.32.0):
+    resolution: {integrity: sha512-QzliNJq4GinDBcD8gPB5v0wh6g8q3SUi6EFF0x8N/BL9PoVs0atuGc47ozMRyOWAKdwaZ5OnbOEa3WR+dSGKuQ==}
     engines: {node: '>=10'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
