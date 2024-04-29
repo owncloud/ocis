@@ -37,8 +37,6 @@ import (
 	"github.com/jellydator/ttlcache/v2"
 )
 
-//go:generate make --no-print-directory -C ../../../.. mockery NAME=UserConverter
-
 // DBShare stores information about user and public shares.
 type DBShare struct {
 	ID           string

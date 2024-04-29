@@ -54,8 +54,6 @@ func init() {
 	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/tree")
 }
 
-//go:generate make --no-print-directory -C ../../../../.. mockery NAME=Blobstore
-
 // Blobstore defines an interface for storing blobs in a blobstore
 type Blobstore interface {
 	Upload(node *node.Node, source string) error

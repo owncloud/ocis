@@ -261,7 +261,7 @@ func checkIfNestedResource(ctx context.Context, ref *provider.Reference, parent 
 	if err != nil {
 		return false, err
 	}
-	if statResponse.Status.Code != rpc.Code_CODE_OK {
+	if statResponse.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return false, statuspkg.NewErrorFromCode(statResponse.Status.Code, "auth interceptor")
 	}
 
@@ -313,14 +313,22 @@ func checkIfNestedResource(ctx context.Context, ref *provider.Reference, parent 
 	if err != nil {
 		return false, err
 	}
-	if childStat.Status.Code != rpc.Code_CODE_OK {
+	if childStat.GetStatus().GetCode() == rpc.Code_CODE_NOT_FOUND && ref.GetPath() != "" && ref.GetPath() != "." {
+		// The resource does not seem to exist (yet?). We might be part of an initiate upload request.
+		// Stat the parent to get its path and check that against the root path.
+		childStat, err = client.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: ref.GetResourceId()}})
+		if err != nil {
+			return false, err
+		}
+	}
+	if childStat.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return false, statuspkg.NewErrorFromCode(childStat.Status.Code, "auth interceptor")
 	}
 	pathResp, err = client.GetPath(ctx, &provider.GetPathRequest{ResourceId: childStat.GetInfo().GetId()})
 	if err != nil {
 		return false, err
 	}
-	if pathResp.Status.Code != rpc.Code_CODE_OK {
+	if pathResp.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return false, statuspkg.NewErrorFromCode(pathResp.Status.Code, "auth interceptor")
 	}
 	childPath = pathResp.Path

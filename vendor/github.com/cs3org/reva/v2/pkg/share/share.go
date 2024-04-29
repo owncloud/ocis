@@ -36,8 +36,6 @@ const (
 	NoState collaboration.ShareState = -1
 )
 
-//go:generate make --no-print-directory -C ../.. mockery NAME=Manager
-
 // Metadata contains Metadata for a share
 type Metadata struct {
 	ETag  string

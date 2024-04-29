@@ -28,8 +28,6 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 )
 
-//go:generate make --no-print-directory -C ../../../.. mockery NAME=Storage
-
 // UploadRequest represents an upload request and its options
 type UploadRequest struct {
 	Path    string
