@@ -463,6 +463,7 @@ def testOcis(ctx):
             "commands": [
                 "mkdir -p cache/checkstyle",
                 "make ci-golangci-lint",
+                "cat checkstyle.xml",
                 "mv checkstyle.xml cache/checkstyle/checkstyle.xml",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,

@@ -404,10 +404,6 @@ func CS3ResourcePermissionsToLibregraphActions(p provider.ResourcePermissions) (
 	return actions
 }
 
-func GetLegacyName(role libregraph.UnifiedRoleDefinition) string {
-	return legacyNames[role.GetId()]
-}
-
 // CS3ResourcePermissionsToUnifiedRole tries to find the UnifiedRoleDefinition that matches the supplied
 // CS3 ResourcePermissions and constraints.
 func CS3ResourcePermissionsToUnifiedRole(p provider.ResourcePermissions, constraints string) *libregraph.UnifiedRoleDefinition {
@@ -459,7 +455,6 @@ func displayName(role *conversions.Role) *string {
 
 	// linter wants this to be a var
 	canEdit := "Can edit"
-
 	var displayName string
 	switch role.Name {
 	case conversions.RoleViewer:
@@ -476,6 +471,8 @@ func displayName(role *conversions.Role) *string {
 		displayName = "Can upload"
 	case conversions.RoleManager:
 		displayName = "Can manage"
+	case "blubb":
+		displayName = "Can view"
 	default:
 		return nil
 	}
@@ -496,5 +493,20 @@ func GetAllowedResourceActions(role *libregraph.UnifiedRoleDefinition, condition
 			return p.GetAllowedResourceActions()
 		}
 	}
+	// if I add some lines of code here
+	r := "something"
+	// maybe I can make the linter lint this file?
+	_ = r
+	// more lines
+
 	return []string{}
+}
+
+func GetLegacyName(role libregraph.UnifiedRoleDefinition) string {
+	// some
+	return legacyNames[role.GetId()]
+}
+
+func SomeUncommentedNewFunction() {
+	// surprise - it does nothing
 }

@@ -41,7 +41,7 @@ type UserlogService struct {
 	publisher        events.Publisher
 }
 
-// NewUserlogService returns an EventHistory service
+// NewlogService returns an EventHistory service
 func NewUserlogService(opts ...Option) (*UserlogService, error) {
 	o := &Options{}
 	for _, opt := range opts {

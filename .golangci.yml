@@ -41,6 +41,12 @@ linters:
     - stylecheck
     - gocognit
     - nestif # each 10-50 issues in codebase
+    - scopelint # deprecated
+    - interfacer # deprecated
+    - deadcode # deprecated
+    - structcheck # deprecated
+    - ifshort # deprecated
+    - varcheck # deprecated
 
 linters-settings:
   gocyclo:
