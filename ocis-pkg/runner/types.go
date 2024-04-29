@@ -55,6 +55,17 @@ func NewTimeoutError(runnerID string, duration time.Duration) *TimeoutError {
 	}
 }
 
+// NewGroupTimeoutError creates a new timeout error. This is intended to be
+// used for group runners when the timeout of the group is reached.
+// The runner id will be set to "_unknown_" because we don't know which is
+// the id of the missing runner.
+func NewGroupTimeoutError(duration time.Duration) *TimeoutError {
+	return &TimeoutError{
+		RunnerID: "_unknown_",
+		Duration: duration,
+	}
+}
+
 // Error generates the message for this particular error.
 func (te *TimeoutError) Error() string {
 	var sb strings.Builder

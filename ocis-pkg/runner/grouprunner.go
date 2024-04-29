@@ -3,6 +3,8 @@ package runner
 import (
 	"context"
 	"sync"
+	"sync/atomic"
+	"time"
 )
 
 // GroupRunner represent a group of tasks that need to run together.
@@ -17,21 +19,44 @@ import (
 // providing a piece of functionality, however, if any of them fails, the
 // feature provided by them would be incomplete or broken.
 //
+// The interrupt duration for the group can be set through the
+// `WithInterruptDuration` option. If the option isn't supplied, the default
+// value (15 secs) will be used.
+//
+// It's recommended that the timeouts are handled by each runner individually,
+// meaning that each runner's timeout should be less than the group runner's
+// timeout. This way, we can know which runner timed out.
+// If the group timeout is reached, the remaining results will have the
+// runner's id as "_unknown_".
+//
 // Note that, as services, the task aren't expected to stop by default.
 // This means that, if a task finishes naturally, the rest of the task will
 // asked to stop as well.
 type GroupRunner struct {
-	runners      sync.Map
-	runnersCount int
-	isRunning    bool
-	runningMutex sync.Mutex
+	runners       sync.Map
+	runnersCount  int
+	isRunning     bool
+	interruptDur  time.Duration
+	interrupted   atomic.Bool
+	interruptedCh chan time.Duration
+	runningMutex  sync.Mutex
 }
 
 // NewGroup will create a GroupRunner
-func NewGroup() *GroupRunner {
+func NewGroup(opts ...Option) *GroupRunner {
+	options := Options{
+		InterruptDuration: DefaultGroupInterruptDuration,
+	}
+
+	for _, o := range opts {
+		o(&options)
+	}
+
 	return &GroupRunner{
-		runners:      sync.Map{},
-		runningMutex: sync.Mutex{},
+		runners:       sync.Map{},
+		runningMutex:  sync.Mutex{},
+		interruptDur:  options.InterruptDuration,
+		interruptedCh: make(chan time.Duration, 1),
 	}
 }
 
@@ -85,7 +110,7 @@ func (gr *GroupRunner) Run(ctx context.Context) []*Result {
 	gr.isRunning = true
 	gr.runningMutex.Unlock()
 
-	results := make(map[string]*Result)
+	results := make([]*Result, 0, gr.runnersCount)
 
 	ch := make(chan *Result, gr.runnersCount) // no need to block writing results
 	gr.runners.Range(func(_, value any) bool {
@@ -94,45 +119,46 @@ func (gr *GroupRunner) Run(ctx context.Context) []*Result {
 		return true
 	})
 
+	var d time.Duration
 	// wait for a result or for the context to be done
 	select {
 	case result := <-ch:
-		results[result.RunnerID] = result
+		results = append(results, result)
+	case d = <-gr.interruptedCh:
+		results = append(results, &Result{
+			RunnerID:    "_unknown_",
+			RunnerError: NewGroupTimeoutError(d),
+		})
 	case <-ctx.Done():
 		// Do nothing
 	}
 
 	// interrupt the rest of the runners
-	gr.runners.Range(func(_, value any) bool {
-		r := value.(*Runner)
-		if _, ok := results[r.ID]; !ok {
-			select {
-			case <-r.Finished():
-				// No data should be sent through the channel, so we'd be
-				// here only if the channel is closed. This means the task
-				// has finished and we don't need to interrupt. We do
-				// nothing in this case
-			default:
-				r.Interrupt()
-			}
-		}
-		return true
-	})
+	gr.Interrupt()
 
 	// Having notified that the context has been finished, we still need to
 	// wait for the rest of the results
 	for i := len(results); i < gr.runnersCount; i++ {
-		result := <-ch
-		results[result.RunnerID] = result
+		select {
+		case result := <-ch:
+			results = append(results, result)
+		case d2, ok := <-gr.interruptedCh:
+			if ok {
+				d = d2
+			}
+			results = append(results, &Result{
+				RunnerID:    "_unknown_",
+				RunnerError: NewGroupTimeoutError(d),
+			})
+		}
 	}
 
-	close(ch)
-
-	values := make([]*Result, 0, gr.runnersCount)
-	for _, val := range results {
-		values = append(values, val)
-	}
-	return values
+	// Even if we reach the group time out and bail out early, tasks might
+	// be running and eventually deliver the result through the channel.
+	// We'll rely on the buffered channel so the tasks won't block and the
+	// data can be eventually garbage-collected along with the unused
+	// channel, so we won't close the channel here.
+	return results
 }
 
 // RunAsync will execute the tasks in the group asynchronously.
@@ -158,12 +184,38 @@ func (gr *GroupRunner) RunAsync(ch chan<- *Result) {
 	})
 
 	go func() {
-		result := <-interCh
+		var result *Result
+		var d time.Duration
+
+		select {
+		case result = <-interCh:
+			// result already assigned, so do nothing
+		case d = <-gr.interruptedCh:
+			// we aren't tracking which runners have finished and which are still
+			// running, so we'll use "_unknown_" as runner id
+			result = &Result{
+				RunnerID:    "_unknown_",
+				RunnerError: NewGroupTimeoutError(d),
+			}
+		}
 		gr.Interrupt()
 
 		ch <- result
 		for i := 1; i < gr.runnersCount; i++ {
-			result = <-interCh
+			select {
+			case result = <-interCh:
+				// result already assigned, so do nothing
+			case d2, ok := <-gr.interruptedCh:
+				// if ok is true, d2 will have a good value; if false, the channel
+				// is closed and we get a default value
+				if ok {
+					d = d2
+				}
+				result = &Result{
+					RunnerID:    "_unknown_",
+					RunnerError: NewGroupTimeoutError(d),
+				}
+			}
 			ch <- result
 		}
 	}()
@@ -179,14 +231,32 @@ func (gr *GroupRunner) RunAsync(ch chan<- *Result) {
 // As said, this will affect ALL the tasks in the group. It isn't possible to
 // try to stop just one task.
 // If a task has finished, the corresponding stopper won't be called
+//
+// The interrupt timeout for the group will start after all the runners in the
+// group have been notified. Note that, if the task's stopper for a runner
+// takes a lot of time to return, it will delay the timeout's start, so it's
+// advised that the stopper either returns fast or is run asynchronously.
 func (gr *GroupRunner) Interrupt() {
-	gr.runners.Range(func(_, value any) bool {
-		r := value.(*Runner)
-		select {
-		case <-r.Finished():
-		default:
-			r.Interrupt()
-		}
-		return true
-	})
+	if gr.interrupted.CompareAndSwap(false, true) {
+		gr.runners.Range(func(_, value any) bool {
+			r := value.(*Runner)
+			select {
+			case <-r.Finished():
+				// No data should be sent through the channel, so we'd be
+				// here only if the channel is closed. This means the task
+				// has finished and we don't need to interrupt. We do
+				// nothing in this case
+			default:
+				r.Interrupt()
+			}
+			return true
+		})
+
+		_ = time.AfterFunc(gr.interruptDur, func() {
+			// timeout reached -> send it through the channel so our runner
+			// can abort
+			gr.interruptedCh <- gr.interruptDur
+			close(gr.interruptedCh)
+		})
+	}
 }

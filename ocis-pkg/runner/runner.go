@@ -32,7 +32,7 @@ type Runner struct {
 //
 // The interrupt duration, which can be set through the `WithInterruptDuration`
 // option, will be used to ensure the runner doesn't block forever. If the
-// option isn't suplied, the default value will be used.
+// option isn't supplied, the default value (10 secs) will be used.
 // The interrupt duration will be used to start a timeout when the
 // runner gets interrupted (either the context of the `Run` method is done
 // or this runner's `Interrupt` method is called). If the timeout is reached,
@@ -56,7 +56,7 @@ func New(id string, fn Runable, interrupt Stopper, opts ...Option) *Runner {
 		interruptDur:  options.InterruptDuration,
 		fn:            fn,
 		interrupt:     interrupt,
-		interruptedCh: make(chan time.Duration),
+		interruptedCh: make(chan time.Duration, 1),
 		finished:      make(chan struct{}),
 	}
 }
@@ -163,7 +163,7 @@ func (r *Runner) Finished() <-chan struct{} {
 // A result will be provided when either the task finishes naturally or we
 // reach the timeout after being interrupted
 func (r *Runner) doTask(ch chan<- *Result, closeChan bool) {
-	tmpCh := make(chan *Result)
+	tmpCh := make(chan *Result, 1)
 
 	// spawn the task and return the result in a temporary channel
 	go func(tmpCh chan *Result) {

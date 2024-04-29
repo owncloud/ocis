@@ -62,7 +62,7 @@ var _ = Describe("GroupRunner", func() {
 			)))
 
 			task3Ch := make(chan error)
-			task3 := TimedTask(task3Ch, 15*time.Second)
+			task3 := TimedTask(task3Ch, 6*time.Second)
 			Expect(func() {
 				gr.Add(runner.New("task3", task3, func() {
 					task3Ch <- nil
@@ -77,7 +77,7 @@ var _ = Describe("GroupRunner", func() {
 
 			Expect(func() {
 				task3Ch := make(chan error)
-				task3 := TimedTask(task3Ch, 15*time.Second)
+				task3 := TimedTask(task3Ch, 6*time.Second)
 				gr.Add(runner.New("task3", task3, func() {
 					task3Ch <- nil
 					close(task3Ch)
@@ -89,7 +89,7 @@ var _ = Describe("GroupRunner", func() {
 	Describe("Run", func() {
 		It("Context is done", func(ctx SpecContext) {
 			task3Ch := make(chan error)
-			task3 := TimedTask(task3Ch, 15*time.Second)
+			task3 := TimedTask(task3Ch, 6*time.Second)
 			gr.Add(runner.New("task3", task3, func() {
 				task3Ch <- nil
 				close(task3Ch)
@@ -141,6 +141,75 @@ var _ = Describe("GroupRunner", func() {
 			)))
 		}, SpecTimeout(5*time.Second))
 
+		It("Context done and group timeout reached", func(ctx SpecContext) {
+			gr := runner.NewGroup(runner.WithInterruptDuration(2 * time.Second))
+
+			gr.Add(runner.New("task1", func() error {
+				time.Sleep(6 * time.Second)
+				return nil
+			}, func() {
+			}))
+
+			gr.Add(runner.New("task2", func() error {
+				time.Sleep(6 * time.Second)
+				return nil
+			}, func() {
+			}))
+
+			// context will be done in 1 second
+			myCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
+			defer cancel()
+
+			// spawn a new goroutine and return the result in the channel
+			ch2 := make(chan []*runner.Result)
+			go func(ch2 chan []*runner.Result) {
+				ch2 <- gr.Run(myCtx)
+				close(ch2)
+			}(ch2)
+
+			// context finishes in 1 sec, tasks will be interrupted
+			// group timeout will be reached after 2 extra seconds
+			Eventually(ctx, ch2).Should(Receive(ContainElements(
+				&runner.Result{RunnerID: "_unknown_", RunnerError: runner.NewGroupTimeoutError(2 * time.Second)},
+				&runner.Result{RunnerID: "_unknown_", RunnerError: runner.NewGroupTimeoutError(2 * time.Second)},
+			)))
+		}, SpecTimeout(5*time.Second))
+
+		It("Interrupted and group timeout reached", func(ctx SpecContext) {
+			gr := runner.NewGroup(runner.WithInterruptDuration(2 * time.Second))
+
+			gr.Add(runner.New("task1", func() error {
+				time.Sleep(6 * time.Second)
+				return nil
+			}, func() {
+			}))
+
+			gr.Add(runner.New("task2", func() error {
+				time.Sleep(6 * time.Second)
+				return nil
+			}, func() {
+			}))
+
+			// context will be done in 10 second
+			myCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+			defer cancel()
+
+			// spawn a new goroutine and return the result in the channel
+			ch2 := make(chan []*runner.Result)
+			go func(ch2 chan []*runner.Result) {
+				ch2 <- gr.Run(myCtx)
+				close(ch2)
+			}(ch2)
+			gr.Interrupt()
+
+			// tasks will be interrupted
+			// group timeout will be reached after 2 extra seconds
+			Eventually(ctx, ch2).Should(Receive(ContainElements(
+				&runner.Result{RunnerID: "_unknown_", RunnerError: runner.NewGroupTimeoutError(2 * time.Second)},
+				&runner.Result{RunnerID: "_unknown_", RunnerError: runner.NewGroupTimeoutError(2 * time.Second)},
+			)))
+		}, SpecTimeout(5*time.Second))
+
 		It("Doble run panics", func(ctx SpecContext) {
 			// context will be done in 1 second
 			myCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
@@ -181,7 +250,7 @@ var _ = Describe("GroupRunner", func() {
 
 		It("Interrupt async", func(ctx SpecContext) {
 			task3Ch := make(chan error)
-			task3 := TimedTask(task3Ch, 15*time.Second)
+			task3 := TimedTask(task3Ch, 6*time.Second)
 			gr.Add(runner.New("task3", task3, func() {
 				task3Ch <- nil
 				close(task3Ch)
@@ -195,6 +264,30 @@ var _ = Describe("GroupRunner", func() {
 			Eventually(ctx, ch2).Should(Receive())
 			Eventually(ctx, ch2).Should(Receive())
 			Eventually(ctx, ch2).Should(Receive())
+		}, SpecTimeout(5*time.Second))
+
+		It("Interrupt async group timeout reached", func(ctx SpecContext) {
+			gr := runner.NewGroup(runner.WithInterruptDuration(2 * time.Second))
+
+			gr.Add(runner.New("task1", func() error {
+				time.Sleep(6 * time.Second)
+				return nil
+			}, func() {
+			}))
+
+			gr.Add(runner.New("task2", func() error {
+				time.Sleep(6 * time.Second)
+				return nil
+			}, func() {
+			}))
+
+			ch2 := make(chan *runner.Result)
+			gr.RunAsync(ch2)
+			gr.Interrupt()
+
+			// group timeout will be reached after 2 extra seconds
+			Eventually(ctx, ch2).Should(Receive(Equal(&runner.Result{RunnerID: "_unknown_", RunnerError: runner.NewGroupTimeoutError(2 * time.Second)})))
+			Eventually(ctx, ch2).Should(Receive(Equal(&runner.Result{RunnerID: "_unknown_", RunnerError: runner.NewGroupTimeoutError(2 * time.Second)})))
 		}, SpecTimeout(5*time.Second))
 	})
 })
