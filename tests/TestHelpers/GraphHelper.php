@@ -2017,6 +2017,39 @@ class GraphHelper {
 	 * @param string $password
 	 * @param string $itemId
 	 * @param string $shareSpaceId
+	 * @param array $body
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function hideSharedResource(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $itemId,
+		string $shareSpaceId,
+		array $body
+	):ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/items/$itemId");
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			'PATCH',
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($body)
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $itemId
+	 * @param string $shareSpaceId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
