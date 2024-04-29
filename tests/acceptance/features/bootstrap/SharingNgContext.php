@@ -537,9 +537,13 @@ class SharingNgContext implements Context {
 	): ResponseInterface {
 		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
 
-		$permId = ($shareType === 'link')
-			? $this->featureContext->shareNgGetLastCreatedLinkShareID()
-			: $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$permId = match ($shareType) {
+			'link' => $this->featureContext->shareNgGetLastCreatedLinkShareID(),
+			'user' => 'u:' . $this->featureContext->getAttributeOfCreatedUser($recipient, 'id'),
+			'group' => 'g:' . $this->featureContext->getAttributeOfCreatedGroup($recipient, 'id'),
+			default => throw new Exception("shareType '$shareType' does not match user|group|link "),
+		};
+
 		return
 			GraphHelper::removeAccessToSpace(
 				$this->featureContext->getBaseUrl(),
@@ -595,7 +599,7 @@ class SharingNgContext implements Context {
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeAccessToSpaceItem($sharer, $recipientType, $space)
+			$this->removeAccessToSpaceItem($sharer, $recipientType, $space, null, $recipient)
 		);
 	}
 
@@ -622,6 +626,7 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" removes the access of (user|group) "([^"]*)" from space "([^"]*)" using root endpoint of the Graph API$/
+	 * @When /^user "([^"]*)" tries to remove the access of (user|group) "([^"]*)" from space "([^"]*)" using root endpoint of the Graph API$/
 	 *
 	 * @param string $sharer
 	 * @param string $recipientType (user|group)
@@ -639,7 +644,7 @@ class SharingNgContext implements Context {
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeAccessToSpace($sharer, $recipientType, $space)
+			$this->removeAccessToSpace($sharer, $recipientType, $space, $recipient)
 		);
 	}
 
@@ -660,6 +665,28 @@ class SharingNgContext implements Context {
 		$this->featureContext->setResponse(
 			$this->removeAccessToSpace($sharer, 'link', $space)
 		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has removed the access of (user|group) "([^"]*)" from space "([^"]*)"$/
+	 *
+	 * @param string $sharer
+	 * @param string $recipientType (user|group)
+	 * @param string $recipient can be both user or group
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userHasRemovedAccessOfUserOrGroupFromSpace(
+		string $sharer,
+		string $recipientType,
+		string $recipient,
+		string $space
+	): void {
+		$response = $this->removeAccessToSpace($sharer, $recipientType, $space, $recipient);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
 	/**
