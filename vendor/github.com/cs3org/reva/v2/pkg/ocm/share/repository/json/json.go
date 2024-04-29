@@ -396,7 +396,7 @@ func (m *mgr) ListShares(ctx context.Context, user *userpb.User, filters []*ocm.
 	}
 
 	for _, share := range m.model.Shares {
-		if utils.UserEqual(user.Id, share.Owner) || utils.UserEqual(user.Id, share.Creator) {
+		if utils.UserEqual(user.Id, share.Owner) || utils.UserEqual(user.Id, share.Creator) || utils.UserEqual(user.Id, share.GetGrantee().GetUserId()) {
 			// no filter we return earlier
 			if len(filters) == 0 {
 				ss = append(ss, share)

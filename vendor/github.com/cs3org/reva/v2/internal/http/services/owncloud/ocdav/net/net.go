@@ -35,7 +35,6 @@ type ctxKey int
 const (
 	// CtxKeyBaseURI is the key of the base URI context field
 	CtxKeyBaseURI ctxKey = iota
-	CtxOCM10
 
 	// NsDav is the Dav ns
 	NsDav = "DAV:"

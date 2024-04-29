@@ -73,12 +73,12 @@ func (c *config) ApplyDefaults() {
 
 // BearerAuthenticator represents an authenticator that adds a Bearer token to the Authorization header of HTTP requests.
 type BearerAuthenticator struct {
-	token string
+	Token string
 }
 
 // Authorize adds the Bearer token to the Authorization header of the provided HTTP request.
 func (b BearerAuthenticator) Authorize(_ *http.Client, r *http.Request, _ string) error {
-	r.Header.Add("Authorization", "Bearer "+b.token)
+	r.Header.Add("Authorization", "Bearer "+b.Token)
 	return nil
 }
 
@@ -88,8 +88,8 @@ func (BearerAuthenticator) Verify(*http.Client, *http.Response, string) (bool, e
 }
 
 // Clone creates a new instance of the BearerAuthenticator.
-func (BearerAuthenticator) Clone() gowebdav.Authenticator {
-	return BearerAuthenticator{}
+func (b BearerAuthenticator) Clone() gowebdav.Authenticator {
+	return BearerAuthenticator{Token: b.Token}
 }
 
 // Close is not implemented for the BearerAuthenticator. It always returns nil.
@@ -196,7 +196,7 @@ func (d *driver) webdavClient(ctx context.Context, forUser *userpb.UserId, ref *
 
 	// FIXME: it's still not clear from the OCM APIs how to use the shared secret
 	// will use as a token in the bearer authentication as this is the reva implementation
-	c := gowebdav.NewAuthClient(endpoint, gowebdav.NewPreemptiveAuth(BearerAuthenticator{token: secret}))
+	c := gowebdav.NewAuthClient(endpoint, gowebdav.NewPreemptiveAuth(BearerAuthenticator{Token: secret}))
 	if d.c.Insecure {
 		c.SetTransport(&http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -250,17 +250,21 @@ func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *oc
 		t = provider.ResourceType_RESOURCE_TYPE_CONTAINER
 	}
 
-	var name string
-	if share.ResourceType == provider.ResourceType_RESOURCE_TYPE_FILE {
-		name = share.Name
-	} else {
-		name = f.Name()
-	}
-
 	webdavFile, ok := f.(gowebdav.File)
 	if !ok {
 		return nil, errtypes.InternalError("could not get webdav props")
 	}
+
+	var name string
+	switch {
+	case share.ResourceType == provider.ResourceType_RESOURCE_TYPE_FILE:
+		name = share.Name
+	case webdavFile.Path() == "/":
+		name = share.Name
+	default:
+		name = webdavFile.Name()
+	}
+
 	opaqueid := base64.StdEncoding.EncodeToString([]byte(webdavFile.Path()))
 
 	// ids are of the format <ocmstorageproviderid>$<shareid>!<opaqueid>
@@ -461,6 +465,13 @@ func (d *driver) ListStorageSpaces(ctx context.Context, filters []*provider.List
 	if err != nil {
 		return nil, err
 	}
+	// FIXME This might have to be ListOCMShares
+	// these are grants
+
+	lsRes, err := d.gateway.ListOCMShares(ctx, &ocmpb.ListOCMSharesRequest{})
+	if err != nil {
+		return nil, err
+	}
 
 	if len(spaceTypes) == 0 {
 		spaceTypes["mountpoint"] = exists
@@ -473,6 +484,25 @@ func (d *driver) ListStorageSpaces(ctx context.Context, filters []*provider.List
 	for k := range spaceTypes {
 		if k == "mountpoint" {
 			for _, share := range lrsRes.Shares {
+				root := &provider.ResourceId{
+					StorageId: utils.OCMStorageProviderID,
+					SpaceId:   share.Id.OpaqueId,
+					OpaqueId:  share.Id.OpaqueId,
+				}
+				space := &provider.StorageSpace{
+					Id: &provider.StorageSpaceId{
+						OpaqueId: storagespace.FormatResourceID(*root),
+					},
+					SpaceType: "mountpoint",
+					Owner: &userv1beta1.User{
+						Id: share.Grantee.GetUserId(),
+					},
+					Root: root,
+				}
+
+				spaces = append(spaces, space)
+			}
+			for _, share := range lsRes.Shares {
 				root := &provider.ResourceId{
 					StorageId: utils.OCMStorageProviderID,
 					SpaceId:   share.Id.OpaqueId,

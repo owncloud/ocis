@@ -89,7 +89,7 @@ func expandAndVerifyScope(ctx context.Context, req interface{}, tokenScope map[s
 					return nil
 				}
 			}
-			log.Err(err).Msgf("error resolving reference %s under scope %+v", ref.String(), k)
+			log.Err(err).Interface("ref", ref).Interface("scope", k).Msg("error resolving reference under scope")
 		}
 
 	} else if ref, ok := extractShareRef(req); ok {
@@ -179,6 +179,11 @@ func resolveOCMShare(ctx context.Context, ref *provider.Reference, scope *authpb
 		return err
 	}
 
+	// for ListOCMSharesRequest, the ref resource id is empty and we set path to . to indicate the root of the share
+	if ref.GetResourceId() == nil && ref.Path == "." {
+		ref.ResourceId = share.GetResourceId()
+	}
+
 	if err := checkCacheForNestedResource(ctx, ref, share.ResourceId, client, mgr); err == nil {
 		return nil
 	}
@@ -213,7 +218,7 @@ func checkRelativeReference(ctx context.Context, requested *provider.Reference, 
 	if sharedResource.ParentId == nil {
 		// Is the requested resource part of the shared space?
 		if requested.ResourceId.StorageId != sharedResource.Id.StorageId || requested.ResourceId.SpaceId != sharedResource.Id.SpaceId {
-			return errtypes.PermissionDenied("access forbidden via public link")
+			return errtypes.PermissionDenied("space access forbidden via public link")
 		}
 	} else {
 		parentID := sharedResource.ParentId
@@ -261,7 +266,7 @@ func checkIfNestedResource(ctx context.Context, ref *provider.Reference, parent 
 	if err != nil {
 		return false, err
 	}
-	if statResponse.Status.Code != rpc.Code_CODE_OK {
+	if statResponse.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return false, statuspkg.NewErrorFromCode(statResponse.Status.Code, "auth interceptor")
 	}
 
@@ -313,14 +318,22 @@ func checkIfNestedResource(ctx context.Context, ref *provider.Reference, parent 
 	if err != nil {
 		return false, err
 	}
-	if childStat.Status.Code != rpc.Code_CODE_OK {
+	if childStat.GetStatus().GetCode() == rpc.Code_CODE_NOT_FOUND && ref.GetPath() != "" && ref.GetPath() != "." {
+		// The resource does not seem to exist (yet?). We might be part of an initiate upload request.
+		// Stat the parent to get its path and check that against the root path.
+		childStat, err = client.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: ref.GetResourceId()}})
+		if err != nil {
+			return false, err
+		}
+	}
+	if childStat.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return false, statuspkg.NewErrorFromCode(childStat.Status.Code, "auth interceptor")
 	}
 	pathResp, err = client.GetPath(ctx, &provider.GetPathRequest{ResourceId: childStat.GetInfo().GetId()})
 	if err != nil {
 		return false, err
 	}
-	if pathResp.Status.Code != rpc.Code_CODE_OK {
+	if pathResp.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return false, statuspkg.NewErrorFromCode(pathResp.Status.Code, "auth interceptor")
 	}
 	childPath = pathResp.Path
@@ -388,6 +401,11 @@ func extractRefForReaderRole(req interface{}) (*provider.Reference, bool) {
 		return v.GetRef(), true
 	case *provider.UnlockRequest:
 		return v.GetRef(), true
+
+	// OCM shares
+	case *ocmv1beta1.ListReceivedOCMSharesRequest:
+		return &provider.Reference{Path: "."}, true // we will try to stat the shared node
+
 	}
 
 	return nil, false

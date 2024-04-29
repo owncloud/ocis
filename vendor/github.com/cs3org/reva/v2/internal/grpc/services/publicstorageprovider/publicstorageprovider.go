@@ -405,7 +405,7 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 					Status: &rpc.Status{Code: rpc.Code_CODE_INVALID_ARGUMENT, Message: err.Error()},
 				}, nil
 			}
-			if resID.SpaceId != utils.PublicStorageSpaceID {
+			if resID.SpaceId != utils.PublicStorageSpaceID && resID.SpaceId != utils.OCMStorageSpaceID {
 				return &provider.ListStorageSpacesResponse{
 					// a specific id was requested, return not found instead of empty list
 					Status: &rpc.Status{Code: rpc.Code_CODE_NOT_FOUND},
@@ -415,7 +415,7 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 		}
 	}
 
-	info, _, grantee, token, err := s.extractLinkFromScope(ctx)
+	info, share, grantee, token, err := s.extractLinkFromScope(ctx)
 	if err != nil {
 		switch err.(type) {
 		case errtypes.NotFound:
@@ -468,6 +468,9 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 				SpaceId:   utils.PublicStorageSpaceID,
 				OpaqueId:  token, // the link share has no id, only the token
 			}
+			if ocmShare, ok := share.(*ocm.Share); ok {
+				root.OpaqueId = ocmShare.GetId().GetOpaqueId()
+			}
 			if spaceID != nil {
 				switch {
 				case utils.ResourceIDEqual(spaceID, root):
@@ -506,7 +509,7 @@ func (s *service) extractLinkFromScope(ctx context.Context) (*provider.ResourceI
 			share := &ocm.Share{}
 			err := utils.UnmarshalJSONToProtoV1(v.Resource.Value, share)
 			if err != nil {
-				return nil, nil, nil, "", errtypes.InternalError("failed to unmarshal public share")
+				return nil, nil, nil, "", errtypes.InternalError("failed to unmarshal ocm share")
 			}
 
 			// the share is minimally populated, we need more than the token
