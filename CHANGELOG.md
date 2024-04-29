@@ -98,9 +98,9 @@ The following sections list the changes for unreleased.
 * Enhancement - Secure viewer share role: [#8907](https://github.com/owncloud/ocis/pull/8907)
 * Enhancement - Add Link SSEs: [#8908](https://github.com/owncloud/ocis/pull/8908)
 * Enhancement - ShareeIDs in SSEs: [#8915](https://github.com/owncloud/ocis/pull/8915)
-* Enhancement - Bump Reva: [#8917](https://github.com/owncloud/ocis/pull/8917)
 * Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
 * Enhancement - Bump nats-js-kv pkg: [#8953](https://github.com/owncloud/ocis/pull/8953)
+* Enhancement - Bump Reva: [#9002](https://github.com/owncloud/ocis/pull/9002)
 
 ## Details
 
@@ -585,16 +585,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8915
 
-* Enhancement - Bump Reva: [#8917](https://github.com/owncloud/ocis/pull/8917)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/8917
-   https://github.com/owncloud/ocis/pull/8795
-   https://github.com/owncloud/ocis/pull/8701
-   https://github.com/owncloud/ocis/pull/8606
-   https://github.com/owncloud/ocis/pull/8937
-
 * Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
 
    Allows sending a header `Initiator-ID` on http requests. This id will be added
@@ -610,6 +600,17 @@ The following sections list the changes for unreleased.
    Uses official nats-js-kv package now. Moves away from custom fork.
 
    https://github.com/owncloud/ocis/pull/8953
+
+* Enhancement - Bump Reva: [#9002](https://github.com/owncloud/ocis/pull/9002)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/9002
+   https://github.com/owncloud/ocis/pull/8917
+   https://github.com/owncloud/ocis/pull/8795
+   https://github.com/owncloud/ocis/pull/8701
+   https://github.com/owncloud/ocis/pull/8606
+   https://github.com/owncloud/ocis/pull/8937
 
 # Changelog for [5.0.2] (2024-04-17)
 
