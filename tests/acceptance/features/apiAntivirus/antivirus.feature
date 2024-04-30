@@ -28,31 +28,34 @@ Feature: antivirus
 
   Scenario Outline: upload a file with virus
     Given using <dav-path-version> DAV path
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/aFileWithVirus.txt" using the WebDAV API
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" using the WebDAV API
     # antivirus service can scan files during post-processing. on demand scanning is currently not available
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
-      | message                                                                             |
-      | Virus found in aFileWithVirus.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And as "Alice" file "/aFileWithVirus.txt" should not exist
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Alice" file "<new-file-name>" should not exist
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+      | dav-path-version | file-name     | new-file-name  |
+      | old              | eicar.com     | virusFile1.txt |
+      | old              | eicar_com.zip | virusFile2.zip |
+      | new              | eicar.com     | virusFile1.txt |
+      | new              | eicar_com.zip | virusFile2.zip |
+      | spaces           | eicar.com     | virusFile1.txt |
+      | spaces           | eicar_com.zip | virusFile2.zip |
 
 
   Scenario Outline: upload a file with virus and a file without virus
     Given using <dav-path-version> DAV path
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/aFileWithVirus.txt" using the WebDAV API
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" using the WebDAV API
     # antivirus service can scan files during post-processing. on demand scanning is currently not available
     Then the HTTP status code should be "201"
     And user "Alice" uploads file "filesForUpload/textfile.txt" to "/normalfile.txt" using the WebDAV API
     And the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
-      | message                                                                             |
-      | Virus found in aFileWithVirus.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And as "Alice" file "/aFileWithVirus.txt" should not exist
+      | message                                                                          |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Alice" file "<new-file-name>" should not exist
     But as "Alice" file "/normalfile.txt" should exist
     And the content of file "/normalfile.txt" for user "Alice" should be:
       """
@@ -61,10 +64,13 @@ Feature: antivirus
       Cheers.
       """
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+      | dav-path-version | file-name     | new-file-name  |
+      | old              | eicar.com     | virusFile1.txt |
+      | old              | eicar_com.zip | virusFile2.zip |
+      | new              | eicar.com     | virusFile1.txt |
+      | new              | eicar_com.zip | virusFile2.zip |
+      | spaces           | eicar.com     | virusFile1.txt |
+      | spaces           | eicar_com.zip | virusFile2.zip |
 
 
   Scenario Outline: upload a file with virus in chunks
@@ -491,7 +497,12 @@ Feature: antivirus
       | shareType       | user         |
       | permissionsRole | Editor       |
     And user "Alice" has uploaded file with content "this is a test file." to "/test.txt"
-    And user "Alice" has shared file "/test.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | test.txt    |
+      | space           | Personal    |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | File Editor |
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/eicar.com" to "/uploadFolder/test.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And user "Brian" should get a notification for resource "test.txt" with subject "Virus found" and message:
