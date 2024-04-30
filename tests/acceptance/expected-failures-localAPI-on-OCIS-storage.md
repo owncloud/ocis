@@ -41,10 +41,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/assignRole.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/assignRole.feature#L31)
 - [apiGraph/assignRole.feature:32](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/assignRole.feature#L32)
 
-#### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
-
-- [apiGraphUserGroup/deleteGroup.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/deleteGroup.feature#L67)
-
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 
 - [apiGraphUserGroup/getUser.feature:84](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L84)
