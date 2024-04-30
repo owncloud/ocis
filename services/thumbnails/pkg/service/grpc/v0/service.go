@@ -43,6 +43,8 @@ func NewService(opts ...Option) decorators.DecoratedService {
 			resolutions,
 			options.ThumbnailStorage,
 			logger,
+			options.Config.Thumbnail.MaxInputWidth,
+			options.Config.Thumbnail.MaxInputHeight,
 		),
 		webdavSource: options.ImageSource,
 		cs3Source:    options.CS3Source,

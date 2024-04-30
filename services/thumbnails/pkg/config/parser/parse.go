@@ -33,6 +33,6 @@ func ParseConfig(cfg *config.Config) error {
 	return Validate(cfg)
 }
 
-func Validate(cfg *config.Config) error {
+func Validate(_ *config.Config) error {
 	return nil
 }

@@ -19,6 +19,7 @@ import (
 	"golang.org/x/image/math/fixed"
 
 	"github.com/dhowden/tag"
+	thumbnailerErrors "github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 )
 
 // FileConverter is the interface for the file converter
@@ -98,12 +99,12 @@ func (i AudioDecoder) Convert(r io.Reader) (interface{}, error) {
 
 	picture := m.Picture()
 	if picture == nil {
-		return nil, errors.New(`could not extract image from audio file`)
+		return nil, thumbnailerErrors.ErrNoImageFromAudioFile
 	}
 
 	converter := ForType(picture.MIMEType, nil)
 	if converter == nil {
-		return nil, errors.New(`could not find converter for image extraced from audio file`)
+		return nil, thumbnailerErrors.ErrNoConverterForExtractedImageFromAudioFile
 	}
 
 	return converter.Convert(bytes.NewReader(picture.Data))
@@ -259,7 +260,7 @@ func ForType(mimeType string, opts map[string]interface{}) FileConverter {
 
 		fontLoader, err := NewFontLoader(fontFileMap, fontFaceOpts)
 		if err != nil {
-			// if couldn't create the FontLoader with the specified fontFileMap,
+			// if it couldn't create the FontLoader with the specified fontFileMap,
 			// try to use the default font
 			fontLoader, _ = NewFontLoader("", fontFaceOpts)
 		}

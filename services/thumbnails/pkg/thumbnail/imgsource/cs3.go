@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"io"
 	"net/http"
 
@@ -15,13 +16,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
-	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
 )
 
 const (
-	// "github.com/cs3org/reva/v2/internal/http/services/datagateway" is internal so we redeclare it here
 	// TokenTransportHeader holds the header key for the reva transfer token
+	// "github.com/cs3org/reva/v2/internal/http/services/datagateway" is internal so we redeclare it here
 	TokenTransportHeader = "X-Reva-Transfer"
 )
 
@@ -44,7 +44,7 @@ func NewCS3Source(cfg config.Thumbnail, gatewaySelector pool.Selectable[gateway.
 func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	auth, ok := ContextGetAuthorization(ctx)
 	if !ok {
-		return nil, errors.New("cs3source: authorization missing")
+		return nil, errors.ErrCS3AuthorizationMissing
 	}
 	ref, err := storagespace.ParseReference(path)
 	if err != nil {

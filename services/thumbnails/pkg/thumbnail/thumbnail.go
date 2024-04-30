@@ -2,6 +2,7 @@ package thumbnail
 
 import (
 	"bytes"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"image"
 	"image/gif"
 	"mime"
@@ -11,7 +12,7 @@ import (
 )
 
 var (
-	// SupportedMimeTypes contains a all mimetypes which are supported by the thumbnailer.
+	// SupportedMimeTypes contains an all mimetypes which are supported by the thumbnailer.
 	SupportedMimeTypes = map[string]struct{}{
 		"image/png":                       {},
 		"image/jpg":                       {},
@@ -50,28 +51,38 @@ type Manager interface {
 }
 
 // NewSimpleManager creates a new instance of SimpleManager
-func NewSimpleManager(resolutions Resolutions, storage storage.Storage, logger log.Logger) SimpleManager {
+func NewSimpleManager(resolutions Resolutions, storage storage.Storage, logger log.Logger, maxInputWidth, maxInputHeight int) SimpleManager {
 	return SimpleManager{
-		storage:     storage,
-		logger:      logger,
-		resolutions: resolutions,
+		storage:      storage,
+		logger:       logger,
+		resolutions:  resolutions,
+		maxDimension: image.Point{X: maxInputWidth, Y: maxInputHeight},
 	}
 }
 
 // SimpleManager is a simple implementation of Manager
 type SimpleManager struct {
-	storage     storage.Storage
-	logger      log.Logger
-	resolutions Resolutions
+	storage      storage.Storage
+	logger       log.Logger
+	resolutions  Resolutions
+	maxDimension image.Point
 }
 
 func (s SimpleManager) Generate(r Request, img interface{}) (string, error) {
 	var match image.Rectangle
+	var inputDimensions image.Rectangle
 	switch m := img.(type) {
 	case *gif.GIF:
 		match = s.resolutions.ClosestMatch(r.Resolution, m.Image[0].Bounds())
+		inputDimensions = m.Image[0].Bounds()
 	case image.Image:
 		match = s.resolutions.ClosestMatch(r.Resolution, m.Bounds())
+		inputDimensions = m.Bounds()
+	}
+
+	// validate max input image dimensions - 6016x4000
+	if inputDimensions.Size().X > s.maxDimension.X || inputDimensions.Size().Y > s.maxDimension.Y {
+		return "", errors.ErrImageTooLarge
 	}
 
 	thumbnail, err := r.Generator.Generate(match, img, r.Processor)
