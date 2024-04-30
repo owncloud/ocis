@@ -677,21 +677,54 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" moves (?:file|folder|entry) "([^"]*)"\s?(asynchronously|) to "([^"]*)" using the WebDAV API$/
+	 * @When user :user moves file :source to :destination using the WebDAV API
+	 * @When user :user moves folder :source to :destination using the WebDAV API
+	 * @When user :user moves entry :source to :destination using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userMovesFileOrFolderUsingTheWebDavAPI(
+		string $user,
+		string $source,
+		string $destination
+	):void {
+		$user = $this->getActualUsername($user);
+		$headers['Destination'] = $this->destinationHeaderValue(
+			$user,
+			$destination
+		);
+		$response = $this->makeDavRequest(
+			$user,
+			"MOVE",
+			$source,
+			$headers
+		);
+		$this->setResponse($response);
+		$this->pushToLastHttpStatusCodesArray(
+			(string) $this->getResponse()->getStatusCode()
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" moves (?:file|folder|entry) "([^"]*)" asynchronously to "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $fileSource
-	 * @param string $type "asynchronously" or empty
 	 * @param string $fileDestination
 	 *
 	 * @return void
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	public function userMovesFileUsingTheAPI(
+	public function userMovesFileOrFolderAsynchronouslyUsingTheWebDavAPI(
 		string $user,
 		string $fileSource,
-		string $type,
 		string $fileDestination
 	):void {
 		$user = $this->getActualUsername($user);
@@ -700,17 +733,15 @@ trait WebDav {
 			$fileDestination
 		);
 		$stream = false;
-		if ($type === "asynchronously") {
-			$headers['OC-LazyOps'] = 'true';
-			if ($this->httpRequestTimeout > 0) {
-				//LazyOps is set and a request timeout, so we want to use stream
-				//to be able to read data from the request before its times out
-				//when doing LazyOps the server does not close the connection
-				//before its really finished
-				//but we want to read JobStatus-Location before the end of the job
-				//to see if it reports the correct values
-				$stream = true;
-			}
+		$headers['OC-LazyOps'] = 'true';
+		if ($this->httpRequestTimeout > 0) {
+			//LazyOps is set and a request timeout, so we want to use stream
+			//to be able to read data from the request before its times out
+			//when doing LazyOps the server does not close the connection
+			//before its really finished
+			//but we want to read JobStatus-Location before the end of the job
+			//to see if it reports the correct values
+			$stream = true;
 		}
 		try {
 			$this->response = $this->makeDavRequest(
@@ -1706,7 +1737,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then /^as "([^"]*)" (file|folder|entry) "([^"]*)" should not exist$/
+	 * @Then as :user :entry :path should not exist
 	 *
 	 * @param string $user
 	 * @param string $entry
@@ -1787,7 +1818,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then /^as "([^"]*)" (file|folder|entry) "([^"]*)" should exist$/
+	 * @Then as :user :entry :path should exist
 	 *
 	 * @param string $user
 	 * @param string $entry
