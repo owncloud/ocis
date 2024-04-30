@@ -1402,7 +1402,7 @@ Feature: get users
       """
 
   @issue-7990
-  Scenario Outline: non-admin user tries to search for a user by display name with invalid characters/token
+  Scenario Outline: user tries to search other users with invalid characters/token (search term without quotation)
     Given user "<user>" has been created with default attributes and without skeleton files
     When user "Brian" tries to search for user "<user>" using Graph API
     Then the HTTP status code should be "400"
@@ -1435,7 +1435,7 @@ Feature: get users
       | Alice@From@Wonderland | @From@Wonderland |
 
   @issue-7990
-  Scenario: non-admin user searches other users by e-mail
+  Scenario: non-admin user searches other users by e-mail (search term with quotation)
     When user "Brian" searches for user "%22alice@example.org%22" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the search response should not contain user email
@@ -1601,3 +1601,67 @@ Feature: get users
         }
       }
       """
+
+
+  Scenario: user searches for a non-existent user/group
+    When user "Brian" tries to search for user "nonexistent" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 0
+          }
+        }
+      }
+      """
+
+  @issue-7990
+  Scenario Outline: user searches for other users having special characters in displayname (search term with quotation)
+    Given the user "Admin" has created a new user with the following attributes:
+      | userName    | specail-user                 |
+      | displayName | <displayname>                |
+      | email       | specialuser@example.org      |
+    When user "Brian" searches for user '"<search-term>"' using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["displayName", "id", "userType"],
+              "properties": {
+                "displayName": {
+                  "const": "<displayname>"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "userType": {
+                  "const": "Member"
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | displayname      | search-term |
+      | -_.ocusr         | -_.         |
+      | _ocusr@          | _oc         |
+      | Alice-Wonderland | -Wonderland |
+      | Alice@Wonderland | @Wonderland |
