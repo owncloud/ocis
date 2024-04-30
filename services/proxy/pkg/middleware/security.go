@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"github.com/a8m/envsubst"
+	gofig "github.com/gookit/config/v2"
+	"github.com/gookit/config/v2/yaml"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/unrolled/secure"
 	"github.com/unrolled/secure/cspbuilder"
-	"gopkg.in/yaml.v2"
 	"net/http"
 	"os"
 )
@@ -16,15 +16,23 @@ func LoadCSPConfig(proxyCfg *config.Config) (*config.CSP, error) {
 	if err != nil {
 		return nil, err
 	}
-	// replace env vars ..
-	yamlContent, err = envsubst.Bytes(yamlContent)
+	return loadCSPConfig(yamlContent)
+}
+
+// LoadCSPConfig loads CSP header configuration from a yaml file.
+func loadCSPConfig(yamlContent []byte) (*config.CSP, error) {
+	// substitute env vars and load to struct
+	gofig.WithOptions(gofig.ParseEnv)
+	gofig.AddDriver(yaml.Driver)
+
+	err := gofig.LoadSources("yaml", yamlContent)
 	if err != nil {
 		return nil, err
 	}
 
 	// read yaml
 	cspConfig := config.CSP{}
-	err = yaml.Unmarshal(yamlContent, &cspConfig)
+	err = gofig.BindStruct("", &cspConfig)
 	if err != nil {
 		return nil, err
 	}
