@@ -6,7 +6,7 @@ app:
   description: Open office documents with a WOPI app
   icon: image-edit
   lockname: com.github.owncloud.collaboration
-jwt_secret: W6ZGA3a3qEWXT84IHt4eWOWY1CT0xCgh
+jwt_secret: UEddGLXcZBWv1GeLGN4EIc5Isd3YGwPS
 grpc:
   addr: 0.0.0.0:9301
 http:
