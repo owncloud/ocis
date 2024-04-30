@@ -86,16 +86,17 @@ Feature: antivirus
       | spaces           |
 
 
-  Scenario Outline: upload a file with the virus to a public share
+  Scenario Outline: public uploads a file with the virus to a public share
     Given using <dav-path-version> DAV path
+    And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And using SharingNG
     And user "Alice" has created folder "/uploadFolder"
-    And user "Alice" has created a public link share with settings
-      | path        | /uploadFolder            |
-      | name        | sharedlink               |
-      | permissions | change                   |
-      | expireDate  | 2040-01-01T23:59:59+0100 |
-      | password    | %public%                 |
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" using the WebDAV API
+    And user "Alice" has created the following link share:
+      | resource           | uploadFolder             |
+      | space              | Personal                 |
+      | permissionsRole    | edit                     |
+      | expirationDateTime | 2040-01-01T23:59:59.000Z |
+    When the public uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" inside last link shared folder using the new WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
@@ -111,17 +112,17 @@ Feature: antivirus
       | spaces           | eicar_com.zip | virusFile2.zip |
 
 
-  Scenario Outline: upload a file with the virus to a password-protected public share
+  Scenario Outline: public uploads a file with the virus to a password-protected public share
     Given using <dav-path-version> DAV path
+    And using SharingNG
     And user "Alice" has created folder "/uploadFolder"
-    And user "Alice" has created a public link share with settings
-      | path        | /uploadFolder            |
-      | name        | sharedlink               |
-      | permissions | change                   |
-      | password    | newpasswd                |
-      | expireDate  | 2040-01-01T23:59:59+0100 |
-      | password    | %public%                 |
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" using the WebDAV API
+    And user "Alice" has created the following link share:
+      | resource           | uploadFolder             |
+      | space              | Personal                 |
+      | permissionsRole    | edit                     |
+      | password           | %public%                 |
+      | expirationDateTime | 2040-01-01T23:59:59.000Z |
+    When the public uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" inside last link shared folder with password "%public%" using the new WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
@@ -141,7 +142,12 @@ Feature: antivirus
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "uploadFolder"
-    And user "Alice" has shared folder "uploadFolder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     When user "Brian" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/Shares/uploadFolder/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -161,7 +167,12 @@ Feature: antivirus
     Given using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "uploadFolder"
-    And user "Alice" has shared folder "uploadFolder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -181,7 +192,12 @@ Feature: antivirus
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Alice" has created folder "uploadFolder"
-    And user "Alice" has shared folder "uploadFolder" with group "group1"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | group1       |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     When user "Brian" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/Shares/uploadFolder/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -203,7 +219,12 @@ Feature: antivirus
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Alice" has created folder "uploadFolder"
-    And user "Alice" has shared folder "uploadFolder" with group "group1"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | group1       |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -247,9 +268,11 @@ Feature: antivirus
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
+    And user "Alice" has sent the following share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Editor |
     When user "Brian" uploads a file "/filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -351,11 +374,12 @@ Feature: antivirus
   Scenario Outline: try to overwrite a file with the virus content in a public link share
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And using <dav-path-version> DAV path
+    And using SharingNG
     And user "Alice" has uploaded file with content "hello" to "test.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | /test.txt  |
-      | name        | sharedlink |
-      | permissions | change     |
+    And user "Alice" has created the following link share:
+      | resource        | test.txt |
+      | space           | Personal |
+      | permissionsRole | edit     |
     When the public overwrites file "test.txt" with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" using the new WebDAV API
     Then the HTTP status code should be "204"
     And user "Alice" should get a notification with subject "Virus found" and message:
@@ -376,7 +400,12 @@ Feature: antivirus
     And user "Brian" has been added to group "group1"
     And user "Alice" has been added to group "group1"
     And user "Alice" has uploaded file with content "hello" to "/test.txt"
-    And user "Alice" has shared file "test.txt" with group "group1"
+    And user "Alice" has sent the following share invitation:
+      | resource        | test.txt    |
+      | space           | Personal    |
+      | sharee          | group1      |
+      | shareType       | group       |
+      | permissionsRole | File Editor |
     When user "Brian" uploads file with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -397,7 +426,12 @@ Feature: antivirus
     And user "Brian" has been added to group "group1"
     And user "Alice" has been added to group "group1"
     And user "Alice" has uploaded file with content "hello" to "/test.txt"
-    And user "Alice" has shared file "test.txt" with group "group1"
+    And user "Alice" has sent the following share invitation:
+      | resource        | test.txt    |
+      | space           | Personal    |
+      | sharee          | group1      |
+      | shareType       | group       |
+      | permissionsRole | File Editor |
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/eicar.com" to "/test.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -412,9 +446,19 @@ Feature: antivirus
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has uploaded file with content "this is a test file." to "uploadFolder/test.txt"
-    And user "Alice" has shared folder "uploadFolder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And user "Alice" has uploaded file with content "this is a test file." to "/test.txt"
-    And user "Alice" has shared file "/test.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | test.txt    |
+      | space           | Personal    |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | File Editor |
     When user "Brian" uploads file with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to "Shares/uploadFolder/test.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And user "Brian" should get a notification for resource "test.txt" with subject "Virus found" and message:
@@ -440,7 +484,12 @@ Feature: antivirus
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has uploaded file with content "this is a test file." to "uploadFolder/test.txt"
-    And user "Alice" has shared folder "uploadFolder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And user "Alice" has uploaded file with content "this is a test file." to "/test.txt"
     And user "Alice" has shared file "/test.txt" with user "Brian"
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/eicar.com" to "/uploadFolder/test.txt" in space "Shares" using the WebDAV API
@@ -478,9 +527,11 @@ Feature: antivirus
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
+    And user "Alice" has sent the following share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Editor |
     And user "Alice" has created a folder ".space" in space "new-space"
     And user "Alice" has uploaded a file inside space "new-space" with content "Here you can add a description for this Space." to ".space/readme.md"
     And user "Alice" has set the file ".space/readme.md" as a description in a special section of the "new-space" space
@@ -498,9 +549,11 @@ Feature: antivirus
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
+    And user "Alice" has sent the following share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Editor |
     And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "text.txt"
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/eicar.com" to "text.txt" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "204"

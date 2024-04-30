@@ -1507,6 +1507,65 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
+	 * @When the public uploads file :source to :destination inside last link shared folder using the :new WebDAV API
+	 *
+	 * @param string $source
+	 * @param string $destination
+	 * @param string $publicWebDAVAPIVersion
+	 *
+	 * @return void
+	 */
+	public function thePublicUploadsFileToInsideLastLinkSharedFolderUsingTheNewWebdavApi(
+		string $source,
+		string $destination,
+		string $publicWebDAVAPIVersion
+	):void {
+		$content = \file_get_contents(
+			$this->featureContext->acceptanceTestsDirLocation() . $source
+		);
+		$response = $this->publicUploadContent(
+			$destination,
+			'',
+			$content,
+			false,
+			[],
+			$publicWebDAVAPIVersion
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 *
+	 * @When the public uploads file :source to :destination inside last link shared folder with password :password using the :new WebDAV API
+	 *
+	 * @param string $source
+	 * @param string $destination
+	 * @param string $password
+	 * @param string $publicWebDAVAPIVersion
+	 *
+	 * @return void
+	 */
+	public function thePublicUploadsFileToInsideLastLinkSharedFolderWithPasswordUsingTheNewWebdavApi(
+		string $source,
+		string $destination,
+		string $password,
+		string $publicWebDAVAPIVersion
+	):void {
+		$content = \file_get_contents(
+			$this->featureContext->acceptanceTestsDirLocation() . $source
+		);
+		$response = $this->publicUploadContent(
+			$destination,
+			$password,
+			$content,
+			false,
+			[],
+			$publicWebDAVAPIVersion
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When the public uploads file :fileName to the last public link shared folder with password :password with mtime :mtime using the :davVersion public WebDAV API
 	 *
 	 * @param String $fileName
@@ -1704,7 +1763,11 @@ class PublicWebDavContext implements Context {
 			return null;
 		}
 		$password = $this->featureContext->getActualPassword($password);
-		$token = $this->featureContext->getLastCreatedPublicShareToken();
+		if ($this->featureContext->isUsingSharingNG()) {
+			$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
+		} else {
+			$token = $this->featureContext->getLastCreatedPublicShareToken();
+		}
 		$davPath = WebDavHelper::getDavPath(
 			$token,
 			0,

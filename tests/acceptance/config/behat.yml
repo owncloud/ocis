@@ -208,6 +208,7 @@ default:
         - SettingsContext:
         - OcisConfigContext:
         - PublicWebDavContext:
+        - SharingNgContext:
 
     apiDownloads:
       paths:
