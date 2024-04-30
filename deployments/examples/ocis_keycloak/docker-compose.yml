@@ -79,8 +79,11 @@ services:
       GRAPH_USERNAME_MATCH: "none"
       # password policies
       OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
+      PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp.yaml
+      KEYCLOAK_DOMAIN: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
     volumes:
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
+      - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:
