@@ -1482,6 +1482,7 @@ trait WebDav {
 
 	/**
 	 * @When user :user downloads file :fileName using the WebDAV API
+	 * @When user :user tries to download file :fileName using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $fileName
