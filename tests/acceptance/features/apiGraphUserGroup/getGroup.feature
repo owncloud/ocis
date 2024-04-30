@@ -464,7 +464,7 @@ Feature: get groups and their members
     Then the HTTP status code should be "404"
 
 
-  Scenario Outline: non-admin user search for a group by group name
+  Scenario Outline: non-admin user searches for a group by group name
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -546,7 +546,7 @@ Feature: get groups and their members
     """
 
   @issue-7990
-  Scenario Outline: non-admin user tries to search for a group by group name with invalid characters/token
+  Scenario Outline: user tries to search for groups with invalid characters/token (search term without quotation)
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -580,3 +580,48 @@ Feature: get groups and their members
       | group      | token   |
       | tea-lovers | -lovers |
       | tea@lovers | @lovers |
+
+  @issue-7990
+  Scenario Outline: user searches for groups with special characters (search term with quotation)
+    Given these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+    And group "<group>" has been created
+    When user "Brian" tries to search for group '"<group>"' using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["displayName", "id", "groupTypes"],
+              "properties": {
+                "displayName": {
+                  "const": "<group>"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "%group_id_pattern%"
+                },
+                "groupTypes": {
+                  "const": []
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | group      | token   |
+      | tea-lovers | -lovers |
+      | tea@lovers | @lovers |
+      | -_.ocgrp   | -_.     |
+      | _ocgrp@    | _oc     |
