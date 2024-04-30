@@ -627,53 +627,24 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" moves (file|folder|entry) "([^"]*)"\s?(asynchronously|) to these (?:filenames|foldernames|entries) using the webDAV API then the results should be as listed$/
-	 *
 	 * @param string $user
-	 * @param string $entry
-	 * @param string $fileSource
-	 * @param string $type "asynchronously" or empty
-	 * @param TableNode $table
+	 * @param string $source
+	 * @param string $destination
 	 *
-	 * @return void
-	 * @throws Exception
+	 * @return ResponseInterface
 	 */
-	public function userMovesEntriesUsingTheAPI(
-		string $user,
-		string $entry,
-		string $fileSource,
-		string $type,
-		TableNode $table
-	):void {
+	public function moveResource(string $user, string $source, string $destination) {
 		$user = $this->getActualUsername($user);
-		foreach ($table->getHash() as $row) {
-			// Allow the "filename" column to optionally be called "foldername"
-			// to help the readability of scenarios that test moving folders
-			$targetName = $row['foldername'] ?? $row['filename'];
-			$this->userMovesFileUsingTheAPI(
-				$user,
-				$fileSource,
-				$type,
-				$targetName
-			);
-			$this->theHTTPStatusCodeShouldBe(
-				$row['http-code'],
-				"HTTP status code is not the expected value while trying to move " . $targetName
-			);
-			if ($row['exists'] === "yes") {
-				$this->asFileOrFolderShouldExist($user, $entry, $targetName);
-				// The move was successful.
-				// Move the file/folder back so the source file/folder exists for the next move
-				$this->userMovesFileUsingTheAPI(
-					$user,
-					$targetName,
-					'',
-					$fileSource
-				);
-			} else {
-				$this->asFileOrFolderShouldNotExist($user, $entry, $targetName);
-			}
-		}
+		$headers['Destination'] = $this->destinationHeaderValue(
+			$user,
+			$destination
+		);
+		return $this->makeDavRequest(
+			$user,
+			"MOVE",
+			$source,
+			$headers
+		);
 	}
 
 	/**
@@ -694,21 +665,9 @@ trait WebDav {
 		string $source,
 		string $destination
 	):void {
-		$user = $this->getActualUsername($user);
-		$headers['Destination'] = $this->destinationHeaderValue(
-			$user,
-			$destination
-		);
-		$response = $this->makeDavRequest(
-			$user,
-			"MOVE",
-			$source,
-			$headers
-		);
+		$response = $this->moveResource($user, $source, $detination);
 		$this->setResponse($response);
-		$this->pushToLastHttpStatusCodesArray(
-			(string) $this->getResponse()->getStatusCode()
-		);
+		$this->pushToLastHttpStatusCodesArray();
 	}
 
 	/**
@@ -777,7 +736,11 @@ trait WebDav {
 		$this->verifyTableNodeColumns($table, ["source",  "destination"]);
 		$rows = $table->getHash();
 		foreach ($rows as $row) {
-			$this->userMovesFileUsingTheAPI($user, $row["source"], "", $row["destination"]);
+			$response = $this->moveResource($user, $row["source"], $row["destination"]);
+			$this->setResponse($response);
+			$this->pushToLastHttpStatusCodesArray(
+				(string) $response->getStatusCode()
+			);
 		}
 	}
 
@@ -800,8 +763,10 @@ trait WebDav {
 		$paths = $table->getHash();
 
 		foreach ($paths as $file) {
-			$this->userMovesFileUsingTheAPI($user, $file['from'], $type, $file['to']);
-			$this->pushToLastStatusCodesArrays();
+			$response = $this->moveResource($user, $file['from'], $file['to']);
+			$this->pushToLastHttpStatusCodesArray(
+				(string) $response->getStatusCode()
+			);
 		}
 	}
 
@@ -819,7 +784,8 @@ trait WebDav {
 	public function theUserShouldBeAbleToRenameEntryTo(string $user, string $entry, string $source, string $destination):void {
 		$user = $this->getActualUsername($user);
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
-		$this->userMovesFileUsingTheAPI($user, $source, "", $destination);
+		$response = $this->moveResource($user, $source, $destination);
+		$this->theHTTPStatusCodeShouldBeBetween(201, 204, $response);
 		$this->asFileOrFolderShouldNotExist($user, $entry, $source);
 		$this->asFileOrFolderShouldExist($user, $entry, $destination);
 	}
@@ -837,30 +803,10 @@ trait WebDav {
 	 */
 	public function theUserShouldNotBeAbleToRenameEntryTo(string $user, string $entry, string $source, string $destination):void {
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
-		$this->userMovesFileUsingTheAPI($user, $source, "", $destination);
+		$response = $this->moveResource($user, $source, $destination);
+		$this->theHTTPStatusCodeShouldBeBetween(201, 204, $response);
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
 		$this->asFileOrFolderShouldNotExist($user, $entry, $destination);
-	}
-
-	/**
-	 * @When /^user "([^"]*)" on "(LOCAL|REMOTE)" moves (?:file|folder|entry) "([^"]*)" to "([^"]*)" using the WebDAV API$/
-	 *
-	 * @param string $user
-	 * @param string $server
-	 * @param string $fileSource
-	 * @param string $fileDestination
-	 *
-	 * @return void
-	 */
-	public function userOnMovesFileUsingTheAPI(
-		string $user,
-		string $server,
-		string $fileSource,
-		string $fileDestination
-	):void {
-		$previousServer = $this->usingServer($server);
-		$this->userMovesFileUsingTheAPI($user, $fileSource, "", $fileDestination);
-		$this->usingServer($previousServer);
 	}
 
 	/**
