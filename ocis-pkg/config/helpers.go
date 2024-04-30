@@ -17,15 +17,14 @@ var (
 	decoderConfigTagName = "yaml"
 )
 
-// BindSourcesToStructs assigns any config value from a config file / env variable to struct `dst`. Its only purpose
-// is to solely modify `dst`, not dealing with the config structs; and do so in a thread safe manner.
-func BindSourcesToStructs(service string, dst interface{}) (*gofig.Config, error) {
+// BindSourcesToStructs assigns any config value from a config file / env variable to struct `dst`.
+func BindSourcesToStructs(service string, dst interface{}) error {
 	fileSystem := os.DirFS("/")
 	filePath := strings.TrimLeft(path.Join(defaults.BaseConfigPath(), service+".yaml"), "/")
 	return bindSourcesToStructs(fileSystem, filePath, service, dst)
 }
 
-func bindSourcesToStructs(fileSystem fs.FS, filePath, service string, dst interface{}) (*gofig.Config, error) {
+func bindSourcesToStructs(fileSystem fs.FS, filePath, service string, dst interface{}) error {
 	cnf := gofig.NewWithOptions(service)
 	cnf.WithOptions(func(options *gofig.Options) {
 		options.ParseEnv = true
@@ -36,17 +35,17 @@ func bindSourcesToStructs(fileSystem fs.FS, filePath, service string, dst interf
 	yamlContent, err := fs.ReadFile(fileSystem, filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return cnf, nil
+			return nil
 		}
 
-		return nil, err
+		return err
 	}
 	_ = cnf.LoadSources("yaml", yamlContent)
 
 	err = cnf.BindStruct("", &dst)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return cnf, nil
+	return nil
 }

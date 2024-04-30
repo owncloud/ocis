@@ -13,7 +13,7 @@ import (
 // copies applicable parts into the commons part, from
 // where the services can copy it into their own config
 func ParseConfig(cfg *config.Config, skipValidate bool) error {
-	_, err := config.BindSourcesToStructs("ocis", cfg)
+	err := config.BindSourcesToStructs("ocis", cfg)
 	if err != nil {
 		return err
 	}
