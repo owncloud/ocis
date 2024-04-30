@@ -138,6 +138,7 @@ default:
         - SpacesTUSContext:
         - OcisConfigContext:
         - TrashbinContext:
+        - SharingNgContext:
 
     apiCors:
       paths:
