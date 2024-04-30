@@ -297,12 +297,34 @@ func (s *OcisSession) MTime() time.Time {
 
 // IsProcessing returns true if all bytes have been received. The session then has entered postprocessing state.
 func (s *OcisSession) IsProcessing() bool {
-	return s.info.Size == s.info.Offset
+	// We might need a more sophisticated way to determine processing status soon
+	return s.info.Size == s.info.Offset && s.info.MetaData["scanResult"] == ""
 }
 
 // binPath returns the path to the file storing the binary data.
 func (s *OcisSession) binPath() string {
 	return filepath.Join(s.store.root, "uploads", s.info.ID)
+}
+
+// InitiatorID returns the id of the initiating client
+func (s *OcisSession) InitiatorID() string {
+	return s.info.MetaData["initiatorid"]
+}
+
+// SetScanData sets virus scan data to the upload session
+func (s *OcisSession) SetScanData(result string, date time.Time) {
+	s.info.MetaData["scanResult"] = result
+	s.info.MetaData["scanDate"] = date.Format(time.RFC3339)
+}
+
+// ScanData returns the virus scan data
+func (s *OcisSession) ScanData() (string, time.Time) {
+	date := s.info.MetaData["scanDate"]
+	if date == "" {
+		return "", time.Time{}
+	}
+	d, _ := time.Parse(time.RFC3339, date)
+	return s.info.MetaData["scanResult"], d
 }
 
 // sessionPath returns the path to the .info file storing the file's info.

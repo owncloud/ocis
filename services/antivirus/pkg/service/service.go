@@ -146,7 +146,7 @@ func (av Antivirus) processEvent(e events.Event, s events.Publisher) error {
 	}
 
 	if av.c.DebugScanOutcome != "" {
-		av.l.Warn().Str("antivir, clamav", ">>>>>>> ANTIVIRUS_DEBUG_SCAN_OUTCOME IS SET NO ACTUAL VIRUS SCAN IS PERFORMED!")
+		av.l.Warn().Str("antivir, clamav", ">>>>>>> ANTIVIRUS_DEBUG_SCAN_OUTCOME IS SET NO ACTUAL VIRUS SCAN IS PERFORMED!").Send()
 		if err := events.Publish(ctx, s, events.PostprocessingStepFinished{
 			FinishedStep:  events.PPStepAntivirus,
 			Outcome:       events.PostprocessingOutcome(av.c.DebugScanOutcome),
@@ -158,7 +158,6 @@ func (av Antivirus) processEvent(e events.Event, s events.Publisher) error {
 				Description: "DEBUG: forced outcome",
 				Scandate:    time.Now(),
 				ResourceID:  ev.ResourceID,
-				ErrorMsg:    "DEBUG: forced outcome",
 			},
 		}); err != nil {
 			av.l.Fatal().Err(err).Str("uploadid", ev.UploadID).Interface("resourceID", ev.ResourceID).Msg("cannot publish events - exiting")

@@ -148,8 +148,14 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 		next = pp.Delay()
 	case events.UploadReady:
 		if ev.Failed {
-			// the upload failed - let's keep it around for a while
-			return nil
+			// the upload failed - let's keep it around for a while - but mark it as finished
+			pp, err = pps.getPP(pps.store, ev.UploadID)
+			if err != nil {
+				pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
+				return fmt.Errorf("%w: cannot get upload", ErrEvent)
+			}
+			pp.Finished = true
+			return storePP(pps.store, pp)
 		}
 
 		// the storage provider thinks the upload is done - so no need to keep it any more
@@ -254,6 +260,11 @@ func (pps *PostprocessingService) resumePP(ctx context.Context, uploadID string)
 			return nil
 		}
 		return fmt.Errorf("cannot get upload: %w", err)
+	}
+
+	if pp.Finished {
+		// dont retry finished uploads
+		return nil
 	}
 
 	return events.Publish(ctx, pps.pub, pp.CurrentStep())

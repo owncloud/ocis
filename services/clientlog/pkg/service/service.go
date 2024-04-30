@@ -97,6 +97,11 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	default:
 		err = errors.New("unhandled event")
 	case events.UploadReady:
+		if e.Failed {
+			// we don't inform about failed uploads yet
+			return
+		}
+
 		info, err := utils.GetResource(ctx, e.FileRef, gwc)
 		if err != nil {
 			cl.log.Error().Err(err).Interface("event", event).Msg("error getting resource")

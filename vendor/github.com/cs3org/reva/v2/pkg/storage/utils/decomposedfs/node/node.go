@@ -54,8 +54,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-//go:generate make --no-print-directory -C ../../../../.. mockery NAME=Tree
-
 var tracer trace.Tracer
 
 func init() {
@@ -1276,6 +1274,12 @@ func (n *Node) UnmarkProcessing(ctx context.Context, uploadID string) error {
 func (n *Node) IsProcessing(ctx context.Context) bool {
 	v, err := n.XattrString(ctx, prefixes.StatusPrefix)
 	return err == nil && strings.HasPrefix(v, ProcessingStatus)
+}
+
+// ProcessingID returns the latest upload session id
+func (n *Node) ProcessingID(ctx context.Context) (string, error) {
+	v, err := n.XattrString(ctx, prefixes.StatusPrefix)
+	return strings.TrimPrefix(v, ProcessingStatus), err
 }
 
 // IsSpaceRoot checks if the node is a space root

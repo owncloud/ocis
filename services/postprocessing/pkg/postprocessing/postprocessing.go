@@ -21,6 +21,7 @@ type Postprocessing struct {
 	Steps      []events.Postprocessingstep
 	Status     Status
 	Failures   int
+	Finished   bool
 
 	config config.Postprocessing
 }

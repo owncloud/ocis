@@ -205,7 +205,15 @@ func (store OcisStore) CreateNodeForUpload(session *OcisSession, initAttrs node.
 	}
 
 	var f *lockedfile.File
-	if session.NodeExists() {
+	if session.NodeExists() { // TODO this is wrong. The node should be created when the upload starts, the revisions should be created independently of the node
+		// we do not need to propagate a change when a node is created, only when the upload is ready.
+		// that still creates problems for desktop clients because if another change causes propagation it will detects an empty file
+		// so the first upload has to point to the first revision with the expected size. The file cannot be downloaded, but it can be overwritten (which will create a new revision and make the node reflect the latest revision)
+		// any finished postprocessing will not affect the node metadata.
+		// *thinking* but then initializing an upload will lock the file until the upload has finished. That sucks.
+		// so we have to check if the node has been created meanwhile (well, only in case the upload does not know the nodeid ... or the NodeExists array that is checked by session.NodeExists())
+		// FIXME look at the disk again to see if the file has been created in between, or just try initializing a new node and do the update existing node as a fallback. <- the latter!
+
 		f, err = store.updateExistingNode(ctx, session, n, session.SpaceID(), uint64(session.Size()))
 		if f != nil {
 			appctx.GetLogger(ctx).Info().Str("lockfile", f.Name()).Interface("err", err).Msg("got lock file from updateExistingNode")
