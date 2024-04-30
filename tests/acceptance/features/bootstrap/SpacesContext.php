@@ -2456,7 +2456,13 @@ class SpacesContext implements Context {
 			$response
 		);
 		$expectedOCSStatus = "200";
-		$this->ocsContext->theOCSStatusCodeShouldBe($expectedOCSStatus, "Expected OCS response status code $expectedOCSStatus", $response);
+		Assert::assertEquals(
+			$expectedOCSStatus,
+			$this->ocsContext->getOCSResponseStatusCode(
+				$response
+			),
+			"Expected OCS response status code $expectedOCSStatus"
+		);
 	}
 
 	/**
@@ -3431,7 +3437,7 @@ class SpacesContext implements Context {
 
 		$url = "/apps/files_sharing/api/v1/shares?reshares=true&space_ref=" . $body;
 
-		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			'GET',
 			$url,
@@ -4011,6 +4017,14 @@ class SpacesContext implements Context {
 			$resource_id
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
+		$responseStatusCode = $this->ocsContext->getOCSResponseStatusCode(
+			$response
+		);
+		$statusCodes = ["100", "200"];
+		Assert::assertContainsEquals(
+			$responseStatusCode,
+			$statusCodes,
+			"OCS status code is not any of the expected values " . \implode(",", $statusCodes) . " got " . $responseStatusCode
+		);
 	}
 }

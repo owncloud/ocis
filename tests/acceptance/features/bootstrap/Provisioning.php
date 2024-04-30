@@ -748,7 +748,7 @@ trait Provisioning {
 		);
 		$this->emptyLastHTTPStatusCodesArray();
 		$this->emptyLastOCSStatusCodesArray();
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$this->ocsContext->sendRequestToOcsEndpoint(
 			$this->getAdminUsername(),
 			"POST",
 			"/cloud/users",
@@ -817,7 +817,7 @@ trait Provisioning {
 	public function userTriesToResetUserPasswordUsingTheProvisioningApi(?string $user, ?string $username, ?string $password):void {
 		$password = $this->getActualPassword($password);
 		$bodyTable = new TableNode([['key', 'password'], ['value', $password]]);
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			"PUT",
 			"/cloud/users/$username",
