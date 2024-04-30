@@ -86,7 +86,16 @@ class OcisConfigContext implements Context {
 	 */
 	public function theConfigHasBeenSetPathTo(string $configVariable, string $path): void {
 		$path = \dirname(__FILE__) . "/../../../" . $path;
-		$this->theConfigHasBeenSetTo($configVariable, $path);
+		$response =  OcisConfigHelper::reConfigureOcis(
+			[
+				$configVariable => $path
+			]
+		);
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			"Failed to set config $configVariable=$path"
+		);
 	}
 
 	/**
