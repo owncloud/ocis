@@ -671,59 +671,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" moves (?:file|folder|entry) "([^"]*)" asynchronously to "([^"]*)" using the WebDAV API$/
-	 *
-	 * @param string $user
-	 * @param string $fileSource
-	 * @param string $fileDestination
-	 *
-	 * @return void
-	 * @throws JsonException
-	 * @throws GuzzleException
-	 */
-	public function userMovesFileOrFolderAsynchronouslyUsingTheWebDavAPI(
-		string $user,
-		string $fileSource,
-		string $fileDestination
-	):void {
-		$user = $this->getActualUsername($user);
-		$headers['Destination'] = $this->destinationHeaderValue(
-			$user,
-			$fileDestination
-		);
-		$stream = false;
-		$headers['OC-LazyOps'] = 'true';
-		if ($this->httpRequestTimeout > 0) {
-			//LazyOps is set and a request timeout, so we want to use stream
-			//to be able to read data from the request before its times out
-			//when doing LazyOps the server does not close the connection
-			//before its really finished
-			//but we want to read JobStatus-Location before the end of the job
-			//to see if it reports the correct values
-			$stream = true;
-		}
-		try {
-			$this->response = $this->makeDavRequest(
-				$user,
-				"MOVE",
-				$fileSource,
-				$headers,
-				null,
-				"files",
-				null,
-				$stream
-			);
-			$this->setResponseXml(
-				HttpRequestHelper::parseResponseAsXml($this->response)
-			);
-			$this->pushToLastHttpStatusCodesArray(
-				(string) $this->getResponse()->getStatusCode()
-			);
-		} catch (ConnectException $e) {
-		}
-	}
-
-	/**
 	 * @When user :user moves the following file using the WebDAV API
 	 *
 	 * @param string $user
