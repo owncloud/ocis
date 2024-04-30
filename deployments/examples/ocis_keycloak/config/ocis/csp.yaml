@@ -3,7 +3,8 @@ directives:
     - '''self'''
   connect-src:
     - '''self'''
-    - 'https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/'
+    # In contrary to bash and docker the default is given after the | character
+    - 'https://${KEYCLOAK_DOMAIN|keycloak.owncloud.test}/'
   default-src:
     - '''none'''
   font-src:

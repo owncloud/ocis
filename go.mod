@@ -9,7 +9,6 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.9.0
 	github.com/Nerzal/gocloak/v13 v13.9.0
-	github.com/a8m/envsubst v1.4.2
 	github.com/bbalet/stopwords v1.0.0
 	github.com/beevik/etree v1.3.0
 	github.com/blevesearch/bleve/v2 v2.4.0

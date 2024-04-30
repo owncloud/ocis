@@ -44,7 +44,7 @@ Let's explore with examples this approach.
 - docker images: `/etc/ocis/`
 - binary releases: `$HOME/.ocis/config/`
 
-followed by the `<extension name>.yaml`, eg `proxy.yaml` for the extension configuration. You also can put an `ocis.yaml` config file to the expected loading location to use a single config file.
+followed by the `<extension name>.yaml`, e.g. `proxy.yaml` for the extension configuration. You also can put an `ocis.yaml` config file to the expected loading location to use a single config file.
 
 You can set another directory as config path in the environment variable `OCIS_CONFIG_DIR`. It will then pick the same file names, but from the folder you configured.
 
@@ -93,6 +93,21 @@ The logging configuration if defined in the main ocis.yaml is inherited by all e
 proxy:
   http:
     addr: localhost:5555
+log:
+  pretty: true
+  color: true
+  level: info
+```
+
+#### Substitute ENV variables in configuration files
+
+Environment variables can be used in the configurations files and will be replaced by oCIS when loading these.
+Default values can be specified after a `|` character - see below.
+
+```yaml
+proxy:
+  http:
+    addr: ${PROXY_HTTP_ADDR|localhost:4321}
 log:
   pretty: true
   color: true
