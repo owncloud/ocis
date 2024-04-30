@@ -4842,7 +4842,7 @@ Feature: an user gets the resources shared to them
       """
 
 
-  Scenario Outline: user hide the shared resource from a personal space
+  Scenario Outline: sharee hides the shared resource (Personal space)
     Given user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
     And user "Alice" has sent the following share invitation:
@@ -4851,7 +4851,7 @@ Feature: an user gets the resources shared to them
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    When user "Brian" hides the resource "<resource>" shared with me using the Graph API
+    When user "Brian" hides the shared resource "<resource>" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
@@ -4860,8 +4860,7 @@ Feature: an user gets the resources shared to them
       "required": ["hidden", "mount_point"],
       "properties": {
         "hidden": {
-          "type": "boolean",
-          "enum": [true]
+          "const": true
         },
         "mount_point": {
           "type": "object",
@@ -4882,7 +4881,7 @@ Feature: an user gets the resources shared to them
       | folder       |
 
 
-  Scenario Outline: user hide the shared resource from a project space
+  Scenario Outline: sharee hides the shared resource (Project space)
     Given using spaces DAV path
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
@@ -4894,7 +4893,7 @@ Feature: an user gets the resources shared to them
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    When user "Brian" hides the resource "<resource>" shared with me using the Graph API
+    When user "Brian" hides the shared resource "<resource>" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
     """
@@ -4903,8 +4902,7 @@ Feature: an user gets the resources shared to them
       "required": ["hidden", "mount_point"],
       "properties": {
         "hidden": {
-          "type": "boolean",
-          "enum": [true]
+          "const": true
         },
         "mount_point": {
           "type": "object",
@@ -4925,7 +4923,7 @@ Feature: an user gets the resources shared to them
       | FolderToShare |
 
 
-  Scenario Outline: user hide and list the shared resource from a personal space
+  Scenario Outline: sharee lists the shares after hiding (Personal space)
     Given user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
     And user "Alice" has sent the following share invitation:
@@ -4934,7 +4932,7 @@ Feature: an user gets the resources shared to them
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    And user "Brian" hidden the resource "<resource>" shared with him
+    And user "Brian" has hidden the share "<resource>"
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -4968,7 +4966,7 @@ Feature: an user gets the resources shared to them
       | folder       |
 
 
-  Scenario Outline: user hide and list the shared resource from a personal
+  Scenario Outline: sharee lists the shares after hiding (Project space)
     Given using spaces DAV path
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
@@ -4980,7 +4978,7 @@ Feature: an user gets the resources shared to them
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    And user "Brian" hidden the resource "<resource>" shared with him
+    And user "Brian" has hidden the share "<resource>"
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match

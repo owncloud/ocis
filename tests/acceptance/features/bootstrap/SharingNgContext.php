@@ -704,15 +704,12 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function hideSharedResource(
-		string $sharee
-	): ResponseInterface {
+	public function hideSharedResource(string $sharee): ResponseInterface {
 		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
 		$itemId = $shareSpaceId . '!' . $shareItemId;
-		$body = [];
 		$body['@UI.Hidden'] = true;
-		return GraphHelper::hideSharedResource(
+		return GraphHelper::hideShare(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($sharee),
@@ -778,7 +775,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When user :user hides the resource :sharedResource shared with me using the Graph API
+	 * @When user :user hides the shared resource :sharedResource using the Graph API
 	 *
 	 * @param string $user
 	 *
@@ -786,13 +783,13 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userHidesSharedResourceSharedWithMeUsingTheGraphApi(string $user):void {
+	public function userHidesTheSharedResourceUsingTheGraphApi(string $user):void {
 		$response = $this->hideSharedResource($user);
 		$this->featureContext->setResponse($response);
 	}
 
 	/**
-	 * @Given  user :user hidden the resource :sharedResource shared with him/her
+	 * @Given  user :user has hidden the share :sharedResource
 	 *
 	 * @param string $user
 	 *
@@ -800,7 +797,7 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userHiddenSharedResourceSharedWithHimHerUsingTheGraphApi(string $user):void {
+	public function userHasHiddenTheShare(string $user):void {
 		$response = $this->hideSharedResource($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}

@@ -2022,7 +2022,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function hideSharedResource(
+	public static function hideShare(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
