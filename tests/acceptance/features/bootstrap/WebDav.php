@@ -665,7 +665,7 @@ trait WebDav {
 		string $source,
 		string $destination
 	):void {
-		$response = $this->moveResource($user, $source, $detination);
+		$response = $this->moveResource($user, $source, $destination);
 		$this->setResponse($response);
 		$this->pushToLastHttpStatusCodesArray();
 	}
