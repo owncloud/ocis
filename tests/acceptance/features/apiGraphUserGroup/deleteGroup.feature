@@ -68,8 +68,18 @@ Feature: delete groups
     Given group "grp1" has been created
     And group "grp2" has been created
     And user "Alice" has uploaded file with content "sample text" to "lorem.txt"
-    And user "Alice" has shared file "lorem.txt" with group "grp1"
-    And user "Alice" has shared file "lorem.txt" with group "grp2"
+    And user "Alice" has sent the following share invitation:
+      | resource        | lorem.txt |
+      | space           | Personal  |
+      | sharee          | grp1      |
+      | shareType       | group     |
+      | permissionsRole | Viewer    |
+    And user "Alice" has sent the following share invitation:
+      | resource        | lorem.txt |
+      | space           | Personal  |
+      | sharee          | grp2      |
+      | shareType       | group     |
+      | permissionsRole | Viewer    |
     And group "grp1" has been deleted
     When user "Alice" gets all the shares of the file "lorem.txt" using the sharing API
     Then the HTTP status code should be "200"
@@ -82,7 +92,12 @@ Feature: delete groups
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has shared file "lorem.txt" with group "grp1"
+    And user "Alice" has sent the following share invitation:
+      | resource        | lorem.txt |
+      | space           | Personal  |
+      | sharee          | grp1      |
+      | shareType       | group     |
+      | permissionsRole | Viewer    |
     When user "Alice" deletes group "grp1" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should not have any received shares

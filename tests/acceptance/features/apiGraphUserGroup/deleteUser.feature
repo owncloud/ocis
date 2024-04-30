@@ -156,11 +156,13 @@ Feature: delete user
   Scenario: accepted share is deleted automatically when the user is deleted
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
-    And user "Brian" has created a folder "new" in space "Brian Murphy"
-    And user "Brian" has created a share inside of space "Brian Murphy" with settings:
-      | path      | new    |
-      | shareWith | Alice  |
-      | role      | viewer |
+    And user "Brian" has created folder "new"
+    And user "Brian" has sent the following share invitation:
+      | resource        | new      |
+      | space           | Personal |
+      | sharee          | Alice    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     And as "Alice" folder "Shares/new" should not exist
