@@ -231,6 +231,7 @@ default:
         - OcisConfigContext:
         - PublicWebDavContext:
         - ArchiverContext:
+        - SharingNgContext:
 
     apiSearch1:
       paths:
