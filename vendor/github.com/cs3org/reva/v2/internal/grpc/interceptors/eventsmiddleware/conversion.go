@@ -179,14 +179,11 @@ func LinkAccessFailed(r *link.GetPublicShareByTokenResponse, req *link.GetPublic
 
 // LinkRemoved converts the response to an event
 func LinkRemoved(r *link.RemovePublicShareResponse, req *link.RemovePublicShareRequest, executant *user.UserId) events.LinkRemoved {
-	var rid *provider.ResourceId
-	_ = utils.ReadJSONFromOpaque(r.Opaque, "resourceid", &rid)
 	return events.LinkRemoved{
 		Executant:  executant,
 		ShareID:    req.Ref.GetId(),
 		ShareToken: req.Ref.GetToken(),
 		Timestamp:  utils.TSNow(),
-		ItemID:     rid,
 	}
 }
 
@@ -352,18 +349,6 @@ func SpaceShared(r *provider.AddGrantResponse, req *provider.AddGrantRequest, ex
 	return events.SpaceShared{
 		Executant:      executant,
 		Creator:        req.Grant.Creator,
-		GranteeUserID:  req.Grant.GetGrantee().GetUserId(),
-		GranteeGroupID: req.Grant.GetGrantee().GetGroupId(),
-		ID:             &provider.StorageSpaceId{OpaqueId: id},
-		Timestamp:      time.Now(),
-	}
-}
-
-// SpaceShareUpdated converts the response to an events
-func SpaceShareUpdated(r *provider.UpdateGrantResponse, req *provider.UpdateGrantRequest, executant *user.UserId) events.SpaceShareUpdated {
-	id := storagespace.FormatStorageID(req.Ref.ResourceId.StorageId, req.Ref.ResourceId.SpaceId)
-	return events.SpaceShareUpdated{
-		Executant:      executant,
 		GranteeUserID:  req.Grant.GetGrantee().GetUserId(),
 		GranteeGroupID: req.Grant.GetGrantee().GetGroupId(),
 		ID:             &provider.StorageSpaceId{OpaqueId: id},

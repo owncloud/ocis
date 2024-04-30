@@ -123,11 +123,6 @@ func NewUnary(m map[string]interface{}) (grpc.UnaryServerInterceptor, int, error
 			if isSuccess(v) && utils.ExistsInOpaque(r.Opaque, "spacegrant") {
 				ev = SpaceShared(v, r, executantID)
 			}
-		case *provider.UpdateGrantResponse:
-			r := req.(*provider.UpdateGrantRequest)
-			if isSuccess(v) && utils.ExistsInOpaque(r.Opaque, "spacegrant") {
-				ev = SpaceShareUpdated(v, r, executantID)
-			}
 		case *provider.RemoveGrantResponse:
 			r := req.(*provider.RemoveGrantRequest)
 			if isSuccess(v) && utils.ExistsInOpaque(r.Opaque, "spacegrant") {
@@ -190,6 +185,7 @@ func NewUnary(m map[string]interface{}) (grpc.UnaryServerInterceptor, int, error
 				ev = FileTouched(v, req.(*provider.TouchFileRequest), ownerID, executantID)
 			}
 		case *provider.SetLockResponse:
+			fmt.Println("set lock response", v)
 			if isSuccess(v) {
 				ev = FileLocked(v, req.(*provider.SetLockRequest), ownerID, executantID)
 			}

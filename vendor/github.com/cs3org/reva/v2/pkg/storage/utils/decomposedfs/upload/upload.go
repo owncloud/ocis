@@ -129,8 +129,6 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 	defer span.End()
 	log := appctx.GetLogger(ctx)
 
-	ctx = ctxpkg.ContextSetInitiator(ctx, session.InitiatorID())
-
 	// calculate the checksum of the written bytes
 	// they will all be written to the metadata later, so we cannot omit any of them
 	// TODO only calculate the checksum in sync that was requested to match, the rest could be async ... but the tests currently expect all to be present
@@ -318,7 +316,7 @@ func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool
 	if revertNodeMetadata {
 		n, err := session.Node(ctx)
 		if err != nil {
-			appctx.GetLogger(ctx).Error().Err(err).Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Str("uploadid", session.ID()).Msg("reading node for session failed")
+			appctx.GetLogger(ctx).Error().Err(err).Str("node", n.ID).Str("sessionid", session.ID()).Msg("reading node for session failed")
 		}
 		if session.NodeExists() {
 			p := session.info.MetaData["versionsPath"]
@@ -340,7 +338,7 @@ func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool
 			// if no other upload session is in progress (processing id != session id) or has finished (processing id == "")
 			latestSession, err := n.ProcessingID(ctx)
 			if err != nil {
-				appctx.GetLogger(ctx).Error().Err(err).Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Str("uploadid", session.ID()).Msg("reading processingid for session failed")
+				appctx.GetLogger(ctx).Error().Err(err).Str("node", n.ID).Str("sessionid", session.ID()).Msg("reading processingid for session failed")
 			}
 			if latestSession == session.ID() {
 				// actually delete the node

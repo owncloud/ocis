@@ -54,8 +54,7 @@ func (s *OcisSession) Context(ctx context.Context) context.Context { // restore 
 	sub := log.With().Int("pid", os.Getpid()).Logger()
 	ctx = appctx.WithLogger(ctx, &sub)
 	ctx = ctxpkg.ContextSetLockID(ctx, s.lockID())
-	ctx = ctxpkg.ContextSetUser(ctx, s.executantUser())
-	return ctxpkg.ContextSetInitiator(ctx, s.InitiatorID())
+	return ctxpkg.ContextSetUser(ctx, s.executantUser())
 }
 
 func (s *OcisSession) lockID() string {

@@ -372,7 +372,6 @@ func (s *service) RemovePublicShare(ctx context.Context, req *link.RemovePublicS
 		}, err
 	}
 	return &link.RemovePublicShareResponse{
-		Opaque: utils.AppendJSONToOpaque(nil, "resourceid", ps.GetResourceId()),
 		Status: status.NewOK(ctx),
 	}, nil
 }
@@ -606,7 +605,7 @@ func isInternalLink(req *link.UpdatePublicShareRequest, ps *link.PublicShare) bo
 }
 
 func enforcePassword(canOptOut bool, permissions *provider.ResourcePermissions, conf *config) bool {
-	isReadOnly := conversions.SufficientCS3Permissions(conversions.NewViewerRole().CS3ResourcePermissions(), permissions)
+	isReadOnly := conversions.SufficientCS3Permissions(conversions.NewViewerRole(true).CS3ResourcePermissions(), permissions)
 	if isReadOnly && canOptOut {
 		return false
 	}

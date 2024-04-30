@@ -171,9 +171,9 @@ func getResourceType(info *providerpb.ResourceInfo) string {
 	return "unknown"
 }
 
-func (s *service) webdavURL(_ context.Context, share *ocm.Share) string {
+func (s *service) webdavURL(ctx context.Context, share *ocm.Share) string {
 	// the url is in the form of https://cernbox.cern.ch/remote.php/dav/ocm/token
-	p, _ := url.JoinPath(s.conf.WebDAVEndpoint, "/dav/ocm", share.GetId().GetOpaqueId())
+	p, _ := url.JoinPath(s.conf.WebDAVEndpoint, "/dav/ocm", share.Token)
 	return p
 }
 
@@ -327,7 +327,7 @@ func (s *service) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareReq
 		ProviderID: ocmshare.Id.OpaqueId,
 		Owner: formatOCMUser(&userpb.UserId{
 			OpaqueId: info.Owner.OpaqueId,
-			Idp:      s.conf.ProviderDomain,
+			Idp:      s.conf.ProviderDomain, // FIXME: this is not generally true in case of resharing
 		}),
 		Sender: formatOCMUser(&userpb.UserId{
 			OpaqueId: user.Id.OpaqueId,

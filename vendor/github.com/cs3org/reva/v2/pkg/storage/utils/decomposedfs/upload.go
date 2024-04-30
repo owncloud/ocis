@@ -54,8 +54,6 @@ func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, u
 
 	session := up.(*upload.OcisSession)
 
-	ctx = session.Context(ctx)
-
 	if session.Chunk() != "" { // check chunking v1
 		p, assembledFile, err := fs.chunkHandler.WriteChunk(session.Chunk(), req.Body)
 		if err != nil {
@@ -180,9 +178,6 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 	session.SetStorageValue("SpaceRoot", n.SpaceRoot.ID)                                     // TODO SpaceRoot -> SpaceID
 	session.SetStorageValue("SpaceOwnerOrManager", n.SpaceOwnerOrManager(ctx).GetOpaqueId()) // TODO needed for what?
 
-	iid, _ := ctxpkg.ContextGetInitiator(ctx)
-	session.SetMetadata("initiatorid", iid)
-
 	if metadata != nil {
 		session.SetMetadata("providerID", metadata["providerID"])
 		if mtime, ok := metadata["mtime"]; ok {
@@ -223,7 +218,7 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 		}
 	}
 
-	log.Debug().Str("uploadid", session.ID()).Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Interface("metadata", metadata).Msg("Decomposedfs: resolved filename")
+	log.Debug().Interface("session", session).Interface("node", n).Interface("metadata", metadata).Msg("Decomposedfs: resolved filename")
 
 	_, err = node.CheckQuota(ctx, n.SpaceRoot, n.Exists, uint64(n.Blobsize), uint64(session.Size()))
 	if err != nil {

@@ -559,37 +559,6 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 		return nil
 	}
 
-	isParent, err := s.referenceIsChildOf(ctx, s.gatewaySelector, srcRef, dstRef)
-	if err != nil {
-		switch err.(type) {
-		case errtypes.IsNotFound:
-			isParent = false
-		case errtypes.IsNotSupported:
-			log.Error().Err(err).Msg("can not detect recursive copy operation. missing machine auth configuration?")
-			w.WriteHeader(http.StatusForbidden)
-			return nil
-		default:
-			log.Error().Err(err).Msg("error while trying to detect recursive copy operation")
-			w.WriteHeader(http.StatusInternalServerError)
-			return nil
-		}
-	}
-
-	if isParent {
-		w.WriteHeader(http.StatusConflict)
-		b, err := errors.Marshal(http.StatusBadRequest, "can not copy a folder into its parent", "")
-		errors.HandleWebdavError(log, w, b, err)
-		return nil
-
-	}
-
-	if srcRef.Path == dstRef.Path && srcRef.ResourceId == dstRef.ResourceId {
-		w.WriteHeader(http.StatusConflict)
-		b, err := errors.Marshal(http.StatusBadRequest, "source and destination are the same", "")
-		errors.HandleWebdavError(log, w, b, err)
-		return nil
-	}
-
 	oh := r.Header.Get(net.HeaderOverwrite)
 	overwrite, err := net.ParseOverwrite(oh)
 	if err != nil {

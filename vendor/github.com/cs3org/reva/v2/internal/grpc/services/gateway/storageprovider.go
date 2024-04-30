@@ -250,14 +250,14 @@ func (s *svc) ListStorageSpaces(ctx context.Context, req *provider.ListStorageSp
 	for _, f := range req.Filters {
 		switch f.Type {
 		case provider.ListStorageSpacesRequest_Filter_TYPE_ID:
-			sid, spid, oid, err := storagespace.SplitID(f.GetId().GetOpaqueId())
+			sid, spid, oid, err := storagespace.SplitID(f.GetId().OpaqueId)
 			if err != nil {
 				continue
 			}
 			filters["storage_id"], filters["space_id"], filters["opaque_id"] = sid, spid, oid
 		case provider.ListStorageSpacesRequest_Filter_TYPE_OWNER:
-			filters["owner_idp"] = f.GetOwner().GetIdp()
-			filters["owner_id"] = f.GetOwner().GetOpaqueId()
+			filters["owner_idp"] = f.GetOwner().Idp
+			filters["owner_id"] = f.GetOwner().OpaqueId
 		case provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE:
 			filters["space_type"] = f.GetSpaceType()
 		case provider.ListStorageSpacesRequest_Filter_TYPE_USER:
@@ -326,6 +326,7 @@ func (s *svc) UpdateStorageSpace(ctx context.Context, req *provider.UpdateStorag
 
 	if res.Status.Code == rpc.Code_CODE_OK {
 		id := res.StorageSpace.Root
+		s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), id)
 		s.providerCache.RemoveListStorageProviders(id)
 	}
 	return res, nil
@@ -339,7 +340,7 @@ func (s *svc) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorag
 		_, purge = opaque.Map["purge"]
 	}
 
-	rid, err := storagespace.ParseID(req.GetId().GetOpaqueId())
+	rid, err := storagespace.ParseID(req.Id.OpaqueId)
 	if err != nil {
 		return &provider.DeleteStorageSpaceResponse{
 			Status: status.NewStatusFromErrType(ctx, fmt.Sprintf("gateway could not parse space id %s", req.GetId().GetOpaqueId()), err),
@@ -361,7 +362,8 @@ func (s *svc) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorag
 		}, nil
 	}
 
-	id := &provider.ResourceId{OpaqueId: req.GetId().GetOpaqueId()}
+	id := &provider.ResourceId{OpaqueId: req.Id.OpaqueId}
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), id)
 	s.providerCache.RemoveListStorageProviders(id)
 
 	if dsRes.Status.Code != rpc.Code_CODE_OK {
@@ -606,6 +608,7 @@ func (s *svc) InitiateFileUpload(ctx context.Context, req *provider.InitiateFile
 		}
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 	return &gateway.InitiateFileUploadResponse{
 		Opaque:    storageRes.Opaque,
 		Status:    storageRes.Status,
@@ -642,6 +645,7 @@ func (s *svc) CreateContainer(ctx context.Context, req *provider.CreateContainer
 		}, nil
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 	return res, nil
 }
 
@@ -684,6 +688,7 @@ func (s *svc) Delete(ctx context.Context, req *provider.DeleteRequest) (*provide
 		}, nil
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 	return res, nil
 }
 
@@ -710,6 +715,8 @@ func (s *svc) Move(ctx context.Context, req *provider.MoveRequest) (*provider.Mo
 
 	req.Source = sref
 	req.Destination = dref
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Source.ResourceId)
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Destination.ResourceId)
 	return c.Move(ctx, req)
 }
 
@@ -732,6 +739,7 @@ func (s *svc) SetArbitraryMetadata(ctx context.Context, req *provider.SetArbitra
 		return nil, errors.Wrap(err, "gateway: error calling SetArbitraryMetadata")
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 	return res, nil
 }
 
@@ -753,6 +761,7 @@ func (s *svc) UnsetArbitraryMetadata(ctx context.Context, req *provider.UnsetArb
 		}
 		return nil, errors.Wrap(err, "gateway: error calling UnsetArbitraryMetadata")
 	}
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 
 	return res, nil
 }
@@ -776,6 +785,7 @@ func (s *svc) SetLock(ctx context.Context, req *provider.SetLockRequest) (*provi
 		return nil, errors.Wrap(err, "gateway: error calling SetLock")
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 	return res, nil
 }
 
@@ -816,6 +826,7 @@ func (s *svc) RefreshLock(ctx context.Context, req *provider.RefreshLockRequest)
 		return nil, errors.Wrap(err, "gateway: error calling RefreshLock")
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 	return res, nil
 }
 
@@ -836,10 +847,12 @@ func (s *svc) Unlock(ctx context.Context, req *provider.UnlockRequest) (*provide
 		return nil, errors.Wrap(err, "gateway: error calling Unlock")
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 	return res, nil
 }
 
 // Stat returns the Resoure info for a given resource by forwarding the request to the responsible provider.
+// TODO cache info
 func (s *svc) Stat(ctx context.Context, req *provider.StatRequest) (*provider.StatResponse, error) {
 	c, _, ref, err := s.findAndUnwrapUnique(ctx, req.Ref)
 	if err != nil {
@@ -914,6 +927,7 @@ func (s *svc) RestoreFileVersion(ctx context.Context, req *provider.RestoreFileV
 		}, nil
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 	return res, nil
 }
 
@@ -969,6 +983,7 @@ func (s *svc) RestoreRecycleItem(ctx context.Context, req *provider.RestoreRecyc
 		}, nil
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 	return res, nil
 }
 
@@ -991,6 +1006,7 @@ func (s *svc) PurgeRecycle(ctx context.Context, req *provider.PurgeRecycleReques
 		}, nil
 	}
 
+	s.statCache.RemoveStatContext(ctx, ctxpkg.ContextMustGetUser(ctx).GetId(), req.Ref.ResourceId)
 	return res, nil
 }
 
@@ -1090,6 +1106,7 @@ func (s *svc) getStorageProviderClient(_ context.Context, p *registry.ProviderIn
 
 	return &cachedAPIClient{
 		c:                        c,
+		statCache:                s.statCache,
 		createPersonalSpaceCache: s.createPersonalSpaceCache,
 	}, nil
 }
@@ -1221,11 +1238,11 @@ func unwrap(ref *provider.Reference, mountPoint string, root *provider.ResourceI
 
 	return &provider.Reference{
 		ResourceId: &provider.ResourceId{
-			StorageId: ref.GetResourceId().GetStorageId(),
-			SpaceId:   ref.GetResourceId().GetSpaceId(),
-			OpaqueId:  ref.GetResourceId().GetOpaqueId(),
+			StorageId: ref.ResourceId.StorageId,
+			SpaceId:   ref.ResourceId.SpaceId,
+			OpaqueId:  ref.ResourceId.OpaqueId,
 		},
-		Path: ref.GetPath(),
+		Path: ref.Path,
 	}
 }
 

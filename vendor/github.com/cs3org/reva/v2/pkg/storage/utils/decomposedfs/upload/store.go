@@ -216,12 +216,12 @@ func (store OcisStore) CreateNodeForUpload(session *OcisSession, initAttrs node.
 
 		f, err = store.updateExistingNode(ctx, session, n, session.SpaceID(), uint64(session.Size()))
 		if f != nil {
-			appctx.GetLogger(ctx).Debug().Str("lockfile", f.Name()).Interface("err", err).Msg("got lock file from updateExistingNode")
+			appctx.GetLogger(ctx).Info().Str("lockfile", f.Name()).Interface("err", err).Msg("got lock file from updateExistingNode")
 		}
 	} else {
 		f, err = store.initNewNode(ctx, session, n, uint64(session.Size()))
 		if f != nil {
-			appctx.GetLogger(ctx).Debug().Str("lockfile", f.Name()).Interface("err", err).Msg("got lock file from initNewNode")
+			appctx.GetLogger(ctx).Info().Str("lockfile", f.Name()).Interface("err", err).Msg("got lock file from initNewNode")
 		}
 	}
 	defer func() {

@@ -89,7 +89,7 @@ func expandAndVerifyScope(ctx context.Context, req interface{}, tokenScope map[s
 					return nil
 				}
 			}
-			log.Err(err).Interface("ref", ref).Interface("scope", k).Msg("error resolving reference under scope")
+			log.Err(err).Msgf("error resolving reference %s under scope %+v", ref.String(), k)
 		}
 
 	} else if ref, ok := extractShareRef(req); ok {
@@ -179,11 +179,6 @@ func resolveOCMShare(ctx context.Context, ref *provider.Reference, scope *authpb
 		return err
 	}
 
-	// for ListOCMSharesRequest, the ref resource id is empty and we set path to . to indicate the root of the share
-	if ref.GetResourceId() == nil && ref.Path == "." {
-		ref.ResourceId = share.GetResourceId()
-	}
-
 	if err := checkCacheForNestedResource(ctx, ref, share.ResourceId, client, mgr); err == nil {
 		return nil
 	}
@@ -218,7 +213,7 @@ func checkRelativeReference(ctx context.Context, requested *provider.Reference, 
 	if sharedResource.ParentId == nil {
 		// Is the requested resource part of the shared space?
 		if requested.ResourceId.StorageId != sharedResource.Id.StorageId || requested.ResourceId.SpaceId != sharedResource.Id.SpaceId {
-			return errtypes.PermissionDenied("space access forbidden via public link")
+			return errtypes.PermissionDenied("access forbidden via public link")
 		}
 	} else {
 		parentID := sharedResource.ParentId
@@ -401,11 +396,6 @@ func extractRefForReaderRole(req interface{}) (*provider.Reference, bool) {
 		return v.GetRef(), true
 	case *provider.UnlockRequest:
 		return v.GetRef(), true
-
-	// OCM shares
-	case *ocmv1beta1.ListReceivedOCMSharesRequest:
-		return &provider.Reference{Path: "."}, true // we will try to stat the shared node
-
 	}
 
 	return nil, false
