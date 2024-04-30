@@ -319,12 +319,20 @@ class SharingNgContext implements Context {
 	 */
 	public function updateResourceShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
-		$space = $bodyRows['space'];
-		$resource = $bodyRows['resource'];
-		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		if ($bodyRows['space'] === 'Personal' || $bodyRows['space'] === 'Shares') {
+			$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
+		} else {
+			$space = $this->spacesContext->getCreatedSpace($bodyRows['space']);
+		}
+		$spaceId = $space["id"];
+		// for updating role of project space shared, we do not need to provide resource
+		$resource = $bodyRows['resource'] ?? '';
+		if ($resource === '' && !\in_array($bodyRows['space'], ['Personal', 'Shares'])) {
+			$itemId = $space['fileId'];
+		} else {
+			$itemId = $this->spacesContext->getResourceId($user, $bodyRows['space'], $resource);
+		}
 		$body = [];
-
 		if (\array_key_exists('permissionsRole', $bodyRows)) {
 			$body['roles'] = [GraphHelper::getPermissionsRoleIdByName($bodyRows['permissionsRole'])];
 		}
