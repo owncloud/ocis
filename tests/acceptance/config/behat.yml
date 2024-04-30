@@ -86,6 +86,7 @@ default:
         - TUSContext:
         - SpacesTUSContext:
         - GraphContext:
+        - SharingNgContext:
 
     apiArchiver:
       paths:
