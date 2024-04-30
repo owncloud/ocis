@@ -51,7 +51,17 @@ class NotificationContext implements Context {
 	 * @return void
 	 */
 	public function deleteDeprovisioningNotification(): void {
-		$this->userDeletesDeprovisioningNotification();
+		$payload["ids"] = ["deprovision"];
+
+		OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->globalNotificationEndpointPath,
+			$this->featureContext->getStepLineRef(),
+			json_encode($payload)
+		);
 	}
 
 	/**
@@ -242,8 +252,9 @@ class NotificationContext implements Context {
 	 * @throws Exception
 	 */
 	public function userShouldNotHaveAnyNotification($user): void {
-		$this->userListAllNotifications($user);
-		$this->theNotificationsShouldBeEmpty();
+		$response = $this->listAllNotifications($user);
+		$notifications = $this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data;
+		Assert::assertNull($notifications, "response should not contain any notification");
 	}
 
 	/**
@@ -414,8 +425,8 @@ class NotificationContext implements Context {
 				$actualMessage,
 				__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'"
 			);
-			$this->userDeletesNotificationOfResourceAndSubject($user, $resource, $subject);
-			$this->featureContext->theHTTPStatusCodeShouldBe(200);
+			$response = $this->userDeletesNotification($user);
+			$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 		} elseif (\count($notification) === 0) {
 			throw new \Exception("Response doesn't contain any notification with resource '$resource' and subject '$subject'.\n" . print_r($notification, true));
 		} else {
