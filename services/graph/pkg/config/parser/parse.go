@@ -16,7 +16,7 @@ import (
 
 // ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
-	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
+	err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
 		return err
 	}

@@ -25,7 +25,7 @@ c: "${CODE_VAR|code}"
 	}
 	// perform test
 	c := TestConfig{}
-	_, err := bindSourcesToStructs(fs, filePath, "foo", &c)
+	err := bindSourcesToStructs(fs, filePath, "foo", &c)
 	if err != nil {
 		t.Error(err)
 	}
@@ -41,7 +41,7 @@ func TestBindSourcesToStructs_UnknownFile(t *testing.T) {
 	fs := fstest.MapFS{}
 	// perform test
 	c := TestConfig{}
-	_, err := bindSourcesToStructs(fs, filePath, "foo", &c)
+	err := bindSourcesToStructs(fs, filePath, "foo", &c)
 	if err != nil {
 		t.Error(err)
 	}
@@ -179,7 +179,7 @@ clientlog:
 	}
 	// perform test
 	c := Config{}
-	_, err := bindSourcesToStructs(fs, filePath, "foo", &c)
+	err := bindSourcesToStructs(fs, filePath, "foo", &c)
 	if err != nil {
 		t.Error(err)
 	}
