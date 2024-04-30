@@ -109,8 +109,8 @@ type ExternalAppConfig struct {
 
 // Web defines the available web configuration.
 type Web struct {
-	ThemeServer string    `yaml:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER" desc:"Base URL to load themes from. Will be prepended to the theme path." introductionVersion:"pre5.0"`  // used to build Theme in WebConfig
-	ThemePath   string    `yaml:"theme_path" env:"WEB_UI_THEME_PATH" desc:"Subpath/file to load the theme. Will be appended to the URL of the theme server." introductionVersion:"pre5.0"` // used to build Theme in WebConfig
+	ThemeServer string    `yaml:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER" desc:"Base URL to load themes from. Will be prepended to the theme path." introductionVersion:"pre5.0"` // used to build Theme in WebConfig
+	ThemePath   string    `yaml:"theme_path" env:"WEB_UI_THEME_PATH" desc:"Path to the theme json file. Will be appended to the URL of the theme server." introductionVersion:"pre5.0"`   // used to build Theme in WebConfig
 	Config      WebConfig `yaml:"config"`
 }
 

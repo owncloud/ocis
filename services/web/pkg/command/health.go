@@ -17,10 +17,10 @@ func Health(cfg *config.Config) *cli.Command {
 		Name:     "health",
 		Usage:    "check health status",
 		Category: "info",
-		Before: func(c *cli.Context) error {
+		Before: func(_ *cli.Context) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		Action: func(_ *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
 			resp, err := http.Get(

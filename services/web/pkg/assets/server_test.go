@@ -1,4 +1,4 @@
-package assets_test
+package assets
 
 import (
 	"fmt"
@@ -10,8 +10,6 @@ import (
 	"testing/fstest"
 
 	"github.com/onsi/gomega"
-
-	"github.com/owncloud/ocis/v2/services/web/pkg/assets"
 )
 
 func TestFileServer(t *testing.T) {
@@ -21,7 +19,7 @@ func TestFileServer(t *testing.T) {
 	}
 
 	{
-		s := assets.FileServer(fstest.MapFS{})
+		s := FileServer(fstest.MapFS{})
 		w := httptest.NewRecorder()
 		req := httptest.NewRequest("GET", "/foo", nil)
 		//defer req.Body.Close()
@@ -109,7 +107,7 @@ func TestFileServer(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", tt.url, nil)
-			assets.FileServer(tt.fs).ServeHTTP(w, req)
+			FileServer(tt.fs).ServeHTTP(w, req)
 			res := w.Result()
 			defer res.Body.Close()
 

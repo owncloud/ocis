@@ -24,10 +24,10 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:     "server",
 		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
-		Before: func(c *cli.Context) error {
+		Before: func(_ *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		Action: func(_ *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
@@ -55,7 +55,7 @@ func Server(cfg *config.Config) *cli.Command {
 					}
 					return context.WithCancel(cfg.Context)
 				}()
-				metrics = metrics.New()
+				m = metrics.New()
 			)
 
 			defer cancel()
@@ -66,7 +66,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Namespace(cfg.HTTP.Namespace),
 					http.Config(cfg),
-					http.Metrics(metrics),
+					http.Metrics(m),
 					http.TraceProvider(traceProvider),
 				)
 				if err != nil {
