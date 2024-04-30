@@ -73,11 +73,15 @@ Feature: PROPFIND with depth:infinity
 
   Scenario: get the list of resources in a folder shared through public link with depth infinity
     Given using new DAV path
+    And using SharingNG
     And the following configs have been set:
       | config                                       | value |
       | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | true  |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
-    And user "Alice" has created a public link share of folder "simple-folder"
+    And user "Alice" has created the following link share:
+      | resource        | simple-folder |
+      | space           | Personal      |
+      | permissionsRole | view          |
     When the public lists the resources in the last created public link with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last public link DAV response should contain these nodes
@@ -124,7 +128,11 @@ Feature: PROPFIND with depth:infinity
       | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | false |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using new DAV path
-    And user "Alice" has created a public link share of folder "simple-folder"
+    And using SharingNG
+    And user "Alice" has created the following link share:
+      | resource        | simple-folder |
+      | space           | Personal      |
+      | permissionsRole | view          |
     When the public lists the resources in the last created public link with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "400"
 

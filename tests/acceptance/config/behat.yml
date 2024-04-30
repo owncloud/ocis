@@ -166,6 +166,7 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - OcisConfigContext:
+        - SharingNgContext:
 
     apiAsyncUpload:
       paths:
