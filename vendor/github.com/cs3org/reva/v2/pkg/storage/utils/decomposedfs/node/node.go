@@ -21,16 +21,16 @@ package node
 import (
 	"context"
 	"crypto/md5"
+	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
 	"hash"
+	"hash/adler32"
 	"io"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -99,9 +99,14 @@ type Tree interface {
 	RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPath string, target *Node) (*Node, *Node, func() error, error)
 	PurgeRecycleItemFunc(ctx context.Context, spaceid, key, purgePath string) (*Node, func() error, error)
 
+	InitNewNode(ctx context.Context, n *Node, fsize uint64) (metadata.UnlockFunc, error)
+
 	WriteBlob(node *Node, source string) error
 	ReadBlob(node *Node) (io.ReadCloser, error)
 	DeleteBlob(node *Node) error
+
+	BuildSpaceIDIndexEntry(spaceID, nodeID string) string
+	ResolveSpaceIDIndexEntry(spaceID, entry string) (string, string, error)
 
 	Propagate(ctx context.Context, node *Node, sizeDiff int64) (err error)
 }
@@ -112,7 +117,10 @@ type PathLookup interface {
 	NodeFromResource(ctx context.Context, ref *provider.Reference) (*Node, error)
 	NodeFromID(ctx context.Context, id *provider.ResourceId) (n *Node, err error)
 
+	NodeIDFromParentAndName(ctx context.Context, n *Node, name string) (string, error)
+
 	GenerateSpaceID(spaceType string, owner *userpb.User) (string, error)
+
 	InternalRoot() string
 	InternalPath(spaceID, nodeID string) string
 	Path(ctx context.Context, n *Node, hasPermission PermissionFunc) (path string, err error)
@@ -122,6 +130,11 @@ type PathLookup interface {
 	TypeFromPath(ctx context.Context, path string) provider.ResourceType
 	CopyMetadataWithSourceLock(ctx context.Context, sourcePath, targetPath string, filter func(attributeName string, value []byte) (newValue []byte, copy bool), lockedSource *lockedfile.File, acquireTargetLock bool) (err error)
 	CopyMetadata(ctx context.Context, src, target string, filter func(attributeName string, value []byte) (newValue []byte, copy bool), acquireTargetLock bool) (err error)
+}
+
+type IDCacher interface {
+	CacheID(ctx context.Context, spaceID, nodeID, val string) error
+	GetCachedID(ctx context.Context, spaceID, nodeID string) (string, bool)
 }
 
 // Node represents a node in the tree and provides methods to get a Parent or Child instance
@@ -362,26 +375,6 @@ func ReadNode(ctx context.Context, lu PathLookup, spaceID, nodeID string, canLis
 	return n, nil
 }
 
-// The os error is buried inside the fs.PathError error
-func isNotDir(err error) bool {
-	if perr, ok := err.(*fs.PathError); ok {
-		if serr, ok2 := perr.Err.(syscall.Errno); ok2 {
-			return serr == syscall.ENOTDIR
-		}
-	}
-	return false
-}
-
-func readChildNodeFromLink(path string) (string, error) {
-	link, err := os.Readlink(path)
-	if err != nil {
-		return "", err
-	}
-	nodeID := strings.TrimLeft(link, "/.")
-	nodeID = strings.ReplaceAll(nodeID, "/", "")
-	return nodeID, nil
-}
-
 // Child returns the child node with the given name
 func (n *Node) Child(ctx context.Context, name string) (*Node, error) {
 	ctx, span := tracer.Start(ctx, "Child")
@@ -393,24 +386,22 @@ func (n *Node) Child(ctx context.Context, name string) (*Node, error) {
 	} else if n.SpaceRoot != nil {
 		spaceID = n.SpaceRoot.ID
 	}
-	nodeID, err := readChildNodeFromLink(filepath.Join(n.InternalPath(), name))
-	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) || isNotDir(err) {
-
-			c := &Node{
-				SpaceID:   spaceID,
-				lu:        n.lu,
-				ParentID:  n.ID,
-				Name:      name,
-				SpaceRoot: n.SpaceRoot,
-			}
-			return c, nil // if the file does not exist we return a node that has Exists = false
-		}
-
-		return nil, errors.Wrap(err, "decomposedfs: Wrap: readlink error")
+	c := &Node{
+		SpaceID:   spaceID,
+		lu:        n.lu,
+		ParentID:  n.ID,
+		Name:      name,
+		SpaceRoot: n.SpaceRoot,
 	}
 
-	var c *Node
+	nodeID, err := n.lu.NodeIDFromParentAndName(ctx, n, name)
+	switch {
+	case metadata.IsNotExist(err) || metadata.IsNotDir(err):
+		return c, nil // if the file does not exist we return a node that has Exists = false
+	case err != nil:
+		return nil, err
+	}
+
 	c, err = ReadNode(ctx, n.lu, spaceID, nodeID, false, n.SpaceRoot, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not read child node")
@@ -1359,4 +1350,31 @@ func enoughDiskSpace(path string, fileSize uint64) bool {
 		return false
 	}
 	return avalB > fileSize
+}
+
+// CalculateChecksums calculates the sha1, md5 and adler32 checksums of a file
+func CalculateChecksums(ctx context.Context, path string) (hash.Hash, hash.Hash, hash.Hash32, error) {
+	sha1h := sha1.New()
+	md5h := md5.New()
+	adler32h := adler32.New()
+
+	_, subspan := tracer.Start(ctx, "os.Open")
+	f, err := os.Open(path)
+	subspan.End()
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	defer f.Close()
+
+	r1 := io.TeeReader(f, sha1h)
+	r2 := io.TeeReader(r1, md5h)
+
+	_, subspan = tracer.Start(ctx, "io.Copy")
+	_, err = io.Copy(adler32h, r2)
+	subspan.End()
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	return sha1h, md5h, adler32h, nil
 }

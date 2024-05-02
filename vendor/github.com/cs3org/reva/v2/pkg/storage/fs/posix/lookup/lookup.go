@@ -118,6 +118,17 @@ func (lu *Lookup) TypeFromPath(ctx context.Context, path string) provider.Resour
 	return t
 }
 
+func (lu *Lookup) NodeIDFromParentAndName(ctx context.Context, parent *node.Node, name string) (string, error) {
+	id, err := lu.metadataBackend.Get(ctx, filepath.Join(parent.InternalPath(), name), prefixes.IDAttr)
+	if err != nil {
+		if metadata.IsNotExist(err) {
+			return "", errtypes.NotFound(name)
+		}
+		return "", err
+	}
+	return string(id), nil
+}
+
 // NodeFromResource takes in a request path or request id and converts it to a Node
 func (lu *Lookup) NodeFromResource(ctx context.Context, ref *provider.Reference) (*node.Node, error) {
 	ctx, span := tracer.Start(ctx, "NodeFromResource")

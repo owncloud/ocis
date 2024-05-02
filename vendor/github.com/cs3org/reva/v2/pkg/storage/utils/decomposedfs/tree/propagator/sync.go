@@ -98,6 +98,7 @@ func (p SyncPropagator) Propagate(ctx context.Context, n *node.Node, sizeDiff in
 			if err == nil && cerr != nil && !errors.Is(cerr, os.ErrClosed) {
 				err = cerr // only overwrite err with en error from close if the former was nil
 			}
+			_ = os.Remove(f.Name())
 		}()
 
 		if n, err = n.Parent(ctx); err != nil {

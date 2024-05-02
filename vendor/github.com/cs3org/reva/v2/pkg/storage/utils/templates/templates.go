@@ -52,6 +52,7 @@ type (
 		*UserData
 		SpaceType string
 		SpaceName string
+		SpaceId   string
 	}
 
 	// EmailData contains mail data
@@ -89,9 +90,9 @@ func WithUser(u *userpb.User, tpl string) string {
 }
 
 // WithSpacePropertiesAndUser generates a layout based on user data and a space type.
-func WithSpacePropertiesAndUser(u *userpb.User, spaceType string, spaceName string, tpl string) string {
+func WithSpacePropertiesAndUser(u *userpb.User, spaceType string, spaceName string, spaceID string, tpl string) string {
 	tpl = clean(tpl)
-	sd := newSpaceData(u, spaceType, spaceName)
+	sd := newSpaceData(u, spaceType, spaceName, spaceID)
 	// compile given template tpl
 	t, err := template.New("tpl").Funcs(sprig.TxtFuncMap()).Parse(tpl)
 	if err != nil {
@@ -147,12 +148,13 @@ func newUserData(u *userpb.User) *UserData {
 	return ut
 }
 
-func newSpaceData(u *userpb.User, st string, n string) *SpaceData {
+func newSpaceData(u *userpb.User, st, n, id string) *SpaceData {
 	userData := newUserData(u)
 	sd := &SpaceData{
 		userData,
 		st,
 		n,
+		id,
 	}
 	return sd
 }
