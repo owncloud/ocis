@@ -131,14 +131,12 @@ Feature: move (rename) folder
       | old              | /upload.      |
       | old              | /upload.1     |
       | old              | /upload...1.. |
-      | old              | /.            |
-      | old              | /..           |
+      | old              | /...          |
       | old              | /..upload     |
       | new              | /upload.      |
       | new              | /upload.1     |
       | new              | /upload...1.. |
-      | new              | /.            |
-      | new              | /..           |
+      | new              | /...          |
       | new              | /..upload     |
 
     @skipOnRevaMaster
@@ -147,8 +145,7 @@ Feature: move (rename) folder
       | spaces           | /upload.      |
       | spaces           | /upload.1     |
       | spaces           | /upload...1.. |
-      | spaces           | /.            |
-      | spaces           | /..           |
+      | spaces           | /...          |
       | spaces           | /..upload     |
 
   @skipOnRevaMaster @issue-3023
@@ -249,7 +246,7 @@ Feature: move (rename) folder
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "testFolder"
     When user "Alice" moves folder "testFolder" to "testFolder" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "404"
     And as "Alice" the folder with original path "testFolder" should not exist in the trashbin
     Examples:
       | dav-path-version |
@@ -282,3 +279,22 @@ Feature: move (rename) folder
     Examples:
       | dav-path-version |
       | spaces           |
+
+
+  Scenario Outline: try to rename folder to . and ..
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "testFolder"
+    When user "Alice" moves folder "testFolder" to "<folder-name>" using the WebDAV API
+    Then the HTTP status code should be "<http-status-code>"
+    Examples:
+      | dav-path-version | folder-name   | http-status-code |
+      | old              | /.            | 409              |
+      | old              | /..           | 404              |
+      | new              | /.            | 409              |
+      | new              | /..           | 404              |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version | folder-name   | http-status-code |
+      | spaces           | /.            | 409              |
+      | spaces           | /..           | 400              |

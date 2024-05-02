@@ -751,7 +751,7 @@ trait WebDav {
 	public function theUserShouldNotBeAbleToRenameEntryTo(string $user, string $entry, string $source, string $destination):void {
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
 		$response = $this->moveResource($user, $source, $destination);
-		$this->theHTTPStatusCodeShouldBeBetween(201, 204, $response);
+		$this->theHTTPStatusCodeShouldBeBetween(400, 499, $response);
 		$this->asFileOrFolderShouldExist($user, $entry, $source);
 		$this->asFileOrFolderShouldNotExist($user, $entry, $destination);
 	}
