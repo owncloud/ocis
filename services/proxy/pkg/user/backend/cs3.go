@@ -16,7 +16,6 @@ import (
 	"go-micro.dev/v4/selector"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
@@ -32,11 +31,12 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	logger            log.Logger
-	gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
-	machineAuthAPIKey string
-	oidcISS           string
-	serviceAccount    config.ServiceAccount
+	logger              log.Logger
+	gatewaySelector     pool.Selectable[gateway.GatewayAPIClient]
+	machineAuthAPIKey   string
+	oidcISS             string
+	serviceAccount      config.ServiceAccount
+	autoProvisionClaims config.AutoProvisionClaims
 }
 
 // WithLogger sets the logger option
@@ -71,6 +71,12 @@ func WithOIDCissuer(oidcISS string) Option {
 func WithServiceAccount(c config.ServiceAccount) Option {
 	return func(o *Options) {
 		o.serviceAccount = c
+	}
+}
+
+func WithAutoProvisionClaims(claims config.AutoProvisionClaims) Option {
+	return func(o *Options) {
+		o.autoProvisionClaims = claims
 	}
 }
 
@@ -111,12 +117,12 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string) (
 		if res.Status.Code == rpcv1beta1.Code_CODE_NOT_FOUND {
 			return nil, "", ErrAccountNotFound
 		}
-		return nil, "", fmt.Errorf("could not get user by claim %v with value %v : %s ", claim, value, res.Status.Message)
+		return nil, "", fmt.Errorf("could not get user by claim %v with value %v : %s ", claim, value, res.GetStatus().GetMessage())
 	}
 
 	user := res.User
 
-	return user, res.Token, nil
+	return user, res.GetToken(), nil
 }
 
 func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error) {
@@ -135,7 +141,7 @@ func (c *cs3backend) Authenticate(ctx context.Context, username string, password
 	case err != nil:
 		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, %w", username, err)
 	case res.Status.Code != rpcv1beta1.Code_CODE_OK:
-		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, got code: %d", username, res.Status.Code)
+		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, got code: %d", username, res.GetStatus().GetCode())
 	}
 
 	return res.User, res.Token, nil
@@ -161,10 +167,10 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 		return nil, err
 	}
 	if authRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
-		return nil, fmt.Errorf("error authenticating service user: %s", authRes.Status.Message)
+		return nil, fmt.Errorf("error authenticating service user: %s", authRes.GetStatus().GetMessage())
 	}
 
-	lgClient, err := c.setupLibregraphClient(newctx, authRes.Token)
+	lgClient, err := c.setupLibregraphClient(newctx, authRes.GetToken())
 	if err != nil {
 		c.logger.Error().Err(err).Msg("Error setting up libregraph client.")
 		return nil, err
@@ -262,22 +268,21 @@ func (c cs3backend) isAlreadyExists(resp *http.Response) (bool, error) {
 }
 
 func (c cs3backend) libregraphUserFromClaims(ctx context.Context, claims map[string]interface{}) (libregraph.User, error) {
-	var ok bool
-	var dn, mail, username string
 	user := libregraph.User{}
-	if dn, ok = claims[oidc.Name].(string); !ok {
-		return user, fmt.Errorf("Missing claim '%s'", oidc.Name)
+	if dn, ok := claims[c.autoProvisionClaims.DisplayName].(string); ok {
+		user.SetDisplayName(dn)
+	} else {
+		return user, fmt.Errorf("Missing claim '%s' (displayName)", c.autoProvisionClaims.DisplayName)
 	}
-	if mail, ok = claims[oidc.Email].(string); !ok {
-		return user, fmt.Errorf("Missing claim '%s'", oidc.Email)
+	if username, ok := claims[c.autoProvisionClaims.Username].(string); ok {
+		user.SetOnPremisesSamAccountName(username)
+	} else {
+		return user, fmt.Errorf("Missing claim '%s' (username)", c.autoProvisionClaims.Username)
 	}
-	if username, ok = claims[oidc.PreferredUsername].(string); !ok {
-		c.logger.Warn().Str("claim", oidc.PreferredUsername).Msg("Missing claim for username, falling back to email address")
-		username = mail
+	// Email is optional so we don't need an 'else' here
+	if mail, ok := claims[c.autoProvisionClaims.Email].(string); ok {
+		user.SetMail(mail)
 	}
-	user.DisplayName = &dn
-	user.OnPremisesSamAccountName = &username
-	user.Mail = &mail
 	return user, nil
 }
 
