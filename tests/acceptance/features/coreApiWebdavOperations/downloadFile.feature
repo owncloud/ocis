@@ -262,7 +262,7 @@ Feature: download file
       | dav-path-version |
       | spaces           |
 
-  @smokeTest @issue-8361
+  @smokeTest @issue-8361 @skipOnReva
   Scenario Outline: downloading a file should serve security headers
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "test file" to "/<file-name>"
@@ -287,15 +287,11 @@ Feature: download file
       | new              | textfile.txt       |
       | new              | comma,.txt         |
       | new              | 'quote'single'.txt |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name          |
       | spaces           | textfile.txt       |
       | spaces           | comma,.txt         |
       | spaces           | 'quote'single'.txt |
 
-  @smokeTest @issue-8361
+  @smokeTest @issue-8361 @skipOnReva
   Scenario Outline: downloading a file should serve security headers (file with doubel quotes)
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "test file" to '/"quote"double".txt'
@@ -316,10 +312,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
