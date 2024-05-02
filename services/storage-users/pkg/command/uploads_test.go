@@ -38,6 +38,31 @@ func TestBuildInfo(t *testing.T) {
 			filter:       storage.UploadSessionFilter{ID: strPtr("123")},
 			expectedInfo: "Session with id '123':",
 		},
+		{
+			alias:        "processing, not expired and not virus infected",
+			filter:       storage.UploadSessionFilter{Processing: boolPtr(true), Expired: boolPtr(false), HasVirus: boolPtr(false)},
+			expectedInfo: "Processing, not expired, not virusinfected sessions:",
+		},
+		{
+			alias:        "not virusinfected",
+			filter:       storage.UploadSessionFilter{HasVirus: boolPtr(false)},
+			expectedInfo: "Not virusinfected sessions:",
+		},
+		{
+			alias:        "expired and virusinfected",
+			filter:       storage.UploadSessionFilter{Expired: boolPtr(true), HasVirus: boolPtr(true)},
+			expectedInfo: "Expired, virusinfected sessions:",
+		},
+		{
+			alias:        "expired and not virus infected",
+			filter:       storage.UploadSessionFilter{Expired: boolPtr(true), HasVirus: boolPtr(false)},
+			expectedInfo: "Expired, not virusinfected sessions:",
+		},
+		{
+			alias:        "processing, not expired, virus infected and with id (note: this makes no sense)",
+			filter:       storage.UploadSessionFilter{Processing: boolPtr(true), Expired: boolPtr(false), HasVirus: boolPtr(true), ID: strPtr("123")},
+			expectedInfo: "Processing, not expired, virusinfected session with id '123':",
+		},
 	}
 
 	for _, tc := range testCases {
