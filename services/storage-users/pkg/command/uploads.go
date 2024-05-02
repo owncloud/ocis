@@ -120,6 +120,11 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				Usage:       "filter sessions by expired status",
 			},
 			&cli.BoolFlag{
+				Name:        "has-virus",
+				DefaultText: "unset",
+				Usage:       "filter sessions by virus scan result",
+			},
+			&cli.BoolFlag{
 				Name:  "json",
 				Usage: "output as json",
 			},
@@ -320,6 +325,10 @@ func buildFilter(c *cli.Context) storage.UploadSessionFilter {
 		expiredValue := c.Bool("expired")
 		filter.Expired = &expiredValue
 	}
+	if c.IsSet("has-virus") {
+		infectedValue := c.Bool("has-virus")
+		filter.HasVirus = &infectedValue
+	}
 	if c.IsSet("id") {
 		idValue := c.String("id")
 		filter.ID = &idValue
@@ -355,6 +364,24 @@ func buildInfo(filter storage.UploadSessionFilter) string {
 			b.WriteString("Expired")
 		} else {
 			b.WriteString("expired")
+		}
+	}
+
+	if filter.HasVirus != nil {
+		if b.Len() != 0 {
+			b.WriteString(", ")
+		}
+		if !*filter.HasVirus {
+			if b.Len() == 0 {
+				b.WriteString("Not ")
+			} else {
+				b.WriteString("not ")
+			}
+		}
+		if b.Len() == 0 {
+			b.WriteString("Virusinfected")
+		} else {
+			b.WriteString("virusinfected")
 		}
 	}
 
