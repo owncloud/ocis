@@ -754,7 +754,7 @@ trait Sharing {
 		$user = $this->getActualUsername($user);
 
 		if ($updateLastPublicLink) {
-			$share_id = (string) $this->getLastCreatedPublicShare()->id;
+			$share_id = (FeatureContext::isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareID() : (string) $this->getLastCreatedPublicShare()->id;
 		} else {
 			if ($shareOwner === null) {
 				$share_id = $this->getLastCreatedUserGroupShareId();

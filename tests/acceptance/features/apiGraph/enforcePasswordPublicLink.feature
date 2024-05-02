@@ -60,9 +60,11 @@ Feature: enforce password on public link
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
-    And user "Alice" has created a public link share with settings
-      | path        | /testfile.txt |
-      | permissions | 1             |
+    And using SharingNG
+    And user "Alice" has created the following link share:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | permissionsRole | view         |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 3        |
       | password    | %public% |
@@ -150,9 +152,11 @@ Feature: enforce password on public link
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
-    And user "Alice" has created a public link share with settings
-      | path        | /testfile.txt |
-      | permissions | 1             |
+    And using SharingNG
+    And user "Alice" has created the following link share:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | permissionsRole | view         |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 3             |
       | password    | 6a0Q;A3 +i^m[ |
@@ -181,9 +185,11 @@ Feature: enforce password on public link
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
-    And user "Alice" has created a public link share with settings
-      | path        | /testfile.txt |
-      | permissions | 1             |
+    And using SharingNG
+    And user "Alice" has created the following link share:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | permissionsRole | view         |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 3    |
       | password    | Pws^ |
@@ -254,9 +260,11 @@ Feature: enforce password on public link
     And using OCS API version "2"
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | /testfile.txt |
-      | permissions | 0             |
+    And using SharingNG
+    And user "Alice" has created the following link share:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | permissionsRole | internal     |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 3          |
       | password    | <password> |

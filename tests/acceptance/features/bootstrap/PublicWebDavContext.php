@@ -918,7 +918,8 @@ class PublicWebDavContext implements Context {
 			$publicWebDAVAPIVersion,
 			"",
 			"",
-			$expectedHttpCode
+			$expectedHttpCode,
+			$this->featureContext->isUsingSharingNG()
 		);
 	}
 
@@ -944,7 +945,8 @@ class PublicWebDavContext implements Context {
 			$path,
 			$password,
 			"",
-			$publicWebDAVAPIVersion
+			$publicWebDAVAPIVersion,
+			$this->featureContext->isUsingSharingNG()
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
@@ -1093,7 +1095,8 @@ class PublicWebDavContext implements Context {
 			$publicWebDAVAPIVersion,
 			$password,
 			"",
-			$expectedHttpCode
+			$expectedHttpCode,
+			$this->featureContext->isUsingSharingNG()
 		);
 	}
 
