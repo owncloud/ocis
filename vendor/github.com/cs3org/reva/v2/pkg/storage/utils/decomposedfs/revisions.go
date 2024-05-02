@@ -213,7 +213,10 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		_ = f.Close()
+		_ = os.Remove(fs.lu.MetadataBackend().LockfilePath(n.InternalPath()))
+	}()
 
 	// move current version to new revision
 	nodePath := fs.lu.InternalPath(spaceID, kp[0])
