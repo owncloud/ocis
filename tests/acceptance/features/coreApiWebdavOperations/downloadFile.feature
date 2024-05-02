@@ -328,3 +328,10 @@ Feature: download file
     When user "Alice" downloads file "/zerobyte.txt" using the WebDAV API
     Then the HTTP status code should be "200"
     And the size of the downloaded file should be 0 bytes
+
+
+  Scenario: try to download recently deleted file
+    When user "Alice" deletes file "textfile0.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    When user "Alice" tries to download file "textfile0.txt" using the WebDAV API
+    Then the HTTP status code should be "404"
