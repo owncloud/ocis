@@ -100,6 +100,7 @@ The following sections list the changes for unreleased.
 * Enhancement - ShareeIDs in SSEs: [#8915](https://github.com/owncloud/ocis/pull/8915)
 * Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
 * Enhancement - Improve infected file handling: [#8947](https://github.com/owncloud/ocis/pull/8947)
+* Enhancement - Configurable claims for auto-provisioning user accounts: [#8952](https://github.com/owncloud/ocis/pull/8952)
 * Enhancement - Bump nats-js-kv pkg: [#8953](https://github.com/owncloud/ocis/pull/8953)
 * Enhancement - Graph permission created date time: [#8954](https://github.com/owncloud/ocis/pull/8954)
 * Enhancement - Bump Reva: [#9002](https://github.com/owncloud/ocis/pull/9002)
@@ -570,6 +571,22 @@ The following sections list the changes for unreleased.
    sessions. Avoids retrying infected files on ocis postprocessing restart.
 
    https://github.com/owncloud/ocis/pull/8947
+
+* Enhancement - Configurable claims for auto-provisioning user accounts: [#8952](https://github.com/owncloud/ocis/pull/8952)
+
+   We introduce the new environment variables "PROXY_AUTOPROVISION_CLAIM_USERNAME",
+   "PROXY_AUTOPROVISION_CLAIM_EMAIL", and "PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME"
+   which can be used to configure the OIDC claims that should be used for
+   auto-provisioning user accounts.
+
+   The automatic fallback to use the 'email' claim value as the username when the
+   'preferred_username' claim is not set, has been removed.
+
+   Also it is now possible to autoprovision users without an email address.
+
+   https://github.com/owncloud/ocis/issues/8635
+   https://github.com/owncloud/ocis/issues/6909
+   https://github.com/owncloud/ocis/pull/8952
 
 * Enhancement - Bump nats-js-kv pkg: [#8953](https://github.com/owncloud/ocis/pull/8953)
 
