@@ -56,6 +56,9 @@
 | PROXY_USER_CS3_CLAIM | string | username | The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>PROXY_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary to access resources from other services.|
 | PROXY_AUTOPROVISION_ACCOUNTS | bool | false | Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running.|
+| PROXY_AUTOPROVISION_CLAIM_USERNAME | string | preferred_username | The name of the OIDC claim that holds the username.|
+| PROXY_AUTOPROVISION_CLAIM_EMAIL | string | email | The name of the OIDC claim that holds the email.|
+| PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME | string | name | The name of the OIDC claim that holds the display name.|
 | PROXY_ENABLE_BASIC_AUTH | bool | false | Set this to true to enable 'basic authentication' (username/password).|
 | PROXY_INSECURE_BACKENDS | bool | false | Disable TLS certificate validation for all HTTP backend connections.|
 | PROXY_HTTPS_CACERT | string |  | Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services.|

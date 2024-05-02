@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-02-09-52-40]
+[#deprecation-note-2024-05-02-14-08-33]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -538,6 +538,33 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running.
+
+a|`PROXY_AUTOPROVISION_CLAIM_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++preferred_username ++
+a| [subs=-attributes]
+The name of the OIDC claim that holds the username.
+
+a|`PROXY_AUTOPROVISION_CLAIM_EMAIL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++email ++
+a| [subs=-attributes]
+The name of the OIDC claim that holds the email.
+
+a|`PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++name ++
+a| [subs=-attributes]
+The name of the OIDC claim that holds the display name.
 
 a|`PROXY_ENABLE_BASIC_AUTH` +
 

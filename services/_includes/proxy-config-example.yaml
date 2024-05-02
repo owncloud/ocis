@@ -172,6 +172,10 @@ user_oidc_claim: preferred_username
 user_cs3_claim: username
 machine_auth_api_key: ""
 auto_provision_accounts: false
+auto_provision_claims:
+  username: preferred_username
+  email: email
+  display_name: name
 enable_basic_auth: false
 insecure_backends: false
 backend_https_cacert: ""
