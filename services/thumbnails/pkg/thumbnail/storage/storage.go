@@ -16,7 +16,7 @@ type Request struct {
 	// The resolution of the thumbnail
 	Resolution image.Rectangle
 	// Characteristic defines the different image characteristics,
-	// for example, if its scaled up to fit in the bounding box or not,
+	// for example, if it's scaled up to fit in the bounding box or not,
 	// is it a chroma version of the image, and so on...
 	// the main propose for this is to be able to differentiate between images which have
 	// the same resolution but different characteristics.
@@ -25,8 +25,8 @@ type Request struct {
 
 // Storage defines the interface for a thumbnail store.
 type Storage interface {
-	Stat(string) bool
-	Get(string) ([]byte, error)
-	Put(string, []byte) error
-	BuildKey(Request) string
+	Stat(key string) bool
+	Get(key string) ([]byte, error)
+	Put(key string, img []byte) error
+	BuildKey(r Request) string
 }

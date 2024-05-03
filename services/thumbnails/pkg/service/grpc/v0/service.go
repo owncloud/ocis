@@ -43,6 +43,8 @@ func NewService(opts ...Option) decorators.DecoratedService {
 			resolutions,
 			options.ThumbnailStorage,
 			logger,
+			options.Config.Thumbnail.MaxInputWidth,
+			options.Config.Thumbnail.MaxInputHeight,
 		),
 		webdavSource: options.ImageSource,
 		cs3Source:    options.CS3Source,
@@ -116,7 +118,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumb
 
 func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest) (string, error) {
 	src := req.GetCs3Source()
-	sRes, err := g.stat(src.Path, src.Authorization)
+	sRes, err := g.stat(src.GetPath(), src.GetAuthorization())
 	if err != nil {
 		return "", err
 	}
@@ -125,7 +127,7 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 	if tType == "" {
 		tType = req.GetThumbnailType().String()
 	}
-	tr, err := thumbnail.PrepareRequest(int(req.Width), int(req.Height), tType, sRes.GetInfo().GetChecksum().GetSum(), req.Processor)
+	tr, err := thumbnail.PrepareRequest(int(req.GetWidth()), int(req.GetHeight()), tType, sRes.GetInfo().GetChecksum().GetSum(), req.GetProcessor())
 	if err != nil {
 		return "", merrors.BadRequest(g.serviceID, err.Error())
 	}
@@ -134,12 +136,12 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 		return key, nil
 	}
 
-	ctx = imgsource.ContextSetAuthorization(ctx, src.Authorization)
-	r, err := g.cs3Source.Get(ctx, src.Path)
+	ctx = imgsource.ContextSetAuthorization(ctx, src.GetAuthorization())
+	r, err := g.cs3Source.Get(ctx, src.GetPath())
 	if err != nil {
 		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
-	defer r.Close() // nolint:errcheck
+	defer r.Close()
 	ppOpts := map[string]interface{}{
 		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
 	}
@@ -158,13 +160,13 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 
 func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest) (string, error) {
 	src := req.GetWebdavSource()
-	imgURL, err := url.Parse(src.Url)
+	imgURL, err := url.Parse(src.GetUrl())
 	if err != nil {
 		return "", errors.Wrap(err, "source url is invalid")
 	}
 
 	var auth, statPath string
-	if src.IsPublicLink {
+	if src.GetIsPublicLink() {
 		q := imgURL.Query()
 		var rsp *gateway.AuthenticateResponse
 		client, err := g.selector.Next()
@@ -177,13 +179,13 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 			exp := q.Get("expiration")
 			rsp, err = client.Authenticate(ctx, &gateway.AuthenticateRequest{
 				Type:         "publicshares",
-				ClientId:     src.PublicLinkToken,
+				ClientId:     src.GetPublicLinkToken(),
 				ClientSecret: strings.Join([]string{"signature", sig, exp}, "|"),
 			})
 		} else {
 			rsp, err = client.Authenticate(ctx, &gateway.AuthenticateRequest{
 				Type:     "publicshares",
-				ClientId: src.PublicLinkToken,
+				ClientId: src.GetPublicLinkToken(),
 				// We pass an empty password because we expect non pre-signed public links
 				// to not be password protected
 				ClientSecret: "password|",
@@ -193,11 +195,11 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 		if err != nil {
 			return "", merrors.InternalServerError(g.serviceID, "could not authenticate: %s", err.Error())
 		}
-		auth = rsp.Token
-		statPath = path.Join("/public", src.PublicLinkToken, req.Filepath)
+		auth = rsp.GetToken()
+		statPath = path.Join("/public", src.GetPublicLinkToken(), req.GetFilepath())
 	} else {
-		auth = src.RevaAuthorization
-		statPath = req.Filepath
+		auth = src.GetRevaAuthorization()
+		statPath = req.GetFilepath()
 	}
 	sRes, err := g.stat(statPath, auth)
 	if err != nil {
@@ -208,7 +210,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	if tType == "" {
 		tType = req.GetThumbnailType().String()
 	}
-	tr, err := thumbnail.PrepareRequest(int(req.Width), int(req.Height), tType, sRes.GetInfo().GetChecksum().GetSum(), req.Processor)
+	tr, err := thumbnail.PrepareRequest(int(req.GetWidth()), int(req.GetHeight()), tType, sRes.GetInfo().GetChecksum().GetSum(), req.GetProcessor())
 	if err != nil {
 		return "", merrors.BadRequest(g.serviceID, err.Error())
 	}
@@ -217,8 +219,8 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 		return key, nil
 	}
 
-	if src.WebdavAuthorization != "" {
-		ctx = imgsource.ContextSetAuthorization(ctx, src.WebdavAuthorization)
+	if src.GetWebdavAuthorization() != "" {
+		ctx = imgsource.ContextSetAuthorization(ctx, src.GetWebdavAuthorization())
 	}
 
 	// add signature and expiration to webdav url
@@ -232,7 +234,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	if err != nil {
 		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
-	defer r.Close() // nolint:errcheck
+	defer r.Close()
 	ppOpts := map[string]interface{}{
 		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
 	}
@@ -272,16 +274,16 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 		return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", err.Error())
 	}
 
-	if rsp.Status.Code != rpc.Code_CODE_OK {
-		switch rsp.Status.Code {
+	if rsp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		switch rsp.GetStatus().GetCode() {
 		case rpc.Code_CODE_NOT_FOUND:
-			return nil, merrors.NotFound(g.serviceID, "could not stat file: %s", rsp.Status.Message)
+			return nil, merrors.NotFound(g.serviceID, "could not stat file: %s", rsp.GetStatus().GetMessage())
 		default:
-			g.logger.Error().Str("status_message", rsp.Status.Message).Str("path", path).Msg("could not stat file")
-			return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", rsp.Status.Message)
+			g.logger.Error().Str("status_message", rsp.GetStatus().GetMessage()).Str("path", path).Msg("could not stat file")
+			return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", rsp.GetStatus().GetMessage())
 		}
 	}
-	if rsp.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
+	if rsp.GetInfo().GetType() != provider.ResourceType_RESOURCE_TYPE_FILE {
 		return nil, merrors.BadRequest(g.serviceID, "Unsupported file type")
 	}
 	if utils.ReadPlainFromOpaque(rsp.GetInfo().GetOpaque(), "status") == "processing" {
@@ -292,11 +294,11 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 			Status: http.StatusText(http.StatusTooEarly),
 		}
 	}
-	if rsp.Info.GetChecksum().GetSum() == "" {
+	if rsp.GetInfo().GetChecksum().GetSum() == "" {
 		g.logger.Error().Msg("resource info is missing checksum")
 		return nil, merrors.NotFound(g.serviceID, "resource info is missing a checksum")
 	}
-	if !thumbnail.IsMimeTypeSupported(rsp.Info.MimeType) {
+	if !thumbnail.IsMimeTypeSupported(rsp.GetInfo().GetMimeType()) {
 		return nil, merrors.NotFound(g.serviceID, "Unsupported file type")
 	}
 	return rsp, nil

@@ -44,7 +44,7 @@ func (s WebDav) Get(ctx context.Context, url string) (io.ReadCloser, error) {
 	}
 
 	client := &http.Client{}
-	resp, err := client.Do(req) // nolint:bodyclose
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.Wrapf(err, `could not get the image "%s"`, url)
 	}

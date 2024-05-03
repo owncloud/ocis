@@ -34,11 +34,11 @@ func (l logging) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbna
 		Logger()
 
 	if err != nil {
-		merror := merrors.FromError(err)
-		switch merror.Code {
+		fromError := merrors.FromError(err)
+		switch fromError.GetCode() {
 		case http.StatusNotFound:
 			logger.Debug().
-				Str("error_detail", merror.Detail).
+				Str("error_detail", fromError.GetDetail()).
 				Msg("no thumbnail found")
 		default:
 			logger.Warn().
