@@ -4867,7 +4867,6 @@ Feature: an user gets the resources shared to them
           "required": ["path"],
           "properties": {
             "path": {
-              "type": "string",
               "const": "<resource>"
             }
           }
@@ -4883,7 +4882,7 @@ Feature: an user gets the resources shared to them
 
   Scenario Outline: sharee hides the shared resource (Project space)
     Given using spaces DAV path
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "testfile.txt"
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
@@ -4909,7 +4908,6 @@ Feature: an user gets the resources shared to them
           "required": ["path"],
           "properties": {
             "path": {
-              "type": "string",
               "const": "<resource>"
             }
           }
@@ -4968,7 +4966,7 @@ Feature: an user gets the resources shared to them
 
   Scenario Outline: sharee lists the shares after hiding (Project space)
     Given using spaces DAV path
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "testfile.txt"
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
