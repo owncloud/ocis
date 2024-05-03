@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-03-09-06-25]
+[#deprecation-note-2024-05-03-10-22-07]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -269,5 +269,23 @@ a| [subs=-attributes]
 ++http://127.0.0.1:9186/thumbnails/data ++
 a| [subs=-attributes]
 The HTTP endpoint where the actual thumbnail file can be downloaded.
+
+a|`THUMBNAILS_MAX_INPUT_WIDTH` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++7680 ++
+a| [subs=-attributes]
+The maximum width of an input image which is being processed.
+
+a|`THUMBNAILS_MAX_INPUT_HEIGHT` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++4320 ++
+a| [subs=-attributes]
+The maximum height of an input image which is being processed.
 |===
 

@@ -47,3 +47,5 @@ thumbnail:
   font_map_file: ""
   transfer_secret: ""
   data_endpoint: http://127.0.0.1:9186/thumbnails/data
+  max_input_width: 7680
+  max_input_height: 4320

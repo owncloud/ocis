@@ -28,3 +28,5 @@
 | THUMBNAILS_TXT_FONTMAP_FILE | string |  | The path to a font file for txt thumbnails.|
 | THUMBNAILS_TRANSFER_TOKEN | string |  | The secret to sign JWT to download the actual thumbnail file.|
 | THUMBNAILS_DATA_ENDPOINT | string | http://127.0.0.1:9186/thumbnails/data | The HTTP endpoint where the actual thumbnail file can be downloaded.|
+| THUMBNAILS_MAX_INPUT_WIDTH | int | 7680 | The maximum width of an input image which is being processed.|
+| THUMBNAILS_MAX_INPUT_HEIGHT | int | 4320 | The maximum height of an input image which is being processed.|
