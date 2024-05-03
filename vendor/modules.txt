@@ -366,7 +366,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.19.2-0.20240429085656-5faad8dad61e
+# github.com/cs3org/reva/v2 v2.19.2-0.20240502102837-7e48a5145133
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -1769,6 +1769,9 @@ github.com/studio-b12/gowebdav
 # github.com/tchap/go-patricia/v2 v2.3.1
 ## explicit; go 1.16
 github.com/tchap/go-patricia/v2/patricia
+# github.com/test-go/testify v1.1.4
+## explicit
+github.com/test-go/testify/require
 # github.com/thejerf/suture/v4 v4.0.5
 ## explicit; go 1.9
 github.com/thejerf/suture/v4
