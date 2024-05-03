@@ -290,6 +290,7 @@ default:
         - SpacesTUSContext:
         - TUSContext:
         - OcisConfigContext:
+        - SharingNgContext:
 
     apiReshare:
       paths:

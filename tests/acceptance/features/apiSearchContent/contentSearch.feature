@@ -92,7 +92,12 @@ Feature: content search
     And user "Alice" has uploaded file with content "saying hello to the world" to "uploadFolder/keywordAtMiddle.txt"
     And user "Alice" has uploaded file with content "nepal want to say hello" to "uploadFolder/keywordAtLast.txt"
     And user "Alice" has uploaded file with content "Namaste nepal" to "uploadFolder/hello.txt"
-    And user "Alice" has shared folder "/uploadFolder" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
     When user "Brian" searches for "Content:hello" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain only these files:
@@ -186,9 +191,11 @@ Feature: content search
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
-    And user "Alice" has shared a space "project-space" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    And user "Alice" has sent the following share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Space Viewer  |
     And user "Alice" has created a folder "spacesFolderWithFile/spacesSubFolder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "hello world from nepal" to "keywordAtStart.txt"
     And user "Alice" has uploaded a file inside space "project-space" with content "saying hello to the world" to "spacesFolderWithFile/keywordAtMiddle.txt"
