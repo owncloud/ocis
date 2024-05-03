@@ -320,6 +320,7 @@ default:
         - SpacesContext:
         - WebDavLockingContext:
         - PublicWebDavContext:
+        - SharingNgContext:
 
     apiSharingNg:
       paths:

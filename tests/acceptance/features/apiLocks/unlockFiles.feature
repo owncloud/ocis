@@ -24,12 +24,14 @@ Feature: unlock locked items
   @issue-7761
   Scenario Outline: public tries to unlock a file in a share that was locked by the file owner
     Given using <dav-path-version> DAV path
+    And using SharingNG
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | PARENT   |
-      | permissions | change   |
-      | password    | %public% |
+    And user "Alice" has created the following link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When the public unlocks file "/parent.txt" with the last created lock of file "PARENT/parent.txt" of user "Alice" using the WebDAV API
@@ -95,7 +97,12 @@ Feature: unlock locked items
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
-    And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | PARENT/parent.txt |
+      | space           | Personal          |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | File Editor       |
     And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Brian" unlocks file "Shares/parent.txt" with the last created lock of file "PARENT/parent.txt" of user "Alice" using the WebDAV API
@@ -119,7 +126,12 @@ Feature: unlock locked items
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
     And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
-    And user "Alice" has shared folder "PARENT" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" unlocks file "Shares/PARENT/parent.txt" with the last created lock of file "PARENT/parent.txt" of user "Alice" using the WebDAV API
     Then the HTTP status code should be "403"
     And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
@@ -139,7 +151,12 @@ Feature: unlock locked items
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
-    And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | PARENT/parent.txt |
+      | space           | Personal          |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | File Editor       |
     And user "Brian" has locked file "Shares/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Brian" unlocks the last created lock of file "Shares/parent.txt" using the WebDAV API
@@ -161,7 +178,12 @@ Feature: unlock locked items
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
-    And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | PARENT/parent.txt |
+      | space           | Personal          |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | File Editor       |
     And user "Brian" has locked file "Shares/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Alice" unlocks file "PARENT/parent.txt" with the last created lock of file "Shares/parent.txt" of user "Brian" using the WebDAV API
@@ -183,6 +205,12 @@ Feature: unlock locked items
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Alice" has sent the following share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has shared folder "PARENT" with user "Brian"
     And user "Brian" has locked file "Shares/PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
@@ -256,10 +284,12 @@ Feature: unlock locked items
     And using spaces DAV path
     And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
-      | path      | textfile.txt |
-      | shareWith | Brian        |
-      | role      | editor       |
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     And user "Brian" has locked file "textfile.txt" using file-id path "<dav-path>" setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
@@ -278,12 +308,14 @@ Feature: unlock locked items
 
   Scenario Outline: unlock a file as an anonymous user
     Given using <dav-path-version> DAV path
+    And using SharingNG
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | PARENT   |
-      | permissions | change   |
-      | password    | %public% |
+    And user "Alice" has created the following link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     And the public has locked "textfile0.txt" in the last public link shared folder setting the following properties
       | lockscope | <lock-scope> |
     When the public unlocks file "textfile0.txt" using the WebDAV API
