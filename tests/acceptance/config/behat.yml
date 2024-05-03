@@ -121,6 +121,7 @@ default:
         - SpacesTUSContext:
         - OcisConfigContext:
         - TrashbinContext:
+        - SharingNgContext:
 
     apiGraphUserGroup:
       paths:

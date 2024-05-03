@@ -586,7 +586,12 @@ Feature: user GDPR (General Data Protection Regulation) report
   Scenario: generate a GDPR report and check events when a user shares a folder
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folderMain"
-    And user "Alice" has shared entry "/folderMain" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | folderMain |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
     Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
@@ -709,10 +714,12 @@ Feature: user GDPR (General Data Protection Regulation) report
   Scenario: generate a GDPR report and check events when a user creates a public link share
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folderMain"
-    And user "Alice" has created a public link share with settings
-      | path     | /folderMain |
-      | name     | sharedlink  |
-      | password | %public%    |
+    And user "Alice" has created the following link share:
+      | resource        | folderMain |
+      | space           | Personal   |
+      | permissionsRole | view       |
+      | password        | %public%   |
+      | displayName     | sharedlink |
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
     Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
@@ -854,9 +861,11 @@ Feature: user GDPR (General Data Protection Regulation) report
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "GDPR Space" with the default quota using the Graph API
-    And user "Alice" has shared a space "GDPR Space" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    And user "Alice" has sent the following share invitation:
+      | space           | GDPR Space   |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
     Then the HTTP status code of responses on each endpoint should be "202, 200" respectively
@@ -864,9 +873,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     """
     {
       "type": "object",
-      "required": [
-        "event"
-      ],
+      "required": ["event", "type"],
       "properties": {
         "event": {
           "type": "object",
@@ -879,11 +886,7 @@ Feature: user GDPR (General Data Protection Regulation) report
           "properties": {
             "Creator": {
                 "type": "object",
-                "required": [
-                    "idp",
-                    "opaque_id",
-                    "type"
-                ],
+                "required": ["idp", "opaque_id", "type"],
                 "properties": {
                     "idp": {
                       "type": "string",
@@ -894,18 +897,13 @@ Feature: user GDPR (General Data Protection Regulation) report
                       "pattern": "^%user_id_pattern%$"
                     },
                     "type": {
-                      "type": "number",
-                      "enum": [1]
+                      "const": 1
                     }
                 }
             },
             "Executant": {
                 "type": "object",
-                "required": [
-                    "idp",
-                    "opaque_id",
-                    "type"
-                ],
+                "required": ["idp", "opaque_id", "type"],
                 "properties": {
                     "idp": {
                       "type": "string",
@@ -916,38 +914,27 @@ Feature: user GDPR (General Data Protection Regulation) report
                       "pattern": "^%user_id_pattern%$"
                     },
                     "type": {
-                      "type": "number",
-                      "enum": [1]
+                      "const": 1
                     }
                 }
             },
             "GranteeGroupID": {
-              "type": ["number", "null"],
-              "enum": [null]
+              "const": null
             },
             "GranteeUserID": {
               "type": "object",
-              "required": [
-                  "idp",
-                  "opaque_id",
-                  "type"
-              ],
+              "required": ["opaque_id"],
               "properties": {
-                  "idp": {
-                    "type": "string",
-                    "pattern": "^%base_url%$"
-                  },
                   "opaque_id": {
                     "type": "string",
                     "pattern": "^%user_id_pattern%$"
-                  },
-                  "type": {
-                    "type": "number",
-                    "enum": [1]
                   }
               }
             }
           }
+        },
+        "type": {
+          "const": "events.SpaceShared"
         }
       }
     }
