@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2024-05-03T12:44:44.078471058Z
+date: 2024-05-03T15:45:11.191249683Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -164,7 +164,7 @@ ocis storage-users uploads sessions --expired=true --clean
 ocis storage-users uploads sessions --processing=false --has-virus=false --restart
 ```
 
-IMPOTANT: `list` and `clean` commands are deprecated. Do not use them.
+IMPORTANT: `list` and `clean` commands are deprecated. Do not use them.
 
 ```bash
 # deprecated
