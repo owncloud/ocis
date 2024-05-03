@@ -1,6 +1,6 @@
-Bugfix: Update reva to v2.19.5
+Bugfix: Update reva to v2.19.6
 
-We updated reva to v2.19.5
+We updated reva to v2.19.6
 
 *   Bugfix      [cs3org/reva#4654](https://github.com/cs3org/reva/pull/4654): Write blob based on session id
 *   Bugfix      [cs3org/reva#4666](https://github.com/cs3org/reva/pull/4666): Fix uploading via a public link
