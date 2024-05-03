@@ -136,7 +136,7 @@ ocis storage-users uploads sessions --expired=true --clean
 ocis storage-users uploads sessions --processing=false --has-virus=false --restart
 ```
 
-IMPOTANT: `list` and `clean` commands are deprecated. Do not use them.
+IMPORTANT: `list` and `clean` commands are deprecated. Do not use them.
 
 ```bash
 # deprecated
