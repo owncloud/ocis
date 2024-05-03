@@ -69,14 +69,12 @@
   * [ ] DEV: prepare changelog folder in `changelog/x.x.x_???`
 * [ ] Release Notes + Breaking Changes @tbsbdr
 * [ ] Migration + Breaking Changes Admin Doc @mmattel
-* [ ] Migration + Breaking Changes Helm Chart Doc @wkloucek @mmattel
 * [ ] DEV: Create final signed tag
 * [ ] DEV: Check successful CI run on `vx.y.z` tag / BLOCKING for all further activity
 * [ ] Merge release notes 
 
 ### Post-release communication
 * [ ] DEV: Create a `docs-stable-x.y` branch based on the docs folder in the ocis repo @micbar 
-* [ ] DEV: Create a `x.y.z` release in the ocis-helm repo (frozen state) @wkloucek
 * [ ] DEV/QA: Ping documentation in RC about the new release tag (for ocis/helm chart version bump in docs)
 * [ ] DEV/QA: Ping marketing to update all download links (download mirrors are updated at the full hour, wait with ping until download is actually available)
 * [ ] DEV/QA: Ping @hodyroff once the demo instances are running this release
