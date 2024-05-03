@@ -5464,7 +5464,11 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theLastPublicDavResponseShouldContainTheseNodes(TableNode $table):void {
-		$user = $this->getLastCreatedPublicShareToken();
+		if ($this->isUsingSharingNG()) {
+			$user = $this->shareNgGetLastCreatedLinkShareToken();
+		} else {
+			$user = $this->getLastCreatedPublicShareToken();
+		}
 		$this->verifyTableNodeColumns($table, ["name"]);
 		$type = $this->usingOldDavPath ? "public-files" : "public-files-new";
 		foreach ($table->getHash() as $row) {
@@ -5502,7 +5506,11 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function thePublicListsTheResourcesInTheLastCreatedPublicLinkWithDepthUsingTheWebdavApi(string $depth):void {
-		$user = $this->getLastCreatedPublicShareToken();
+		if ($this->isUsingSharingNG()) {
+			$user = $this->shareNgGetLastCreatedLinkShareToken();
+		} else {
+			$user = $this->getLastCreatedPublicShareToken();
+		}
 		$response = $this->listFolder(
 			$user,
 			'/',
