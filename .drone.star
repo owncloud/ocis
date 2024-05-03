@@ -238,18 +238,17 @@ def main(ctx):
 
     pipelines = []
 
-    build_release_helpers = [
-        changelog(),
-        docs(),
-        licenseCheck(ctx),
-    ]
+    build_release_helpers = \
+        changelog() + \
+        docs() + \
+        licenseCheck(ctx)
 
     test_pipelines = \
         codestyle(ctx) + \
         checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
-        [buildOcisBinaryForTesting(ctx)] + \
+        buildOcisBinaryForTesting(ctx) + \
         checkStarlark() + \
         build_release_helpers + \
         testOcisAndUploadResults(ctx) + \
@@ -543,7 +542,7 @@ def scanOcis(ctx):
     }
 
 def buildOcisBinaryForTesting(ctx):
-    return {
+    return [{
         "kind": "pipeline",
         "type": "docker",
         "name": "build_ocis_binary_for_testing",
@@ -563,7 +562,7 @@ def buildOcisBinaryForTesting(ctx):
             ],
         },
         "volumes": [pipelineVolumeGo],
-    }
+    }]
 
 def uploadScanResults(ctx):
     sonar_env = {
@@ -817,7 +816,7 @@ def localApiTestPipeline(ctx):
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      logRequests(),
                             "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [],
-                            "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+                            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
                                     "refs/heads/stable-*",
@@ -877,7 +876,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
                          ],
                      },
                  ],
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/stable-*",
@@ -984,7 +983,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                      },
                  ] +
                  validatorTests,
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/stable-*",
@@ -1033,7 +1032,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                  ] +
                  logRequests(),
         "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/stable-*",
@@ -1157,7 +1156,7 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
             "name": "uploads",
             "temp": {},
         }],
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
+        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/stable-*",
@@ -1242,7 +1241,7 @@ def e2eTests(ctx):
                 "type": "docker",
                 "name": "e2e-tests-%s" % name,
                 "steps": steps,
-                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
+                "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
                 "trigger": e2e_trigger,
                 "volumes": e2e_volumes,
             })
@@ -1564,7 +1563,7 @@ def licenseCheck(ctx):
         "target": target,
     }
 
-    return {
+    return [{
         "kind": "pipeline",
         "type": "docker",
         "name": "check-licenses",
@@ -1664,7 +1663,7 @@ def licenseCheck(ctx):
             ],
         },
         "volumes": [pipelineVolumeGo],
-    }
+    }]
 
 def releaseDockerManifest():
     return {
@@ -1700,7 +1699,7 @@ def releaseDockerManifest():
     }
 
 def changelog():
-    return {
+    return [{
         "kind": "pipeline",
         "type": "docker",
         "name": "changelog",
@@ -1766,7 +1765,7 @@ def changelog():
                 "refs/pull/**",
             ],
         },
-    }
+    }]
 
 def releaseDockerReadme(ctx):
     return {
@@ -1802,7 +1801,7 @@ def releaseDockerReadme(ctx):
     }
 
 def docs():
-    return {
+    return [{
         "kind": "pipeline",
         "type": "docker",
         "name": "docs",
@@ -1871,7 +1870,7 @@ def docs():
                 "refs/pull/**",
             ],
         },
-    }
+    }]
 
 def makeNodeGenerate(module):
     if module == "":
@@ -2582,7 +2581,7 @@ def litmus(ctx, storage):
                      },
                  ],
         "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/stable-*",
