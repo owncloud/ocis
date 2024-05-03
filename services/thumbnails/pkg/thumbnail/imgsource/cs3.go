@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"io"
 	"net/http"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -66,18 +66,18 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	if rsp.Status.Code != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("could not load image: %s", rsp.Status.Message)
+	if rsp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("could not load image: %s", rsp.GetStatus().GetMessage())
 	}
 	var ep, tk string
-	for _, p := range rsp.Protocols {
-		if p.Protocol == "spaces" {
-			ep, tk = p.DownloadEndpoint, p.Token
+	for _, p := range rsp.GetProtocols() {
+		if p.GetProtocol() == "spaces" {
+			ep, tk = p.GetDownloadEndpoint(), p.GetToken()
 			break
 		}
 	}
-	if (ep == "" || tk == "") && len(rsp.Protocols) > 0 {
-		ep, tk = rsp.Protocols[0].DownloadEndpoint, rsp.Protocols[0].Token
+	if (ep == "" || tk == "") && len(rsp.GetProtocols()) > 0 {
+		ep, tk = rsp.GetProtocols()[0].GetDownloadEndpoint(), rsp.GetProtocols()[0].GetToken()
 	}
 
 	httpReq, err := rhttp.NewRequest(ctx, "GET", ep, nil)
@@ -93,7 +93,7 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	}
 	client := &http.Client{}
 
-	resp, err := client.Do(httpReq) // nolint:bodyclose
+	resp, err := client.Do(httpReq)
 	if err != nil {
 		return nil, err
 	}

@@ -59,14 +59,3 @@ func ThumbnailStorage(storage storage.Storage) Option {
 		o.ThumbnailStorage = storage
 	}
 }
-
-// TraceProvider provides a function to configure the trace provider
-func TraceProvider(traceProvider trace.TracerProvider) Option {
-	return func(o *Options) {
-		if traceProvider != nil {
-			o.TraceProvider = traceProvider
-		} else {
-			o.TraceProvider = trace.NewNoopTracerProvider()
-		}
-	}
-}

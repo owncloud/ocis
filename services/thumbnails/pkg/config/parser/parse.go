@@ -33,6 +33,7 @@ func ParseConfig(cfg *config.Config) error {
 	return Validate(cfg)
 }
 
+// Validate can validate the configuration
 func Validate(_ *config.Config) error {
 	return nil
 }

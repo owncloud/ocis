@@ -1,13 +1,14 @@
 package thumbnail
 
 import (
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"image"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"io"
 	"strings"
+
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 )
 
 const (
@@ -21,7 +22,7 @@ const (
 // Encoder encodes the thumbnail to a specific format.
 type Encoder interface {
 	// Encode encodes the image to a format.
-	Encode(io.Writer, interface{}) error
+	Encode(w io.Writer, img interface{}) error
 	// Types returns the formats suffixes.
 	Types() []string
 	// MimeType returns the mimetype used by the encoder.
@@ -50,7 +51,7 @@ func (e PngEncoder) MimeType() string {
 	return "image/png"
 }
 
-// JpegEncoder encodes to jpg.
+// JpegEncoder encodes to jpg
 type JpegEncoder struct{}
 
 // Encode encodes to jpg
@@ -72,6 +73,7 @@ func (e JpegEncoder) MimeType() string {
 	return "image/jpeg"
 }
 
+// GifEncoder encodes to gif
 type GifEncoder struct{}
 
 // Encode encodes the image to a gif format
@@ -83,6 +85,7 @@ func (e GifEncoder) Encode(w io.Writer, img interface{}) error {
 	return gif.EncodeAll(w, g)
 }
 
+// Types returns the supported types of the GifEncoder
 func (e GifEncoder) Types() []string {
 	return []string{typeGif}
 }

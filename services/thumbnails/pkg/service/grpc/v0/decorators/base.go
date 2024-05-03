@@ -6,7 +6,7 @@ import (
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
 )
 
-// Interface acting as facade, holding all the interfaces that this
+// DecoratedService is an interface acting as facade, holding all the interfaces that this
 // thumbnails microservice is expecting to implement.
 // For now, only the thumbnailssvc.ThumbnailServiceHandler is present,
 // but a future configsvc.ConfigServiceHandler is expected to be added here
@@ -17,7 +17,7 @@ type DecoratedService interface {
 	thumbnailssvc.ThumbnailServiceHandler
 }
 
-// Base type to implement the decorators. It will provide a basic implementation
+// Decorator is the base type to implement the decorators. It will provide a basic implementation
 // by delegating to the decoratedService
 //
 // Expected implementations will be like:
@@ -43,7 +43,7 @@ type Decorator struct {
 	next DecoratedService
 }
 
-// Base implementation for the GetThumbnail (for the thumbnailssvc).
+// GetThumbnail is the base implementation for the thumbnailssvc.GetThumbnail.
 // It will just delegate to the underlying decoratedService
 //
 // Your custom decorator is expected to overwrite this function,

@@ -1,7 +1,6 @@
 package thumbnail
 
 import (
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"image"
 	"image/color"
 	"image/draw"
@@ -9,11 +8,12 @@ import (
 	"strings"
 
 	"github.com/kovidgoyal/imaging"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 )
 
 // Generator generates a web friendly file version.
 type Generator interface {
-	Generate(image.Rectangle, interface{}, Processor) (interface{}, error)
+	Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error)
 }
 
 // SimpleGenerator is the default image generator and is used for all image types expect gif.

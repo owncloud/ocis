@@ -2,12 +2,12 @@ package thumbnail
 
 import (
 	"bytes"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"image"
 	"image/gif"
 	"mime"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/storage"
 )
 
@@ -29,7 +29,7 @@ var (
 	}
 )
 
-// Request bundles information needed to generate a thumbnail for afile
+// Request bundles information needed to generate a thumbnail for a file
 type Request struct {
 	Resolution image.Rectangle
 	Encoder    Encoder
@@ -42,10 +42,10 @@ type Request struct {
 type Manager interface {
 	// Generate creates a thumbnail and stores it.
 	// The function returns a key with which the actual file can be retrieved.
-	Generate(Request, interface{}) (string, error)
+	Generate(r Request, img interface{}) (string, error)
 	// CheckThumbnail checks if a thumbnail with the requested attributes exists.
 	// The function will return a status if the file exists and the key to the file.
-	CheckThumbnail(Request) (string, bool)
+	CheckThumbnail(r Request) (string, bool)
 	// GetThumbnail will load the thumbnail from the storage and return its content.
 	GetThumbnail(key string) ([]byte, error)
 }
@@ -68,6 +68,7 @@ type SimpleManager struct {
 	maxDimension image.Point
 }
 
+// Generate creates a thumbnail and stores it
 func (s SimpleManager) Generate(r Request, img interface{}) (string, error) {
 	var match image.Rectangle
 	var inputDimensions image.Rectangle
@@ -103,11 +104,13 @@ func (s SimpleManager) Generate(r Request, img interface{}) (string, error) {
 	return k, nil
 }
 
+// CheckThumbnail checks if a thumbnail with the requested attributes exists.
 func (s SimpleManager) CheckThumbnail(r Request) (string, bool) {
 	k := s.storage.BuildKey(mapToStorageRequest(r))
 	return k, s.storage.Stat(k)
 }
 
+// GetThumbnail will load the thumbnail from the storage and return its content.
 func (s SimpleManager) GetThumbnail(key string) ([]byte, error) {
 	return s.storage.Get(key)
 }
