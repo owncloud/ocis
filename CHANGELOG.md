@@ -103,7 +103,9 @@ The following sections list the changes for unreleased.
 * Enhancement - Configurable claims for auto-provisioning user accounts: [#8952](https://github.com/owncloud/ocis/pull/8952)
 * Enhancement - Bump nats-js-kv pkg: [#8953](https://github.com/owncloud/ocis/pull/8953)
 * Enhancement - Graph permission created date time: [#8954](https://github.com/owncloud/ocis/pull/8954)
-* Enhancement - Bump Reva: [#9002](https://github.com/owncloud/ocis/pull/9002)
+* Enhancement - Add virus filter to sessions command: [#9041](https://github.com/owncloud/ocis/pull/9041)
+* Enhancement - Assimilate `clean` into `sessions` command: [#9041](https://github.com/owncloud/ocis/pull/9041)
+* Enhancement - Bump Reva: [#9041](https://github.com/owncloud/ocis/pull/9041)
 
 ## Details
 
@@ -601,10 +603,24 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/8749
    https://github.com/owncloud/ocis/pull/8954
 
-* Enhancement - Bump Reva: [#9002](https://github.com/owncloud/ocis/pull/9002)
+* Enhancement - Add virus filter to sessions command: [#9041](https://github.com/owncloud/ocis/pull/9041)
+
+   Allow filtering upload session by virus status (has-virus=true/false)
+
+   https://github.com/owncloud/ocis/pull/9041
+
+* Enhancement - Assimilate `clean` into `sessions` command: [#9041](https://github.com/owncloud/ocis/pull/9041)
+
+   We deprecated `ocis storage-user uploads clean` and added the same logic to
+   `ocis storage-users uploads session --clean`
+
+   https://github.com/owncloud/ocis/pull/9041
+
+* Enhancement - Bump Reva: [#9041](https://github.com/owncloud/ocis/pull/9041)
 
    Bumps reva version
 
+   https://github.com/owncloud/ocis/pull/9041
    https://github.com/owncloud/ocis/pull/9002
    https://github.com/owncloud/ocis/pull/8917
    https://github.com/owncloud/ocis/pull/8795
