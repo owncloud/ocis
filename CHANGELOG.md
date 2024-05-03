@@ -1,6 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 5.0.3](#changelog-for-503-2024-05-02)
 * [Changelog for 5.0.2](#changelog-for-502-2024-04-17)
 * [Changelog for 5.0.1](#changelog-for-501-2024-04-10)
 * [Changelog for 4.0.7](#changelog-for-407-2024-03-27)
@@ -41,7 +42,7 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.2...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.3...master
 
 ## Summary
 
@@ -635,6 +636,58 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8701
    https://github.com/owncloud/ocis/pull/8606
    https://github.com/owncloud/ocis/pull/8937
+
+# Changelog for [5.0.3] (2024-05-02)
+
+The following sections list the changes for 5.0.3.
+
+[5.0.3]: https://github.com/owncloud/ocis/compare/v5.0.2...v5.0.3
+
+## Summary
+
+* Bugfix - Update the admin user role assignment to enforce the config: [#8918](https://github.com/owncloud/ocis/pull/8918)
+* Bugfix - Crash when processing crafted TIFF files: [#8981](https://github.com/owncloud/ocis/pull/8981)
+* Bugfix - Update reva to v2.19.6: [#9011](https://github.com/owncloud/ocis/pull/9011)
+* Bugfix - Fix infected file handling: [#9011](https://github.com/owncloud/ocis/pull/9011)
+
+## Details
+
+* Bugfix - Update the admin user role assignment to enforce the config: [#8918](https://github.com/owncloud/ocis/pull/8918)
+
+   The admin user role assigment was not updated after the first assignment. We now
+   read the assigned role during init and update the admin user ID accordingly if
+   the role is not assigned. This is especially needed when the OCIS_ADMIN_USER_ID
+   is set after the autoprovisioning of the admin user when it originates from an
+   external Identity Provider.
+
+   https://github.com/owncloud/ocis/pull/8918
+   https://github.com/owncloud/ocis/pull/8897
+
+* Bugfix - Crash when processing crafted TIFF files: [#8981](https://github.com/owncloud/ocis/pull/8981)
+
+   Fix for a vulnerability with low severity in disintegration/imaging.
+
+   https://github.com/owncloud/ocis/pull/8981
+   https://github.com/advisories/GHSA-q7pp-wcgr-pffx
+
+* Bugfix - Update reva to v2.19.6: [#9011](https://github.com/owncloud/ocis/pull/9011)
+
+   We updated reva to v2.19.6
+
+  *   Bugfix      [cs3org/reva#4654](https://github.com/cs3org/reva/pull/4654): Write blob based on session id
+  *   Bugfix      [cs3org/reva#4666](https://github.com/cs3org/reva/pull/4666): Fix uploading via a public link
+  *   Bugfix      [cs3org/reva#4665](https://github.com/cs3org/reva/pull/4665): Fix creating documents in nested folders of public shares
+  *   Enhancement [cs3org/reva#4655](https://github.com/cs3org/reva/pull/4655): Bump mockery to v2.40.2
+  *   Enhancement [cs3org/reva#4664](https://github.com/cs3org/reva/pull/4664): Add ScanData to Uploadsession
+
+   https://github.com/owncloud/ocis/pull/9011
+
+* Bugfix - Fix infected file handling: [#9011](https://github.com/owncloud/ocis/pull/9011)
+
+   Reworks virus handling. Shows scandate and outcome on ocis storage-users uploads
+   sessions. Avoids retrying infected files on ocis postprocessing restart.
+
+   https://github.com/owncloud/ocis/pull/9011
 
 # Changelog for [5.0.2] (2024-04-17)
 
