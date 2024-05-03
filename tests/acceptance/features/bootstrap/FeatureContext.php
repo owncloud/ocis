@@ -34,14 +34,12 @@ use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
 use Swaggest\JsonSchema\Schema as JsonSchema;
-use TestHelpers\AppConfigHelper;
 use TestHelpers\OcsApiHelper;
+use Laminas\Ldap\Ldap;
 use TestHelpers\SetupHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\HttpLogger;
-use TestHelpers\UploadHelper;
 use TestHelpers\OcisHelper;
-use Laminas\Ldap\Ldap;
 use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
 
@@ -67,8 +65,6 @@ class FeatureContext extends BehatVariablesContext {
 	private int $scenarioStartTime;
 	private string $adminUsername;
 	private string $adminPassword;
-	private string $adminDisplayName = '';
-	private string $adminEmailAddress = '';
 	private string $originalAdminPassword;
 
 	/**
@@ -100,11 +96,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	private string $publicLinkSharePassword;
 	private string $ocPath;
-
-	/**
-	 * Location of the root folder of ownCloud on the local server under test
-	 */
-	private ?string $localServerRoot = null;
 	private string $currentUser = '';
 	private string $currentServer;
 
@@ -153,11 +144,9 @@ class FeatureContext extends BehatVariablesContext {
 	private ?ResponseInterface $response = null;
 	private string $responseUser = '';
 	private ?string $responseBodyContent = null;
-	private array $userResponseBodyContents = [];
 	public array $emailRecipients = [];
 	private CookieJar $cookieJar;
 	private string $requestToken;
-	private array $storageIds = [];
 	private array $createdFiles = [];
 
 	/**
@@ -171,18 +160,12 @@ class FeatureContext extends BehatVariablesContext {
 	public TUSContext $tusContext;
 	public GraphContext $graphContext;
 	public SpacesContext $spacesContext;
-	private array $initialTrustedServer;
 
 	/**
 	 * The codes are stored as strings, even though they are numbers
 	 */
 	private array $lastHttpStatusCodesArray = [];
 	private array $lastOCSStatusCodesArray = [];
-
-	/**
-	 * this is set true for db conversion tests
-	 */
-	private bool $dbConversion = false;
 
 	public const SHARES_SPACE_ID = 'a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668';
 	private bool $useSharingNG = false;
@@ -192,22 +175,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function isUsingSharingNG(): bool {
 		return $this->useSharingNG;
-	}
-
-	/**
-	 * @param bool $value
-	 *
-	 * @return void
-	 */
-	public function setDbConversionState(bool $value): void {
-		$this->dbConversion = $value;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isRunningForDbConversion(): bool {
-		return $this->dbConversion;
 	}
 
 	private string $oCSelector;
@@ -653,36 +620,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @param string $appTestCodeFullPath
-	 *
-	 * @return string the relative path from the core tests/acceptance dir
-	 *                to the equivalent dir in the app
-	 */
-	public function getPathFromCoreToAppAcceptanceTests(
-		string $appTestCodeFullPath
-	): string {
-		// $appTestCodeFullPath is something like:
-		// '/somedir/anotherdir/core/apps/guests/tests/acceptance/features/bootstrap'
-		// and we want to know the 'apps/guests/tests/acceptance' part
-
-		$path = \dirname($appTestCodeFullPath, 2);
-		$acceptanceDir = \basename($path);
-		$path = \dirname($path);
-		$testsDir = \basename($path);
-		$path = \dirname($path);
-		$appNameDir = \basename($path);
-		$path = \dirname($path);
-		// We specially are not sure about the name of the directory 'apps'
-		// Sometimes the app could be installed in some alternate apps directory
-		// like, for example, `apps-external`. So this really does need to be
-		// resolved here at run-time.
-		$appsDir = \basename($path);
-		// To get from core tests/acceptance we go up 2 levels then down through
-		// the above app dirs.
-		return "../../$appsDir/$appNameDir/$testsDir/$acceptanceDir";
-	}
-
-	/**
 	 * Get the externally-defined admin username, if any
 	 *
 	 * @return string|false
@@ -793,20 +730,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getOcPath(): string {
 		return $this->ocPath;
-	}
-
-	/**
-	 * @return CookieJar
-	 */
-	public function getCookieJar(): CookieJar {
-		return $this->cookieJar;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getRequestToken(): string {
-		return $this->requestToken;
 	}
 
 	/**
@@ -940,54 +863,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getOcsApiVersion(): int {
 		return $this->ocsApiVersion;
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function getSourceIpAddress(): ?string {
-		return $this->sourceIpAddress;
-	}
-
-	/**
-	 * @return array|null
-	 */
-	public function getStorageIds(): ?array {
-		return $this->storageIds;
-	}
-
-	/**
-	 * @param string $storageName
-	 *
-	 * @return integer
-	 * @throws Exception
-	 */
-	public function getStorageId(string $storageName): int {
-		$storageIds = $this->getStorageIds();
-		$storageId = \array_search($storageName, $storageIds);
-		Assert::assertNotFalse(
-			$storageId,
-			"Could not find storageId with storage name $storageName"
-		);
-		return $storageId;
-	}
-
-	/**
-	 * @param integer $storageId
-	 *
-	 * @return void
-	 */
-	public function popStorageId(int $storageId): void {
-		unset($this->storageIds[$storageId]);
-	}
-
-	/**
-	 * @param string $sourceIpAddress
-	 *
-	 * @return void
-	 */
-	public function setSourceIpAddress(string $sourceIpAddress): void {
-		$this->sourceIpAddress = $sourceIpAddress;
 	}
 
 	/**
@@ -1158,79 +1033,6 @@ class FeatureContext extends BehatVariablesContext {
 			$exceptionText = __METHOD__;
 		}
 		return HttpRequestHelper::getResponseXml($response, $exceptionText);
-	}
-
-	/**
-	 * Parses the xml answer to get the requested key and sub-key
-	 *
-	 * @param ResponseInterface $response
-	 * @param string $key1
-	 * @param string $key2
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function getXMLKey1Key2Value(ResponseInterface $response, string $key1, string $key2): string {
-		return (string)$this->getResponseXml($response, __METHOD__)->$key1->$key2;
-	}
-
-	/**
-	 * Parses the xml answer to get the requested key sequence
-	 *
-	 * @param ResponseInterface $response
-	 * @param string $key1
-	 * @param string $key2
-	 * @param string $key3
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function getXMLKey1Key2Key3Value(
-		ResponseInterface $response,
-		string            $key1,
-		string            $key2,
-		string            $key3
-	): string {
-		return (string)$this->getResponseXml($response, __METHOD__)->$key1->$key2->$key3;
-	}
-
-	/**
-	 * Parses the xml answer to get the requested attribute value
-	 *
-	 * @param ResponseInterface $response
-	 * @param string $key1
-	 * @param string $key2
-	 * @param string $key3
-	 * @param string $attribute
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function getXMLKey1Key2Key3AttributeValue(
-		ResponseInterface $response,
-		string            $key1,
-		string            $key2,
-		string            $key3,
-		string            $attribute
-	): string {
-		return (string)$this->getResponseXml($response, __METHOD__)->$key1->$key2->$key3->attributes()->$attribute;
-	}
-
-	/**
-	 * This function is needed to use a vertical fashion in the gherkin tables.
-	 *
-	 * @param array $arrayOfArrays
-	 *
-	 * @return array
-	 */
-	public function simplifyArray(array $arrayOfArrays): array {
-		$a = \array_map(
-			function ($subArray) {
-				return $subArray[0];
-			},
-			$arrayOfArrays
-		);
-		return $a;
 	}
 
 	/**
@@ -1449,17 +1251,20 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has sent HTTP method "([^"]*)" to URL "([^"]*)"$/
+	 * This function is needed to use a vertical fashion in the gherkin tables.
 	 *
-	 * @param string $user
-	 * @param string $verb
-	 * @param string $url
+	 * @param array $arrayOfArrays
 	 *
-	 * @return void
+	 * @return array
 	 */
-	public function userHasSentHTTPMethodToUrl(string $user, string $verb, string $url): void {
-		$this->userSendsHTTPMethodToUrl($user, $verb, $url);
-		$this->theHTTPStatusCodeShouldBeSuccess();
+	public function simplifyArray(array $arrayOfArrays): array {
+		$a = \array_map(
+			function ($subArray) {
+				return $subArray[0];
+			},
+			$arrayOfArrays
+		);
+		return $a;
 	}
 
 	/**
@@ -1488,21 +1293,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function userSendsHTTPMethodToUrlWithPassword(string $user, string $verb, string $url, string $password): void {
 		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url, null, $password));
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has sent HTTP method "([^"]*)" to URL "([^"]*)" with password "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $verb
-	 * @param string $url
-	 * @param string $password
-	 *
-	 * @return void
-	 */
-	public function userHasSentHTTPMethodToUrlWithPassword(string $user, string $verb, string $url, string $password): void {
-		$this->userSendsHTTPMethodToUrlWithPassword($user, $verb, $url, $password);
-		$this->theHTTPStatusCodeShouldBeSuccess();
 	}
 
 	/**
@@ -1743,15 +1533,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @Then the HTTP status code should be success
-	 *
-	 * @return void
-	 */
-	public function theHTTPStatusCodeShouldBeSuccess(): void {
-		$this->theHTTPStatusCodeShouldBeBetween(200, 299);
-	}
-
-	/**
 	 * @Then the HTTP status code should be failure
 	 *
 	 * @return void
@@ -1764,341 +1545,6 @@ class FeatureContext extends BehatVariablesContext {
 			$statusCode,
 			$message
 		);
-	}
-
-	/**
-	 *
-	 * @return bool
-	 */
-	public function theHTTPStatusCodeWasSuccess(): bool {
-		$statusCode = $this->response->getStatusCode();
-		return (($statusCode >= 200) && ($statusCode <= 299));
-	}
-
-	/**
-	 * Check the text in an HTTP responseXml message
-	 *
-	 * @Then /^the HTTP response message should be "([^"]*)"$/
-	 *
-	 * @param string $expectedMessage
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theHttpResponseMessageShouldBe(string $expectedMessage): void {
-		$actualMessage = $this->responseXml['value'][1]['value'];
-		Assert::assertEquals(
-			$expectedMessage,
-			$actualMessage,
-			"Expected $expectedMessage HTTP response message but got $actualMessage"
-		);
-	}
-
-	/**
-	 * Check the text in an HTTP reason phrase
-	 *
-	 * @Then /^the HTTP reason phrase should be "([^"]*)"$/
-	 *
-	 * @param string $reasonPhrase
-	 *
-	 * @return void
-	 */
-	public function theHTTPReasonPhraseShouldBe(string $reasonPhrase): void {
-		Assert::assertEquals(
-			$reasonPhrase,
-			$this->getResponse()->getReasonPhrase(),
-			'Unexpected HTTP reason phrase in response'
-		);
-	}
-
-	/**
-	 * Check the text in an HTTP reason phrase
-	 * Use this step form if the expected text contains double quotes,
-	 * single quotes and other content that theHTTPReasonPhraseShouldBe()
-	 * cannot handle.
-	 *
-	 * After the step, write the expected text in PyString form like:
-	 *
-	 * """
-	 * File "abc.txt" can't be shared due to reason "xyz"
-	 * """
-	 *
-	 * @Then /^the HTTP reason phrase should be:$/
-	 *
-	 * @param PyStringNode $reasonPhrase
-	 *
-	 * @return void
-	 */
-	public function theHTTPReasonPhraseShouldBePyString(
-		PyStringNode $reasonPhrase
-	): void {
-		Assert::assertEquals(
-			$reasonPhrase->getRaw(),
-			$this->getResponse()->getReasonPhrase(),
-			'Unexpected HTTP reason phrase in response'
-		);
-	}
-
-	/**
-	 * @Then /^the XML "([^"]*)" "([^"]*)" value should be "([^"]*)"$/
-	 *
-	 * @param string $key1
-	 * @param string $key2
-	 * @param string $idText
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theXMLKey1Key2ValueShouldBe(string $key1, string $key2, string $idText): void {
-		$actualValue = $this->getXMLKey1Key2Value($this->response, $key1, $key2);
-		Assert::assertEquals(
-			$idText,
-			$actualValue,
-			"Expected $idText but got "
-			. $actualValue
-		);
-	}
-
-	/**
-	 * @Then /^the XML "([^"]*)" "([^"]*)" "([^"]*)" value should be "([^"]*)"$/
-	 *
-	 * @param string $key1
-	 * @param string $key2
-	 * @param string $key3
-	 * @param string $idText
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theXMLKey1Key2Key3ValueShouldBe(
-		string $key1,
-		string $key2,
-		string $key3,
-		string $idText
-	) {
-		$actualValue = $this->getXMLKey1Key2Key3Value($this->response, $key1, $key2, $key3);
-		Assert::assertEquals(
-			$idText,
-			$actualValue,
-			"Expected $idText but got "
-			. $actualValue
-		);
-	}
-
-	/**
-	 * @Then /^the XML "([^"]*)" "([^"]*)" "([^"]*)" "([^"]*)" attribute value should be a valid version string$/
-	 *
-	 * @param string $key1
-	 * @param string $key2
-	 * @param string $key3
-	 * @param string $attribute
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theXMLKey1Key2AttributeValueShouldBe(
-		string $key1,
-		string $key2,
-		string $key3,
-		string $attribute
-	): void {
-		$value = $this->getXMLKey1Key2Key3AttributeValue(
-			$this->response,
-			$key1,
-			$key2,
-			$key3,
-			$attribute
-		);
-		Assert::assertTrue(
-			\version_compare($value, '0.0.1') >= 0,
-			"attribute $attribute value $value is not a valid version string"
-		);
-	}
-
-	/**
-	 * @param ResponseInterface $response
-	 *
-	 * @return void
-	 */
-	public function extractRequestTokenFromResponse(ResponseInterface $response): void {
-		$this->requestToken = \substr(
-			\preg_replace(
-				'/(.*)data-requesttoken="(.*)">(.*)/sm',
-				'\2',
-				$response->getBody()->getContents()
-			),
-			0,
-			89
-		);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has logged in to a web-style session$/
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 */
-	public function userHasLoggedInToAWebStyleSessionUsingTheAPI(string $user): void {
-		$user = $this->getActualUsername($user);
-		$loginUrl = $this->getBaseUrl() . '/login';
-		// Request a new session and extract CSRF token
-
-		$config = null;
-		if ($this->sourceIpAddress !== null) {
-			$config = [
-				'curl' => [
-					CURLOPT_INTERFACE => $this->sourceIpAddress
-				]
-			];
-		}
-
-		$response = HttpRequestHelper::get(
-			$loginUrl,
-			$this->getStepLineRef(),
-			null,
-			null,
-			$this->guzzleClientHeaders,
-			null,
-			$config,
-			$this->cookieJar
-		);
-		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
-		$this->extractRequestTokenFromResponse($response);
-
-		// Login and extract new token
-		$password = $this->getPasswordForUser($user);
-		$body = [
-			'user' => $user,
-			'password' => $password,
-			'requesttoken' => $this->requestToken
-		];
-		$response = HttpRequestHelper::post(
-			$loginUrl,
-			$this->getStepLineRef(),
-			null,
-			null,
-			$this->guzzleClientHeaders,
-			$body,
-			$config,
-			$this->cookieJar
-		);
-		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
-		$this->extractRequestTokenFromResponse($response);
-	}
-
-	/**
-	 * @When the client sends a :method to :url of user :user with requesttoken
-	 *
-	 * @param string $method
-	 * @param string $url
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 */
-	public function sendingAToWithRequesttoken(
-		string $method,
-		string $url,
-		string $user
-	): void {
-		$headers = $this->guzzleClientHeaders;
-
-		$config = null;
-		if ($this->sourceIpAddress !== null) {
-			$config = [
-				'curl' => [
-					CURLOPT_INTERFACE => $this->sourceIpAddress
-				]
-			];
-		}
-
-		$headers['requesttoken'] = $this->requestToken;
-
-		$user = \strtolower($this->getActualUsername($user));
-		$url = $this->getBaseUrl() . $url;
-		$url = $this->substituteInLineCodes($url, $user);
-		$this->response = HttpRequestHelper::sendRequest(
-			$url,
-			$this->getStepLineRef(),
-			$method,
-			null,
-			null,
-			$headers,
-			null,
-			$config,
-			$this->cookieJar
-		);
-	}
-
-	/**
-	 * @Given the client has sent a :method to :url of user :user with requesttoken
-	 *
-	 * @param string $method
-	 * @param string $url
-	 * @param string $user
-	 *
-	 * @return void
-	 */
-	public function theClientHasSentAToWithRequesttoken(
-		string $method,
-		string $url,
-		string $user
-	): void {
-		$this->sendingAToWithRequesttoken($method, $url, $user);
-		$this->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
-	 * @When the client sends a :method to :url of user :user without requesttoken
-	 *
-	 * @param string $method
-	 * @param string $url
-	 * @param string|null $user
-	 *
-	 * @return void
-	 * @throws JsonException
-	 */
-	public function sendingAToWithoutRequesttoken(string $method, string $url, ?string $user = null): void {
-		$config = null;
-		if ($this->sourceIpAddress !== null) {
-			$config = [
-				'curl' => [
-					CURLOPT_INTERFACE => $this->sourceIpAddress
-				]
-			];
-		}
-
-		$user = \strtolower($this->getActualUsername($user));
-		$url = $this->getBaseUrl() . $url;
-		$url = $this->substituteInLineCodes($url, $user);
-		$this->response = HttpRequestHelper::sendRequest(
-			$url,
-			$this->getStepLineRef(),
-			$method,
-			null,
-			null,
-			$this->guzzleClientHeaders,
-			null,
-			$config,
-			$this->cookieJar
-		);
-	}
-
-	/**
-	 * @Given the client has sent a :method to :url without requesttoken
-	 *
-	 * @param string $method
-	 * @param string $url
-	 *
-	 * @return void
-	 */
-	public function theClientHasSentAToWithoutRequesttoken(string $method, string $url): void {
-		$this->sendingAToWithoutRequesttoken($method, $url);
-		$this->theHTTPStatusCodeShouldBeSuccess();
 	}
 
 	/**
@@ -2154,37 +1600,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @param string $filePathFromServerRoot
-	 * @param string $content
-	 *
-	 * @return void
-	 * @throws Exception
-	 * @throws GuzzleException
-	 */
-	public function createFileOnServerWithContent(
-		string $filePathFromServerRoot,
-		string $content
-	): void {
-		SetupHelper::createFileOnServer(
-			$filePathFromServerRoot,
-			$content,
-			$this->getStepLineRef(),
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword()
-		);
-	}
-
-	/**
-	 * @param string $user
-	 *
-	 * @return boolean
-	 */
-	public function isAdminUsername(string $user): bool {
-		return ($user === $this->getAdminUsername());
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getAdminUsername(): string {
@@ -2196,15 +1611,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getAdminPassword(): string {
 		return $this->adminPassword;
-	}
-
-	/**
-	 * @param string $password
-	 *
-	 * @return void
-	 */
-	public function rememberNewAdminPassword(string $password): void {
-		$this->adminPassword = $password;
 	}
 
 	/**
@@ -2435,107 +1841,12 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @param string $userName
-	 *
-	 * @return array
-	 */
-	public function getAuthOptionForUser(string $userName): array {
-		return [$userName, $this->getPasswordForUser($userName)];
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getAuthOptionForAdmin(): array {
-		return $this->getAuthOptionForUser($this->getAdminUsername());
-	}
-
-	/**
 	 * @When the administrator requests status.php
 	 *
 	 * @return void
 	 */
 	public function theAdministratorRequestsStatusPhp(): void {
 		$this->response = $this->getStatusPhp();
-	}
-
-	/**
-	 * Copy a file from the test-runner to the temporary storage directory on
-	 * the system-under-test. This uses the testing app to push the file into
-	 * the backend of the server, where it can be seen by occ commands done in
-	 * the server-under-test.
-	 *
-	 * @Given the administrator has copied file :localPath to :destination in temporary storage on the system under test
-	 *
-	 * @param string $localPath relative to the core "root" folder
-	 * @param string $destination
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasCopiedFileToTemporaryStorageOnTheSystemUnderTest(
-		string $localPath,
-		string $destination
-	): void {
-		// FeatureContext is in tests/acceptance/features/bootstrap so go up 4
-		// levels to the test-runner root
-		$testRunnerRoot = \dirname(__DIR__, 4);
-		// The local path is specified down from the root - e.g. tests/data/file.txt
-		$content = \file_get_contents("$testRunnerRoot/$localPath");
-		Assert::assertNotFalse(
-			$content,
-			"Local file $localPath cannot be read"
-		);
-		$this->copyContentToFileInTemporaryStorageOnSystemUnderTest($destination, $content);
-		$this->theFileWithContentShouldExistInTheServerRoot(TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER . "/$destination", $content);
-	}
-
-	/**
-	 * @param string $destination
-	 * @param string $content
-	 *
-	 * @return ResponseInterface
-	 * @throws Exception
-	 */
-	public function copyContentToFileInTemporaryStorageOnSystemUnderTest(
-		string $destination,
-		string $content
-	): ResponseInterface {
-		$this->mkDirOnServer(TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER);
-
-		return OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			'POST',
-			"/apps/testing/api/v1/file",
-			$this->getStepLineRef(),
-			[
-				'file' => TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER . "/$destination",
-				'content' => $content
-			],
-			$this->getOcsApiVersion()
-		);
-	}
-
-	/**
-	 * @Given a file with the size of :size bytes and the name :name has been created locally
-	 *
-	 * @param int $size if not int given it will be cast to int
-	 * @param string $name
-	 *
-	 * @return void
-	 * @throws InvalidArgumentException
-	 */
-	public function aFileWithSizeAndNameHasBeenCreatedLocally(int $size, string $name): void {
-		$fullPath = UploadHelper::getUploadFilesDir($name);
-		if (\file_exists($fullPath)) {
-			throw new InvalidArgumentException(
-				__METHOD__ . " could not create '$fullPath' file exists"
-			);
-		}
-		UploadHelper::createFileSpecificSize($fullPath, $size);
-		$this->createdFiles[] = $fullPath;
 	}
 
 	/**
@@ -2562,162 +1873,6 @@ class FeatureContext extends BehatVariablesContext {
 			$this->guzzleClientHeaders,
 			null,
 			$config
-		);
-	}
-
-	/**
-	 * @Then the json responded should match with
-	 *
-	 * @param PyStringNode $jsonExpected
-	 *
-	 * @return void
-	 */
-	public function jsonRespondedShouldMatch(PyStringNode $jsonExpected): void {
-		$jsonExpectedEncoded = \json_encode($jsonExpected->getRaw());
-		$jsonRespondedEncoded = \json_encode((string)$this->response->getBody());
-		Assert::assertEquals(
-			$jsonExpectedEncoded,
-			$jsonRespondedEncoded,
-			"The json responded: $jsonRespondedEncoded does not match with json expected: $jsonExpectedEncoded"
-		);
-	}
-
-	/**
-	 * send request to read a server file for core
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function readFileInServerRootForCore(string $path): ResponseInterface {
-		return OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			'GET',
-			"/apps/testing/api/v1/file?file=$path",
-			$this->getStepLineRef()
-		);
-	}
-
-	/**
-	 * read a server file for ocis
-	 *
-	 * @param string $path
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function readFileInServerRootForOCIS(string $path): string {
-		$pathToOcis = \getenv("PATH_TO_OCIS");
-		$targetFile = \rtrim($pathToOcis, "/") . "/" . "services/web/assets" . "/" . ltrim($path, '/');
-		if (!\file_exists($targetFile)) {
-			throw new Exception('Target File ' . $targetFile . ' could not be found');
-		}
-		return \file_get_contents($targetFile);
-	}
-
-	/**
-	 * send request to list a server file
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function listTrashbinFileInServerRoot(string $path): void {
-		$response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			'GET',
-			"/apps/testing/api/v1/dir?dir=$path",
-			$this->getStepLineRef()
-		);
-		$this->setResponse($response);
-	}
-
-	/**
-	 * move file in server root
-	 *
-	 * @param string $path
-	 * @param string $target
-	 *
-	 * @return void
-	 */
-	public function moveFileInServerRoot(string $path, string $target): void {
-		$response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			"MOVE",
-			"/apps/testing/api/v1/file",
-			$this->getStepLineRef(),
-			[
-				'source' => $path,
-				'target' => $target
-			]
-		);
-
-		$this->setResponse($response);
-	}
-
-	/**
-	 * @Then the file :path with content :content should exist in the server root
-	 *
-	 * @param string $path
-	 * @param string $content
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theFileWithContentShouldExistInTheServerRoot(string $path, string $content): void {
-		$fileContent = $this->readFileInServerRootForOCIS($path);
-		Assert::assertSame(
-			$content,
-			$fileContent,
-			"The content of the file does not match with '$content'"
-		);
-	}
-
-	/**
-	 * @Then /^the content in the response should match with the content of file "([^"]*)" in the server root$/
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theContentInTheRespShouldMatchWithFileInTheServerRoot(string $path): void {
-		$content = $this->getResponse()->getBody()->getContents();
-		$this->theFileWithContentShouldExistInTheServerRoot($path, $content);
-	}
-
-	/**
-	 * @Then the file :path should not exist in the server root
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function theFileShouldNotExistInTheServerRoot(string $path): void {
-		$this->readFileInServerRootForCore($path);
-		Assert::assertSame(
-			404,
-			$this->getResponse()->getStatusCode(),
-			"The file '$path' exists in the server root but was not expected to exist"
-		);
-	}
-
-	/**
-	 * @Then the body of the response should be empty
-	 *
-	 * @return void
-	 */
-	public function theResponseBodyShouldBeEmpty(): void {
-		Assert::assertEmpty(
-			$this->getResponse()->getBody()->getContents(),
-			"The response body was expected to be empty but got "
-			. $this->getResponse()->getBody()->getContents()
 		);
 	}
 
@@ -3209,53 +2364,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * Get the path of the ownCloud server root directory
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function getServerRoot(): string {
-		if ($this->localServerRoot === null) {
-			$this->localServerRoot = SetupHelper::getServerRoot(
-				$this->getBaseUrl(),
-				$this->getAdminUsername(),
-				$this->getAdminPassword(),
-				$this->getStepLineRef()
-			);
-		}
-		return $this->localServerRoot;
-	}
-
-	/**
-	 * @Then the config key :key of app :appID should have value :value
-	 *
-	 * @param string $key
-	 * @param string $appID
-	 * @param string $value
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theConfigKeyOfAppShouldHaveValue(string $key, string $appID, string $value): void {
-		$response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			'GET',
-			"/apps/testing/api/v1/app/$appID/$key",
-			$this->getStepLineRef(),
-			[],
-			$this->getOcsApiVersion()
-		);
-		$configkeyValue = (string)$this->getResponseXml($response, __METHOD__)->data[0]->element->value;
-		Assert::assertEquals(
-			$value,
-			$configkeyValue,
-			"The config key $key of app $appID was expected to have value $value but got $configkeyValue"
-		);
-	}
-
-	/**
 	 * Parse list of config keys from the given XML response
 	 *
 	 * @param SimpleXMLElement $responseXml
@@ -3277,171 +2385,6 @@ class FeatureContext extends BehatVariablesContext {
 			$configkeyValues[0] = $configkeyData;
 		}
 		return $configkeyValues;
-	}
-
-	/**
-	 * Returns a list of config keys for the given app
-	 *
-	 * @param string $appID
-	 * @param string $exceptionText text to put at the front of exception messages
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getConfigKeyList(string $appID, string $exceptionText = ''): array {
-		if ($exceptionText === '') {
-			$exceptionText = __METHOD__;
-		}
-		$response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			'GET',
-			"/apps/testing/api/v1/app/$appID",
-			$this->getStepLineRef(),
-			[],
-			$this->getOcsApiVersion()
-		);
-		return $this->parseConfigListFromResponseXml(
-			$this->getResponseXml($response, $exceptionText)
-		);
-	}
-
-	/**
-	 * Check if given config key is present for given app
-	 *
-	 * @param string $key
-	 * @param string $appID
-	 *
-	 * @return bool
-	 * @throws Exception
-	 */
-	public function checkConfigKeyInApp(string $key, string $appID): bool {
-		$configkeyList = $this->getConfigKeyList($appID);
-		foreach ($configkeyList as $config) {
-			if ($config['configkey'] === $key) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @Then /^app ((?:'[^']*')|(?:"[^"]*")) should (not|)\s?have config key ((?:'[^']*')|(?:"[^"]*"))$/
-	 *
-	 * @param string $appID
-	 * @param string $shouldOrNot
-	 * @param string $key
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function appShouldHaveConfigKey(string $appID, string $shouldOrNot, string $key): void {
-		$appID = \trim($appID, $appID[0]);
-		$key = \trim($key, $key[0]);
-
-		$should = ($shouldOrNot !== "not");
-
-		if ($should) {
-			Assert::assertTrue(
-				$this->checkConfigKeyInApp($key, $appID),
-				"App $appID does not have config key $key"
-			);
-		} else {
-			Assert::assertFalse(
-				$this->checkConfigKeyInApp($key, $appID),
-				"App $appID has config key $key but was not expected to"
-			);
-		}
-	}
-
-	/**
-	 * @Then /^following config keys should (not|)\s?exist$/
-	 *
-	 * @param string $shouldOrNot
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function followingConfigKeysShouldExist(string $shouldOrNot, TableNode $table): void {
-		$should = ($shouldOrNot !== "not");
-		if ($should) {
-			foreach ($table as $item) {
-				Assert::assertTrue(
-					$this->checkConfigKeyInApp($item['configkey'], $item['appid']),
-					"{$item['appid']} was expected to have config key {$item['configkey']} but does not"
-				);
-			}
-		} else {
-			foreach ($table as $item) {
-				Assert::assertFalse(
-					$this->checkConfigKeyInApp($item['configkey'], $item['appid']),
-					"Expected : {$item['appid']} should not have config key {$item['configkey']}"
-				);
-			}
-		}
-	}
-
-	/**
-	 * @param string $user
-	 * @param string|null $asUser
-	 * @param string|null $password
-	 *
-	 * @return void
-	 */
-	public function sendUserSyncRequest(string $user, ?string $asUser = null, ?string $password = null): void {
-		$user = $this->getActualUsername($user);
-		$asUser = $asUser ?? $this->getAdminUsername();
-		$password = $password ?? $this->getPasswordForUser($asUser);
-		$response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$asUser,
-			$password,
-			'POST',
-			"/cloud/user-sync/$user",
-			$this->getStepLineRef(),
-			[],
-			$this->getOcsApiVersion()
-		);
-		$this->setResponse($response);
-	}
-
-	/**
-	 * @When the administrator tries to sync user :user using the OCS API
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 */
-	public function theAdministratorTriesToSyncUserUsingTheOcsApi(string $user): void {
-		$this->sendUserSyncRequest($user);
-	}
-
-	/**
-	 * @When user :asUser tries to sync user :user using the OCS API
-	 *
-	 * @param string $asUser
-	 * @param string $user
-	 *
-	 * @return void
-	 */
-	public function userTriesToSyncUserUsingTheOcsApi(string $asUser, string $user): void {
-		$asUser = $this->getActualUsername($asUser);
-		$user = $this->getActualUsername($user);
-		$this->sendUserSyncRequest($user, $asUser);
-	}
-
-	/**
-	 * @When the administrator tries to sync user :user using password :password and the OCS API
-	 *
-	 * @param string|null $user
-	 * @param string|null $password
-	 *
-	 * @return void
-	 */
-	public function theAdministratorTriesToSyncUserUsingPasswordAndTheOcsApi(?string $user, ?string $password): void {
-		$this->sendUserSyncRequest($user, null, $password);
 	}
 
 	/**
@@ -3585,25 +2528,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 *
-	 * @param string $serverUrl
-	 *
-	 * @return void
-	 */
-	public function clearFileLocksForServer(string $serverUrl): void {
-		$response = OcsApiHelper::sendRequest(
-			$serverUrl,
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			'delete',
-			"/apps/testing/api/v1/lockprovisioning",
-			$this->getStepLineRef(),
-			["global" => "true"]
-		);
-		Assert::assertEquals("200", $response->getStatusCode());
-	}
-
-	/**
 	 * @AfterScenario
 	 *
 	 * clear space id reference
@@ -3700,152 +2624,6 @@ class FeatureContext extends BehatVariablesContext {
 		$rowCount = \count($table->getRows()[0]);
 		if ($count !== $rowCount) {
 			throw new Exception("Table expected to have $count rows but found $rowCount");
-		}
-	}
-
-	/**
-	 * @return void
-	 */
-	public function resetAppConfigs(): void {
-		// Set the required starting values for testing
-		$this->setCapabilities($this->getCommonSharingConfigs());
-	}
-
-	/**
-	 * @Given the administrator has set the last login date for user :user to :days days ago
-	 * @When the administrator sets the last login date for user :user to :days days ago using the testing API
-	 *
-	 * @param string $user
-	 * @param string $days
-	 *
-	 * @return void
-	 */
-	public function theAdministratorSetsTheLastLoginDateForUserToDaysAgoUsingTheTestingApi(string $user, string $days): void {
-		$user = $this->getActualUsername($user);
-		$adminUser = $this->getAdminUsername();
-		$baseUrl = "/apps/testing/api/v1/lastlogindate/$user";
-		$response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$adminUser,
-			$this->getAdminPassword(),
-			'POST',
-			$baseUrl,
-			$this->getStepLineRef(),
-			['days' => $days],
-			$this->getOcsApiVersion()
-		);
-		$this->setResponse($response);
-	}
-
-	/**
-	 * @param array $capabilitiesArray with each array entry containing keys for:
-	 *                                 ['capabilitiesApp'] the "app" name in the capabilities response
-	 *                                 ['capabilitiesParameter'] the parameter name in the capabilities response
-	 *                                 ['testingApp'] the "app" name as understood by "testing"
-	 *                                 ['testingParameter'] the parameter name as understood by "testing"
-	 *                                 ['testingState'] boolean state the parameter must be set to for the test
-	 *
-	 * @return void
-	 */
-	public function setCapabilities(array $capabilitiesArray): void {
-		AppConfigHelper::setCapabilities(
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			$capabilitiesArray,
-			$this->getStepLineRef()
-		);
-	}
-
-	/**
-	 * @param string $sourceUser
-	 * @param string $targetUser
-	 *
-	 * @return string|null
-	 * @throws Exception
-	 */
-	public function findLastTransferFolderForUser(string $sourceUser, string $targetUser): ?string {
-		$foundPaths = [];
-		$responseXmlObject = $this->listFolderAndReturnResponseXml(
-			$targetUser,
-			'',
-			'1'
-		);
-		$transferredElements = $responseXmlObject->xpath(
-			"//d:response/d:href[contains(., '/transferred%20from%20$sourceUser%20on%')]"
-		);
-		foreach ($transferredElements as $transferredElement) {
-			// $transferredElement is an XML object. We want to work with the string in the XML element.
-			$path = \rawurldecode((string)$transferredElement);
-			$parts = \explode(' ', $path);
-			// store timestamp as key
-			$foundPaths[] = [
-				'date' => \strtotime(\trim($parts[4], '/')),
-				'path' => $path,
-			];
-		}
-		if (empty($foundPaths)) {
-			return null;
-		}
-
-		\usort(
-			$foundPaths,
-			function ($a, $b) {
-				return $a['date'] - $b['date'];
-			}
-		);
-
-		$davPath = \rtrim($this->getFullDavFilesPath($targetUser), '/');
-
-		$foundPath = \end($foundPaths)['path'];
-		// strip DAV path
-		return \substr($foundPath, \strlen($davPath) + 1);
-	}
-
-	/**
-	 * Get the array of trusted servers in format ["url" => "id"]
-	 *
-	 * @param string $server 'LOCAL'/'REMOTE'
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getTrustedServers(string $server = 'LOCAL'): array {
-		if ($server === 'LOCAL') {
-			$url = $this->getLocalBaseUrl();
-		} elseif ($server === 'REMOTE') {
-			$url = $this->getRemoteBaseUrl();
-		} else {
-			throw new Exception(__METHOD__ . " Invalid value for server : $server");
-		}
-		$adminUser = $this->getAdminUsername();
-		$response = OcsApiHelper::sendRequest(
-			$url,
-			$adminUser,
-			$this->getAdminPassword(),
-			'GET',
-			"/apps/testing/api/v1/trustedservers",
-			$this->getStepLineRef()
-		);
-		if ($response->getStatusCode() !== 200) {
-			throw new Exception("Could not get the list of trusted servers" . $response->getBody()->getContents());
-		}
-		$responseXml = HttpRequestHelper::getResponseXml(
-			$response,
-			__METHOD__
-		);
-		$serverData = \json_decode(
-			\json_encode(
-				$responseXml->data
-			),
-			true
-		);
-		if (!\array_key_exists('element', $serverData)) {
-			return [];
-		} else {
-			return isset($serverData['element'][0]) ?
-				\array_column($serverData['element'], 'id', 'url') :
-				\array_column($serverData, 'id', 'url');
 		}
 	}
 
