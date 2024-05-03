@@ -54,7 +54,12 @@ Feature: date search
     And using spaces DAV path
     And user "Alice" has created folder "sharedFolder"
     And user "Alice" uploads a file "filesForUpload/textfile.txt" to "/sharedFolder/yesterday.txt" with mtime "yesterday" via TUS inside of the space "Personal" using the WebDAV API
-    And user "Alice" has shared folder "/sharedFolder" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | sharedFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
     When user "Brian" searches for "Mtime:yesterday" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain these entries:
