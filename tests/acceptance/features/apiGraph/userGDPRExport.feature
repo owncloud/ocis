@@ -897,7 +897,6 @@ Feature: user GDPR (General Data Protection Regulation) report
                       "pattern": "^%user_id_pattern%$"
                     },
                     "type": {
-                      "type": "number",
                       "const": 1
                     }
                 }
@@ -915,13 +914,11 @@ Feature: user GDPR (General Data Protection Regulation) report
                       "pattern": "^%user_id_pattern%$"
                     },
                     "type": {
-                      "type": "number",
                       "const": 1
                     }
                 }
             },
             "GranteeGroupID": {
-              "type": ["number", "null"],
               "const": null
             },
             "GranteeUserID": {
@@ -937,7 +934,6 @@ Feature: user GDPR (General Data Protection Regulation) report
           }
         },
         "type": {
-          "type": "string",
           "const": "events.SpaceShared"
         }
       }
