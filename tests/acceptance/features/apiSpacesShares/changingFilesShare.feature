@@ -17,13 +17,23 @@ Feature: change shared resource
     And user "Alice" has created folder "/PARENT"
     And user "Brian" has created folder "/PARENT"
     And user "Alice" has moved file "textfile0.txt" to "PARENT/from_alice.txt" in space "Personal"
-    And user "Alice" has shared folder "/PARENT" with user "Carol"
-    And user "Brian" has shared folder "/PARENT" with user "Carol"
+    And user "Alice" has sent the following share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Carol    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And user "Brian" has sent the following share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Carol    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Carol" moves file "PARENT/from_alice.txt" to "PARENT (1)/from_alice.txt" in space "Shares" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And for user "Carol" folder "PARENT" of the space "Shares" should not contain these entries:
+    Then the HTTP status code should be "502"
+    And for user "Carol" folder "PARENT" of the space "Shares" should contain these entries:
       | from_alice.txt |
-    And for user "Carol" folder "PARENT (1)" of the space "Shares" should contain these entries:
+    And for user "Carol" folder "PARENT (1)" of the space "Shares" should not contain these entries:
       | from_alice.txt |
 
 
@@ -31,7 +41,12 @@ Feature: change shared resource
     Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has uploaded file with content "old content version 1" to "/textfile1.txt"
     And user "Alice" has uploaded file with content "old content version 2" to "/textfile1.txt"
-    And user "Alice" has shared file "/textfile1.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Brian" uploads a file inside space "Shares" with content "this is a new content" to "textfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should contain these entries:
