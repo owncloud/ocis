@@ -35,10 +35,12 @@ Feature: Search
 
   Scenario Outline: user can search items from the shares
     Given using <dav-path-version> DAV path
-    And user "Alice" has created a share inside of space "project101" with settings:
-      | path      | folderMain |
-      | shareWith | Brian      |
-      | role      | viewer     |
+    And user "Alice" has sent the following share invitation:
+      | resource        | folderMain |
+      | space           | project101 |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     When user "Brian" searches for "*folder*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
@@ -72,10 +74,12 @@ Feature: Search
   Scenario Outline: user cannot search pending share
     Given user "Brian" has disabled auto-accepting
     And using <dav-path-version> DAV path
-    And user "Alice" has created a share inside of space "project101" with settings:
-      | path      | folderMain |
-      | shareWith | Brian      |
-      | role      | viewer     |
+    And user "Alice" has sent the following share invitation:
+      | resource        | folderMain |
+      | space           | project101 |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     When user "Brian" searches for "*folder*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
@@ -92,11 +96,13 @@ Feature: Search
 
   Scenario Outline: user cannot search declined share
     Given using <dav-path-version> DAV path
-    And user "Alice" has created a share inside of space "project101" with settings:
-      | path      | folderMain |
-      | shareWith | Brian      |
-      | role      | viewer     |
-    And user "Brian" has declined share "/Shares/folderMain" offered by user "Alice"
+    And user "Alice" has sent the following share invitation:
+      | resource        | folderMain |
+      | space           | project101 |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Brian" has disabled sync of last shared resource
     When user "Brian" searches for "*folder*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
@@ -157,10 +163,12 @@ Feature: Search
 
   Scenario Outline: search inside folder in shares
     Given using <dav-path-version> DAV path
-    And user "Alice" has created a share inside of space "project101" with settings:
-      | path      | folderMain |
-      | shareWith | Brian      |
-      | role      | viewer     |
+    And user "Alice" has sent the following share invitation:
+      | resource        | folderMain |
+      | space           | project101 |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     When user "Brian" searches for "*folder*" inside folder "/folderMain" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain only these entries:
@@ -238,10 +246,12 @@ Feature: Search
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder "foo/sharedToBrian" in space "Alice Hansen"
     And user "Alice" has created a folder "sharedToCarol" in space "Alice Hansen"
-    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
-      | path      | foo    |
-      | shareWith | Brian  |
-      | role      | viewer |
+    And user "Alice" has sent the following share invitation:
+      | resource        | foo      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" searches for "shared*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain these entries:
