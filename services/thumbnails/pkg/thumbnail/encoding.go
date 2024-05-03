@@ -1,13 +1,14 @@
 package thumbnail
 
 import (
-	"errors"
 	"image"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"io"
 	"strings"
+
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 )
 
 const (
@@ -18,17 +19,10 @@ const (
 	typeGgs  = "ggs"
 )
 
-var (
-	// ErrInvalidType represents the error when a type can't be encoded.
-	ErrInvalidType = errors.New("can't encode this type")
-	// ErrNoEncoderForType represents the error when an encoder couldn't be found for a type.
-	ErrNoEncoderForType = errors.New("no encoder for this type found")
-)
-
 // Encoder encodes the thumbnail to a specific format.
 type Encoder interface {
 	// Encode encodes the image to a format.
-	Encode(io.Writer, interface{}) error
+	Encode(w io.Writer, img interface{}) error
 	// Types returns the formats suffixes.
 	Types() []string
 	// MimeType returns the mimetype used by the encoder.
@@ -42,7 +36,7 @@ type PngEncoder struct{}
 func (e PngEncoder) Encode(w io.Writer, img interface{}) error {
 	m, ok := img.(image.Image)
 	if !ok {
-		return ErrInvalidType
+		return errors.ErrInvalidType
 	}
 	return png.Encode(w, m)
 }
@@ -57,14 +51,14 @@ func (e PngEncoder) MimeType() string {
 	return "image/png"
 }
 
-// JpegEncoder encodes to jpg.
+// JpegEncoder encodes to jpg
 type JpegEncoder struct{}
 
 // Encode encodes to jpg
 func (e JpegEncoder) Encode(w io.Writer, img interface{}) error {
 	m, ok := img.(image.Image)
 	if !ok {
-		return ErrInvalidType
+		return errors.ErrInvalidType
 	}
 	return jpeg.Encode(w, m, nil)
 }
@@ -79,17 +73,19 @@ func (e JpegEncoder) MimeType() string {
 	return "image/jpeg"
 }
 
+// GifEncoder encodes to gif
 type GifEncoder struct{}
 
 // Encode encodes the image to a gif format
 func (e GifEncoder) Encode(w io.Writer, img interface{}) error {
 	g, ok := img.(*gif.GIF)
 	if !ok {
-		return ErrInvalidType
+		return errors.ErrInvalidType
 	}
 	return gif.EncodeAll(w, g)
 }
 
+// Types returns the supported types of the GifEncoder
 func (e GifEncoder) Types() []string {
 	return []string{typeGif}
 }
@@ -110,7 +106,7 @@ func EncoderForType(fileType string) (Encoder, error) {
 	case typeGif:
 		return GifEncoder{}, nil
 	default:
-		return nil, ErrNoEncoderForType
+		return nil, errors.ErrNoEncoderForType
 	}
 }
 

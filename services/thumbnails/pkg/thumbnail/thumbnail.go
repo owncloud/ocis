@@ -7,11 +7,12 @@ import (
 	"mime"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/storage"
 )
 
 var (
-	// SupportedMimeTypes contains a all mimetypes which are supported by the thumbnailer.
+	// SupportedMimeTypes contains an all mimetypes which are supported by the thumbnailer.
 	SupportedMimeTypes = map[string]struct{}{
 		"image/png":                       {},
 		"image/jpg":                       {},
@@ -28,7 +29,7 @@ var (
 	}
 )
 
-// Request bundles information needed to generate a thumbnail for afile
+// Request bundles information needed to generate a thumbnail for a file
 type Request struct {
 	Resolution image.Rectangle
 	Encoder    Encoder
@@ -41,37 +42,48 @@ type Request struct {
 type Manager interface {
 	// Generate creates a thumbnail and stores it.
 	// The function returns a key with which the actual file can be retrieved.
-	Generate(Request, interface{}) (string, error)
+	Generate(r Request, img interface{}) (string, error)
 	// CheckThumbnail checks if a thumbnail with the requested attributes exists.
 	// The function will return a status if the file exists and the key to the file.
-	CheckThumbnail(Request) (string, bool)
+	CheckThumbnail(r Request) (string, bool)
 	// GetThumbnail will load the thumbnail from the storage and return its content.
 	GetThumbnail(key string) ([]byte, error)
 }
 
 // NewSimpleManager creates a new instance of SimpleManager
-func NewSimpleManager(resolutions Resolutions, storage storage.Storage, logger log.Logger) SimpleManager {
+func NewSimpleManager(resolutions Resolutions, storage storage.Storage, logger log.Logger, maxInputWidth, maxInputHeight int) SimpleManager {
 	return SimpleManager{
-		storage:     storage,
-		logger:      logger,
-		resolutions: resolutions,
+		storage:      storage,
+		logger:       logger,
+		resolutions:  resolutions,
+		maxDimension: image.Point{X: maxInputWidth, Y: maxInputHeight},
 	}
 }
 
 // SimpleManager is a simple implementation of Manager
 type SimpleManager struct {
-	storage     storage.Storage
-	logger      log.Logger
-	resolutions Resolutions
+	storage      storage.Storage
+	logger       log.Logger
+	resolutions  Resolutions
+	maxDimension image.Point
 }
 
+// Generate creates a thumbnail and stores it
 func (s SimpleManager) Generate(r Request, img interface{}) (string, error) {
 	var match image.Rectangle
+	var inputDimensions image.Rectangle
 	switch m := img.(type) {
 	case *gif.GIF:
 		match = s.resolutions.ClosestMatch(r.Resolution, m.Image[0].Bounds())
+		inputDimensions = m.Image[0].Bounds()
 	case image.Image:
 		match = s.resolutions.ClosestMatch(r.Resolution, m.Bounds())
+		inputDimensions = m.Bounds()
+	}
+
+	// validate max input image dimensions - 6016x4000
+	if inputDimensions.Size().X > s.maxDimension.X || inputDimensions.Size().Y > s.maxDimension.Y {
+		return "", errors.ErrImageTooLarge
 	}
 
 	thumbnail, err := r.Generator.Generate(match, img, r.Processor)
@@ -92,11 +104,13 @@ func (s SimpleManager) Generate(r Request, img interface{}) (string, error) {
 	return k, nil
 }
 
+// CheckThumbnail checks if a thumbnail with the requested attributes exists.
 func (s SimpleManager) CheckThumbnail(r Request) (string, bool) {
 	k := s.storage.BuildKey(mapToStorageRequest(r))
 	return k, s.storage.Stat(k)
 }
 
+// GetThumbnail will load the thumbnail from the storage and return its content.
 func (s SimpleManager) GetThumbnail(key string) ([]byte, error) {
 	return s.storage.Get(key)
 }

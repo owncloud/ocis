@@ -1,8 +1,12 @@
 package thumbnail
 
 import (
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/preprocessor"
+	"github.com/stretchr/testify/assert"
 	"image"
 	"os"
+	"path"
 	"path/filepath"
 	"testing"
 
@@ -17,11 +21,11 @@ type NoOpManager struct {
 	storage.Storage
 }
 
-func (m NoOpManager) BuildKey(r storage.Request) string {
+func (m NoOpManager) BuildKey(_ storage.Request) string {
 	return ""
 }
 
-func (m NoOpManager) Set(username, key string, thumbnail []byte) error {
+func (m NoOpManager) Set(_, _ string, _ []byte) error {
 	return nil
 }
 
@@ -31,6 +35,8 @@ func BenchmarkGet(b *testing.B) {
 		Resolutions{},
 		NoOpManager{},
 		log.NewLogger(),
+		6016,
+		4000,
 	)
 
 	res, _ := ParseResolution("32x32")
@@ -126,10 +132,59 @@ func TestPrepareRequest(t *testing.T) {
 				return
 			}
 
-			// func's are not reflactable, ignore
+			// funcs are not reflactable, ignore
 			if diff := cmp.Diff(tt.want, got, cmpopts.IgnoreFields(Request{}, "Processor")); diff != "" {
 				t.Errorf("PrepareRequest(): %v", diff)
 			}
+		})
+	}
+}
+
+func TestPreviewGenerationTooBigImage(t *testing.T) {
+	tests := []struct {
+		name     string
+		fileName string
+		mimeType string
+	}{
+		{name: "png", mimeType: "image/png", fileName: "../../testdata/oc.png"},
+		{name: "gif", mimeType: "image/gif", fileName: "../../testdata/oc.gif"},
+		{name: "ggs", mimeType: "application/vnd.geogebra.slides", fileName: "../../testdata/test.ggs"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sut := NewSimpleManager(
+				Resolutions{},
+				NoOpManager{},
+				log.NewLogger(),
+				1024,
+				768,
+			)
+
+			res, _ := ParseResolution("32x32")
+			req := Request{
+				Resolution: res,
+				Checksum:   "1872ade88f3013edeb33decd74a4f947",
+			}
+			cwd, _ := os.Getwd()
+			p := filepath.Join(cwd, tt.fileName)
+			f, _ := os.Open(p)
+			defer f.Close()
+
+			preproc := preprocessor.ForType(tt.mimeType, nil)
+			convert, err := preproc.Convert(f)
+			if err != nil {
+				return
+			}
+
+			ext := path.Ext(tt.fileName)
+			req.Encoder, _ = EncoderForType(ext)
+			generate, err := sut.Generate(req, convert)
+			if err != nil {
+				return
+			}
+			assert.ErrorIs(t, err, errors.ErrImageTooLarge)
+			assert.Equal(t, "", generate)
 		})
 	}
 }
