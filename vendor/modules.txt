@@ -1790,6 +1790,9 @@ github.com/tidwall/match
 # github.com/tidwall/pretty v1.2.1
 ## explicit; go 1.16
 github.com/tidwall/pretty
+# github.com/tidwall/sjson v1.2.5
+## explicit; go 1.14
+github.com/tidwall/sjson
 # github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208
 ## explicit
 github.com/toorop/go-dkim
