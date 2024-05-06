@@ -251,6 +251,7 @@ default:
         - TagContext:
         - TUSContext:
         - WebDavPropertiesContext:
+        - SharingNgContext:
 
     apiSearch2:
       paths:

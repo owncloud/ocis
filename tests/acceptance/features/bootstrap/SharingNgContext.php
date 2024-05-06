@@ -728,6 +728,29 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @Given user :user has disabled sync of last shared resource
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userHasDisabledSyncOfLastSharedResource(string $user):void {
+		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$itemId = $shareSpaceId . '!' . $shareItemId;
+		$response = GraphHelper::disableShareSync(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$itemId,
+			$shareSpaceId,
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, __METHOD__ . " could not disable sync of last share", $response);
+	}
+
+	/**
 	 * @When user :user disables sync of share :share using the Graph API
 	 *
 	 * @param string $user
