@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	authapp "github.com/owncloud/ocis/v2/services/auth-app/pkg/command"
 	"net"
 	"net/http"
 	"net/rpc"
@@ -159,6 +160,11 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.AppRegistry.Context = ctx
 		cfg.AppRegistry.Commons = cfg.Commons
 		return appRegistry.Execute(cfg.AppRegistry)
+	})
+	reg(3, opts.Config.AuthApp.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.AuthApp.Context = ctx
+		cfg.AuthApp.Commons = cfg.Commons
+		return authapp.Execute(cfg.AuthApp)
 	})
 	reg(3, opts.Config.AuthBasic.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.AuthBasic.Context = ctx
