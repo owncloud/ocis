@@ -510,7 +510,7 @@ Feature: move (rename) file
       | spaces           |
 
 
-  Scenario Outline: rename folder to/from special characters
+  Scenario Outline: rename file to/from special characters
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "test file" to <from-file-name>
     When user "Alice" moves file <from-file-name> to <to-file-name> using the WebDAV API
