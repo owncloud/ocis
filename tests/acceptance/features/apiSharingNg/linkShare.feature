@@ -26,7 +26,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": true
           },
           "id": {
@@ -44,19 +43,15 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.displayName": {
-                "type": "string",
                 "const": ""
               },
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "<permissions-role>"
               },
               "webUrl": {
@@ -95,7 +90,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": false
           },
           "id": {
@@ -113,19 +107,15 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.displayName": {
-                "type": "string",
                 "const": ""
               },
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "internal"
               },
               "webUrl": {
@@ -168,7 +158,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": true
           },
           "id": {
@@ -186,19 +175,15 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.displayName": {
-                "type": "string",
                 "const": ""
               },
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "<permissions-role>"
               },
               "webUrl": {
@@ -235,7 +220,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": false
           },
           "id": {
@@ -253,19 +237,15 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.displayName": {
-                "type": "string",
                 "const": ""
               },
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "internal"
               },
               "webUrl": {
@@ -311,7 +291,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": true
           },
           "id": {
@@ -319,7 +298,6 @@ Feature: Create a share link for a resource
             "pattern": "^[a-zA-Z]{15}$"
           },
           "expirationDateTime": {
-            "type": "string",
             "const": "2200-07-15T23:59:59Z"
           },
           "link": {
@@ -333,19 +311,15 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.displayName": {
-                "type": "string",
                 "const": "Homework"
               },
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "<permissions-role>"
               },
               "webUrl": {
@@ -388,7 +362,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": true
           },
           "id": {
@@ -396,7 +369,6 @@ Feature: Create a share link for a resource
             "pattern": "^[a-zA-Z]{15}$"
           },
           "expirationDateTime": {
-            "type": "string",
             "const": "2200-07-15T23:59:59Z"
           },
           "link": {
@@ -410,19 +382,15 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.displayName": {
-                "type": "string",
                 "const": "Homework"
               },
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "<permissions-role>"
               },
               "webUrl": {
@@ -462,7 +430,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": false
           },
           "id": {
@@ -480,19 +447,15 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.displayName": {
-                "type": "string",
                 "const": ""
               },
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "<permissions-role>"
               },
               "webUrl": {
@@ -535,7 +498,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": true
           },
           "id": {
@@ -553,19 +515,15 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.displayName": {
-                "type": "string",
                 "const": ""
               },
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "<new-permissions-role>"
               },
               "webUrl": {
@@ -610,7 +568,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": false
           },
           "id": {
@@ -628,23 +585,18 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.displayName": {
-                "type": "string",
                 "const": ""
               },
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "internal"
               },
               "webUrl": {
-                "type": "string",
                 "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
               }
             }
@@ -684,15 +636,12 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": true
           },
           "id": {
-            "type": "string",
             "pattern": "^[a-zA-Z]{15}$"
           },
           "expirationDateTime": {
-            "type": "string",
             "const": "2201-07-15T23:59:59Z"
           },
           "link": {
@@ -706,15 +655,12 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "view"
               },
               "webUrl": {
@@ -753,7 +699,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": true
           },
           "id": {
@@ -771,15 +716,12 @@ Feature: Create a share link for a resource
             ],
             "properties": {
               "@libre.graph.quickLink": {
-                "type": "boolean",
                 "const": false
               },
               "preventsDownload": {
-                "type": "boolean",
                 "const": false
               },
               "type": {
-                "type": "string",
                 "const": "view"
               },
               "webUrl": {
@@ -820,7 +762,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": true
           }
         }
@@ -849,7 +790,6 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "type": "boolean",
             "const": true
           }
         }
@@ -888,7 +828,6 @@ Feature: Create a share link for a resource
                 "pattern": "invalidRequest"
               },
               "message": {
-                "type": "string",
                 "const": "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
               }
             }
@@ -937,7 +876,6 @@ Feature: Create a share link for a resource
                 "pattern": "invalidRequest"
               },
               "message": {
-                "type": "string",
                 "const": "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
               }
             }
@@ -950,3 +888,745 @@ Feature: Create a share link for a resource
       | 123             |
       | password        |
       | ownCloud        |
+
+  @issue-7879
+  Scenario Outline: create a share link of a folder inside project-space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | folderToShare      |
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": true
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "<permissions-role>"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
+
+
+  Scenario: create an internal link share of a folder inside project-space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | folderToShare |
+      | space           | projectSpace  |
+      | permissionsRole | internal      |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": false
+          },
+          "id": {
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "internal"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @issue-8619
+  Scenario: try to create an internal share link of a folder inside project-space with password
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | folderToShare |
+      | space           | projectSpace  |
+      | permissionsRole | internal      |
+      | password        | %public%      |
+    Then the HTTP status code should be "400"
+
+  @issue-7879
+  Scenario Outline: create a share link of a folder inside project-space with display name and expiry date
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource           | folderToShare            |
+      | space              | projectSpace             |
+      | permissionsRole    | <permissions-role>       |
+      | password           | %public%                 |
+      | displayName        | Homework                 |
+      | expirationDateTime | 2200-07-15T14:00:00.000Z |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link",
+          "expirationDateTime"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": true
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "expirationDateTime": {
+            "const": "2200-07-15T23:59:59Z"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": "Homework"
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "<permissions-role>"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
+
+
+  Scenario Outline: create a share link of a folder inside project-space with a password that is listed in the Banned-Password-List
+    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | folderToShare      |
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | password        | <banned-password>  |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "invalidRequest"
+              },
+              "message": {
+                "const": "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | banned-password | permissions-role |
+      | 123             | view             |
+      | password        | view             |
+      | ownCloud        | view             |
+      | 123             | edit             |
+      | password        | edit             |
+      | ownCloud        | edit             |
+      | 123             | upload           |
+      | password        | upload           |
+      | ownCloud        | upload           |
+      | 123             | createOnly       |
+      | password        | createOnly       |
+      | ownCloud        | createOnly       |
+      | 123             | blocksDownload   |
+      | password        | blocksDownload   |
+      | ownCloud        | blocksDownload   |
+
+  @env-config
+  Scenario: set password on a existing share link of a folder inside project-space
+    Given the following configs have been set:
+      | config                                       | value |
+      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "folderToShare/textfile.txt"
+    And user "Alice" has created the following link share:
+      | resource        | folderToShare |
+      | space           | projectSpace  |
+      | permissionsRole | view          |
+    When user "Alice" sets the following password for the last link share using the Graph API:
+      | resource | folderToShare |
+      | space    | projectSpace  |
+      | password | %public%      |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": true
+          }
+        }
+      }
+      """
+    And the public should be able to download file "/textfile.txt" from the last link share with password "%public%" and the content should be "to share"
+
+  @env-config @issue-7879
+  Scenario Outline: create a share link of a file inside project-space without password
+    Given the following configs have been set:
+      | config                                       | value |
+      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | folderToShare      |
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": false
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "<permissions-role>"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
+
+  @issue-7879
+  Scenario Outline: create a share link of a file inside project-space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | textfile.txt       |
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": true
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "<permissions-role>"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | blocksDownload   |
+
+  @issue-8619
+  Scenario: create an internal share link of a file inside project-space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | textfile.txt |
+      | space           | projectSpace |
+      | permissionsRole | internal     |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": false
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "internal"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @issue-8619
+  Scenario: try to create an internal share link of a file inside project-space with password from project-space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | textfile.txt |
+      | space           | projectSpace |
+      | permissionsRole | internal     |
+      | password        | %public%     |
+    Then the HTTP status code should be "400"
+
+  @issue-7879
+  Scenario Outline: create a share link of a file inside project-space with display name and expiry date
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource           | textfile.txt             |
+      | space              | projectSpace             |
+      | permissionsRole    | <permissions-role>       |
+      | password           | %public%                 |
+      | displayName        | Homework                 |
+      | expirationDateTime | 2200-07-15T14:00:00.000Z |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link",
+          "expirationDateTime"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": true
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "expirationDateTime": {
+            "const": "2200-07-15T23:59:59Z"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": "Homework"
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "<permissions-role>"
+              },
+              "webUrl": {
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | blocksDownload   |
+
+  @env-config @issue-7879
+  Scenario Outline: create a share link of a file inside project-space without password
+    Given the following configs have been set:
+      | config                                       | value |
+      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | textfile.txt       |
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": false
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "<permissions-role>"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | internal         |
+      | blocksDownload   |
+
+
+  Scenario Outline: create a share link of a file inside project-space with a password that is listed in the Banned-Password-List
+    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
+    When user "Alice" creates the following link share using the Graph API:
+      | resource        | textfile.txt       |
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | password        | <banned-password>  |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "invalidRequest"
+              },
+              "message": {
+                "const": "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | banned-password | permissions-role |
+      | 123             | view             |
+      | password        | view             |
+      | ownCloud        | view             |
+      | 123             | edit             |
+      | password        | edit             |
+      | ownCloud        | edit             |
+      | 123             | blocksDownload   |
+      | password        | blocksDownload   |
+      | ownCloud        | blocksDownload   |
+
+  @env-config
+  Scenario: set password on a existing share link of a file inside project-space
+    Given the following configs have been set:
+      | config                                       | value |
+      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
+    And user "Alice" has created the following link share:
+      | resource        | textfile.txt |
+      | space           | projectSpace |
+      | permissionsRole | view         |
+    When user "Alice" sets the following password for the last link share using the Graph API:
+      | resource | textfile.txt |
+      | space    | projectSpace |
+      | password | %public%     |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": true
+          }
+        }
+      }
+      """
+    And the public should be able to download file "textfile.txt" from the last link share with password "%public%" and the content should be "to share"
