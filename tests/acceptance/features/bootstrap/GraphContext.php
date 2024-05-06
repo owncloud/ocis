@@ -173,8 +173,8 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserHasDisabledUser(string $byUser, string $user): void {
-		$this->theUserDisablesUserToUsingTheGraphApi($byUser, $user);
-		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
+		$response = $this->editUserUsingTheGraphApi($byUser, $user, null, null, null, null, false);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
 	/**
