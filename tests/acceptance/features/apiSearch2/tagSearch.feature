@@ -125,7 +125,12 @@ Feature: tag search
     And user "Alice" has uploaded file with content "hello nepal" to "uploadFolder/file3.txt"
     And user "Alice" has created the following tags for file "uploadFolder/file1.txt" of the space "Personal":
       | tag1 |
-    And user "Alice" has shared folder "/uploadFolder" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And user "Brian" has created the following tags for file "uploadFolder/file2.txt" of the space "Shares":
       | tag1 |
     When user "Brian" searches for "Tags:tag1" using the WebDAV API
@@ -149,9 +154,11 @@ Feature: tag search
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "tag-space" with the default quota using the Graph API
-    And user "Alice" has shared a space "tag-space" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    And user "Alice" has sent the following share invitation:
+      | space           | tag-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     And user "Alice" has created a folder "spacesFolderWithFile/spacesSubFolder" in space "tag-space"
     And user "Alice" has uploaded a file inside space "tag-space" with content "tagged file" to "spacesFile.txt"
     And user "Alice" has uploaded a file inside space "tag-space" with content "untagged file" to "spacesFileWithoutTag.txt"

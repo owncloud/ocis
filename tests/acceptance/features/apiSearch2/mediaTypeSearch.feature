@@ -109,7 +109,12 @@ Feature: media type search
     And user "Alice" has uploaded file "filesForUpload/data.7z" to "/uploadFolder/data.7z"
     And user "Alice" has uploaded file "filesForUpload/data.rar" to "/uploadFolder/data.rar"
     And user "Alice" has uploaded file "filesForUpload/data.tar.bz2" to "/uploadFolder/data.tar.bz2"
-    And user "Alice" has shared folder "uploadFolder" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
     When user "Brian" searches for "mediatype:<pattern>" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
@@ -140,9 +145,11 @@ Feature: media type search
     And user "Alice" has uploaded a file "filesForUpload/data.7z" to "/data.7z" in space "project101"
     And user "Alice" has uploaded a file "filesForUpload/data.rar" to "/data.rar" in space "project101"
     And user "Alice" has uploaded a file "filesForUpload/data.tar.bz2" to "/data.tar.bz2" in space "project101"
-    And user "Alice" has shared a space "project101" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    And user "Alice" has sent the following share invitation:
+      | space           | project101   |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     When user "Brian" searches for "mediatype:<pattern>" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
