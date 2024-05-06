@@ -26,8 +26,9 @@ import (
 
 // Aspects holds dependencies for handling aspects of the decomposedfs
 type Aspects struct {
-	Lookup      node.PathLookup
-	Tree        node.Tree
-	Permissions permissions.Permissions
-	EventStream events.Stream
+	Lookup            node.PathLookup
+	Tree              node.Tree
+	Permissions       permissions.Permissions
+	EventStream       events.Stream
+	DisableVersioning bool
 }

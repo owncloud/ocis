@@ -50,8 +50,14 @@ type Options struct {
 	// ocis fs works on top of a dir of uuid nodes
 	Root string `mapstructure:"root"`
 
+	// the upload directory where uploads in progress are stored
+	UploadDirectory string `mapstructure:"upload_directory"`
+
 	// UserLayout describes the relative path from the storage's root node to the users home node.
 	UserLayout string `mapstructure:"user_layout"`
+
+	// ProjectLayout describes the relative path from the storage's root node to the project spaces root directory.
+	ProjectLayout string `mapstructure:"project_layout"`
 
 	// propagate mtime changes as tmtime (tree modification time) to the parent directory when user.ocis.propagation=1 is set on a node
 	TreeTimeAccounting bool `mapstructure:"treetime_accounting"`
@@ -65,7 +71,9 @@ type Options struct {
 	PermTLSMode              pool.TLSMode
 
 	PersonalSpaceAliasTemplate string `mapstructure:"personalspacealias_template"`
+	PersonalSpacePathTemplate  string `mapstructure:"personalspacepath_template"`
 	GeneralSpaceAliasTemplate  string `mapstructure:"generalspacealias_template"`
+	GeneralSpacePathTemplate   string `mapstructure:"generalspacepath_template"`
 
 	AsyncFileUploads bool `mapstructure:"asyncfileuploads"`
 
@@ -73,10 +81,9 @@ type Options struct {
 
 	Tokens TokenOptions `mapstructure:"tokens"`
 
-	// FileMetadataCache for file metadata
+	StatCache         cache.Config `mapstructure:"statcache"`
 	FileMetadataCache cache.Config `mapstructure:"filemetadatacache"`
-	// IDCache for symlink lookups of direntry to node id
-	IDCache cache.Config `mapstructure:"idcache"`
+	IDCache           cache.Config `mapstructure:"idcache"`
 
 	MaxAcquireLockCycles    int `mapstructure:"max_acquire_lock_cycles"`
 	LockCycleDurationFactor int `mapstructure:"lock_cycle_duration_factor"`
@@ -117,9 +124,6 @@ func New(m map[string]interface{}) (*Options, error) {
 		o.MetadataBackend = "xattrs"
 	}
 
-	if o.UserLayout == "" {
-		o.UserLayout = "{{.Id.OpaqueId}}"
-	}
 	// ensure user layout has no starting or trailing /
 	o.UserLayout = strings.Trim(o.UserLayout, "/")
 
@@ -158,6 +162,10 @@ func New(m map[string]interface{}) (*Options, error) {
 	}
 	if o.AsyncPropagatorOptions.PropagationDelay == 0 {
 		o.AsyncPropagatorOptions.PropagationDelay = 5 * time.Second
+	}
+
+	if o.UploadDirectory == "" {
+		o.UploadDirectory = filepath.Join(o.Root, "uploads")
 	}
 
 	return o, nil
