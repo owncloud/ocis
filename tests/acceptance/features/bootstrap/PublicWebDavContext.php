@@ -304,7 +304,8 @@ class PublicWebDavContext implements Context {
 			$path,
 			$password,
 			"",
-			$publicWebDAVAPIVersion
+			$publicWebDAVAPIVersion,
+			$this->featureContext->isUsingSharingNG()
 		);
 		$this->featureContext->setResponse($response);
 	}

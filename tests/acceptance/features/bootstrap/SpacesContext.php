@@ -3443,7 +3443,7 @@ class SpacesContext implements Context {
 		if ($should) {
 			Assert::assertNotEmpty($responseArray, __METHOD__ . ' Response should contain a link, but it is empty');
 			foreach ($responseArray as $element) {
-				$expectedLinkId = (string) $this->featureContext->getLastCreatedPublicShare()->id;
+				$expectedLinkId = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareID() : (string) $this->featureContext->getLastCreatedPublicShare()->id;
 				Assert::assertEquals($element["id"], $expectedLinkId, "link IDs are different");
 			}
 		} else {
