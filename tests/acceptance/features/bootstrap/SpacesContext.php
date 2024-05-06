@@ -3153,7 +3153,9 @@ class SpacesContext implements Context {
 	 */
 	public function userTriesToDownloadFileVersions(string $user, string $file, string $index, string $spaceName):void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->filesVersionsContext->userGetsFileVersions($user, $file);
+		$this->featureContext->setResponse(
+			$this->filesVersionsContext->getFileVersions($user, $file)
+		);
 	}
 
 	/**

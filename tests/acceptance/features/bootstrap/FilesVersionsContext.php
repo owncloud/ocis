@@ -134,6 +134,17 @@ class FilesVersionsContext implements Context {
 	 * @throws Exception
 	 */
 	public function userGetsVersionMetadataOfFile(string $user, string $file):void {
+		$response = $this->getFileVersionMetadata($user, $file);
+		$this->featureContext->setResponse($response, $user);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $file
+	 *
+	 * @return ResponseInterface
+	 */
+	public function getFileVersionMetadata(string $user, string $file) : ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $file);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $file user $user not found (the file may not exist)");
@@ -144,7 +155,7 @@ class FilesVersionsContext implements Context {
                     <oc:meta-version-edited-by-name />
                   </d:prop>
                 </d:propfind>';
-		$response = $this->featureContext->makeDavRequest(
+		return $this->featureContext->makeDavRequest(
 			$user,
 			"PROPFIND",
 			$this->getVersionsPathForFileId($fileId),
@@ -153,7 +164,6 @@ class FilesVersionsContext implements Context {
 			null,
 			'2'
 		);
-		$this->featureContext->setResponse($response, $user);
 	}
 
 	/**
@@ -335,7 +345,9 @@ class FilesVersionsContext implements Context {
 		$usersArray = \explode(",", $users);
 		foreach ($usersArray as $username) {
 			$actualUsername = $this->featureContext->getActualUsername($username);
-			$this->userGetsVersionMetadataOfFile($actualUsername, $filename);
+			$this->featureContext->setResponse(
+				$this->getFileVersionMetadata($actualUsername, $filename)
+			);
 			foreach ($requiredVersionMetadata as $versionMetadata) {
 				$this->featureContext->theAuthorOfEditedVersionFile(
 					$versionMetadata['index'],
