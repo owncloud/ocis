@@ -14,7 +14,12 @@ Feature: Notification
 
 
   Scenario Outline: user gets a notification of resource sharing
-    Given user "Alice" has shared entry "<resource>" with user "Brian"
+    Given user "Alice" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "Resource shared" and the message-details should match
@@ -127,8 +132,13 @@ Feature: Notification
 
 
   Scenario Outline: user gets a notification of unsharing resource
-    Given user "Alice" has shared entry "<resource>" with user "Brian"
-    And user "Alice" has unshared entity "<resource>" shared to "Brian"
+    Given user "Alice" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Alice" has removed the access of user "Brian" from resource "<resource>" of space "Personal" using the Graph API
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "Resource unshared" and the message-details should match
@@ -242,7 +252,12 @@ Feature: Notification
 
   Scenario Outline: get a notification about a file share in various languages
     Given user "Brian" has switched the system language to "<language>" using the <api> API
-    And user "Alice" has shared entry "textfile1.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "<subject>" and the message-details should match
@@ -272,7 +287,12 @@ Feature: Notification
   @env-config
   Scenario: get a notification about a file share in default languages
     Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"
-    And user "Alice" has shared entry "textfile1.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "Neue Freigabe" and the message-details should match
@@ -295,8 +315,13 @@ Feature: Notification
 
 
   Scenario Outline: notifications related to a resource get deleted when the resource is deleted
-    Given user "Alice" has shared entry "<resource>" with user "Brian"
-    And user "Alice" has unshared entity "<resource>" shared to "Brian"
+    Given user "Alice" has sent the following share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Alice" has removed the access of user "Brian" from resource "<resource>" of space "Personal" using the Graph API
     And user "Alice" has deleted entity "/<resource>"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"

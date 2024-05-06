@@ -11,12 +11,14 @@ Feature: Notification
       | Carol    |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "notification checking" with the default quota using the Graph API
+    And user "Alice" has sent the following share invitation:
+      | space           | notification checking |
+      | sharee          | Brian                 |
+      | shareType       | user                  |
+      | permissionsRole | Space Editor          |
 
 
   Scenario: get a notification of space shared
-    Given user "Alice" has shared a space "notification checking" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "Space shared" and the message-details should match
@@ -146,10 +148,7 @@ Feature: Notification
 
 
   Scenario: get a notification of space unshared
-    Given user "Alice" has shared a space "notification checking" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
-    And user "Alice" has unshared a space "notification checking" shared with "Brian"
+    Given user "Alice" has removed the access of user "Brian" from space "notification checking" using permissions endpoint of the Graph API
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "Removed from Space" and the message-details should match
@@ -279,10 +278,7 @@ Feature: Notification
 
 
   Scenario: get a notification of space disabled
-    Given user "Alice" has shared a space "notification checking" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
-    And user "Alice" has disabled a space "notification checking"
+    Given user "Alice" has disabled a space "notification checking"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And there should be "2" notifications
@@ -414,9 +410,6 @@ Feature: Notification
 
   Scenario Outline: get a notification about a space share in various languages
     Given user "Brian" has switched the system language to "<language>" using the Graph API
-    And user "Alice" has shared a space "notification checking" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "<subject>" and the message-details should match
@@ -443,10 +436,7 @@ Feature: Notification
 
 
   Scenario: all notification related to space get deleted when the sharer deletes that resource
-    Given user "Alice" has shared a space "notification checking" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
-    And user "Alice" has unshared a space "notification checking" shared with "Brian"
+    Given user "Alice" has removed the access of user "Brian" from space "notification checking" using permissions endpoint of the Graph API
     And user "Alice" has disabled a space "notification checking"
     And user "Alice" has deleted a space "notification checking"
     When user "Brian" lists all notifications
@@ -455,10 +445,7 @@ Feature: Notification
 
 
   Scenario: user doesn't get any notification after being removed from space
-    Given user "Alice" has shared a space "notification checking" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
-    And user "Alice" has unshared a space "notification checking" shared with "Brian"
+    Given user "Alice" has removed the access of user "Brian" from space "notification checking" using permissions endpoint of the Graph API
     And user "Alice" has disabled a space "notification checking"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
