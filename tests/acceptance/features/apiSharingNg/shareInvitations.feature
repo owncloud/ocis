@@ -3215,3 +3215,97 @@ Feature: Send a sharing invitations
       | Space Viewer     | group       |
       | Space Editor     | group       |
       | Manager          | group       |
+
+
+  Scenario: share a file to user and group having same name (Personal space)
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "Brian" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Carol    | Brian     |
+    And user "Alice" has uploaded file with content "lorem" to "textfile.txt"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | textfile.txt |
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    Then the HTTP status code should be "200"
+    And for user "Carol" the space Shares should contain these entries:
+      | textfile.txt |
+
+
+  Scenario: share a file to group containing special characters in name (Personal space)
+    Given group "?\?@#%@;" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | ?\?@#%@;  |
+    And user "Alice" has uploaded file with content "lorem" to "textfile.txt"
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | ?\?@#%@;     |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | textfile.txt |
+
+
+  Scenario: share a file to user and group having same name (Project space)
+    Given using spaces DAV path
+    And user "Carol" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "lorem" to "textfile.txt"
+    And group "Brian" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Carol    | Brian     |
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resource        | textfile.txt |
+      | space           | NewSpace     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | textfile.txt |
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resource        | textfile.txt |
+      | space           | NewSpace     |
+      | sharee          | Brian        |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    Then the HTTP status code should be "200"
+    And for user "Carol" the space Shares should contain these entries:
+      | textfile.txt |
+
+
+  Scenario: share a file to group containing special characters in name (Project space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "lorem" to "textfile.txt"
+    And group "?\?@#%@;" has been created
+    And the following users have been added to the following groups
+      | username | groupname |
+      | Brian    | ?\?@#%@;  |
+    When user "Alice" sends the following share invitation using the Graph API:
+      | resource        | textfile.txt |
+      | space           | NewSpace     |
+      | sharee          | ?\?@#%@;     |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    Then the HTTP status code should be "200"
+    And for user "Brian" the space Shares should contain these entries:
+      | textfile.txt |
