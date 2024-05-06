@@ -14,12 +14,16 @@ Feature: Change data of space
       | Bob      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "Project Jupiter" of type "project" with quota "20"
-    And user "Alice" has shared a space "Project Jupiter" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
-    And user "Alice" has shared a space "Project Jupiter" with settings:
-      | shareWith | Bob    |
-      | role      | viewer |
+    And user "Alice" has sent the following space share invitation:
+      | space           | Project Jupiter |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | Space Editor    |
+    And user "Alice" has sent the following space share invitation:
+      | space           | Project Jupiter |
+      | sharee          | Bob             |
+      | shareType       | user            |
+      | permissionsRole | Space Viewer    |
     And using spaces DAV path
 
 
