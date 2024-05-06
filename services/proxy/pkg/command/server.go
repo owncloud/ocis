@@ -194,6 +194,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			{
 				middlewares := loadMiddlewares(logger, cfg, userInfoCache, signingKeyStore, traceProvider, *m, userProvider, gatewaySelector)
+
 				server, err := proxyHTTP.Server(
 					proxyHTTP.Handler(lh.Handler()),
 					proxyHTTP.Logger(logger),
@@ -246,10 +247,14 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
+<<<<<<< HEAD
 func loadMiddlewares(logger log.Logger, cfg *config.Config,
 	userInfoCache, signingKeyStore microstore.Store, traceProvider trace.TracerProvider, metrics metrics.Metrics,
 	userProvider backend.UserBackend, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) alice.Chain {
 
+=======
+func loadMiddlewares(logger log.Logger, cfg *config.Config, userInfoCache, signingKeyStore microstore.Store, traceProvider trace.TracerProvider, metrics metrics.Metrics) alice.Chain {
+>>>>>>> a9df2a66b1 (feat: reva app auth)
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
 	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
 
@@ -293,6 +298,17 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		})
 	}
 
+<<<<<<< HEAD
+=======
+	authenticators = append(authenticators, middleware.AppAuthAuthenticator{
+		Logger:              logger,
+		RevaGatewaySelector: gatewaySelector,
+	})
+	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
+		Logger:              logger,
+		RevaGatewaySelector: gatewaySelector,
+	})
+>>>>>>> a9df2a66b1 (feat: reva app auth)
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
 		middleware.UserInfoCache(userInfoCache),
