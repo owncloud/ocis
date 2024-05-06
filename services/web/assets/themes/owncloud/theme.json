@@ -1,0 +1,198 @@
+{
+  "common": {
+    "name": "ownCloud",
+    "slogan": "ownCloud – A safe home for all your data",
+    "logo": "themes/owncloud/assets/logo.svg",
+    "urls": {
+      "accessDeniedHelp": "",
+      "imprint": "",
+      "privacy": ""
+    }
+  },
+  "clients": {
+    "android": {},
+    "desktop": {},
+    "ios": {},
+    "web": {
+      "defaults": {
+        "appBanner": {},
+        "logo": {
+          "topbar": "themes/owncloud/assets/logo.svg",
+          "favicon": "themes/owncloud/assets/favicon.jpg",
+          "login": "themes/owncloud/assets/logo.svg"
+        },
+        "loginPage": {
+          "backgroundImg": "themes/owncloud/assets/loginBackground.jpg"
+        },
+        "designTokens": {
+          "breakpoints": {
+            "xsmall-max": "",
+            "small-default": "",
+            "small-max": "",
+            "medium-default": "",
+            "medium-max": "",
+            "large-default": "",
+            "large-max": "",
+            "xlarge": ""
+          },
+          "fontSizes": {
+            "default": "",
+            "large": "",
+            "medium": ""
+          },
+          "sizes": {
+            "form-check-default": "",
+            "height-small": "",
+            "height-table-row": "",
+            "icon-default": "",
+            "max-height-logo": "",
+            "max-width-logo": "",
+            "width-medium": "",
+            "tiles-default": "",
+            "tiles-resize-step": ""
+          },
+          "spacing": {
+            "xsmall": "",
+            "small": "",
+            "medium": "",
+            "large": "",
+            "xlarge": "",
+            "xxlarge": ""
+          }
+        }
+      },
+      "themes": [
+        {
+          "isDark": false,
+          "name": "Light Theme",
+          "designTokens": {
+            "colorPalette": {
+              "background-accentuate": "rgba(255, 255, 5, 0.1)",
+              "background-default": "#ffffff",
+              "background-highlight": "#edf3fa",
+              "background-muted": "#f8f8f8",
+              "background-secondary": "#ffffff",
+              "background-hover": "rgb(236, 236, 236)",
+              "color-components-apptopbar-background": "transparent",
+              "color-components-apptopbar-border": "#ceddee",
+              "border": "#ecebee",
+              "input-bg": "#ffffff",
+              "input-border": "#ceddee",
+              "input-text-default": "#041e42",
+              "input-text-muted": "#4c5f79",
+              "swatch-brand-default": "#041e42",
+              "swatch-brand-hover": "#223959",
+              "swatch-brand-contrast": "#ffffff",
+              "swatch-danger-contrast": "#ffffff",
+              "swatch-danger-default": "rgb(197, 48, 48)",
+              "swatch-danger-hover": "#b12b2b",
+              "swatch-danger-muted": "rgb(204, 117, 117)",
+              "swatch-inverse-default": "#ffffff",
+              "swatch-inverse-hover": "#ffffff",
+              "swatch-inverse-muted": "#bfbfbf",
+              "swatch-passive-default": "#4c5f79",
+              "swatch-passive-hover": "#43536b",
+              "swatch-passive-hover-outline": "#f7fafd",
+              "swatch-passive-muted": "#283e5d",
+              "swatch-passive-contrast": "#ffffff",
+              "swatch-primary-default": "#4a76ac",
+              "swatch-primary-hover": "#80a7d7",
+              "swatch-primary-muted": "#2c588e",
+              "swatch-primary-muted-hover": "rgb(36, 75, 119)",
+              "swatch-primary-gradient": "#4e85c8",
+              "swatch-primary-gradient-hover": "rgb(59, 118, 194)",
+              "swatch-primary-contrast": "#ffffff",
+              "swatch-success-default": "rgb(3, 84, 63)",
+              "swatch-success-hover": "#023b2c",
+              "swatch-success-muted": "rgb(83, 150, 10)",
+              "swatch-success-contrast": "#ffffff",
+              "swatch-warning-default": "rgb(183, 76, 27)",
+              "swatch-warning-hover": "#a04318",
+              "swatch-warning-muted": "rgba(183, 76, 27, .5)",
+              "swatch-warning-contrast": "#ffffff",
+              "text-default": "#041e42",
+              "text-inverse": "#ffffff",
+              "text-muted": "#4c5f79",
+              "icon-folder": "#4d7eaf",
+              "icon-archive": "#fbbe54",
+              "icon-image": "#ee6b3b",
+              "icon-spreadsheet": "#15c286",
+              "icon-document": "#3b44a6",
+              "icon-video": "#045459",
+              "icon-audio": "#700460",
+              "icon-presentation": "#ee6b3b",
+              "icon-pdf": "#ec0d47",
+              "icon-medical": "#0984db"
+            }
+          }
+        },
+        {
+          "isDark": true,
+          "name": "Dark Theme",
+          "designTokens": {
+            "colorPalette": {
+              "background-accentuate": "#696969",
+              "background-default": "#292929",
+              "background-highlight": "#383838",
+              "background-muted": "#383838",
+              "background-secondary": "#4f4f4f",
+              "background-hover": "#383838",
+              "color-components-apptopbar-background": "transparent",
+              "color-components-apptopbar-border": "#ceddee",
+              "border": "#383838",
+              "input-bg": "#4f4f4f",
+              "input-border": "#696969",
+              "input-text-default": "#dadcdf",
+              "input-text-muted": "#bdbfc3",
+              "swatch-brand-default": "#212121",
+              "swatch-brand-hover": "#ffffff",
+              "swatch-brand-contrast": "#dadcdf",
+              "swatch-inverse-default": "",
+              "swatch-inverse-hover": "",
+              "swatch-inverse-muted": "#696969",
+              "swatch-passive-default": "#c2c2c2",
+              "swatch-passive-hover": "",
+              "swatch-passive-hover-outline": "#3B3B3B",
+              "swatch-passive-muted": "#bdbfc3",
+              "swatch-passive-contrast": "#000000",
+              "swatch-primary-default": "#73b0f2",
+              "swatch-primary-hover": "#7bafef",
+              "swatch-primary-muted": "",
+              "swatch-primary-muted-hover": "#2282f7",
+              "swatch-primary-gradient": "#4e85c8",
+              "swatch-primary-gradient-hover": "#76a1d5",
+              "swatch-primary-contrast": "#dadcdf",
+              "swatch-success-background": "rgba(0, 188, 140, 0)",
+              "swatch-success-default": "rgb(0, 188, 140)",
+              "swatch-success-hover": "#00f0b4",
+              "swatch-success-muted": "rgba(0, 188, 140, .5)",
+              "swatch-success-contrast": "#000000",
+              "swatch-warning-background": "rgba(0,0,0,0)",
+              "swatch-warning-default": "rgb(232, 191, 73)",
+              "swatch-warning-hover": "#eed077",
+              "swatch-warning-muted": "rgba(232, 178, 19, .5)",
+              "swatch-danger-default": "rgb(255, 72, 53)",
+              "swatch-danger-hover": "#ff7566",
+              "swatch-danger-muted": "rgba(255, 72, 53, .5)",
+              "swatch-danger-contrast": "#dadcdf",
+              "swatch-warning-contrast": "#000000",
+              "text-default": "#dadcdf",
+              "text-inverse": "#000000",
+              "text-muted": "#c2c2c2",
+              "icon-folder": "rgb(44, 101, 255)",
+              "icon-archive": "rgb(255, 207, 1)",
+              "icon-image": "rgb(255, 111, 0)",
+              "icon-spreadsheet": "rgb(0, 182, 87)",
+              "icon-document": "rgb(44, 101, 255)",
+              "icon-video": "rgb(0, 187, 219)",
+              "icon-audio": "rgb(208, 67, 236)",
+              "icon-presentation": "rgb(255, 64, 6)",
+              "icon-pdf": "rgb(225, 5, 14)",
+              "icon-medical": "rgb(9,132,219)"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

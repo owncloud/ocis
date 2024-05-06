@@ -28,13 +28,3 @@ func (l logging) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (l logging) Config(w http.ResponseWriter, r *http.Request) {
 	l.next.Config(w, r)
 }
-
-// UploadLogo implements the Service interface.
-func (l logging) UploadLogo(w http.ResponseWriter, r *http.Request) {
-	l.next.UploadLogo(w, r)
-}
-
-// ResetLogo implements the Service interface.
-func (l logging) ResetLogo(w http.ResponseWriter, r *http.Request) {
-	l.next.ResetLogo(w, r)
-}

@@ -56,15 +56,10 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, err
 	}
 
-	coreFS := fsx.NewFallbackFS(
-		fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.CorePath),
-		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/core"),
-	)
 	appsFS := fsx.NewFallbackFS(
 		fsx.NewReadOnlyFs(fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.AppsPath)),
 		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/apps"),
 	)
-
 	// build and inject the list of applications into the config
 	for _, application := range apps.List(options.Logger, options.Config.Apps, appsFS.Secondary().IOFS(), appsFS.Primary().IOFS()) {
 		options.Config.Web.Config.ExternalApps = append(
@@ -73,10 +68,20 @@ func Server(opts ...Option) (http.Service, error) {
 		)
 	}
 
-	handle := svc.NewService(
+	coreFS := fsx.NewFallbackFS(
+		fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.CorePath),
+		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/core"),
+	)
+	themeFS := fsx.NewFallbackFS(
+		fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.ThemesPath),
+		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/themes"),
+	)
+
+	handle, err := svc.NewService(
 		svc.Logger(options.Logger),
-		svc.CoreFS(coreFS),
+		svc.CoreFS(coreFS.IOFS()),
 		svc.AppFS(appsFS.IOFS()),
+		svc.ThemeFS(themeFS),
 		svc.AppsHTTPEndpoint(_customAppsEndpoint),
 		svc.Config(options.Config),
 		svc.GatewaySelector(gatewaySelector),
@@ -102,6 +107,10 @@ func Server(opts ...Option) (http.Service, error) {
 		),
 		svc.TraceProvider(options.TraceProvider),
 	)
+
+	if err != nil {
+		return http.Service{}, err
+	}
 
 	{
 		handle = svc.NewInstrument(handle, options.Metrics)
