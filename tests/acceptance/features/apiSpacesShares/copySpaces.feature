@@ -16,18 +16,20 @@ Feature: copy file
     And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/insideSpace.txt"
-    And user "Alice" has shared a space "Project" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Brian" copies file "/insideSpace.txt" to "/newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Brian" folder "newfolder" of the space "Project" should contain these files:
       | insideSpace.txt |
     And for user "Alice" the content of the file "/newfolder/insideSpace.txt" of the space "Project" should be "some content"
     Examples:
-      | space-role |
-      | manager    |
-      | editor     |
+      | space-role   |
+      | Manager      |
+      | Space Editor |
 
 
   Scenario: copying a file within a same project space with role viewer
@@ -35,9 +37,11 @@ Feature: copy file
     And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
-    And user "Alice" has shared a space "Project" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    And user "Alice" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     When user "Brian" copies file "/insideSpace.txt" to "/newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Brian" folder "newfolder" of the space "Project" should not contain these files:
@@ -49,12 +53,16 @@ Feature: copy file
     And user "Brian" has created a space "Project1" with the default quota using the Graph API
     And user "Brian" has created a space "Project2" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "/project1.txt"
-    And user "Brian" has shared a space "Project2" with settings:
-      | shareWith | Alice           |
-      | role      | <to-space-role> |
-    And user "Brian" has shared a space "Project1" with settings:
-      | shareWith | Alice             |
-      | role      | <from-space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project2        |
+      | sharee          | Alice           |
+      | shareType       | user            |
+      | permissionsRole | <to-space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project1          |
+      | sharee          | Alice             |
+      | shareType       | user              |
+      | permissionsRole | <from-space-role> |
     When user "Alice" copies file "/project1.txt" from space "Project1" to "/project1.txt" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project2" should contain these entries:
@@ -62,10 +70,10 @@ Feature: copy file
     And for user "Alice" the content of the file "/project1.txt" of the space "Project2" should be "Project1 content"
     Examples:
       | from-space-role | to-space-role |
-      | manager         | manager       |
-      | manager         | editor        |
-      | editor          | manager       |
-      | editor          | editor        |
+      | Manager         | Manager       |
+      | Manager         | Space Editor  |
+      | Space Editor    | Manager       |
+      | Space Editor    | Space Editor  |
 
 
   Scenario Outline: user copies a file from a project space with a different role to a project space with a viewer role
@@ -73,39 +81,45 @@ Feature: copy file
     And user "Brian" has created a space "Project1" with the default quota using the Graph API
     And user "Brian" has created a space "Project2" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "/project1.txt"
-    And user "Brian" has shared a space "Project2" with settings:
-      | shareWith | Alice  |
-      | role      | viewer |
-    And user "Brian" has shared a space "Project1" with settings:
-      | shareWith | Alice        |
-      | role      | <space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project2     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project1     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Alice" copies file "/project1.txt" from space "Project1" to "/project1.txt" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" the space "Project2" should not contain these entries:
       | project1.txt |
     Examples:
-      | space-role |
-      | manager    |
-      | editor     |
+      | space-role   |
+      | Manager      |
+      | Space Editor |
 
 
   Scenario Outline: user copies a file from project space with different role to personal space
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice        |
-      | role      | <space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Alice" copies file "/project.txt" from space "Project" to "/project.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | project.txt |
     And for user "Alice" the content of the file "/project.txt" of the space "Personal" should be "Project content"
     Examples:
-      | space-role |
-      | manager    |
-      | editor     |
-      | viewer     |
+      | space-role   |
+      | Manager      |
+      | Space Editor |
+      | Space Viewer |
 
 
   Scenario Outline: user copies a file from project space with different role to share space with editor role
@@ -113,22 +127,27 @@ Feature: copy file
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice        |
-      | role      | <space-role> |
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "15"
-      | shareWith | Alice  |
-      | role      | <role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" folder "testshare" of the space "Shares" should contain these files:
       | /project.txt |
     And for user "Alice" the content of the file "/testshare/project.txt" of the space "Shares" should be "Project content"
     Examples:
-      | space-role |
-      | manager    |
-      | editor     |
-      | viewer     |
+      | space-role   |
+      | Manager      |
+      | Space Editor |
+      | Space Viewer |
 
 
   Scenario Outline: user copies a file from project space with different role to Shares with viewer role
@@ -136,27 +155,31 @@ Feature: copy file
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice        |
-      | role      | <space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "1"
     When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" folder "testshare" of the space "Shares" should not contain these files:
       | project.txt |
     Examples:
-      | space-role |
-      | manager    |
-      | editor     |
-      | viewer     |
+      | space-role   |
+      | Manager      |
+      | Space Editor |
+      | Space Viewer |
 
 
   Scenario Outline: user copies a file from personal space to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice        |
-      | role      | <space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     And user "Alice" has uploaded file with content "personal space content" to "/personal.txt"
     When user "Alice" copies file "/personal.txt" from space "Personal" to "/personal.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -164,17 +187,19 @@ Feature: copy file
       | /personal.txt |
     And for user "Alice" the content of the file "/personal.txt" of the space "Project" should be "personal space content"
     Examples:
-      | space-role |
-      | manager    |
-      | editor     |
+      | space-role   |
+      | Manager      |
+      | Space Editor |
 
 
   Scenario: user copies a file from personal space to project space with role viewer
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice  |
-      | role      | viewer |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     And user "Alice" has uploaded file with content "personal space content" to "/personal.txt"
     When user "Alice" copies file "/personal.txt" from space "Personal" to "/personal.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
@@ -184,7 +209,12 @@ Feature: copy file
 
   Scenario: user copies a file from personal space to share space with role editor
     Given user "Brian" has created folder "/testshare"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "15"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     And user "Alice" has uploaded file with content "personal content" to "personal.txt"
     When user "Alice" copies file "/personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -195,7 +225,12 @@ Feature: copy file
 
   Scenario: user copies a file from personal space to share space with role viewer
     Given user "Brian" has created folder "/testshare"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "1"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
     And user "Alice" has uploaded file with content "personal content" to "/personal.txt"
     When user "Alice" copies file "/personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
@@ -207,65 +242,94 @@ Feature: copy file
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | /testshare.txt |
     And for user "Alice" the content of the file "/testshare.txt" of the space "Personal" should be "testshare content"
     Examples:
-      | permissions |
-      | 15          |
-      | 1           |
+      | permissions-role |
+      | Editor           |
+      | Viewer           |
 
 
   Scenario Outline: user copies a file from share space with different role to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice        |
-      | role      | <space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project" should contain these entries:
       | /testshare.txt |
     And for user "Alice" the content of the file "/testshare.txt" of the space "Project" should be "testshare content"
     Examples:
-      | space-role | permissions |
-      | manager    | 15          |
-      | manager    | 1           |
-      | editor     | 15          |
-      | editor     | 1           |
+      | space-role   | permissions-role |
+      | Manager      | Editor           |
+      | Manager      | Viewer           |
+      | Space Editor | Editor           |
+      | Space Editor | Viewer           |
 
 
   Scenario Outline: user copies a file from share space with different role to project space with role viewer
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice  |
-      | role      | viewer |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" the space "Project" should not contain these entries:
       | /testshare.txt |
     Examples:
-      | permissions |
-      | 15          |
-      | 1           |
+      | permissions-role |
+      | Editor           |
+      | Viewer           |
 
 
   Scenario Outline: user copies a file from share space with different role to share space with role editor
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
-    And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "<permissions>"
-    And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "15"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare1         |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare2 |
+      | space           | Personal   |
+      | sharee          | Alice      |
+      | shareType       | user       |
+      | permissionsRole | Editor     |
     When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" folder "testshare2" of the space "Shares" should contain these files:
@@ -275,17 +339,27 @@ Feature: copy file
     And for user "Alice" the content of the file "/testshare2/testshare1.txt" of the space "Shares" should be "testshare1 content"
     And for user "Brian" the content of the file "/testshare1/testshare1.txt" of the space "Personal" should be "testshare1 content"
     Examples:
-      | permissions |
-      | 15          |
-      | 1           |
+      | permissions-role |
+      | Editor           |
+      | Viewer           |
 
 
   Scenario Outline: user copies a file from share space with different role to share space with role viewer
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
-    And user "Brian" has shared folder "/testshare1" with user "Alice" with permissions "<permissions>"
-    And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "1"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare1         |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare2 |
+      | space           | Personal   |
+      | sharee          | Alice      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" folder "testshare2" of the space "Shares" should not contain these files:
@@ -293,9 +367,9 @@ Feature: copy file
     And for user "Brian" folder "testshare2" of the space "Personal" should not contain these files:
       | testshare1.txt |
     Examples:
-      | permissions |
-      | 15          |
-      | 1           |
+      | permissions-role |
+      | Editor           |
+      | Viewer           |
 
 
   Scenario Outline: copying a folder within the same project space with different role
@@ -304,18 +378,20 @@ Feature: copy file
     And user "Alice" has created a folder "/folder1" in space "Project"
     And user "Alice" has created a folder "/folder2" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/folder2/demo.txt"
-    And user "Alice" has shared a space "Project" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Brian" copies folder "/folder2" to "/folder1/folder2" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "<parent-folder>" of the space "Project" <should-or-not> contain these files:
       | <resource> |
     Examples:
-      | space-role | should-or-not | http-status-code | parent-folder   | resource |
-      | manager    | should        | 201              | folder1/folder2 | demo.txt |
-      | editor     | should        | 201              | folder1/folder2 | demo.txt |
-      | viewer     | should not    | 403              | folder1         | folder2  |
+      | space-role   | should-or-not | http-status-code | parent-folder   | resource |
+      | Manager      | should        | 201              | folder1/folder2 | demo.txt |
+      | Space Editor | should        | 201              | folder1/folder2 | demo.txt |
+      | Space Viewer | should not    | 403              | folder1         | folder2  |
 
 
   Scenario Outline: user copies a folder from a project space with different role to a project space with different role
@@ -324,25 +400,29 @@ Feature: copy file
     And user "Brian" has created a space "Project2" with the default quota using the Graph API
     And user "Brian" has created a folder "/folder1" in space "Project1"
     And user "Brian" has uploaded a file inside space "Project1" with content "some content" to "/folder1/demo.txt"
-    And user "Brian" has shared a space "Project2" with settings:
-      | shareWith | Alice     |
-      | role      | <to_role> |
-    And user "Brian" has shared a space "Project1" with settings:
-      | shareWith | Alice       |
-      | role      | <from_role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project2        |
+      | sharee          | Alice           |
+      | shareType       | user            |
+      | permissionsRole | <to-space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project1          |
+      | sharee          | Alice             |
+      | shareType       | user              |
+      | permissionsRole | <from-space-role> |
     When user "Alice" copies folder "/folder1" from space "Project1" to "/folder1" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
     And for user "Alice" folder "<parent-folder>" of the space "Project2" <should-or-not> contain these files:
       | <entry> |
     Examples:
-      | from_role | to_role | status-code | should-or-not | parent-folder | entry    |
-      | manager   | manager | 201         | should        | folder1       | demo.txt |
-      | manager   | editor  | 201         | should        | folder1       | demo.txt |
-      | editor    | manager | 201         | should        | folder1       | demo.txt |
-      | editor    | editor  | 201         | should        | folder1       | demo.txt |
-      | manager   | viewer  | 403         | should not    | /             | folder1  |
-      | editor    | viewer  | 403         | should not    | /             | folder1  |
-      | viewer    | viewer  | 403         | should not    | /             | folder1  |
+      | from-space-role | to-space-role | status-code | should-or-not | parent-folder | entry    |
+      | Manager         | Manager       | 201         | should        | folder1       | demo.txt |
+      | Manager         | Space Editor  | 201         | should        | folder1       | demo.txt |
+      | Space Editor    | Manager       | 201         | should        | folder1       | demo.txt |
+      | Space Editor    | Space Editor  | 201         | should        | folder1       | demo.txt |
+      | Manager         | Space Viewer  | 403         | should not    | /             | folder1  |
+      | Space Editor    | Space Viewer  | 403         | should not    | /             | folder1  |
+      | Space Viewer    | Space Viewer  | 403         | should not    | /             | folder1  |
 
 
   Scenario Outline: user copies a folder from project space with different role to personal space
@@ -350,50 +430,61 @@ Feature: copy file
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created a folder "/folder1" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "/folder1/demo.txt"
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice        |
-      | role      | <space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Alice" copies file "/folder1" from space "Project" to "/folder1" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" folder "folder1" of the space "Personal" should contain these files:
       | demo.txt |
     Examples:
-      | space-role |
-      | manager    |
-      | editor     |
-      | viewer     |
+      | space-role   |
+      | Manager      |
+      | Space Editor |
+      | Space Viewer |
 
 
-  Scenario Outline: Uuer copies a folder from project space with different role to share space with different role
+  Scenario Outline: user copies a folder from project space with different role to share space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created a folder "/folder1" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "/folder1/demo.txt"
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice        |
-      | role      | <space-role> |
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" copies folder "/folder1" from space "Project" to "/testshare/folder1" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
     And for user "Alice" folder "<parent-folder>" of the space "Shares" <should-or-not> contain these files:
       | <entry> |
     Examples:
-      | space-role | should-or-not | permissions | status-code | parent-folder     | entry    |
-      | manager    | should        | 15          | 201         | testshare/folder1 | demo.txt |
-      | editor     | should        | 15          | 201         | testshare/folder1 | demo.txt |
-      | viewer     | should        | 15          | 201         | testshare/folder1 | demo.txt |
-      | manager    | should not    | 1           | 403         | testshare         | folder1  |
-      | editor     | should not    | 1           | 403         | testshare         | folder1  |
-      | viewer     | should not    | 1           | 403         | testshare         | folder1  |
+      | space-role   | should-or-not | permissions-role | status-code | parent-folder     | entry    |
+      | Manager      | should        | Editor           | 201         | testshare/folder1 | demo.txt |
+      | Space Editor | should        | Editor           | 201         | testshare/folder1 | demo.txt |
+      | Space Viewer | should        | Editor           | 201         | testshare/folder1 | demo.txt |
+      | Manager      | should not    | Viewer           | 403         | testshare         | folder1  |
+      | Space Editor | should not    | Viewer           | 403         | testshare         | folder1  |
+      | Space Viewer | should not    | Viewer           | 403         | testshare         | folder1  |
 
 
   Scenario Outline: user copies a folder from personal space to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice        |
-      | role      | <space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     And user "Alice" has created folder "/folder1"
     And user "Alice" has uploaded file with content "some content" to "folder1/demo.txt"
     When user "Alice" copies folder "/folder1" from space "Personal" to "/folder1" inside space "Project" using the WebDAV API
@@ -401,15 +492,20 @@ Feature: copy file
     And for user "Alice" folder "<parent-folder>" of the space "Project" <should-or-not> contain these files:
       | <entry> |
     Examples:
-      | space-role | should-or-not | status-code | parent-folder | entry    |
-      | manager    | should        | 201         | folder1       | demo.txt |
-      | editor     | should        | 201         | folder1       | demo.txt |
-      | viewer     | should not    | 403         | /             | folder1  |
+      | space-role   | should-or-not | status-code | parent-folder | entry    |
+      | Manager      | should        | 201         | folder1       | demo.txt |
+      | Space Editor | should        | 201         | folder1       | demo.txt |
+      | Space Viewer | should not    | 403         | /             | folder1  |
 
 
   Scenario Outline: user copies a folder from personal space to share space with different permissions
     Given user "Brian" has created folder "/testshare"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     And user "Alice" has created folder "folder1"
     And user "Alice" has uploaded file with content "some content" to "folder1/demo.txt"
     When user "Alice" copies folder "/folder1" from space "Personal" to "/testshare/folder1" inside space "Shares" using the WebDAV API
@@ -417,77 +513,97 @@ Feature: copy file
     And for user "Alice" folder "<parent-folder>" of the space "Shares" <should-or-not> contain these files:
       | <resource> |
     Examples:
-      | permissions | should-or-not | status-code | parent-folder     | resource |
-      | 15          | should        | 201         | testshare/folder1 | demo.txt |
-      | 1           | should not    | 403         | testshare         | folder1  |
+      | permissions-role | should-or-not | status-code | parent-folder     | resource |
+      | Editor           | should        | 201         | testshare/folder1 | demo.txt |
+      | Viewer           | should not    | 403         | testshare         | folder1  |
 
 
   Scenario Outline: user copies a folder from share space with different role to personal space
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | /testshare.txt |
     And for user "Alice" the content of the file "/testshare.txt" of the space "Personal" should be "testshare content"
     Examples:
-      | permissions |
-      | 15          |
-      | 1           |
+      | permissions-role |
+      | Editor           |
+      | Viewer           |
 
 
   Scenario Outline: user copies a folder from share space with different role to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice        |
-      | role      | <space-role> |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created folder "/testshare/folder1"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" copies folder "/testshare/folder1" from space "Shares" to "folder1" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" folder "folder1" of the space "Project" should contain these files:
       | testshare.txt |
     Examples:
-      | space-role | permissions |
-      | manager    | 15          |
-      | manager    | 1           |
-      | editor     | 15          |
-      | editor     | 1           |
+      | space-role   | permissions-role |
+      | Manager      | Editor           |
+      | Manager      | Viewer           |
+      | Space Editor | Editor           |
+      | Space Editor | Viewer           |
 
 
   Scenario Outline: user copies a folder from share space with different role to project space with role viewer
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has shared a space "Project" with settings:
-      | shareWith | Alice  |
-      | role      | viewer |
+    And user "Brian" has sent the following share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created folder "/testshare/folder1"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" copies folder "/testshare/folder1" from space "Shares" to "folder1" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" folder "/" of the space "Project" should not contain these files:
       | folder1 |
     Examples:
-      | permissions |
-      | 15          |
-      | 1           |
+      | permissions-role |
+      | Editor           |
+      | Viewer           |
 
 
   Scenario: copying a file to a folder with no permissions
     Given using spaces DAV path
     And user "Brian" has created folder "/testshare"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | read      |
-      | shareWith   | Alice     |
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" copies file "/textfile0.txt" from space "Personal" to "/testshare/textfile0.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
@@ -499,11 +615,12 @@ Feature: copy file
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "ownCloud test text file 1" to "/testshare/overwritethis.txt"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | read      |
-      | shareWith   | Alice     |
+    And user "Brian" has sent the following share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
     When user "Alice" copies file "/textfile0.txt" from space "Personal" to "/testshare/overwritethis.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" the content of the file "/testshare/overwritethis.txt" of the space "Shares" should be "ownCloud test text file 1"
@@ -514,7 +631,12 @@ Feature: copy file
     And user "Alice" has uploaded file with content "ownCloud test text file 1" to "/textfile1.txt"
     And user "Brian" has created folder "/BRIAN-Folder"
     And user "Brian" has created folder "BRIAN-Folder/sample-folder"
-    And user "Brian" has shared folder "BRIAN-Folder" with user "Alice"
+    And user "Brian" has sent the following share invitation:
+      | resource        | BRIAN-Folder |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     When user "Alice" copies file "/textfile1.txt" from space "Personal" to "/BRIAN-Folder" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And for user "Alice" the content of the file "/BRIAN-Folder" of the space "Shares" should be "ownCloud test text file 1"
@@ -527,7 +649,12 @@ Feature: copy file
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has created folder "/FOLDER/sample-folder"
     And user "Brian" has uploaded file with content "file to share" to "/sharedfile1.txt"
-    And user "Brian" has shared file "/sharedfile1.txt" with user "Alice"
+    And user "Brian" has sent the following share invitation:
+      | resource        | sharedfile1.txt |
+      | space           | Personal        |
+      | sharee          | Alice           |
+      | shareType       | user            |
+      | permissionsRole | File Editor     |
     When user "Alice" copies folder "/FOLDER" from space "Personal" to "/sharedfile1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" folder "/FOLDER/sample-folder" should exist
@@ -538,10 +665,16 @@ Feature: copy file
 
   Scenario: copy a folder into another folder at different level which is received as a user share
     Given using spaces DAV path
+    And using SharingNG
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has shared folder "/BRIAN-FOLDER" with user "Alice"
+    And user "Brian" has sent the following share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b/sample-folder-c"
@@ -558,10 +691,16 @@ Feature: copy file
 
   Scenario: copy a file into a folder at different level received as a user share
     Given using spaces DAV path
+    And using SharingNG
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has shared folder "/BRIAN-FOLDER" with user "Alice"
+    And user "Brian" has sent the following share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "/Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -580,9 +719,15 @@ Feature: copy file
 
   Scenario: copy a file into a file at different level received as a user share
     Given using spaces DAV path
+    And using SharingNG
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has uploaded file with content "file at second level" to "/BRIAN-FOLDER/second-level-file.txt"
-    And user "Brian" has shared folder "/BRIAN-FOLDER" with user "Alice"
+    And user "Brian" has sent the following share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "/Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -601,13 +746,19 @@ Feature: copy file
 
   Scenario: copy a folder into a file at different level received as a user share
     Given using spaces DAV path
+    And using SharingNG
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has created folder "/FOLDER/second-level-folder"
     And user "Alice" has created folder "/FOLDER/second-level-folder/third-level-folder"
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has uploaded file with content "file at third level" to "BRIAN-FOLDER/second-level-folder/third-level-file.txt"
-    And user "Brian" has shared folder "/BRIAN-FOLDER" with user "Alice"
+    And user "Brian" has sent the following share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     When user "Alice" copies folder "/FOLDER/second-level-folder" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And for user "Alice" folder "BRIAN-FOLDER/second-level-folder/third-level-file.txt" of the space "Shares" should contain these entries:
@@ -620,13 +771,19 @@ Feature: copy file
 
   Scenario: copy a folder into another folder at different level which is received as a group share
     Given using spaces DAV path
+    And using SharingNG
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has shared folder "/BRIAN-FOLDER" with group "grp1"
+    And user "Brian" has sent the following share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b/sample-folder-c"
@@ -641,13 +798,19 @@ Feature: copy file
 
   Scenario: copy a file into a folder at different level received as a group share
     Given using spaces DAV path
+    And using SharingNG
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has shared folder "/BRIAN-FOLDER" with group "grp1"
+    And user "Brian" has sent the following share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "/Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -663,12 +826,18 @@ Feature: copy file
 
   Scenario: overwrite a file received as a group share with a file from different level
     Given using spaces DAV path
+    And using SharingNG
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has uploaded file with content "file at second level" to "/BRIAN-FOLDER/second-level-file.txt"
-    And user "Brian" has shared folder "/BRIAN-FOLDER" with group "grp1"
+    And user "Brian" has sent the following share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "/Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -686,13 +855,19 @@ Feature: copy file
 
   Scenario: copy a folder into a file at different level received as a group share
     Given using spaces DAV path
+    And using SharingNG
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has uploaded file with content "file at third level" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt"
-    And user "Brian" has shared folder "/BRIAN-FOLDER" with group "grp1"
+    And user "Brian" has sent the following share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has created folder "/FOLDER/second-level-folder"
     And user "Alice" has created folder "/FOLDER/second-level-folder/third-level-folder"
@@ -747,10 +922,12 @@ Feature: copy file
     And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/newfolder/personal.txt"
-    And user "Alice" creates a share inside of space "Project" with settings:
-      | path      | newfolder |
-      | shareWith | Brian     |
-      | role      | editor    |
+    And user "Alice" has sent the following share invitation:
+      | resource        | newfolder |
+      | space           | Project   |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     And user "Brian" has uploaded file with content "new content" to "/personal.txt"
     When user "Brian" copies file "/personal.txt" from space "Personal" to "/newfolder/personal (1).txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -769,10 +946,12 @@ Feature: copy file
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "old content version 1" to "/newfolder/personal.txt"
     And user "Alice" has uploaded a file inside space "Project" with content "old content version 2" to "/newfolder/personal.txt"
-    And user "Alice" creates a share inside of space "Project" with settings:
-      | path      | newfolder |
-      | shareWith | Brian     |
-      | role      | editor    |
+    And user "Alice" has sent the following share invitation:
+      | resource        | newfolder |
+      | space           | Project   |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     And user "Brian" has uploaded file with content "new content" to "/personal.txt"
     When user "Brian" overwrites file "/personal.txt" from space "Personal" to "/newfolder/personal.txt" inside space "Shares" while copying using the WebDAV API
     Then the HTTP status code should be "204"

@@ -69,6 +69,7 @@ default:
         - ArchiverContext:
         - GraphContext:
         - OcisConfigContext:
+        - SharingNgContext:
 
     apiContract:
       paths:

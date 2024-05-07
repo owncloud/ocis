@@ -2115,7 +2115,8 @@ trait Sharing {
 	):void {
 		$user = $this->getActualUsername($user);
 		$this->verifyTableNodeRows($body, [], $this->shareResponseFields);
-		$response = $this->getShareData($user, $this->getLastCreatedUserGroupShareId());
+		$share_id = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
+		$response = $this->getShareData($user, $share_id);
 		$this->theHTTPStatusCodeShouldBe(
 			200,
 			"Error getting info of last share for user $user",
