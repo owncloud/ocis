@@ -854,3 +854,29 @@ Feature: copy file
     Examples:
       | dav-path-version |
       | spaces           |
+
+
+  Scenario Outline: copy a file into a folder with special characters
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder <folder-name>
+    And user "Alice" has uploaded file with content "test file" to <file-name>
+    When user "Alice" copies file <file-name> to <destination> using the WebDAV API
+    Then the HTTP status code should be "201"
+    And as "Alice" file <file-name> should exist
+    And as "Alice" file <destination> should exist
+    And as "Alice" folder <folder-name> should exist
+    Examples:
+      | dav-path-version | file-name   | folder-name        | destination                  |
+      | old              | "'single'"  | "folder-'single'"  | "folder-'single'/'single'"   |
+      | old              | "question?" | "folder-question?" | "folder-question?/question?" |
+      | old              | "&and#hash" | "folder-&and#hash" | "folder-&and#hash/&and#hash" |
+      | new              | "'single'"  | "folder-'single'"  | "folder-'single'/'single'"   |
+      | new              | "question?" | "folder-question?" | "folder-question?/question?" |
+      | new              | "&and#hash" | "folder-&and#hash" | "folder-&and#hash/&and#hash" |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version | file-name   | folder-name        | destination                  |
+      | spaces           | "'single'"  | "folder-'single'"  | "folder-'single'/'single'"   |
+      | spaces           | "question?" | "folder-question?" | "folder-question?/question?" |
+      | spaces           | "&and#hash" | "folder-&and#hash" | "folder-&and#hash/&and#hash" |

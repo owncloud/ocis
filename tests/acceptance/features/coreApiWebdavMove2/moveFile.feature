@@ -126,6 +126,27 @@ Feature: move (rename) file
       | spaces           |
 
 
+  Scenario Outline: move a file to existing file name
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "test file" to "testfile.txt"
+    And user "Alice" has uploaded file with content "some content" to "lorem.txt"
+    When user "Alice" moves file "testfile.txt" to "lorem.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" file "lorem.txt" should exist
+    And the content of file "lorem.txt" for user "Alice" should be "test file"
+    But as "Alice" file "testfile.txt" should not exist
+    And as "Alice" the file with original path "lorem.txt" should exist in the trashbin
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version |
+      | spaces           |
+
+
   Scenario Outline: move file into a not-existing folder
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToMove.txt"
@@ -487,3 +508,86 @@ Feature: move (rename) file
     Examples:
       | dav-path-version |
       | spaces           |
+
+
+  Scenario Outline: rename file to/from special characters
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "test file" to <from-file-name>
+    When user "Alice" moves file <from-file-name> to <to-file-name> using the WebDAV API
+    Then the HTTP status code should be "201"
+    And as "Alice" file <to-file-name> should exist
+    But as "Alice" file <from-file-name> should not exist
+    Examples:
+      | dav-path-version | from-file-name          | to-file-name            |
+      | old              | "testfile.txt"          | "'single'quotes.txt"    |
+      | old              | "testfile.txt"          | '"double"quotes.txt'    |
+      | old              | "testfile.txt"          | "strängé नेपाली.txt"      |
+      | old              | "testfile.txt"          | "file,comma.txt"        |
+      | old              | "testfile.txt"          | " start with space.txt" |
+      | old              | "'single'quotes.txt"    | "testfile.txt"          |
+      | old              | '"double"quotes.txt'    | "testfile.txt"          |
+      | old              | "strängé नेपाली.txt"      | "testfile.txt"          |
+      | old              | "file,comma.txt"        | "testfile.txt"          |
+      | old              | " start with space.txt" | "testfile.txt"          |
+      | new              | "testfile.txt"          | "'single'quotes.txt"    |
+      | new              | "testfile.txt"          | '"double"quotes.txt'    |
+      | new              | "testfile.txt"          | "strängé नेपाली.txt"      |
+      | new              | "testfile.txt"          | "file,comma.txt"        |
+      | new              | "testfile.txt"          | " start with space.txt" |
+      | new              | "'single'quotes.txt"    | "testfile.txt"          |
+      | new              | '"double"quotes.txt'    | "testfile.txt"          |
+      | new              | "strängé नेपाली.txt"      | "testfile.txt"          |
+      | new              | "file,comma.txt"        | "testfile.txt"          |
+      | new              | " start with space.txt" | "testfile.txt"          |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version | from-file-name          | to-file-name            |
+      | spaces           | "testfile.txt"          | "'single'quotes.txt"    |
+      | spaces           | "testfile.txt"          | '"double"quotes.txt'    |
+      | spaces           | "testfile.txt"          | "strängé नेपाली.txt"      |
+      | spaces           | "testfile.txt"          | "file,comma.txt"        |
+      | spaces           | "testfile.txt"          | " start with space.txt" |
+      | spaces           | "'single'quotes.txt"    | "testfile.txt"          |
+      | spaces           | '"double"quotes.txt'    | "testfile.txt"          |
+      | spaces           | "strängé नेपाली.txt"      | "testfile.txt"          |
+      | spaces           | "file,comma.txt"        | "testfile.txt"          |
+      | spaces           | " start with space.txt" | "testfile.txt"          |
+
+
+  Scenario Outline: try to rename file to name having white space at the end
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "test file" to "testfile.txt"
+    When user "Alice" moves file "testfile.txt" to "space at end " using the WebDAV API
+    Then the HTTP status code should be "201"
+    And as "Alice" file "space at end" should exist
+    But as "Alice" file "testfile.txt" should not exist
+    And as "Alice" file "space at end " should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version |
+      | spaces           |
+
+
+  Scenario Outline: try to rename file to . and ..
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "test file" to "testfile.txt"
+    When user "Alice" moves file "testfile.txt" to "<file-name>" using the WebDAV API
+    Then the HTTP status code should be "<http-status-code>"
+    Examples:
+      | dav-path-version | file-name   | http-status-code |
+      | old              | /.            | 409              |
+      | old              | /..           | 404              |
+      | new              | /.            | 409              |
+      | new              | /..           | 404              |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version | file-name   | http-status-code |
+      | spaces           | /.            | 409              |
+      | spaces           | /..           | 400              |
