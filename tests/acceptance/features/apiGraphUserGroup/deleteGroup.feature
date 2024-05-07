@@ -68,13 +68,13 @@ Feature: delete groups
     Given group "grp1" has been created
     And group "grp2" has been created
     And user "Alice" has uploaded file with content "sample text" to "lorem.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | lorem.txt |
       | space           | Personal  |
       | sharee          | grp1      |
       | shareType       | group     |
       | permissionsRole | Viewer    |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | lorem.txt |
       | space           | Personal  |
       | sharee          | grp2      |
@@ -92,7 +92,7 @@ Feature: delete groups
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | lorem.txt |
       | space           | Personal  |
       | sharee          | grp1      |

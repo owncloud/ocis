@@ -29,7 +29,7 @@ Feature: Download space
 
 
   Scenario Outline: user downloads a shared space (shared by others)
-    Given user "Alice" has sent the following share invitation:
+    Given user "Alice" has sent the following space share invitation:
       | space           | Project-space |
       | sharee          | Brian         |
       | shareType       | user          |

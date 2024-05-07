@@ -17,7 +17,7 @@ Feature: checking file versions using file id
 
 
   Scenario Outline: check the file versions of a file shared from project space
-    Given user "Alice" has sent the following share invitation:
+    Given user "Alice" has sent the following resource share invitation:
       | resource        | text.txt |
       | space           | Project1 |
       | sharee          | Brian    |
@@ -34,7 +34,7 @@ Feature: checking file versions using file id
       | Viewer      |
 
   Scenario Outline: check the versions of a file in a shared space as editor/manager
-    Given user "Alice" has sent the following share invitation:
+    Given user "Alice" has sent the following space share invitation:
       | space           | Project1     |
       | sharee          | Brian        |
       | shareType       | user         |
@@ -52,7 +52,7 @@ Feature: checking file versions using file id
 
 
   Scenario: check the versions of a file in a shared space as viewer
-    Given user "Alice" has sent the following share invitation:
+    Given user "Alice" has sent the following space share invitation:
       | space           | Project1     |
       | sharee          | Brian        |
       | shareType       | user         |
@@ -63,7 +63,7 @@ Feature: checking file versions using file id
   @issue-7738
   Scenario Outline: check the versions of a file after moving to a shared folder inside a project space as editor/viewer
     Given user "Alice" has created a folder "testFolder" in space "Project1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | text.txt |
       | space           | Project1 |
       | sharee          | Brian    |
@@ -83,13 +83,13 @@ Feature: checking file versions using file id
   @issue-7738
   Scenario: check the versions of a file after moving it to a shared folder inside a project space as manager
     Given user "Alice" has created a folder "testFolder" in space "Project1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | testFolder |
       | space           | Project1   |
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | Project1 |
       | sharee          | Brian    |
       | shareType       | user     |

@@ -15,7 +15,7 @@ Feature: Send a sharing invitations
   Scenario Outline: send share invitation to user with different roles
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -105,7 +105,7 @@ Feature: Send a sharing invitations
       | Carol    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1               |
@@ -190,7 +190,7 @@ Feature: Send a sharing invitations
 
   Scenario Outline: send share invitation for a file to user with different permissions
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource          | textfile1.txt        |
       | space             | Personal             |
       | sharee            | Brian                |
@@ -278,7 +278,7 @@ Feature: Send a sharing invitations
 
   Scenario Outline: send share invitation for a folder to user with different permissions
     Given user "Alice" has created folder "FolderToShare"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource          | FolderToShare        |
       | space             | Personal             |
       | sharee            | Brian                |
@@ -375,7 +375,7 @@ Feature: Send a sharing invitations
       | Brian    | grp1      |
       | Carol    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource          | textfile1.txt        |
       | space             | Personal             |
       | sharee            | grp1                 |
@@ -469,7 +469,7 @@ Feature: Send a sharing invitations
       | Brian    | grp1      |
       | Carol    | grp1      |
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource          | FolderToShare        |
       | space             | Personal             |
       | sharee            | grp1                 |
@@ -561,7 +561,7 @@ Feature: Send a sharing invitations
   Scenario Outline: send share invitation with expiration date to user with different roles
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>               |
       | space           | Personal                 |
       | sharee          | Brian                    |
@@ -657,7 +657,7 @@ Feature: Send a sharing invitations
       | Carol    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>               |
       | space           | Personal                 |
       | sharee          | grp1                     |
@@ -748,7 +748,7 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     And the user "Admin" has disabled user "Brian"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -837,7 +837,7 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     And group "grp1" has been deleted
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1               |
@@ -883,7 +883,7 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     And the user "Admin" has deleted a user "Brian"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -940,7 +940,7 @@ Feature: Send a sharing invitations
       | Bob      | grp2      |
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1, grp2         |
@@ -995,7 +995,7 @@ Feature: Send a sharing invitations
       | Carol    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1, Bob          |
@@ -1040,7 +1040,7 @@ Feature: Send a sharing invitations
   Scenario Outline: send sharing invitation to non-existing group
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | nonExistentGroup   |
@@ -1091,13 +1091,13 @@ Feature: Send a sharing invitations
       | Carol    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1               |
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | grp1               |
@@ -1143,7 +1143,7 @@ Feature: Send a sharing invitations
   Scenario Outline: send share invitation to wrong user id
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" tries to send the following share invitation using the Graph API:
+    When user "Alice" tries to send the following resource share invitation using the Graph API:
       | resource        | <resource>                           |
       | space           | Personal                             |
       | shareeId        | a4c0c83e-ae24-4870-93c3-fcaf2a2228f7 |
@@ -1185,7 +1185,7 @@ Feature: Send a sharing invitations
   Scenario Outline: send share invitation with empty user id
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" tries to send the following share invitation using the Graph API:
+    When user "Alice" tries to send the following resource share invitation using the Graph API:
       | resource        | <resource> |
       | space           | Personal   |
       | shareeId        |            |
@@ -1227,7 +1227,7 @@ Feature: Send a sharing invitations
   Scenario Outline: send share invitation to user with wrong recipient type
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" tries to send the following share invitation using the Graph API:
+    When user "Alice" tries to send the following resource share invitation using the Graph API:
       | resource        | <resource>     |
       | space           | Personal       |
       | sharee          | Brian          |
@@ -1275,7 +1275,7 @@ Feature: Send a sharing invitations
       | username | groupname |
       | Brian    | grp1      |
       | Carol    | grp1      |
-    When user "Alice" tries to send the following share invitation using the Graph API:
+    When user "Alice" tries to send the following resource share invitation using the Graph API:
       | resource        | <resource>     |
       | space           | Personal       |
       | sharee          | grp1           |
@@ -1317,7 +1317,7 @@ Feature: Send a sharing invitations
   Scenario Outline: send share invitation to user with empty recipient type
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" tries to send the following share invitation using the Graph API:
+    When user "Alice" tries to send the following resource share invitation using the Graph API:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -1365,7 +1365,7 @@ Feature: Send a sharing invitations
       | username | groupname |
       | Brian    | grp1      |
       | Carol    | grp1      |
-    When user "Alice" tries to send the following share invitation using the Graph API:
+    When user "Alice" tries to send the following resource share invitation using the Graph API:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | grp1       |
@@ -1407,7 +1407,7 @@ Feature: Send a sharing invitations
   Scenario Outline: try to share a resource with invalid roles
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -1452,7 +1452,7 @@ Feature: Send a sharing invitations
 
   Scenario Outline: try to share a file with invalid roles
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | textfile1.txt      |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -1494,13 +1494,13 @@ Feature: Send a sharing invitations
   Scenario Outline: send share invitation to already shared user
     Given user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    When user "Alice" tries to send the following share invitation using the Graph API:
+    When user "Alice" tries to send the following resource share invitation using the Graph API:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -1540,11 +1540,11 @@ Feature: Send a sharing invitations
       | FolderToShare  |
 
 
-  Scenario Outline: send share invitation for project space to user with different roles
+  Scenario Outline: send share invitation for project space to user with different roles (permissions endpoint)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" sends the following share invitation for space using the Graph API:
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -1615,12 +1615,12 @@ Feature: Send a sharing invitations
       | Manager          |
 
 
-  Scenario Outline: send share invitation for disabled project space to user with different roles
+  Scenario Outline: send share invitation for disabled project space to user with different roles (permissions endpoint)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Admin" has disabled a space "NewSpace"
-    When user "Alice" sends the following share invitation for space using the Graph API:
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -1660,13 +1660,13 @@ Feature: Send a sharing invitations
       | Manager          |
 
 
-  Scenario Outline: send share invitation for deleted project space to user with different roles
+  Scenario Outline: send share invitation for deleted project space to user with different roles (permissions endpoint)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Admin" has disabled a space "NewSpace"
     And user "Admin" has deleted a space "NewSpace"
-    When user "Alice" sends the following share invitation for space using the Graph API:
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -1705,7 +1705,7 @@ Feature: Send a sharing invitations
       | Manager          |
 
 
-  Scenario Outline: send share invitation for project space to group with different roles
+  Scenario Outline: send share invitation for project space to group with different roles (permissions endpoint)
     Given using spaces DAV path
     And user "Carol" has been created with default attributes and without skeleton files
     And group "grp1" has been created
@@ -1715,7 +1715,7 @@ Feature: Send a sharing invitations
       | Carol    | grp1      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" sends the following share invitation for space using the Graph API:
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | grp1               |
       | shareType       | group              |
@@ -1791,7 +1791,7 @@ Feature: Send a sharing invitations
       | Manager          |
 
 
-  Scenario Outline: send share invitation for disabled project space to group with different roles
+  Scenario Outline: send share invitation for disabled project space to group with different roles (permissions endpoint)
     Given using spaces DAV path
     And user "Carol" has been created with default attributes and without skeleton files
     And group "grp1" has been created
@@ -1802,7 +1802,7 @@ Feature: Send a sharing invitations
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Admin" has disabled a space "NewSpace"
-    When user "Alice" sends the following share invitation for space using the Graph API:
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | grp1               |
       | shareType       | group              |
@@ -1842,7 +1842,7 @@ Feature: Send a sharing invitations
       | Manager          |
 
 
-  Scenario Outline: send share invitation for deleted project space to group with different roles
+  Scenario Outline: send share invitation for deleted project space to group with different roles (permissions endpoint)
     Given using spaces DAV path
     And user "Carol" has been created with default attributes and without skeleton files
     And group "grp1" has been created
@@ -1854,7 +1854,7 @@ Feature: Send a sharing invitations
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Admin" has disabled a space "NewSpace"
     And user "Admin" has deleted a space "NewSpace"
-    When user "Alice" sends the following share invitation for space using the Graph API:
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | grp1               |
       | shareType       | group              |
@@ -1981,13 +1981,13 @@ Feature: Send a sharing invitations
       """
 
 
-  Scenario Outline: send share invitation for project space resource to user with different roles
+  Scenario Outline: send share invitation for project space resource to user with different roles (permissions endpoint)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "textfile1.txt"
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
-    When user "Alice" sends the following share invitation for space using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | NewSpace           |
       | sharee          | Brian              |
@@ -2063,7 +2063,7 @@ Feature: Send a sharing invitations
       | Uploader         | FolderToShare |
 
 
-  Scenario Outline: send share invitation for project space resource to group with different roles
+  Scenario Outline: send share invitation for project space resource to group with different roles (permissions endpoint)
     Given using spaces DAV path
     And user "Carol" has been created with default attributes and without skeleton files
     And group "grp1" has been created
@@ -2075,7 +2075,7 @@ Feature: Send a sharing invitations
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "textfile1.txt"
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
-    When user "Alice" sends the following share invitation for space using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | <resource>         |
       | space           | NewSpace           |
       | sharee          | grp1               |
@@ -2158,8 +2158,8 @@ Feature: Send a sharing invitations
       | Uploader         | FolderToShare |
 
   @issue-8494
-  Scenario Outline: try to send share invitation for personal space to user with different roles
-    When user "Alice" sends the following share invitation for space using the Graph API:
+  Scenario Outline: try to send share invitation for personal space to user with different roles (permissions endpoint)
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | Personal           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -2204,8 +2204,8 @@ Feature: Send a sharing invitations
       | Manager          |
 
   @issue-8495
-  Scenario Outline: try to share Shares space with a user
-    When user "Alice" sends the following share invitation for space using the Graph API:
+  Scenario Outline: try to share Shares space with a user (permissions endpoint)
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | Shares             |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -2258,14 +2258,14 @@ Feature: Send a sharing invitations
       | username | groupname |
       | Brian    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource          | textfile1.txt        |
       | space             | Personal             |
       | sharee            | grp1                 |
       | shareType         | group                |
       | permissionsAction | <permissions-action> |
     Then the HTTP status code should be "400"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource          | FolderToShare        |
       | space             | Personal             |
       | sharee            | Brian                |
@@ -2284,7 +2284,7 @@ Feature: Send a sharing invitations
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" sends the following share invitation using root endpoint of the Graph API:
+    When user "Alice" sends the following space share invitation using root endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -2364,7 +2364,7 @@ Feature: Send a sharing invitations
       | Brian    | grp1      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" sends the following share invitation using root endpoint of the Graph API:
+    When user "Alice" sends the following space share invitation using root endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | grp1               |
       | shareType       | group              |
@@ -2441,7 +2441,7 @@ Feature: Send a sharing invitations
     And user "Carol" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | Brian, Carol       |
       | shareType       | user, user         |
@@ -2490,7 +2490,7 @@ Feature: Send a sharing invitations
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | NewSpace            |
       | sharee          | Brian, non-existent |
       | shareType       | user, user          |
@@ -2546,7 +2546,7 @@ Feature: Send a sharing invitations
       | Carol    | grp2      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | grp1, grp2         |
       | shareType       | group, group       |
@@ -2599,7 +2599,7 @@ Feature: Send a sharing invitations
       | Brian    | grp1      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | grp1, grp2         |
       | shareType       | group, group       |
@@ -2653,7 +2653,7 @@ Feature: Send a sharing invitations
       | Brian    | grp1      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | Carol, grp2        |
       | shareType       | user, group        |
@@ -2699,7 +2699,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: try to invite user to personal drive with different roles using root endpoint
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | Personal           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -2751,7 +2751,7 @@ Feature: Send a sharing invitations
     And the following users have been added to the following groups
       | username | groupname |
       | Brian    | grp1      |
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | Personal           |
       | sharee          | grp1               |
       | shareType       | group              |
@@ -2799,7 +2799,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: try to invite user to shares drive with different re-sharing permissions using root endpoint
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space             | Shares               |
       | sharee            | Brian                |
       | shareType         | user                 |
@@ -2850,7 +2850,7 @@ Feature: Send a sharing invitations
     And the following users have been added to the following groups
       | username | groupname |
       | Brian    | grp1      |
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space             | Shares               |
       | sharee            | grp1                 |
       | shareType         | group                |
@@ -2897,7 +2897,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: try to send a sharing invitation for the personal drive to an non-existent sharee using root endpoint
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | Personal           |
       | sharee          | non-existent       |
       | shareType       | <sharee-type>      |
@@ -2950,7 +2950,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: try to send a sharing invitation for the personal drive with an empty sharee using root endpoint
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | Personal           |
       | sharee          |                    |
       | shareType       | <sharee-type>      |
@@ -3006,7 +3006,7 @@ Feature: Send a sharing invitations
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          | non-existent       |
       | shareType       | <sharee-type>      |
@@ -3058,7 +3058,7 @@ Feature: Send a sharing invitations
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    When user "Alice" tries to send the following share invitation using root endpoint of the Graph API:
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | NewSpace           |
       | sharee          |                    |
       | shareType       | <sharee-type>      |
@@ -3113,7 +3113,7 @@ Feature: Send a sharing invitations
       | username | groupname |
       | Carol    | Brian     |
     And user "Alice" has uploaded file with content "lorem" to "textfile.txt"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -3122,7 +3122,7 @@ Feature: Send a sharing invitations
     Then the HTTP status code should be "200"
     And for user "Brian" the space Shares should contain these entries:
       | textfile.txt |
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -3139,7 +3139,7 @@ Feature: Send a sharing invitations
       | username | groupname |
       | Brian    | ?\?@#%@;  |
     And user "Alice" has uploaded file with content "lorem" to "textfile.txt"
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | ?\?@#%@;     |
@@ -3160,7 +3160,7 @@ Feature: Send a sharing invitations
     And the following users have been added to the following groups
       | username | groupname |
       | Carol    | Brian     |
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | textfile.txt |
       | space           | NewSpace     |
       | sharee          | Brian        |
@@ -3169,7 +3169,7 @@ Feature: Send a sharing invitations
     Then the HTTP status code should be "200"
     And for user "Brian" the space Shares should contain these entries:
       | textfile.txt |
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | textfile.txt |
       | space           | NewSpace     |
       | sharee          | Brian        |
@@ -3189,7 +3189,7 @@ Feature: Send a sharing invitations
     And the following users have been added to the following groups
       | username | groupname |
       | Brian    | ?\?@#%@;  |
-    When user "Alice" sends the following share invitation using the Graph API:
+    When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | textfile.txt |
       | space           | NewSpace     |
       | sharee          | ?\?@#%@;     |

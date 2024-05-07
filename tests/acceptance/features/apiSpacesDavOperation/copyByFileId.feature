@@ -186,7 +186,7 @@ Feature: copying file using file id
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/sub-folder/test.txt"
     And we save it into "FILEID"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | Brian    |
@@ -211,7 +211,7 @@ Feature: copying file using file id
   Scenario Outline: copy a file from personal to share space
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folder"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | Brian    |
@@ -238,7 +238,7 @@ Feature: copying file using file id
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
     And we save it into "FILEID"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | Brian    |

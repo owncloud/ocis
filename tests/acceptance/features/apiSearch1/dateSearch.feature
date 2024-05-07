@@ -54,7 +54,7 @@ Feature: date search
     And using spaces DAV path
     And user "Alice" has created folder "sharedFolder"
     And user "Alice" uploads a file "filesForUpload/textfile.txt" to "/sharedFolder/yesterday.txt" with mtime "yesterday" via TUS inside of the space "Personal" using the WebDAV API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | sharedFolder |
       | space           | Personal     |
       | sharee          | Brian        |

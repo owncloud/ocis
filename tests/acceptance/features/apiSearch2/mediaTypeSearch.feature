@@ -109,7 +109,7 @@ Feature: media type search
     And user "Alice" has uploaded file "filesForUpload/data.7z" to "/uploadFolder/data.7z"
     And user "Alice" has uploaded file "filesForUpload/data.rar" to "/uploadFolder/data.rar"
     And user "Alice" has uploaded file "filesForUpload/data.tar.bz2" to "/uploadFolder/data.tar.bz2"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | uploadFolder |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -145,7 +145,7 @@ Feature: media type search
     And user "Alice" has uploaded a file "filesForUpload/data.7z" to "/data.7z" in space "project101"
     And user "Alice" has uploaded a file "filesForUpload/data.rar" to "/data.rar" in space "project101"
     And user "Alice" has uploaded a file "filesForUpload/data.tar.bz2" to "/data.tar.bz2" in space "project101"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | project101   |
       | sharee          | Brian        |
       | shareType       | user         |

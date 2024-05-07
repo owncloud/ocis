@@ -17,13 +17,13 @@ Feature: propfind a shares
     And user "Alice" has created folder "folderToShare"
     And user "Carol" has uploaded file with content "to share" to "textfile.txt"
     And user "Carol" has created folder "folderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -54,13 +54,13 @@ Feature: propfind a shares
     And user "Alice" has created folder "folderToShare"
     And user "Carol" has uploaded file with content "to share" to "textfile.txt"
     And user "Carol" has created folder "folderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -96,13 +96,13 @@ Feature: propfind a shares
     And user "Alice" has uploaded file with content "to share" to "folderToShare/textfile.txt"
     And user "Carol" has created folder "folderToShare"
     And user "Carol" has uploaded file with content "to share" to "folderToShare/textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -126,7 +126,7 @@ Feature: propfind a shares
     Given using spaces DAV path
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "folderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |

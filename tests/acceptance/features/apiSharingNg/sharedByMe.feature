@@ -14,7 +14,7 @@ Feature: resources shared by user
 
   Scenario: sharer lists the file share (Personal space)
     Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -138,7 +138,7 @@ Feature: resources shared by user
   Scenario: sharer lists the file share shared from inside a folder (Personal space)
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "FolderToShare/textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | FolderToShare/textfile.txt |
       | space           | Personal                   |
       | sharee          | Brian                      |
@@ -261,7 +261,7 @@ Feature: resources shared by user
 
   Scenario: sharer lists the folder share (Personal space)
     Given user "Alice" has created folder "FolderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | FolderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -378,13 +378,13 @@ Feature: resources shared by user
   Scenario: sharer lists the file and folder shares (Personal space)
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | FolderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -613,13 +613,13 @@ Feature: resources shared by user
     Given group "grp1" has been created
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | grp1         |
       | shareType       | group        |
       | permissionsRole | Viewer       |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | FolderToShare |
       | space           | Personal      |
       | sharee          | grp1          |
@@ -825,7 +825,7 @@ Feature: resources shared by user
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | NewSpace     |
       | sharee          | Brian        |
@@ -952,7 +952,7 @@ Feature: resources shared by user
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "FolderToShare/textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | FolderToShare/textfile.txt |
       | space           | NewSpace                   |
       | sharee          | Brian                      |
@@ -1078,7 +1078,7 @@ Feature: resources shared by user
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | FolderToShare |
       | space           | NewSpace      |
       | sharee          | Brian         |
@@ -1198,13 +1198,13 @@ Feature: resources shared by user
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | NewSpace     |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | FolderToShare |
       | space           | NewSpace      |
       | sharee          | Brian         |
@@ -1436,13 +1436,13 @@ Feature: resources shared by user
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
     And user "Alice" has created a folder "FolderToShare" in space "new-space"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | new-space    |
       | sharee          | grp1         |
       | shareType       | group        |
       | permissionsRole | Viewer       |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | FolderToShare |
       | space           | new-space     |
       | sharee          | grp1          |
@@ -1647,7 +1647,7 @@ Feature: resources shared by user
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -1679,7 +1679,7 @@ Feature: resources shared by user
     And group "grp1" has been created
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | grp1         |
@@ -1710,7 +1710,7 @@ Feature: resources shared by user
     Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -1801,7 +1801,7 @@ Feature: resources shared by user
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | new-space    |
       | sharee          | Brian        |
@@ -1835,7 +1835,7 @@ Feature: resources shared by user
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | new-space    |
       | sharee          | grp1         |
@@ -1868,7 +1868,7 @@ Feature: resources shared by user
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | new-space    |
       | sharee          | Brian        |

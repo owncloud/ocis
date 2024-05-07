@@ -12,7 +12,7 @@ Feature: Remove access to a drive item
   Scenario Outline: user removes access to resource in the user share
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -36,7 +36,7 @@ Feature: Remove access to a drive item
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has uploaded a file inside space "NewSpace" with content "some content" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource>         |
       | space           | NewSpace           |
       | sharee          | Brian              |
@@ -61,7 +61,7 @@ Feature: Remove access to a drive item
     And user "Alice" has been added to group "group1"
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | group1             |
@@ -88,7 +88,7 @@ Feature: Remove access to a drive item
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Alice" has been added to group "group1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource>         |
       | space           | NewSpace           |
       | sharee          | group1             |
@@ -182,7 +182,7 @@ Feature: Remove access to a drive item
   Scenario Outline: user removes user member from project space using permissions endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -202,7 +202,7 @@ Feature: Remove access to a drive item
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace           |
       | sharee          | group1              |
       | shareType       | group               |

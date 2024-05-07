@@ -51,7 +51,7 @@ Feature: update files using file id
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -72,7 +72,7 @@ Feature: update files using file id
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has uploaded file with content "some data" to "uploadFolder/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | uploadFolder |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -94,7 +94,7 @@ Feature: update files using file id
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | new-space    |
       | sharee          | Brian        |
       | shareType       | user         |

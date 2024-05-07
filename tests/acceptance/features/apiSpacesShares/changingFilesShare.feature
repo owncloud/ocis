@@ -17,13 +17,13 @@ Feature: change shared resource
     And user "Alice" has created folder "/PARENT"
     And user "Brian" has created folder "/PARENT"
     And user "Alice" has moved file "textfile0.txt" to "PARENT/from_alice.txt" in space "Personal"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
       | sharee          | Carol    |
       | shareType       | user     |
       | permissionsRole | Editor   |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
       | sharee          | Carol    |
@@ -41,7 +41,7 @@ Feature: change shared resource
     Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has uploaded file with content "old content version 1" to "/textfile1.txt"
     And user "Alice" has uploaded file with content "old content version 2" to "/textfile1.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt |
       | space           | Personal      |
       | sharee          | Brian         |

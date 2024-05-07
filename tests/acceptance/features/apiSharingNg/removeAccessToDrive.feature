@@ -13,7 +13,7 @@ Feature: Remove access to a drive
   Scenario Outline: user removes user member from project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -33,7 +33,7 @@ Feature: Remove access to a drive
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace           |
       | sharee          | group1             |
       | shareType       | group              |
@@ -53,12 +53,12 @@ Feature: Remove access to a drive
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace           |
       | sharee          | group1             |
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace     |
       | sharee          | Carol        |
       | shareType       | user         |
@@ -78,7 +78,7 @@ Feature: Remove access to a drive
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace           |
       | sharee          | group1             |
       | shareType       | group              |
@@ -97,7 +97,7 @@ Feature: Remove access to a drive
   Scenario Outline: user removes himself from the project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
@@ -115,12 +115,12 @@ Feature: Remove access to a drive
   Scenario Outline: user removes another user from project space using permissions endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace     |
       | sharee          | Carol        |
       | shareType       | user         |
@@ -148,7 +148,7 @@ Feature: Remove access to a drive
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace |
       | sharee          | group1   |
       | shareType       | group    |

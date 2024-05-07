@@ -125,7 +125,7 @@ Feature: tag search
     And user "Alice" has uploaded file with content "hello nepal" to "uploadFolder/file3.txt"
     And user "Alice" has created the following tags for file "uploadFolder/file1.txt" of the space "Personal":
       | tag1 |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | uploadFolder |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -154,7 +154,7 @@ Feature: tag search
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "tag-space" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | tag-space    |
       | sharee          | Brian        |
       | shareType       | user         |

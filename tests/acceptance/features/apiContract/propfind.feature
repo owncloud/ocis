@@ -30,7 +30,7 @@ Feature: Propfind test
 
   Scenario Outline: space member with a different role checks the PROPFIND request of a space
     Given user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | new-space    |
       | sharee          | Brian        |
       | shareType       | user         |
@@ -55,7 +55,7 @@ Feature: Propfind test
 
   Scenario Outline: space member with a different role checks the PROPFIND request of the folder in the space
     Given user "Alice" has created a folder "folderMain" in space "new-space"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | new-space    |
       | sharee          | Brian        |
       | shareType       | user         |
@@ -78,7 +78,7 @@ Feature: Propfind test
 
   Scenario Outline: space member with a different role checks the PROPFIND request of the sub-folder in the space
     Given user "Alice" has created a folder "folderMain/subFolder1/subFolder2" in space "new-space"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | new-space    |
       | sharee          | Brian        |
       | shareType       | user         |
@@ -101,7 +101,7 @@ Feature: Propfind test
 
   Scenario Outline: space member with a different role checks the PROPFIND request of the file in the space
     Given user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | new-space    |
       | sharee          | Brian        |
       | shareType       | user         |

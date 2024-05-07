@@ -13,14 +13,14 @@ Feature: Update permission of a share
 
   Scenario: user updates expiration date of a share
     Given user "Alice" has uploaded file with content "hello world" to "testfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource           | testfile.txt         |
       | space              | Personal             |
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | Viewer               |
       | expirationDateTime | 2025-07-15T14:00:00Z |
-    When user "Alice" updates the last share with the following using the Graph API:
+    When user "Alice" updates the last resource share with the following using the Graph API:
       | space              | Personal             |
       | resource           | testfile.txt         |
       | expirationDateTime | 2200-07-15T14:00:00Z |
@@ -85,14 +85,14 @@ Feature: Update permission of a share
   Scenario Outline: user removes expiration date of a share
     Given user "Alice" has uploaded file with content "hello world" to "testfile.txt"
     And user "Alice" has created folder "folder"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource           | <resource>           |
       | space              | Personal             |
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | Viewer               |
       | expirationDateTime | 2025-07-15T14:00:00Z |
-    When user "Alice" updates the last share with the following using the Graph API:
+    When user "Alice" updates the last resource share with the following using the Graph API:
       | space              | Personal   |
       | resource           | <resource> |
       | expirationDateTime |            |
@@ -156,13 +156,13 @@ Feature: Update permission of a share
   Scenario Outline: user updates role of a share
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource>         |
       | space           | Personal           |
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    When user "Alice" updates the last share with the following using the Graph API:
+    When user "Alice" updates the last resource share with the following using the Graph API:
       | permissionsRole | <new-permissions-role> |
       | space           | Personal               |
       | resource        | <resource>             |
@@ -233,12 +233,12 @@ Feature: Update permission of a share
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    When user "Alice" updates the last share with the following using the Graph API:
+    When user "Alice" updates the space share for user "Brian" with the following using the Graph API:
       | permissionsRole | <new-permissions-role> |
       | space           | NewSpace               |
     Then the HTTP status code should be "200"
@@ -308,13 +308,13 @@ Feature: Update permission of a share
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "textfile1.txt"
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource>         |
       | space           | NewSpace           |
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    When user "Alice" updates the last share with the following using the Graph API:
+    When user "Alice" updates the last resource share with the following using the Graph API:
       | permissionsRole | <new-permissions-role> |
       | space           | NewSpace               |
       | resource        | <resource>             |
@@ -389,7 +389,7 @@ Feature: Update permission of a share
       | Brian    | grp1      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation using root endpoint of the Graph API:
+    And user "Alice" has sent the following space share invitation:
       | space              | NewSpace             |
       | sharee             | grp1                 |
       | shareType          | group                |
@@ -469,7 +469,7 @@ Feature: Update permission of a share
       | Brian    | grp1      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation using root endpoint of the Graph API:
+    And user "Alice" has sent the following space share invitation:
       | space              | NewSpace             |
       | sharee             | grp1                 |
       | shareType          | group                |
@@ -549,7 +549,7 @@ Feature: Update permission of a share
       | Brian    | grp1      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation using root endpoint of the Graph API:
+    And user "Alice" has sent the following space share invitation:
       | space              | NewSpace             |
       | sharee             | grp1                 |
       | shareType          | group                |
@@ -634,7 +634,7 @@ Feature: Update permission of a share
       | Brian    | grp1      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation using root endpoint of the Graph API:
+    And user "Alice" has sent the following space share invitation:
       | space              | NewSpace             |
       | sharee             | grp1                 |
       | shareType          | group                |
@@ -715,7 +715,7 @@ Feature: Update permission of a share
       | Brian    | grp1      |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation using root endpoint of the Graph API:
+    And user "Alice" has sent the following space share invitation:
       | space              | NewSpace             |
       | sharee             | grp1                 |
       | shareType          | group                |
@@ -797,7 +797,7 @@ Feature: Update permission of a share
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation using root endpoint of the Graph API:
+    And user "Alice" has sent the following space share invitation:
       | space              | NewSpace             |
       | sharee             | Brian                |
       | shareType          | user                 |
@@ -873,7 +873,7 @@ Feature: Update permission of a share
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation using root endpoint of the Graph API:
+    And user "Alice" has sent the following space share invitation:
       | space              | NewSpace             |
       | sharee             | Brian                |
       | shareType          | user                 |
@@ -949,7 +949,7 @@ Feature: Update permission of a share
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation using root endpoint of the Graph API:
+    And user "Alice" has sent the following space share invitation:
       | space              | NewSpace             |
       | sharee             | Brian                |
       | shareType          | user                 |
@@ -1031,7 +1031,7 @@ Feature: Update permission of a share
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation using root endpoint of the Graph API:
+    And user "Alice" has sent the following space share invitation:
       | space              | NewSpace             |
       | sharee             | Brian                |
       | shareType          | user                 |
@@ -1108,7 +1108,7 @@ Feature: Update permission of a share
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation using root endpoint of the Graph API:
+    And user "Alice" has sent the following space share invitation:
       | space              | NewSpace             |
       | sharee             | Brian                |
       | shareType          | user                 |
