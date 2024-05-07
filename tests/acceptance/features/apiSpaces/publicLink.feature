@@ -9,8 +9,10 @@ Feature: public link for a space
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "public space" with the default quota using the Graph API
-    And user "Alice" has created a public link share of the space "public space" with settings:
-      | permissions | 1 |
+    And user "Alice" has created the following space link share:
+      | space           | public space |
+      | permissionsRole | view         |
+    And using SharingNG
 
 
   Scenario: public tries to upload a file in the public space
