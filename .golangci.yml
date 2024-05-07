@@ -44,8 +44,16 @@ linters:
     - depguard # disabled for now. Needs configuration
 
 linters-settings:
+  tagalign:
+    align: false
+    sort: true
+    order:
+      - yaml
+      - env
+      - desc
+      - introductionVersion
   gocyclo:
-    min-complexity: 35 # there are some func unforuntately who need this - should we refactor them?
+    min-complexity: 35 # there are some func unfortunately who need this - should we refactor them?
   gomoddirectives:
     replace-allow-list:
       - github.com/studio-b12/gowebdav
@@ -56,12 +64,6 @@ linters-settings:
 
 severity:
   default-severity: error
-
-skip-dirs:
-  - protogen/gen
-  - docs
-  - deployments
-  - changelog
 
 issues:
   exclude-use-default: true
@@ -75,6 +77,12 @@ issues:
     - EXC0013
     - EXC0014
     - EXC0015
+
+  exclude-dirs:
+    - protogen/gen
+    - docs
+    - deployments
+    - changelog
 
 # Enabled by default linters:
 # deadcode: Finds unused code [fast: false, auto-fix: false]
