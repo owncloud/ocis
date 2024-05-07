@@ -22,13 +22,13 @@ Feature: change shared resource
       | space           | Personal |
       | sharee          | Carol    |
       | shareType       | user     |
-      | permissionsRole | Viewer   |
+      | permissionsRole | Editor   |
     And user "Brian" has sent the following share invitation:
       | resource        | PARENT   |
       | space           | Personal |
       | sharee          | Carol    |
       | shareType       | user     |
-      | permissionsRole | Viewer   |
+      | permissionsRole | Editor   |
     When user "Carol" moves file "PARENT/from_alice.txt" to "PARENT (1)/from_alice.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "502"
     And for user "Carol" folder "PARENT" of the space "Shares" should contain these entries:
