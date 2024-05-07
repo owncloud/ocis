@@ -278,6 +278,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		mountpointRootID *searchmsg.ResourceID
 		rootName         string
 		permissions      *provider.ResourcePermissions
+		remoteItemId     *searchmsg.ResourceID
 	)
 	mountpointPrefix := ""
 	searchPathPrefix := req.Ref.GetPath()
@@ -329,6 +330,11 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		}
 		rootName = space.GetRootInfo().GetPath()
 		permissions = space.GetRootInfo().GetPermissionSet()
+		remoteItemId = &searchmsg.ResourceID{
+			StorageId: space.GetRootInfo().GetId().GetStorageId(),
+			SpaceId:   space.GetRootInfo().GetId().GetSpaceId(),
+			OpaqueId:  space.GetRootInfo().GetId().GetOpaqueId(),
+		}
 		s.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
 	case _spaceTypePersonal, _spaceTypeProject:
 		permissions = space.GetRootInfo().GetPermissionSet()
@@ -365,6 +371,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 			match.Entity.Ref.ResourceId = mountpointRootID
 		}
 		match.Entity.ShareRootName = rootName
+		match.Entity.RemoteItemId = remoteItemId
 
 		isShared := match.GetEntity().GetRef().GetResourceId().GetSpaceId() == utils.ShareStorageSpaceID
 		isMountpoint := isShared && match.GetEntity().GetRef().GetPath() == "."

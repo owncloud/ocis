@@ -59,6 +59,7 @@ message Entity {
 	string highlights = 14;
 	Audio audio = 15;
 	GeoCoordinates location = 16;
+	ResourceID remote_item_id = 17;
 }
 
 message Match {

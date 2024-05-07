@@ -281,6 +281,13 @@ var _ = Describe("Searchprovider", func() {
 					Id:        &sprovider.StorageSpaceId{OpaqueId: "storageproviderid$spaceid!otherspacegrant"},
 					Root:      &sprovider.ResourceId{StorageId: "storageproviderid", SpaceId: "spaceid", OpaqueId: "otherspacegrant"},
 					Name:      "grantspace",
+					RootInfo: &sprovider.ResourceInfo{
+						Id: &sprovider.ResourceId{
+							StorageId: "storageid",
+							SpaceId:   "spaceid",
+							OpaqueId:  "opaqueid",
+						},
+					},
 				}
 				mountpointSpace = &sprovider.StorageSpace{
 					SpaceType: "mountpoint",
@@ -345,6 +352,11 @@ var _ = Describe("Searchprovider", func() {
 				Expect(match.Entity.Name).To(Equal("Shared.pdf"))
 				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(mountpointSpace.Root.OpaqueId))
 				Expect(match.Entity.Ref.Path).To(Equal("./to/Shared.pdf"))
+				Expect(match.Entity.RemoteItemId).To(Equal(&searchmsg.ResourceID{
+					StorageId: grantSpace.RootInfo.Id.StorageId,
+					SpaceId:   grantSpace.RootInfo.Id.SpaceId,
+					OpaqueId:  grantSpace.RootInfo.Id.OpaqueId,
+				}))
 			})
 
 			Context("when searching both spaces", func() {

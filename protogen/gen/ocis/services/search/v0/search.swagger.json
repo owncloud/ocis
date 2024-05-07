@@ -273,6 +273,9 @@
         },
         "location": {
           "$ref": "#/definitions/v0GeoCoordinates"
+        },
+        "remoteItemId": {
+          "$ref": "#/definitions/v0ResourceID"
         }
       }
     },
