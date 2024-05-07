@@ -69,7 +69,7 @@ COMMANDS:
 The `sessions` command is the entry point for listing, restarting and cleaning unfinished uploads.
 
 ```bash
-ocis storage-users uploads sessions <command>
+ocis storage-users uploads sessions <commandoptions>
 ```
 
 ```
