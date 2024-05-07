@@ -269,7 +269,6 @@ class SharingNgContext implements Context {
 	 */
 	public function userHasSentTheFollowingShareInvitation(string $user, TableNode $table): void {
 		$response = $this->sendShareInvitation($user, $table);
-		//        print_r($response->getBody ()->getContents ());
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 

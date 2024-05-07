@@ -351,11 +351,7 @@ class WebDavLockingContext implements Context {
 		string    $file,
 		TableNode $properties
 	) {
-		if ($this->featureContext->isUsingSharingNG()) {
-			$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
-		} else {
-			$token = $this->featureContext->getLastCreatedPublicShareToken();
-		}
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->lockFile(
 			$token,
 			$file,
@@ -676,13 +672,9 @@ class WebDavLockingContext implements Context {
 		string $lockOwner,
 		string $itemToUseLockOf
 	) {
-		if ($this->featureContext->isUsingSharingNG()) {
-			$user = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
-		} else {
-			$user = $this->featureContext->getLastCreatedPublicShareToken();
-		}
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
-			$user,
+			$token,
 			$itemToUnlock,
 			$lockOwner,
 			$itemToUseLockOf,
@@ -699,15 +691,11 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function unlockItemAsPublicUsingWebDavAPI(string $itemToUnlock) {
-		if ($this->featureContext->isUsingSharingNG()) {
-			$user = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
-		} else {
-			$user = $this->featureContext->getLastCreatedPublicShareToken();
-		}
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
-			$user,
+			$token,
 			$itemToUnlock,
-			$user,
+			$token,
 			$itemToUnlock,
 			true
 		);
