@@ -1,6 +1,6 @@
 ---
 title: Webfinger
-date: 2024-05-07T10:29:01.284375182Z
+date: 2024-05-07T11:49:48.359034186Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/webfinger
