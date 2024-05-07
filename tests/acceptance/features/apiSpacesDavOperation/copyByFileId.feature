@@ -186,7 +186,12 @@ Feature: copying file using file id
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/sub-folder/test.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "/folder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" copies a file "Shares/folder/sub-folder/test.txt" into "Shares/folder" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:
@@ -206,7 +211,12 @@ Feature: copying file using file id
   Scenario Outline: copy a file from personal to share space
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folder"
-    And user "Alice" has shared folder "/folder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Brian" has uploaded file with content "some data" to "/test.txt"
     And we save it into "FILEID"
     When user "Brian" copies a file "/test.txt" into "Shares/folder" inside space "Shares" using file-id path "<dav-path>"
@@ -228,7 +238,12 @@ Feature: copying file using file id
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "/folder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" copies a file "/test.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:

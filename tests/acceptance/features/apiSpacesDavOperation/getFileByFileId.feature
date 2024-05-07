@@ -51,7 +51,12 @@ Feature: accessing files using file id
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared file "/textfile.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
     When user "Brian" sends HTTP method "GET" to URL "<dav-path>"
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
@@ -66,7 +71,12 @@ Feature: accessing files using file id
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has uploaded file with content "some data" to "uploadFolder/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "/uploadFolder" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
     When user "Brian" sends HTTP method "GET" to URL "<dav-path>"
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
@@ -82,9 +92,11 @@ Feature: accessing files using file id
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    And user "Alice" has sent the following share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     When user "Brian" sends HTTP method "GET" to URL "<dav-path>"
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
