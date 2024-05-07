@@ -52,6 +52,7 @@ func DefaultConfig() *config.Config {
 		FrontendPublicURL: "https://localhost:9200",
 
 		AppRegistryEndpoint:       "com.owncloud.api.app-registry",
+		AuthAppEndpoint:           "com.owncloud.api.auth-app",
 		AuthBasicEndpoint:         "com.owncloud.api.auth-basic",
 		AuthMachineEndpoint:       "com.owncloud.api.auth-machine",
 		AuthServiceEndpoint:       "com.owncloud.api.auth-service",
