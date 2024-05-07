@@ -148,7 +148,7 @@ Feature: Notification
 
 
   Scenario: get a notification of space unshared
-    Given user "Alice" has removed the access of user "Brian" from space "notification checking" using permissions endpoint of the Graph API
+    Given user "Alice" has removed the access of user "Brian" from space "notification checking"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "Removed from Space" and the message-details should match
@@ -436,7 +436,7 @@ Feature: Notification
 
 
   Scenario: all notification related to space get deleted when the sharer deletes that resource
-    Given user "Alice" has removed the access of user "Brian" from space "notification checking" using permissions endpoint of the Graph API
+    Given user "Alice" has removed the access of user "Brian" from space "notification checking"
     And user "Alice" has disabled a space "notification checking"
     And user "Alice" has deleted a space "notification checking"
     When user "Brian" lists all notifications
@@ -445,7 +445,7 @@ Feature: Notification
 
 
   Scenario: user doesn't get any notification after being removed from space
-    Given user "Alice" has removed the access of user "Brian" from space "notification checking" using permissions endpoint of the Graph API
+    Given user "Alice" has removed the access of user "Brian" from space "notification checking"
     And user "Alice" has disabled a space "notification checking"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"

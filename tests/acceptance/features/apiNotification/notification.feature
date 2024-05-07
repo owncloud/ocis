@@ -138,7 +138,7 @@ Feature: Notification
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    And user "Alice" has removed the access of user "Brian" from resource "<resource>" of space "Personal" using the Graph API
+    And user "Alice" has removed the access of user "Brian" from resource "<resource>" of space "Personal"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "Resource unshared" and the message-details should match
@@ -321,7 +321,7 @@ Feature: Notification
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    And user "Alice" has removed the access of user "Brian" from resource "<resource>" of space "Personal" using the Graph API
+    And user "Alice" has removed the access of user "Brian" from resource "<resource>" of space "Personal"
     And user "Alice" has deleted entity "/<resource>"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
