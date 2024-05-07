@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2024-05-07T00:06:43.85106269Z
+date: 2024-05-07T06:25:57.974678125Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -97,7 +97,7 @@ COMMANDS:
 The `sessions` command is the entry point for listing, restarting and cleaning unfinished uploads.
 
 ```bash
-ocis storage-users uploads sessions <command>
+ocis storage-users uploads sessions <commandoptions>
 ```
 
 ```
