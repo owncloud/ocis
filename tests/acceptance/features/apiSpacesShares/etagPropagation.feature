@@ -14,7 +14,12 @@ Feature: check etag propagation after different file alterations
 
   Scenario: copying a file inside a folder as a share receiver changes its etag for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/file.txt" inside space "Personal"
@@ -41,7 +46,12 @@ Feature: check etag propagation after different file alterations
 
   Scenario: copying a file inside a folder as a sharer changes its etag for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/file.txt" inside space "Personal"
@@ -68,7 +78,12 @@ Feature: check etag propagation after different file alterations
 
   Scenario: share receiver renaming a file inside a folder changes its etag for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/file.txt" on path "/upload/renamed.txt" inside space "Personal"
@@ -91,7 +106,12 @@ Feature: check etag propagation after different file alterations
 
   Scenario: sharer renaming a file inside a folder changes its etag for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/file.txt" on path "/upload/renamed.txt" inside space "Personal"
@@ -115,8 +135,18 @@ Feature: check etag propagation after different file alterations
   Scenario: sharer moving a file from one folder to an other changes the etags of both folders for all collaborators
     Given user "Alice" has created folder "/dst"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
-    And user "Alice" has shared folder "/dst" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following share invitation:
+      | resource        | dst      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/dst" inside space "Personal"
@@ -139,8 +169,18 @@ Feature: check etag propagation after different file alterations
   Scenario: sharer moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Alice" has created folder "/dst"
     And user "Alice" has created folder "/upload/toMove"
-    And user "Alice" has shared folder "/upload" with user "Brian"
-    And user "Alice" has shared folder "/dst" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following share invitation:
+      | resource        | dst      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/dst" inside space "Personal"
@@ -160,7 +200,12 @@ Feature: check etag propagation after different file alterations
 
 
   Scenario: share receiver creating a folder inside a folder received as a share changes its etag for all collaborators
-    Given user "Alice" has shared folder "/upload" with user "Brian"
+    Given user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -176,7 +221,12 @@ Feature: check etag propagation after different file alterations
 
 
   Scenario: sharer creating a folder inside a shared folder changes etag for all collaborators
-    Given user "Alice" has shared folder "/upload" with user "Brian"
+    Given user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -192,7 +242,12 @@ Feature: check etag propagation after different file alterations
 
 
   Scenario: share receiver uploading a file inside a folder received as a share changes its etag for all collaborators
-    Given user "Alice" has shared folder "/upload" with user "Brian"
+    Given user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -208,7 +263,12 @@ Feature: check etag propagation after different file alterations
 
 
   Scenario: sharer uploading a file inside a shared folder should update etags for all collaborators
-    Given user "Alice" has shared folder "/upload" with user "Brian"
+    Given user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -225,7 +285,12 @@ Feature: check etag propagation after different file alterations
 
   Scenario: share receiver overwriting a file inside a received shared folder should update etags for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -242,7 +307,12 @@ Feature: check etag propagation after different file alterations
 
   Scenario: sharer overwriting a file inside a shared folder should update etags for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -260,7 +330,12 @@ Feature: check etag propagation after different file alterations
   Scenario: share receiver deleting (removing) a file changes the etags of all parents for all collaborators
     Given user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
@@ -286,7 +361,12 @@ Feature: check etag propagation after different file alterations
   Scenario: sharer deleting (removing) a file changes the etags of all parents for all collaborators
     Given user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
@@ -312,7 +392,12 @@ Feature: check etag propagation after different file alterations
   Scenario: share receiver deleting (removing) a folder changes the etags of all parents for all collaborators
     Given user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
@@ -338,7 +423,12 @@ Feature: check etag propagation after different file alterations
   Scenario: sharer deleting (removing) a folder changes the etags of all parents for all collaborators
     Given user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
