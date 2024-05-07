@@ -1,11 +1,16 @@
 package revaconfig
 
 import (
+	"path/filepath"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/config"
 )
 
 // AuthAppConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func AuthAppConfigFromStruct(cfg *config.Config) map[string]interface{} {
+	appAuthJSON := filepath.Join(defaults.BaseDataPath(), "appauth.json")
+
 	rcfg := map[string]interface{}{
 		"shared": map[string]interface{}{
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
@@ -27,6 +32,14 @@ func AuthAppConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"auth_managers": map[string]interface{}{
 						"appauth": map[string]interface{}{
 							"gateway_addr": cfg.Reva.Address,
+						},
+					},
+				},
+				"applicationauth": map[string]interface{}{
+					"driver": "json",
+					"drivers": map[string]interface{}{
+						"json": map[string]interface{}{
+							"file": appAuthJSON,
 						},
 					},
 				},

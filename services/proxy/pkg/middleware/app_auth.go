@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
@@ -31,6 +33,7 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, bool
 	if err != nil {
 		return nil, false
 	}
+
 	authenticateResponse, err := next.Authenticate(r.Context(), &gateway.AuthenticateRequest{
 		Type:         "appauth",
 		ClientId:     username,
@@ -39,7 +42,12 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, bool
 	if err != nil {
 		return nil, false
 	}
-	r.Header.Add(_headerRevaAccessToken, authenticateResponse.GetToken())
+	if authenticateResponse.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
+		// TODO: log???
+		return nil, false
+	}
+
+	r.Header.Set(revactx.TokenHeader, authenticateResponse.GetToken())
 
 	return r, true
 }
