@@ -74,7 +74,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Crash when processing crafted TIFF files: [#8981](https://github.com/owncloud/ocis/pull/8981)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
-* Change - Define maximum input image dimensions when generating previews: [#9035](https://github.com/owncloud/ocis/pull/9035)
+* Change - Define maximum input image dimensions and size when generating previews: [#9035](https://github.com/owncloud/ocis/pull/9035)
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 * Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
@@ -322,12 +322,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8653
 
-* Change - Define maximum input image dimensions when generating previews: [#9035](https://github.com/owncloud/ocis/pull/9035)
+* Change - Define maximum input image dimensions and size when generating previews: [#9035](https://github.com/owncloud/ocis/pull/9035)
 
    This is a general hardening change to limit processing time and resources of the
    thumbnailer.
 
    https://github.com/owncloud/ocis/pull/9035
+   https://github.com/owncloud/ocis/pull/9069
 
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
 
