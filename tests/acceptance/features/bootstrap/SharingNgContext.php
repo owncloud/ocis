@@ -56,10 +56,10 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * Create link share of itme (resource) or drive (space) using drives.permissions endpoint
+	 * Create link share of item (resource) or drive (space) using drives.permissions endpoint
 	 *
 	 * @param string $user
-	 * @param TableNode|null $body
+	 * @param TableNode $body
 	 *
 	 * @return ResponseInterface
 	 * @throws Exception
@@ -98,7 +98,7 @@ class SharingNgContext implements Context {
 	 * Create link share of drive (space) using drives.root endpoint
 	 *
 	 * @param string $user
-	 * @param TableNode|null $body
+	 * @param TableNode $body
 	 *
 	 * @return ResponseInterface
 	 * @throws Exception
@@ -539,7 +539,7 @@ class SharingNgContext implements Context {
 	 * @When /^user "([^"]*)" creates the following resource link share using the Graph API:$/
 	 *
 	 * @param string $user
-	 * @param TableNode|null $body
+	 * @param TableNode $body
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -553,7 +553,7 @@ class SharingNgContext implements Context {
 	 * @Given /^user "([^"]*)" has created the following resource link share:$/
 	 *
 	 * @param string $user
-	 * @param TableNode|null $body
+	 * @param TableNode $body
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -570,7 +570,7 @@ class SharingNgContext implements Context {
 	 * @Given /^user "([^"]*)" has created the following space link share:$/
 	 *
 	 * @param string $user
-	 * @param TableNode|null $body
+	 * @param TableNode $body
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -587,7 +587,7 @@ class SharingNgContext implements Context {
 	 * @When /^user "([^"]*)" updates the last public link share using the Graph API with$/
 	 *
 	 * @param string $user
-	 * @param TableNode|null $body
+	 * @param TableNode $body
 	 *
 	 * @return void
 	 * @throws Exception
@@ -641,7 +641,7 @@ class SharingNgContext implements Context {
 	 * @When user :user sets the following password for the last link share using the Graph API:
 	 *
 	 * @param string $user
-	 * @param TableNode|null $body
+	 * @param TableNode $body
 	 *
 	 * @return void
 	 * @throws Exception
