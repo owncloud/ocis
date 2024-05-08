@@ -179,8 +179,168 @@ For example `deployments/examples/ocis_wopi/docker-compose.yml`
 },
 ```
 
+### Debugging the Collaboration Stack
+Sometimes for debugging purposes, we want to run the WOPI stack with the collaboration service locally.
+Let's focus on an example that uses the local runs of the ocis and collaboration together with the containerized traefik and collabora.
+Please note: Against the stack that uses https://github.com/cs3org/wopiserver, we don't need the app_provider anymore. The new collaboration service now includes an app_provider.
 
-### Gather error messages
+
+1. Update the hosts file
+```bash
+127.0.0.1 ocis.owncloud.test
+127.0.0.1 traefik.owncloud.test
+127.0.0.1 collabora.owncloud.test
+127.0.0.1 collaboration.owncloud.test
+```
+
+2. Update the ocis/services/proxy/pkg/config/csp.yaml
+``` yaml
+  frame-src:
+    - '''self'''
+    - 'https://embed.diagrams.net/'
+    - 'https://collabora.owncloud.test/'
+  img-src:
+    - '''self'''
+    - 'data:'
+    - 'blob:'
+    - 'https://collabora.owncloud.test/'
+```
+
+3. Run dependencies in a docker
+3.1 Set the OCIS_DOMAIN
+```bash
+export OCIS_DOMAIN=ocis.owncloud.test:9200
+```
+3.2 Create the docker-compose.yml
+```yaml
+
+---
+version: "3.7"
+
+services:
+  traefik:
+    image: traefik:v2.9.1
+    networks:
+      ocis-net:
+        aliases:
+          - ${OCIS_DOMAIN:-ocis.owncloud.test}
+          - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+          - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
+          - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
+          - ${COMPANION_DOMAIN:-companion.owncloud.test}
+    command:
+      - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
+      # letsencrypt configuration
+      - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
+      - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
+      - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
+      # enable dashboard
+      - "--api.dashboard=true"
+      # define entrypoints
+      - "--entryPoints.http.address=:80"
+      - "--entryPoints.http.http.redirections.entryPoint.to=https"
+      - "--entryPoints.http.http.redirections.entryPoint.scheme=https"
+      - "--entryPoints.https.address=:443"
+      # docker provider (get configuration from container labels)
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.exposedByDefault=false"
+      # access log
+      - "--accessLog=true"
+      - "--accessLog.format=json"
+      - "--accessLog.fields.headers.names.X-Request-Id=keep"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro"
+      - "certs:/certs"
+    labels:
+      - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$$apr1$$4vqie50r$$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
+      - "traefik.http.routers.traefik.entrypoints=https"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik.tls.certresolver=http"
+      - "traefik.http.routers.traefik.service=api@internal"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+  collabora:
+    image: collabora/code:23.05.5.2.1
+    networks:
+      ocis-net:
+    extra_hosts:
+      - "collaboration.owncloud.test:host-gateway"
+    environment:
+      aliasgroup1: https://collaboration.owncloud.test:9300
+      DONT_GEN_SSL_CERT: "YES"
+      extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test:9200}
+      username: ${COLLABORA_ADMIN_USER}
+      password: ${COLLABORA_ADMIN_PASSWORD}
+    cap_add:
+      - MKNOD
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.collabora.entrypoints=https"
+      - "traefik.http.routers.collabora.rule=Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
+      - "traefik.http.routers.collabora.tls.certresolver=http"
+      - "traefik.http.routers.collabora.service=collabora"
+      - "traefik.http.services.collabora.loadbalancer.server.port=9980"
+      # websockets can't be opened when this is ommitted
+      - "traefik.http.middlewares.collabora.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.collabora.middlewares=collabora"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9980/hosting/discovery"]
+
+volumes:
+  certs:
+  companion-data:
+
+networks:
+  ocis-net:
+
+```
+3.3 Run the docker compose `docker compose up -d`
+
+4. Run ocis or configure you IDE for debugging an application on the host machine
+``` bash
+OCIS_URL=https://ocis.owncloud.test:9200 \
+PROXY_ENABLE_BASIC_AUTH=true \
+MICRO_REGISTRY=nats-js-kv \
+MICRO_REGISTRY_ADDRESS="127.0.0.1:9233" \
+NATS_NATS_HOST="0.0.0.0" \
+NATS_NATS_PORT=9233 \
+GATEWAY_GRPC_ADDR="0.0.0.0:9142" \
+PROXY_CSP_CONFIG_FILE_LOCATION=ocis/services/proxy/pkg/config/csp.yaml \
+PROXY_ENABLE_BASIC_AUTH=true \
+OCIS_EXCLUDE_RUN_SERVICES=app-provider \
+ocis/bin/ocis server
+```
+
+5. Run collaboration server or configure you IDE for debugging an application on the host machine
+```bash
+COLLABORATION_APP_NAME=Collabora \
+COLLABORATION_APP_ICON=https://collabora.owncloud.test/favicon.ico \
+COLLABORATION_CS3API_DATAGATEWAY_INSECURE=true \
+COLLABORATION_HTTP_ADDR=collaboration.owncloud.test:9300 \
+COLLABORATION_HTTP_SCHEME=http \
+COLLABORATION_LOG_LEVEL=debug \
+COLLABORATION_WOPIAPP_ADDR=https://collabora.owncloud.test \
+COLLABORATION_WOPIAPP_INSECURE=true \
+MICRO_REGISTRY=nats-js-kv \
+MICRO_REGISTRY_ADDRESS=localhost:9233 \
+OCIS_URL=https://ocis.owncloud.test:9200 \
+ocis/bin/ocis collaboration server
+```
+
+6. Open ocis in a browser https://ocis.owncloud.test:9200
+
+
+### Gather Error Messages
 
 We recommend you collect all related information in a single file or in a GitHub issue. Let us start with an error that pops up in the Web UI:
 
