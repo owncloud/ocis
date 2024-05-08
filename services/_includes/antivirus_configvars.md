@@ -28,5 +28,5 @@
 | ANTIVIRUS_ICAP_SCAN_TIMEOUT | Duration | 5m0s | Scan timeout for the ICAP client. Defaults to '5m' (5 minutes). See the Environment Variable Types description for more details.|
 | ANTIVIRUS_ICAP_URL | string | icap://127.0.0.1:1344 | URL of the ICAP server.|
 | ANTIVIRUS_ICAP_SERVICE | string | avscan | The name of the ICAP service.|
-| ANTIVIRUS_MAX_SCAN_SIZE | string |  | The maximum scan size the virus scanner can handle. Only this many bytes of a file will be scanned. 0 means unlimited and is the default. Usable common abbreviations: [KB, KiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB.|
+| ANTIVIRUS_MAX_SCAN_SIZE | string |  | The maximum scan size the virus scanner can handle. Only this many bytes of a file will be scanned. 0 means unlimited and is the default. Usable common abbreviations: [KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB.|
 | ANTIVIRUS_DEBUG_SCAN_OUTCOME | string |  | A predefined outcome for virus scanning, FOR DEBUG PURPOSES ONLY! (example values: 'found,infected')|

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-08-14-20-46]
+[#deprecation-note-2024-05-08-14-30-24]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -287,5 +287,14 @@ a| [subs=-attributes]
 ++4320 ++
 a| [subs=-attributes]
 The maximum height of an input image which is being processed.
+
+a|`THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++50MB ++
+a| [subs=-attributes]
+The maximum file size of an input image which is being processed. Usable common abbreviations: [KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB.
 |===
 
