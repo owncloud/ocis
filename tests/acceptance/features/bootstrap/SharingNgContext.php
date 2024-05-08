@@ -512,7 +512,7 @@ class SharingNgContext implements Context {
 		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
 		$itemId = (isset($resource)) ? $this->spacesContext->getResourceId($sharer, $space, $resource) : $this->spacesContext->getResourceId($sharer, $space, $space);
 
-		$permId = ($shareType === 'link')
+		$permissionID = ($shareType === 'link')
 			? $this->featureContext->shareNgGetLastCreatedLinkShareID()
 			: $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		return
@@ -523,7 +523,7 @@ class SharingNgContext implements Context {
 				$this->featureContext->getPasswordForUser($sharer),
 				$spaceId,
 				$itemId,
-				$permId
+				$permissionID
 			);
 	}
 
@@ -545,7 +545,7 @@ class SharingNgContext implements Context {
 	): ResponseInterface {
 		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
 
-		$permId = match ($shareType) {
+		$permissionID = match ($shareType) {
 			'link' => $this->featureContext->shareNgGetLastCreatedLinkShareID(),
 			'user' => 'u:' . $this->featureContext->getAttributeOfCreatedUser($recipient, 'id'),
 			'group' => 'g:' . $this->featureContext->getAttributeOfCreatedGroup($recipient, 'id'),
@@ -559,7 +559,7 @@ class SharingNgContext implements Context {
 				$sharer,
 				$this->featureContext->getPasswordForUser($sharer),
 				$spaceId,
-				$permId
+				$permissionID
 			);
 	}
 
@@ -996,6 +996,18 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userSendsTheFollowingShareInvitationUsingRootEndPointTheGraphApi(string $user, TableNode $table):void {
+		$this->featureContext->setResponse($this->sendSharingInvitationForDrive($user, $table));
+	}
+
+	/**
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return ResponseInterface
+	 * @throw Exception
+	 * @throws GuzzleException
+	 */
+	public function sendSharingInvitationForDrive(string $user, TableNode $table): ResponseInterface {
 		$shareeIds = [];
 		$rows = $table->getRowsHash();
 		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
@@ -1029,7 +1041,7 @@ class SharingNgContext implements Context {
 		$permissionsAction = $rows['permissionsAction'] ?? null;
 		$expireDate = $rows["expireDate"] ?? null;
 
-		$response = GraphHelper::sendSharingInvitationForDrive(
+		return GraphHelper::sendSharingInvitationForDrive(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
@@ -1041,7 +1053,59 @@ class SharingNgContext implements Context {
 			$permissionsAction,
 			$expireDate
 		);
+	}
 
-		$this->featureContext->setResponse($response);
+	/**
+	 * @Given /^user "([^"]*)" has sent the following share invitation using root endpoint of the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasSentTheFollowingShareInvitationUsingRootEndPointTheGraphApi(string $user, TableNode $table): void {
+		$this->sendSharingInvitationForDrive($user, $table);
+	}
+
+	/**
+	 * @When user :user updates the last drive share with the following using root endpoint of the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userUpdatesTheLastDriveShareWithTheFollowingUsingRootEndpointTheGraphApi(string $user, TableNode $table): void {
+		$bodyRows = $table->getRowsHash();
+		$permissionID = match ($bodyRows['shareType']) {
+			'user' => 'u:' . $this->featureContext->getAttributeOfCreatedUser($bodyRows['sharee'], 'id'),
+			'group' => 'g:' . $this->featureContext->getAttributeOfCreatedGroup($bodyRows['sharee'], 'id'),
+			default => throw new Exception("shareType {$bodyRows['shareType']} does not match user|group "),
+		};
+		$space = $bodyRows['space'];
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$body = [];
+
+		if (\array_key_exists('permissionsRole', $bodyRows)) {
+			$body['roles'] = [GraphHelper::getPermissionsRoleIdByName($bodyRows['permissionsRole'])];
+		}
+
+		if (\array_key_exists('expirationDateTime', $bodyRows)) {
+			$body['expirationDateTime'] = empty($bodyRows['expirationDateTime']) ? null : $bodyRows['expirationDateTime'];
+		}
+
+		$this->featureContext->setResponse(
+			GraphHelper::updateDriveShare(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId,
+				\json_encode($body),
+				$permissionID
+			)
+		);
 	}
 }

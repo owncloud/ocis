@@ -75,10 +75,7 @@ Feature: Send a sharing invitations
                           "pattern": "^%user_id_pattern%$"
                         },
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "Brian Murphy"
-                          ]
+                          "const": "Brian Murphy"
                         }
                       }
                     }
@@ -170,10 +167,7 @@ Feature: Send a sharing invitations
                           "pattern": "^%group_id_pattern%$"
                         },
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "grp1"
-                          ]
+                          "const": "grp1"
                         }
                       }
                     }
@@ -254,10 +248,7 @@ Feature: Send a sharing invitations
                           "pattern": "^%user_id_pattern%$"
                         },
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "Brian Murphy"
-                          ]
+                          "const": "Brian Murphy"
                         }
                       }
                     }
@@ -345,10 +336,7 @@ Feature: Send a sharing invitations
                           "pattern": "^%user_id_pattern%$"
                         },
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "Brian Murphy"
-                          ]
+                          "const": "Brian Murphy"
                         }
                       }
                     }
@@ -445,10 +433,7 @@ Feature: Send a sharing invitations
                           "pattern": "^%user_id_pattern%$"
                         },
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "grp1"
-                          ]
+                          "const": "grp1"
                         }
                       }
                     }
@@ -542,10 +527,7 @@ Feature: Send a sharing invitations
                           "pattern": "^%user_id_pattern%$"
                         },
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "grp1"
-                          ]
+                          "const": "grp1"
                         }
                       }
                     }
@@ -639,10 +621,7 @@ Feature: Send a sharing invitations
                           "pattern": "^%user_id_pattern%$"
                         },
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "Brian Murphy"
-                          ]
+                          "const": "Brian Murphy"
                         }
                       }
                     }
@@ -738,10 +717,7 @@ Feature: Send a sharing invitations
                           "pattern": "^%group_id_pattern%$"
                         },
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "grp1"
-                          ]
+                          "const": "grp1"
                         }
                       }
                     }
@@ -830,10 +806,7 @@ Feature: Send a sharing invitations
                           "pattern": "^%user_id_pattern%$"
                         },
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "Brian Murphy"
-                          ]
+                          "const": "Brian Murphy"
                         }
                       }
                     }
@@ -887,16 +860,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": [
-                  "invalidRequest"
-                ]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "itemNotFound: not found"
-                ]
+                "const": "itemNotFound: not found"
               }
             }
           }
@@ -943,10 +910,7 @@ Feature: Send a sharing invitations
                 "pattern": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "itemNotFound: not found"
-                ]
+                "const": "itemNotFound: not found"
               }
             }
           }
@@ -999,16 +963,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": [
-                  "invalidRequest"
-                ]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "Key: 'DriveItemInvite.Recipients' Error:Field validation for 'Recipients' failed on the 'len' tag"
-                ]
+                "const": "Key: 'DriveItemInvite.Recipients' Error:Field validation for 'Recipients' failed on the 'len' tag"
               }
             }
           }
@@ -1060,16 +1018,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": [
-                  "invalidRequest"
-                ]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "Key: 'DriveItemInvite.Recipients' Error:Field validation for 'Recipients' failed on the 'len' tag"
-                ]
+                "const": "Key: 'DriveItemInvite.Recipients' Error:Field validation for 'Recipients' failed on the 'len' tag"
               }
             }
           }
@@ -1111,16 +1063,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": [
-                  "invalidRequest"
-                ]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "itemNotFound: not found"
-                ]
+                "const": "itemNotFound: not found"
               }
             }
           }
@@ -1174,10 +1120,7 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": [
-                  "nameAlreadyExists"
-                ]
+                "const": "nameAlreadyExists"
               },
               "message": {
                 "type": "string",
@@ -1223,14 +1166,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["invalidRequest"]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "itemNotFound: not found"
-                ]
+                "const": "itemNotFound: not found"
               }
             }
           }
@@ -1269,14 +1208,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["invalidRequest"]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "Key: 'DriveItemInvite.Recipients[0].ObjectId' Error:Field validation for 'ObjectId' failed on the 'ne' tag"
-                ]
+                "const": "Key: 'DriveItemInvite.Recipients[0].ObjectId' Error:Field validation for 'ObjectId' failed on the 'ne' tag"
               }
             }
           }
@@ -1315,14 +1250,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["invalidRequest"]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
-                ]
+                "const": "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
               }
             }
           }
@@ -1367,14 +1298,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["invalidRequest"]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
-                ]
+                "const": "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
               }
             }
           }
@@ -1413,14 +1340,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["invalidRequest"]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
-                ]
+                "const": "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
               }
             }
           }
@@ -1465,14 +1388,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["invalidRequest"]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
-                ]
+                "const": "Key: 'DriveItemInvite.Recipients[0].LibreGraphRecipientType' Error:Field validation for 'LibreGraphRecipientType' failed on the 'oneof' tag"
               }
             }
           }
@@ -1511,16 +1430,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": [
-                  "invalidRequest"
-                ]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "role not applicable to this resource"
-                ]
+                "const": "role not applicable to this resource"
               }
             }
           }
@@ -1562,16 +1475,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": [
-                  "invalidRequest"
-                ]
+                "const": "invalidRequest"
               },
               "message": {
-                "type": "string",
-                "enum": [
-                  "role not applicable to this resource"
-                ]
+                "const": "role not applicable to this resource"
               }
             }
           }
@@ -1616,8 +1523,7 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["nameAlreadyExists"]
+                "const": "nameAlreadyExists"
               },
               "message": {
                 "type": "string",
@@ -1677,10 +1583,7 @@ Feature: Send a sharing invitations
                       ],
                       "properties": {
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "Brian Murphy"
-                          ]
+                          "const": "Brian Murphy"
                         },
                         "id": {
                           "type": "string",
@@ -1739,8 +1642,7 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["itemNotFound"]
+                "const": "itemNotFound"
               },
               "message": {
                 "type": "string",
@@ -1786,12 +1688,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["itemNotFound"]
+                "const": "itemNotFound"
               },
               "message": {
-                "type": "string",
-                "enum": ["stat: error: not found: "]
+                "const": "stat: error: not found: "
               }
             }
           }
@@ -1837,7 +1737,8 @@ Feature: Send a sharing invitations
               "type": "object",
               "required": [
                 "grantedToV2",
-                "roles"
+                "roles",
+                "id"
               ],
               "properties": {
                 "grantedToV2": {
@@ -1846,7 +1747,7 @@ Feature: Send a sharing invitations
                     "group"
                   ],
                   "properties": {
-                    "user": {
+                    "group": {
                       "type": "object",
                       "required": [
                         "displayName",
@@ -1854,18 +1755,19 @@ Feature: Send a sharing invitations
                       ],
                       "properties": {
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "grp1"
-                          ]
+                          "const": "grp1"
                         },
                         "id": {
                           "type": "string",
-                          "pattern": "^%user_id_pattern%$"
+                          "pattern": "^%group_id_pattern%$"
                         }
                       }
                     }
                   }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^g:%group_id_pattern%$"
                 },
                 "roles": {
                   "type": "array",
@@ -1922,8 +1824,7 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["itemNotFound"]
+                "const": "itemNotFound"
               },
               "message": {
                 "type": "string",
@@ -1975,12 +1876,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["itemNotFound"]
+                "const": "itemNotFound"
               },
               "message": {
-                "type": "string",
-                "enum": ["stat: error: not found: "]
+                "const": "stat: error: not found: "
               }
             }
           }
@@ -2022,12 +1921,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["itemNotFound"]
+                "const": "itemNotFound"
               },
               "message": {
-                "type": "string",
-                "enum": ["stat: error: not found: "]
+                "const": "stat: error: not found: "
               }
             }
           }
@@ -2072,12 +1969,10 @@ Feature: Send a sharing invitations
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "enum": ["itemNotFound"]
+                "const": "itemNotFound"
               },
               "message": {
-                "type": "string",
-                "enum": ["stat: error: not found: "]
+                "const": "stat: error: not found: "
               }
             }
           }
@@ -2134,10 +2029,7 @@ Feature: Send a sharing invitations
                       ],
                       "properties": {
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "Brian Murphy"
-                          ]
+                          "const": "Brian Murphy"
                         },
                         "id": {
                           "type": "string",
@@ -2245,10 +2137,7 @@ Feature: Send a sharing invitations
                           "pattern": "^%group_id_pattern%$"
                         },
                         "displayName": {
-                          "type": "string",
-                          "enum": [
-                            "grp1"
-                          ]
+                          "const": "grp1"
                         }
                       }
                     }
