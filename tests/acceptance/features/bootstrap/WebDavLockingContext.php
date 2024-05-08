@@ -328,8 +328,9 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function publicLocksLastSharedFile(TableNode $properties) {
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->lockFile(
-			$this->featureContext->getLastCreatedPublicShareToken(),
+			$token,
 			"/",
 			$properties,
 			null,
@@ -377,8 +378,9 @@ class WebDavLockingContext implements Context {
 		string $publicWebDAVAPIVersion,
 		TableNode $properties
 	) {
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->lockFile(
-			$this->featureContext->getLastCreatedPublicShareToken(),
+			$token,
 			$file,
 			$properties,
 			null,

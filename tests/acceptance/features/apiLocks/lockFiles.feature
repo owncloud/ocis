@@ -93,9 +93,11 @@ Feature: lock files
     And using spaces DAV path
     And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "textfile.txt"
-    And user "Alice" has shared a space "Project" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | Project      |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Brian" locks file "textfile.txt" inside the space "Project" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
@@ -109,9 +111,9 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:timeout               | Second-3600  |
       | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
     Examples:
-      | space-role |
-      | manager    |
-      | editor     |
+      | space-role   |
+      | Manager      |
+      | Space Editor |
 
 
   Scenario Outline: lock a file in the project space using file-id
@@ -120,9 +122,11 @@ Feature: lock files
     And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "Project" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | Project      |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Brian" locks file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
@@ -136,9 +140,9 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:timeout               | Second-3600  |
       | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
     Examples:
-      | space-role | dav-path                          |
-      | manager    | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | /dav/spaces/<<FILEID>>            |
+      | space-role   | dav-path                          |
+      | Manager      | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | /dav/spaces/<<FILEID>>            |
 
 
   Scenario: viewer cannot lock a file in the project space
@@ -147,9 +151,11 @@ Feature: lock files
     And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "Project" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    And user "Alice" has sent the following space share invitation:
+      | space           | Project      |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "403"
@@ -161,10 +167,12 @@ Feature: lock files
   Scenario Outline: lock a file in the shares
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
-    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
-      | path      | textfile.txt |
-      | shareWith | Brian        |
-      | role      | editor       |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     When user "Brian" locks file "/Shares/textfile.txt" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "200"
@@ -184,10 +192,12 @@ Feature: lock files
   Scenario Outline: lock a file in the shares using file-id
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
-      | path      | textfile.txt |
-      | shareWith | Brian        |
-      | role      | editor       |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     When user "Brian" locks file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
@@ -207,10 +217,12 @@ Feature: lock files
   Scenario: viewer cannot lock a file in the shares using file-id
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
-      | path      | textfile.txt |
-      | shareWith | Brian        |
-      | role      | viewer       |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
     When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "403"
@@ -219,10 +231,12 @@ Feature: lock files
   Scenario: sharee cannot lock a resource exclusively locked by a sharer
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
-      | path      | textfile.txt |
-      | shareWith | Brian        |
-      | role      | editor       |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     And user "Alice" has locked file "textfile.txt" setting the following properties
       | lockscope | exclusive |
     When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
@@ -240,10 +254,12 @@ Feature: lock files
   Scenario: sharer cannot lock a resource exclusively locked by a sharee
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has created a share inside of space "Alice Hansen" with settings:
-      | path      | textfile.txt |
-      | shareWith | Brian        |
-      | role      | editor       |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     And user "Brian" has locked file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" setting the following properties
       | lockscope | exclusive |
     When user "Alice" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
@@ -262,7 +278,12 @@ Feature: lock files
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "some data" to "textfile0.txt"
     And user "Brian" has uploaded file with content "some data" to "textfile0.txt"
-    And user "Alice" has shared file "/textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     And user "Alice" has locked file "textfile0.txt" setting the following properties
       | lockscope | shared |
     And user "Brian" has locked file "Shares/textfile0.txt" setting the following properties
@@ -311,8 +332,18 @@ Feature: lock files
     And user "Brian" has created folder "FromBrian"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/FromAlice/textfile0.txt"
     And user "Brian" has uploaded file "filesForUpload/textfile.txt" to "/FromBrian/textfile0.txt"
-    And user "Alice" has shared folder "FromAlice" with user "Carol"
-    And user "Brian" has shared folder "FromBrian" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FromAlice |
+      | space           | Personal  |
+      | sharee          | Carol     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | FromBrian |
+      | space           | Personal  |
+      | sharee          | Carol     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     When user "Carol" locks file "/Shares/FromBrian/textfile0.txt" using the WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "200"
@@ -334,8 +365,18 @@ Feature: lock files
     And user "Alice" has created folder "notlocked/"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/locked/textfile0.txt"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/notlocked/textfile0.txt"
-    And user "Alice" has shared folder "locked" with user "Brian"
-    And user "Alice" has shared folder "notlocked" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | locked   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | notlocked |
+      | space           | Personal  |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     When user "Brian" locks file "/Shares/locked/textfile0.txt" using the WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "200"
@@ -371,12 +412,14 @@ Feature: lock files
   @issue-7641
   Scenario Outline: try to lock a folder as anonymous user
     Given using <dav-path-version> DAV path
+    And using SharingNG
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | PARENT   |
-      | permissions | change   |
-      | password    | %public% |
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     When the public locks the last public link shared file using the WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "403"
@@ -391,6 +434,7 @@ Feature: lock files
       | new              | exclusive  |
       | spaces           | shared     |
       | spaces           | exclusive  |
+
 
   Scenario Outline: lock expiration
     Given using <dav-path-version> DAV path
@@ -413,12 +457,14 @@ Feature: lock files
 
   Scenario Outline: lock a file inside a folder shared by a link as anonymous user with edit permission
     Given using <dav-path-version> DAV path
+    And using SharingNG
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | PARENT   |
-      | permissions | change   |
-      | password    | %public% |
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     When the public locks "textfile0.txt" in the last public link shared folder using the new public WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "200"
@@ -436,12 +482,14 @@ Feature: lock files
 
   Scenario Outline: try to lock a file inside a folder shared by a link as anonymous user with read permission
     Given using <dav-path-version> DAV path
+    And using SharingNG
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | PARENT   |
-      | permissions | read     |
-      | password    | %public% |
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
     When the public tries to lock "textfile0.txt" in the last public link shared folder using the new public WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "403"
@@ -459,11 +507,13 @@ Feature: lock files
 
   Scenario Outline: lock a file shared by a link as anonymous user with edit permission
     Given using <dav-path-version> DAV path
+    And using SharingNG
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | permissions | change        |
-      | password    | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | permissionsRole | edit          |
+      | password        | %public%      |
     When the public locks the last public link shared file using the WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "200"
@@ -481,11 +531,13 @@ Feature: lock files
 
   Scenario Outline: try to lock a file shared by a link as anonymous user with read permission
     Given using <dav-path-version> DAV path
+    And using SharingNG
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | permissions | read          |
-      | password    | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | permissionsRole | view          |
+      | password        | %public%      |
     When the public tries to lock the last public link shared file using the WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "403"
