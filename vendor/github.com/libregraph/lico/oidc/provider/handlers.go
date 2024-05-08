@@ -23,11 +23,11 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/libregraph/oidc-go"
 	"github.com/longsleep/rndm"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/square/go-jose.v2"
 
 	konnect "github.com/libregraph/lico"
 	"github.com/libregraph/lico/identity"

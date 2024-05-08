@@ -15,9 +15,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/libregraph/lico/signing"
 )
