@@ -51,7 +51,12 @@ Feature: update files using file id
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared file "/textfile.txt" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     When user "Brian" sends HTTP method "PUT" to URL "<dav-path>" with content "updated content"
     Then the HTTP status code should be "204"
     And for user "Alice" the content of the file "/textfile.txt" of the space "Personal" should be "updated content"
@@ -67,7 +72,12 @@ Feature: update files using file id
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has uploaded file with content "some data" to "uploadFolder/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "/uploadFolder" with user "Brian"
+    And user "Alice" has sent the following share invitation:
+      | resource        | uploadFolder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     When user "Brian" sends HTTP method "PUT" to URL "<dav-path>" with content "updated content"
     Then the HTTP status code should be "204"
     And for user "Alice" the content of the file "uploadFolder/textfile.txt" of the space "Personal" should be "updated content"
@@ -84,17 +94,19 @@ Feature: update files using file id
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Brian" sends HTTP method "PUT" to URL "<dav-path>" with content "updated content"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Alice" the content of the file "/textfile.txt" of the space "new-space" should be "<file-content>"
     And for user "Brian" the content of the file "/textfile.txt" of the space "new-space" should be "<file-content>"
     Examples:
-      | dav-path                          | space-role | http-status-code | file-content    |
-      | /remote.php/dav/spaces/<<FILEID>> | viewer     | 403              | some data       |
-      | /dav/spaces/<<FILEID>>            | editor     | 204              | updated content |
+      | dav-path                          | space-role   | http-status-code | file-content    |
+      | /remote.php/dav/spaces/<<FILEID>> | Space Viewer | 403              | some data       |
+      | /dav/spaces/<<FILEID>>            | Space Editor | 204              | updated content |
 
 
   Scenario Outline: user tries to update content of a file owned by others
