@@ -15,11 +15,13 @@ Feature: Public can download folders from project space public link
   @env-config
   Scenario: download a folder from public link of a space
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And using SharingNG
     And user "Alice" has created a folder "NewFolder" in space "new-space"
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "NewFolder/test.txt"
-    And user "Alice" has created a public link share of the space "new-space" with settings:
-      | permissions | 1        |
-      | name        | someName |
+    And user "Alice" has created the following space link share:
+      | space           | new-space |
+      | displayName     | someName  |
+      | permissionsRole | view      |
     When public downloads the folder "NewFolder" from the last created public link using the public files API
     Then the HTTP status code should be "200"
     And the downloaded tar archive should contain these files:
@@ -29,14 +31,15 @@ Feature: Public can download folders from project space public link
   @env-config @issue-5229
   Scenario: download a folder from public link of a folder inside a space
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And using SharingNG
     And user "Alice" has created a folder "NewFolder" in space "new-space"
     And user "Alice" has created a folder "NewFolder/folder" in space "new-space"
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "NewFolder/folder/test.txt"
-    And user "Alice" has created a public link share inside of space "new-space" with settings:
-      | path        | NewFolder   |
-      | shareType   | 3           |
-      | permissions | 1           |
-      | name        | public link |
+    And user "Alice" has created the following resource link share:
+      | resource        | NewFolder   |
+      | space           | new-space   |
+      | displayName     | public link |
+      | permissionsRole | view        |
     When public downloads the folder "folder" from the last created public link using the public files API
     Then the HTTP status code should be "200"
     And the downloaded tar archive should contain these files:

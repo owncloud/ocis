@@ -3878,7 +3878,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException|JsonException
 	 */
 	public function publicDownloadsTheFolderFromTheLastCreatedPublicLink(string $resource) {
-		$token = $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->featureContext->listFolderAndReturnResponseXml(
 			$token,
 			$resource,
