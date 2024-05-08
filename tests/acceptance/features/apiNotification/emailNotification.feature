@@ -165,7 +165,7 @@ Feature: Email notification
   Scenario: user gets an email notification when space admin unshares a space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | new-space    |
       | sharee          | Brian        |
       | shareType       | user         |

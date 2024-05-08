@@ -10,13 +10,13 @@ Feature: Delete notification
       | Brian    |
     And user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
     And user "Alice" has created folder "my_data"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | my_data  |
       | space           | Personal |
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt |
       | space           | Personal      |
       | sharee          | Brian         |

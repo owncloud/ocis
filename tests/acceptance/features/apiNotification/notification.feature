@@ -14,7 +14,7 @@ Feature: Notification
 
 
   Scenario Outline: user gets a notification of resource sharing
-    Given user "Alice" has sent the following share invitation:
+    Given user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -132,7 +132,7 @@ Feature: Notification
 
 
   Scenario Outline: user gets a notification of unsharing resource
-    Given user "Alice" has sent the following share invitation:
+    Given user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -252,7 +252,7 @@ Feature: Notification
 
   Scenario Outline: get a notification about a file share in various languages
     Given user "Brian" has switched the system language to "<language>" using the <api> API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -287,7 +287,7 @@ Feature: Notification
   @env-config
   Scenario: get a notification about a file share in default languages
     Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -315,7 +315,7 @@ Feature: Notification
 
 
   Scenario Outline: notifications related to a resource get deleted when the resource is deleted
-    Given user "Alice" has sent the following share invitation:
+    Given user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
