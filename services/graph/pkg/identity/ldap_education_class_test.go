@@ -273,7 +273,7 @@ func TestGetEducationClassMembers(t *testing.T) {
 			Scope:      0,
 			SizeLimit:  1,
 			Filter:     "(objectClass=inetOrgPerson)",
-			Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
+			Attributes: ldapUserAttributes,
 			Controls:   []ldap.Control(nil),
 		}
 		lm.On("Search", userSr).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)

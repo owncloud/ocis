@@ -83,11 +83,11 @@ func TestGetGroup(t *testing.T) {
 		Entries: []*ldap.Entry{invalidGroupEntry},
 	}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
-	g, err := b.GetGroup(context.Background(), "group", nil)
+	_, err = b.GetGroup(context.Background(), "group", nil)
 	assert.ErrorContains(t, err, "itemNotFound:")
-	g, err = b.GetGroup(context.Background(), "group", queryParamExpand)
+	_, err = b.GetGroup(context.Background(), "group", queryParamExpand)
 	assert.ErrorContains(t, err, "itemNotFound:")
-	g, err = b.GetGroup(context.Background(), "group", queryParamSelect)
+	_, err = b.GetGroup(context.Background(), "group", queryParamSelect)
 	assert.ErrorContains(t, err, "itemNotFound:")
 
 	// Mock a valid	Search Result
@@ -96,14 +96,14 @@ func TestGetGroup(t *testing.T) {
 		BaseDN:     "uid=user,ou=people,dc=test",
 		SizeLimit:  1,
 		Filter:     "(objectClass=inetOrgPerson)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
+		Attributes: ldapUserAttributes,
 		Controls:   []ldap.Control(nil),
 	}
 	sr3 := &ldap.SearchRequest{
 		BaseDN:     "uid=invalid,ou=people,dc=test",
 		SizeLimit:  1,
 		Filter:     "(objectClass=inetOrgPerson)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
+		Attributes: ldapUserAttributes,
 		Controls:   []ldap.Control(nil),
 	}
 
@@ -111,7 +111,7 @@ func TestGetGroup(t *testing.T) {
 	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
 	lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{invalidUserEntry}}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
-	g, err = b.GetGroup(context.Background(), "group", nil)
+	g, err := b.GetGroup(context.Background(), "group", nil)
 	if err != nil {
 		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
 	} else if *g.Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
@@ -257,14 +257,14 @@ func TestGetGroups(t *testing.T) {
 		BaseDN:     "uid=user,ou=people,dc=test",
 		SizeLimit:  1,
 		Filter:     "(objectClass=inetOrgPerson)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
+		Attributes: ldapUserAttributes,
 		Controls:   []ldap.Control(nil),
 	}
 	sr3 := &ldap.SearchRequest{
 		BaseDN:     "uid=invalid,ou=people,dc=test",
 		SizeLimit:  1,
 		Filter:     "(objectClass=inetOrgPerson)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
+		Attributes: ldapUserAttributes,
 		Controls:   []ldap.Control(nil),
 	}
 
