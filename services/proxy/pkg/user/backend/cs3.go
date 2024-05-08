@@ -16,6 +16,7 @@ import (
 	"go-micro.dev/v4/selector"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
@@ -176,7 +177,7 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 		return nil, err
 	}
 
-	newUser, err := c.libregraphUserFromClaims(newctx, claims)
+	newUser, err := c.libregraphUserFromClaims(claims)
 	if err != nil {
 		c.logger.Error().Err(err).Interface("claims", claims).Msg("Error creating user from claims")
 		return nil, fmt.Errorf("Error creating user from claims: %w", err)
@@ -267,7 +268,7 @@ func (c cs3backend) isAlreadyExists(resp *http.Response) (bool, error) {
 	return false, nil
 }
 
-func (c cs3backend) libregraphUserFromClaims(ctx context.Context, claims map[string]interface{}) (libregraph.User, error) {
+func (c cs3backend) libregraphUserFromClaims(claims map[string]interface{}) (libregraph.User, error) {
 	user := libregraph.User{}
 	if dn, ok := claims[c.autoProvisionClaims.DisplayName].(string); ok {
 		user.SetDisplayName(dn)
@@ -283,6 +284,17 @@ func (c cs3backend) libregraphUserFromClaims(ctx context.Context, claims map[str
 	if mail, ok := claims[c.autoProvisionClaims.Email].(string); ok {
 		user.SetMail(mail)
 	}
+
+	sub, subExists := claims[oidc.Sub].(string)
+	iss, issExists := claims[oidc.Iss].(string)
+
+	if subExists && issExists {
+		var objectIdentity libregraph.ObjectIdentity
+		objectIdentity.SetIssuer(iss)
+		objectIdentity.SetIssuerAssignedId(sub)
+		user.Identities = append(user.Identities, objectIdentity)
+	}
+
 	return user, nil
 }
 
