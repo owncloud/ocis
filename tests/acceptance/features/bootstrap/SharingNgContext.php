@@ -56,6 +56,8 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * Create link share of itme (resource) or drive (space) using drives.permissions endpoint
+	 *
 	 * @param string $user
 	 * @param TableNode|null $body
 	 *
@@ -66,7 +68,7 @@ class SharingNgContext implements Context {
 	public function createLinkShare(string $user, TableNode $body): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
-		$resource = $bodyRows['resource'];
+		$resource = $bodyRows['resource'] ?? "";
 
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
 		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
@@ -88,6 +90,42 @@ class SharingNgContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
 			$itemId,
+			\json_encode($body)
+		);
+	}
+
+	/**
+	 * Create link share of drive (space) using drives.root endpoint
+	 *
+	 * @param string $user
+	 * @param TableNode|null $body
+	 *
+	 * @return ResponseInterface
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function createDriveLinkShare(string $user, TableNode $body): ResponseInterface {
+		$bodyRows = $body->getRowsHash();
+		$space = $bodyRows['space'];
+
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+
+		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
+		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
+		$bodyRows['password'] = $bodyRows['password'] ?? null;
+		$body = [
+			'type' => $bodyRows['permissionsRole'],
+			'displayName' => $bodyRows['displayName'],
+			'expirationDateTime' => $bodyRows['expirationDateTime'],
+			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
+		];
+
+		return GraphHelper::createDriveShareLink(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
 			\json_encode($body)
 		);
 	}
@@ -179,6 +217,8 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * share the item (resource) or drive (space) using the drives.permissions endpoint
+	 *
 	 * @param string $user
 	 * @param TableNode $table
 	 * @param string|null $fileId
@@ -258,7 +298,67 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has sent the following share invitation:$/
+	 * share the drive (space) using the drives.root endpoint
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function sendDriveShareInvitation(string $user, TableNode $table): ResponseInterface {
+		$shareeIds = [];
+		$rows = $table->getRowsHash();
+		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
+			$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
+		} else {
+			$space = $this->spacesContext->getCreatedSpace($rows['space']);
+		}
+		$spaceId = $space['id'];
+
+		$sharees = array_map('trim', explode(',', $rows['sharee']));
+		$shareTypes = array_map('trim', explode(',', $rows['shareType']));
+
+		foreach ($sharees as $index => $sharee) {
+			$shareType = $shareTypes[$index];
+			if ($sharee === "") {
+				// set empty value to $shareeIds
+				$shareeIds[] = "";
+				continue;
+			}
+			$shareeId = "";
+			if ($shareType === "user") {
+				$shareeId = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
+			} elseif ($shareType === "group") {
+				$shareeId = $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
+			}
+			// for non-existing group or user, generate random id
+			$shareeIds[] = $shareeId ?: WebDavHelper::generateUUIDv4();
+		}
+
+		$permissionsRole = $rows['permissionsRole'] ?? null;
+		$permissionsAction = $rows['permissionsAction'] ?? null;
+		$expireDate = $rows["expireDate"] ?? null;
+
+		return GraphHelper::sendSharingInvitationForDrive(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$shareeIds,
+			$shareTypes,
+			$permissionsRole,
+			$permissionsAction,
+			$expireDate
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has sent the following resource share invitation:$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -267,15 +367,15 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userHasSentTheFollowingShareInvitation(string $user, TableNode $table): void {
+	public function userHasSentTheFollowingResourceShareInvitation(string $user, TableNode $table): void {
+		$rows = $table->getRowsHash();
+		Assert::assertArrayHasKey("resource", $rows, "'resource' should be provided in the data-table while sharing a resource");
 		$response = $this->sendShareInvitation($user, $table);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
 	/**
-	 * @When /^user "([^"]*)" sends the following share invitation using the Graph API:$/
-	 * @When /^user "([^"]*)" tries to send the following share invitation using the Graph API:$/
-	 * @When user :user sends the following share invitation for space using the Graph API:
+	 * @Given /^user "([^"]*)" has sent the following space share invitation:$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -284,14 +384,52 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userSendsTheFollowingShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
+	public function userHasSentTheFollowingShareShareInvitation(string $user, TableNode $table): void {
+		$rows = $table->getRowsHash();
+		Assert::assertArrayNotHasKey("resource", $rows, "'resource' should not be provided in the data-table while sharing a space");
+		$response = $this->sendDriveShareInvitation($user, $table);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" sends the following resource share invitation using the Graph API:$/
+	 * @When /^user "([^"]*)" tries to send the following resource share invitation using the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userSendsTheFollowingResourceShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
+		$rows = $table->getRowsHash();
+		Assert::assertArrayHasKey("resource", $rows, "'resource' should be provided in the data-table while sharing a resource");
 		$this->featureContext->setResponse(
 			$this->sendShareInvitation($user, $table)
 		);
 	}
 
 	/**
-	 * @When user :user updates the last share with the following using the Graph API:
+	 * @When /^user "([^"]*)" sends the following space share invitation using permissions endpoint of the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userSendsTheFollowingSpaceShareInvitationUsingPermissionsEndpointOfTheGraphApi(string $user, TableNode $table): void {
+		$rows = $table->getRowsHash();
+		Assert::assertArrayNotHasKey("resource", $rows, "'resource' should not be provided in the data-table while sharing a space");
+		$this->featureContext->setResponse(
+			$this->sendShareInvitation($user, $table)
+		);
+	}
+
+	/**
+	 * @When user :user updates the last resource share with the following using the Graph API:
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -301,6 +439,33 @@ class SharingNgContext implements Context {
 	public function userUpdatesTheLastShareWithFollowingUsingGraphApi($user, TableNode $table) {
 		$response = $this->featureContext->shareNgGetLastCreatedUserGroupShare();
 		$permissionID = json_decode($response->getBody()->getContents())->value[0]->id;
+		$this->featureContext->setResponse(
+			$this->updateResourceShare(
+				$user,
+				$table,
+				$permissionID
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" updates the space share for (user|group) "([^"]*)" with the following using the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param string $shareType
+	 * @param string $sharee
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userUpdatesTheSpaceShareForUserOrGroupWithFollowingUsingGraphApi(string $user, string $shareType, string $sharee, TableNode $table) {
+		$permissionID = "";
+		if ($shareType === "user") {
+			$permissionID = "u:" . $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
+		} elseif ($shareType === "group") {
+			$permissionID = "g:" . $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
+		}
+
 		$this->featureContext->setResponse(
 			$this->updateResourceShare(
 				$user,
@@ -371,7 +536,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" creates the following link share using the Graph API:$/
+	 * @When /^user "([^"]*)" creates the following resource link share using the Graph API:$/
 	 *
 	 * @param string $user
 	 * @param TableNode|null $body
@@ -385,7 +550,24 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has created the following link share:$/
+	 * @Given /^user "([^"]*)" has created the following resource link share:$/
+	 *
+	 * @param string $user
+	 * @param TableNode|null $body
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasCreatedTheFollowingResourceLinkShare(string $user, TableNode  $body): void {
+		$rows = $body->getRowsHash();
+		Assert::assertArrayHasKey("resource", $rows, "'resource' should be provided in the data-table while sharing a resource");
+		$response = $this->createLinkShare($user, $body);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while creating public share link!", $response);
+		$this->featureContext->shareNgAddToCreatedLinkShares($response);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has created the following space link share:$/
 	 *
 	 * @param string $user
 	 * @param TableNode|null $body
@@ -394,7 +576,9 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userHasCreatedTheFollowingLinkShare(string $user, TableNode  $body): void {
-		$response = $this->createLinkShare($user, $body);
+		$rows = $body->getRowsHash();
+		Assert::assertArrayHasKey("resource", $rows, "'resource' should not be provided in the data-table while sharing a space");
+		$response = $this->createDriveLinkShare($user, $body);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while creating public share link!", $response);
 		$this->featureContext->shareNgAddToCreatedLinkShares($response);
 	}
@@ -492,6 +676,8 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * Remove user|group|link share of item (resource) or drive (space) using drives.permissions endpoint
+	 *
 	 * @param string $sharer
 	 * @param string $shareType (user|group|link)
 	 * @param string $space
@@ -512,9 +698,23 @@ class SharingNgContext implements Context {
 		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
 		$itemId = (isset($resource)) ? $this->spacesContext->getResourceId($sharer, $space, $resource) : $this->spacesContext->getResourceId($sharer, $space, $space);
 
-		$permissionID = ($shareType === 'link')
-			? $this->featureContext->shareNgGetLastCreatedLinkShareID()
-			: $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$permissionID = "";
+
+		// if resource is not provided then it indicates a space share
+		// and the space shares are not stored
+		// so build the permission-id using the user or group id
+		if ($resource === null) {
+			if ($shareType === "user") {
+				$permissionID = "u:" . $this->featureContext->getAttributeOfCreatedUser($recipient, 'id');
+			} elseif ($shareType === "group") {
+				$permissionID = "g:" . $this->featureContext->getAttributeOfCreatedGroup($recipient, 'id');
+			}
+		} else {
+			$permissionID = ($shareType === 'link')
+				? $this->featureContext->shareNgGetLastCreatedLinkShareID()
+				: $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		}
+
 		return
 			GraphHelper::removeAccessToSpaceItem(
 				$this->featureContext->getBaseUrl(),
@@ -528,6 +728,8 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * Remove user|group|link from drive (space) using drives.root endpoint
+	 *
 	 * @param string $sharer
 	 * @param string $shareType (user|group|link)
 	 * @param string $space
@@ -584,7 +786,7 @@ class SharingNgContext implements Context {
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeAccessToSpaceItem($sharer, $recipientType, $space, $resource)
+			$this->removeAccessToSpaceItem($sharer, $recipientType, $space, $resource, $recipient)
 		);
 	}
 
@@ -987,7 +1189,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:tries to send|sends) the following share invitation using root endpoint of the Graph API:$/
+	 * @When /^user "([^"]*)" (?:tries to send|sends) the following space share invitation using root endpoint of the Graph API:$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -996,76 +1198,8 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userSendsTheFollowingShareInvitationUsingRootEndPointTheGraphApi(string $user, TableNode $table):void {
-		$this->featureContext->setResponse($this->sendSharingInvitationForDrive($user, $table));
-	}
-
-	/**
-	 * @param string $user
-	 * @param TableNode $table
-	 *
-	 * @return ResponseInterface
-	 * @throw Exception
-	 * @throws GuzzleException
-	 */
-	public function sendSharingInvitationForDrive(string $user, TableNode $table): ResponseInterface {
-		$shareeIds = [];
-		$rows = $table->getRowsHash();
-		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
-			$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
-		} else {
-			$space = $this->spacesContext->getCreatedSpace($rows['space']);
-		}
-		$spaceId = $space['id'];
-
-		$sharees = array_map('trim', explode(',', $rows['sharee']));
-		$shareTypes = array_map('trim', explode(',', $rows['shareType']));
-
-		foreach ($sharees as $index => $sharee) {
-			$shareType = $shareTypes[$index];
-			if ($sharee === "") {
-				// set empty value to $shareeIds
-				$shareeIds[] = "";
-				continue;
-			}
-			$shareeId = "";
-			if ($shareType === "user") {
-				$shareeId = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
-			} elseif ($shareType === "group") {
-				$shareeId = $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
-			}
-			// for non-existing group or user, generate random id
-			$shareeIds[] = $shareeId ?: WebDavHelper::generateUUIDv4();
-		}
-
-		$permissionsRole = $rows['permissionsRole'] ?? null;
-		$permissionsAction = $rows['permissionsAction'] ?? null;
-		$expireDate = $rows["expireDate"] ?? null;
-
-		return GraphHelper::sendSharingInvitationForDrive(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$spaceId,
-			$shareeIds,
-			$shareTypes,
-			$permissionsRole,
-			$permissionsAction,
-			$expireDate
-		);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has sent the following share invitation using root endpoint of the Graph API:$/
-	 *
-	 * @param string $user
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function userHasSentTheFollowingShareInvitationUsingRootEndPointTheGraphApi(string $user, TableNode $table): void {
-		$this->sendSharingInvitationForDrive($user, $table);
+		$response = $this->sendDriveShareInvitation($user, $table);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -1077,7 +1211,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userUpdatesTheLastDriveShareWithTheFollowingUsingRootEndpointTheGraphApi(string $user, TableNode $table): void {
+	public function userUpdatesTheLastDriveShareWithTheFollowingUsingRootEndpointOfTheGraphApi(string $user, TableNode $table): void {
 		$bodyRows = $table->getRowsHash();
 		$permissionID = match ($bodyRows['shareType']) {
 			'user' => 'u:' . $this->featureContext->getAttributeOfCreatedUser($bodyRows['sharee'], 'id'),

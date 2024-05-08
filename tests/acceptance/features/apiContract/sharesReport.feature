@@ -11,7 +11,7 @@ Feature: REPORT request to Shares space
     And user "Alice" has created folder "/folderMain"
     And user "Alice" has created folder "/folderMain/SubFolder1"
     And user "Alice" has created folder "/folderMain/SubFolder1/subFOLDER2"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | /folderMain |
       | space           | Personal    |
       | sharee          | Brian       |
@@ -65,7 +65,7 @@ Feature: REPORT request to Shares space
     Given user "Brian" has disabled auto-accepting
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folderToBrian"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | /folderToBrian |
       | space           | Personal       |
       | sharee          | Brian          |

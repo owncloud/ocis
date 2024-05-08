@@ -104,7 +104,7 @@ Feature: propfind a file using file id
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -125,7 +125,7 @@ Feature: propfind a file using file id
   Scenario Outline: sharee sends a PROPFIND request to a file inside of a shared folder
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folder"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | Brian    |

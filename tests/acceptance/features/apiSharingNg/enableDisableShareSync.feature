@@ -14,7 +14,7 @@ Feature:  enable or disable sync of incoming shares
   Scenario Outline: disable sync of shared resource
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -61,7 +61,7 @@ Feature:  enable or disable sync of incoming shares
     Given user "Brian" has disabled the auto-sync share
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Alice" has created folder "folder"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -98,7 +98,7 @@ Feature:  enable or disable sync of incoming shares
     And user "Brian" has disabled the auto-sync share
     And user "Carol" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Carol" has created folder "FolderToShare"
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | grp1       |
@@ -135,7 +135,7 @@ Feature:  enable or disable sync of incoming shares
     And user "Brian" has been added to group "grp1"
     And user "Carol" has created folder "FolderToShare"
     And user "Carol" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | grp1       |
@@ -157,7 +157,7 @@ Feature:  enable or disable sync of incoming shares
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | NewSpace   |
       | sharee          | Brian      |
@@ -190,7 +190,7 @@ Feature:  enable or disable sync of incoming shares
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | NewSpace   |
       | sharee          | Brian      |
@@ -244,7 +244,7 @@ Feature:  enable or disable sync of incoming shares
     And user "Carol" has created a space "NewSpace" with the default quota using the Graph API
     And user "Carol" has created a folder "FolderToShare" in space "NewSpace"
     And user "Carol" has uploaded a file inside space "NewSpace" with content "hello world" to "/textfile0.txt"
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | NewSpace   |
       | sharee          | grp1       |
@@ -283,7 +283,7 @@ Feature:  enable or disable sync of incoming shares
     And user "Carol" has created a space "NewSpace" with the default quota using the Graph API
     And user "Carol" has created a folder "FolderToShare" in space "NewSpace"
     And user "Carol" has uploaded a file inside space "NewSpace" with content "hello world" to "/textfile0.txt"
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | NewSpace   |
       | sharee          | grp1       |

@@ -80,25 +80,25 @@ Feature: download multiple resources bundled into an archive
     And user "Alice" has uploaded file with content "some data" to "/my_data/textfile2.txt"
     And user "Alice" has created folder "more_data"
     And user "Alice" has uploaded file with content "more data" to "/more_data/an_other_file.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | my_data  |
       | space           | Personal |
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | more_data |
       | space           | Personal  |
       | sharee          | Brian     |
@@ -126,25 +126,25 @@ Feature: download multiple resources bundled into an archive
     And user "Alice" has uploaded file with content "some data" to "/my_data/textfile2.txt"
     And user "Alice" has created folder "more_data"
     And user "Alice" has uploaded file with content "more data" to "/more_data/an_other_file.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | my_data  |
       | space           | Personal |
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | more_data |
       | space           | Personal  |
       | sharee          | Brian     |

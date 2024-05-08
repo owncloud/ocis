@@ -157,7 +157,7 @@ Feature: delete user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "new"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | new      |
       | space           | Personal |
       | sharee          | Alice    |

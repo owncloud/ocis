@@ -92,7 +92,7 @@ Feature: content search
     And user "Alice" has uploaded file with content "saying hello to the world" to "uploadFolder/keywordAtMiddle.txt"
     And user "Alice" has uploaded file with content "nepal want to say hello" to "uploadFolder/keywordAtLast.txt"
     And user "Alice" has uploaded file with content "Namaste nepal" to "uploadFolder/hello.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | uploadFolder |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -191,7 +191,7 @@ Feature: content search
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | project-space |
       | sharee          | Brian         |
       | shareType       | user          |

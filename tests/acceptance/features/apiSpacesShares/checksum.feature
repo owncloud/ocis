@@ -11,7 +11,7 @@ Feature: checksums
   @issue-1291
   Scenario: sharing a file with checksum should return the checksum in the propfind using new DAV path
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | myChecksumFile.txt |
       | space           | Personal           |
       | sharee          | Brian              |
@@ -24,7 +24,7 @@ Feature: checksums
   @issue-1291
   Scenario: modifying a shared file should return correct checksum in the propfind using new DAV path
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | myChecksumFile.txt |
       | space           | Personal           |
       | sharee          | Brian              |

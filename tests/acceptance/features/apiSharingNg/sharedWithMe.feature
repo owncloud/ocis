@@ -14,7 +14,7 @@ Feature: an user gets the resources shared to them
 
   Scenario: sharee lists the file share (Personal space)
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -313,7 +313,7 @@ Feature: an user gets the resources shared to them
 
   Scenario: sharee lists the folder share (Personal space)
     Given user "Alice" has created folder "folder"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | Brian    |
@@ -604,7 +604,7 @@ Feature: an user gets the resources shared to them
     And user "Alice" has uploaded file with content "hello" to "textfile0.txt"
     And user "Alice" has created a group "grp1" using the Graph API
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | grp1          |
@@ -897,7 +897,7 @@ Feature: an user gets the resources shared to them
     And  user "Alice" has created folder "folder"
     And user "Alice" has created a group "grp1" using the Graph API
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | grp1     |
@@ -1137,13 +1137,13 @@ Feature: an user gets the resources shared to them
     And user "Alice" has uploaded file with content "hello" to "textfile0.txt"
     And user "Alice" has created a group "grp1" using the Graph API
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | grp1          |
@@ -1508,13 +1508,13 @@ Feature: an user gets the resources shared to them
     And  user "Alice" has created folder "folder"
     And user "Alice" has created a group "grp1" using the Graph API
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | grp1     |
@@ -1850,13 +1850,13 @@ Feature: an user gets the resources shared to them
     Given user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And user "Carol" has uploaded file with content "to share" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -2132,13 +2132,13 @@ Feature: an user gets the resources shared to them
     Given user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "folderToShare"
     And user "Carol" has created folder "folderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -2416,25 +2416,25 @@ Feature: an user gets the resources shared to them
     And user "Brian" has uploaded file with content "hello world" to "/textfile.txt"
     And user "Carol" has created folder "folder"
     And user "Carol" has uploaded file with content "hello world" to "/textfile.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | Alice    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | Alice    |
@@ -2504,7 +2504,7 @@ Feature: an user gets the resources shared to them
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | testfile.txt |
       | space           | new-space    |
       | sharee          | Brian        |
@@ -2732,7 +2732,7 @@ Feature: an user gets the resources shared to them
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a folder "folder" in space "new-space"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder    |
       | space           | new-space |
       | sharee          | Brian     |
@@ -2943,7 +2943,7 @@ Feature: an user gets the resources shared to them
     And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile0.txt"
     And user "Alice" has created a group "grp1" using the Graph API
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | new-space     |
       | sharee          | grp1          |
@@ -3158,7 +3158,7 @@ Feature: an user gets the resources shared to them
     And user "Alice" has created a group "grp1" using the Graph API
     And user "Alice" has created a folder "folder" in space "new-space"
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder    |
       | space           | new-space |
       | sharee          | grp1      |
@@ -3351,13 +3351,13 @@ Feature: an user gets the resources shared to them
     And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile0.txt"
     And user "Alice" has created a group "grp1" using the Graph API
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | new-space     |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | new-space     |
       | sharee          | grp1          |
@@ -3643,13 +3643,13 @@ Feature: an user gets the resources shared to them
     And user "Alice" has created a group "grp1" using the Graph API
     And user "Alice" has created a folder "folder" in space "new-space"
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder    |
       | space           | new-space |
       | sharee          | Brian     |
       | shareType       | user      |
       | permissionsRole | Viewer    |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder    |
       | space           | new-space |
       | sharee          | grp1      |
@@ -3917,25 +3917,25 @@ Feature: an user gets the resources shared to them
     And user "Alice" has created a space "space-mars" with the default quota using the Graph API
     And user "Alice" has created a folder "folder" in space "space-mars"
     And user "Alice" has uploaded a file inside space "space-mars" with content "hello world" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | space-moon   |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder     |
       | space           | space-moon |
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | space-mars   |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder     |
       | space           | space-mars |
       | sharee          | Brian      |
@@ -4002,7 +4002,7 @@ Feature: an user gets the resources shared to them
 
   Scenario: sharee lists the file share after sharer is deleted (Personal space)
     Given user "Alice" has uploaded file with content "hello" to "textfile0.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -4029,7 +4029,7 @@ Feature: an user gets the resources shared to them
 
   Scenario: sharee lists the folder share after sharer is deleted (Personal space)
     Given user "Alice" has created folder "folder"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
       | space           | Personal |
       | sharee          | Brian    |
@@ -4058,7 +4058,7 @@ Feature: an user gets the resources shared to them
 
   Scenario: sharee lists the file share after the sharer is disabled (Personal space)
     Given user "Alice" has uploaded file with content "hello" to "textfile0.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -4239,7 +4239,7 @@ Feature: an user gets the resources shared to them
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a folder "folder" in space "new-space"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder    |
       | space           | new-space |
       | sharee          | Brian     |
@@ -4450,7 +4450,7 @@ Feature: an user gets the resources shared to them
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | testfile.txt |
       | space           | new-space    |
       | sharee          | Brian        |
@@ -4685,7 +4685,7 @@ Feature: an user gets the resources shared to them
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a folder "folder" in space "new-space"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folder    |
       | space           | new-space |
       | sharee          | Brian     |
@@ -4845,7 +4845,7 @@ Feature: an user gets the resources shared to them
   Scenario Outline: sharee hides the shared resource (Personal space)
     Given user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -4886,7 +4886,7 @@ Feature: an user gets the resources shared to them
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "testfile.txt"
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | NewSpace   |
       | sharee          | Brian      |
@@ -4924,7 +4924,7 @@ Feature: an user gets the resources shared to them
   Scenario Outline: sharee lists the shares after hiding (Personal space)
     Given user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -4970,7 +4970,7 @@ Feature: an user gets the resources shared to them
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "testfile.txt"
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | NewSpace   |
       | sharee          | Brian      |

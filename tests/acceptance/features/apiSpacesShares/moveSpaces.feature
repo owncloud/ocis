@@ -16,7 +16,7 @@ Feature: move (rename) file
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created a folder "newfolder" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -38,7 +38,7 @@ Feature: move (rename) file
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created a folder "newfolder" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -55,7 +55,7 @@ Feature: move (rename) file
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -76,12 +76,12 @@ Feature: move (rename) file
     And user "Brian" has created a space "Project1" with the default quota using the Graph API
     And user "Brian" has created a space "Project2" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "project1.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project1        |
       | sharee          | Alice           |
       | shareType       | user            |
       | permissionsRole | <to-space-role> |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project2          |
       | sharee          | Alice             |
       | shareType       | user              |
@@ -109,7 +109,7 @@ Feature: move (rename) file
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "project.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -132,12 +132,12 @@ Feature: move (rename) file
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "project.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | <space-role> |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -165,7 +165,7 @@ Feature: move (rename) file
   Scenario Outline: user moves a file from space personal to space project with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -186,7 +186,7 @@ Feature: move (rename) file
 
   Scenario Outline: user moves a file from space personal to space Shares with different role (permission)
     Given user "Brian" has created folder "/testshare"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -209,7 +209,7 @@ Feature: move (rename) file
   Scenario Outline: user moves a file from space Shares with different role (permissions) to space personal
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -231,14 +231,14 @@ Feature: move (rename) file
   Scenario Outline: user moves a file from space Shares with different role (permissions) to space project with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | <space-role> |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -267,13 +267,13 @@ Feature: move (rename) file
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare1              |
       | space           | Personal                |
       | sharee          | Alice                   |
       | shareType       | user                    |
       | permissionsRole | <from-permissions-role> |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare2            |
       | space           | Personal              |
       | sharee          | Alice                 |
@@ -301,7 +301,7 @@ Feature: move (rename) file
   Scenario Outline: moving a file out of a shared folder as a sharer
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "test data" to "/testshare/testfile.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -327,7 +327,7 @@ Feature: move (rename) file
       | /testshare               |
       | /testshare/testsubfolder |
     And user "Brian" has uploaded file with content "test data" to "/testshare/testsubfolder/testfile.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -351,7 +351,7 @@ Feature: move (rename) file
     Given user "Brian" has created folder "testshare"
     Given user "Brian" has created folder "testshare/child"
     And user "Brian" has uploaded file with content "test file content" to "/testshare/testfile.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -372,7 +372,7 @@ Feature: move (rename) file
     Given user "Brian" has created folder "testshare"
     Given user "Brian" has created folder "testshare/child"
     And user "Brian" has uploaded file with content "test file content" to "/testshare/testfile.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
       | space           | Personal  |
       | sharee          | Alice     |
@@ -389,7 +389,7 @@ Feature: move (rename) file
   Scenario Outline: sharee tries to move a file into same shared folder with same name
     Given user "Brian" has created folder "testshare"
     And user "Brian" has uploaded file with content "test file content" to "testshare/testfile.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -414,7 +414,7 @@ Feature: move (rename) file
     And user "Brian" has uploaded a file inside space "Project" with content "root file v1" to "testfile.txt"
     And user "Brian" has uploaded a file inside space "Project" with content "root file v2" to "testfile.txt"
     And user "Brian" has uploaded a file inside space "Project" with content "same name file" to "folder/testfile.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |

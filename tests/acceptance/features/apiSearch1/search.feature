@@ -35,7 +35,7 @@ Feature: Search
 
   Scenario Outline: user can search items from the shares
     Given using <dav-path-version> DAV path
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
       | space           | project101 |
       | sharee          | Brian      |
@@ -74,7 +74,7 @@ Feature: Search
   Scenario Outline: user cannot search pending share
     Given user "Brian" has disabled auto-accepting
     And using <dav-path-version> DAV path
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
       | space           | project101 |
       | sharee          | Brian      |
@@ -96,7 +96,7 @@ Feature: Search
 
   Scenario Outline: user cannot search declined share
     Given using <dav-path-version> DAV path
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
       | space           | project101 |
       | sharee          | Brian      |
@@ -163,7 +163,7 @@ Feature: Search
 
   Scenario Outline: search inside folder in shares
     Given using <dav-path-version> DAV path
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
       | space           | project101 |
       | sharee          | Brian      |
@@ -246,7 +246,7 @@ Feature: Search
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder "foo/sharedToBrian" in space "Alice Hansen"
     And user "Alice" has created a folder "sharedToCarol" in space "Alice Hansen"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | foo      |
       | space           | Personal |
       | sharee          | Brian    |

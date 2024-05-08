@@ -20,7 +20,7 @@ Feature: Report test
 
 
   Scenario: check the response of the found folder
-    Given user "Alice" has sent the following share invitation:
+    Given user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
       | space           | find data  |
       | sharee          | Brian      |
@@ -42,7 +42,7 @@ Feature: Report test
 
 
   Scenario: check the response of the found file
-    Given user "Alice" has sent the following share invitation:
+    Given user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
       | space           | find data  |
       | sharee          | Brian      |
@@ -65,7 +65,7 @@ Feature: Report test
 
   Scenario: search for the shared folder when the share is not accepted
     Given user "Brian" has disabled auto-accepting
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
       | space           | find data  |
       | sharee          | Brian      |

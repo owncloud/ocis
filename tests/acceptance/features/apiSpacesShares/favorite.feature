@@ -13,7 +13,7 @@ Feature: favorite
 
 
   Scenario: favorite a received share itself
-    Given user "Alice" has sent the following share invitation:
+    Given user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
       | sharee          | Brian    |
@@ -26,7 +26,7 @@ Feature: favorite
 
   Scenario: favorite a file inside of a received share
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
       | sharee          | Brian    |
@@ -39,7 +39,7 @@ Feature: favorite
 
   Scenario: favorite a folder inside of a received share
     Given user "Alice" has created folder "/PARENT/sub-folder"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
       | sharee          | Brian    |
@@ -52,7 +52,7 @@ Feature: favorite
 
   Scenario: sharee file favorite state should not change the favorite state of sharer
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT/parent.txt |
       | space           | Personal          |
       | sharee          | Brian             |

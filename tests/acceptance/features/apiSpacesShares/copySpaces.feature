@@ -16,7 +16,7 @@ Feature: copy file
     And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/insideSpace.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Brian        |
       | shareType       | user         |
@@ -37,7 +37,7 @@ Feature: copy file
     And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Brian        |
       | shareType       | user         |
@@ -53,12 +53,12 @@ Feature: copy file
     And user "Brian" has created a space "Project1" with the default quota using the Graph API
     And user "Brian" has created a space "Project2" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "/project1.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project2        |
       | sharee          | Alice           |
       | shareType       | user            |
       | permissionsRole | <to-space-role> |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project1          |
       | sharee          | Alice             |
       | shareType       | user              |
@@ -81,12 +81,12 @@ Feature: copy file
     And user "Brian" has created a space "Project1" with the default quota using the Graph API
     And user "Brian" has created a space "Project2" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "/project1.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project2     |
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project1     |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -105,7 +105,7 @@ Feature: copy file
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -127,12 +127,12 @@ Feature: copy file
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | <space-role> |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
       | space           | Personal  |
       | sharee          | Alice     |
@@ -155,7 +155,7 @@ Feature: copy file
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -175,7 +175,7 @@ Feature: copy file
   Scenario Outline: user copies a file from personal space to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -195,7 +195,7 @@ Feature: copy file
   Scenario: user copies a file from personal space to project space with role viewer
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -209,7 +209,7 @@ Feature: copy file
 
   Scenario: user copies a file from personal space to share space with role editor
     Given user "Brian" has created folder "/testshare"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
       | space           | Personal  |
       | sharee          | Alice     |
@@ -225,7 +225,7 @@ Feature: copy file
 
   Scenario: user copies a file from personal space to share space with role viewer
     Given user "Brian" has created folder "/testshare"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
       | space           | Personal  |
       | sharee          | Alice     |
@@ -242,7 +242,7 @@ Feature: copy file
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -262,14 +262,14 @@ Feature: copy file
   Scenario Outline: user copies a file from share space with different role to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | <space-role> |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -291,14 +291,14 @@ Feature: copy file
   Scenario Outline: user copies a file from share space with different role to project space with role viewer
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -318,13 +318,13 @@ Feature: copy file
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare1         |
       | space           | Personal           |
       | sharee          | Alice              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare2 |
       | space           | Personal   |
       | sharee          | Alice      |
@@ -348,13 +348,13 @@ Feature: copy file
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare1         |
       | space           | Personal           |
       | sharee          | Alice              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare2 |
       | space           | Personal   |
       | sharee          | Alice      |
@@ -378,7 +378,7 @@ Feature: copy file
     And user "Alice" has created a folder "/folder1" in space "Project"
     And user "Alice" has created a folder "/folder2" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/folder2/demo.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Brian        |
       | shareType       | user         |
@@ -400,12 +400,12 @@ Feature: copy file
     And user "Brian" has created a space "Project2" with the default quota using the Graph API
     And user "Brian" has created a folder "/folder1" in space "Project1"
     And user "Brian" has uploaded a file inside space "Project1" with content "some content" to "/folder1/demo.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project2        |
       | sharee          | Alice           |
       | shareType       | user            |
       | permissionsRole | <to-space-role> |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project1          |
       | sharee          | Alice             |
       | shareType       | user              |
@@ -430,7 +430,7 @@ Feature: copy file
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created a folder "/folder1" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "/folder1/demo.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -452,12 +452,12 @@ Feature: copy file
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created a folder "/folder1" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "/folder1/demo.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | <space-role> |
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -480,7 +480,7 @@ Feature: copy file
   Scenario Outline: user copies a folder from personal space to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -500,7 +500,7 @@ Feature: copy file
 
   Scenario Outline: user copies a folder from personal space to share space with different permissions
     Given user "Brian" has created folder "/testshare"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -522,7 +522,7 @@ Feature: copy file
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -542,7 +542,7 @@ Feature: copy file
   Scenario Outline: user copies a folder from share space with different role to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -550,7 +550,7 @@ Feature: copy file
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created folder "/testshare/folder1"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -571,7 +571,7 @@ Feature: copy file
   Scenario Outline: user copies a folder from share space with different role to project space with role viewer
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following space share invitation:
       | space           | Project      |
       | sharee          | Alice        |
       | shareType       | user         |
@@ -579,7 +579,7 @@ Feature: copy file
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created folder "/testshare/folder1"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
       | space           | Personal           |
       | sharee          | Alice              |
@@ -598,7 +598,7 @@ Feature: copy file
   Scenario: copying a file to a folder with no permissions
     Given using spaces DAV path
     And user "Brian" has created folder "/testshare"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
       | space           | Personal  |
       | sharee          | Alice     |
@@ -615,7 +615,7 @@ Feature: copy file
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "ownCloud test text file 1" to "/testshare/overwritethis.txt"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
       | space           | Personal  |
       | sharee          | Alice     |
@@ -631,7 +631,7 @@ Feature: copy file
     And user "Alice" has uploaded file with content "ownCloud test text file 1" to "/textfile1.txt"
     And user "Brian" has created folder "/BRIAN-Folder"
     And user "Brian" has created folder "BRIAN-Folder/sample-folder"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | BRIAN-Folder |
       | space           | Personal     |
       | sharee          | Alice        |
@@ -649,7 +649,7 @@ Feature: copy file
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has created folder "/FOLDER/sample-folder"
     And user "Brian" has uploaded file with content "file to share" to "/sharedfile1.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | sharedfile1.txt |
       | space           | Personal        |
       | sharee          | Alice           |
@@ -669,7 +669,7 @@ Feature: copy file
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | BRIAN-FOLDER |
       | space           | Personal     |
       | sharee          | Alice        |
@@ -695,7 +695,7 @@ Feature: copy file
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | BRIAN-FOLDER |
       | space           | Personal     |
       | sharee          | Alice        |
@@ -722,7 +722,7 @@ Feature: copy file
     And using SharingNG
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has uploaded file with content "file at second level" to "/BRIAN-FOLDER/second-level-file.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | BRIAN-FOLDER |
       | space           | Personal     |
       | sharee          | Alice        |
@@ -753,7 +753,7 @@ Feature: copy file
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has uploaded file with content "file at third level" to "BRIAN-FOLDER/second-level-folder/third-level-file.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | BRIAN-FOLDER |
       | space           | Personal     |
       | sharee          | Alice        |
@@ -778,7 +778,7 @@ Feature: copy file
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | BRIAN-FOLDER |
       | space           | Personal     |
       | sharee          | grp1         |
@@ -805,7 +805,7 @@ Feature: copy file
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | BRIAN-FOLDER |
       | space           | Personal     |
       | sharee          | grp1         |
@@ -832,7 +832,7 @@ Feature: copy file
     And user "Brian" has been added to group "grp1"
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has uploaded file with content "file at second level" to "/BRIAN-FOLDER/second-level-file.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | BRIAN-FOLDER |
       | space           | Personal     |
       | sharee          | grp1         |
@@ -862,7 +862,7 @@ Feature: copy file
     And user "Brian" has created folder "/BRIAN-FOLDER"
     And user "Brian" has created folder "/BRIAN-FOLDER/second-level-folder"
     And user "Brian" has uploaded file with content "file at third level" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt"
-    And user "Brian" has sent the following share invitation:
+    And user "Brian" has sent the following resource share invitation:
       | resource        | BRIAN-FOLDER |
       | space           | Personal     |
       | sharee          | grp1         |
@@ -922,7 +922,7 @@ Feature: copy file
     And user "Alice" has created a space "Project" with the default quota using the Graph API
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/newfolder/personal.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | newfolder |
       | space           | Project   |
       | sharee          | Brian     |
@@ -946,7 +946,7 @@ Feature: copy file
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "old content version 1" to "/newfolder/personal.txt"
     And user "Alice" has uploaded a file inside space "Project" with content "old content version 2" to "/newfolder/personal.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | newfolder |
       | space           | Project   |
       | sharee          | Brian     |

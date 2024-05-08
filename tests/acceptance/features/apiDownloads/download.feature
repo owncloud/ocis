@@ -16,12 +16,12 @@ Feature: Download file in project space
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "download file" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "download file" with content "some content" to "file.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | download file |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Space Editor  |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following space share invitation:
       | space           | download file |
       | sharee          | Bob           |
       | shareType       | user          |

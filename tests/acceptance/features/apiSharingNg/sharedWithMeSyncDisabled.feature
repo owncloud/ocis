@@ -15,7 +15,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
 
   Scenario: user lists the file shared with them
     Given user "Alice" has uploaded file with content "to share" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -284,7 +284,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
 
   Scenario: user lists the folder shared with them
     Given user "Alice" has created folder "folderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -527,7 +527,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
       | username | groupname |
       | Brian    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | grp1         |
@@ -800,7 +800,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
       | username | groupname |
       | Brian    | grp1      |
     And user "Alice" has created folder "folderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | grp1          |
@@ -1042,7 +1042,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | projectSpace |
       | sharee          | Brian        |
@@ -1285,7 +1285,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | projectSpace  |
       | sharee          | Brian         |
@@ -1507,7 +1507,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | projectSpace |
       | sharee          | grp1         |
@@ -1741,7 +1741,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | projectSpace  |
       | sharee          | grp1          |
@@ -1942,13 +1942,13 @@ Feature: listing sharedWithMe when auto-sync is disabled
       | username | groupname |
       | Brian    | grp1      |
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | grp1         |
@@ -2086,13 +2086,13 @@ Feature: listing sharedWithMe when auto-sync is disabled
       | username | groupname |
       | Brian    | grp1      |
     And user "Alice" has created folder "folderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | grp1          |
@@ -2226,13 +2226,13 @@ Feature: listing sharedWithMe when auto-sync is disabled
     Given user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And user "Carol" has uploaded file with content "to share" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |
       | sharee          | Brian        |
@@ -2523,13 +2523,13 @@ Feature: listing sharedWithMe when auto-sync is disabled
     Given user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "folderToShare"
     And user "Carol" has created folder "folderToShare"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
@@ -2825,13 +2825,13 @@ Feature: listing sharedWithMe when auto-sync is disabled
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | projectSpace |
       | sharee          | grp1         |
       | shareType       | group        |
       | permissionsRole | File Editor  |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | projectSpace |
       | sharee          | Brian        |
@@ -2999,13 +2999,13 @@ Feature: listing sharedWithMe when auto-sync is disabled
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | projectSpace  |
       | sharee          | grp1          |
       | shareType       | group         |
       | permissionsRole | Viewer        |
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | projectSpace  |
       | sharee          | Brian         |
@@ -3167,14 +3167,14 @@ Feature: listing sharedWithMe when auto-sync is disabled
     And user "Alice" has created a space "projectSpace1" with the default quota using the Graph API
     And user "Carol" has created a space "projectSpace2" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace1" with content "to share" to "textfile.txt"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt  |
       | space           | projectSpace1 |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
     And user "Carol" has uploaded a file inside space "projectSpace2" with content "to share" to "textfile.txt"
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | textfile.txt  |
       | space           | projectSpace2 |
       | sharee          | Brian         |
@@ -3486,14 +3486,14 @@ Feature: listing sharedWithMe when auto-sync is disabled
     And user "Alice" has created a space "projectSpace1" with the default quota using the Graph API
     And user "Carol" has created a space "projectSpace2" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace1"
-    And user "Alice" has sent the following share invitation:
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | projectSpace1 |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
     And user "Carol" has created a folder "folderToShare" in space "projectSpace2"
-    And user "Carol" has sent the following share invitation:
+    And user "Carol" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | projectSpace2 |
       | sharee          | Brian         |
