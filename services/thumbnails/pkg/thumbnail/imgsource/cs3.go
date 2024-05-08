@@ -10,6 +10,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/bytesize"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
@@ -27,15 +28,17 @@ const (
 
 // CS3 implements a CS3 image source
 type CS3 struct {
-	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-	insecure        bool
+	gatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
+	insecure         bool
+	maxImageFileSize uint64
 }
 
 // NewCS3Source configures a new CS3 image source
-func NewCS3Source(cfg config.Thumbnail, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) CS3 {
+func NewCS3Source(cfg config.Thumbnail, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], b bytesize.ByteSize) CS3 {
 	return CS3{
-		gatewaySelector: gatewaySelector,
-		insecure:        cfg.CS3AllowInsecure,
+		gatewaySelector:  gatewaySelector,
+		insecure:         cfg.CS3AllowInsecure,
+		maxImageFileSize: b.Bytes(),
 	}
 }
 
@@ -56,6 +59,11 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	}
 
 	ctx = metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
+	err = s.checkImageFileSize(ctx, ref)
+	if err != nil {
+		return nil, err
+	}
+
 	gwc, err := s.gatewaySelector.Next()
 	if err != nil {
 		return nil, err
@@ -103,4 +111,22 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	}
 
 	return resp.Body, nil
+}
+
+func (s CS3) checkImageFileSize(ctx context.Context, ref provider.Reference) error {
+	gwc, err := s.gatewaySelector.Next()
+	if err != nil {
+		return err
+	}
+	stat, err := gwc.Stat(ctx, &provider.StatRequest{Ref: &ref})
+	if err != nil {
+		return err
+	}
+	if stat.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return fmt.Errorf("could not stat image: %s", stat.GetStatus().GetMessage())
+	}
+	if stat.GetInfo().GetSize() > s.maxImageFileSize {
+		return errors.ErrImageTooLarge
+	}
+	return nil
 }

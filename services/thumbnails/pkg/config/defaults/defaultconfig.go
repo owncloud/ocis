@@ -45,12 +45,13 @@ func DefaultConfig() *config.Config {
 			FileSystemStorage: config.FileSystemStorage{
 				RootDirectory: path.Join(defaults.BaseDataPath(), "thumbnails"),
 			},
-			WebdavAllowInsecure: false,
-			RevaGateway:         shared.DefaultRevaConfig().Address,
-			CS3AllowInsecure:    false,
-			DataEndpoint:        "http://127.0.0.1:9186/thumbnails/data",
-			MaxInputWidth:       7680,
-			MaxInputHeight:      4320,
+			WebdavAllowInsecure:   false,
+			RevaGateway:           shared.DefaultRevaConfig().Address,
+			CS3AllowInsecure:      false,
+			DataEndpoint:          "http://127.0.0.1:9186/thumbnails/data",
+			MaxInputWidth:         7680,
+			MaxInputHeight:        4320,
+			MaxInputImageFileSize: "50MB",
 		},
 	}
 }
