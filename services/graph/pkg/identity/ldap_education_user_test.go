@@ -194,7 +194,7 @@ func TestUpdateEducationUser(t *testing.T) {
 		Scope:      0,
 		SizeLimit:  1,
 		Filter:     "(objectClass=inetOrgPerson)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
+		Attributes: ldapUserAttributes,
 	}
 	eduUserLookupReq := &ldap.SearchRequest{
 		BaseDN:     "uid=newtestuser,ou=people,dc=test",

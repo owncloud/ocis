@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/go-ldap/ldap/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -12,13 +11,11 @@ import (
 )
 
 type educationUserAttributeMap struct {
-	identities  string
 	primaryRole string
 }
 
 func newEducationUserAttributeMap() educationUserAttributeMap {
 	return educationUserAttributeMap{
-		identities:  "oCExternalIdentity",
 		primaryRole: "userClass",
 	}
 }
@@ -164,7 +161,7 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 			}
 			attrValues = append(attrValues, identityStr)
 		}
-		mr.Replace(i.educationConfig.userAttributeMap.identities, attrValues)
+		mr.Replace(i.userAttributeMap.identities, attrValues)
 		updateNeeded = true
 	}
 
@@ -261,6 +258,7 @@ func (i *LDAP) educationUserToUser(eduUser libregraph.EducationUser) *libregraph
 	user.DisplayName = eduUser.DisplayName
 	user.Mail = eduUser.Mail
 	user.UserType = eduUser.UserType
+	user.Identities = eduUser.Identities
 
 	return user
 }
@@ -281,17 +279,6 @@ func (i *LDAP) userToEducationUser(user libregraph.User, e *ldap.Entry) *libregr
 		if primaryRole := e.GetEqualFoldAttributeValue(i.educationConfig.userAttributeMap.primaryRole); primaryRole != "" {
 			eduUser.SetPrimaryRole(primaryRole)
 		}
-		var identities []libregraph.ObjectIdentity
-		for _, identityStr := range e.GetEqualFoldAttributeValues(i.educationConfig.userAttributeMap.identities) {
-			parts := strings.SplitN(identityStr, "$", 3)
-			identity := libregraph.NewObjectIdentity()
-			identity.SetIssuer(strings.TrimSpace(parts[1]))
-			identity.SetIssuerAssignedId(strings.TrimSpace(parts[2]))
-			identities = append(identities, *identity)
-		}
-		if len(identities) > 0 {
-			eduUser.SetIdentities(identities)
-		}
 	}
 
 	return eduUser
@@ -301,28 +288,8 @@ func (i *LDAP) educationUserToLDAPAttrValues(user libregraph.EducationUser, attr
 	if role, ok := user.GetPrimaryRoleOk(); ok {
 		attrs[i.educationConfig.userAttributeMap.primaryRole] = []string{*role}
 	}
-	if identities, ok := user.GetIdentitiesOk(); ok {
-		for _, identity := range identities {
-			identityStr, err := i.identityToLDAPAttrValue(identity)
-			if err != nil {
-				return nil, err
-			}
-			attrs[i.educationConfig.userAttributeMap.identities] = append(
-				attrs[i.educationConfig.userAttributeMap.identities],
-				identityStr,
-			)
-		}
-	}
 	attrs["objectClass"] = append(attrs["objectClass"], i.educationConfig.userObjectClass)
 	return attrs, nil
-}
-func (i *LDAP) identityToLDAPAttrValue(identity libregraph.ObjectIdentity) (string, error) {
-	// TODO add support for the "signInType" of objectIdentity
-	if identity.GetIssuer() == "" || identity.GetIssuerAssignedId() == "" {
-		return "", fmt.Errorf("missing Attribute for objectIdentity")
-	}
-	identityStr := fmt.Sprintf(" $ %s $ %s", identity.GetIssuer(), identity.GetIssuerAssignedId())
-	return identityStr, nil
 }
 
 func (i *LDAP) educationUserToAddRequest(user libregraph.EducationUser) (*ldap.AddRequest, error) {
@@ -359,7 +326,7 @@ func (i *LDAP) getEducationUserAttrTypes() []string {
 		i.userAttributeMap.givenName,
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
-		i.educationConfig.userAttributeMap.identities,
+		i.userAttributeMap.identities,
 		i.educationConfig.userAttributeMap.primaryRole,
 		i.educationConfig.memberOfSchoolAttribute,
 	}

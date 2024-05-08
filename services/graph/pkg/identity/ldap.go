@@ -21,8 +21,9 @@ import (
 )
 
 const (
-	_givenNameAttribute = "givenname"
-	_surNameAttribute   = "sn"
+	_givenNameAttribute  = "givenname"
+	_surNameAttribute    = "sn"
+	_identitiesAttribute = "oCExternalIdentity"
 )
 
 // DisableUserMechanismType is used instead of directly using the string values from the configuration.
@@ -81,6 +82,7 @@ type userAttributeMap struct {
 	surname        string
 	accountEnabled string
 	userType       string
+	identities     string
 }
 
 type ldapAttributeValues map[string][]string
@@ -114,6 +116,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		givenName:      _givenNameAttribute,
 		surname:        _surNameAttribute,
 		userType:       config.UserTypeAttribute,
+		identities:     _identitiesAttribute,
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -338,6 +341,19 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 		}
 	}
 
+	if identities, ok := user.GetIdentitiesOk(); ok {
+		attrValues := make([]string, 0, len(identities))
+		for _, identity := range identities {
+			identityStr, err := i.identityToLDAPAttrValue(identity)
+			if err != nil {
+				return nil, err
+			}
+			attrValues = append(attrValues, identityStr)
+		}
+		mr.Replace(i.userAttributeMap.identities, attrValues)
+		updateNeeded = true
+	}
+
 	// Behavior of enabling/disabling of users depends on the "disableUserMechanism" config option:
 	//
 	// "attribute": For the upstream user management service which modifies accountEnabled on the user entry
@@ -395,6 +411,7 @@ func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
 		i.userAttributeMap.givenName,
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
+		i.userAttributeMap.identities,
 	}
 
 	filter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
@@ -519,9 +536,9 @@ func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 		i.userAttributeMap.userName,
 		i.userAttributeMap.surname,
 		i.userAttributeMap.givenName,
-
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
+		i.userAttributeMap.identities,
 	}
 	return i.searchLDAPEntryByFilter(i.userBaseDN, attrs, filter)
 }
@@ -601,6 +618,7 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 			i.userAttributeMap.givenName,
 			i.userAttributeMap.accountEnabled,
 			i.userAttributeMap.userType,
+			i.userAttributeMap.identities,
 		},
 		nil,
 	)
@@ -785,7 +803,7 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	surname := e.GetEqualFoldAttributeValue(i.userAttributeMap.surname)
 
 	if id != "" && opsan != "" {
-		return &libregraph.User{
+		user := &libregraph.User{
 			DisplayName:              pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName)),
 			Mail:                     pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.mail)),
 			OnPremisesSamAccountName: &opsan,
@@ -795,6 +813,18 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 			UserType:                 pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.userType)),
 			AccountEnabled:           booleanOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)),
 		}
+		var identities []libregraph.ObjectIdentity
+		for _, identityStr := range e.GetEqualFoldAttributeValues(i.userAttributeMap.identities) {
+			parts := strings.SplitN(identityStr, "$", 3)
+			identity := libregraph.NewObjectIdentity()
+			identity.SetIssuer(strings.TrimSpace(parts[1]))
+			identity.SetIssuerAssignedId(strings.TrimSpace(parts[2]))
+			identities = append(identities, *identity)
+		}
+		if len(identities) > 0 {
+			user.SetIdentities(identities)
+		}
+		return user
 	}
 	i.logger.Warn().Str("dn", e.DN).Msg("Invalid User. Missing username or id attribute")
 	return nil
@@ -808,6 +838,19 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
 		"cn":                           {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.userType:    {user.GetUserType()},
+	}
+
+	if identities, ok := user.GetIdentitiesOk(); ok {
+		for _, identity := range identities {
+			identityStr, err := i.identityToLDAPAttrValue(identity)
+			if err != nil {
+				return nil, err
+			}
+			attrs[i.userAttributeMap.identities] = append(
+				attrs[i.userAttributeMap.identities],
+				identityStr,
+			)
+		}
 	}
 
 	if !i.useServerUUID {
@@ -844,6 +887,15 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 	return attrs, nil
 }
 
+func (i *LDAP) identityToLDAPAttrValue(identity libregraph.ObjectIdentity) (string, error) {
+	// TODO add support for the "signInType" of objectIdentity
+	if identity.GetIssuer() == "" || identity.GetIssuerAssignedId() == "" {
+		return "", fmt.Errorf("missing Attribute for objectIdentity")
+	}
+	identityStr := fmt.Sprintf(" $ %s $ %s", identity.GetIssuer(), identity.GetIssuerAssignedId())
+	return identityStr, nil
+}
+
 func (i *LDAP) getUserAttrTypes() []string {
 	return []string{
 		i.userAttributeMap.displayName,
@@ -857,6 +909,7 @@ func (i *LDAP) getUserAttrTypes() []string {
 		"userPassword",
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
+		i.userAttributeMap.identities,
 	}
 }
 
