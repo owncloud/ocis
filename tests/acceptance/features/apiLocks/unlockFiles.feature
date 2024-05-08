@@ -27,7 +27,7 @@ Feature: unlock locked items
     And using SharingNG
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | PARENT   |
       | space           | Personal |
       | permissionsRole | edit     |
@@ -311,7 +311,7 @@ Feature: unlock locked items
     And using SharingNG
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/textfile0.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | PARENT   |
       | space           | Personal |
       | permissionsRole | edit     |

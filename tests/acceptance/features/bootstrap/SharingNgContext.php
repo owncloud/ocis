@@ -56,6 +56,8 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * Create link share of itme (resource) or drive (space) using drives.permissions endpoint
+	 *
 	 * @param string $user
 	 * @param TableNode|null $body
 	 *
@@ -66,7 +68,7 @@ class SharingNgContext implements Context {
 	public function createLinkShare(string $user, TableNode $body): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
-		$resource = $bodyRows['resource'];
+		$resource = $bodyRows['resource'] ?? "";
 
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
 		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
@@ -88,6 +90,42 @@ class SharingNgContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
 			$itemId,
+			\json_encode($body)
+		);
+	}
+
+	/**
+	 * Create link share of drive (space) using drives.root endpoint
+	 *
+	 * @param string $user
+	 * @param TableNode|null $body
+	 *
+	 * @return ResponseInterface
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function createDriveLinkShare(string $user, TableNode $body): ResponseInterface {
+		$bodyRows = $body->getRowsHash();
+		$space = $bodyRows['space'];
+
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+
+		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
+		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
+		$bodyRows['password'] = $bodyRows['password'] ?? null;
+		$body = [
+			'type' => $bodyRows['permissionsRole'],
+			'displayName' => $bodyRows['displayName'],
+			'expirationDateTime' => $bodyRows['expirationDateTime'],
+			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
+		];
+
+		return GraphHelper::createDriveShareLink(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
 			\json_encode($body)
 		);
 	}
@@ -382,7 +420,7 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userSendsTheFollowingSpaceShareInvitationUsingTheGraphApi(string $user, TableNode $table): void {
+	public function userSendsTheFollowingSpaceShareInvitationUsingPermissionsEndpointOfTheGraphApi(string $user, TableNode $table): void {
 		$rows = $table->getRowsHash();
 		Assert::assertArrayNotHasKey("resource", $rows, "'resource' should not be provided in the data-table while sharing a space");
 		$this->featureContext->setResponse(
@@ -498,7 +536,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" creates the following link share using the Graph API:$/
+	 * @When /^user "([^"]*)" creates the following resource link share using the Graph API:$/
 	 *
 	 * @param string $user
 	 * @param TableNode|null $body
@@ -512,7 +550,24 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has created the following link share:$/
+	 * @Given /^user "([^"]*)" has created the following resource link share:$/
+	 *
+	 * @param string $user
+	 * @param TableNode|null $body
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasCreatedTheFollowingResourceLinkShare(string $user, TableNode  $body): void {
+		$rows = $body->getRowsHash();
+		Assert::assertArrayHasKey("resource", $rows, "'resource' should be provided in the data-table while sharing a resource");
+		$response = $this->createLinkShare($user, $body);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while creating public share link!", $response);
+		$this->featureContext->shareNgAddToCreatedLinkShares($response);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has created the following space link share:$/
 	 *
 	 * @param string $user
 	 * @param TableNode|null $body
@@ -521,7 +576,9 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userHasCreatedTheFollowingLinkShare(string $user, TableNode  $body): void {
-		$response = $this->createLinkShare($user, $body);
+		$rows = $body->getRowsHash();
+		Assert::assertArrayHasKey("resource", $rows, "'resource' should not be provided in the data-table while sharing a space");
+		$response = $this->createDriveLinkShare($user, $body);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while creating public share link!", $response);
 		$this->featureContext->shareNgAddToCreatedLinkShares($response);
 	}

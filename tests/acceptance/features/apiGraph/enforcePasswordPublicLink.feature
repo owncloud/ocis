@@ -61,7 +61,7 @@ Feature: enforce password on public link
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     And using SharingNG
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | testfile.txt |
       | space           | Personal     |
       | permissionsRole | view         |
@@ -153,7 +153,7 @@ Feature: enforce password on public link
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     And using SharingNG
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | testfile.txt |
       | space           | Personal     |
       | permissionsRole | view         |
@@ -186,7 +186,7 @@ Feature: enforce password on public link
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     And using SharingNG
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | testfile.txt |
       | space           | Personal     |
       | permissionsRole | view         |
@@ -261,7 +261,7 @@ Feature: enforce password on public link
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using SharingNG
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | testfile.txt |
       | space           | Personal     |
       | permissionsRole | internal     |

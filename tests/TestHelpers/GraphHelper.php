@@ -2178,4 +2178,34 @@ class GraphHelper {
 			$body
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param mixed $body
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function createDriveShareLink(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $spaceId,
+		$body
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/createLink");
+		return HttpRequestHelper::post(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			$body
+		);
+	}
 }

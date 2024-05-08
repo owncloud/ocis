@@ -9,7 +9,7 @@ Feature: Create a share link for a resource
   @issue-7879
   Scenario Outline: create a link share of a folder
     Given user "Alice" has created folder "folder"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folder             |
       | space           | Personal           |
       | permissionsRole | <permissions-role> |
@@ -74,7 +74,7 @@ Feature: Create a share link for a resource
   @issue-8619
   Scenario: create an internal link share of a folder
     Given user "Alice" has created folder "folder"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folder   |
       | space           | Personal |
       | permissionsRole | internal |
@@ -131,7 +131,7 @@ Feature: Create a share link for a resource
   @issue-8619
   Scenario: try to create an internal link share of a folder with password
     Given user "Alice" has created folder "folder"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folder   |
       | space           | Personal |
       | permissionsRole | internal |
@@ -141,7 +141,7 @@ Feature: Create a share link for a resource
   @issue-7879
   Scenario Outline: create a link share of a file
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile1.txt      |
       | space           | Personal           |
       | permissionsRole | <permissions-role> |
@@ -204,7 +204,7 @@ Feature: Create a share link for a resource
   @issue-8619
   Scenario: create an internal link share of a file
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile1.txt |
       | space           | Personal      |
       | permissionsRole | internal      |
@@ -261,7 +261,7 @@ Feature: Create a share link for a resource
   @issue-8619
   Scenario: try to create an internal link share of a file with password
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile1.txt |
       | space           | Personal      |
       | permissionsRole | internal      |
@@ -271,7 +271,7 @@ Feature: Create a share link for a resource
   @issue-7879
   Scenario Outline: create a link share of a folder with display name and expiry date
     Given user "Alice" has created folder "folder"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource           | folder                   |
       | space              | Personal                 |
       | permissionsRole    | <permissions-role>       |
@@ -342,7 +342,7 @@ Feature: Create a share link for a resource
   @issue-7879
   Scenario Outline: create a link share of a file with display name and expiry date
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource           | textfile1.txt            |
       | space              | Personal                 |
       | permissionsRole    | <permissions-role>       |
@@ -414,7 +414,7 @@ Feature: Create a share link for a resource
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile1.txt      |
       | space           | Personal           |
       | permissionsRole | <permissions-role> |
@@ -477,7 +477,7 @@ Feature: Create a share link for a resource
   @issue-7879
   Scenario Outline: update role of a file's link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | textfile1.txt      |
       | space           | Personal           |
       | permissionsRole | <permissions-role> |
@@ -547,7 +547,7 @@ Feature: Create a share link for a resource
   @issue-8619
   Scenario Outline: update role of a file's to internal link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | textfile1.txt      |
       | space           | Personal           |
       | permissionsRole | <permissions-role> |
@@ -613,7 +613,7 @@ Feature: Create a share link for a resource
 
   Scenario: update expiration date of a file's link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource           | textfile1.txt            |
       | space              | Personal                 |
       | permissionsRole    | view                     |
@@ -677,7 +677,7 @@ Feature: Create a share link for a resource
   Scenario Outline: remove expiration date of a resource link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created folder "folder"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource           | <resource>               |
       | space              | Personal                 |
       | permissionsRole    | view                     |
@@ -744,7 +744,7 @@ Feature: Create a share link for a resource
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | textfile1.txt |
       | space           | Personal      |
       | permissionsRole | view          |
@@ -771,7 +771,7 @@ Feature: Create a share link for a resource
 
   Scenario: update password of a file's link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | textfile1.txt |
       | space           | Personal      |
       | permissionsRole | view          |
@@ -802,7 +802,7 @@ Feature: Create a share link for a resource
   Scenario Outline: create a file's link share with a password that is listed in the Banned-Password-List
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | text.txt          |
       | space           | Personal          |
       | permissionsRole | view              |
@@ -845,7 +845,7 @@ Feature: Create a share link for a resource
   Scenario Outline: update a file's link share with a password that is listed in the Banned-Password-List
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | text.txt |
       | space           | Personal |
       | permissionsRole | view     |
@@ -895,7 +895,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folderToShare      |
       | space           | projectSpace       |
       | permissionsRole | <permissions-role> |
@@ -963,7 +963,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folderToShare |
       | space           | projectSpace  |
       | permissionsRole | internal      |
@@ -1022,7 +1022,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folderToShare |
       | space           | projectSpace  |
       | permissionsRole | internal      |
@@ -1035,7 +1035,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource           | folderToShare            |
       | space              | projectSpace             |
       | permissionsRole    | <permissions-role>       |
@@ -1110,7 +1110,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folderToShare      |
       | space           | projectSpace       |
       | permissionsRole | <permissions-role> |
@@ -1171,7 +1171,7 @@ Feature: Create a share link for a resource
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "folderToShare/textfile.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | folderToShare |
       | space           | projectSpace  |
       | permissionsRole | view          |
@@ -1205,7 +1205,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folderToShare      |
       | space           | projectSpace       |
       | permissionsRole | <permissions-role> |
@@ -1272,7 +1272,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile.txt       |
       | space           | projectSpace       |
       | permissionsRole | <permissions-role> |
@@ -1338,7 +1338,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile.txt |
       | space           | projectSpace |
       | permissionsRole | internal     |
@@ -1398,7 +1398,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile.txt |
       | space           | projectSpace |
       | permissionsRole | internal     |
@@ -1411,7 +1411,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource           | textfile.txt             |
       | space              | projectSpace             |
       | permissionsRole    | <permissions-role>       |
@@ -1485,7 +1485,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile.txt       |
       | space           | projectSpace       |
       | permissionsRole | <permissions-role> |
@@ -1552,7 +1552,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    When user "Alice" creates the following link share using the Graph API:
+    When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile.txt       |
       | space           | projectSpace       |
       | permissionsRole | <permissions-role> |
@@ -1606,7 +1606,7 @@ Feature: Create a share link for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | textfile.txt |
       | space           | projectSpace |
       | permissionsRole | view         |

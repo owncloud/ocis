@@ -97,7 +97,7 @@ Feature: antivirus
     And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And using SharingNG
     And user "Alice" has created folder "/uploadFolder"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource           | uploadFolder             |
       | space              | Personal                 |
       | permissionsRole    | edit                     |
@@ -122,7 +122,7 @@ Feature: antivirus
     Given using <dav-path-version> DAV path
     And using SharingNG
     And user "Alice" has created folder "/uploadFolder"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource           | uploadFolder             |
       | space              | Personal                 |
       | permissionsRole    | edit                     |
@@ -382,7 +382,7 @@ Feature: antivirus
     And using <dav-path-version> DAV path
     And using SharingNG
     And user "Alice" has uploaded file with content "hello" to "test.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | test.txt |
       | space           | Personal |
       | permissionsRole | edit     |

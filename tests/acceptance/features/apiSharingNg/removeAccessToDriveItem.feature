@@ -109,7 +109,7 @@ Feature: Remove access to a drive item
 
   Scenario Outline: user removes access to a folder in link share
     Given user "Alice" has created folder "FolderToShare"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | FolderToShare      |
       | space           | Personal           |
       | permissionsRole | <permissions-role> |
@@ -127,7 +127,7 @@ Feature: Remove access to a drive item
 
   Scenario Outline: user removes access to a file in link share
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | textfile.txt       |
       | space           | Personal           |
       | permissionsRole | <permissions-role> |
@@ -145,7 +145,7 @@ Feature: Remove access to a drive item
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | FolderToShare      |
       | space           | NewSpace           |
       | permissionsRole | <permissions-role> |
@@ -165,7 +165,7 @@ Feature: Remove access to a drive item
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "some content" to "textfile.txt"
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | resource        | textfile.txt       |
       | space           | NewSpace           |
       | permissionsRole | <permissions-role> |

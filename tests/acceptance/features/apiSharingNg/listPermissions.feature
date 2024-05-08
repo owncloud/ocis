@@ -357,7 +357,7 @@ Feature: List a sharing permissions
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
-    And user "Alice" has created the following link share:
+    And user "Alice" has created the following resource link share:
       | space           | new-space |
       | permissionsRole | view      |
       | password        | %public%  |
