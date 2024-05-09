@@ -2208,4 +2208,37 @@ class GraphHelper {
 			$body
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param mixed $body
+	 * @param string $permissionsId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 *
+	 */
+	public static function setDriveLinkSharePassword(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $spaceId,
+		$body,
+		string $permissionsId
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions/$permissionsId/setPassword");
+		return HttpRequestHelper::post(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			$body
+		);
+	}
 }

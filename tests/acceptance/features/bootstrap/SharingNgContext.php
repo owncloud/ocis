@@ -1283,4 +1283,37 @@ class SharingNgContext implements Context {
 
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * @When user :user sets the following password for the last space link share using root endpoint of the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $body
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userSetsTheFollowingPasswordForTheLastSpaceLinkShareUsingRootEndpointOfTheGraphAPI(string $user, TableNode $body): void {
+		$rows = $body->getRowsHash();
+		Assert::assertArrayNotHasKey("resource", $rows, "'resource' should not be provided in the data-table while setting password in space shared link");
+
+		Assert::assertArrayHasKey("password", $rows, "'password' is missing in the data-table");
+		$body = [
+			"password" => $this->featureContext->getActualPassword($rows['password']),
+		];
+
+		$space = $rows['space'];
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+
+		$response = GraphHelper::setDriveLinkSharePassword(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			\json_encode($body),
+			$this->featureContext->shareNgGetLastCreatedLinkShareID()
+		);
+		$this->featureContext->setResponse($response);
+	}
 }
