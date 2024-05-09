@@ -74,40 +74,6 @@ class FavoritesContext implements Context {
 	}
 
 	/**
-	 * @When the user favorites element :path using the WebDAV API
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function theUserFavoritesElement(string $path):void {
-		$response = $this->userFavoritesElement(
-			$this->featureContext->getCurrentUser(),
-			$path
-		);
-		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @Given the user has favorited element :path
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function theUserHasFavoritedElement(string $path):void {
-		$response = $this->userFavoritesElement(
-			$this->featureContext->getCurrentUser(),
-			$path
-		);
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			207,
-			"Expected response status code to be 207 (Multi-status), but not found! ",
-			$response
-		);
-	}
-
-	/**
 	 * @param string $user
 	 * @param string $path
 	 *
@@ -131,18 +97,6 @@ class FavoritesContext implements Context {
 	 */
 	public function userUnfavoritesElementUsingWebDavApi(string $user, string $path):void {
 		$this->featureContext->setResponse($this->userUnfavoritesElement($user, $path));
-	}
-
-	/**
-	 * @Given user :user has unfavorited element :path
-	 *
-	 * @param string $user
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function userHasUnfavoritedElementUsingWebDavApi(string $user, string $path):void {
-		$this->featureContext->theHTTPStatusCodeShouldBe(207, '', $this->userUnfavoritesElement($user, $path));
 	}
 
 	/**
@@ -205,40 +159,6 @@ class FavoritesContext implements Context {
 			$this->featureContext->getDavPathVersion()
 		);
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @param string $path
-	 *
-	 * @return ResponseInterface
-	 */
-	public function theUserUnfavoritesElement(string $path):ResponseInterface {
-		return $this->userUnfavoritesElement(
-			$this->featureContext->getCurrentUser(),
-			$path
-		);
-	}
-
-	/**
-	 * @When the user unfavorites element :path using the WebDAV API
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function theUserUnfavoritesElementUsingWebDavApi(string $path):void {
-		$this->featureContext->setResponse($this->theUserUnfavoritesElement($path));
-	}
-
-	/**
-	 * @Given the user has unfavorited element :path
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function theUserHasUnfavoritedElementUsingWebDavApi(string $path):void {
-		$this->featureContext->theHTTPStatusCodeShouldBe(207, '', $this->theUserUnfavoritesElement($path));
 	}
 
 	/**
