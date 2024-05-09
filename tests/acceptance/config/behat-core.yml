@@ -50,6 +50,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - FavoritesContext:
         - WebDavPropertiesContext:
+        - SharingNgContext:
 
     coreApiShareCreateSpecialToShares1:
       paths:
