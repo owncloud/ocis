@@ -757,7 +757,7 @@ trait Sharing {
 			$share_id = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareID() : (string) $this->getLastCreatedPublicShare()->id;
 		} else {
 			if ($shareOwner === null) {
-				$share_id = $this->getLastCreatedUserGroupShareId();
+				$share_id = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 			} else {
 				$share_id = $this->getLastCreatedUserGroupShareId($shareOwner);
 			}
