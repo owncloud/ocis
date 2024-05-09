@@ -261,14 +261,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [sharee (editor role) MOVE a file by file-id into same shared folder returns 403](https://github.com/owncloud/ocis/issues/7617)
 
-- [apiSpacesDavOperation/moveByFileId.feature:443](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L443)
-- [apiSpacesDavOperation/moveByFileId.feature:444](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L444)
-- [apiSpacesDavOperation/moveByFileId.feature:445](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L445)
-- [apiSpacesDavOperation/moveByFileId.feature:446](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L446)
-- [apiSpacesDavOperation/moveByFileId.feature:686](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L686)
-- [apiSpacesDavOperation/moveByFileId.feature:687](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L687)
-- [apiSpacesDavOperation/moveByFileId.feature:688](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L688)
-- [apiSpacesDavOperation/moveByFileId.feature:689](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L689)
+- [apiSpacesDavOperation/moveByFileId.feature:466](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L466)
+- [apiSpacesDavOperation/moveByFileId.feature:467](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L467)
+- [apiSpacesDavOperation/moveByFileId.feature:488](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L488)
+- [apiSpacesDavOperation/moveByFileId.feature:489](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L489)
+- [apiSpacesDavOperation/moveByFileId.feature:724](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L724)
+- [apiSpacesDavOperation/moveByFileId.feature:725](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L725)
 
 ### [MOVE a file into same folder with same name returns 404 instead of 403](https://github.com/owncloud/ocis/issues/1976)
 
@@ -277,16 +275,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesShares/moveSpaces.feature:405](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L405)
 - [apiSpacesDavOperation/moveByFileId.feature:86](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L86)
 - [apiSpacesDavOperation/moveByFileId.feature:87](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L87)
-- [apiSpacesDavOperation/moveByFileId.feature:195](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L195)
-- [apiSpacesDavOperation/moveByFileId.feature:196](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L196)
-- [apiSpacesDavOperation/moveByFileId.feature:197](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L197)
-- [apiSpacesDavOperation/moveByFileId.feature:198](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L198)
-- [apiSpacesDavOperation/moveByFileId.feature:199](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L199)
-- [apiSpacesDavOperation/moveByFileId.feature:200](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L200)
-- [apiSpacesDavOperation/moveByFileId.feature:462](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L462)
-- [apiSpacesDavOperation/moveByFileId.feature:463](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L463)
-- [apiSpacesDavOperation/moveByFileId.feature:464](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L464)
-- [apiSpacesDavOperation/moveByFileId.feature:465](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L465)
+- [apiSpacesDavOperation/moveByFileId.feature:204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L204)
+- [apiSpacesDavOperation/moveByFileId.feature:205](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L205)
+- [apiSpacesDavOperation/moveByFileId.feature:206](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L206)
+- [apiSpacesDavOperation/moveByFileId.feature:207](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L207)
+- [apiSpacesDavOperation/moveByFileId.feature:208](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L208)
+- [apiSpacesDavOperation/moveByFileId.feature:209](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L209)
 
 ### [500 when deleting share role](https://github.com/owncloud/ocis/issues/8747)
 

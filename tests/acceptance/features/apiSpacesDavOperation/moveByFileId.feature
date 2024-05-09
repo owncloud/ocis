@@ -90,7 +90,12 @@ Feature: moving/renaming file using file id
   Scenario Outline: move a file from personal to share space
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folder"
-    And user "Alice" has shared folder "/folder" with user "Brian" with permissions "<permissions>"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder        |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <permissions> |
     And user "Brian" has uploaded file with content "some data" to "/test.txt"
     And we save it into "FILEID"
     When user "Brian" moves a file "test.txt" into "folder" inside space "Shares" using file-id path "<dav-path>"
@@ -102,12 +107,10 @@ Feature: moving/renaming file using file id
       | test.txt |
     Examples:
       | permissions | dav-path                          |
-      | all         | /remote.php/dav/spaces/<<FILEID>> |
-      | all         | /dav/spaces/<<FILEID>>            |
-      | change      | /remote.php/dav/spaces/<<FILEID>> |
-      | change      | /dav/spaces/<<FILEID>>            |
-      | read        | /remote.php/dav/spaces/<<FILEID>> |
-      | read        | /dav/spaces/<<FILEID>>            |
+      | Editor      | /remote.php/dav/spaces/<<FILEID>> |
+      | Editor      | /dav/spaces/<<FILEID>>            |
+      | Viewer      | /remote.php/dav/spaces/<<FILEID>> |
+      | Viewer      | /dav/spaces/<<FILEID>>            |
 
   @issue-7618
   Scenario Outline: move a file from personal to project space
@@ -116,9 +119,11 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Personal" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "project-space" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
     When user "Brian" moves a file "textfile.txt" into "/" inside space "project-space" using file-id path "<dav-path>"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "/" of the space "Personal" should contain these files:
@@ -126,13 +131,13 @@ Feature: moving/renaming file using file id
     But for user "Brian" folder "/" of the space "project-space" should not contain these files:
       | textfile.txt |
     Examples:
-      | space-role | http-status-code | dav-path                          |
-      | manager    | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer     | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager    | 502              | /dav/spaces/<<FILEID>>            |
-      | editor     | 502              | /dav/spaces/<<FILEID>>            |
-      | viewer     | 403              | /dav/spaces/<<FILEID>>            |
+      | space-role   | http-status-code | dav-path                          |
+      | Manager      | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | 502              | /dav/spaces/<<FILEID>>            |
+      | Space Editor | 502              | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | 403              | /dav/spaces/<<FILEID>>            |
 
   @issue-7618
   Scenario Outline: move a file to different name from personal space to project space
@@ -160,9 +165,11 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a folder "/folder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "project-space" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
     When user "Brian" moves a file "/textfile.txt" into "/folder" inside space "project-space" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
     And for user "Alice" folder "folder" of the space "project-space" should contain these files:
@@ -170,11 +177,11 @@ Feature: moving/renaming file using file id
     But for user "Alice" the space "project-space" should not contain these entries:
       | textfile.txt |
     Examples:
-      | space-role | dav-path                          |
-      | manager    | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | /remote.php/dav/spaces/<<FILEID>> |
-      | manager    | /dav/spaces/<<FILEID>>            |
-      | editor     | /dav/spaces/<<FILEID>>            |
+      | space-role   | dav-path                          |
+      | Manager      | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | /dav/spaces/<<FILEID>>            |
+      | Space Editor | /dav/spaces/<<FILEID>>            |
 
   @issue-1976
   Scenario Outline: try to move a file within a project space into a folder with same name
@@ -183,21 +190,23 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "project-space" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
     When user "Brian" moves a file "textfile.txt" into "/" inside space "project-space" using file-id path "<dav-path>"
     Then the HTTP status code should be "403"
     And as "Alice" file "textfile.txt" should not exist in the trashbin of the space "project-space"
     And for user "Brian" the content of the file "textfile.txt" of the space "project-space" should be "some data"
     Examples:
-      | space-role | dav-path                          |
-      | manager    | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer     | /remote.php/dav/spaces/<<FILEID>> |
-      | manager    | /dav/spaces/<<FILEID>>            |
-      | editor     | /dav/spaces/<<FILEID>>            |
-      | viewer     | /dav/spaces/<<FILEID>>            |
+      | space-role   | dav-path                          |
+      | Manager      | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | /dav/spaces/<<FILEID>>            |
+      | viewer       | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: try to move a file into a folder inside project space (viewer)
@@ -207,9 +216,11 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a folder "/folder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "project-space" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    And user "Alice" has sent the following space share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Space Viewer  |
     When user "Brian" moves a file "/textfile.txt" into "/folder" inside space "project-space" using file-id path "<dav-path>"
     Then the HTTP status code should be "403"
     And for user "Alice" the space "project-space" should contain these entries:
@@ -283,12 +294,16 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a space "second-project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "first-project-space" with content "first project space" to "file.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "first-project-space" with settings:
-      | shareWith | Brian             |
-      | role      | <from-space-role> |
-    And user "Alice" has shared a space "second-project-space" with settings:
-      | shareWith | Brian           |
-      | role      | <to-space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | first-project-space |
+      | sharee          | Brian               |
+      | shareType       | user                |
+      | permissionsRole | <from-space-role>   |
+    And user "Alice" has sent the following space share invitation:
+      | space           | second-project-space |
+      | sharee          | Brian                |
+      | shareType       | user                 |
+      | permissionsRole | <to-space-role>      |
     When user "Brian" moves a file "file.txt" into "/" inside space "second-project-space" using file-id path "<dav-path>"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" the space "second-project-space" should not contain these entries:
@@ -297,24 +312,24 @@ Feature: moving/renaming file using file id
       | file.txt |
     Examples:
       | from-space-role | to-space-role | http-status-code | dav-path                          |
-      | manager         | manager       | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor          | manager       | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager         | editor        | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor          | editor        | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager         | viewer        | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor          | viewer        | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer          | manager       | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer          | editor        | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer          | viewer        | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager         | manager       | 502              | /dav/spaces/<<FILEID>>            |
-      | editor          | manager       | 502              | /dav/spaces/<<FILEID>>            |
-      | manager         | editor        | 502              | /dav/spaces/<<FILEID>>            |
-      | editor          | editor        | 502              | /dav/spaces/<<FILEID>>            |
-      | manager         | viewer        | 403              | /dav/spaces/<<FILEID>>            |
-      | editor          | viewer        | 403              | /dav/spaces/<<FILEID>>            |
-      | viewer          | manager       | 403              | /dav/spaces/<<FILEID>>            |
-      | viewer          | editor        | 403              | /dav/spaces/<<FILEID>>            |
-      | viewer          | viewer        | 403              | /dav/spaces/<<FILEID>>            |
+      | Manager         | Manager       | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor    | Manager       | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager         | Space Editor  | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor    | Space Editor  | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager         | Space Viewer  | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor    | Space Viewer  | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer    | Manager       | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer    | Space Editor  | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer    | Space Viewer  | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager         | Manager       | 502              | /dav/spaces/<<FILEID>>            |
+      | Space Editor    | Manager       | 502              | /dav/spaces/<<FILEID>>            |
+      | Manager         | Space Editor  | 502              | /dav/spaces/<<FILEID>>            |
+      | Space Editor    | Space Editor  | 502              | /dav/spaces/<<FILEID>>            |
+      | Manager         | Space Viewer  | 403              | /dav/spaces/<<FILEID>>            |
+      | Space Editor    | Space Viewer  | 403              | /dav/spaces/<<FILEID>>            |
+      | Space Viewer    | Manager       | 403              | /dav/spaces/<<FILEID>>            |
+      | Space Viewer    | Space Editor  | 403              | /dav/spaces/<<FILEID>>            |
+      | Space Viewer    | Space Viewer  | 403              | /dav/spaces/<<FILEID>>            |
 
   @issue-8116
   Scenario Outline: move a file to different name between project spaces
@@ -345,11 +360,18 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "project-space" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
     And user "Alice" has created folder "testshare"
-    And user "Alice" has shared folder "testshare" with user "Brian" with permissions "<permissions>"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testshare     |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <permissions> |
     When user "Brian" moves a file "textfile.txt" into "testshare" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "/" of the space "project-space" should contain these files:
@@ -357,25 +379,19 @@ Feature: moving/renaming file using file id
     But for user "Brian" folder "testshare" of the space "Shares" should not contain these files:
       | textfile.txt |
     Examples:
-      | space-role | permissions | dav-path                          |
-      | manager    | all         | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | all         | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer     | all         | /remote.php/dav/spaces/<<FILEID>> |
-      | manager    | change      | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | change      | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer     | change      | /remote.php/dav/spaces/<<FILEID>> |
-      | manager    | read        | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | read        | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer     | read        | /remote.php/dav/spaces/<<FILEID>> |
-      | manager    | all         | /dav/spaces/<<FILEID>>            |
-      | editor     | all         | /dav/spaces/<<FILEID>>            |
-      | viewer     | all         | /dav/spaces/<<FILEID>>            |
-      | manager    | change      | /dav/spaces/<<FILEID>>            |
-      | editor     | change      | /dav/spaces/<<FILEID>>            |
-      | viewer     | change      | /dav/spaces/<<FILEID>>            |
-      | manager    | read        | /dav/spaces/<<FILEID>>            |
-      | editor     | read        | /dav/spaces/<<FILEID>>            |
-      | viewer     | read        | /dav/spaces/<<FILEID>>            |
+      | space-role   | permissions | dav-path                          |
+      | Manager      | Editor      | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | Editor      | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | Editor      | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | Viewer      | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | Viewer      | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | Viewer      | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | Editor      | /dav/spaces/<<FILEID>>            |
+      | Space Editor | Editor      | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | Editor      | /dav/spaces/<<FILEID>>            |
+      | Manager      | Viewer      | /dav/spaces/<<FILEID>>            |
+      | Space Editor | Viewer      | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | Viewer      | /dav/spaces/<<FILEID>>            |
 
   @issue-7618
   Scenario Outline: move a file from project to personal space
@@ -384,9 +400,11 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared a space "project-space" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
     When user "Brian" moves a file "/textfile.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "/" of the space "project-space" should contain these files:
@@ -394,13 +412,13 @@ Feature: moving/renaming file using file id
     But for user "Brian" folder "/" of the space "Personal" should not contain these files:
       | textfile.txt |
     Examples:
-      | space-role | http-status-code | dav-path                          |
-      | manager    | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer     | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager    | 502              | /dav/spaces/<<FILEID>>            |
-      | editor     | 502              | /dav/spaces/<<FILEID>>            |
-      | viewer     | 403              | /dav/spaces/<<FILEID>>            |
+      | space-role   | http-status-code | dav-path                          |
+      | Manager      | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | 502              | /dav/spaces/<<FILEID>>            |
+      | Space Editor | 502              | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | 403              | /dav/spaces/<<FILEID>>            |
 
   @issue-7618
   Scenario Outline: move a file to different name from project space to personal space
@@ -421,13 +439,18 @@ Feature: moving/renaming file using file id
       | /dav/spaces/<<FILEID>>            |
 
   @issue-7617
-  Scenario Outline: move a file into a folder within a shared folder (all/change permissions)
+  Scenario Outline: move a file into a folder within a shared folder (edit permissions)
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "folder"
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "folder/test.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "folder" with user "Brian" with permissions "<permissions>"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder        |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <permissions> |
     When user "Brian" moves a file "Shares/folder/test.txt" into "folder/sub-folder" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should contain these files:
@@ -440,10 +463,8 @@ Feature: moving/renaming file using file id
       | test.txt |
     Examples:
       | permissions | dav-path                          |
-      | all         | /remote.php/dav/spaces/<<FILEID>> |
-      | all         | /dav/spaces/<<FILEID>>            |
-      | change      | /remote.php/dav/spaces/<<FILEID>> |
-      | change      | /dav/spaces/<<FILEID>>            |
+      | Editor      | /remote.php/dav/spaces/<<FILEID>> |
+      | Editor      | /dav/spaces/<<FILEID>>            |
 
   @issue-1976
   Scenario Outline: sharee tries to move a file into same shared folder with same name
@@ -451,7 +472,12 @@ Feature: moving/renaming file using file id
     And user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "some data" to "folder/test.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "folder" with user "Brian" with permissions "<permissions>"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder        |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <permissions> |
     When user "Brian" moves a file "Shares/folder/test.txt" into "folder" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "403"
     And as "Alice" file "test.txt" should not exist in the trashbin of the space "Personal"
@@ -459,12 +485,10 @@ Feature: moving/renaming file using file id
     And for user "Alice" the content of the file "folder/test.txt" of the space "Personal" should be "some data"
     Examples:
       | permissions | dav-path                          |
-      | all         | /remote.php/dav/spaces/<<FILEID>> |
-      | all         | /dav/spaces/<<FILEID>>            |
-      | change      | /remote.php/dav/spaces/<<FILEID>> |
-      | change      | /dav/spaces/<<FILEID>>            |
-      | read        | /remote.php/dav/spaces/<<FILEID>> |
-      | read        | /dav/spaces/<<FILEID>>            |
+      | Editor      | /remote.php/dav/spaces/<<FILEID>> |
+      | Editor      | /dav/spaces/<<FILEID>>            |
+      | Viewer      | /remote.php/dav/spaces/<<FILEID>> |
+      | Viewer      | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: try to move a file into a folder within a shared folder (read permissions)
@@ -473,7 +497,12 @@ Feature: moving/renaming file using file id
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "folder/test.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "folder" with user "Brian" with permissions "read"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" moves a file "Shares/folder/test.txt" into "folder/sub-folder" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should not contain these files:
@@ -496,8 +525,18 @@ Feature: moving/renaming file using file id
     And user "Alice" has created folder "testshare2"
     And user "Alice" has uploaded file with content "some data" to "testshare1/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "testshare1" with user "Brian" with permissions "<from-permissions>"
-    And user "Alice" has shared folder "testshare2" with user "Brian" with permissions "<to-permissions>"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testshare1         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <from-permissions> |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testshare2       |
+      | space           | Personal         |
+      | sharee          | Brian            |
+      | shareType       | user             |
+      | permissionsRole | <to-permissions> |
     When user "Brian" moves a file "Shares/testshare1/textfile.txt" into "testshare2" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "testshare1" of the space "Shares" should contain these files:
@@ -506,24 +545,14 @@ Feature: moving/renaming file using file id
       | textfile.txt |
     Examples:
       | from-permissions | to-permissions | dav-path                          |
-      | all              | all            | /remote.php/dav/spaces/<<FILEID>> |
-      | all              | change         | /remote.php/dav/spaces/<<FILEID>> |
-      | all              | read           | /remote.php/dav/spaces/<<FILEID>> |
-      | change           | all            | /remote.php/dav/spaces/<<FILEID>> |
-      | change           | change         | /remote.php/dav/spaces/<<FILEID>> |
-      | change           | read           | /remote.php/dav/spaces/<<FILEID>> |
-      | read             | all            | /remote.php/dav/spaces/<<FILEID>> |
-      | read             | change         | /remote.php/dav/spaces/<<FILEID>> |
-      | read             | read           | /remote.php/dav/spaces/<<FILEID>> |
-      | all              | all            | /dav/spaces/<<FILEID>>            |
-      | all              | change         | /dav/spaces/<<FILEID>>            |
-      | all              | read           | /dav/spaces/<<FILEID>>            |
-      | change           | all            | /dav/spaces/<<FILEID>>            |
-      | change           | change         | /dav/spaces/<<FILEID>>            |
-      | change           | read           | /dav/spaces/<<FILEID>>            |
-      | read             | all            | /dav/spaces/<<FILEID>>            |
-      | read             | change         | /dav/spaces/<<FILEID>>            |
-      | read             | read           | /dav/spaces/<<FILEID>>            |
+      | Editor           | Editor         | /remote.php/dav/spaces/<<FILEID>> |
+      | Editor           | Viewer         | /remote.php/dav/spaces/<<FILEID>> |
+      | Viewer           | Editor         | /remote.php/dav/spaces/<<FILEID>> |
+      | Viewer           | Viewer         | /remote.php/dav/spaces/<<FILEID>> |
+      | Editor           | Editor         | /dav/spaces/<<FILEID>>            |
+      | Editor           | Viewer         | /dav/spaces/<<FILEID>>            |
+      | Viewer           | Editor         | /dav/spaces/<<FILEID>>            |
+      | Viewer           | Viewer         | /dav/spaces/<<FILEID>>            |
 
   @issue-8124
   Scenario Outline: move a file from share to personal space
@@ -531,7 +560,12 @@ Feature: moving/renaming file using file id
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "/folder" with user "Brian" with permissions "<permissions>"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder        |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <permissions> |
     When user "Brian" moves a file "Shares/folder/test.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:
@@ -540,25 +574,30 @@ Feature: moving/renaming file using file id
       | test.txt |
     Examples:
       | permissions | dav-path                          | http-status-code |
-      | all         | /remote.php/dav/spaces/<<FILEID>> | 502              |
-      | all         | /dav/spaces/<<FILEID>>            | 502              |
-      | change      | /remote.php/dav/spaces/<<FILEID>> | 502              |
-      | change      | /dav/spaces/<<FILEID>>            | 502              |
-      | read        | /remote.php/dav/spaces/<<FILEID>> | 403              |
-      | read        | /dav/spaces/<<FILEID>>            | 403              |
+      | Editor      | /remote.php/dav/spaces/<<FILEID>> | 502              |
+      | Editor      | /dav/spaces/<<FILEID>>            | 502              |
+      | Viewer      | /remote.php/dav/spaces/<<FILEID>> | 403              |
+      | Viewer      | /dav/spaces/<<FILEID>>            | 403              |
 
   @issue-8125
   Scenario Outline: move a file from shares to project space
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
-    And user "Alice" has shared a space "project-space" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
     And user "Alice" has created folder "testshare"
     And user "Alice" has uploaded file with content "some data" to "testshare/textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "testshare" with user "Brian" with permissions "<permissions>"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testshare     |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <permissions> |
     When user "Brian" moves a file "Shares/testshare/textfile.txt" into "/" inside space "project-space" using file-id path "<dav-path>"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "testshare" of the space "Shares" should contain these files:
@@ -566,25 +605,19 @@ Feature: moving/renaming file using file id
     But for user "Brian" folder "/" of the space "project-space" should not contain these files:
       | textfile.txt |
     Examples:
-      | space-role | permissions | http-status-code | dav-path                          |
-      | manager    | all         | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | all         | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer     | all         | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager    | change      | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | change      | 502              | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer     | change      | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager    | read        | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | editor     | read        | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | viewer     | read        | 403              | /remote.php/dav/spaces/<<FILEID>> |
-      | manager    | all         | 502              | /dav/spaces/<<FILEID>>            |
-      | editor     | all         | 502              | /dav/spaces/<<FILEID>>            |
-      | viewer     | all         | 403              | /dav/spaces/<<FILEID>>            |
-      | manager    | change      | 502              | /dav/spaces/<<FILEID>>            |
-      | editor     | change      | 502              | /dav/spaces/<<FILEID>>            |
-      | viewer     | change      | 403              | /dav/spaces/<<FILEID>>            |
-      | manager    | read        | 403              | /dav/spaces/<<FILEID>>            |
-      | editor     | read        | 403              | /dav/spaces/<<FILEID>>            |
-      | viewer     | read        | 403              | /dav/spaces/<<FILEID>>            |
+      | space-role   | permissions | http-status-code | dav-path                          |
+      | Manager      | Editor      | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | Editor      | 502              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | Editor      | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | Viewer      | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | Viewer      | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | Viewer      | 403              | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | Editor      | 502              | /dav/spaces/<<FILEID>>            |
+      | Space Editor | Editor      | 502              | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | Editor      | 403              | /dav/spaces/<<FILEID>>            |
+      | Manager      | Viewer      | 403              | /dav/spaces/<<FILEID>>            |
+      | Space Editor | Viewer      | 403              | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | Viewer      | 403              | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: rename a root file inside personal space
@@ -668,13 +701,18 @@ Feature: moving/renaming file using file id
       | /dav/spaces/<<FILEID>>            |
 
   @issue-7617
-  Scenario Outline: move a file to a different name into a sub-folder inside share space (all/change permissions)
+  Scenario Outline: move a file to a different name into a sub-folder inside share space (editor permissions)
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folder"
     And user "Alice" has created folder "/folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "/folder" with user "Brian" with permissions "<permissions>"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" renames a file "Shares/folder/test.txt" into "folder/sub-folder/renamed.txt" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should contain these files:
@@ -682,11 +720,9 @@ Feature: moving/renaming file using file id
     But for user "Brian" folder "folder" of the space "Shares" should not contain these files:
       | test.txt |
     Examples:
-      | permissions | dav-path                          |
-      | all         | /remote.php/dav/spaces/<<FILEID>> |
-      | all         | /dav/spaces/<<FILEID>>            |
-      | change      | /remote.php/dav/spaces/<<FILEID>> |
-      | change      | /dav/spaces/<<FILEID>>            |
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: move a file to a different name into a sub-folder inside share space (read permissions)
@@ -695,7 +731,12 @@ Feature: moving/renaming file using file id
     And user "Alice" has created folder "/folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
     And we save it into "FILEID"
-    And user "Alice" has shared folder "/folder" with user "Brian" with permissions "read"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" renames a file "Shares/folder/test.txt" into "folder/sub-folder/renamed.txt" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:
