@@ -19,9 +19,11 @@ Feature: Tag
 
 
   Scenario: user creates tags for resources in the project space
-    Given user "Alice" has shared a space "use-tag" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | use-tag      |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     When user "Alice" creates the following tags for folder "folderMain" of space "use-tag":
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
@@ -84,9 +86,11 @@ Feature: Tag
 
 
   Scenario Outline: member of the space tries to create tag
-    Given user "Alice" has shared a space "use-tag" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | use-tag      |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Brian" creates the following tags for folder "folderMain/insideTheFolder.txt" of space "use-tag":
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
@@ -97,10 +101,10 @@ Feature: Tag
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
     Examples:
-      | space-role | http-status-code | should-or-not |
-      | viewer     | 403              | should not    |
-      | editor     | 200              | should        |
-      | manager    | 200              | should        |
+      | space-role   | http-status-code | should-or-not |
+      | Space Viewer | 403              | should not    |
+      | Space Editor | 200              | should        |
+      | Manager      | 200              | should        |
 
 
   Scenario: recipient has a created tags if share is accepted
@@ -245,9 +249,11 @@ Feature: Tag
 
 
   Scenario: user creates a comma-separated list of tags for resources in the project space
-    Given user "Alice" has shared a space "use-tag" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | use-tag      |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     When user "Alice" creates the following tags for folder "folderMain" of space "use-tag":
       | finance,नेपाल |
     Then the HTTP status code should be "200"
