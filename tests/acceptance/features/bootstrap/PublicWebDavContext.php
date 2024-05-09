@@ -153,7 +153,7 @@ class PublicWebDavContext implements Context {
 	 * @return ResponseInterface
 	 */
 	public function deleteFileFromPublicShare(string $fileName, string $publicWebDAVAPIVersion, string $password = ""):ResponseInterface {
-		$token = $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			$token,
 			0,
@@ -304,7 +304,8 @@ class PublicWebDavContext implements Context {
 			$path,
 			$password,
 			"",
-			$publicWebDAVAPIVersion
+			$publicWebDAVAPIVersion,
+			$this->featureContext->isUsingSharingNG()
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1609,7 +1610,7 @@ class PublicWebDavContext implements Context {
 		string $destination,
 		string $password
 	):ResponseInterface {
-		$token = $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			$token,
 			0,

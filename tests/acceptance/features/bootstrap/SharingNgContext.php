@@ -577,7 +577,7 @@ class SharingNgContext implements Context {
 	 */
 	public function userHasCreatedTheFollowingLinkShare(string $user, TableNode  $body): void {
 		$rows = $body->getRowsHash();
-		Assert::assertArrayHasKey("resource", $rows, "'resource' should not be provided in the data-table while sharing a space");
+		Assert::assertArrayNotHasKey("resource", $rows, "'resource' should not be provided in the data-table while sharing a space");
 		$response = $this->createDriveLinkShare($user, $body);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while creating public share link!", $response);
 		$this->featureContext->shareNgAddToCreatedLinkShares($response);

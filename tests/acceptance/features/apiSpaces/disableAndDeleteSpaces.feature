@@ -15,12 +15,16 @@ Feature: Disabling and deleting space
       | Carol    |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "Project Moon" with the default quota using the Graph API
-    And user "Alice" has shared a space "Project Moon" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
-    And user "Alice" has shared a space "Project Moon" with settings:
-      | shareWith | Bob    |
-      | role      | viewer |
+    And user "Alice" has sent the following space share invitation:
+      | space           | Project Moon |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Editor |
+    And user "Alice" has sent the following space share invitation:
+      | space           | Project Moon |
+      | sharee          | Bob          |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
 
 
   Scenario Outline: user can disable their own space via the Graph API

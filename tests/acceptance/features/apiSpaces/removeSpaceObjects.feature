@@ -19,26 +19,30 @@ Feature: Remove files, folder
 
 
   Scenario Outline: user deletes a folder with some subfolders in a space via the webDav API
-    Given user "Alice" has shared a space "delete objects" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | delete objects |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | <space-role>   |
     When user "<user>" removes the folder "folderForDeleting" from space "delete objects"
     Then the HTTP status code should be "<http-status-code>"
     And for user "<user>" the space "delete objects" <should-or-not-be-in-space> contain these entries:
       | folderForDeleting |
     And as "<user>" folder "folderForDeleting" <should-or-not-be-in-trash> exist in the trashbin of the space "delete objects"
     Examples:
-      | user  | space-role | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
-      | Alice | manager    | 204              | should not                | should                    |
-      | Brian | manager    | 204              | should not                | should                    |
-      | Brian | editor     | 204              | should not                | should                    |
-      | Brian | viewer     | 403              | should                    | should not                |
+      | user  | space-role   | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
+      | Alice | Manager      | 204              | should not                | should                    |
+      | Brian | Manager      | 204              | should not                | should                    |
+      | Brian | Space Editor | 204              | should not                | should                    |
+      | Brian | Space Viewer | 403              | should                    | should not                |
 
 
   Scenario Outline: user deletes a subfolder in a space via the webDav API
-    Given user "Alice" has shared a space "delete objects" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | delete objects |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | <space-role>   |
     When user "<user>" removes the folder "folderForDeleting/sub1" from space "delete objects"
     Then the HTTP status code should be "<http-status-code>"
     And for user "<user>" the space "delete objects" should contain these entries:
@@ -47,28 +51,30 @@ Feature: Remove files, folder
       | sub1 |
     And as "<user>" folder "sub1" <should-or-not-be-in-trash> exist in the trashbin of the space "delete objects"
     Examples:
-      | user  | space-role | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
-      | Alice | manager    | 204              | should not                | should                    |
-      | Brian | manager    | 204              | should not                | should                    |
-      | Brian | editor     | 204              | should not                | should                    |
-      | Brian | viewer     | 403              | should                    | should not                |
+      | user  | space-role   | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
+      | Alice | Manager      | 204              | should not                | should                    |
+      | Brian | Manager      | 204              | should not                | should                    |
+      | Brian | Space Editor | 204              | should not                | should                    |
+      | Brian | Space Viewer | 403              | should                    | should not                |
 
 
   Scenario Outline: user deletes a file in a space via the webDav API
-    Given user "Alice" has shared a space "delete objects" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | delete objects |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | <space-role>   |
     When user "<user>" removes the file "text.txt" from space "delete objects"
     Then the HTTP status code should be "<http-status-code>"
     And for user "<user>" the space "delete objects" <should-or-not-be-in-space> contain these entries:
       | text.txt |
     And as "<user>" file "text.txt" <should-or-not-be-in-trash> exist in the trashbin of the space "delete objects"
     Examples:
-      | user  | space-role | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
-      | Alice | manager    | 204              | should not                | should                    |
-      | Brian | manager    | 204              | should not                | should                    |
-      | Brian | editor     | 204              | should not                | should                    |
-      | Brian | viewer     | 403              | should                    | should not                |
+      | user  | space-role   | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
+      | Alice | Manager      | 204              | should not                | should                    |
+      | Brian | Manager      | 204              | should not                | should                    |
+      | Brian | Space Editor | 204              | should not                | should                    |
+      | Brian | Space Viewer | 403              | should                    | should not                |
 
 
   Scenario: try to delete an empty string folder from a space

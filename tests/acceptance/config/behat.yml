@@ -47,6 +47,7 @@ default:
         - GraphContext:
         - OcisConfigContext:
         - WebDavLockingContext:
+        - SharingNgContext:
 
     apiSpacesShares:
       paths:

@@ -80,7 +80,12 @@ Feature: List and create spaces
   Scenario: ordinary user can request information about their Space via the Graph API using a filter
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "folder"
-    And user "Brian" has shared folder "folder" with user "Alice" with permissions "15"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Alice    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Alice" lists all available spaces via the Graph API with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" and match
@@ -441,7 +446,12 @@ Feature: List and create spaces
     And user "Alice" has disabled auto-accepting
     And user "Brian" has uploaded file with content "this is a test file." to "test.txt"
     And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
-    And user "Brian" has shared file "/test.txt" with user "Alice"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | test.txt |
+      | space           | Personal |
+      | sharee          | Alice    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Alice" lists all available spaces via the Graph API
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Shares" owned by "Alice" and match

@@ -46,7 +46,12 @@ Feature: Preview file in project space
   Scenario Outline: download preview of shared file inside project space
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded a file from "<source>" to "<destination>" via TUS inside of the space "previews of the files" using the WebDAV API
-    And user "Alice" has shared resource "<destination>" inside space "previews of the files" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <destination>         |
+      | space           | previews of the files |
+      | sharee          | Brian                 |
+      | shareType       | user                  |
+      | permissionsRole | Viewer                |
     When user "Brian" downloads the preview of shared resource "/Shares/<destination>" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high
@@ -60,7 +65,12 @@ Feature: Preview file in project space
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created a folder "folder" in space "previews of the files"
     And user "Alice" has uploaded a file inside space "previews of the files" with content "test" to "/folder/lorem.txt"
-    And user "Alice" has shared resource "/folder" inside space "previews of the files" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        |  /folder              |
+      | space           | previews of the files |
+      | sharee          | Brian                 |
+      | shareType       | user                  |
+      | permissionsRole | Viewer                |
     When user "Brian" downloads the preview of shared resource "Shares/folder/lorem.txt" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high

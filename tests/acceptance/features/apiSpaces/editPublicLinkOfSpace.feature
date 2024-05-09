@@ -16,12 +16,14 @@ Feature: A manager of the space can edit public link
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "edit space" with the default quota using the Graph API
-    And user "Alice" has created a public link share of the space "edit space" with settings:
-      | permissions | 1                        |
-      | password    | %public%                 |
-      | expireDate  | 2040-01-01T23:59:59+0100 |
-      | name        | someName                 |
+    And user "Alice" has created the following space link share:
+      | space              | edit space               |
+      | permissionsRole    | view                     |
+      | password           | %public%                 |
+      | expirationDateTime | 2040-01-01T23:59:59.000Z |
+      | displayName        | someName                 |
     And user "Alice" has uploaded a file inside space "edit space" with content "some content" to "test.txt"
+    And using SharingNG
 
 
   Scenario Outline: manager of the space can edit public link.
@@ -69,15 +71,17 @@ Feature: A manager of the space can edit public link
 
   Scenario Outline: members of the space try to edit a public link
     Given using OCS API version "2"
-    And user "Alice" has shared a space "edit space" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | edit space   |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | 15 |
     Then the HTTP status code should be "<http-status-code>"
     And the OCS status code should be "<ocs-status-code>"
     Examples:
-      | space-role | http-status-code | ocs-status-code |
-      | manager    | 200              | 200             |
-      | editor     | 401              | 997             |
-      | viewer     | 401              | 997             |
+      | space-role   | http-status-code | ocs-status-code |
+      | Manager      | 200              | 200             |
+      | Space Editor | 401              | 997             |
+      | Space Viewer | 401              | 997             |
