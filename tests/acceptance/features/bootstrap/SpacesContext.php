@@ -3098,7 +3098,7 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->checksumContext->userRequestsTheChecksumOfViaPropfind($user, $path);
+		$this->featureContext->setResponse($this->checksumContext->propfindResourceChecksum($user, $path));
 	}
 
 	/**

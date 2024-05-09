@@ -128,25 +128,6 @@ class ChecksumContext implements Context {
 	}
 
 	/**
-	 * @When user :user uploads file with content :content and checksum :checksum to :destination using the WebDAV API
-	 *
-	 * @param string $user
-	 * @param string $content
-	 * @param string $checksum
-	 * @param string $destination
-	 *
-	 * @return void
-	 */
-	public function userUploadsFileWithContentAndChecksumToUsingTheAPI(
-		string $user,
-		string $content,
-		string $checksum,
-		string $destination
-	):void {
-		$this->featureContext->setResponse($this->uploadFileWithContentAndChecksumToUsingTheAPI($user, $content, $checksum, $destination));
-	}
-
-	/**
 	 * @Given user :user has uploaded file with content :content and checksum :checksum to :destination
 	 *
 	 * @param string $user
@@ -176,6 +157,16 @@ class ChecksumContext implements Context {
 	 * @return void
 	 */
 	public function userRequestsTheChecksumOfViaPropfind(string $user, string $path):void {
+		$this->featureContext->setResponse($this->propfindResourceChecksum($user, $path));
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $path
+	 *
+	 * @return ResponseInterface
+	 */
+	public function propfindResourceChecksum(string $user, string $path) : ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$body = '<?xml version="1.0"?>
 			<d:propfind  xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
@@ -184,7 +175,7 @@ class ChecksumContext implements Context {
 			  </d:prop>
 			</d:propfind>';
 		$password = $this->featureContext->getPasswordForUser($user);
-		$response = WebDavHelper::makeDavRequest(
+		return WebDavHelper::makeDavRequest(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$password,
@@ -195,7 +186,6 @@ class ChecksumContext implements Context {
 			$body,
 			$this->featureContext->getDavPathVersion()
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -207,8 +197,34 @@ class ChecksumContext implements Context {
 	 * @throws Exception
 	 */
 	public function theWebdavChecksumShouldMatch(string $expectedChecksum):void {
-		$service = new Sabre\Xml\Service();
 		$bodyContents = $this->featureContext->getResponse()->getBody()->getContents();
+		$this->validateChecksum($bodyContents, $expectedChecksum);
+	}
+
+	/**
+	 * @Then as user :user the webdav checksum of :path via propfind should match :expectedChecksum
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $expectedChecksum
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function asUserTheWebdavChecksumOfPathViaPropfindShouldMatch(string $user, string $path, string $expectedChecksum):void {
+		$user = $this->featureContext->getActualUsername($user);
+		$resource = $this->propfindResourceChecksum($user, $path);
+		$bodyContents = $resource->getBody()->getContents();
+		$this->validateChecksum($bodyContents, $expectedChecksum);
+	}
+	/**
+	 * @param string $bodyContents
+	 * @param string $expectedChecksum
+	 *
+	 * @return void
+	 */
+	public function validateChecksum(string $bodyContents, string $expectedChecksum):void {
+		$service = new Sabre\Xml\Service();
 		$parsed = $service->parse($bodyContents);
 
 		/*
@@ -294,22 +310,6 @@ class ChecksumContext implements Context {
 	}
 
 	/**
-	 * @Then as user :user the webdav checksum of :path via propfind should match :expectedChecksum
-	 *
-	 * @param string $user
-	 * @param string $path
-	 * @param string $expectedChecksum
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theWebdavChecksumOfViaPropfindShouldMatch(string $user, string $path, string $expectedChecksum):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$this->userRequestsTheChecksumOfViaPropfind($user, $path);
-		$this->theWebdavChecksumShouldMatch($expectedChecksum);
-	}
-
-	/**
 	 * @Then the header checksum should match :expectedChecksum
 	 *
 	 * @param string $expectedChecksum
@@ -359,46 +359,31 @@ class ChecksumContext implements Context {
 	 */
 	public function theHeaderChecksumWhenUserDownloadsFileUsingTheWebdavApiShouldMatch(string $user, string $fileName, string $expectedChecksum):void {
 		$this->featureContext->userDownloadsFileUsingTheAPI($user, $fileName);
-		$this->theHeaderChecksumShouldMatch($expectedChecksum);
-	}
+		$headerChecksums = $this->featureContext->getResponse()->getHeader('OC-Checksum');
 
-	/**
-	 * @Then the webdav checksum should be empty
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theWebdavChecksumShouldBeEmpty():void {
-		$service = new Sabre\Xml\Service();
-		$parsed = $service->parse(
-			$this->featureContext->getResponse()->getBody()->getContents()
+		Assert::assertIsArray(
+			$headerChecksums,
+			__METHOD__ . " getHeader('OC-Checksum') did not return an array"
 		);
 
-		/*
-		 * Fetch the checksum array
-		 * Maybe we want to do this a bit cleaner ;)
-		 */
-		$status = $parsed[0]['value'][1]['value'][1]['value'];
-		$expectedStatus = 'HTTP/1.1 404 Not Found';
+		Assert::assertNotEmpty(
+			$headerChecksums,
+			__METHOD__ . " getHeader('OC-Checksum') returned an empty array. No checksum header was found."
+		);
+
+		$checksumCount = \count($headerChecksums);
+
+		Assert::assertTrue(
+			$checksumCount === 1,
+			__METHOD__ . " Expected 1 checksum in the header but found $checksumCount checksums"
+		);
+
+		$headerChecksum
+			= $headerChecksums[0];
 		Assert::assertEquals(
-			$expectedStatus,
-			$status,
-			"Expected status to be $expectedStatus but got $status"
-		);
-	}
-
-	/**
-	 * @Then the OC-Checksum header should not be there
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theOcChecksumHeaderShouldNotBeThere():void {
-		$isHeader = $this->featureContext->getResponse()->hasHeader('OC-Checksum');
-		Assert::assertFalse(
-			$isHeader,
-			"Expected no checksum header but got "
-			. print_r($this->featureContext->getResponse()->getHeader('OC-Checksum'), true)
+			$expectedChecksum,
+			$headerChecksum,
+			"Expected: header checksum should match $expectedChecksum but got $headerChecksum"
 		);
 	}
 
