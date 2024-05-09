@@ -1696,7 +1696,7 @@ trait Sharing {
 			}
 		}
 		$url = $this->getSharesEndpointPath("/$shareId");
-		return $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		return $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			"DELETE",
 			$url
@@ -1899,7 +1899,7 @@ trait Sharing {
 		if ($language !== null) {
 			$headers['Accept-Language'] = $language;
 		}
-		return $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		return $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			"GET",
 			$url,
@@ -1919,7 +1919,7 @@ trait Sharing {
 	public function userGetsAllTheSharesSharedWithHimUsingTheSharingApi(string $user):void {
 		$user = $this->getActualUsername($user);
 		$url = "/apps/files_sharing/api/v1/shares?shared_with_me=true";
-		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			'GET',
 			$url
@@ -1966,7 +1966,7 @@ trait Sharing {
 		} else {
 			$rawShareTypes = SharingHelper::SHARE_TYPES[$shareType];
 		}
-		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			'GET',
 			$this->getSharesEndpointPath(
@@ -1988,7 +1988,7 @@ trait Sharing {
 		$user = $this->getActualUsername($user);
 		$url = "/apps/files_sharing/api/"
 			. "v$this->sharingApiVersion/shares?shared_with_me=true&path=$path";
-		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			'GET',
 			$url
@@ -2765,7 +2765,7 @@ trait Sharing {
 		$user = $this->getActualUsername($user);
 		$share_id = $this->getPublicShareIDByName($user, $path, $name);
 		$url = $this->getSharesEndpointPath("/$share_id");
-		return $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		return $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			"DELETE",
 			$url
@@ -2871,7 +2871,7 @@ trait Sharing {
 			$httpRequestMethod = "POST";
 		}
 
-		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			$httpRequestMethod,
 			$url
@@ -2930,7 +2930,7 @@ trait Sharing {
 			$httpRequestMethod = "POST";
 		}
 
-		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			$httpRequestMethod,
 			$url
@@ -3123,7 +3123,7 @@ trait Sharing {
 			__METHOD__ . " could not find share, offered by $sharer to $sharee"
 		);
 
-		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->sendRequestToOcsEndpoint(
 			$sharer,
 			'DELETE',
 			'/apps/files_sharing/api/v' . $this->sharingApiVersion . '/shares/' . $shareId
@@ -3198,7 +3198,7 @@ trait Sharing {
 				);
 		}
 		$url = $this->getSharesEndpointPath("?format=json&shared_with_me=true&state=$stateCode");
-		$response = $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+		$response = $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			"GET",
 			$url
