@@ -111,19 +111,21 @@ Feature: Set quota
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has created a space "Project Jupiter" of type "project" with quota "20"
-    And user "Alice" has shared a space "Project Jupiter" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    And user "Alice" has sent the following space share invitation:
+      | space           | Project Jupiter |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | <space-role>    |
     When user "Brian" changes the quota of the "Project Jupiter" space to "100"
     Then the HTTP status code should be "403"
     Examples:
-      | user-role  | space-role |
-      | User       | viewer     |
-      | User       | editor     |
-      | User       | manager    |
-      | User Light | viewer     |
-      | User Light | editor     |
-      | User Light | manager    |
+      | user-role  | space-role   |
+      | User       | Space Viewer |
+      | User       | Space Editor |
+      | User       | Manager      |
+      | User Light | Space Viewer |
+      | User Light | Space Editor |
+      | User Light | Manager      |
 
 
   Scenario: admin user can set their own personal space quota
