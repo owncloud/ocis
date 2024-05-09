@@ -12,9 +12,14 @@ Feature: sharing
     And using spaces DAV path
 
 
-  Scenario: correct webdav share-permissions for received file with edit and reshare permissions
+  Scenario: correct webdav share-permissions for received file with edit permissions
     Given user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has shared file "/tmp.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp.txt     |
+      | space           | Personal    |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | File Editor |
     When user "Brian" gets the following properties of file "/tmp.txt" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -22,15 +27,16 @@ Feature: sharing
     And the single response should contain a property "ocs:share-permissions" with value "3"
 
 
-  Scenario: correct webdav share-permissions for received group shared file with edit and reshare permissions
+  Scenario: correct webdav share-permissions for received group shared file with edit permissions
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has created a share with settings
-      | path        | /tmp.txt    |
-      | shareType   | group       |
-      | permissions | update,read |
-      | shareWith   | grp1        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp.txt     |
+      | space           | Personal    |
+      | sharee          | grp1        |
+      | shareType       | group       |
+      | permissionsRole | File Editor |
     When user "Brian" gets the following properties of file "/tmp.txt" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -38,49 +44,31 @@ Feature: sharing
     And the single response should contain a property "ocs:share-permissions" with value "3"
 
 
-  Scenario: correct webdav share-permissions for received file with edit permissions but no reshare permissions
+  Scenario: correct webdav share-permissions for received file with read permissions
     Given user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has shared file "tmp.txt" with user "Brian"
-    When user "Alice" updates the last share using the sharing API with
-      | permissions | update,read |
-    Then the HTTP status code should be "200"
-    And as user "Brian" file "/tmp.txt" inside space "Shares" should contain a property "ocs:share-permissions" with value "3"
-
-
-  Scenario: correct webdav share-permissions for received group shared file with edit permissions but no reshare permissions
-    Given group "grp1" has been created
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has created a share with settings
-      | path        | /tmp.txt    |
-      | shareType   | group       |
-      | permissions | update,read |
-      | shareWith   | grp1        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp.txt  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" gets the following properties of file "/tmp.txt" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "3"
+    And the single response should contain a property "ocs:share-permissions" with value "1"
 
 
-  Scenario: correct webdav share-permissions for received file with reshare permissions but no edit permissions
-    Given user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has shared file "tmp.txt" with user "Brian"
-    When user "Alice" updates the last share using the sharing API with
-      | permissions | read |
-    Then the HTTP status code should be "200"
-    And as user "Brian" file "/tmp.txt" inside space "Shares" should contain a property "ocs:share-permissions" with value "1"
-
-
-  Scenario: correct webdav share-permissions for received group shared file with reshare permissions but no edit permissions
+  Scenario: correct webdav share-permissions for received group shared file with read permissions
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has created a share with settings
-      | path        | /tmp.txt |
-      | shareType   | group    |
-      | permissions | read     |
-      | shareWith   | grp1     |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp.txt  |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     When user "Brian" gets the following properties of file "/tmp.txt" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -90,7 +78,12 @@ Feature: sharing
 
   Scenario: correct webdav share-permissions for received folder with all permissions
     Given user "Alice" has created folder "/tmp"
-    And user "Alice" has shared file "/tmp" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" gets the following properties of folder "/tmp" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -102,10 +95,12 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has created a share with settings
-      | path      | tmp   |
-      | shareType | group |
-      | shareWith | grp1  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     When user "Brian" gets the following properties of folder "/tmp" inside space "Shares" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -115,7 +110,13 @@ Feature: sharing
 
   Scenario: correct webdav share-permissions for received folder with all permissions but edit
     Given user "Alice" has created folder "/tmp"
-    And user "Alice" has shared file "/tmp" with user "Brian"
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Alice" updates the last share using the sharing API with
       | permissions | delete,create,read |
     Then the HTTP status code should be "200"
@@ -126,21 +127,28 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has created a share with settings
-      | path        | tmp                |
-      | shareType   | group              |
-      | shareWith   | grp1               |
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
+    When user "Alice" updates the last share using the sharing API with
       | permissions | delete,create,read |
-    When user "Brian" gets the following properties of folder "/tmp" inside space "Shares" using the WebDAV API
-      | propertyName          |
-      | ocs:share-permissions |
-    Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "13"
+    Then the HTTP status code should be "200"
+    And as user "Brian" folder "/tmp" inside space "Shares" should contain a property "ocs:share-permissions" with value "13"
 
 
   Scenario: correct webdav share-permissions for received folder with all permissions but create
     Given user "Alice" has created folder "/tmp"
-    And user "Alice" has shared file "/tmp" with user "Brian"
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Alice" updates the last share using the sharing API with
       | permissions | delete,update,read |
     Then the HTTP status code should be "200"
@@ -151,21 +159,28 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has created a share with settings
-      | path        | tmp                |
-      | shareType   | group              |
-      | shareWith   | grp1               |
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
+    When user "Alice" updates the last share using the sharing API with
       | permissions | delete,update,read |
-    When user "Brian" gets the following properties of folder "/tmp" inside space "Shares" using the WebDAV API
-      | propertyName          |
-      | ocs:share-permissions |
-    Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "11"
+    Then the HTTP status code should be "200"
+    And as user "Brian" folder "/tmp" inside space "Shares" should contain a property "ocs:share-permissions" with value "11"
 
 
   Scenario: correct webdav share-permissions for received folder with all permissions but delete
     Given user "Alice" has created folder "/tmp"
-    And user "Alice" has shared file "/tmp" with user "Brian"
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Alice" updates the last share using the sharing API with
       | permissions | create,update,read |
     Then the HTTP status code should be "200"
@@ -176,52 +191,42 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has created a share with settings
-      | path        | tmp                |
-      | shareType   | group              |
-      | shareWith   | grp1               |
-      | permissions | create,update,read |
-    When user "Brian" gets the following properties of folder "/tmp" inside space "Shares" using the WebDAV API
-      | propertyName          |
-      | ocs:share-permissions |
-    Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "7"
-
-
-  Scenario: correct webdav share-permissions for received folder with all permissions but share
-    Given user "Alice" has created folder "/tmp"
-    And user "Alice" has shared file "/tmp" with user "Brian"
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     When user "Alice" updates the last share using the sharing API with
-      | permissions | change |
+      | permissions | create,update,read |
     Then the HTTP status code should be "200"
-    And as user "Brian" folder "/tmp" inside space "Shares" should contain a property "ocs:share-permissions" with value "15"
+    And as user "Brian" folder "/tmp" inside space "Shares" should contain a property "ocs:share-permissions" with value "7"
 
 
-  Scenario: correct webdav share-permissions for received group shared folder with all permissions but share
-    Given group "grp1" has been created
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has created folder "/tmp"
-    And user "Alice" has created a share with settings
-      | path        | tmp    |
-      | shareType   | group  |
-      | shareWith   | grp1   |
-      | permissions | change |
-    When user "Brian" gets the following properties of folder "/tmp" inside space "Shares" using the WebDAV API
-      | propertyName          |
-      | ocs:share-permissions |
-    Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "15"
+  Scenario: uploading a file to a folder received as a read-only user share
+    Given user "Alice" has created folder "FOLDER"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    When user "Brian" uploads a file inside space "Shares" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And as "Alice" file "/FOLDER/textfile.txt" should not exist
 
 
   Scenario: uploading a file to a folder received as a read-only group share
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | read   |
-      | shareWith   | grp1   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     When user "Brian" uploads a file inside space "Shares" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist
@@ -229,11 +234,12 @@ Feature: sharing
 
   Scenario: uploading a file to a folder received as a upload-only user share
     Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | create |
-      | shareWith   | Brian  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Uploader |
     When user "Brian" uploads a file inside space "Shares" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Brian"
@@ -248,11 +254,12 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | create |
-      | shareWith   | grp1   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Uploader |
     When user "Brian" uploads a file inside space "Shares" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Brian"
@@ -265,11 +272,12 @@ Feature: sharing
 
   Scenario: uploading a file to a folder received as a read/write user share
     Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | change |
-      | shareWith   | Brian  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" uploads a file inside space "Shares" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
@@ -282,11 +290,12 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | change |
-      | shareWith   | grp1   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     When user "Brian" uploads a file inside space "Shares" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
@@ -297,11 +306,28 @@ Feature: sharing
 
   Scenario: uploading to a user shared folder with read/write permission when the sharer has insufficient quota
     Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | change |
-      | shareWith   | Brian  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
+    When user "Brian" uploads a file inside space "Shares" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "507"
+    And as "Alice" file "/FOLDER/textfile.txt" should not exist
+
+
+  Scenario: uploading to a user shared folder with read/write permission when the sharer has insufficient quota
+    Given group "grp1" has been created
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has created folder "FOLDER"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads a file inside space "Shares" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -310,11 +336,12 @@ Feature: sharing
 
   Scenario: uploading to a user shared folder with upload-only permission when the sharer has insufficient quota
     Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | create |
-      | shareWith   | Brian  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Uploader |
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads a file inside space "Shares" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -325,11 +352,12 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | create |
-      | shareWith   | grp1   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Uploader |
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "10"
     When user "Brian" uploads a file inside space "Shares" with content "new descriptionfgshsywhhh" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -338,19 +366,20 @@ Feature: sharing
 
   Scenario Outline: sharer can download file uploaded with different permission by sharee to a shared folder
     Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER        |
-      | shareType   | user          |
-      | permissions | <permissions> |
-      | shareWith   | Brian         |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER             |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" uploads a file inside space "Shares" with content "some content" to "/FOLDER/textfile.txt" using the WebDAV API
     And user "Alice" downloads file "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
     Examples:
-      | permissions |
-      | change      |
-      | create      |
+      | permissions-role |
+      | Editor           |
+      | Uploader         |
 
 
   Scenario Outline: space admin tries to remove password of a public link share (change/create permission)
@@ -358,10 +387,12 @@ Feature: sharing
     And using OCS API version "<ocs-api-version>"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path        | /FOLDER       |
-      | permissions | <permissions> |
-      | password    | %public%      |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER             |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Alice" updates the last public link share using the sharing API with
       | path        | /FOLDER       |
       | permissions | <permissions> |
@@ -370,11 +401,11 @@ Feature: sharing
     And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
     Examples:
-      | ocs-api-version | permissions | http-status-code |
-      | 1               | change      | 200              |
-      | 2               | change      | 400              |
-      | 1               | create      | 200              |
-      | 2               | create      | 400              |
+      | ocs-api-version | permissions-role | permissions | http-status-code |
+      | 1               | edit             | change      | 200              |
+      | 2               | edit             | change      | 400              |
+      | 1               | createOnly       | create      | 200              |
+      | 2               | createOnly       | create      | 400              |
 
 
   Scenario Outline: space admin removes password of a public link share (read permission)
@@ -382,10 +413,12 @@ Feature: sharing
     And using OCS API version "<ocs-api-version>"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path        | /FOLDER  |
-      | permissions | read     |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
     When user "Alice" updates the last public link share using the sharing API with
       | path        | /FOLDER |
       | permissions | read    |
