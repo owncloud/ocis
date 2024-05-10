@@ -140,4 +140,3 @@ Feature: upload resources using TUS protocol
     When user "Brian" uploads a file from "filesForUpload/zerobyte.txt" to "textfile.txt" via TUS inside of the space "new-space" using the WebDAV API
     Then for user "Brian" the content of the file "textfile.txt" of the space "new-space" should be ""
     And for user "Alice" the content of the file "textfile.txt" of the space "new-space" should be ""
-
