@@ -1266,4 +1266,21 @@ class SharingNgContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @When /^user "([^"]*)" (?:tries to create|creates) the following space link share using root endpoint of the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $body
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userCreatesTheFollowingSpaceLinkShareUsingRootEndpointOfTheGraphApi(string $user, TableNode $body): void {
+		$rows = $body->getRowsHash();
+		Assert::assertArrayNotHasKey("resource", $rows, "'resource' should not be provided in the data-table while sharing a space");
+		$response = $this->createDriveLinkShare($user, $body);
+
+		$this->featureContext->setResponse($response);
+	}
 }
