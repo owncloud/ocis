@@ -2,7 +2,6 @@ package http
 
 import (
 	"fmt"
-
 	stdhttp "net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -26,7 +25,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.TLSConfig(options.Config.HTTP.TLS),
 		http.Logger(options.Logger),
 		http.Namespace(options.Config.HTTP.Namespace),
-		http.Name(options.Config.Service.Name),
+		http.Name("wopi"),
 		http.Version(version.GetString()),
 		http.Address(options.Config.HTTP.BindAddr),
 		http.Context(options.Context),

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"net/url"
 	"path"
 	"strconv"
@@ -99,6 +100,15 @@ func (s *Service) OpenInApp(
 			editAppURL = url
 		}
 	}
+	if editAppURL == "" && viewAppURL == "" {
+		err := fmt.Errorf("OpenInApp: neither edit nor view app url found")
+		s.logger.Error().
+			Err(err).
+			Str("FileReference", providerFileRef.String()).
+			Str("ViewMode", req.GetViewMode().String()).
+			Str("Requester", user.GetId().String()).Send()
+		return nil, err
+	}
 
 	if editAppURL == "" {
 		// assuming that an view action is always available in the /hosting/discovery manifest
@@ -106,6 +116,10 @@ func (s *Service) OpenInApp(
 		// eg. OnlyOffice does support viewing pdfs but no editing
 		// there is no known case of supporting edit only without view
 		editAppURL = viewAppURL
+	}
+	if viewAppURL == "" {
+		// the URL of the end-user application in view mode when different (defaults to edit mod URL)
+		viewAppURL = editAppURL
 	}
 
 	wopiSrcURL := url.URL{

@@ -18,7 +18,7 @@ import (
 // There are no explicit requirements for the context, and it will be passed
 // without changes to the underlying RegisterService method.
 func RegisterOcisService(ctx context.Context, cfg *config.Config, logger log.Logger) error {
-	svc := registry.BuildGRPCService(cfg.Service.Name, uuid.Must(uuid.NewV4()).String(), cfg.GRPC.Addr, "0.0.0")
+	svc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, uuid.Must(uuid.NewV4()).String(), cfg.GRPC.Addr, "0.0.0")
 	return registry.RegisterService(ctx, svc, logger)
 }
 
@@ -61,7 +61,7 @@ func RegisterAppProvider(
 			Name:        cfg.App.Name,
 			Description: cfg.App.Description,
 			Icon:        cfg.App.Icon,
-			Address:     cfg.Service.Name,
+			Address:     cfg.GRPC.Namespace + "." + cfg.Service.Name,
 			MimeTypes:   mimeTypes,
 		},
 	}
