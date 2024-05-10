@@ -73,6 +73,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix well-known rewrite endpoint: [#8946](https://github.com/owncloud/ocis/pull/8946)
 * Bugfix - Crash when processing crafted TIFF files: [#8981](https://github.com/owncloud/ocis/pull/8981)
 * Bugfix - Fix collaboration registry setting: [#9105](https://github.com/owncloud/ocis/pull/9105)
+* Bugfix - Service startup of WOPI example: [#9127](https://github.com/owncloud/ocis/pull/9127)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Change - Define maximum input image dimensions and size when generating previews: [#9035](https://github.com/owncloud/ocis/pull/9035)
@@ -313,6 +314,13 @@ The following sections list the changes for unreleased.
    Fixed the collaboration service GRPC namespace
 
    https://github.com/owncloud/ocis/pull/9105
+
+* Bugfix - Service startup of WOPI example: [#9127](https://github.com/owncloud/ocis/pull/9127)
+
+   We fixed a bug in the service startup of the appprovider-onlyoffice in the
+   ocis_wopi deployment example.
+
+   https://github.com/owncloud/ocis/pull/9127
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
