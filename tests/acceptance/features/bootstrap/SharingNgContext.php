@@ -1316,4 +1316,64 @@ class SharingNgContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * @When user :user tries to remove the link from space :space owned by :owner using root endpoint of the Graph API
+	 *
+	 * @param string $user
+	 * @param string $space
+	 * @param string $spaceOwner
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userTriesToRemoveShareLinkOfSpaceOwnedByUsingRootEndpointOfTheGraphApi(string $user, string $space, string $spaceOwner): void {
+		$permissionID = $this->featureContext->shareNgGetLastCreatedLinkShareID();
+		$spaceId = ($this->spacesContext->getSpaceByName($spaceOwner, $space))["id"];
+
+		$response = GraphHelper::removeAccessToSpace(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$permissionID
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then user :user should not have any :shareType permissions on space :space
+	 *
+	 * @param string $user
+	 * @param string $shareType
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userShouldNotHaveAnyPermissionsOnSpace(string $user, string $shareType, string $space): void {
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+
+		$response = GraphHelper::getDrivePermissionsList(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId
+		);
+		$responseBody = $this->featureContext->getJsonDecodedResponse($response);
+		foreach ($responseBody['value'] as $value) {
+			switch ($shareType) {
+				case $shareType === 'link':
+					Assert::assertArrayNotHasKey('link', $value, $space . ' space should not have any link permissions but found ' . print_r($value, true));
+					break;
+				case $shareType === "share":
+					Assert::assertArrayNotHasKey('grantedToV2', $value, $space . ' space should not have any share permissions but found ' . print_r($value, true));
+					break;
+				default:
+					Assert::fail('Invalid share type has been specified');
+			}
+		}
+	}
 }
