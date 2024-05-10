@@ -157,3 +157,61 @@ Feature: Remove access to a drive
     When user "Brian" tries to remove the access of group "group1" from space "NewSpace" using root endpoint of the Graph API
     Then the HTTP status code should be "403"
     And the user "Brian" should have a space called "NewSpace"
+
+  @issue-7879
+  Scenario Outline: user removes link share from project space
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | NewSpace           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    When user "Alice" removes the link from space "NewSpace" using root endpoint of the Graph API
+    Then the HTTP status code should be "204"
+    And user "Alice" should not have any "link" permissions on space "NewSpace"
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
+
+
+  Scenario: user removes internal link share from project space
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | NewSpace |
+      | permissionsRole | internal |
+    When user "Alice" removes the link from space "NewSpace" using root endpoint of the Graph API
+    Then the HTTP status code should be "204"
+    And user "Alice" should not have any "link" permissions on space "NewSpace"
+
+  @issue-7879
+  Scenario Outline: user tries to remove link share of project space owned by next user
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | NewSpace           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    When user "Brian" tries to remove the link from space "NewSpace" owned by "Alice" using root endpoint of the Graph API
+    Then the HTTP status code should be "500"
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
+
+
+  Scenario: user tries to remove internal link share of project space owned by next user
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | NewSpace |
+      | permissionsRole | internal |
+    When user "Brian" tries to remove the link from space "NewSpace" owned by "Alice" using root endpoint of the Graph API
+    Then the HTTP status code should be "500"

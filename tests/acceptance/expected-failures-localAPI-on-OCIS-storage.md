@@ -266,6 +266,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg/removeAccessToDriveItem.feature:141](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/removeAccessToDriveItem.feature#L141)
 - [apiSharingNg/removeAccessToDriveItem.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/removeAccessToDriveItem.feature#L161)
 - [apiSharingNg/removeAccessToDriveItem.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/removeAccessToDriveItem.feature#L179)
+- [apiSharingNg/removeAccessToDrive.feature:178](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/removeAccessToDrive.feature#L178)
+- [apiSharingNg/removeAccessToDrive.feature:207](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg/removeAccessToDrive.feature#L207)
 
 ### [sharee (editor role) MOVE a file by file-id into same shared folder returns 403](https://github.com/owncloud/ocis/issues/7617)
 
