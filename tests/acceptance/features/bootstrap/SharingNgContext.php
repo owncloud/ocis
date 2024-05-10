@@ -1001,6 +1001,7 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @When user :user disables sync of share :share using the Graph API
+	 * @When user :user tries to disable sync of share :share using the Graph API
 	 *
 	 * @param string $user
 	 *
