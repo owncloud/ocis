@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"gopkg.in/square/go-jose.v2"
+	"github.com/go-jose/go-jose/v3"
 )
 
 // Supported Authority kind string values.

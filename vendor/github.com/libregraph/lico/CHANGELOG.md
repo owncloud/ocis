@@ -4,6 +4,15 @@
 
 
 
+## v0.62.0 (2024-05-08)
+
+- Update golangci-lint config
+- Bump go-jose to latest backwards compatible release
+- Bump golang.org/x/net from 0.17.0 to 0.24.0
+- enhancement: enhance Security by Allowing Same-Site Cookie Value Modification
+- Bump ip from 2.0.0 to 2.0.1 in /identifier
+
+
 ## v0.61.2 (2024-02-19)
 
 - Limit oidc check session iframe postMessage hook scope

@@ -892,6 +892,12 @@ github.com/go-git/go-git/v5/utils/trace
 # github.com/go-ini/ini v1.67.0
 ## explicit
 github.com/go-ini/ini
+# github.com/go-jose/go-jose/v3 v3.0.3
+## explicit; go 1.12
+github.com/go-jose/go-jose/v3
+github.com/go-jose/go-jose/v3/cipher
+github.com/go-jose/go-jose/v3/json
+github.com/go-jose/go-jose/v3/jwt
 # github.com/go-jose/go-jose/v4 v4.0.1
 ## explicit; go 1.21
 github.com/go-jose/go-jose/v4
@@ -1275,7 +1281,7 @@ github.com/libregraph/idm/server
 github.com/libregraph/idm/server/handler
 github.com/libregraph/idm/server/handler/boltdb
 github.com/libregraph/idm/server/handler/ldif
-# github.com/libregraph/lico v0.61.3-0.20240322112242-72cf9221d3a7
+# github.com/libregraph/lico v0.62.0
 ## explicit; go 1.18
 github.com/libregraph/lico
 github.com/libregraph/lico/bootstrap
@@ -1305,7 +1311,7 @@ github.com/libregraph/lico/server
 github.com/libregraph/lico/signing
 github.com/libregraph/lico/utils
 github.com/libregraph/lico/version
-# github.com/libregraph/oidc-go v1.0.0
+# github.com/libregraph/oidc-go v1.1.0
 ## explicit; go 1.13
 github.com/libregraph/oidc-go
 # github.com/longsleep/go-metrics v1.0.0
@@ -1630,7 +1636,7 @@ github.com/pkg/xattr
 # github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 ## explicit
 github.com/pmezard/go-difflib/difflib
-# github.com/pquerna/cachecontrol v0.1.0
+# github.com/pquerna/cachecontrol v0.2.0
 ## explicit; go 1.16
 github.com/pquerna/cachecontrol
 github.com/pquerna/cachecontrol/cacheobject
@@ -2320,7 +2326,6 @@ gopkg.in/ini.v1
 gopkg.in/square/go-jose.v2
 gopkg.in/square/go-jose.v2/cipher
 gopkg.in/square/go-jose.v2/json
-gopkg.in/square/go-jose.v2/jwt
 # gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7
 ## explicit
 gopkg.in/tomb.v1

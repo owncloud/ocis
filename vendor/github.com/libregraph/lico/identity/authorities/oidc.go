@@ -27,10 +27,10 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/libregraph/oidc-go"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/square/go-jose.v2"
 
 	konnectoidc "github.com/libregraph/lico/oidc"
 	"github.com/libregraph/lico/oidc/payload"

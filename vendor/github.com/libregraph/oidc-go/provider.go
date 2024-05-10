@@ -26,7 +26,7 @@ import (
 	"sync"
 
 	"github.com/desertbit/timer"
-	"gopkg.in/square/go-jose.v2"
+	"github.com/go-jose/go-jose/v3"
 )
 
 // Provider represents an OpenID Connect server's configuration.

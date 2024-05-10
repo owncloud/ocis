@@ -17,11 +17,11 @@ import (
 
 	"github.com/MicahParks/keyfunc"
 	goidc "github.com/coreos/go-oidc/v3/oidc"
+	"github.com/go-jose/go-jose/v3"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"golang.org/x/oauth2"
-	"gopkg.in/square/go-jose.v2"
 )
 
 // OIDCClient used to mock the oidc client during tests

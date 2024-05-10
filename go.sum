@@ -1167,6 +1167,8 @@ github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-ini/ini v1.67.0 h1:z6ZrTEZqSWOTyH2FlglNbNgARyHG8oLW9gMELqKr06A=
 github.com/go-ini/ini v1.67.0/go.mod h1:ByCAeIL28uOIIG0E3PJtZPDL8WnHpFKFOtgjp+3Ies8=
+github.com/go-jose/go-jose/v3 v3.0.3 h1:fFKWeig/irsp7XD2zBxvnmA/XaRWp5V3CBsZXJF7G7k=
+github.com/go-jose/go-jose/v3 v3.0.3/go.mod h1:5b+7YgP7ZICgJDBdfjZaIt+H/9L9T/YQrVfLAMboGkQ=
 github.com/go-jose/go-jose/v4 v4.0.1 h1:QVEPDE3OluqXBQZDcnNvQrInro2h0e4eqNbnZSWqS6U=
 github.com/go-jose/go-jose/v4 v4.0.1/go.mod h1:WVf9LFMHh/QVrmqrOfqun0C45tMe3RoiKJMPvgWwLfY=
 github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
@@ -1637,10 +1639,10 @@ github.com/leonelquinteros/gotext v1.6.0 h1:IYL2+dKsaYYvqGAOafaC7mpAGBhMrD/vKjHU
 github.com/leonelquinteros/gotext v1.6.0/go.mod h1:qQRISjoonXYFdRGrTG1LARQ38Gpibad0IPeB4hpvyyM=
 github.com/libregraph/idm v0.5.0 h1:tDMwKbAOZzdeDYMxVlY5PbSqRKO7dbAW9KT42A51WSk=
 github.com/libregraph/idm v0.5.0/go.mod h1:BGMwIQ/6orJSPVzJ1x6kgG2JyG9GY05YFmbsnaD80k0=
-github.com/libregraph/lico v0.61.3-0.20240322112242-72cf9221d3a7 h1:fcPgiBu7DGyGeokE0Qk+S+GW/3n+QWu1dIjw0TqadhI=
-github.com/libregraph/lico v0.61.3-0.20240322112242-72cf9221d3a7/go.mod h1:TgZGBAYzVRQSRdBC8PgGQKjYhtXuTr6UCM3ZZyGTleQ=
-github.com/libregraph/oidc-go v1.0.0 h1:l2tE/EwLyLXVy0B5BuVKgIFX9pNpz/5J3x5IBw0KEhc=
-github.com/libregraph/oidc-go v1.0.0/go.mod h1:7TRHrY/H1Vg6JqFjV0oAe1+kN+mGFBqXYvclSyvhRyc=
+github.com/libregraph/lico v0.62.0 h1:4aa0hp8kLCj/oy/aGuGKQCzdQRLHY/cvDs25bdkdcXU=
+github.com/libregraph/lico v0.62.0/go.mod h1:Byuq0dALiJD9hpx2gvX5UTVZ6eWZs3sO0SeoXQQeFcE=
+github.com/libregraph/oidc-go v1.1.0 h1:RyudjL3UyQblqeBQI06W53PniWobqODeeyAy6v/HumA=
+github.com/libregraph/oidc-go v1.1.0/go.mod h1:qW9ubcXvZrfbbWZBaLMuk7bt5qAUMYyt9/NtXQt07Cw=
 github.com/linode/linodego v0.25.3/go.mod h1:GSBKPpjoQfxEfryoCRcgkuUOCuVtGHWhzI8OMdycNTE=
 github.com/liquidweb/go-lwApi v0.0.0-20190605172801-52a4864d2738/go.mod h1:0sYF9rMXb0vlG+4SzdiGMXHheCZxjguMq+Zb4S2BfBs=
 github.com/liquidweb/go-lwApi v0.0.5/go.mod h1:0sYF9rMXb0vlG+4SzdiGMXHheCZxjguMq+Zb4S2BfBs=
@@ -1838,8 +1840,8 @@ github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH
 github.com/posener/complete v1.1.1/go.mod h1:em0nMJCgc9GFtwrmVmEMR/ZL6WyhyjMBndrE9hABlRI=
 github.com/posener/complete v1.2.3/go.mod h1:WZIdtGGp+qx0sLrYKtIRAruyNpv6hFCicSgv7Sy7s/s=
 github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35/go.mod h1:prYjPmNq4d1NPVmpShWobRqXY3q7Vp+80DqgxxUrUIA=
-github.com/pquerna/cachecontrol v0.1.0 h1:yJMy84ti9h/+OEWa752kBTKv4XC30OtVVHYv/8cTqKc=
-github.com/pquerna/cachecontrol v0.1.0/go.mod h1:NrUG3Z7Rdu85UNR3vm7SOsl1nFIeSiQnrHV5K9mBcUI=
+github.com/pquerna/cachecontrol v0.2.0 h1:vBXSNuE5MYP9IJ5kjsdo8uq+w41jSPgvba2DEnkRx9k=
+github.com/pquerna/cachecontrol v0.2.0/go.mod h1:NrUG3Z7Rdu85UNR3vm7SOsl1nFIeSiQnrHV5K9mBcUI=
 github.com/pquerna/otp v1.3.0/go.mod h1:dkJfzwRKNiegxyNb54X/3fLwhCynbMspSyWKnvi1AEg=
 github.com/prometheus/alertmanager v0.26.0 h1:uOMJWfIwJguc3NaM3appWNbbrh6G/OjvaHMk22aBBYc=
 github.com/prometheus/alertmanager v0.26.0/go.mod h1:rVcnARltVjavgVaNnmevxK7kOn7IZavyf0KNgHkbEpU=

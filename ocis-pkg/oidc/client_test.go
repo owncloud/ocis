@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	goidc "github.com/coreos/go-oidc/v3/oidc"
+	"github.com/go-jose/go-jose/v3"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	"gopkg.in/square/go-jose.v2"
 )
 
 type signingKey struct {
