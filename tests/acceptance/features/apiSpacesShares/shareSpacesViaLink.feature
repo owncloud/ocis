@@ -83,9 +83,11 @@ Feature: Share spaces via link
 
   @skipOnRevaMaster
   Scenario Outline: user without manager role cannot share a space to public via link
-    Given user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | share space  |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
     When user "Brian" creates a public link share of the space "share space" with settings:
       | permissions | 1 |
     Then the HTTP status code should be "403"
@@ -93,15 +95,17 @@ Feature: Share spaces via link
     And the OCS status message should be "No share permission"
     And for user "Alice" the space "share space" should not contain the last created public link
     Examples:
-      | space-role |
-      | viewer     |
-      | editor     |
+      | space-role   |
+      | Space Viewer |
+      | Space Editor |
 
 
   Scenario: user with manager role can share a space to public via link
-    Given user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian   |
-      | role      | manager |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | share space |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | Manager     |
     When user "Brian" creates a public link share of the space "share space" with settings:
       | permissions | 1        |
       | password    | %public% |
@@ -132,28 +136,30 @@ Feature: Share spaces via link
 
   Scenario Outline: space admin removes password of a public link share of a space (read/invite permission)
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has created a public link share of the space "share space" with settings:
-      | permissions | <permissions> |
-      | password    | %public%      |
+    And using SharingNG
+    And user "Alice" has created the following space link share:
+      | space           | share space |
+      | permissionsRole | view        |
+      | password        | %public%    |
     When user "Alice" updates the last public link share using the sharing API with
-      | permissions | <permissions> |
-      | password    |               |
+      | permissions | 1 |
+      | password    |   |
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs-status-code>"
     And the OCS status message should be "OK"
     Examples:
-      | ocs-api-version | ocs-status-code | permissions |
-      | 1               | 100             | 1           |
-      | 1               | 100             | 0           |
-      | 2               | 200             | 1           |
-      | 2               | 200             | 0           |
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario Outline: space admin tries to remove password of a public link share of a space (various permission)
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has created a public link share of the space "share space" with settings:
-      | permissions | <permissions> |
-      | password    | %public%      |
+    And using SharingNG
+    And user "Alice" has created the following space link share:
+      | space           | share space        |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | <permissions> |
       | password    |               |
@@ -161,20 +167,22 @@ Feature: Share spaces via link
     And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
     Examples:
-      | ocs-api-version | permissions | http-status-code |
-      | 1               | 5           | 200              |
-      | 2               | 5           | 400              |
-      | 1               | 15          | 200              |
-      | 2               | 15          | 400              |
-      | 1               | 4           | 200              |
-      | 2               | 4           | 400              |
+      | ocs-api-version | permissions | http-status-code | permissions-role |
+      | 1               | 5           | 200              | upload           |
+      | 2               | 5           | 400              | upload           |
+      | 1               | 15          | 200              | edit             |
+      | 2               | 15          | 400              | edit             |
+      | 1               | 4           | 200              | createOnly       |
+      | 2               | 4           | 400              | createOnly       |
 
 
   Scenario Outline: space admin removes password of a public link share of a space (invite permission)
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has created a public link share of the space "share space" with settings:
-      | permissions | 1        |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following space link share:
+      | space           | share space |
+      | permissionsRole | view        |
+      | password        | %public%    |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 0 |
       | password    |   |
@@ -189,12 +197,16 @@ Feature: Share spaces via link
 
   Scenario Outline: space manager tries to remove password of a public link share of a space (read permission)
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian   |
-      | role      | manager |
-    And user "Brian" has created a public link share of the space "share space" with settings:
-      | permissions | 1        |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has sent the following space share invitation:
+      | space           | share space |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | Manager     |
+    And user "Brian" has created the following space link share:
+      | space           | share space |
+      | permissionsRole | view        |
+      | password        | %public%    |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | 1 |
       | password    |   |
@@ -209,12 +221,16 @@ Feature: Share spaces via link
 
   Scenario Outline: space manager tries to remove password of a public link share of a space (various permission)
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian   |
-      | role      | manager |
-    And user "Brian" has created a public link share of the space "share space" with settings:
-      | permissions | <permissions> |
-      | password    | %public%      |
+    And using SharingNG
+    And user "Alice" has sent the following space share invitation:
+      | space           | share space |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | Manager     |
+    And user "Brian" has created the following space link share:
+      | space           | share space        |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | <permissions> |
       | password    |               |
@@ -222,23 +238,27 @@ Feature: Share spaces via link
     And the OCS status code should be "400"
     And the OCS status message should be "missing required password"
     Examples:
-      | ocs-api-version | permissions | http-status-code |
-      | 1               | 5           | 200              |
-      | 2               | 5           | 400              |
-      | 1               | 15          | 200              |
-      | 2               | 15          | 400              |
-      | 1               | 4           | 200              |
-      | 2               | 4           | 400              |
+      | ocs-api-version | permissions | http-status-code | permissions-role |
+      | 1               | 5           | 200              | upload           |
+      | 2               | 5           | 400              | upload           |
+      | 1               | 15          | 200              | edit             |
+      | 2               | 15          | 400              | edit             |
+      | 1               | 4           | 200              | createOnly       |
+      | 2               | 4           | 400              | createOnly       |
 
 
   Scenario Outline: space manager removes password of a public link share of a space (invite permission)
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian   |
-      | role      | manager |
-    And user "Brian" has created a public link share of the space "share space" with settings:
-      | permissions | 1        |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has sent the following space share invitation:
+      | space           | share space |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | Manager     |
+    And user "Brian" has created the following space link share:
+      | space           | share space |
+      | permissionsRole | view        |
+      | password        | %public%    |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | 0 |
       | password    |   |
@@ -253,12 +273,16 @@ Feature: Share spaces via link
 
   Scenario Outline: space member tries to remove the password of a public link share of a space
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
-    And user "Alice" has created a public link share of the space "share space" with settings:
-      | permissions | <permissions> |
-      | password    | %public%      |
+    And using SharingNG
+    And user "Alice" has sent the following space share invitation:
+      | space           | share space  |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
+    And user "Alice" has created the following space link share:
+      | space           | share space        |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | <permissions> |
       | password    |               |
@@ -266,24 +290,20 @@ Feature: Share spaces via link
     And the OCS status code should be "997"
     And the OCS status message should be "missing permissions to update share"
     Examples:
-      | ocs-api-version | http-status-code | space-role | permissions |
-      | 1               | 200              | viewer     | 1           |
-      | 2               | 401              | viewer     | 1           |
-      | 1               | 200              | viewer     | 5           |
-      | 2               | 401              | viewer     | 5           |
-      | 1               | 200              | viewer     | 15          |
-      | 2               | 401              | viewer     | 15          |
-      | 1               | 200              | viewer     | 4           |
-      | 2               | 401              | viewer     | 4           |
-      | 1               | 200              | viewer     | 0           |
-      | 2               | 401              | viewer     | 0           |
-      | 1               | 200              | editor     | 1           |
-      | 2               | 401              | editor     | 1           |
-      | 1               | 200              | editor     | 5           |
-      | 2               | 401              | editor     | 5           |
-      | 1               | 200              | editor     | 15          |
-      | 2               | 401              | editor     | 15          |
-      | 1               | 200              | editor     | 4           |
-      | 2               | 401              | editor     | 4           |
-      | 1               | 200              | editor     | 0           |
-      | 2               | 401              | editor     | 0           |
+      | ocs-api-version | http-status-code | space-role   | permissions | permissions-role |
+      | 1               | 200              | Space Viewer | 1           | view             |
+      | 2               | 401              | Space Viewer | 1           | view             |
+      | 1               | 200              | Space Viewer | 5           | upload           |
+      | 2               | 401              | Space Viewer | 5           | upload           |
+      | 1               | 200              | Space Viewer | 15          | edit             |
+      | 2               | 401              | Space Viewer | 15          | edit             |
+      | 1               | 200              | Space Viewer | 4           | createOnly       |
+      | 2               | 401              | Space Viewer | 4           | createOnly       |
+      | 1               | 200              | Space Editor | 1           | view             |
+      | 2               | 401              | Space Editor | 1           | view             |
+      | 1               | 200              | Space Editor | 5           | upload           |
+      | 2               | 401              | Space Editor | 5           | upload           |
+      | 1               | 200              | Space Editor | 15          | edit             |
+      | 2               | 401              | Space Editor | 15          | edit             |
+      | 1               | 200              | Space Editor | 4           | createOnly       |
+      | 2               | 401              | Space Editor | 4           | createOnly       |
