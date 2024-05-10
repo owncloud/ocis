@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.3](#changelog-for-503-2024-05-02)
 * [Changelog for 5.0.2](#changelog-for-502-2024-04-17)
 * [Changelog for 5.0.1](#changelog-for-501-2024-04-10)
@@ -35,6 +36,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.3...master
+
+## Summary
+
+* Bugfix - Service startup of WOPI example: [#9127](https://github.com/owncloud/ocis/pull/9127)
+
+## Details
+
+* Bugfix - Service startup of WOPI example: [#9127](https://github.com/owncloud/ocis/pull/9127)
+
+   We fixed a bug in the service startup of the appprovider-onlyoffice in the
+   ocis_wopi deployment example.
+
+   https://github.com/owncloud/ocis/pull/9127
 
 # Changelog for [5.0.3] (2024-05-02)
 
