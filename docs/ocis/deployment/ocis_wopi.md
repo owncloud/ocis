@@ -41,6 +41,7 @@ The last four containers are the WOPI server, Collabora and OnlyOffice.
   * onlyoffice.* for serving OnlyOffice
   * wopiserver.* for serving the WOPI server
   * traefik.* for serving the Traefik dashboard
+  * companion.* for serving the uppy companion app
 
 See also [example server setup]({{< ref "preparing_server" >}})
 
@@ -68,7 +69,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
   TRAEFIK_DASHBOARD=
   # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
   TRAEFIK_DOMAIN=
-  # Basic authentication for the dashboard. Defaults to user "admin" and password "admin"
+  # Basic authentication for the dashboard. Defaults to user "admin" and password "admin" (written as: "admin:admin").
   TRAEFIK_BASIC_AUTH_USERS=
   # Email address for obtaining LetsEncrypt certificates, needs only be changed if this is a public facing server
   TRAEFIK_ACME_MAIL=
@@ -83,6 +84,8 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # The demo users should not be created on a production instance
   # because their passwords are public. Defaults to "false".
   DEMO_USERS=
+  # Log level for oCIS. Defaults to "info".
+  OCIS_LOG_LEVEL=
 
   ### Wopi server settings ###
   # cs3org wopi server version. Defaults to "v8.3.3"
@@ -95,7 +98,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
   ### Collabora settings ###
   # Domain of Collabora, where you can find the frontend. Defaults to "collabora.owncloud.test"
   COLLABORA_DOMAIN=
-  # Admin user for Collabora. Defaults to blank, provide one to enable access
+  # Admin user for Collabora. Defaults to blank, provide one to enable access. Collabora Admin Panel URL: https://{COLLABORA_DOMAIN}/browser/dist/admin/admin.html
   COLLABORA_ADMIN_USER=
   # Admin password for Collabora. Defaults to blank, provide one to enable access
   COLLABORA_ADMIN_PASSWORD=
@@ -103,6 +106,27 @@ See also [example server setup]({{< ref "preparing_server" >}})
   ### OnlyOffice settings ###
   # Domain of OnlyOffice, where you can find the frontend. Defaults to "onlyoffice.owncloud.test"
   ONLYOFFICE_DOMAIN=
+
+  ### Email / Inbucket settings ###
+  # Inbucket / Mail domain. Defaults to "mail.owncloud.test"
+  INBUCKET_DOMAIN=
+
+  ### Apache Tika Content analysis toolkit ###
+  # Set the desired docker image tag or digest, defaults to "latest"
+  TIKA_IMAGE=
+
+  # If you want to use debugging and tracing with this stack,
+  # you need uncomment following line. Please see documentation at
+  # https://owncloud.dev/ocis/deployment/monitoring-tracing/
+  #COMPOSE_FILE=docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
+
+  ### Uppy Companion settings ###
+  # Domain of Uppy Companion. Defaults to "companion.owncloud.test"
+  COMPANION_IMAGE=
+  COMPANION_DOMAIN=
+  # Provider settings, see https://uppy.io/docs/companion/#provideroptions for reference. Empty by default, which disables providers.
+  COMPANION_ONEDRIVE_KEY=
+  COMPANION_ONEDRIVE_SECRET=
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
@@ -152,6 +176,8 @@ On Linux and macOS you can add them to your `/etc/hosts` file and on Windows to 
 127.0.0.1 collabora.owncloud.test
 127.0.0.1 onlyoffice.owncloud.test
 127.0.0.1 wopiserver.owncloud.test
+127.0.0.1 mail.owncloud.test
+127.0.0.1 companion.owncloud.test
 ```
 
 After that you're ready to start the application stack:
