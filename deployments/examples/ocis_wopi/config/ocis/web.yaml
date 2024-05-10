@@ -11,7 +11,7 @@ web:
       - id: importer
         path: web-app-importer
         config:
-          companionUrl: https://companion.ocis-wopi.released.owncloud.works
+          companionUrl: https://${COMPANION_DOMAIN|companion.owncloud.test}
           supportedClouds:
             - WebdavPublicLink
             #- OneDrive # needs a client id and secret
