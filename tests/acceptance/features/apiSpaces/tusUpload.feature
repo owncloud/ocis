@@ -45,7 +45,12 @@ Feature: upload resources using TUS protocol
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "testFolder"
-    And user "Alice" has shared folder "testFolder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testFolder |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Editor     |
     When user "Brian" uploads file "filesForUpload/zerobyte.txt" to "Shares/testFolder/textfile.txt" using the TUS protocol on the WebDAV API
     Then the content of file "Shares/testFolder/textfile.txt" for user "Brian" should be ""
     And the content of file "testFolder/textfile.txt" for user "Alice" should be ""
@@ -59,7 +64,12 @@ Feature: upload resources using TUS protocol
     Given using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "testFolder"
-    And user "Alice" has shared folder "testFolder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testFolder |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Editor     |
     When user "Brian" uploads a file from "filesForUpload/zerobyte.txt" to "testFolder/textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" the content of the file "testFolder/textfile.txt" of the space "Shares" should be ""
     And for user "Alice" the content of the file "testFolder/textfile.txt" of the space "Personal" should be ""
@@ -77,7 +87,12 @@ Feature: upload resources using TUS protocol
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "This is TUS upload" to "textfile.txt"
-    And user "Alice" has shared file "textfile.txt" with user "Brian" with permissions "read,update"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     When user "Brian" uploads file "filesForUpload/zerobyte.txt" to "Shares/textfile.txt" using the TUS protocol on the WebDAV API
     Then the content of file "Shares/textfile.txt" for user "Brian" should be ""
     And the content of file "textfile.txt" for user "Alice" should be ""
@@ -91,7 +106,12 @@ Feature: upload resources using TUS protocol
     Given using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "This is TUS upload" to "textfile.txt"
-    And user "Alice" has shared file "textfile.txt" with user "Brian" with permissions "read,update"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     When user "Brian" uploads a file from "filesForUpload/zerobyte.txt" to "textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" the content of the file "textfile.txt" of the space "Shares" should be ""
     And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be ""
@@ -112,9 +132,12 @@ Feature: upload resources using TUS protocol
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "This is TUS upload" to "textfile.txt"
-    And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Editor |
     When user "Brian" uploads a file from "filesForUpload/zerobyte.txt" to "textfile.txt" via TUS inside of the space "new-space" using the WebDAV API
     Then for user "Brian" the content of the file "textfile.txt" of the space "new-space" should be ""
     And for user "Alice" the content of the file "textfile.txt" of the space "new-space" should be ""
+
