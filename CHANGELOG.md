@@ -72,6 +72,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix affected users on sses: [#8928](https://github.com/owncloud/ocis/pull/8928)
 * Bugfix - Fix well-known rewrite endpoint: [#8946](https://github.com/owncloud/ocis/pull/8946)
 * Bugfix - Crash when processing crafted TIFF files: [#8981](https://github.com/owncloud/ocis/pull/8981)
+* Bugfix - Fix collaboration registry setting: [#9105](https://github.com/owncloud/ocis/pull/9105)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Change - Define maximum input image dimensions and size when generating previews: [#9035](https://github.com/owncloud/ocis/pull/9035)
@@ -306,6 +307,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8981
    https://github.com/advisories/GHSA-q7pp-wcgr-pffx
+
+* Bugfix - Fix collaboration registry setting: [#9105](https://github.com/owncloud/ocis/pull/9105)
+
+   Fixed the collaboration service GRPC namespace
+
+   https://github.com/owncloud/ocis/pull/9105
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
