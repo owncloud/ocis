@@ -146,7 +146,7 @@ services:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    #command: app-provider server
+    command: app-provider server
     environment:
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
       # use the internal service name of the gateway
