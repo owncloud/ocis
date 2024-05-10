@@ -535,3 +535,35 @@ Feature: restore deleted files/folders
       | dav-path-version |
       | old              |
       | new              |
+
+
+  Scenario Outline: restore deleted file when folder with same name exists
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "lorem epsum" to "same-name.txt"
+    And user "Alice" has deleted file "same-name.txt"
+    And user "Alice" has created folder "same-name.txt"
+    When user "Alice" restores the file with original path "same-name.txt" using the trashbin API
+    Then the HTTP status code should be "204"
+    And the content of file "same-name.txt" for user "Alice" should be "lorem epsum"
+    And as "Alice" folder "same-name.txt" should not exist
+    And as "Alice" the folder with original path "same-name.txt" should exist in the trashbin
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+
+  Scenario Outline: restore deleted folder when file with same name exists
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "same-name.txt"
+    And user "Alice" has deleted folder "same-name.txt"
+    And user "Alice" has uploaded file with content "lorem epsum" to "same-name.txt"
+    When user "Alice" restores the folder with original path "same-name.txt" using the trashbin API
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "same-name.txt" should exist
+    And as "Alice" file "same-name.txt" should not exist
+    And as "Alice" the file with original path "same-name.txt" should exist in the trashbin
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
