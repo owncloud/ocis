@@ -619,10 +619,7 @@ Feature: Update permission of a share
     Examples:
       | permissions-role |
       | Space Viewer     |
-      | Space Viewer     |
       | Space Editor     |
-      | Space Editor     |
-      | Manager          |
       | Manager          |
 
 

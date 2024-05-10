@@ -1376,4 +1376,75 @@ class SharingNgContext implements Context {
 			}
 		}
 	}
+
+	/**
+	 * @Then user :user should be able to send the following space share invitation with all allowed permission roles using root endpoint of the Graph API
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userShouldBeAbleToSendTheFollowingSpaceShareInvitationWithAllAllowedPermissionRolesUsingRootEndpointOFTheGraphApi(string $user, TableNode $table): void {
+		$listPermissionResponse = $this->featureContext->getJsonDecodedResponseBodyContent();
+		if (!isset($listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'})) {
+			Assert::fail(
+				"The following response does not contain '@libre.graph.permissions.roles.allowedValues' property:\n" . $listPermissionResponse
+			);
+		}
+		Assert::assertNotEmpty(
+			$listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'},
+			"'@libre.graph.permissions.roles.allowedValues' should not be empty"
+		);
+		$allowedPermissionRoles = $listPermissionResponse->{'@libre.graph.permissions.roles.allowedValues'};
+		// this info is needed for log to see which roles allowed and which were not when tests fail
+		$shareInvitationRequestResult = "From the given allowed role lists from the permissions:\n";
+		$areAllSendInvitationSuccessFullForAllowedRoles = true;
+		$rows = $table->getRowsHash();
+
+		$shareType = $rows['shareType'];
+		$space = $rows['space'];
+		$recipient = $rows['sharee'];
+
+		foreach ($allowedPermissionRoles as $role) {
+			// we should be able to send share invitation for each of the roles allowed which are listed in permissions (allowed)
+			$roleAllowed = GraphHelper::getPermissionNameByPermissionRoleId($role->id);
+			$responseSendInvitation = $this->sendDriveShareInvitation($user, new TableNode(array_merge($table->getTable(), [['permissionsRole', $roleAllowed]])));
+			$jsonResponseSendInvitation = $this->featureContext->getJsonDecodedResponseBodyContent($responseSendInvitation);
+			$httpsStatusCode = $responseSendInvitation->getStatusCode();
+			if ($httpsStatusCode === 200 && !empty($jsonResponseSendInvitation->value)) {
+				// remove the share so that the same user can be share for the next allowed roles
+				$removePermissionsResponse = $this->removeAccessToSpace($user, $shareType, $space, $recipient);
+				Assert::assertEquals(204, $removePermissionsResponse->getStatusCode());
+			} else {
+				$areAllSendInvitationSuccessFullForAllowedRoles = false;
+				$shareInvitationRequestResult .= "\tShare invitation for " . $space . "' with role '" . $roleAllowed . "' failed and was not allowed.\n";
+			}
+		}
+		Assert::assertTrue($areAllSendInvitationSuccessFullForAllowedRoles, $shareInvitationRequestResult);
+	}
+
+	/**
+	 * @When user :user tries to list the permissions of space :space owned by :spaceOwner using root endpoint of the Graph API
+	 *
+	 * @param string $user
+	 * @param string $space
+	 * @param string $spaceOwner
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userTriesToListThePermissionsOfSpaceOwnedByUsingRootEndpointOfTheGraphApi(string $user, string $space, string $spaceOwner): void {
+		$spaceId = ($this->spacesContext->getSpaceByName($spaceOwner, $space))["id"];
+
+		$response = GraphHelper::getDrivePermissionsList(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId
+		);
+		$this->featureContext->setResponse($response);
+	}
 }
