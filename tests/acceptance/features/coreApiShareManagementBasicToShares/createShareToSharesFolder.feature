@@ -255,8 +255,13 @@ Feature: sharing
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Brian" has uploaded file with content "ownCloud test text file 0" to "/randomfile.txt"
-    And user "Brian" has shared file "randomfile.txt" with group "grp1"
-    And user "Brian" has deleted the last share
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | randomfile.txt |
+      | space           | Personal       |
+      | sharee          | grp1           |
+      | shareType       | group          |
+      | permissionsRole | Viewer         |
+    And user "Brian" has removed the access of group "grp1" from resource "randomfile.txt" of space "Personal"
     When user "Brian" shares file "/randomfile.txt" with group "grp1" using the sharing API
     And as "Alice" file "/Shares/randomfile.txt" should exist
 
@@ -270,11 +275,31 @@ Feature: sharing
       | David    |
       | Emily    |
     And user "Alice" has created folder "/folder1"
-    And user "Alice" has shared folder "/folder1" with user "Brian"
-    And user "Alice" has shared folder "/folder1" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder1  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder1  |
+      | space           | Personal |
+      | sharee          | Carol    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     And user "Alice" has created folder "/folder1/folder2"
-    And user "Alice" has shared folder "/folder1/folder2" with user "David"
-    And user "Alice" has shared folder "/folder1/folder2" with user "Emily"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder1/folder2 |
+      | space           | Personal        |
+      | sharee          | David           |
+      | shareType       | user            |
+      | permissionsRole | Viewer          |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder1/folder2 |
+      | space           | Personal        |
+      | sharee          | Emily           |
+      | shareType       | user            |
+      | permissionsRole | Viewer          |
     When user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares"
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -377,14 +402,18 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
-    And user "Alice" has shared file "randomfile.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | randomfile.txt |
+      | space           | Personal       |
+      | sharee          | grp1           |
+      | shareType       | group          |
+      | permissionsRole | Viewer         |
     Then user "Brian" should see the following elements
       | /Shares/randomfile.txt |
     And the content of file "/Shares/randomfile.txt" for user "Brian" should be "Random data"
 
 
-  Scenario Outline: share of folder to a group with emoji in the name
-    Given using OCS API version "<ocs-api-version>"
+  Scenario: share of folder to a group with emoji in the name
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -394,8 +423,12 @@ Feature: sharing
     And user "Carol" has been added to group "😀 😁"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "file in parent folder" to "/PARENT/parent.txt"
-    When user "Alice" shares folder "/PARENT" with group "😀 😁" using the sharing API
-    Then the OCS status code should be "<ocs-status-code>"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | 😀 😁    |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     And the HTTP status code should be "200"
     Then user "Brian" should see the following elements
       | /Shares/PARENT/           |
@@ -403,10 +436,6 @@ Feature: sharing
     And user "Carol" should see the following elements
       | /Shares/PARENT/           |
       | /Shares/PARENT/parent.txt |
-    Examples:
-      | ocs-api-version | ocs-status-code |
-      | 1               | 100             |
-      | 2               | 200             |
 
   @skipOnReva
   Scenario Outline: share with a group and then add a user to that group
@@ -447,7 +476,12 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Alice" has shared file "/textfile0.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | File Editor   |
     When user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares"
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -482,8 +516,18 @@ Feature: sharing
     And user "Alice" has created folder "/common"
     And user "Alice" has created folder "/common/sub"
     And user "Alice" has uploaded file with content "ownCloud" to "/textfile0.txt"
-    And user "Alice" has shared folder "common" with group "grp1"
-    And user "Alice" has shared file "textfile0.txt" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | common   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     And user "Alice" has moved file "/textfile0.txt" to "/common/textfile0.txt"
     And user "Alice" has moved file "/common/textfile0.txt" to "/common/sub/textfile0.txt"
     When user "Carol" uploads file "filesForUpload/file_to_overwrite.txt" to "/Shares/textfile0.txt" using the WebDAV API
@@ -531,8 +575,18 @@ Feature: sharing
       | Brian    |
       | Carol    |
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Alice" has shared file "textfile0.txt" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     And user "Brian" has been deleted
     When user "Alice" gets all the shares of the file "textfile0.txt" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -550,7 +604,12 @@ Feature: sharing
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/Folder1"
     And user "Alice" has created folder "/Folder2"
-    And user "Alice" has shared folder "/Folder1" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | Folder1  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     And user "Alice" has moved file "/Folder2" to "/renamedFolder2"
     When user "Alice" shares folder "/renamedFolder2" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -578,7 +637,12 @@ Feature: sharing
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | File Editor   |
     When user "Alice" shares file "textfile0.txt" with group "grp1" using the sharing API
     Then the HTTP status code should be "<http-status>"
     And the OCS status code should be "403"

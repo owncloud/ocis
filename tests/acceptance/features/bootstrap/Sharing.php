@@ -1690,9 +1690,9 @@ trait Sharing {
 			$shareId = (string) $this->getLastCreatedPublicShare()->id;
 		} else {
 			if ($sharer === null) {
-				$shareId = $this->getLastCreatedUserGroupShareId();
+				$shareId = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 			} else {
-				$shareId = $this->getLastCreatedUserGroupShareId($sharer);
+				$shareId = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId($sharer);
 			}
 		}
 		$url = $this->getSharesEndpointPath("/$shareId");

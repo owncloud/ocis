@@ -14,9 +14,15 @@ Feature: sharing
   @issue-7555
   Scenario Outline: delete all group shares
     Given using OCS API version "<ocs-api-version>"
+    And using SharingNG
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has shared file "textfile0.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | File Editor   |
     And user "Brian" has moved file "/Shares/textfile0.txt" to "/Shares/anotherName.txt"
     When user "Alice" deletes the last share using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -32,7 +38,13 @@ Feature: sharing
   @smokeTest
   Scenario Outline: delete a share
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Alice" deletes the last share using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -48,7 +60,12 @@ Feature: sharing
     Given using OCS API version "1"
     And user "Alice" has created folder "/common"
     And user "Alice" has created folder "/common/sub"
-    And user "Alice" has shared folder "/common/sub" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | /common/sub |
+      | space           | Personal    |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | Viewer      |
     When user "Alice" deletes folder "/common" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Brian" folder "/Shares/sub" should not exist
@@ -59,7 +76,12 @@ Feature: sharing
     Given using OCS API version "1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
-    And user "Alice" has shared folder "/shared" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | shared   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" deletes file "/Shares/shared/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Brian" file "/Shares/shared/shared_file.txt" should not exist
@@ -73,7 +95,12 @@ Feature: sharing
     And user "Alice" has created folder "/shared"
     And user "Alice" has created folder "/shared/sub"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/sub/shared_file.txt"
-    And user "Alice" has shared folder "/shared" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | shared   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" deletes folder "/Shares/shared/sub" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Brian" folder "/Shares/shared/sub" should not exist
@@ -93,7 +120,12 @@ Feature: sharing
     And user "Carol" has been added to group "grp1"
     And user "Carol" has created folder "PARENT"
     And user "Carol" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
-    And user "Carol" has shared file "/PARENT/parent.txt" with group "grp1"
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | /PARENT/parent.txt |
+      | space           | Personal           |
+      | sharee          | grp1               |
+      | shareType       | group              |
+      | permissionsRole | Viewer             |
     And user "Carol" has stored etag of element "/PARENT"
     And user "Brian" has stored etag of element "/"
     And user "Brian" has stored etag of element "/Shares"
@@ -108,7 +140,12 @@ Feature: sharing
     Given using OCS API version "1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
-    And user "Alice" has shared folder "shared" with user "Brian" with permissions "read"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | shared   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" deletes file "/Shares/shared/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/shared/shared_file.txt" should exist
@@ -119,7 +156,12 @@ Feature: sharing
     Given using OCS API version "1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
-    And user "Alice" has shared folder "shared" with user "Brian" with permissions "create"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | shared   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Uploader |
     When user "Brian" deletes file "/Shares/shared/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/shared/shared_file.txt" should exist
@@ -130,7 +172,12 @@ Feature: sharing
   Scenario: sharee of an upload-only shared folder tries to delete their file in the folder
     Given using OCS API version "1"
     And user "Alice" has created folder "/shared"
-    And user "Alice" has shared folder "shared" with user "Brian" with permissions "create"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | shared   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Uploader |
     And user "Brian" has uploaded file "filesForUpload/textfile.txt" to "/Shares/shared/textfile.txt"
     When user "Brian" deletes file "/Shares/shared/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
@@ -149,7 +196,12 @@ Feature: sharing
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
-    And user "Alice" has shared entry "<entry-to-share>" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <entry-to-share>  |
+      | space           | Personal          |
+      | sharee          | grp1              |
+      | shareType       | group             |
+      | permissionsRole | <permission-role> |
     When user "Brian" deletes the last share of user "Alice" using the sharing API
     Then the OCS status code should be "404"
     And the HTTP status code should be "<http-status-code>"
@@ -157,11 +209,11 @@ Feature: sharing
     And as "Brian" entry "<received-entry>" should exist
     And as "Carol" entry "<received-entry>" should exist
     Examples:
-      | entry-to-share          | ocs-api-version | http-status-code | received-entry          |
-      | /shared/shared_file.txt | 1               | 200              | /Shares/shared_file.txt |
-      | /shared/shared_file.txt | 2               | 404              | /Shares/shared_file.txt |
-      | /shared                 | 1               | 200              | /Shares/shared          |
-      | /shared                 | 2               | 404              | /Shares/shared          |
+      | entry-to-share          | permission-role | ocs-api-version | http-status-code | received-entry          |
+      | /shared/shared_file.txt | File Editor     | 1               | 200              | /Shares/shared_file.txt |
+      | /shared/shared_file.txt | File Editor     | 2               | 404              | /Shares/shared_file.txt |
+      | /shared                 | Editor          | 1               | 200              | /Shares/shared          |
+      | /shared                 | Editor          | 2               | 404              | /Shares/shared          |
 
 
   Scenario Outline: individual share recipient tries to delete the share
@@ -169,22 +221,34 @@ Feature: sharing
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
     And user "Alice" has shared entry "<entry-to-share>" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <entry-to-share>  |
+      | space           | Personal          |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | <permission-role> |
     When user "Brian" deletes the last share of user "Alice" using the sharing API
     Then the OCS status code should be "404"
     And the HTTP status code should be "<http-status-code>"
     And as "Alice" entry "<entry-to-share>" should exist
     And as "Brian" entry "<received-entry>" should exist
     Examples:
-      | entry-to-share          | ocs-api-version | http-status-code | received-entry          |
-      | /shared/shared_file.txt | 1               | 200              | /Shares/shared_file.txt |
-      | /shared/shared_file.txt | 2               | 404              | /Shares/shared_file.txt |
-      | /shared                 | 1               | 200              | /Shares/shared          |
-      | /shared                 | 2               | 404              | /Shares/shared          |
+      | entry-to-share          | permission-role | ocs-api-version | http-status-code | received-entry          |
+      | /shared/shared_file.txt | File Editor     | 1               | 200              | /Shares/shared_file.txt |
+      | /shared/shared_file.txt | File Editor     | 2               | 404              | /Shares/shared_file.txt |
+      | /shared                 | Editor          | 1               | 200              | /Shares/shared          |
+      | /shared                 | Editor          | 2               | 404              | /Shares/shared          |
 
   @issue-720
   Scenario Outline: request PROPFIND after sharer deletes the collaborator
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Alice" deletes the last share using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -198,7 +262,13 @@ Feature: sharing
   @issue-1229
   Scenario Outline: delete a share with wrong authentication
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Brian" tries to delete the last share of user "Alice" using the sharing API
     Then the OCS status code should be "404"
     And the HTTP status code should be "<http-status-code>"
@@ -210,7 +280,12 @@ Feature: sharing
 
   Scenario Outline: unshare a shared resources
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Alice" unshares file "textfile0.txt" shared to "Brian"
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
