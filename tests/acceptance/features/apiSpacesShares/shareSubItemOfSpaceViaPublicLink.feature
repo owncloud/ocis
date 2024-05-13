@@ -67,9 +67,11 @@ Feature: Share a file or folder that is inside a space via public link
 
   @issue-5139
   Scenario Outline: user participant of the project space with space manager role can share an entity inside project space via public link
-    Given user "Alice" has shared a space "share sub-item" with settings:
-      | shareWith | Brian   |
-      | role      | manager |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | share sub-item |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | Manager        |
     When user "Brian" creates a public link share inside of space "share sub-item" with settings:
       | path        | <resource>               |
       | shareType   | 3                        |
@@ -97,9 +99,11 @@ Feature: Share a file or folder that is inside a space via public link
 
   @skipOnRevaMaster
   Scenario Outline: user participant of the project space without space manager role cannot share an entity inside project space via public link
-    Given user "Alice" has shared a space "share sub-item" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | share sub-item |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | <space-role>   |
     When user "Brian" creates a public link share inside of space "share sub-item" with settings:
       | path        | <resource>               |
       | shareType   | 3                        |
@@ -111,11 +115,11 @@ Feature: Share a file or folder that is inside a space via public link
     And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     Examples:
-      | resource        | space-role |
-      | folder          | editor     |
-      | folder          | viewer     |
-      | folder/file.txt | editor     |
-      | folder/file.txt | viewer     |
+      | resource        | space-role   |
+      | folder          | Space Editor |
+      | folder          | Space Viewer |
+      | folder/file.txt | Space Editor |
+      | folder/file.txt | Space Viewer |
 
 
   Scenario Outline: user creates a new public link share of a file inside the personal space with edit permissions
@@ -147,9 +151,11 @@ Feature: Share a file or folder that is inside a space via public link
 
   @issue-5139
   Scenario Outline: user participant of the project space can see the created public resources link
-    Given user "Alice" has shared a space "share sub-item" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | share sub-item |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | <space-role>   |
     When user "Alice" creates a public link share inside of space "share sub-item" with settings:
       | path        | folder/file.txt |
       | shareType   | 3               |
@@ -169,7 +175,7 @@ Feature: Share a file or folder that is inside a space via public link
       | space_id               | %space_id%       |
     And for user "Brian" the space "share sub-item" should contain the last created public link of the file "folder/file.txt"
     Examples:
-      | space-role |
-      | editor     |
-      | viewer     |
-      | manager    |
+      | space-role   |
+      | Space Editor |
+      | Space Viewer |
+      | Manager      |
