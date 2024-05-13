@@ -12,12 +12,7 @@ The settings service is currently used for managing the:
 
 As an example, user profile settings that can be changed in the Web UI must be persistent.
 
-The settings service supports two different backends for persisting the data. The backend can be set via the `SETTINGS_STORE_TYPE` environment variable. Supported values are:
-
-*   `metadata`: The default. This backend persists the settings data via the `storage-system` service.
-*   `filesystem`: (deprecated) This backend persists the settings data in a directory on the local filesystem.
-  The directory can be configured with `SETTINGS_DATA_PATH`. This backend is **not** suitable for running
-  multiple intances of the `settings` service in a scale-out deployment and was therefore deprecated.
+The settings service persists the settings data via the `storage-system` service.
 
 <!--- Note: The diagramm is outdate, leaving it here for a future rework
 The diagram shows how the settings service integrates into oCIS:
@@ -37,7 +32,7 @@ graph TD
 
 ## Caching
 
-When using `SETTINGS_STORE_TYPE=metadata`, the `settings` service caches the results of queries against the storage backend to provide faster responses. The content of this cache is independent of the cache used in the `storage-system` service as it caches directory listing and settings content stored in files.
+The `settings` service caches the results of queries against the storage backend to provide faster responses. The content of this cache is independent of the cache used in the `storage-system` service as it caches directory listing and settings content stored in files.
 
 The store used for the cache can be configured using the `SETTINGS_CACHE_STORE` environment variable. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
