@@ -27,28 +27,31 @@ var themeDefaults = KV{
 				"iconName": "eye",
 			},
 			unifiedrole.UnifiedRoleSpaceViewerID: KV{
-				"name":     "UnifiedRoleFileEditor",
-				"iconName": "pencil",
+				"label":    "UnifiedRoleSpaceViewer",
+				"iconName": "eye",
 			},
 			unifiedrole.UnifiedRoleFileEditorID: KV{
-				"name":     "UnifiedRoleEditor",
+				"label":    "UnifiedRoleFileEditor",
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleEditorID: KV{
-				"name":     "UnifiedRoleSpaceEditor",
+				"label":    "UnifiedRoleEditor",
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleSpaceEditorID: KV{
-				"name":     "UnifiedRoleManager",
+				"label":    "UnifiedRoleSpaceEditor",
+				"iconName": "pencil",
+			},
+			unifiedrole.UnifiedRoleManagerID: KV{
+				"label":    "UnifiedRoleManager",
 				"iconName": "user-star",
 			},
 			unifiedrole.UnifiedRoleUploaderID: KV{
-				"name":     "UnifiedRoleUploader",
+				"label":    "UnifiedRoleUploader",
 				"iconName": "upload",
 			},
-			// TBD
-			"aa97fe03-7980-45ac-9e50-b325749fd7e6": KV{
-				"name":     "UnifiedRoleSecureView",
+			unifiedrole.UnifiedRoleSecureViewerID: KV{
+				"label":    "UnifiedRoleSecureView",
 				"iconName": "shield",
 			},
 		},

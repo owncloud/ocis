@@ -7,8 +7,6 @@ import (
 	"dario.cat/mergo"
 	"github.com/spf13/afero"
 	"github.com/tidwall/sjson"
-
-	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 )
 
 // KV is a generic key-value map.
@@ -56,7 +54,7 @@ func PatchKV(v any, values KV) error {
 }
 
 // LoadKV loads a key-value map from the given file system.
-func LoadKV(fsys fsx.FS, p string) (KV, error) {
+func LoadKV(fsys afero.Fs, p string) (KV, error) {
 	f, err := fsys.Open(p)
 	if err != nil {
 		return nil, err
@@ -73,7 +71,7 @@ func LoadKV(fsys fsx.FS, p string) (KV, error) {
 }
 
 // WriteKV writes the given key-value map to the file system.
-func WriteKV(fsys fsx.FS, p string, kv KV) error {
+func WriteKV(fsys afero.Fs, p string, kv KV) error {
 	data, err := json.Marshal(kv)
 	if err != nil {
 		return err
@@ -83,7 +81,7 @@ func WriteKV(fsys fsx.FS, p string, kv KV) error {
 }
 
 // UpdateKV updates the key-value map at the given path with the given values.
-func UpdateKV(fsys fsx.FS, p string, values KV) error {
+func UpdateKV(fsys afero.Fs, p string, values KV) error {
 	var kv KV
 
 	existing, err := LoadKV(fsys, p)

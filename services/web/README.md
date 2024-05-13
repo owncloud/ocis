@@ -43,6 +43,31 @@ This feature is useful for organizations that want to provide third party or cus
 It's important to note that the feature at the moment is only capable of providing static (js, mjs, e.g.) web applications
 and does not support injection of dynamic web applications (custom dynamic backends).
 
+### Loading Themes
+
+Web themes are loaded, if added in the Infinite Scale source code, at build-time from
+`<ocis_repo>/services/web/assets/themes`.
+This cannot be manipulated at runtime.
+
+Additionally, the administrator can provide custom themes by storing it in the path defined by the environment
+variable `WEB_ASSET_THEMES_PATH`.
+
+This environment variable defaults to the Infinite Scale base data directory `$OCIS_BASE_DATA_PATH/web/assets/themes`,
+but can be redefined with any path set manually.
+
+Once the theme root directory is defined, the system needs to know which theme to use.
+This can be done by setting the `WEB_UI_THEME_PATH` environment variable.
+
+The final theme is composed of the built-in and the custom theme provided by the
+administrator via `WEB_ASSET_THEMES_PATH` and `WEB_UI_THEME_PATH`.
+
+For example, Infinite Scale by default contains a ownCloud theme,
+if the administrator then provides a custom theme via the `WEB_ASSET_THEMES_PATH` directory,
+the theme located at `WEB_ASSET_THEMES_PATH/owncloud/themes.json` will be used instead of the built-in one.
+
+Some theme keys are mandatory,
+for example, the `common.shareRoles` settings, such mandatory keys are injected automatically at runtime if not provided.
+
 ### Loading Applications
 
 Web applications are loaded, if added in the Infinite Scale source code, at build-time from
@@ -57,7 +82,7 @@ but can be redefined with any path set manually.
 The final list of available applications is composed of the built-in and the custom applications provided by the
 administrator via `WEB_ASSET_APPS_PATH`.
 
-For example, if Infinite Scale would contain a built-in extension named `image-viewer-dfx` and the administrator provides a custom application named `image-viewer-obj` via the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both
+For example, if Infinite Scale contains a built-in extension named `image-viewer-dfx` and the administrator provides a custom application named `image-viewer-obj` via the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both
 applications from the WebUI.
 
 ### Application Structure

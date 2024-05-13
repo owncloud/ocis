@@ -2,7 +2,6 @@ package theme
 
 import (
 	"encoding/json"
-	"io/fs"
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -50,7 +49,6 @@ func (o ServiceOptions) validate() error {
 
 // Service defines the http service.
 type Service struct {
-	coreFS          fs.FS
 	themeFS         *fsx.FallbackFS
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
