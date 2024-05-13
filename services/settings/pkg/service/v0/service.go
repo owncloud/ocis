@@ -17,7 +17,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
-	filestore "github.com/owncloud/ocis/v2/services/settings/pkg/store/filesystem"
 	metastore "github.com/owncloud/ocis/v2/services/settings/pkg/store/metadata"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
@@ -40,17 +39,7 @@ func NewService(cfg *config.Config, logger log.Logger) settings.ServiceHandler {
 		logger: logger,
 	}
 
-	switch cfg.StoreType {
-	default:
-		fallthrough
-	case "metadata":
-		service.manager = metastore.New(cfg)
-	case "filesystem":
-		fmt.Println("WARNING: filesystem store is deprecated and will be removed in the future. Please use metadata store instead.")
-		service.manager = filestore.New(cfg)
-		// TODO: if we want to further support filesystem store it should use default permissions from store/defaults/defaults.go instead using this duplicate
-		service.RegisterDefaultRoles()
-	}
+	service.manager = metastore.New(cfg)
 	return service
 }
 
@@ -99,45 +88,6 @@ func (g Service) CheckPermission(ctx context.Context, req *cs3permissions.CheckP
 	return &cs3permissions.CheckPermissionResponse{
 		Status: status.NewOK(ctx),
 	}, nil
-}
-
-// RegisterDefaultRoles composes default roles and saves them. Skipped if the roles already exist.
-func (g Service) RegisterDefaultRoles() {
-	// FIXME: we're writing default roles per service start (i.e. twice at the moment, for http and grpc server). has to happen only once.
-	for _, role := range generateBundlesDefaultRoles() {
-		bundleID := role.Extension + "." + role.Id
-		// check if the role already exists
-		bundle, _ := g.manager.ReadBundle(role.Id)
-		if bundle != nil {
-			g.logger.Debug().Str("bundleID", bundleID).Msg("bundle already exists. skipping.")
-			continue
-		}
-		// create the role
-		_, err := g.manager.WriteBundle(role)
-		if err != nil {
-			g.logger.Error().Err(err).Str("bundleID", bundleID).Msg("failed to register bundle")
-		}
-		g.logger.Debug().Str("bundleID", bundleID).Msg("successfully registered bundle")
-	}
-
-	for _, req := range generatePermissionRequests() {
-		_, err := g.manager.AddSettingToBundle(req.GetBundleId(), req.GetSetting())
-		if err != nil {
-			g.logger.Error().
-				Err(err).
-				Str("bundleID", req.GetBundleId()).
-				Interface("setting", req.GetSetting()).
-				Msg("failed to register permission")
-		}
-	}
-
-	if g.config.SetupDefaultAssignments {
-		for _, req := range g.defaultRoleAssignments() {
-			if _, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId); err != nil {
-				g.logger.Error().Err(err).Msg("failed to register role assignment")
-			}
-		}
-	}
 }
 
 // TODO: check permissions on every request

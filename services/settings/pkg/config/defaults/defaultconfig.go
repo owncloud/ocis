@@ -3,11 +3,9 @@ package defaults
 import (
 	"encoding/json"
 	"os"
-	"path"
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
 	rdefaults "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
@@ -49,8 +47,6 @@ func DefaultConfig() *config.Config {
 			Addr:      "127.0.0.1:9191",
 			Namespace: "com.owncloud.api",
 		},
-		StoreType:               "metadata", // use metadata or filesystem
-		DataPath:                path.Join(defaults.BaseDataPath(), "settings"),
 		SetupDefaultAssignments: false,
 		Metadata: config.Metadata{
 			GatewayAddress: "com.owncloud.api.storage-system",

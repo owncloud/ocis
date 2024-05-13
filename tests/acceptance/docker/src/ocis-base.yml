@@ -14,7 +14,6 @@ services:
       STORAGE_USERS_DRIVER_OCIS_ROOT: /srv/app/tmp/ocis/storage/users
       STORAGE_SYSTEM_DRIVER_OCIS_ROOT: /srv/app/tmp/ocis/storage/metadata
       SHARING_USER_JSON_FILE: /srv/app/tmp/ocis/shares.json
-      SETTINGS_DATA_PATH: "/srv/app/tmp/ocis/settings"
       PROXY_ENABLE_BASIC_AUTH: "true"
       WEB_UI_CONFIG_FILE: /drone/src/tests/config/drone/ocis-config.json
       ACCOUNTS_HASH_DIFFICULTY: 4
