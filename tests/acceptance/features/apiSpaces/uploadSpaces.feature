@@ -18,33 +18,37 @@ Feature: Upload files into a space
 
 
   Scenario Outline: user creates a folder in the space via the Graph API
-    Given user "Alice" has shared a space "Project Ceres" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | Project Ceres |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
     When user "Brian" creates a folder "mainFolder" in space "Project Ceres" using the WebDav Api
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" the space "Project Ceres" <should-or-not> contain these entries:
       | mainFolder |
     Examples:
-      | space-role | http-status-code | should-or-not |
-      | manager    | 201              | should        |
-      | editor     | 201              | should        |
-      | viewer     | 403              | should not    |
+      | space-role   | http-status-code | should-or-not |
+      | Manager      | 201              | should        |
+      | Space Editor | 201              | should        |
+      | Space Viewer | 403              | should not    |
 
 
   Scenario Outline: user uploads a file in shared space via the Graph API
-    Given user "Alice" has shared a space "Project Ceres" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | Project Ceres |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
     When user "Brian" uploads a file inside space "Project Ceres" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" the space "Project Ceres" <should-or-not> contain these entries:
       | test.txt |
     Examples:
-      | space-role | http-status-code | should-or-not |
-      | manager    | 201              | should        |
-      | editor     | 201              | should        |
-      | viewer     | 403              | should not    |
+      | space-role   | http-status-code | should-or-not |
+      | Manager      | 201              | should        |
+      | Space Editor | 201              | should        |
+      | Space Viewer | 403              | should not    |
 
 
   Scenario: user can create subfolders in a space via the Graph API
