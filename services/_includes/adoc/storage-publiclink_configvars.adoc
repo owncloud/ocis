@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-13-04-09-34]
+[#deprecation-note-2024-05-13-07-13-10]
 [caption=]
 .Deprecation notes for the storage-publiclink service
 [width="100%",cols="~,~,~,~",options="header"]
