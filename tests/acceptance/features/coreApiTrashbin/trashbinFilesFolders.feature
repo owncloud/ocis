@@ -376,12 +376,24 @@ Feature: files and folders exist in the trashbin after being deleted
       | !@tester$^.txt   |
       | %file *?2.txt    |
       | # %ab ab?=ed.txt |
+      | fo.              |
+      | fo.1             |
+      | fo...1..         |
+      | ...              |
+      | ..fo             |
+      | fo.xyz           |
     When user "Alice" deletes the following files
       | path             |
       | qa&dev.txt       |
       | !@tester$^.txt   |
       | %file *?2.txt    |
       | # %ab ab?=ed.txt |
+      | fo.              |
+      | fo.1             |
+      | fo...1..         |
+      | ...              |
+      | ..fo             |
+      | fo.xyz           |
     Then the HTTP status code of responses on all endpoints should be "204"
     And as "Alice" the following files should not exist
       | path             |
@@ -389,12 +401,24 @@ Feature: files and folders exist in the trashbin after being deleted
       | !@tester$^.txt   |
       | %file *?2.txt    |
       | # %ab ab?=ed.txt |
+      | fo.              |
+      | fo.1             |
+      | fo...1..         |
+      | ...              |
+      | ..fo             |
+      | fo.xyz           |
     But as "Alice" the files with following original paths should exist in the trashbin
       | path             |
       | qa&dev.txt       |
       | !@tester$^.txt   |
       | %file *?2.txt    |
       | # %ab ab?=ed.txt |
+      | fo.              |
+      | fo.1             |
+      | fo...1..         |
+      | ...              |
+      | ..fo             |
+      | fo.xyz           |
     Examples:
       | dav-path-version |
       | new              |
@@ -413,12 +437,24 @@ Feature: files and folders exist in the trashbin after being deleted
       | !@tester$^   |
       | %file *?2    |
       | # %ab ab?=ed |
+      | fo.          |
+      | fo.1         |
+      | fo...1..     |
+      | ...          |
+      | ..fo         |
+      | fo.xyz       |
     When user "Alice" deletes the following folders
       | path         |
       | qa&dev       |
       | !@tester$^   |
       | %file *?2    |
       | # %ab ab?=ed |
+      | fo.          |
+      | fo.1         |
+      | fo...1..     |
+      | ...          |
+      | ..fo         |
+      | fo.xyz       |
     Then the HTTP status code of responses on all endpoints should be "204"
     But as "Alice" the following folders should not exist
       | path         |
@@ -426,12 +462,24 @@ Feature: files and folders exist in the trashbin after being deleted
       | !@tester$^   |
       | %file *?2    |
       | # %ab ab?=ed |
+      | fo.          |
+      | fo.1         |
+      | fo...1..     |
+      | ...          |
+      | ..fo         |
+      | fo.xyz       |
     And as "Alice" the folders with following original paths should exist in the trashbin
       | path         |
       | qa&dev       |
       | !@tester$^   |
       | %file *?2    |
       | # %ab ab?=ed |
+      | fo.          |
+      | fo.1         |
+      | fo...1..     |
+      | ...          |
+      | ..fo         |
+      | fo.xyz       |
     Examples:
       | dav-path-version |
       | new              |

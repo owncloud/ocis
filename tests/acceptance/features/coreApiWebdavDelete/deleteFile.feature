@@ -103,6 +103,32 @@ Feature: delete file
       | spaces           | ",,,.,"        |
 
 
+  Scenario Outline: delete a file with special characters in the filename
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "special file" to <file-name>
+    When user "Alice" deletes file <file-name> using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" file <file-name> should not exist
+    Examples:
+      | dav-path-version | file-name      |
+      | old              | "'single'.txt" |
+      | old              | '"double".txt' |
+      | old              | "question?"    |
+      | old              | "&and#hash"    |
+      | new              | "'single'.txt" |
+      | new              | '"double".txt' |
+      | new              | "question?"    |
+      | new              | "&and#hash"    |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version | file-name      |
+      | spaces           | "'single'.txt" |
+      | spaces           | '"double".txt' |
+      | spaces           | "question?"    |
+      | spaces           | "&and#hash"    |
+
+
   Scenario Outline: delete a hidden file
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
