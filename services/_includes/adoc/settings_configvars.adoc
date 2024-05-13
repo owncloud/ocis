@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-13-12-49-39]
+[#deprecation-note-2024-05-13-12-52-58]
 [caption=]
 .Deprecation notes for the settings service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -235,24 +235,6 @@ a| [subs=-attributes]
 ++127.0.0.1:9191 ++
 a| [subs=-attributes]
 The bind address of the GRPC service.
-
-a|`SETTINGS_STORE_TYPE` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++metadata ++
-a| [subs=-attributes]
-Store type configures the persistency driver. Supported values are 'metadata' and 'filesystem'. Note that the value 'filesystem' is considered deprecated.
-
-a|`SETTINGS_DATA_PATH` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++/var/lib/ocis/settings ++
-a| [subs=-attributes]
-The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/settings.
 
 a|`STORAGE_GATEWAY_GRPC_ADDR` +
 
