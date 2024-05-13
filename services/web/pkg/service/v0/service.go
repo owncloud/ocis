@@ -31,8 +31,8 @@ var ErrConfigInvalid = `Invalid or missing config`
 
 // Service defines the service handlers.
 type Service interface {
-	ServeHTTP(http.ResponseWriter, *http.Request)
-	Config(http.ResponseWriter, *http.Request)
+	ServeHTTP(w http.ResponseWriter, r *http.Request)
+	Config(w http.ResponseWriter, r *http.Request)
 }
 
 // NewService returns a service implementation for Service.

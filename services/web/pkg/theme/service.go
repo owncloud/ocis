@@ -59,10 +59,7 @@ func NewService(options ServiceOptions) (Service, error) {
 		return Service{}, err
 	}
 
-	return Service{
-		themeFS:         options.themeFS,
-		gatewaySelector: options.gatewaySelector,
-	}, nil
+	return Service(options), nil
 }
 
 // Get renders the theme, the theme is a merge of the default theme, the base theme, and the branding theme.
