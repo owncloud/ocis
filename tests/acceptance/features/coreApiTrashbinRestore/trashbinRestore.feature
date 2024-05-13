@@ -187,10 +187,10 @@ Feature: restore deleted files/folders
     And the content of file "<file-name>" for user "Alice" should be "file original content"
     Examples:
       | dav-path-version | file-name               |
-      | old              | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️ |
-      | new              | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️ |
-      | old              | strängé नेपाली file     |
-      | new              | strängé नेपाली file     |
+      | old              | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️    |
+      | new              | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️    |
+      | old              | strängé नेपाली file       |
+      | new              | strängé नेपाली file       |
       | old              | sample,1.txt            |
       | new              | sample,1.txt            |
 
@@ -352,18 +352,21 @@ Feature: restore deleted files/folders
       | !@tester$^   |
       | %file *?2    |
       | # %ab ab?=ed |
+      | Folder,Comma |
     And user "Alice" has deleted the following folders
       | path         |
       | qa&dev       |
       | !@tester$^   |
       | %file *?2    |
       | # %ab ab?=ed |
+      | Folder,Comma |
     When user "Alice" restores the following folders with original path
       | path         |
       | qa&dev       |
       | !@tester$^   |
       | %file *?2    |
       | # %ab ab?=ed |
+      | Folder,Comma |
     Then the HTTP status code of responses on all endpoints should be "201"
     And as "Alice" the folders with following original paths should not exist in the trashbin
       | path         |
@@ -371,12 +374,14 @@ Feature: restore deleted files/folders
       | !@tester$^   |
       | %file *?2    |
       | # %ab ab?=ed |
+      | Folder,Comma |
     But as "Alice" the following folders should exist
       | path         |
       | qa&dev       |
       | !@tester$^   |
       | %file *?2    |
       | # %ab ab?=ed |
+      | Folder,Comma |
     Examples:
       | dav-path-version |
       | old              |
@@ -389,7 +394,7 @@ Feature: restore deleted files/folders
     And user "Alice" has created folder "/parent_folder/sub"
     And user "Alice" has uploaded file with content "parent text" to "/parent_folder/sub/parent.txt"
     And user "Alice" has deleted folder "parent_folder"
-    When user "Alice" restores the folder with original path "/parent_folder/sub/parent.txt" to "parent.txt" using the trashbin API
+    When user "Alice" restores the file with original path "/parent_folder/sub/parent.txt" to "parent.txt" using the trashbin API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Alice"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
@@ -407,7 +412,7 @@ Feature: restore deleted files/folders
     And user "Alice" has created folder "/parent_folder/sub"
     And user "Alice" has uploaded file with content "parent text" to "/parent_folder/sub/parent.txt"
     And user "Alice" has deleted folder "parent_folder"
-    When user "Alice" restores the folder with original path "/parent_folder/sub/parent.txt" to "/parent_folder/sub/parent.txt" using the trashbin API
+    When user "Alice" restores the file with original path "/parent_folder/sub/parent.txt" to "/parent_folder/sub/parent.txt" using the trashbin API
     Then the HTTP status code should be "409"
     And as "Alice" the file with original path "/parent_folder/sub/parent.txt" should exist in the trashbin
     And user "Alice" should not see the following elements
@@ -428,7 +433,7 @@ Feature: restore deleted files/folders
     And user "Alice" has deleted folder "parent_folder"
     And user "Alice" has created folder "/parent_folder"
     And user "Alice" has created folder "/parent_folder/sub"
-    When user "Alice" restores the folder with original path "/parent_folder/sub/parent.txt" using the trashbin API
+    When user "Alice" restores the file with original path "/parent_folder/sub/parent.txt" using the trashbin API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Alice"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
@@ -450,7 +455,7 @@ Feature: restore deleted files/folders
     And user "Alice" has created folder "/parent_folder/sub"
     And user "Alice" has uploaded file with content "parent text" to "/parent_folder/sub/parent.txt"
     And user "Alice" has deleted folder "parent_folder"
-    When user "Alice" restores the folder with original path "/parent_folder/sub/parent.txt" without specifying the destination using the trashbin API
+    When user "Alice" restores the file with original path "/parent_folder/sub/parent.txt" without specifying the destination using the trashbin API
     Then the HTTP status code should be "400"
     And as "Alice" the file with original path "/parent_folder/sub/parent.txt" should exist in the trashbin
     And user "Alice" should not see the following elements
@@ -467,7 +472,7 @@ Feature: restore deleted files/folders
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "parent text" to "/parent.txt"
     And user "Alice" has deleted file "parent.txt"
-    When user "Alice" restores the folder with original path "parent.txt" without specifying the destination using the trashbin API
+    When user "Alice" restores the file with original path "parent.txt" without specifying the destination using the trashbin API
     Then the HTTP status code should be "400"
     And as "Alice" the file with original path "parent.txt" should exist in the trashbin
     And user "Alice" should not see the following elements
@@ -526,6 +531,38 @@ Feature: restore deleted files/folders
       | /..fo     |
       | /fo.xyz   |
       | /fo.exe   |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+
+  Scenario Outline: restore deleted file when folder with same name exists
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "lorem epsum" to "same-name.txt"
+    And user "Alice" has deleted file "same-name.txt"
+    And user "Alice" has created folder "same-name.txt"
+    When user "Alice" restores the file with original path "same-name.txt" using the trashbin API
+    Then the HTTP status code should be "204"
+    And the content of file "same-name.txt" for user "Alice" should be "lorem epsum"
+    And as "Alice" folder "same-name.txt" should not exist
+    And as "Alice" the folder with original path "same-name.txt" should exist in the trashbin
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+
+  Scenario Outline: restore deleted folder when file with same name exists
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "same-name.txt"
+    And user "Alice" has deleted folder "same-name.txt"
+    And user "Alice" has uploaded file with content "lorem epsum" to "same-name.txt"
+    When user "Alice" restores the folder with original path "same-name.txt" using the trashbin API
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "same-name.txt" should exist
+    And as "Alice" file "same-name.txt" should not exist
+    And as "Alice" the file with original path "same-name.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
       | old              |

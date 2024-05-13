@@ -850,7 +850,7 @@ class TrashbinContext implements Context {
 	}
 
 	/**
-	 * @When user :user restores the folder with original path :originalPath without specifying the destination using the trashbin API
+	 * @When user :user restores the folder/file with original path :originalPath without specifying the destination using the trashbin API
 	 *
 	 * @param $user string
 	 * @param $originalPath string
