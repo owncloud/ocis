@@ -29,7 +29,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.TLSConfig(options.Config.HTTP.TLS),
 		http.Logger(options.Logger),
 		http.Namespace(options.Config.HTTP.Namespace),
-		http.Name("userlog"),
+		http.Name(options.Config.Service.Name),
 		http.Version(version.GetString()),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
@@ -46,7 +46,7 @@ func Server(opts ...Option) (http.Service, error) {
 	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
 		chimiddleware.RequestID,
 		middleware.Version(
-			"userlog",
+			options.Config.Service.Name,
 			version.GetString(),
 		),
 		middleware.Logger(

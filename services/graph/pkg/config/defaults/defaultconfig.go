@@ -28,7 +28,7 @@ func DefaultConfig() *config.Config {
 		},
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9120",
-			Namespace: "com.owncloud.graph",
+			Namespace: "com.owncloud.web",
 			Root:      "/graph",
 			CORS: config.CORS{
 				AllowedOrigins:   []string{"*"},

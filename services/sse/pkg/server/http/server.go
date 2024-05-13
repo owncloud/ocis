@@ -47,7 +47,7 @@ func Server(opts ...Option) (http.Service, error) {
 	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
 		chimiddleware.RequestID,
 		middleware.Version(
-			"userlog",
+			options.Config.Service.Name,
 			version.GetString(),
 		),
 		middleware.Logger(

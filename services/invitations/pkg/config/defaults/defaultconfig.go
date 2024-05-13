@@ -24,7 +24,7 @@ func DefaultConfig() *config.Config {
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:0", // :0 to pick any free local port
 			Root:      "/graph/v1.0",
-			Namespace: "com.owncloud.graph",
+			Namespace: "com.owncloud.web",
 			CORS: config.CORS{
 				AllowedOrigins: []string{"https://localhost:9200"},
 			},

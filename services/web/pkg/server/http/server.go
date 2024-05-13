@@ -86,7 +86,7 @@ func Server(opts ...Option) (http.Service, error) {
 			middleware.NoCache,
 			webmid.SilentRefresh,
 			middleware.Version(
-				"web",
+				options.Config.Service.Name,
 				version.GetString(),
 			),
 			middleware.Logger(

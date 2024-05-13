@@ -142,7 +142,7 @@ func DefaultPolicies() []config.Policy {
 				{
 					// reroute oc10 notifications endpoint to userlog service
 					Endpoint: "/ocs/v2.php/apps/notifications/api/v1/notifications",
-					Service:  "com.owncloud.userlog.userlog",
+					Service:  "com.owncloud.web.userlog",
 				},
 				{
 					Type:     config.RegexRoute,
@@ -238,11 +238,11 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint: "/graph/v1.0/invitations",
-					Service:  "com.owncloud.graph.invitations",
+					Service:  "com.owncloud.web.invitations",
 				},
 				{
 					Endpoint: "/graph/",
-					Service:  "com.owncloud.graph.graph",
+					Service:  "com.owncloud.web.graph",
 				},
 				{
 					Endpoint: "/api/v0/settings",
