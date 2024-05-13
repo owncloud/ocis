@@ -45,10 +45,19 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Update reva to v2.19.7: [#9011](https://github.com/owncloud/ocis/pull/9011)
 * Bugfix - Service startup of WOPI example: [#9127](https://github.com/owncloud/ocis/pull/9127)
 * Bugfix - Nats reconnects: [#9139](https://github.com/owncloud/ocis/pull/9139)
 
 ## Details
+
+* Bugfix - Update reva to v2.19.7: [#9011](https://github.com/owncloud/ocis/pull/9011)
+
+   We updated reva to v2.19.7
+
+  *   Enhancement [cs3org/reva#4673](https://github.com/cs3org/reva/pull/4673): Add virus filter to list uploads sessions
+
+   https://github.com/owncloud/ocis/pull/9011
 
 * Bugfix - Service startup of WOPI example: [#9127](https://github.com/owncloud/ocis/pull/9127)
 
