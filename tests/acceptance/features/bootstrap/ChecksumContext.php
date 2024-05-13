@@ -358,8 +358,8 @@ class ChecksumContext implements Context {
 	 * @throws Exception
 	 */
 	public function theHeaderChecksumWhenUserDownloadsFileUsingTheWebdavApiShouldMatch(string $user, string $fileName, string $expectedChecksum):void {
-		$this->featureContext->userDownloadsFileUsingTheAPI($user, $fileName);
-		$headerChecksums = $this->featureContext->getResponse()->getHeader('OC-Checksum');
+		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName);
+		$headerChecksums = $response->getHeader('OC-Checksum');
 
 		Assert::assertIsArray(
 			$headerChecksums,
