@@ -86,4 +86,5 @@ type UploadSessionFilter struct {
 	ID         *string
 	Processing *bool
 	Expired    *bool
+	HasVirus   *bool
 }

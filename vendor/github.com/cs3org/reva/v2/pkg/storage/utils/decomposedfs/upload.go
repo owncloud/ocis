@@ -376,6 +376,13 @@ func (fs *Decomposedfs) ListUploadSessions(ctx context.Context, filter storage.U
 				}
 			}
 		}
+		if filter.HasVirus != nil {
+			sr, _ := session.ScanData()
+			infected := sr != ""
+			if *filter.HasVirus != infected {
+				continue
+			}
+		}
 		filteredSessions = append(filteredSessions, session)
 	}
 	return filteredSessions, nil
