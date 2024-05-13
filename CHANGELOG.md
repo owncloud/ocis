@@ -46,6 +46,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Service startup of WOPI example: [#9127](https://github.com/owncloud/ocis/pull/9127)
+* Bugfix - Nats reconnects: [#9139](https://github.com/owncloud/ocis/pull/9139)
 
 ## Details
 
@@ -55,6 +56,13 @@ The following sections list the changes for unreleased.
    ocis_wopi deployment example.
 
    https://github.com/owncloud/ocis/pull/9127
+
+* Bugfix - Nats reconnects: [#9139](https://github.com/owncloud/ocis/pull/9139)
+
+   We fixed the reconnect handling of the natjs kv registry.
+
+   https://github.com/owncloud/ocis/pull/9139
+   https://github.com/owncloud/ocis/pull/8880
 
 # Changelog for [5.0.3] (2024-05-02)
 
