@@ -2244,7 +2244,8 @@ class SpacesContext implements Context {
 			$this->featureContext->getStepLineRef()
 		);
 		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
-		$this->featureContext->addToCreatedPublicShares($responseXml->data);
+		$sharer = (string) $responseXml->data->uid_owner;
+		$this->featureContext->addToCreatedUserGroupshares($sharer, $responseXml->data);
 		return $response;
 	}
 
@@ -2314,7 +2315,7 @@ class SpacesContext implements Context {
 	 * @throws JsonException
 	 */
 	public function updateSharedResource(string $user, array $rows):ResponseInterface {
-		$shareId = (string) $this->featureContext->getLastCreatedPublicShare()->id;
+		$shareId = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedUserGroupShareID() : $this->featureContext->getLastCreatedUserGroupShareId();
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl . '/' . $shareId;
 		return  HttpRequestHelper::sendRequest(
 			$fullUrl,
@@ -2328,17 +2329,44 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" expires the last share$/
+	 * @When user :user expires the last share of resource :resource inside of the space :spaceName
 	 *
 	 * @param string $user
+	 * @param string $resource
+	 * @param string $spaceName
 	 *
 	 * @return void
+	 * @throws GuzzleException|JsonException
 	 */
-	public function userExpiresLastResourceShare(string $user): void {
+	public function userExpiresTheLastShareOfResourceInsideOfTheSpace(string $user, string $resource, string $spaceName): void {
 		$dateTime = new DateTime('yesterday');
 		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
-		$rows['permissions'] = (string) $this->featureContext->getLastCreatedPublicShare()->permissions;
-		$this->featureContext->setResponse($this->updateSharedResource($user, $rows));
+		if ($this->featureContext->isUsingSharingNG()) {
+			if (!\in_array($spaceName, ['Personal', 'Shares'])) {
+				$space = $this->getSpaceByName($user, $spaceName);
+				$itemId = $this->getResourceId($user, $spaceName, $resource);
+			} else {
+				$space = $this->getCreatedSpace($spaceName);
+				$itemId = $space['fileId'];
+			}
+			$body['expirationDateTime'] = $rows['expireDate'];
+			$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+			$this->featureContext->setResponse(
+				GraphHelper::updateShare(
+					$this->featureContext->getBaseUrl(),
+					$this->featureContext->getStepLineRef(),
+					$user,
+					$this->featureContext->getPasswordForUser($user),
+					$space["id"],
+					$itemId,
+					\json_encode($body),
+					$permissionID
+				)
+			);
+		} else {
+			$rows['permissions'] = (string)$this->featureContext->getLastCreatedUserGroupShare()->permissions;
+			$this->featureContext->setResponse($this->updateSharedResource($user, $rows));
+		}
 	}
 
 	/**
@@ -3410,12 +3438,12 @@ class SpacesContext implements Context {
 
 	/**
 	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain the last created public link$/
-	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain the last created public link of the file "([^"]*)"$/
-	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain the last created share of the file "([^"]*)"$/
+	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain the last created (public link|share) of the file "([^"]*)"$/
 	 *
 	 * @param string    $user
 	 * @param string    $spaceName
 	 * @param string    $shouldOrNot   (not|)
+	 * @param string    $shareType
 	 * @param string    $fileName
 	 *
 	 * @return void
@@ -3426,6 +3454,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $shouldOrNot,
+		string $shareType = 'public link',
 		string $fileName = ''
 	): void {
 		if (!empty($fileName)) {
@@ -3449,8 +3478,13 @@ class SpacesContext implements Context {
 		if ($should) {
 			Assert::assertNotEmpty($responseArray, __METHOD__ . ' Response should contain a link, but it is empty');
 			foreach ($responseArray as $element) {
-				$expectedLinkId = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareID() : (string) $this->featureContext->getLastCreatedPublicShare()->id;
-				Assert::assertEquals($element["id"], $expectedLinkId, "link IDs are different");
+				if ($shareType === 'public link') {
+					$expectedLinkId = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareID() : (string) $this->featureContext->getLastCreatedPublicShare()->id;
+					Assert::assertEquals($element["id"], $expectedLinkId, "link IDs are different");
+				} else {
+					$expectedShareId = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedUserGroupShareID() : (string)$this->featureContext->getLastCreatedUserGroupShareId();
+					Assert::assertEquals($element["id"], $expectedShareId, "share IDs are different");
+				}
 			}
 		} else {
 			Assert::assertEmpty($responseArray, __METHOD__ . ' Response should be empty');
