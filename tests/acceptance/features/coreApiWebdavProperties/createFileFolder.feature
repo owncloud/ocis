@@ -10,39 +10,48 @@ Feature: create files and folder
 
   Scenario Outline: create a folder
     Given using <dav-path-version> DAV path
-    When user "Alice" creates folder "<folder-name>" using the WebDAV API
+    When user "Alice" creates folder <folder-name> using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Alice" folder "<folder-name>" should exist
+    And as "Alice" folder <folder-name> should exist
     Examples:
       | dav-path-version | folder-name     |
-      | old              | /upload         |
-      | old              | /strängé folder |
-      | old              | /C++ folder.cpp |
-      | old              | /नेपाली         |
-      | old              | /folder #2      |
-      | old              | /folder ?2      |
-      | old              | /😀 🤖          |
-      | old              | /new&folder     |
-      | new              | /upload         |
-      | new              | /strängé folder |
-      | new              | /C++ folder.cpp |
-      | new              | /नेपाली         |
-      | new              | /folder #2      |
-      | new              | /folder ?2      |
-      | new              | /😀 🤖          |
-      | new              | /new&folder     |
+      | old              | "upload"         |
+      | old              | "strängé folder" |
+      | old              | "C++ folder.cpp" |
+      | old              | "नेपाली"           |
+      | old              | "folder #2"      |
+      | old              | "folder ?2"      |
+      | old              | "😀 🤖"          |
+      | old              | "new&folder"     |
+      | old              | "Sample,comma"   |
+      | old              | "'single'"       |
+      | old              | '"double"'       |
+      | new              | "upload"         |
+      | new              | "strängé folder" |
+      | new              | "C++ folder.cpp" |
+      | new              | "नेपाली"           |
+      | new              | "folder #2"      |
+      | new              | "folder ?2"      |
+      | new              | "😀 🤖"          |
+      | new              | "new&folder"     |
+      | new              | "Sample,comma"   |
+      | new              | "'single'"       |
+      | new              | '"double"'       |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder-name     |
-      | spaces           | /upload         |
-      | spaces           | /strängé folder |
-      | spaces           | /C++ folder.cpp |
-      | spaces           | /नेपाली         |
-      | spaces           | /folder #2      |
-      | spaces           | /folder ?2      |
-      | spaces           | /😀 🤖          |
-      | spaces           | /new&folder     |
+      | dav-path-version | folder-name      |
+      | spaces           | "upload"         |
+      | spaces           | "strängé folder" |
+      | spaces           | "C++ folder.cpp" |
+      | spaces           | "नेपाली"           |
+      | spaces           | "folder #2"      |
+      | spaces           | "folder ?2"      |
+      | spaces           | "😀 🤖"          |
+      | spaces           | "new&folder"     |
+      | spaces           | "Sample,comma"   |
+      | spaces           | "'single'"       |
+      | spaces           | '"double"'       |
 
   @smokeTest
   Scenario Outline: get resourcetype property of a folder
@@ -143,37 +152,154 @@ Feature: create files and folder
 
   Scenario Outline: create a file
     Given using <dav-path-version> DAV path
-    When user "Alice" uploads file with content "some text" to "<file-name>" using the WebDAV API
+    When user "Alice" uploads file with content "some text" to <file-name> using the WebDAV API
     Then the HTTP status code should be "201"
-    And as "Alice" file "<file-name>" should exist
-    And the content of file "<file-name>" for user "Alice" should be "some text"
+    And as "Alice" file <file-name> should exist
+    And the content of file <file-name> for user "Alice" should be "some text"
     Examples:
-      | dav-path-version | file-name        |
-      | old              | /upload.txt      |
-      | old              | /strängéfile.txt |
-      | old              | /C++ file.cpp    |
-      | old              | /नेपाली          |
-      | old              | /file #2.txt     |
-      | old              | /file ?2.pdf     |
-      | old              | /😀 🤖.txt       |
-      | old              | /new&file.txt    |
-      | new              | /upload.txt      |
-      | new              | /strängéfile.txt |
-      | new              | /C++ file.cpp    |
-      | new              | /नेपाली          |
-      | new              | /file #2.txt     |
-      | new              | /file ?2.pdf     |
-      | new              | /😀 🤖.txt       |
-      | new              | /new&file.txt    |
+      | dav-path-version | file-name          |
+      | old              | "upload.txt"       |
+      | old              | "strängéfile.txt"  |
+      | old              | "C++ file.cpp"     |
+      | old              | "नेपाली"             |
+      | old              | "file #2.txt"      |
+      | old              | "file ?2.pdf"      |
+      | old              | "😀 🤖.txt"        |
+      | old              | "new&file.txt"     |
+      | old              | "Sample,comma.txt" |
+      | old              | "'single'.txt"     |
+      | old              | '"double".txt'     |
+      | new              | "upload.txt"       |
+      | new              | "strängéfile.txt"  |
+      | new              | "C++ file.cpp"     |
+      | new              | "नेपाली"             |
+      | new              | "file #2.txt"      |
+      | new              | "file ?2.pdf"      |
+      | new              | "😀 🤖.txt"        |
+      | new              | "new&file.txt"     |
+      | new              | "Sample,comma.txt" |
+      | new              | "'single'.txt"     |
+      | new              | '"double".txt'     |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file-name        |
-      | spaces           | /upload.txt      |
-      | spaces           | /strängéfile.txt |
-      | spaces           | /C++ file.cpp    |
-      | spaces           | /नेपाली          |
-      | spaces           | /file #2.txt     |
-      | spaces           | /file ?2.pdf     |
-      | spaces           | /😀 🤖.txt       |
-      | spaces           | /new&file.txt    |
+      | dav-path-version | file-name          |
+      | spaces           | "upload.txt"       |
+      | spaces           | "strängéfile.txt"  |
+      | spaces           | "C++ file.cpp"     |
+      | spaces           | "नेपाली"             |
+      | spaces           | "file #2.txt"      |
+      | spaces           | "file ?2.pdf"      |
+      | spaces           | "😀 🤖.txt"        |
+      | spaces           | "new&file.txt"     |
+      | spaces           | "Sample,comma.txt" |
+      | spaces           | "'single'.txt"     |
+      | spaces           | '"double".txt'     |
+
+
+  Scenario Outline: try to create file and folder with . and ..
+    Given using <dav-path-version> DAV path
+    When user "Alice" creates folder "<file-name>" using the WebDAV API
+    Then the HTTP status code should be "<http-status-code-folder>"
+    When user "Alice" uploads file with content "some text" to "<file-name>" using the WebDAV API
+    Then the HTTP status code should be "<http-status-code-file>"
+    Examples:
+      | dav-path-version | file-name | http-status-code-file | http-status-code-folder |
+      | old              | /.        | 500                   | 405                     |
+      | old              | /..       | 404                   | 404                     |
+      | old              | /../lorem | 404                   | 404                     |
+      | new              | /.        | 500                   | 405                     |
+      | new              | /..       | 405                   | 405                     |
+      | new              | /../lorem | 404                   | 409                     |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version | file-name | http-status-code-file | http-status-code-folder |
+      | spaces           | /.        | 500                   | 400                     |
+      | spaces           | /..       | 405                   | 405                     |
+      | spaces           | /../lorem | 404                   | 404                     |
+
+
+  Scenario Outline: try to create file and folder with empty name
+    Given using <dav-path-version> DAV path
+    When user "Alice" uploads file with content "some text" to "" using the WebDAV API
+    Then the HTTP status code should be "405"
+    When user "Alice" creates folder "" using the WebDAV API
+    Then the HTTP status code should be "405"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version |
+      | spaces           |
+
+
+  Scenario Outline: create a file with dots in the name 
+    Given using <dav-path-version> DAV path
+    And user "Alice" uploads file with content "some text" to "<file-name>" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And the content of file "<file-name>" for user "Alice" should be "some text"
+    Examples:
+      | dav-path-version | file-name |
+      | old              | /fo.      |
+      | old              | /fo.1     |
+      | old              | /fo...1.. |
+      | old              | /...      |
+      | old              | /..fo     |
+      | old              | /fo.xyz   |
+      | old              | /fo.exe   |
+      | new              | /fo.      |
+      | new              | /fo.1     |
+      | new              | /fo...1.. |
+      | new              | /...      |
+      | new              | /..fo     |
+      | new              | /fo.xyz   |
+      | new              | /fo.exe   |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version | file-name |
+      | spaces           | /fo.      |
+      | spaces           | /fo.1     |
+      | spaces           | /fo...1.. |
+      | spaces           | /...      |
+      | spaces           | /..fo     |
+      | spaces           | /fo.xyz   |
+      | spaces           | /fo.exe   |
+
+
+  Scenario Outline: create a folder with dots in the name 
+    Given using <dav-path-version> DAV path
+    When user "Alice" creates folder "<folder-name>" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And as "Alice" folder "<folder-name>" should exist
+    Examples:
+      | dav-path-version | file-name |
+      | old              | /fo.      |
+      | old              | /fo.1     |
+      | old              | /fo...1.. |
+      | old              | /...      |
+      | old              | /..fo     |
+      | old              | /fo.xyz   |
+      | old              | /fo.exe   |
+      | new              | /fo.      |
+      | new              | /fo.1     |
+      | new              | /fo...1.. |
+      | new              | /...      |
+      | new              | /..fo     |
+      | new              | /fo.xyz   |
+      | new              | /fo.exe   |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version | file-name |
+      | spaces           | /fo.      |
+      | spaces           | /fo.1     |
+      | spaces           | /fo...1.. |
+      | spaces           | /...      |
+      | spaces           | /..fo     |
+      | spaces           | /fo.xyz   |
+      | spaces           | /fo.exe   |
