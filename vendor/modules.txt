@@ -1646,7 +1646,7 @@ github.com/prometheus/alertmanager/asset
 github.com/prometheus/alertmanager/pkg/labels
 github.com/prometheus/alertmanager/template
 github.com/prometheus/alertmanager/types
-# github.com/prometheus/client_golang v1.19.0
+# github.com/prometheus/client_golang v1.19.1
 ## explicit; go 1.20
 github.com/prometheus/client_golang/prometheus
 github.com/prometheus/client_golang/prometheus/internal
