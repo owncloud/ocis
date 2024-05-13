@@ -237,6 +237,11 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.frontend",
 				},
 				{
+					Endpoint:    "/wopi",
+					Service:     "com.owncloud.web.collaboration",
+					Unprotected: true,
+				},
+				{
 					Endpoint: "/graph/v1.0/invitations",
 					Service:  "com.owncloud.graph.invitations",
 				},

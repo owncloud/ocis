@@ -33,6 +33,7 @@ import (
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
 	authservice "github.com/owncloud/ocis/v2/services/auth-service/pkg/command"
 	clientlog "github.com/owncloud/ocis/v2/services/clientlog/pkg/command"
+	collaboration "github.com/owncloud/ocis/v2/services/collaboration/pkg/command"
 	eventhistory "github.com/owncloud/ocis/v2/services/eventhistory/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/command"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/command"
@@ -322,6 +323,11 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.Audit.Context = ctx
 		cfg.Audit.Commons = cfg.Commons
 		return audit.Execute(cfg.Audit)
+	})
+	areg(opts.Config.Collaboration.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Collaboration.Context = ctx
+		cfg.Collaboration.Commons = cfg.Commons
+		return collaboration.Execute(cfg.Collaboration)
 	})
 	areg(opts.Config.Policies.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.Policies.Context = ctx

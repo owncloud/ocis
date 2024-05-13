@@ -29,12 +29,12 @@ func DefaultConfig() *config.Config {
 		JWTSecret: secret,
 		GRPC: config.GRPC{
 			Addr:      "0.0.0.0:9301",
-			Namespace: "com.owncloud.collaboration",
+			Namespace: "com.owncloud.api",
 		},
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9300",
 			BindAddr:  "0.0.0.0:9300",
-			Namespace: "com.owncloud.collaboration",
+			Namespace: "com.owncloud.web",
 			Scheme:    "https",
 		},
 		Debug: config.Debug{
