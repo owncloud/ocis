@@ -33,7 +33,7 @@ type Config struct {
 type Asset struct {
 	DeprecatedPath string `yaml:"path" env:"WEB_ASSET_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets." introductionVersion:"pre5.0" deprecationVersion:"5.1.0" removalVersion:"6.0.0" deprecationInfo:"The WEB_ASSET_PATH is deprecated and will be removed in the future." deprecationReplacement:"Use WEB_ASSET_CORE_PATH instead."`
 	CorePath       string `yaml:"core_path" env:"WEB_ASSET_CORE_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets." introductionVersion:"5.1"`
-	ThemesPath     string `yaml:"themes_path" env:"WEB_ASSET_THEMES_PATH" desc:"Serve ownCloud Web themes from a path on the filesystem instead of the builtin assets." introductionVersion:"5.2"`
+	ThemesPath     string `yaml:"themes_path" env:"WEB_ASSET_THEMES_PATH" desc:"Serve ownCloud Web themes from a path on the filesystem instead of the builtin assets." introductionVersion:"5.1"`
 	AppsPath       string `yaml:"apps_path" env:"WEB_ASSET_APPS_PATH" desc:"Serve ownCloud Web apps assets from a path on the filesystem instead of the builtin assets." introductionVersion:"5.1"`
 }
 
