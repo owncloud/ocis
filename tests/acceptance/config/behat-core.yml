@@ -48,6 +48,7 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
+        - SpacesContext:
         - FavoritesContext:
         - WebDavPropertiesContext:
         - SharingNgContext:
