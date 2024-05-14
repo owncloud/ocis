@@ -224,6 +224,62 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 	return &cs3UserCreated, nil
 }
 
+func (c cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
+	newUser, err := c.libregraphUserFromClaims(claims)
+	if err != nil {
+		c.logger.Error().Err(err).Interface("claims", claims).Msg("Error converting claims to user")
+		return fmt.Errorf("error converting claims to updated user: %w", err)
+	}
+
+	// Check if the user needs to be updated, only updates of "displayName" and "mail" are supported
+	// currently.
+	switch {
+	case newUser.GetDisplayName() != user.GetDisplayName():
+		fallthrough
+	case newUser.GetMail() != user.GetMail():
+		return c.updateLibregraphUser(user.GetId().GetOpaqueId(), newUser)
+	}
+
+	return nil
+}
+
+func (c cs3backend) updateLibregraphUser(userid string, user libregraph.User) error {
+	gatewayClient, err := c.gatewaySelector.Next()
+	if err != nil {
+		c.logger.Error().Err(err).Msg("could not select next gateway client")
+		return err
+	}
+	newctx := context.Background()
+	authRes, err := gatewayClient.Authenticate(newctx, &gateway.AuthenticateRequest{
+		Type:         "serviceaccounts",
+		ClientId:     c.serviceAccount.ServiceAccountID,
+		ClientSecret: c.serviceAccount.ServiceAccountSecret,
+	})
+	if err != nil {
+		return err
+	}
+	if authRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+		return fmt.Errorf("error authenticating service user: %s", authRes.GetStatus().GetMessage())
+	}
+
+	lgClient, err := c.setupLibregraphClient(newctx, authRes.GetToken())
+	if err != nil {
+		c.logger.Error().Err(err).Msg("Error setting up libregraph client")
+		return err
+	}
+
+	req := lgClient.UserApi.UpdateUser(newctx, userid).User(user)
+
+	_, resp, err := req.Execute()
+	defer resp.Body.Close()
+	if err != nil {
+		c.logger.Error().Err(err).Msg("Failed to update user via libregraph")
+		return err
+	}
+
+	return nil
+}
+
 func (c cs3backend) setupLibregraphClient(ctx context.Context, cs3token string) (*libregraph.APIClient, error) {
 	// Use micro registry to resolve next graph service endpoint
 	next, err := c.graphSelector.Select("com.owncloud.graph.graph")

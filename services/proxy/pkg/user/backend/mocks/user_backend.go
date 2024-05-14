@@ -215,6 +215,54 @@ func (_c *UserBackend_GetUserByClaims_Call) RunAndReturn(run func(context.Contex
 	return _c
 }
 
+// UpdateUserIfNeeded provides a mock function with given fields: ctx, user, claims
+func (_m *UserBackend) UpdateUserIfNeeded(ctx context.Context, user *userv1beta1.User, claims map[string]interface{}) error {
+	ret := _m.Called(ctx, user, claims)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateUserIfNeeded")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *userv1beta1.User, map[string]interface{}) error); ok {
+		r0 = rf(ctx, user, claims)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UserBackend_UpdateUserIfNeeded_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateUserIfNeeded'
+type UserBackend_UpdateUserIfNeeded_Call struct {
+	*mock.Call
+}
+
+// UpdateUserIfNeeded is a helper method to define mock.On call
+//   - ctx context.Context
+//   - user *userv1beta1.User
+//   - claims map[string]interface{}
+func (_e *UserBackend_Expecter) UpdateUserIfNeeded(ctx interface{}, user interface{}, claims interface{}) *UserBackend_UpdateUserIfNeeded_Call {
+	return &UserBackend_UpdateUserIfNeeded_Call{Call: _e.mock.On("UpdateUserIfNeeded", ctx, user, claims)}
+}
+
+func (_c *UserBackend_UpdateUserIfNeeded_Call) Run(run func(ctx context.Context, user *userv1beta1.User, claims map[string]interface{})) *UserBackend_UpdateUserIfNeeded_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*userv1beta1.User), args[2].(map[string]interface{}))
+	})
+	return _c
+}
+
+func (_c *UserBackend_UpdateUserIfNeeded_Call) Return(_a0 error) *UserBackend_UpdateUserIfNeeded_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *UserBackend_UpdateUserIfNeeded_Call) RunAndReturn(run func(context.Context, *userv1beta1.User, map[string]interface{}) error) *UserBackend_UpdateUserIfNeeded_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewUserBackend creates a new instance of UserBackend. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewUserBackend(t interface {
