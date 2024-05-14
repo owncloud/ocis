@@ -1271,7 +1271,7 @@ def e2eTestPipeline(ctx):
                     "type": "docker",
                     "name": "e2e-tests-%s-%s" % (name, run_part),
                     "steps": steps_before + [run_e2e] + steps_after,
-                    "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
+                    "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
                     "trigger": e2e_trigger,
                     "volumes": e2e_volumes,
                 })
