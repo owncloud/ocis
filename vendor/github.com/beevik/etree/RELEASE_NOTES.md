@@ -1,3 +1,13 @@
+Release v1.4.0
+==============
+
+**New Features**
+
+* Add `AutoClose` option to `ReadSettings`.
+* Add `ValidateInput` to `ReadSettings`.
+* Add `NotNil` function to `Element`.
+* Add `NextSibling` and `PrevSibling` functions to `Element`.
+
 Release v1.3.0
 ==============
 
