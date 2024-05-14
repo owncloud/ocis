@@ -31,8 +31,9 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "app-provider",
 		},
-		Reva:   shared.DefaultRevaConfig(),
-		Driver: "",
+		Reva:         shared.DefaultRevaConfig(),
+		ExternalAddr: "com.owncloud.api.app-provider",
+		Driver:       "",
 		Drivers: config.Drivers{
 			WOPI: config.WOPIDriver{
 				WopiFolderURLBaseURL:      "https://localhost:9200/",
