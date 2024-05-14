@@ -59,6 +59,7 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
+			// only once? yes, we register a service name with the app registry, not an ip address
 			if err := helpers.RegisterAppProvider(ctx, cfg, logger, gwc, appUrls); err != nil {
 				return err
 			}
@@ -85,7 +86,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 				return grpcServer.Serve(l)
 			},
-				func(_ error) {
+				func(err error) {
 					logger.Error().
 						Err(err).
 						Str("server", "grpc").
@@ -100,7 +101,7 @@ func Server(cfg *config.Config) *cli.Command {
 				debug.Config(cfg),
 			)
 			if err != nil {
-				logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
+				logger.Error().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
 				return err
 			}
 
@@ -117,6 +118,10 @@ func Server(cfg *config.Config) *cli.Command {
 				http.Context(ctx),
 				http.TracerProvider(traceProvider),
 			)
+			if err != nil {
+				logger.Error().Err(err).Str("transport", "http").Msg("Failed to initialize server")
+				return err
+			}
 			gr.Add(httpServer.Run, func(_ error) {
 				cancel()
 			})

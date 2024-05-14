@@ -33,9 +33,7 @@ func DefaultConfig() *config.Config {
 		},
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9300",
-			BindAddr:  "0.0.0.0:9300",
 			Namespace: "com.owncloud.web",
-			Scheme:    "https",
 		},
 		Debug: config.Debug{
 			Addr:   "127.0.0.1:9304",
@@ -46,6 +44,7 @@ func DefaultConfig() *config.Config {
 		WopiApp: config.WopiApp{
 			Addr:     "https://127.0.0.1:8080",
 			Insecure: false,
+			WopiSrc:  "https://localhost:9200",
 		},
 		CS3Api: config.CS3Api{
 			Gateway: config.Gateway{

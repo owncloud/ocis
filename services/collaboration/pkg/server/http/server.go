@@ -27,7 +27,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Namespace(options.Config.HTTP.Namespace),
 		http.Name(options.Config.Service.Name),
 		http.Version(version.GetString()),
-		http.Address(options.Config.HTTP.BindAddr),
+		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.TraceProvider(options.TracerProvider),
 	)

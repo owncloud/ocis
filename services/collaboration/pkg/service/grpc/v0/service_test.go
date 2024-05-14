@@ -103,8 +103,7 @@ var _ = Describe("Discovery", func() {
 		It("Invalid access token", func() {
 			ctx := context.Background()
 
-			cfg.HTTP.Addr = "wopiserver.test.prv"
-			cfg.HTTP.Scheme = "https"
+			cfg.WopiApp.WopiSrc = "https://wopiserver.test.prv"
 
 			req := &appproviderv1beta1.OpenInAppRequest{
 				ResourceInfo: &providerv1beta1.ResourceInfo{
@@ -140,8 +139,7 @@ var _ = Describe("Discovery", func() {
 			ctx := context.Background()
 			nowTime := time.Now()
 
-			cfg.HTTP.Addr = "wopiserver.test.prv"
-			cfg.HTTP.Scheme = "https"
+			cfg.WopiApp.WopiSrc = "https://wopiserver.test.prv"
 			cfg.JWTSecret = "my_supa_secret"
 
 			myself := &userv1beta1.User{
