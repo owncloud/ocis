@@ -104,6 +104,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add Link SSEs: [#8908](https://github.com/owncloud/ocis/pull/8908)
 * Enhancement - ShareeIDs in SSEs: [#8915](https://github.com/owncloud/ocis/pull/8915)
 * Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
+* Enhancement - Add endpoint for getting drive items: [#8939](https://github.com/owncloud/ocis/pull/8939)
 * Enhancement - Improve infected file handling: [#8947](https://github.com/owncloud/ocis/pull/8947)
 * Enhancement - Configurable claims for auto-provisioning user accounts: [#8952](https://github.com/owncloud/ocis/pull/8952)
 * Enhancement - Bump nats-js-kv pkg: [#8953](https://github.com/owncloud/ocis/pull/8953)
@@ -599,6 +600,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8936
    https://github.com/owncloud/ocis/pull/8701
+
+* Enhancement - Add endpoint for getting drive items: [#8939](https://github.com/owncloud/ocis/pull/8939)
+
+   An endpoint for getting drive items via ID has been added.
+
+   https://github.com/owncloud/ocis/issues/8915
+   https://github.com/owncloud/ocis/pull/8939
 
 * Enhancement - Improve infected file handling: [#8947](https://github.com/owncloud/ocis/pull/8947)
 
