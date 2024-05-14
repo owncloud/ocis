@@ -197,7 +197,7 @@ Feature: create files and folder
       | spaces           | '"double".txt'     |
 
 
-  Scenario Outline: try to create file and folder with . and ..
+  Scenario Outline: try to create file and folder with '.', '..' and 'empty' 
     Given using <dav-path-version> DAV path
     When user "Alice" creates folder "<file-name>" using the WebDAV API
     Then the HTTP status code should be "<http-status-code-folder>"
@@ -208,9 +208,11 @@ Feature: create files and folder
       | old              | /.        | 500                   | 405                     |
       | old              | /..       | 404                   | 404                     |
       | old              | /../lorem | 404                   | 404                     |
+      | old              |           | 500                   | 405                     |
       | new              | /.        | 500                   | 405                     |
       | new              | /..       | 405                   | 405                     |
       | new              | /../lorem | 404                   | 409                     |
+      | new              |           | 500                   | 405                     |
 
     @skipOnRevaMaster
     Examples:
@@ -218,23 +220,7 @@ Feature: create files and folder
       | spaces           | /.        | 500                   | 400                     |
       | spaces           | /..       | 405                   | 405                     |
       | spaces           | /../lorem | 404                   | 404                     |
-
-
-  Scenario Outline: try to create file and folder with empty name
-    Given using <dav-path-version> DAV path
-    When user "Alice" uploads file with content "some text" to "" using the WebDAV API
-    Then the HTTP status code should be "405"
-    When user "Alice" creates folder "" using the WebDAV API
-    Then the HTTP status code should be "405"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
-      | spaces           |
+      | spaces           |           | 500                   | 400                     |
 
 
   Scenario Outline: create a file with dots in the name 

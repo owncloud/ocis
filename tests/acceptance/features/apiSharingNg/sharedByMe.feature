@@ -2169,7 +2169,7 @@ Feature: resources shared by user
       """
 
 
-  Scenario: sharer lists the link shares of same named files (Personal space)
+  Scenario: sharer lists the link shares of same name files (Personal space)
     Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "FolderToShare/textfile.txt"
@@ -2281,6 +2281,158 @@ Feature: resources shared by user
                         },
                         "name": {
                           "const": "FolderToShare"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "view"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the link shares of same name folders (Personal space)
+    Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has created folder "parent"
+    And user "Alice" has created folder "parent/FolderToShare"
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | permissionsRole | edit          |
+      | password        | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource        | parent/FolderToShare |
+      | space           | Personal             |
+      | permissionsRole | view                 |
+      | password        | %public%             |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "folder"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "FolderToShare"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "personal"
+                        },
+                        "path": {
+                          "const": "/"
+                        },
+                        "name": {
+                          "const": "/"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "edit"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "folder"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "FolderToShare"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "personal"
+                        },
+                        "path": {
+                          "const": "/parent"
+                        },
+                        "name": {
+                          "const": "parent"
                         }
                       }
                     },
@@ -2689,7 +2841,7 @@ Feature: resources shared by user
       """
 
 
-  Scenario: sharer lists the link shares of same named files (project space)
+  Scenario: sharer lists the link shares of same name files (project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
@@ -2804,6 +2956,160 @@ Feature: resources shared by user
                         },
                         "name": {
                           "const": "FolderToShare"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "view"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the link shares of same name folders (project space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has created a folder "parent" in space "NewSpace"
+    And user "Alice" has created a folder "parent/FolderToShare" in space "NewSpace"
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare |
+      | space           | NewSpace      |
+      | permissionsRole | edit          |
+      | password        | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource        | parent/FolderToShare |
+      | space           | NewSpace             |
+      | permissionsRole | view                 |
+      | password        | %public%             |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "folder"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "FolderToShare"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "project"
+                        },
+                        "path": {
+                          "const": "/"
+                        },
+                        "name": {
+                          "const": "/"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "edit"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "folder"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "FolderToShare"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "project"
+                        },
+                        "path": {
+                          "const": "/parent"
+                        },
+                        "name": {
+                          "const": "parent"
                         }
                       }
                     },
