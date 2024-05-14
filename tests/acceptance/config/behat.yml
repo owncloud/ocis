@@ -325,9 +325,21 @@ default:
         - PublicWebDavContext:
         - SharingNgContext:
 
-    apiSharingNg:
+    apiSharingNg1:
       paths:
-        - "%paths.base%/../features/apiSharingNg"
+        - "%paths.base%/../features/apiSharingNg1"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - SpacesContext:
+        - SharingNgContext:
+        - PublicWebDavContext:
+        - OcisConfigContext:
+        - SettingsContext:
+
+    apiSharingNg2:
+      paths:
+        - "%paths.base%/../features/apiSharingNg2"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
