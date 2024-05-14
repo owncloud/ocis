@@ -2342,13 +2342,8 @@ class SpacesContext implements Context {
 		$dateTime = new DateTime('yesterday');
 		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
 		if ($this->featureContext->isUsingSharingNG()) {
-			if (!\in_array($spaceName, ['Personal', 'Shares'])) {
-				$space = $this->getSpaceByName($user, $spaceName);
-				$itemId = $this->getResourceId($user, $spaceName, $resource);
-			} else {
-				$space = $this->getCreatedSpace($spaceName);
-				$itemId = $space['fileId'];
-			}
+			$space = $this->getSpaceByName($user, $spaceName);
+			$itemId = $this->getResourceId($user, $spaceName, $resource);
 			$body['expirationDateTime'] = $rows['expireDate'];
 			$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 			$this->featureContext->setResponse(
