@@ -114,6 +114,7 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - SettingsContext:
+        - SharingNgContext:
 
     coreApiShareOperationsToShares2:
       paths:
