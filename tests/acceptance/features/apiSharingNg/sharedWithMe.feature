@@ -4857,19 +4857,10 @@ Feature: an user gets the resources shared to them
     """
     {
       "type": "object",
-      "required": ["hidden", "mount_point"],
+      "required": ["@UI.Hidden"],
       "properties": {
-        "hidden": {
+        "@UI.Hidden": {
           "const": true
-        },
-        "mount_point": {
-          "type": "object",
-          "required": ["path"],
-          "properties": {
-            "path": {
-              "const": "<resource>"
-            }
-          }
         }
       }
     }
@@ -4898,19 +4889,10 @@ Feature: an user gets the resources shared to them
     """
     {
       "type": "object",
-      "required": ["hidden", "mount_point"],
+      "required": ["@UI.Hidden"],
       "properties": {
-        "hidden": {
+        "@UI.Hidden": {
           "const": true
-        },
-        "mount_point": {
-          "type": "object",
-          "required": ["path"],
-          "properties": {
-            "path": {
-              "const": "<resource>"
-            }
-          }
         }
       }
     }
