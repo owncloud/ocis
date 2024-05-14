@@ -1,7 +1,6 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 )
 
@@ -15,7 +14,6 @@ func FullDefaultConfig() *config.Config {
 
 // DefaultConfig returns a basic default configuration
 func DefaultConfig() *config.Config {
-	secret, _ := generators.GenerateRandomString(generators.AlphaNumChars, 32) // anything to do with the error?
 	return &config.Config{
 		Service: config.Service{
 			Name: "collaboration",
@@ -26,7 +24,6 @@ func DefaultConfig() *config.Config {
 			Icon:        "image-edit",
 			LockName:    "com.github.owncloud.collaboration",
 		},
-		JWTSecret: secret,
 		GRPC: config.GRPC{
 			Addr:      "0.0.0.0:9301",
 			Namespace: "com.owncloud.collaboration",

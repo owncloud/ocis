@@ -10,7 +10,7 @@ The collaboration service requires the target document server (ONLYOFFICE, Colla
 
 * External document server.
 * The gateway service.
-* The app-provider service.
+* The app-registry service.
 
 If any of the named services above have not been started or are not reachable, the collaboration service won't start. For the binary or the docker release of Infinite Scale, check with the `ocis list` command if they have been started. If not, you must start them manually upfront before starting the collaboration service.
 

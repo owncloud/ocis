@@ -156,6 +156,10 @@ type Clientlog struct {
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
 
+type Collaboration struct {
+	JWTSecret string `yaml:"jwt_secret"`
+}
+
 type Nats struct {
 	// The nats config has a field called nats
 	Nats struct {
@@ -191,6 +195,7 @@ type OcisConfig struct {
 	Graph             GraphService
 	Idp               LdapBasedService
 	Idm               IdmService
+	Collaboration     Collaboration
 	Proxy             ProxyService
 	Frontend          FrontendService
 	AuthBasic         AuthbasicService  `yaml:"auth_basic"`
@@ -289,6 +294,10 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	if err != nil {
 		return fmt.Errorf("could not generate random password for tokenmanager: %s", err)
 	}
+	collaborationJwtSecret, err := generators.GenerateRandomPassword(passwordLength)
+	if err != nil {
+		return fmt.Errorf("could not generate random password for collaboration service: %s", err)
+	}
 	machineAuthAPIKey, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
@@ -343,6 +352,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 					BindPassword: revaServicePassword,
 				},
 			},
+		},
+		Collaboration: Collaboration{
+			JWTSecret: collaborationJwtSecret,
 		},
 		Groups: UsersAndGroupsService{
 			Drivers: LdapBasedService{
