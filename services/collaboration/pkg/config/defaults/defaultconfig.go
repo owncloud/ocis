@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 )
 
@@ -46,7 +47,7 @@ func DefaultConfig() *config.Config {
 		},
 		CS3Api: config.CS3Api{
 			Gateway: config.Gateway{
-				Name: "com.owncloud.api.gateway",
+				Name: shared.DefaultRevaConfig().Address,
 			},
 			DataGateway: config.DataGateway{
 				Insecure: false,
