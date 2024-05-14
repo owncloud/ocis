@@ -1783,7 +1783,7 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userGetsInfoOfLastShareUsingTheSharingApi(string $user, ?string $language = null):void {
-		$shareId = $this->getLastCreatedUserGroupShareId();
+		$shareId = $this->isUsingSharingNg() ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 		$language = TranslationHelper::getLanguage($language);
 		$this->setResponse($this->getShareData($user, $shareId, $language));
 		$this->pushToLastStatusCodesArrays();
