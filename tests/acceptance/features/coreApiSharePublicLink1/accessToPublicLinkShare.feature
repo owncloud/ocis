@@ -11,10 +11,12 @@ Feature: accessing a public link share
 
   Scenario: access to the preview of password protected public link without providing the password is not allowed
     Given user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
-    And user "Alice" has created a public link share with settings
-      | path        | /testavatar.jpg |
-      | permissions | change          |
-      | password    | %public%        |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | testavatar.jpg |
+      | space           | Personal       |
+      | permissionsRole | edit           |
+      | password        | %public%       |
     When the public accesses the preview of file "testavatar.jpg" from the last shared public link using the sharing API
     Then the HTTP status code should be "404"
 
@@ -22,9 +24,11 @@ Feature: accessing a public link share
   Scenario: access to the preview of public shared file without password
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
-    And user "Alice" has created a public link share with settings
-      | path        | /testavatar.jpg |
-      | permissions | change          |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | testavatar.jpg |
+      | space           | Personal       |
+      | permissionsRole | edit           |
     When the public accesses the preview of file "testavatar.jpg" from the last shared public link using the sharing API
     Then the HTTP status code should be "200"
 
@@ -33,10 +37,12 @@ Feature: accessing a public link share
     Given user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "FOLDER/testavatar.jpg"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | /FOLDER  |
-      | permissions | change   |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     When the public accesses the preview of the following files from the last shared public link using the sharing API
       | path           |
       | testavatar.jpg |
@@ -49,9 +55,11 @@ Feature: accessing a public link share
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "FOLDER/testavatar.jpg"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | /FOLDER |
-      | permissions | change  |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | edit     |
     When the public accesses the preview of the following files from the last shared public link using the sharing API
       | path           |
       | testavatar.jpg |
@@ -62,9 +70,11 @@ Feature: accessing a public link share
   Scenario: user tries to download public link file using own basic auth
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | FOLDER   |
-      | permissions | change   |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     When user "Alice" tries to download file "textfile.txt" from the last public link using own basic auth and new public WebDAV API
     Then the HTTP status code should be "401"
