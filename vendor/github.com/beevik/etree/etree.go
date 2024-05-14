@@ -50,8 +50,21 @@ type ReadSettings struct {
 	// preserve them instead of keeping only one. Default: false.
 	PreserveDuplicateAttrs bool
 
+	// ValidateInput forces all ReadFrom* methods to validate that the
+	// provided input is composed of well-formed XML before processing it. If
+	// invalid XML is detected, the ReadFrom* methods return an error. Because
+	// this option requires the input to be processed twice, it incurs a
+	// significant performance penalty. Default: false.
+	ValidateInput bool
+
 	// Entity to be passed to standard xml.Decoder. Default: nil.
 	Entity map[string]string
+
+	// When Permissive is true, AutoClose indicates a set of elements to
+	// consider closed immediately after they are opened, regardless of
+	// whether an end element is present. Commonly set to xml.HTMLAutoClose.
+	// Default: nil.
+	AutoClose []string
 }
 
 // newReadSettings creates a default ReadSettings record.
@@ -60,9 +73,6 @@ func newReadSettings() ReadSettings {
 		CharsetReader: func(label string, input io.Reader) (io.Reader, error) {
 			return input, nil
 		},
-		Permissive:    false,
-		PreserveCData: false,
-		Entity:        nil,
 	}
 }
 
@@ -347,6 +357,16 @@ func (d *Document) SetRoot(e *Element) {
 // ReadFrom reads XML from the reader 'r' into this document. The function
 // returns the number of bytes read and any error encountered.
 func (d *Document) ReadFrom(r io.Reader) (n int64, err error) {
+	if d.ReadSettings.ValidateInput {
+		b, err := io.ReadAll(r)
+		if err != nil {
+			return 0, err
+		}
+		if err := validateXML(bytes.NewReader(b), d.ReadSettings); err != nil {
+			return 0, err
+		}
+		r = bytes.NewReader(b)
+	}
 	return d.Element.readFrom(r, d.ReadSettings)
 }
 
@@ -358,20 +378,60 @@ func (d *Document) ReadFromFile(filepath string) error {
 		return err
 	}
 	defer f.Close()
+
 	_, err = d.ReadFrom(f)
 	return err
 }
 
 // ReadFromBytes reads XML from the byte slice 'b' into the this document.
 func (d *Document) ReadFromBytes(b []byte) error {
-	_, err := d.ReadFrom(bytes.NewReader(b))
+	if d.ReadSettings.ValidateInput {
+		if err := validateXML(bytes.NewReader(b), d.ReadSettings); err != nil {
+			return err
+		}
+	}
+	_, err := d.Element.readFrom(bytes.NewReader(b), d.ReadSettings)
 	return err
 }
 
 // ReadFromString reads XML from the string 's' into this document.
 func (d *Document) ReadFromString(s string) error {
-	_, err := d.ReadFrom(strings.NewReader(s))
+	if d.ReadSettings.ValidateInput {
+		if err := validateXML(strings.NewReader(s), d.ReadSettings); err != nil {
+			return err
+		}
+	}
+	_, err := d.Element.readFrom(strings.NewReader(s), d.ReadSettings)
 	return err
+}
+
+// validateXML determines if the data read from the reader 'r' contains
+// well-formed XML according to the rules set by the go xml package.
+func validateXML(r io.Reader, settings ReadSettings) error {
+	dec := newDecoder(r, settings)
+	err := dec.Decode(new(interface{}))
+	if err != nil {
+		return err
+	}
+
+	// If there are any trailing tokens after unmarshalling with Decode(),
+	// then the XML input didn't terminate properly.
+	_, err = dec.Token()
+	if err == io.EOF {
+		return nil
+	}
+	return ErrXML
+}
+
+// newDecoder creates an XML decoder for the reader 'r' configured using
+// the provided read settings.
+func newDecoder(r io.Reader, settings ReadSettings) *xml.Decoder {
+	d := xml.NewDecoder(r)
+	d.CharsetReader = settings.CharsetReader
+	d.Strict = !settings.Permissive
+	d.Entity = settings.Entity
+	d.AutoClose = settings.AutoClose
+	return d
 }
 
 // WriteTo serializes the document out to the writer 'w'. The function returns
@@ -796,6 +856,27 @@ func (e *Element) RemoveChildAt(index int) Token {
 	return t
 }
 
+// autoClose analyzes the stack's top element and the current token to decide
+// whether the top element should be closed.
+func (e *Element) autoClose(stack *stack, t xml.Token, tags []string) {
+	if stack.empty() {
+		return
+	}
+
+	top := stack.peek().(*Element)
+
+	for _, tag := range tags {
+		if strings.EqualFold(tag, top.FullTag()) {
+			if e, ok := t.(xml.EndElement); !ok ||
+				!strings.EqualFold(e.Name.Space, top.Space) ||
+				!strings.EqualFold(e.Name.Local, top.Tag) {
+				stack.pop()
+			}
+			break
+		}
+	}
+}
+
 // ReadFrom reads XML from the reader 'ri' and stores the result as a new
 // child of this element.
 func (e *Element) readFrom(ri io.Reader, settings ReadSettings) (n int64, err error) {
@@ -808,10 +889,7 @@ func (e *Element) readFrom(ri io.Reader, settings ReadSettings) (n int64, err er
 		r = newXmlSimpleReader(ri)
 	}
 
-	dec := xml.NewDecoder(r)
-	dec.CharsetReader = settings.CharsetReader
-	dec.Strict = !settings.Permissive
-	dec.Entity = settings.Entity
+	dec := newDecoder(r, settings)
 
 	var stack stack
 	stack.push(e)
@@ -821,6 +899,10 @@ func (e *Element) readFrom(ri io.Reader, settings ReadSettings) (n int64, err er
 		}
 
 		t, err := dec.RawToken()
+
+		if settings.Permissive && settings.AutoClose != nil {
+			e.autoClose(&stack, t, settings.AutoClose)
+		}
 
 		switch {
 		case err == io.EOF:
@@ -968,6 +1050,25 @@ func (e *Element) FindElements(path string) []*Element {
 func (e *Element) FindElementsPath(path Path) []*Element {
 	p := newPather()
 	return p.traverse(e, path)
+}
+
+// NotNil returns the receiver element if it isn't nil; otherwise, it returns
+// an unparented element with an empty string tag. This function simplifies
+// the task of writing code to ignore not-found results from element queries.
+// For example, instead of writing this:
+//
+//	if e := doc.SelectElement("enabled"); e != nil {
+//		e.SetText("true")
+//	}
+//
+// You could write this:
+//
+//	doc.SelectElement("enabled").NotNil().SetText("true")
+func (e *Element) NotNil() *Element {
+	if e == nil {
+		return NewElement("")
+	}
+	return e
 }
 
 // GetPath returns the absolute path of the element. The absolute path is the
@@ -1171,6 +1272,34 @@ func (e *Element) dup(parent *Element) Token {
 	}
 	copy(ne.Attr, e.Attr)
 	return ne
+}
+
+// NextSibling returns this element's next sibling element. It returns nil if
+// there is no next sibling element.
+func (e *Element) NextSibling() *Element {
+	if e.parent == nil {
+		return nil
+	}
+	for i := e.index + 1; i < len(e.parent.Child); i++ {
+		if s, ok := e.parent.Child[i].(*Element); ok {
+			return s
+		}
+	}
+	return nil
+}
+
+// PrevSibling returns this element's preceding sibling element. It returns
+// nil if there is no preceding sibling element.
+func (e *Element) PrevSibling() *Element {
+	if e.parent == nil {
+		return nil
+	}
+	for i := e.index - 1; i >= 0; i-- {
+		if s, ok := e.parent.Child[i].(*Element); ok {
+			return s
+		}
+	}
+	return nil
 }
 
 // Parent returns this element's parent element. It returns nil if this
