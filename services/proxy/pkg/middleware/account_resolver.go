@@ -134,6 +134,14 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		if m.autoProvisionAccounts {
+			if err = m.userProvider.UpdateUserIfNeeded(req.Context(), user, claims); err != nil {
+				m.logger.Error().Err(err).Str("userid", user.GetId().GetOpaqueId()).Interface("claims", claims).Msg("Failed to update autoprovisioned user")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		}
+
 		// resolve the user's roles
 		user, err = m.userRoleAssigner.UpdateUserRoleAssignment(ctx, user, claims)
 		if err != nil {
