@@ -18,13 +18,7 @@ services:
       - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
       - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
-
-      # Uncomment the command for testing when using real certificates:
-      # You will get an SSL error in the browser, but if you display the certificate and see it was emitted by
-      # "Fake LE Intermediate X1", it means all is good. It is the staging environment intermediate certificate used by Let's Encrypt.
-      # Re-comment to create real certificates.
-      #- "--certificatesresolvers.http.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-
+      - "--certificatesresolvers.http.acme.caserver=${TRAEFIK_ACME_CASERVER:-https://acme-v02.api.letsencrypt.org/directory"
       # enable dashboard
       - "--api.dashboard=true"
       # define entrypoints
