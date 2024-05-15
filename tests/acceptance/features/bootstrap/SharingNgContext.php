@@ -1001,6 +1001,7 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @When user :user disables sync of share :share using the Graph API
+	 * @When user :user tries to disable sync of share :share using the Graph API
 	 *
 	 * @param string $user
 	 *
@@ -1080,7 +1081,10 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * step definition for enabling sync for items for non-existing group|user|space sharer
+	 *
 	 * @When user :user tries to enable share sync of a resource :resource using the Graph API
+	 * @When user :user enables share sync of a resource :resource using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $resource

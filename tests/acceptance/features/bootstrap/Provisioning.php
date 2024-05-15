@@ -1881,6 +1881,7 @@ trait Provisioning {
 			$response = $this->graphContext->deleteGroupWithName($group);
 			$this->theHTTPStatusCodeShouldBe(204, "", $response);
 		}
+		$this->rememberThatGroupIsNotExpectedToExist($group);
 		Assert::assertFalse(
 			$this->groupExists($group),
 			"Group '$group' should not exist but does exist"
@@ -1937,7 +1938,7 @@ trait Provisioning {
 			$response = $this->graphContext->removeUserFromGroup($group, $user);
 			$this->TheHTTPStatusCodeShouldBe(204, '', $response);
 		}
-		
+
 		if (OcisHelper::isTestingOnReva()) {
 			$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/users/$user/groups";
 			$response = HttpRequestHelper::get(
