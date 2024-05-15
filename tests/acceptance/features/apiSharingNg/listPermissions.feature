@@ -347,21 +347,20 @@ Feature: List a sharing permissions
       """
 
   @issues-8352
-  Scenario: sharer lists permissions of a shared project space
+  Scenario Outline: sharer lists permissions of a shared project space
     Given using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
-      | space           | new-space    |
-      | sharee          | Brian        |
-      | shareType       | user         |
-      | permissionsRole | Space Viewer |
-    And user "Alice" has created the following resource link share:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    And user "Alice" has created the following space link share:
       | space           | new-space |
       | permissionsRole | view      |
       | password        | %public%  |
-      | resource        | new-space |
     When user "Alice" lists the permissions of space "new-space" using permissions endpoint of the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -641,6 +640,11 @@ Feature: List a sharing permissions
         }
       }
       """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
 
   @issues-8331
   Scenario: user lists permissions of a file in personal space
@@ -1323,18 +1327,77 @@ Feature: List a sharing permissions
       }
       """
 
+  @issues-8331
+  Scenario: user sends share invitation with all allowed roles for a folder in project space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "folder" in space "new-space"
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" gets permissions list for folder "folder" of the space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Alice" should be able to send share the following invitation with all allowed permission roles
+      | resource  | folder    |
+      | space     | new-space |
+      | sharee    | Brian     |
+      | shareType | user      |
 
-  Scenario: member with viewer role lists the permissions of a project space using permissions endpoint
+
+  Scenario: try to list the permissions of other user's personal space
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Brian" tries to list the permissions of space "Personal" owned by "Alice" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "itemNotFound"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "pattern": "stat: error: not found: %file_id_pattern%$"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario Outline: sharer lists permissions of a shared project space using root endpoint
     Given using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
-      | space           | new-space    |
-      | sharee          | Brian        |
-      | shareType       | user         |
-      | permissionsRole | Space Viewer |
-    When user "Brian" lists the permissions of space "new-space" using permissions endpoint of the Graph API
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    And user "Alice" has created the following space link share:
+      | space           | new-space |
+      | permissionsRole | view      |
+      | password        | %public%  |
+    When user "Alice" lists the permissions of space "new-space" using root endpoint of the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -1348,19 +1411,31 @@ Feature: List a sharing permissions
         "properties": {
           "@libre.graph.permissions.actions.allowedValues": {
             "const": [
+              "libre.graph/driveItem/permissions/create",
+              "libre.graph/driveItem/children/create",
+              "libre.graph/driveItem/standard/delete",
               "libre.graph/driveItem/path/read",
               "libre.graph/driveItem/quota/read",
               "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/upload/create",
               "libre.graph/driveItem/permissions/read",
               "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/versions/read",
               "libre.graph/driveItem/deleted/read",
-              "libre.graph/driveItem/basic/read"
+              "libre.graph/driveItem/path/update",
+              "libre.graph/driveItem/permissions/delete",
+              "libre.graph/driveItem/deleted/delete",
+              "libre.graph/driveItem/versions/update",
+              "libre.graph/driveItem/deleted/update",
+              "libre.graph/driveItem/basic/read",
+              "libre.graph/driveItem/permissions/update",
+              "libre.graph/driveItem/permissions/deny"
             ]
           },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
-            "minItems": 2,
-            "maxItems": 2,
+            "minItems": 4,
+            "maxItems": 4,
             "uniqueItems": true,
             "items": {
               "oneOf":  [
@@ -1409,14 +1484,60 @@ Feature: List a sharing permissions
                       "const": "a8d5fe5e-96e3-418d-825b-534dbdf22b99"
                     }
                   }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "const": 3
+                    },
+                    "description": {
+                      "const": "View, download, upload, edit, add and delete."
+                    },
+                    "displayName": {
+                      "const": "Can edit"
+                    },
+                    "id": {
+                      "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "const": 4
+                    },
+                    "description": {
+                      "const": "View, download, upload, edit, add, delete and manage members."
+                    },
+                    "displayName": {
+                      "const": "Can manage"
+                    },
+                    "id": {
+                      "const": "312c0871-5ef7-4b3a-85b6-0e4074c64049"
+                    }
+                  }
                 }
               ]
             }
           },
           "value": {
             "type": "array",
-            "minItems": 2,
-            "maxItems": 2,
+            "minItems": 3,
+            "maxItems": 3,
             "uniqueItems": true,
             "items": {
               "oneOf":[
@@ -1503,6 +1624,51 @@ Feature: List a sharing permissions
                       }
                     }
                   }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "hasPassword",
+                    "id",
+                    "link"
+                  ],
+                  "properties": {
+                    "hasPassword": {
+                      "const": true
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z]{15}$"
+                    },
+                    "link": {
+                      "type": "object",
+                      "required": [
+                        "@libre.graph.displayName",
+                        "@libre.graph.quickLink",
+                        "preventsDownload",
+                        "type",
+                        "webUrl"
+                      ],
+                      "properties": {
+                        "@libre.graph.displayName": {
+                          "const": ""
+                        },
+                        "@libre.graph.quickLink": {
+                          "const": false
+                        },
+                        "preventsDownload": {
+                          "const": false
+                        },
+                        "type": {
+                          "const": "view"
+                        },
+                        "webUrl": {
+                          "type": "string",
+                          "pattern": "^%base_url%\/s\/[a-zA-Z]{15}$"
+                        }
+                      }
+                    }
+                  }
                 }
               ]
             }
@@ -1510,58 +1676,21 @@ Feature: List a sharing permissions
         }
       }
       """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
 
-  @issues-8331
-  Scenario: user sends share invitation with all allowed roles for a folder in project space
+
+  Scenario: user sends share invitation with all allowed roles for a project space using root endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    And user "Alice" has created a folder "folder" in space "new-space"
     And user "Brian" has been created with default attributes and without skeleton files
-    When user "Alice" gets permissions list for folder "folder" of the space "new-space" using the Graph API
+    When user "Alice" lists the permissions of space "new-space" using root endpoint of the Graph API
     Then the HTTP status code should be "200"
-    And user "Alice" should be able to send share the following invitation with all allowed permission roles
-      | resource  | folder    |
+    And user "Alice" should be able to send the following space share invitation with all allowed permission roles using root endpoint of the Graph API
       | space     | new-space |
       | sharee    | Brian     |
       | shareType | user      |
-
-
-  Scenario: try to list the permissions of other user's personal space
-    Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    When user "Brian" tries to list the permissions of space "Personal" owned by "Alice" using permissions endpoint of the Graph API
-    Then the HTTP status code should be "404"
-    And the JSON data of the response should match
-      """
-      {
-        "type": "object",
-        "required": ["error"],
-        "properties": {
-          "error": {
-            "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
-            "properties": {
-              "code": {
-                "const": "itemNotFound"
-              },
-              "innererror": {
-                "type": "object",
-                "required": [
-                  "date",
-                  "request-id"
-                ]
-              },
-              "message": {
-                "type": "string",
-                "pattern": "stat: error: not found: %file_id_pattern%$"
-              }
-            }
-          }
-        }
-      }
-      """
