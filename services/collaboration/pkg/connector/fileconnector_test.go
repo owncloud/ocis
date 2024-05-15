@@ -52,7 +52,9 @@ var _ = Describe("FileConnector", func() {
 					OpaqueId: "opaqueId",
 					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
 				},
-				Username: "Pet Shaft",
+				Username:    "Shaft",
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
 				// Opaque is here for reference, not used by default but might be needed for some tests
 				//Opaque: &typesv1beta1.Opaque{
 				//	Map: map[string]*typesv1beta1.OpaqueEntry{
@@ -867,6 +869,57 @@ var _ = Describe("FileConnector", func() {
 			// overwrite UserId and UserFriendlyName here for easier matching
 			newFileInfo.UserId = "guest-zzz000"
 			newFileInfo.UserFriendlyName = "guest zzz000"
+
+			Expect(err).To(Succeed())
+			Expect(newFileInfo).To(Equal(expectedFileInfo))
+		})
+
+		It("Stat success authenticated user", func() {
+			// change view mode to view only
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					// Other properties aren't used for now.
+				},
+			}, nil)
+
+			expectedFileInfo := connector.FileInfo{
+				OwnerId:                    "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
+				Size:                       int64(998877),
+				Version:                    "16273849.0",
+				BaseFileName:               "test.txt",
+				BreadcrumbDocName:          "test.txt",
+				UserCanNotWriteRelative:    true,
+				HostViewUrl:                "http://test.ex.prv/view",
+				HostEditUrl:                "http://test.ex.prv/edit",
+				EnableOwnerTermination:     false,
+				SupportsExtendedLockLength: true,
+				SupportsGetLock:            true,
+				SupportsLocks:              true,
+				DisableExport:              true,
+				DisableCopy:                true,
+				DisablePrint:               true,
+				IsAnonymousUser:            false,
+				UserId:                     hex.EncodeToString([]byte("opaqueId@inmemory")),
+				UserFriendlyName:           "Pet Shaft",
+				WatermarkText:              "Pet Shaft shaft@example.com",
+			}
+
+			newFileInfo, err := fc.CheckFileInfo(ctx)
 
 			Expect(err).To(Succeed())
 			Expect(newFileInfo).To(Equal(expectedFileInfo))

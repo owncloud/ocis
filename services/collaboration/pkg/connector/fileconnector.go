@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
@@ -13,6 +14,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
@@ -521,6 +523,29 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 		SupportsLocks:   true,
 	}
 
+	// user logic from reva wopi driver #TODO: refactor
+	var isPublicShare bool = false
+	if wopiContext.User != nil {
+		// UserId must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
+		if wopiContext.User.GetId().GetType() == userv1beta1.UserType_USER_TYPE_LIGHTWEIGHT {
+			fileInfo.UserId = hex.EncodeToString([]byte(statRes.GetInfo().GetOwner().GetOpaqueId() + "@" + statRes.GetInfo().GetOwner().GetIdp()))
+		} else {
+			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.GetId().GetOpaqueId() + "@" + wopiContext.User.GetId().GetIdp()))
+		}
+
+		isPublicShare = utils.ExistsInOpaque(wopiContext.User.GetOpaque(), "public-share-role")
+		if !isPublicShare {
+			fileInfo.UserFriendlyName = wopiContext.User.GetDisplayName()
+			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.GetId().GetOpaqueId() + "@" + wopiContext.User.GetId().GetIdp()))
+		}
+	}
+	if wopiContext.User == nil || isPublicShare {
+		randomID, _ := uuid.NewUUID()
+		fileInfo.UserId = hex.EncodeToString([]byte("guest-" + randomID.String()))
+		fileInfo.UserFriendlyName = "Guest " + randomID.String()
+		fileInfo.IsAnonymousUser = true
+	}
+
 	switch wopiContext.ViewMode {
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE:
 		fileInfo.SupportsUpdate = true
@@ -533,35 +558,19 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 		fileInfo.DisableExport = true
 		fileInfo.DisableCopy = true
 		fileInfo.DisablePrint = true
-	}
-
-	// user logic from reva wopi driver #TODO: refactor
-	var isPublicShare bool = false
-	if wopiContext.User != nil {
-		// UserId must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
-		if wopiContext.User.GetId().GetType() == userv1beta1.UserType_USER_TYPE_LIGHTWEIGHT {
-			fileInfo.UserId = hex.EncodeToString([]byte(statRes.GetInfo().GetOwner().GetOpaqueId() + "@" + statRes.GetInfo().GetOwner().GetIdp()))
-		} else {
-			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.GetId().GetOpaqueId() + "@" + wopiContext.User.GetId().GetIdp()))
-		}
-
-		if wopiContext.User.GetOpaque() != nil {
-			if _, ok := wopiContext.User.GetOpaque().GetMap()["public-share-role"]; ok {
-				isPublicShare = true
-			}
-		}
 		if !isPublicShare {
-			fileInfo.UserFriendlyName = wopiContext.User.GetUsername()
-			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.GetId().GetOpaqueId() + "@" + wopiContext.User.GetId().GetIdp()))
+			// the fileInfo.WatermarkText supported by Collabora only
+			fileInfo.WatermarkText = f.watermarkText(wopiContext.User)
 		}
-	}
-	if wopiContext.User == nil || isPublicShare {
-		randomID, _ := uuid.NewUUID()
-		fileInfo.UserId = hex.EncodeToString([]byte("guest-" + randomID.String()))
-		fileInfo.UserFriendlyName = "Guest " + randomID.String()
-		fileInfo.IsAnonymousUser = true
 	}
 
 	logger.Debug().Msg("CheckFileInfo: success")
 	return fileInfo, nil
+}
+
+func (f *FileConnector) watermarkText(user *userv1beta1.User) string {
+	if user != nil {
+		return strings.TrimSpace(user.GetDisplayName() + " " + user.GetMail())
+	}
+	return "Watermark"
 }
