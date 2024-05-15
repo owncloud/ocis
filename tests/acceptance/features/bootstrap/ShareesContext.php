@@ -45,7 +45,7 @@ class ShareesContext implements Context {
 	 * @return void
 	 */
 	public function theUserGetsTheShareesWithParameters(TableNode $body):void {
-		$this->userGetsTheShareesWithParameters(
+		$this->getShareesWithParameters(
 			$this->featureContext->getCurrentUser(),
 			$body
 		);
@@ -58,26 +58,12 @@ class ShareesContext implements Context {
 	 * @param TableNode $body
 	 *
 	 * @return void
-	 * @throws Exception
 	 */
 	public function userGetsTheShareesWithParameters(string $user, TableNode $body):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$url = '/apps/files_sharing/api/v1/sharees';
-		$this->featureContext->verifyTableNodeColumnsCount($body, 2);
-		$parameters = [];
-		foreach ($body->getRowsHash() as $key => $value) {
-			$parameters[] = "$key=$value";
-		}
-		if (!empty($parameters)) {
-			$url .= '?' . \implode('&', $parameters);
-		}
-
-		$response = $this->ocsContext->sendRequestToOcsEndpoint(
+		$this->getShareesWithParameters(
 			$user,
-			'GET',
-			$url
+			$body
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -200,6 +186,32 @@ class ShareesContext implements Context {
 			}
 		}
 		return $sharees;
+	}
+
+	/**
+	 * @param string $user
+	 * @param TableNode $body
+	 *
+	 * @return void
+	 */
+	public function getShareesWithParameters(string $user, TableNode $body):void {
+		$user = $this->featureContext->getActualUsername($user);
+		$url = '/apps/files_sharing/api/v1/sharees';
+		$this->featureContext->verifyTableNodeColumnsCount($body, 2);
+		$parameters = [];
+		foreach ($body->getRowsHash() as $key => $value) {
+			$parameters[] = "$key=$value";
+		}
+		if (!empty($parameters)) {
+			$url .= '?' . \implode('&', $parameters);
+		}
+
+		$response = $this->ocsContext->sendRequestToOcsEndpoint(
+			$user,
+			'GET',
+			$url
+		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
