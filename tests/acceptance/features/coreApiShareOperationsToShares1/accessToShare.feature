@@ -14,7 +14,13 @@ Feature: sharing
   @smokeTest
   Scenario Outline: sharee can see the share
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And using SharingNG
     When user "Brian" gets all the shares shared with him using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -28,8 +34,19 @@ Feature: sharing
   Scenario Outline: sharee can see the filtered share
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "some data" to "/textfile1.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Alice" has shared file "textfile1.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And using SharingNG
     When user "Brian" gets all the shares shared with him that are received as file "/Shares/textfile1.txt" using the provisioning API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -43,8 +60,19 @@ Feature: sharing
   Scenario Outline: sharee can't see the share that is filtered out
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "some data" to "/textfile1.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Alice" has shared file "textfile1.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And using SharingNG
     When user "Brian" gets all the shares shared with him that are received as file "/Shares/textfile0.txt" using the provisioning API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -59,7 +87,13 @@ Feature: sharing
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has shared file "textfile0.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+    And using SharingNG
     When user "Brian" gets all the shares shared with him using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"

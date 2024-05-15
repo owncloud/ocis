@@ -14,7 +14,12 @@ Feature: sharing
   Scenario Outline: getting all shares from a user
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "some data" to "/file_to_share.txt"
-    And user "Alice" has shared file "file_to_share.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | file_to_share.txt |
+      | space           | Personal          |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | Viewer            |
     When user "Alice" gets all shares shared by her using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -28,7 +33,12 @@ Feature: sharing
   Scenario Outline: getting all shares of a user using another user
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When the administrator gets all shares shared by him using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -46,8 +56,18 @@ Feature: sharing
       | Carol    |
       | David    |
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    And user "Alice" has shared file "textfile0.txt" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Alice" gets all the shares of the file "textfile0.txt" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -63,7 +83,13 @@ Feature: sharing
   Scenario Outline: getting share info of a share
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "some data" to "/file_to_share.txt"
-    And user "Alice" has shared file "file_to_share.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | file_to_share.txt |
+      | space           | Personal          |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | File Editor       |
+    And using SharingNG
     When user "Alice" gets the info of the last share using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -94,7 +120,13 @@ Feature: sharing
     Given using OCS API version "<ocs-api-version>"
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And using SharingNG
     When user "Carol" gets the info of the last share using the sharing API
     Then the OCS status code should be "404"
     And the HTTP status code should be "<http_status_code>"
@@ -112,7 +144,12 @@ Feature: sharing
     And user "Carol" has been added to group "group0"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
-    And user "Alice" has shared folder "/PARENT" with group "group0"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | /PARENT  |
+      | space           | Personal |
+      | sharee          | group0   |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     When the administrator removes user "Carol" from group "group0" using the provisioning API
     Then the HTTP status code should be "204"
     And user "Brian" should see the following elements
@@ -127,7 +164,12 @@ Feature: sharing
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/file_to_share.txt"
-    And user "Alice" has shared file "/PARENT/file_to_share.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | /PARENT/file_to_share.txt |
+      | space           | Personal                  |
+      | sharee          | Brian                     |
+      | shareType       | user                      |
+      | permissionsRole | File Editor               |
     When user "Alice" gets all shares shared by her using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"

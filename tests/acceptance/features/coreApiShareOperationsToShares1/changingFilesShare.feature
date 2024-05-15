@@ -17,8 +17,18 @@ Feature: sharing
     And user "Alice" has created folder "share2"
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has moved file "textfile0.txt" to "share1/textfile0.txt"
-    And user "Alice" has shared folder "/share1" with user "Brian"
-    And user "Alice" has shared folder "/share2" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | /share1  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | /share2  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" moves file "/Shares/share1/textfile0.txt" to "/Shares/share2/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "502"
     And as "Brian" file "/Shares/share1/textfile0.txt" should exist
@@ -34,7 +44,12 @@ Feature: sharing
   Scenario Outline: overwrite a received file share
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "this is the old content" to "/textfile1.txt"
-    And user "Alice" has shared file "/textfile1.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Brian" uploads file with content "this is a new content" to "/Shares/textfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Brian" file "Shares/textfile1.txt" should exist

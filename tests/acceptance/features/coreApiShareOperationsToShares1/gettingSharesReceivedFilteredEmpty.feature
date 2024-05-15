@@ -21,16 +21,28 @@ Feature: get the received shares filtered by type (user, group etc)
 
   Scenario Outline: getting shares received from users when there are none
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared folder "/folderToShareWithGroup" with group "grp1"
-    And user "Alice" has created a public link share with settings
-      | path        | /folderToShareWithPublic |
-      | permissions | read                     |
-      | password    | %public%                 |
-    And user "Alice" has shared file "/fileToShareWithGroup.txt" with group "grp1"
-    And user "Alice" has created a public link share with settings
-      | path        | /fileToShareWithPublic.txt |
-      | permissions | read                       |
-      | password    | %public%                   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShareWithGroup |
+      | space           | Personal               |
+      | sharee          | grp1                   |
+      | shareType       | group                  |
+      | permissionsRole | Viewer                 |
+    And user "Alice" has created the following resource link share:
+      | resource        | folderToShareWithPublic |
+      | space           | Personal                |
+      | permissionsRole | view                    |
+      | password        | %public%                |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | fileToShareWithGroup.txt |
+      | space           | Personal                 |
+      | sharee          | grp1                     |
+      | shareType       | group                    |
+      | permissionsRole | Viewer                   |
+    And user "Alice" has created the following resource link share:
+      | resource        | fileToShareWithPublic.txt |
+      | space           | Personal                  |
+      | permissionsRole | view                      |
+      | password        | %public%                  |
     When user "Brian" gets the user shares shared with him using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -43,16 +55,28 @@ Feature: get the received shares filtered by type (user, group etc)
 
   Scenario Outline: getting shares received from groups when there are none
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared folder "/folderToShareWithUser" with user "Brian"
-    And user "Alice" has created a public link share with settings
-      | path        | /folderToShareWithPublic |
-      | permissions | read                     |
-      | password    | %public%                 |
-    And user "Alice" has shared file "/fileToShareWithUser.txt" with user "Brian"
-    And user "Alice" has created a public link share with settings
-      | path        | /fileToShareWithPublic.txt |
-      | permissions | read                       |
-      | password    | %public%                   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShareWithUser |
+      | space           | Personal              |
+      | sharee          | Brian                 |
+      | shareType       | user                  |
+      | permissionsRole | Viewer                |
+    And user "Alice" has created the following resource link share:
+      | resource        | folderToShareWithPublic |
+      | space           | Personal                |
+      | permissionsRole | view                    |
+      | password        | %public%                |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | fileToShareWithUser.txt |
+      | space           | Personal                |
+      | sharee          | Brian                   |
+      | shareType       | user                    |
+      | permissionsRole | Viewer                  |
+    And user "Alice" has created the following resource link share:
+      | resource        | fileToShareWithPublic.txt |
+      | space           | Personal                  |
+      | permissionsRole | view                      |
+      | password        | %public%                  |
     When user "Brian" gets the group shares shared with him using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -68,18 +92,40 @@ Feature: get the received shares filtered by type (user, group etc)
     #       users do not receive public links, so asking for a list of public links
     #       that are "shared with me" should always return an empty list.
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared folder "/folderToShareWithUser" with user "Brian"
-    And user "Alice" has shared folder "/folderToShareWithGroup" with group "grp1"
-    And user "Alice" has created a public link share with settings
-      | path        | /folderToShareWithPublic |
-      | permissions | read                     |
-      | password    | %public%                 |
-    And user "Alice" has shared file "/fileToShareWithUser.txt" with user "Brian"
-    And user "Alice" has shared file "/fileToShareWithGroup.txt" with group "grp1"
-    And user "Alice" has created a public link share with settings
-      | path        | /fileToShareWithPublic.txt |
-      | permissions | read                       |
-      | password    | %public%                   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShareWithUser |
+      | space           | Personal              |
+      | sharee          | Brian                 |
+      | shareType       | user                  |
+      | permissionsRole | Viewer                |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShareWithGroup |
+      | space           | Personal               |
+      | sharee          | grp1                   |
+      | shareType       | group                  |
+      | permissionsRole | Viewer                 |
+    And user "Alice" has created the following resource link share:
+      | resource        | folderToShareWithPublic |
+      | space           | Personal                |
+      | permissionsRole | view                    |
+      | password        | %public%                |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | fileToShareWithUser.txt |
+      | space           | Personal                |
+      | sharee          | Brian                   |
+      | shareType       | user                    |
+      | permissionsRole | Viewer                  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | fileToShareWithGroup.txt |
+      | space           | Personal                 |
+      | sharee          | grp1                     |
+      | shareType       | group                    |
+      | permissionsRole | Viewer                   |
+    And user "Alice" has created the following resource link share:
+      | resource        | fileToShareWithPublic.txt |
+      | space           | Personal                  |
+      | permissionsRole | view                      |
+      | password        | %public%                  |
     When user "Brian" gets the public link shares shared with him using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"

@@ -1783,7 +1783,7 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userGetsInfoOfLastShareUsingTheSharingApi(string $user, ?string $language = null):void {
-		$shareId = $this->getLastCreatedUserGroupShareId();
+		$shareId = $this->isUsingSharingNg() ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 		$language = TranslationHelper::getLanguage($language);
 		$this->setResponse($this->getShareData($user, $shareId, $language));
 		$this->pushToLastStatusCodesArrays();
@@ -2254,7 +2254,7 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function checkingLastShareIDIsIncluded():void {
-		$shareId = $this->getLastCreatedUserGroupShareId();
+		$shareId = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 		if (!$this->isFieldInResponse('id', $shareId)) {
 			Assert::fail(
 				"Share id $shareId not found in response"
@@ -2269,7 +2269,7 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function checkLastShareIDIsNotIncluded():void {
-		$shareId = $this->getLastCreatedUserGroupShareId();
+		$shareId = $this->isUsingSharingNG() ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 		if ($this->isFieldInResponse('id', $shareId, false)) {
 			Assert::fail(
 				"Share id $shareId has been found in response"
