@@ -113,6 +113,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Assimilate `clean` into `sessions` command: [#9041](https://github.com/owncloud/ocis/pull/9041)
 * Enhancement - Bump Reva: [#9132](https://github.com/owncloud/ocis/pull/9132)
 * Enhancement - Add watermark text: [#9144](https://github.com/owncloud/ocis/pull/9144)
+* Enhancement - Update selected attributes of autoprovisioned users: [#9166](https://github.com/owncloud/ocis/pull/9166)
 
 ## Details
 
@@ -676,6 +677,14 @@ The following sections list the changes for unreleased.
    We've added the watermark text for the Secure View mode.
 
    https://github.com/owncloud/ocis/pull/9144
+
+* Enhancement - Update selected attributes of autoprovisioned users: [#9166](https://github.com/owncloud/ocis/pull/9166)
+
+   When autoprovisioning is enabled, we now update autoprovisioned users when their
+   display name or email address claims change.
+
+   https://github.com/owncloud/ocis/issues/8955
+   https://github.com/owncloud/ocis/pull/9166
 
 # Changelog for [5.0.3] (2024-05-02)
 
