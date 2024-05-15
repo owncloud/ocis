@@ -112,6 +112,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add virus filter to sessions command: [#9041](https://github.com/owncloud/ocis/pull/9041)
 * Enhancement - Assimilate `clean` into `sessions` command: [#9041](https://github.com/owncloud/ocis/pull/9041)
 * Enhancement - Bump Reva: [#9132](https://github.com/owncloud/ocis/pull/9132)
+* Enhancement - Add watermark text: [#9144](https://github.com/owncloud/ocis/pull/9144)
 
 ## Details
 
@@ -669,6 +670,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8701
    https://github.com/owncloud/ocis/pull/8606
    https://github.com/owncloud/ocis/pull/8937
+
+* Enhancement - Add watermark text: [#9144](https://github.com/owncloud/ocis/pull/9144)
+
+   We've added the watermark text for the Secure View mode.
+
+   https://github.com/owncloud/ocis/pull/9144
 
 # Changelog for [5.0.3] (2024-05-02)
 
