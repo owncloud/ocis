@@ -25,9 +25,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 
-- [apiSpacesShares/shareUploadTUS.feature:268](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L268)
-- [apiSpacesShares/shareUploadTUS.feature:287](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L287)
-- [apiSpacesShares/shareUploadTUS.feature:365](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L365)
+- [apiSpacesShares/shareUploadTUS.feature:267](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L267)
+- [apiSpacesShares/shareUploadTUS.feature:286](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L286)
+- [apiSpacesShares/shareUploadTUS.feature:364](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L364)
 
 ### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
 
