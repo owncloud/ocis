@@ -134,6 +134,8 @@ default:
         - FeatureContext: *common_feature_context_params
         - PublicWebDavContext:
         - TrashbinContext:
+        - SpacesContext:
+        - SharingNgContext:
         - WebDavPropertiesContext:
         - OcisConfigContext:
 

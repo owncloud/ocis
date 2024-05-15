@@ -277,10 +277,12 @@ Feature: create a public link share
   Scenario: delete a folder that has been publicly shared and try to access using the public WebDAV API
     Given user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file with content "Random data" to "/PARENT/parent.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | PARENT   |
-      | permissions | read     |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
     When user "Alice" deletes folder "/PARENT" using the WebDAV API
     Then the public download of file "/parent.txt" from inside the last public link shared folder using the new public WebDAV API with password "%public%" should fail with HTTP status code "404"
 
@@ -288,10 +290,12 @@ Feature: create a public link share
   Scenario: try to download from a public share that has upload only permissions using the public webdav api
     Given user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file with content "Random data" to "/PARENT/parent.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | PARENT          |
-      | permissions | uploadwriteonly |
-      | password    | %public%        |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT     |
+      | space           | Personal   |
+      | permissionsRole | createOnly |
+      | password        | %public%   |
     When the public downloads file "parent.txt" from inside the last public link shared folder using the new public WebDAV API
     Then the value of the item "//s:message" in the response should be "File not found: parent.txt"
     And the HTTP status code should be "404"
@@ -300,9 +304,11 @@ Feature: create a public link share
   Scenario: get the size of a file shared by public link
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And user "Alice" has uploaded file with content "This is a test file" to "test-file.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | test-file.txt |
-      | permissions | read          |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | test-file.txt |
+      | space           | Personal      |
+      | permissionsRole | view          |
     When the public gets the size of the last shared public link using the WebDAV API
     Then the HTTP status code should be "207"
     And the size of the file should be "19"
@@ -342,9 +348,11 @@ Feature: create a public link share
   Scenario: get the mtime of a file inside a folder shared by public link using new webDAV version
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And user "Alice" has created folder "testFolder"
-    And user "Alice" has created a public link share with settings
-      | path        | /testFolder               |
-      | permissions | read,update,create,delete |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | testFolder |
+      | space           | Personal   |
+      | permissionsRole | edit       |
     When the public uploads file "file.txt" to the last public link shared folder with password "%public%" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the new public WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "testFolder/file.txt" should exist
@@ -370,9 +378,11 @@ Feature: create a public link share
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And using new DAV path
     And user "Alice" has uploaded file with content "Random data" to "/file.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | file.txt |
-      | permissions | read     |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | file.txt |
+      | space           | Personal |
+      | permissionsRole | view     |
     When the public lists the resources in the last created public link with depth "1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the value of the item "//d:response[2]//d:href" in the response should match "/%base_path%\/remote.php\/dav\/public-files\/%public_token%\/file.txt$/"
@@ -386,10 +396,12 @@ Feature: create a public link share
   Scenario Outline: create a password-protected public link on a file with the name same to the previously deleted one
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "test data 1" to "/test.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | test.txt |
-      | permissions | read     |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | test.txt |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
     And user "Alice" has deleted file "test.txt"
     When user "Alice" updates the last public link share using the sharing API with
       | password | Test:123345 |

@@ -1473,8 +1473,7 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function publicGetsSizeOfLastSharedPublicLinkUsingTheWebdavApi():void {
-		$tokenArray = $this->getLastCreatedPublicShare()->token;
-		$token = (string)$tokenArray[0];
+		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$url = $this->getBaseUrl() . "/remote.php/dav/public-files/$token";
 		$this->response = HttpRequestHelper::sendRequest(
 			$url,
@@ -5506,13 +5505,9 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function thePublicListsTheResourcesInTheLastCreatedPublicLinkWithDepthUsingTheWebdavApi(string $depth):void {
-		if ($this->isUsingSharingNG()) {
-			$user = $this->shareNgGetLastCreatedLinkShareToken();
-		} else {
-			$user = $this->getLastCreatedPublicShareToken();
-		}
+		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$response = $this->listFolder(
-			$user,
+			$token,
 			'/',
 			$depth,
 			null,

@@ -3245,7 +3245,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function thePublicAccessesThePreviewOfTheSharedFileUsingTheSharingApi(string $path):void {
-		$token = $this->getLastCreatedPublicShareToken();
+		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$this->getPublicPreviewOfFile($path, $token);
 		$this->pushToLastStatusCodesArrays();
 	}
@@ -3266,7 +3266,7 @@ trait Sharing {
 		$this->emptyLastHTTPStatusCodesArray();
 		$this->emptyLastOCSStatusCodesArray();
 		foreach ($paths as $path) {
-			$token = $this->getLastCreatedPublicShareToken();
+			$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 			$this->getPublicPreviewOfFile($path["path"], $token);
 			$this->pushToLastStatusCodesArrays();
 		}

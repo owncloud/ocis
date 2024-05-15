@@ -224,7 +224,7 @@ class PublicWebDavContext implements Context {
 	 * @return ResponseInterface
 	 */
 	public function renameFileFromPublicShare(string $fileName, string $toFileName, string $publicWebDAVAPIVersion, ?string $password = ""):ResponseInterface {
-		$token = $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			$token,
 			0,
@@ -332,17 +332,12 @@ class PublicWebDavContext implements Context {
 	/**
 	 * @param string $path
 	 * @param string $user
-	 * @param bool $shareNg
 	 *
 	 * @return ResponseInterface
 	 */
-	public function downloadFromPublicLinkAsUser(string $path, string $user, bool $shareNg = false): ResponseInterface {
+	public function downloadFromPublicLinkAsUser(string $path, string $user): ResponseInterface {
 		$path = \ltrim($path, "/");
-		if ($shareNg) {
-			$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
-		} else {
-			$token = $this->featureContext->getLastCreatedPublicShareToken();
-		}
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 
 		$davPath = WebDavHelper::getDavPath(
 			$token,
@@ -1701,7 +1696,7 @@ class PublicWebDavContext implements Context {
 		string $fileName,
 		string $mtime
 	):void {
-		$token = $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$mtime = \explode(" ", $mtime);
 		\array_pop($mtime);
