@@ -1,28 +1,133 @@
 ---
 title: "Release Roadmap"
-date: 2020-12-16T20:35:00+01:00
+date: 2024-05-10T21:20:00+01:00
 weight: 0
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_roadmap.md
 ---
 
-You may have asked yourself why there are major version 1 tags in our GitHub repository but the Readme still states `ownCloud Infinite Scale is currently in a technical preview state. It will be subject to a lot of changes and is not yet ready for general production deployments.`. How can that be if it's a major version 1?
+{{< toc >}}
 
-Our initial and also our current plan is to stick to SemVer as versioning scheme. But sometimes there are other factors which cross your plans. Therefore we started releasing oCIS with version `1.0.0 Tech Preview`.
+## Releases
 
-## ownCloud Infinite Scale 1.x technology preview releases
 
-All oCIS releases within major version 1 will be handled as technology previews. There will be no supported releases in terms of us guaranteeing production readiness. We will do releases every 3 weeks, and they will sometimes only include bugfixes, but also introduce new features or optimizations.
+| Release Date | Flavour      | Version                                                                               | Notes                                                                                         | Support        |
+| ------------ | ------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | -------------- |
+| 23.12.2024   | Rolling      | -                                                                                     | -                                                                                             | -              |
+| 02.12.2024   | Rolling      | -                                                                                     | -                                                                                             | -              |
+| 11.11.2024   | Production   | -                                                                                     | -                                                                                             | -              |
+| 21.10.2024   | Rolling      | -                                                                                     | -                                                                                             | -              |
+| 30.09.2024   | Rolling      | -                                                                                     | -                                                                                             | -              |
+| 09.09.2024   | Rolling      | -                                                                                     | -                                                                                             | -              |
+| 19.08.2024   | Rolling      | -                                                                                     | -                                                                                             | -              |
+| 29.07.2024   | Rolling      | -                                                                                     | -                                                                                             | -              |
+| 08.07.2024   | Rolling      | -                                                                                     | -                                                                                             | -              |
+| 17.06.2024   | Rolling      | -                                                                                     | -                                                                                             | -              |
+| 27.05.2024   | Rolling      | -                                                                                     | -                                                                                             | -              |
+| **02.05.2024**   | **Production**   | **[Infinite Scale 5 (5.0.3)](https://download.owncloud.com/ocis/ocis/stable/5.0.3/)** | **[Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-5-0-3)**        | **Active Support** |
+| 17.04.2024   | Production   | [Infinite Scale 5 (5.0.2)](https://download.owncloud.com/ocis/ocis/stable/5.0.2/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-5-0-2)        | Active Support |
+| 11.04.2024   | Production   | [Infinite Scale 5 (5.0.1)](https://download.owncloud.com/ocis/ocis/stable/5.0.1/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-5-0-1)        | Active Support |
+| 18.03.2024   | Production   | [Infinite Scale 5 (5.0.0)](https://download.owncloud.com/ocis/ocis/stable/5.0.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-5-0-0)        | Active Support |
+| 27.03.2024   | Production   | [Infinite Scale 4 (4.0.7)](https://download.owncloud.com/ocis/ocis/stable/4.0.7/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-4-0-7)        | Discontinued   |
+| 07.02.2024   | Production   | [Infinite Scale 4 (4.0.6)](https://download.owncloud.com/ocis/ocis/stable/4.0.6/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-4-0-6)        | Discontinued   |
+| 21.12.2023   | Production   | [Infinite Scale 4 (4.0.5)](https://download.owncloud.com/ocis/ocis/stable/4.0.5/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-4-0-5)        | Discontinued   |
+| 07.12.2023   | Production   | [Infinite Scale 4 (4.0.4)](https://download.owncloud.com/ocis/ocis/stable/4.0.4/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-4-0-4)        | Discontinued   |
+| 24.11.2023   | Production   | [Infinite Scale 4 (4.0.3)](https://download.owncloud.com/ocis/ocis/stable/4.0.3/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-4-0-3)        | Discontinued   |
+| 06.10.2023   | Production   | [Infinite Scale 4 (4.0.2)](https://download.owncloud.com/ocis/ocis/stable/4.0.2/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-4-0-2)        | Discontinued   |
+| 01.09.2023   | Production   | [Infinite Scale 4 (4.0.1)](https://download.owncloud.com/ocis/ocis/stable/4.0.1/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-4-0-1)        | Discontinued   |
+| 25.08.2023   | Production   | [Infinite Scale 4 (4.0.0)](https://download.owncloud.com/ocis/ocis/stable/4.0.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-4-0-0)        | Discontinued   |
+| 07.06.2023   | Production   | [Infinite Scale 3 (3.0.0)](https://download.owncloud.com/ocis/ocis/stable/3.0.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-3-0-0)        | Discontinued   |
+| 30.11.2022   | Production   | [Infinite Scale 2 (2.0.0)](https://download.owncloud.com/ocis/ocis/stable/2.0.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#infinite-scale-2-0-0)        | Discontinued   |
+| 04.04.2022   | Beta         | [Infinite Scale 1 (1.9.0)](https://download.owncloud.com/ocis/ocis/stable/1.9.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#beta-releases)               | Discontinued   |
+| 04.04.2022   | Beta         | [Infinite Scale 1 (1.8.0)](https://download.owncloud.com/ocis/ocis/stable/1.8.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#beta-releases)               | Discontinued   |
+| 04.04.2022   | Beta         | [Infinite Scale 1 (1.7.0)](https://download.owncloud.com/ocis/ocis/stable/1.7.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#beta-releases)               | Discontinued   |
+| 04.04.2022   | Beta         | [Infinite Scale 1 (1.6.0)](https://download.owncloud.com/ocis/ocis/stable/1.6.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#beta-releases)               | Discontinued   |
+| 04.04.2022   | Beta         | [Infinite Scale 1 (1.5.0)](https://download.owncloud.com/ocis/ocis/stable/1.5.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#beta-releases)               | Discontinued   |
+| 04.04.2022   | Beta         | [Infinite Scale 1 (1.4.0)](https://download.owncloud.com/ocis/ocis/stable/1.4.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#beta-releases)               | Discontinued   |
+| 04.04.2022   | Beta         | [Infinite Scale 1 (1.3.0)](https://download.owncloud.com/ocis/ocis/stable/1.3.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#beta-releases)               | Discontinued   |
+| 13.04.2022   | Beta         | [Infinite Scale 1 (1.20.0)](https://download.owncloud.com/ocis/ocis/stable/1.20.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#beta-releases)               | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.2.0)](https://download.owncloud.com/ocis/ocis/stable/1.2.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 05.04.2022   | Tech Preview | [Infinite Scale 1 (1.19.1)](https://download.owncloud.com/ocis/ocis/stable/1.19.1/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 05.04.2022   | Tech Preview | [Infinite Scale 1 (1.19.0)](https://download.owncloud.com/ocis/ocis/stable/1.19.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.18.0)](https://download.owncloud.com/ocis/ocis/stable/1.18.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.17.0)](https://download.owncloud.com/ocis/ocis/stable/1.17.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.16.0)](https://download.owncloud.com/ocis/ocis/stable/1.16.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.15.0)](https://download.owncloud.com/ocis/ocis/stable/1.15.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.14.0)](https://download.owncloud.com/ocis/ocis/stable/1.14.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.13.0)](https://download.owncloud.com/ocis/ocis/stable/1.13.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.12.0)](https://download.owncloud.com/ocis/ocis/stable/1.12.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.11.0)](https://download.owncloud.com/ocis/ocis/stable/1.11.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.10.0)](https://download.owncloud.com/ocis/ocis/stable/1.10.0/)   | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.1.0)](https://download.owncloud.com/ocis/ocis/stable/1.1.0/)     | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
+| 04.04.2022   | Tech Preview | [Infinite Scale 1 (1.0.06)](https://download.owncloud.com/ocis/ocis/stable/1.0.0/)    | [Release Notes](https://doc.owncloud.com/ocis_release_notes.html#technology-preview-releases) | Discontinued   |
 
-We will be fixing bugs if you report them and truly appreciate every report and contribution. Depending on the individual case, we will publish bugfix releases or add the fix to the next minor release.
+Please find the daily release here: [https://download.owncloud.com/ocis/ocis/daily/](https://download.owncloud.com/ocis/ocis/daily/).
 
-We are going to stick to major version 1 until we feel confident about running oCIS in production environments. As a consequence of this we cannot raise the major version, like SemVer requires it, even if we need to introduce breaking changes. We will do our best to avoid breaking changes. If there is no way to circumvent this, we will add an automatic migration or at least point out manual migration steps, since we as oCIS developers are already using oCIS on a personal basis. The best place to see if a breaking change happens is our changelog which is available for every release. If things are not working out for you please contact us immediately. We want to know about this and solve it for you.
 
-It isn't our intention to scare you with our addendum "Tech Preview". We want you to have a clear picture of what you can expect from oCIS. You could take it as a disclaimer or even compare it to running a Linux kernel in alpha stage. It can be very pleasing to be on the latest codebase but you could also find yourself with a lot of problems arising because of that.
+## Release Flavours
 
-You clearly can expect a totally new experience of file-sync and share with oCIS and we want you to use it now - but with understanding and caution.
+ownCloud Infinite Scale is released in three different release flavors: **Production**, **Rolling** and **Daily**. Each of them is targeted to a specific use case and audience group:
 
-## ownCloud Infinite Scale 2.x general availability releases
+{{< columns >}}
+{{< hint type=tip title=Production >}}
+- Stable and tested release, suitable for critical data.
+- Slow cycle, but most stable with slow feature additions.
+- Patch releases are provided for critical- and security-bugs as defined by ownCloud support regulations.
+{{< /hint >}}
+<---> <!-- magic separator, between columns -->
+{{< hint title=Rolling icon=gdoc_check >}}
+- Chances are high that some manual testing has happened, yet not structured.
+- Features are mostly completed. An upgrade path from the previous rolling release is provided and tested. Great release to use with non critical data.
+- Critical bugs are guaranteed to be fixed with the next rolling release.
+{{< /hint >}}
+## 
+<---> <!-- magic separator, between columns -->
+{{< hint type=important title=Daily >}}
+- Mainly for test use cases. As the releases are done completely unattended, only the automatic test suite has tested the release. Manual testing was only applied by chance. 
+- Based on ownClouds strong test suite the daily releases are pretty stable, but the risk of unfinished changes is high. 
+- For example, if a feature requires three commits, and only one was committed, the daily is cut anyway.{{< /columns >}}
+{{< /hint >}}
 
-Starting with oCIS 2.0.0 release we will strictly stick to SemVer, just as we do right now for ownCloud Server. The general availability release will also mean that we can recommend oCIS warmly to everyone. Use it to store your precious family pictures or you confidential company data!
+| Flavour                       | Production                                                                                             | Rolling                                            | Daily                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------- | ---------------------------------------- |
+| Frequency                     | About every 6 month                                                                                           | Every 3 weeks                                      | Daily                                    |
+| Audience                      | Everyone                                                                                               | Early adopters                                     | Developers                               |
+| Risk                          | Low (known) risk                                                                                       | Low-medium risk                                    | High (unknown) risk                      |
+| Support                       | Commercially supported                                                                                 | Company support on special agreement with ownCloud | Community support                        |
+| Documentation                 | Official                                                                                               | Moving documentation                               | Moving documentation, engineering output |
+| Updates                       | Patch releases based on last stable                                                                    | Rolling every three weeks                          | None                                     |
+| Update path                   | Incremental: from previous production to new production, from last rolling before a production release | from previous rolling to new rolling               | Clean slate                              |
+| Downgrade                     | No                                                                                                     | No                                                 | No                                       |
+| Service-level agreement (SLA) | Yes                                                                                                    | No                                                 | No                                       |
+| Overlapping support           | Yes                                                                                                    | No                                                 | No                                       |
+
+
+
+
+## Documentation
+- **Production** will come with released documentation that is specific for the release. It will remain valid throughout the whole livetime of the release. If patches require documentation changes, addendums will be delivered.
+
+- **Daily** and **Rolling** have access to the documentation as it moves forward in the development process along with the product which will be available on ownClouds web site. There wont be specific releases. Changelog entries, PR comments and similar engineering output can complement the information.
+
+## Updating and Overlap
+
+- **Production** provides a guaranteed upgrade path from the last Production release, as well as from the previous Rolling release before the new Production. For that, support from ownCloud is required. Upgrades between two Production releases are only supported to tested patch releases provided by ownCloud. In an upgrade process, all released patch releases have to be installed in the correct sequence.
+
+- **Rolling** is guaranteed to upgrade from the last rolling release or from the previous daily before the new Rolling release. If a critical bug is found in a rolling release, it is guaranteed to be fixed in the next Rolling. There are no backports to the Rolling. In critical cases, an upgrade to a daily release in between has to be done at own risk.
+
+- **Daily** does not come with any guaranteed update path. Chances are good that updates will go smooth, but that might have hickups in cases where the upgrade code is not finalized in time.
+
+Only production gives a reasonable overlap time between releases, for example if version 9 was released, version 8 will still receive a patch release until the next production release.
+
+## Support
+ownCloud only offers commercial support for **Production**. Rolling might be considered for customer installations in the sales process but always requires an individual agreement between all parties.
+
+**Daily** and **Rolling** are supported on best effort provided by community and ownCloud staff. There is **no SLA** and no guarantee for attention.
+
+As ownCloud understands that the effort taken to report a problem is significant and results benefit all users in the community and ownCloud customers, there are resources available to respectfully work on community issues.
+
+Please consider the [Contribution guidelines](https://github.com/owncloud/ocis/blob/master/CONTRIBUTING.md) for this.
+
+## Versioning Scheme
+We adhere to **Semantic Versioning** (SemVer) to ensure clarity and predictability in each of our releases. Learn how Semantic Versioning works on [https://semver.org/](https://semver.org/ ).
