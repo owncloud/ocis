@@ -45,9 +45,11 @@ class ShareesContext implements Context {
 	 * @return void
 	 */
 	public function theUserGetsTheShareesWithParameters(TableNode $body):void {
-		$this->getShareesWithParameters(
-			$this->featureContext->getCurrentUser(),
-			$body
+		$this->featureContext->setResponse(
+			$this->getShareesWithParameters(
+				$this->featureContext->getCurrentUser(),
+				$body
+			)
 		);
 	}
 
@@ -60,9 +62,11 @@ class ShareesContext implements Context {
 	 * @return void
 	 */
 	public function userGetsTheShareesWithParameters(string $user, TableNode $body):void {
-		$this->getShareesWithParameters(
-			$user,
-			$body
+		$this->featureContext->setResponse(
+			$this->getShareesWithParameters(
+				$user,
+				$body
+			)
 		);
 	}
 
@@ -192,9 +196,9 @@ class ShareesContext implements Context {
 	 * @param string $user
 	 * @param TableNode $body
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
-	public function getShareesWithParameters(string $user, TableNode $body):void {
+	public function getShareesWithParameters(string $user, TableNode $body): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$url = '/apps/files_sharing/api/v1/sharees';
 		$this->featureContext->verifyTableNodeColumnsCount($body, 2);
@@ -206,12 +210,11 @@ class ShareesContext implements Context {
 			$url .= '?' . \implode('&', $parameters);
 		}
 
-		$response = $this->ocsContext->sendRequestToOcsEndpoint(
+		return $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			'GET',
 			$url
 		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
