@@ -227,13 +227,13 @@ class WebDavPropertiesContext implements Context {
 	 * @throws Exception
 	 */
 	public function getPropertiesOfEntryFromLastLinkShare(string $path, TableNode $propertiesTable): ResponseInterface {
-		$user = $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$properties = null;
 		foreach ($propertiesTable->getRows() as $row) {
 			$properties[] = $row[0];
 		}
 		return $this->featureContext->listFolder(
-			$user,
+			$token,
 			$path,
 			'0',
 			$properties,
@@ -824,6 +824,7 @@ class WebDavPropertiesContext implements Context {
 		);
 		$user = $this->featureContext->getActualUsername($user);
 		$value = $xmlPart[0]->__toString();
+		$callback = ($this->featureContext->isUsingSharingNG()) ? "shareNgGetLastCreatedLinkShareToken" : "getLastCreatedPublicShareToken";
 		$pattern = $this->featureContext->substituteInLineCodes(
 			$pattern,
 			$user,
@@ -832,7 +833,7 @@ class WebDavPropertiesContext implements Context {
 				[
 					"code" => "%public_token%",
 					"function" =>
-					[$this->featureContext, "getLastCreatedPublicShareToken"],
+					[$this->featureContext, $callback],
 					"parameter" => []
 				],
 			]

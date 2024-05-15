@@ -134,10 +134,10 @@ default:
         - FeatureContext: *common_feature_context_params
         - PublicWebDavContext:
         - TrashbinContext:
-        - WebDavPropertiesContext:
-        - OcisConfigContext:
         - SpacesContext:
         - SharingNgContext:
+        - WebDavPropertiesContext:
+        - OcisConfigContext:
 
     coreApiSharePublicLink2:
       paths:

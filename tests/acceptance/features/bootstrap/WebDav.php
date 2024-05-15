@@ -5505,13 +5505,9 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function thePublicListsTheResourcesInTheLastCreatedPublicLinkWithDepthUsingTheWebdavApi(string $depth):void {
-		if ($this->isUsingSharingNG()) {
-			$user = $this->shareNgGetLastCreatedLinkShareToken();
-		} else {
-			$user = $this->getLastCreatedPublicShareToken();
-		}
+		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$response = $this->listFolder(
-			$user,
+			$token,
 			'/',
 			$depth,
 			null,
