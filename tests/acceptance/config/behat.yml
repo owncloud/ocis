@@ -333,21 +333,17 @@ default:
         - FeatureContext: *common_feature_context_params
         - SpacesContext:
         - SharingNgContext:
-        - PublicWebDavContext:
         - OcisConfigContext:
         - SettingsContext:
 
-    apiSharingNgShareInvitations:
+    apiSharingNgShareInvitation:
       paths:
-        - "%paths.base%/../features/apiSharingNgShareInvitations"
+        - "%paths.base%/../features/apiSharingNgShareInvitation"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
         - SpacesContext:
         - SharingNgContext:
-        - PublicWebDavContext:
-        - OcisConfigContext:
-        - SettingsContext:
 
     apiSharingNgLinkShare:
       paths:
@@ -359,7 +355,6 @@ default:
         - SharingNgContext:
         - PublicWebDavContext:
         - OcisConfigContext:
-        - SettingsContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
