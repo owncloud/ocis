@@ -185,6 +185,11 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 	if match.Entity.Ref.ResourceId.StorageId == utils.ShareStorageProviderID {
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:shareid", match.Entity.Ref.ResourceId.OpaqueId))
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:shareroot", match.Entity.ShareRootName))
+		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:remote-item-id", storagespace.FormatResourceID(provider.ResourceId{
+			StorageId: match.Entity.GetRemoteItemId().GetStorageId(),
+			SpaceId:   match.Entity.GetRemoteItemId().GetSpaceId(),
+			OpaqueId:  match.Entity.GetRemoteItemId().GetOpaqueId(),
+		})))
 	}
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:name", match.Entity.Name))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(time.RFC3339)))
