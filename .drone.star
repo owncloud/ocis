@@ -152,7 +152,7 @@ config = {
         },
     },
     "rocketchat": {
-        "channel": "infinitescale",
+        "channel": "builds",
         "channel_cron": "builds",
         "from_secret": "rocketchat_talk_webhook",
     },
