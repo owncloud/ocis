@@ -111,6 +111,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Graph permission created date time: [#8954](https://github.com/owncloud/ocis/pull/8954)
 * Enhancement - Add virus filter to sessions command: [#9041](https://github.com/owncloud/ocis/pull/9041)
 * Enhancement - Assimilate `clean` into `sessions` command: [#9041](https://github.com/owncloud/ocis/pull/9041)
+* Enhancement - Add remote item id to WebDAV report responses: [#9094](https://github.com/owncloud/ocis/issues/9094)
 * Enhancement - Bump Reva: [#9132](https://github.com/owncloud/ocis/pull/9132)
 * Enhancement - Add watermark text: [#9144](https://github.com/owncloud/ocis/pull/9144)
 * Enhancement - Update selected attributes of autoprovisioned users: [#9166](https://github.com/owncloud/ocis/pull/9166)
@@ -658,6 +659,13 @@ The following sections list the changes for unreleased.
    `ocis storage-users uploads session --clean`
 
    https://github.com/owncloud/ocis/pull/9041
+
+* Enhancement - Add remote item id to WebDAV report responses: [#9094](https://github.com/owncloud/ocis/issues/9094)
+
+   The remote item id has been added to WebDAV `REPORT` responses.
+
+   https://github.com/owncloud/ocis/issues/9094
+   https://github.com/owncloud/ocis/pull/9095
 
 * Enhancement - Bump Reva: [#9132](https://github.com/owncloud/ocis/pull/9132)
 
