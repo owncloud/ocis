@@ -1473,8 +1473,7 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function publicGetsSizeOfLastSharedPublicLinkUsingTheWebdavApi():void {
-		$tokenArray = $this->getLastCreatedPublicShare()->token;
-		$token = (string)$tokenArray[0];
+		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$url = $this->getBaseUrl() . "/remote.php/dav/public-files/$token";
 		$this->response = HttpRequestHelper::sendRequest(
 			$url,

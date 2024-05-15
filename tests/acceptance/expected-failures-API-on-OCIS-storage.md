@@ -90,7 +90,7 @@ cannot share a folder with create permission
 
 #### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
 
-- [coreApiSharePublicLink1/createPublicLinkShare.feature:288](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L288)
+- [coreApiSharePublicLink1/createPublicLinkShare.feature:290](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L290)
 
 #### [copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file](https://github.com/owncloud/ocis/issues/1232)
 

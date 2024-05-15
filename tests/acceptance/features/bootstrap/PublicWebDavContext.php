@@ -1696,7 +1696,7 @@ class PublicWebDavContext implements Context {
 		string $fileName,
 		string $mtime
 	):void {
-		$token = $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$mtime = \explode(" ", $mtime);
 		\array_pop($mtime);
