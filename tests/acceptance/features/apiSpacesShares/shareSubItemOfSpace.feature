@@ -41,9 +41,11 @@ Feature: Share a file or folder that is inside a space
 
 
   Scenario Outline: user participant of the project space with manager role can share an entity to another user
-    Given user "Alice" has shared a space "share sub-item" with settings:
-      | shareWith | Brian   |
-      | role      | manager |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | share sub-item |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | Manager        |
     When user "Brian" creates a share inside of space "share sub-item" with settings:
       | path       | <resource>    |
       | shareWith  | Bob           |
@@ -64,9 +66,11 @@ Feature: Share a file or folder that is inside a space
 
   @skipOnRevaMaster
   Scenario Outline: user participant of the project space without space manager role cannot share an entity to another user
-    Given user "Alice" has shared a space "share sub-item" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | share sub-item |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | <space-role>   |
     When user "Brian" creates a share inside of space "share sub-item" with settings:
       | path      | <resource> |
       | shareWith | Bob        |
@@ -75,17 +79,19 @@ Feature: Share a file or folder that is inside a space
     And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     Examples:
-      | resource | space-role |
-      | folder   | editor     |
-      | file.txt | editor     |
-      | file.txt | viewer     |
-      | folder   | viewer     |
+      | resource | space-role   |
+      | folder   | Space Editor |
+      | file.txt | Space Editor |
+      | file.txt | Space Viewer |
+      | folder   | Space Viewer |
 
 
   Scenario Outline: user participant of the project space can see the created resources share
-    Given user "Alice" has shared a space "share sub-item" with settings:
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | share sub-item |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | <space-role>   |
     When user "Alice" creates a share inside of space "share sub-item" with settings:
       | path      | file.txt |
       | shareWith | Bob      |
@@ -93,10 +99,10 @@ Feature: Share a file or folder that is inside a space
     Then for user "Alice" the space "share sub-item" should contain the last created share of the file "file.txt"
     And for user "Brian" the space "share sub-item" should contain the last created share of the file "file.txt"
     Examples:
-      | space-role |
-      | editor     |
-      | viewer     |
-      | manager    |
+      | space-role   |
+      | Space Editor |
+      | Space Viewer |
+      | Manager      |
 
 
   Scenario: user shares the folder to the group
@@ -117,11 +123,14 @@ Feature: Share a file or folder that is inside a space
 
 
   Scenario: user changes the expiration date
-    Given user "Alice" has created a share inside of space "share sub-item" with settings:
-      | path       | folder                   |
-      | shareWith  | Brian                    |
-      | role       | viewer                   |
-      | expireDate | 2042-01-01T23:59:59+0100 |
+    Given using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder                   |
+      | space           | share sub-item           |
+      | sharee          | Brian                    |
+      | shareType       | user                     |
+      | permissionsRole | Viewer                   |
+      | expireDate      | 2042-01-01T23:59:59.000Z |
     When user "Alice" changes the last share with settings:
       | expireDate | 2044-01-01T23:59:59.999+01:00 |
       | role       | viewer                        |
@@ -131,11 +140,14 @@ Feature: Share a file or folder that is inside a space
 
 
   Scenario: user deletes the expiration date
-    Given user "Alice" has created a share inside of space "share sub-item" with settings:
-      | path       | folder                   |
-      | shareWith  | Brian                    |
-      | role       | viewer                   |
-      | expireDate | 2042-01-01T23:59:59+0100 |
+    Given using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder                   |
+      | space           | share sub-item           |
+      | sharee          | Brian                    |
+      | shareType       | user                     |
+      | permissionsRole | Viewer                   |
+      | expireDate      | 2042-01-01T23:59:59.000Z |
     When user "Alice" changes the last share with settings:
       | expireDate |        |
       | role       | viewer |
@@ -143,39 +155,47 @@ Feature: Share a file or folder that is inside a space
     And the information about the last share for user "Brian" should include
       | expiration |  |
 
-
+  @issue-8747
   Scenario: user cannot delete share role
     Given using OCS API version "<ocs_api_version>"
-    And user "Alice" has created a share inside of space "share sub-item" with settings:
-      | path       | folder                   |
-      | shareWith  | Brian                    |
-      | role       | viewer                   |
-      | expireDate | 2042-01-01T23:59:59+0100 |
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder                   |
+      | space           | share sub-item           |
+      | sharee          | Brian                    |
+      | shareType       | user                     |
+      | permissionsRole | Viewer                   |
+      | expireDate      | 2042-01-01T23:59:59.000Z |
     When user "Alice" changes the last share with settings:
       | role |  |
     Then the HTTP status code should be "400"
 
 
   Scenario: check the end of expiration date in user share
-    Given user "Alice" has created a share inside of space "share sub-item" with settings:
-      | path       | folder                   |
-      | shareWith  | Brian                    |
-      | role       | viewer                   |
-      | expireDate | 2042-01-01T23:59:59+0100 |
-    When user "Alice" expires the last share
+    Given using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder                   |
+      | space           | share sub-item           |
+      | sharee          | Brian                    |
+      | shareType       | user                     |
+      | permissionsRole | Viewer                   |
+      | expireDate      | 2042-01-01T23:59:59.000Z |
+    When user "Alice" expires the last share of resource "folder" inside of the space "share sub-item"
     Then the HTTP status code should be "200"
     And as "Brian" folder "Shares/folder" should not exist
 
   @issue-5823
   Scenario: check the end of expiration date in group share
     Given group "sales" has been created
+    And using SharingNG
     And the administrator has added a user "Brian" to the group "sales" using the Graph API
-    And user "Alice" has created a share inside of space "share sub-item" with settings:
-      | path       | folder                   |
-      | shareWith  | sales                    |
-      | shareType  | 1                        |
-      | role       | viewer                   |
-      | expireDate | 2042-01-01T23:59:59+0100 |
-    When user "Alice" expires the last share
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder                   |
+      | space           | share sub-item           |
+      | sharee          | sales                    |
+      | shareType       | group                    |
+      | permissionsRole | Viewer                   |
+      | expireDate      | 2042-01-01T23:59:59.000Z |
+    When user "Alice" expires the last share of resource "folder" inside of the space "share sub-item"
     Then the HTTP status code should be "200"
     And as "Brian" folder "Shares/folder" should not exist

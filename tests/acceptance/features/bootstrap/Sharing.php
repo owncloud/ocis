@@ -1934,10 +1934,11 @@ trait Sharing {
 	 * @param TableNode $table
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function userGetsTheLastShareSharedWithHimUsingTheSharingApi(string $user, TableNode $table):void {
 		$user = $this->getActualUsername($user);
-		$shareId = (string) $this->getLastCreatedPublicShare()->id;
+		$shareId = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 		$response = $this->getShareData($user, $shareId);
 		$this->checkFields($user, $table, $response);
 	}
