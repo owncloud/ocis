@@ -178,7 +178,7 @@ services:
         condition: service_healthy
 
   wopiserver:
-    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v10.3.0}
+    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v10.4.0}
     networks:
       ocis-net:
     entrypoint:
