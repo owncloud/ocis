@@ -297,14 +297,33 @@ var _ = Describe("DrivesDriveItemService", func() {
 				EXPECT().
 				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
 				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.ListReceivedSharesRequest, option ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-					Expect(request.Filters).To(HaveLen(2))
+					Expect(request.Filters).To(HaveLen(3))
 					Expect(request.Filters[0].Type).To(Equal(collaborationv1beta1.Filter_TYPE_RESOURCE_ID))
 					Expect(request.Filters[1].Term.(*collaborationv1beta1.Filter_State).State).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED))
-					return nil, nil
+					Expect(request.Filters[2].Term.(*collaborationv1beta1.Filter_State).State).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_REJECTED))
+					return &collaborationv1beta1.ListReceivedSharesResponse{
+						Status: status.NewOK(context.Background()),
+						Shares: []*collaborationv1beta1.ReceivedShare{
+							{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_REJECTED},
+							{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED},
+							{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED},
+						},
+					}, nil
 				}).
 				Once()
 
-			_ = drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{})
+			gatewayClient.
+				EXPECT().
+				UpdateReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.UpdateReceivedShareRequest, option ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+					return &collaborationv1beta1.UpdateReceivedShareResponse{
+						Status: status.NewOK(ctx),
+					}, nil
+				}).
+				Times(2)
+
+			err := drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{})
+			Expect(err).To(BeNil())
 		})
 
 		It("reports some error if one or multiple shares could not be unmounted", func() {
@@ -323,7 +342,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 					Status: status.NewOK(context.Background()),
 					Shares: []*collaborationv1beta1.ReceivedShare{
 						{},
-						{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}},
+						{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED},
 						{},
 					},
 				}, nil).
@@ -334,19 +353,13 @@ var _ = Describe("DrivesDriveItemService", func() {
 				EXPECT().
 				UpdateReceivedShare(context.Background(), mock.Anything, mock.Anything).
 				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.UpdateReceivedShareRequest, option ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
-					if request.GetShare().GetShare().GetId() != nil {
-						return &collaborationv1beta1.UpdateReceivedShareResponse{
-							Status: status.NewOK(ctx),
-						}, nil
-					}
-
 					return nil, someErr
 				}).
-				Times(3)
+				Times(1)
 
 			err := drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{})
 			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
-			Expect(err.(interface{ Unwrap() []error }).Unwrap()).To(HaveLen(2))
+			Expect(err.(interface{ Unwrap() []error }).Unwrap()).To(HaveLen(1))
 		})
 	})
 
@@ -362,15 +375,43 @@ var _ = Describe("DrivesDriveItemService", func() {
 				EXPECT().
 				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
 				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.ListReceivedSharesRequest, option ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
-					Expect(request.Filters).To(HaveLen(3))
+					Expect(request.Filters).To(HaveLen(1))
 					Expect(request.Filters[0].Type).To(Equal(collaborationv1beta1.Filter_TYPE_RESOURCE_ID))
-					Expect(request.Filters[1].Term.(*collaborationv1beta1.Filter_State).State).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_PENDING))
-					Expect(request.Filters[2].Term.(*collaborationv1beta1.Filter_State).State).To(Equal(collaborationv1beta1.ShareState_SHARE_STATE_REJECTED))
 					return nil, nil
 				}).
 				Once()
 
 			_, _ = drivesDriveItemService.MountShare(context.Background(), nil, "some")
+		})
+
+		It("reports no errors when shares have mounted", func() {
+			gatewayClient.
+				EXPECT().
+				ListReceivedShares(context.Background(), mock.Anything, mock.Anything, mock.Anything).
+				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.ListReceivedSharesRequest, option ...grpc.CallOption) (*collaborationv1beta1.ListReceivedSharesResponse, error) {
+					return &collaborationv1beta1.ListReceivedSharesResponse{
+						Status: status.NewOK(context.Background()),
+						Shares: []*collaborationv1beta1.ReceivedShare{
+							{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_REJECTED},
+							{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED},
+							{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING},
+						},
+					}, nil
+				}).
+				Once()
+			gatewayClient.
+				EXPECT().
+				UpdateReceivedShare(context.Background(), mock.Anything, mock.Anything).
+				RunAndReturn(func(ctx context.Context, request *collaborationv1beta1.UpdateReceivedShareRequest, option ...grpc.CallOption) (*collaborationv1beta1.UpdateReceivedShareResponse, error) {
+					return &collaborationv1beta1.UpdateReceivedShareResponse{
+						Status: status.NewOK(ctx),
+					}, nil
+				}).
+				Times(2)
+
+			shares, err := drivesDriveItemService.MountShare(context.Background(), nil, "some")
+			Expect(err).To(BeNil())
+			Expect(shares).To(HaveLen(2))
 		})
 
 		It("fails if the update instructions produce as many errors as there are shares", func() {
@@ -380,9 +421,9 @@ var _ = Describe("DrivesDriveItemService", func() {
 				Return(&collaborationv1beta1.ListReceivedSharesResponse{
 					Status: status.NewOK(context.Background()),
 					Shares: []*collaborationv1beta1.ReceivedShare{
-						{},
-						{},
-						{},
+						{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING},
+						{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING},
+						{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING},
 					},
 				}, nil).
 				Once()
@@ -408,7 +449,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 					Status: status.NewOK(context.Background()),
 					Shares: []*collaborationv1beta1.ReceivedShare{
 						{},
-						{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}},
+						{Share: &collaborationv1beta1.Share{Id: &collaborationv1beta1.ShareId{}}, State: collaborationv1beta1.ShareState_SHARE_STATE_PENDING},
 						{},
 					},
 				}, nil).
@@ -430,7 +471,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 						Status: status.NewOK(ctx),
 					}, nil
 				}).
-				Times(3)
+				Once()
 
 			shares, err := drivesDriveItemService.MountShare(context.Background(), nil, "some")
 			Expect(err).To(BeNil())
@@ -518,7 +559,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 		failOnNonShareJailDriveID(drivesDriveItemApi.DeleteDriveItem)
 
-		It("fails if unmounting the share fails", func() {
+		It("fails if unmounting the share fails with the general error", func() {
 			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
 			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
 			w := httptest.NewRecorder()
@@ -534,10 +575,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				Once()
 
 			drivesDriveItemApi.DeleteDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusBadRequest))
+			Expect(w.Code).To(Equal(http.StatusInternalServerError))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrUnmountShare.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal("generalException: some error"))
 		})
 
 		It("successfully unmounts the share", func() {
@@ -1021,7 +1062,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrInvalidID.Error()))
 		})
 
-		It("fails if mounting the share fails", func() {
+		It("fails if mounting the share fails with the general error", func() {
 			rCTX.URLParams.Add("driveID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668")
 			rCTX.URLParams.Add("itemID", "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!1")
 
@@ -1046,10 +1087,10 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				)
 
 			drivesDriveItemApi.CreateDriveItem(w, r)
-			Expect(w.Code).To(Equal(http.StatusBadRequest))
+			Expect(w.Code).To(Equal(http.StatusInternalServerError))
 
 			jsonData := gjson.Get(w.Body.String(), "error")
-			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal(svc.ErrMountShare.Error()))
+			Expect(jsonData.Get("code").String() + ": " + jsonData.Get("message").String()).To(Equal("generalException: some error"))
 		})
 
 		It("fails if drive item conversion fails", func() {

@@ -298,11 +298,10 @@ Feature:  enable or disable sync of incoming shares
       | textfile0.txt |
       | FolderToShare |
 
-  @issue-8724
   Scenario: try to enable share sync of a non-existent resource
     Given user "Brian" has disabled the auto-sync share
     When user "Brian" tries to enable share sync of a resource "nonexistent" using the Graph API
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "404"
     And the JSON data of the response should match
       """
       {
@@ -318,7 +317,7 @@ Feature:  enable or disable sync of incoming shares
             ],
             "properties": {
               "code" : {
-                "const": "invalidRequest"
+                "const": "itemNotFound"
               },
               "innererror" : {
                 "type": "object",
@@ -328,7 +327,7 @@ Feature:  enable or disable sync of incoming shares
                 ]
               },
               "message" : {
-                "const": "mounting share failed"
+                "const": "no shares found"
               }
             }
           }
@@ -380,7 +379,7 @@ Feature:  enable or disable sync of incoming shares
     And user "Alice" has uploaded file with content "some data" to "/fileNotShared.txt"
     And we save it into "FILEID"
     When user "Brian" tries to enable share sync of a resource "<<FILEID>>" using the Graph API
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "404"
     And the JSON data of the response should match
       """
       {
@@ -396,7 +395,7 @@ Feature:  enable or disable sync of incoming shares
             ],
             "properties": {
               "code" : {
-                "const": "invalidRequest"
+                "const": "itemNotFound"
               },
               "innererror" : {
                 "type": "object",
@@ -406,7 +405,7 @@ Feature:  enable or disable sync of incoming shares
                 ]
               },
               "message" : {
-                "const": "mounting share failed"
+                "const": "no shares found"
               }
             }
           }
@@ -474,7 +473,7 @@ Feature:  enable or disable sync of incoming shares
       | permissionsRole | Viewer        |
     And the user "Admin" has deleted a user "Alice"
     When user "Brian" tries to disable sync of share "textfile0.txt" using the Graph API
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "404"
     And the JSON data of the response should match
       """
       {
@@ -490,7 +489,7 @@ Feature:  enable or disable sync of incoming shares
             ],
             "properties": {
               "code" : {
-                "const": "invalidRequest"
+                "const": "itemNotFound"
               },
               "innererror" : {
                 "type": "object",
@@ -500,7 +499,7 @@ Feature:  enable or disable sync of incoming shares
                 ]
               },
               "message" : {
-                "const": "unmounting share failed"
+                "const": "no shares found"
               }
             }
           }
@@ -559,7 +558,7 @@ Feature:  enable or disable sync of incoming shares
       | permissionsRole | Viewer        |
     And group "grp1" has been deleted
     When user "Brian" tries to enable share sync of a resource "<<FILEID>>" using the Graph API
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "404"
     And the JSON data of the response should match
       """
       {
@@ -575,7 +574,7 @@ Feature:  enable or disable sync of incoming shares
             ],
             "properties": {
               "code" : {
-                "const": "invalidRequest"
+                "const": "itemNotFound"
               },
               "innererror" : {
                 "type": "object",
@@ -585,7 +584,7 @@ Feature:  enable or disable sync of incoming shares
                 ]
               },
               "message" : {
-                "const": "mounting share failed"
+                "const": "no shares found"
               }
             }
           }
@@ -609,7 +608,7 @@ Feature:  enable or disable sync of incoming shares
       | permissionsRole | Viewer        |
     And group "grp1" has been deleted
     When user "Brian" tries to disable sync of share "textfile0.txt" using the Graph API
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "404"
     And the JSON data of the response should match
       """
       {
@@ -625,7 +624,7 @@ Feature:  enable or disable sync of incoming shares
             ],
             "properties": {
               "code" : {
-                "const": "invalidRequest"
+                "const": "itemNotFound"
               },
               "innererror" : {
                 "type": "object",
@@ -635,7 +634,7 @@ Feature:  enable or disable sync of incoming shares
                 ]
               },
               "message" : {
-                "const": "unmounting share failed"
+                "const": "error getting received share"
               }
             }
           }
