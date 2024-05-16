@@ -171,8 +171,8 @@ var _ = Describe("unifiedroles", func() {
 				unifiedrole.UnifiedRoleConditionFolder,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSecureViewerUnifiedRole(),
-					unifiedrole.NewUploaderUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewEditorLiteUnifiedRole(),
 					unifiedrole.NewEditorUnifiedRole(),
 				},
 			),
@@ -194,8 +194,8 @@ var _ = Describe("unifiedroles", func() {
 				unifiedrole.UnifiedRoleConditionFolder,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSecureViewerUnifiedRole(),
-					unifiedrole.NewUploaderUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewEditorLiteUnifiedRole(),
 					unifiedrole.NewEditorUnifiedRole(),
 				},
 			),
@@ -221,10 +221,11 @@ var _ = Describe("unifiedroles", func() {
 
 			Entry(
 				"mixed",
-				append(rolesToAction(unifiedrole.NewUploaderUnifiedRole()), unifiedrole.DriveItemQuotaRead),
+				append(rolesToAction(unifiedrole.NewEditorLiteUnifiedRole()), unifiedrole.DriveItemQuotaRead),
 				unifiedrole.UnifiedRoleConditionFolder,
 				[]*libregraph.UnifiedRoleDefinition{
-					unifiedrole.NewUploaderUnifiedRole(),
+					unifiedrole.NewSecureViewerUnifiedRole(),
+					unifiedrole.NewEditorLiteUnifiedRole(),
 				},
 			),
 		)
