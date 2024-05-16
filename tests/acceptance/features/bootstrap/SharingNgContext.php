@@ -74,7 +74,7 @@ class SharingNgContext implements Context {
 		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 
 		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
-		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
+		$bodyRows['expirationDateTime'] = \array_key_exists('expirationDateTime', $bodyRows) ? \date('Y-m-d', \strtotime($bodyRows['expirationDateTime'])) . 'T14:00:00.000Z' : null;
 		$bodyRows['password'] = $bodyRows['password'] ?? null;
 		$body = [
 			'type' => $bodyRows['permissionsRole'],

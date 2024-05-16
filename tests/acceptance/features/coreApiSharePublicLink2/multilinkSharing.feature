@@ -10,27 +10,28 @@ Feature: multi-link sharing
   Scenario Outline: creating three public shares of a folder
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path         | FOLDER      |
-      | password     | %public%    |
-      | expireDate   | +3 days     |
-      | publicUpload | true        |
-      | permissions  | change      |
-      | name         | sharedlink1 |
-    And user "Alice" has created a public link share with settings
-      | path         | FOLDER      |
-      | password     | %public%    |
-      | expireDate   | +3 days     |
-      | publicUpload | true        |
-      | permissions  | change      |
-      | name         | sharedlink2 |
-    And user "Alice" has created a public link share with settings
-      | path         | FOLDER      |
-      | password     | %public%    |
-      | expireDate   | +3 days     |
-      | publicUpload | true        |
-      | permissions  | change      |
-      | name         | sharedlink3 |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource           | FOLDER      |
+      | space              | Personal    |
+      | permissionsRole    | edit        |
+      | expirationDateTime | +3 days     |
+      | displayName        | sharedlink1 |
+      | password           | %public%    |
+    And user "Alice" has created the following resource link share:
+      | resource           | FOLDER      |
+      | space              | Personal    |
+      | permissionsRole    | edit        |
+      | expirationDateTime | +3 days     |
+      | displayName        | sharedlink2 |
+      | password           | %public%    |
+    And user "Alice" has created the following resource link share:
+      | resource           | FOLDER      |
+      | space              | Personal    |
+      | permissionsRole    | edit        |
+      | expirationDateTime | +3 days     |
+      | displayName        | sharedlink3 |
+      | password           | %public%    |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | read |
     Then the OCS status code should be "<ocs-status-code>"
@@ -49,24 +50,28 @@ Feature: multi-link sharing
   Scenario Outline: creating three public shares of a file
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | password    | %public%      |
-      | expireDate  | +3 days       |
-      | permissions | read          |
-      | name        | sharedlink1   |
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | password    | %public%      |
-      | expireDate  | +3 days       |
-      | permissions | read          |
-      | name        | sharedlink2   |
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | password    | %public%      |
-      | expireDate  | +3 days       |
-      | permissions | read          |
-      | name        | sharedlink3   |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource           | textfile0.txt |
+      | space              | Personal      |
+      | permissionsRole    | view          |
+      | expirationDateTime | +3 days       |
+      | displayName        | sharedlink1   |
+      | password           | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource           | textfile0.txt |
+      | space              | Personal      |
+      | permissionsRole    | view          |
+      | expirationDateTime | +3 days       |
+      | displayName        | sharedlink2   |
+      | password           | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource           | textfile0.txt |
+      | space              | Personal      |
+      | permissionsRole    | view          |
+      | expirationDateTime | +3 days       |
+      | displayName        | sharedlink3   |
+      | password           | %public%      |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | read |
     Then the OCS status code should be "<ocs-status-code>"
@@ -85,20 +90,21 @@ Feature: multi-link sharing
   Scenario Outline: check that updating password doesn't remove name of links
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path         | FOLDER      |
-      | password     | %public%    |
-      | expireDate   | +3 days     |
-      | publicUpload | true        |
-      | permissions  | change      |
-      | name         | sharedlink1 |
-    And user "Alice" has created a public link share with settings
-      | path         | FOLDER      |
-      | password     | %public%    |
-      | expireDate   | +3 days     |
-      | publicUpload | true        |
-      | permissions  | change      |
-      | name         | sharedlink2 |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource           | FOLDER      |
+      | space              | Personal    |
+      | permissionsRole    | edit        |
+      | expirationDateTime | +3 days     |
+      | displayName        | sharedlink1 |
+      | password           | %public%    |
+    And user "Alice" has created the following resource link share:
+      | resource           | FOLDER      |
+      | space              | Personal    |
+      | permissionsRole    | edit        |
+      | expirationDateTime | +3 days     |
+      | displayName        | sharedlink2 |
+      | password           | %public%    |
     When user "Alice" updates the last public link share using the sharing API with
       | password | New-StronPass1 |
     Then the OCS status code should be "<ocs-status-code>"
@@ -117,18 +123,20 @@ Feature: multi-link sharing
     Given using OCS API version "1"
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | password    | %public%      |
-      | expireDate  | +3 days       |
-      | permissions | read          |
-      | name        | sharedlink1   |
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | password    | %public%      |
-      | expireDate  | +3 days       |
-      | permissions | read          |
-      | name        | sharedlink2   |
+    And user "Alice" has created the following resource link share:
+      | resource           | textfile0.txt |
+      | space              | Personal      |
+      | permissionsRole    | view          |
+      | expirationDateTime | +3 days       |
+      | displayName        | sharedlink1   |
+      | password           | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource           | textfile0.txt |
+      | space              | Personal      |
+      | permissionsRole    | view          |
+      | expirationDateTime | +3 days       |
+      | displayName        | sharedlink2   |
+      | password           | %public%      |
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -147,24 +155,27 @@ Feature: multi-link sharing
   Scenario Outline: deleting one public link share of a file doesn't affect the rest
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | password    | %public%      |
-      | expireDate  | +3 days       |
-      | permissions | read          |
-      | name        | sharedlink1   |
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | password    | %public%      |
-      | expireDate  | +3 days       |
-      | permissions | read          |
-      | name        | sharedlink2   |
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | password    | %public%      |
-      | expireDate  | +3 days       |
-      | permissions | read          |
-      | name        | sharedlink3   |
+    And user "Alice" has created the following resource link share:
+      | resource           | textfile0.txt |
+      | space              | Personal      |
+      | permissionsRole    | view          |
+      | expirationDateTime | +3 days       |
+      | displayName        | sharedlink1   |
+      | password           | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource           | textfile0.txt |
+      | space              | Personal      |
+      | permissionsRole    | view          |
+      | expirationDateTime | +3 days       |
+      | displayName        | sharedlink2   |
+      | password           | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource           | textfile0.txt |
+      | space              | Personal      |
+      | permissionsRole    | view          |
+      | expirationDateTime | +3 days       |
+      | displayName        | sharedlink3   |
+      | password           | %public%      |
     When user "Alice" deletes public link share named "sharedlink2" in file "/textfile0.txt" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -182,18 +193,20 @@ Feature: multi-link sharing
     Given using OCS API version "1"
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | password    | %public%      |
-      | expireDate  | +3 days       |
-      | permissions | read          |
-      | name        | sharedlink1   |
-    And user "Alice" has created a public link share with settings
-      | path        | textfile0.txt |
-      | password    | %public%      |
-      | expireDate  | +3 days       |
-      | permissions | read          |
-      | name        | sharedlink2   |
+    And user "Alice" has created the following resource link share:
+      | resource           | textfile0.txt |
+      | space              | Personal      |
+      | permissionsRole    | view          |
+      | expirationDateTime | +3 days       |
+      | displayName        | sharedlink1   |
+      | password           | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource           | textfile0.txt |
+      | space              | Personal      |
+      | permissionsRole    | view          |
+      | expirationDateTime | +3 days       |
+      | displayName        | sharedlink2   |
+      | password           | %public%      |
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as user "Alice" the public shares of file "/textfile0.txt" should be
@@ -215,20 +228,20 @@ Feature: multi-link sharing
     Given using OCS API version "1"
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path         | FOLDER      |
-      | password     | %public%    |
-      | expireDate   | +3 days     |
-      | publicUpload | true        |
-      | permissions  | change      |
-      | name         | sharedlink1 |
-    And user "Alice" has created a public link share with settings
-      | path         | FOLDER      |
-      | password     | %public%    |
-      | expireDate   | +3 days     |
-      | publicUpload | true        |
-      | permissions  | change      |
-      | name         | sharedlink2 |
+    And user "Alice" has created the following resource link share:
+      | resource           | FOLDER      |
+      | space              | Personal    |
+      | permissionsRole    | edit        |
+      | expirationDateTime | +3 days     |
+      | displayName        | sharedlink1 |
+      | password           | %public%    |
+    And user "Alice" has created the following resource link share:
+      | resource           | FOLDER      |
+      | space              | Personal    |
+      | permissionsRole    | edit        |
+      | expirationDateTime | +3 days     |
+      | displayName        | sharedlink2 |
+      | password           | %public%    |
     When user "Alice" moves folder "/FOLDER" to "/FOLDER_RENAMED" using the WebDAV API
     Then the HTTP status code should be "201"
     And as user "Alice" the public shares of file "/FOLDER_RENAMED" should be
