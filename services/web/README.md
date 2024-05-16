@@ -52,21 +52,18 @@ This cannot be manipulated at runtime.
 Additionally, the administrator can provide custom themes by storing it in the path defined by the environment
 variable `WEB_ASSET_THEMES_PATH`.
 
-This environment variable defaults to the Infinite Scale base data directory `$OCIS_BASE_DATA_PATH/web/assets/themes`,
-but can be redefined with any path set manually.
-
-Once the theme root directory is defined, the system needs to know which theme to use.
+With the theme root directory defined, the system needs to know which theme to use.
 This can be done by setting the `WEB_UI_THEME_PATH` environment variable.
 
 The final theme is composed of the built-in and the custom theme provided by the
 administrator via `WEB_ASSET_THEMES_PATH` and `WEB_UI_THEME_PATH`.
 
-For example, Infinite Scale by default contains a ownCloud theme,
-if the administrator then provides a custom theme via the `WEB_ASSET_THEMES_PATH` directory,
-the theme located at `WEB_ASSET_THEMES_PATH/owncloud/themes.json` will be used instead of the built-in one.
+For example, Infinite Scale by default contains a built in ownCloud theme.
+If the administrator provides a custom theme via the `WEB_ASSET_THEMES_PATH` directory like,
+`WEB_ASSET_THEMES_PATH/owncloud/themes.json`, this one will be used instead of the built-in one.
 
-Some theme keys are mandatory,
-for example, the `common.shareRoles` settings, such mandatory keys are injected automatically at runtime if not provided.
+Some theme keys are mandatory, like the `common.shareRoles` settings.
+Such mandatory keys are injected automatically at runtime if not provided.
 
 ### Loading Applications
 
