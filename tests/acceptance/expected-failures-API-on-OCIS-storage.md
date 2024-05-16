@@ -78,15 +78,15 @@ File and sync features in a shared scenario
 
 #### [File deletion using dav gives unique string in filename in the trashbin](https://github.com/owncloud/product/issues/178)
 
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L58)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L71)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:75](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L75)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L93)
 
 cannot share a folder with create permission
 
 #### [Resource with share permission create is readable for sharee](https://github.com/owncloud/ocis/issues/4524)
 
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:118](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L118)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L130)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:155](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L155)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L172)
 
 #### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
 
@@ -141,15 +141,11 @@ cannot share a folder with create permission
 - [coreApiShareUpdateToShares/updateShare.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L161)
 - [coreApiShareUpdateToShares/updateShare.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L162)
 
-#### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
-
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:544](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L544)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:545](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L545)
 
 #### [deleting a share with wrong authentication returns OCS status 996 / HTTP 500](https://github.com/owncloud/ocis/issues/1229)
 
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:207](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L207)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:208](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L208)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:277](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L277)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:278](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L278)
 
 ### Other
 
@@ -252,8 +248,8 @@ And other missing implementation of favorites
 
 #### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
 
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:588](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L588)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:589](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L589)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:650](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L650)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:651](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L651)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 
@@ -321,8 +317,8 @@ And other missing implementation of favorites
 
 #### [Shares to deleted group listed in the response](https://github.com/owncloud/ocis/issues/2441)
 
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:470](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L470)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:471](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L471)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:502](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L502)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:503](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L503)
 
 #### [copying the file inside Shares folder returns 404](https://github.com/owncloud/ocis/issues/3874)
 
@@ -376,14 +372,14 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiShareManagementToShares/acceptShares.feature:457](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/acceptShares.feature#L457)
 - [coreApiShareOperationsToShares2/shareAccessByID.feature:119](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/shareAccessByID.feature#L119)
 - [coreApiShareOperationsToShares2/shareAccessByID.feature:120](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/shareAccessByID.feature#L120)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L161)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L162)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:163](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L163)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:164](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L164)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L179)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:180](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L180)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:181](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L181)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:182](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L182)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:213](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L213)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:214](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L214)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:215](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L215)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:216](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L216)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:237](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L237)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:238](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L238)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:239](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L239)
+- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:240](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L240)
 
 #### [Content-type is not multipart/byteranges when downloading file with Range Header](https://github.com/owncloud/ocis/issues/2677)
 
