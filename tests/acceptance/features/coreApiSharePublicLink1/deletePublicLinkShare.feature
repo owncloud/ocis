@@ -13,7 +13,7 @@ Feature: delete a public link share
     And user "Alice" has created the following resource link share:
       | resource        | test-file.txt |
       | space           | Personal      |
-      | permissionsRole | edit          |
+      | permissionsRole | view          |
       | password        | %public%      |
       | displayName     | sharedlink    |
     When user "Alice" deletes public link share named "sharedlink" in file "test-file.txt" using the sharing API
@@ -32,7 +32,7 @@ Feature: delete a public link share
     And user "Alice" has created the following resource link share:
       | resource        | test-file.txt |
       | space           | Personal      |
-      | permissionsRole | edit          |
+      | permissionsRole | view          |
       | password        | %public%      |
       | displayName     | sharedlink    |
     And user "Alice" has moved file "/test-file.txt" to "/renamed-test-file.txt"
@@ -52,7 +52,7 @@ Feature: delete a public link share
     And user "Alice" has created the following resource link share:
       | resource        | test-folder |
       | space           | Personal    |
-      | permissionsRole | edit        |
+      | permissionsRole | view        |
       | password        | %public%    |
       | displayName     | sharedlink  |
     When user "Alice" deletes public link share named "sharedlink" in folder "test-folder" using the sharing API
@@ -72,7 +72,7 @@ Feature: delete a public link share
     And user "Alice" has created the following resource link share:
       | resource        | test-folder/testfile.txt |
       | space           | Personal                 |
-      | permissionsRole | edit                     |
+      | permissionsRole | view                     |
       | password        | %public%                 |
       | displayName     | sharedlink               |
     And user "Alice" deletes public link share named "sharedlink" in file "/test-folder/testfile.txt" using the sharing API
