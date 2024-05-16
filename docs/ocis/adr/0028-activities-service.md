@@ -39,7 +39,21 @@ Besides the current resource, the user should also be able to decide if he wants
 ### Activity format
 
 * Normalize the activities before storing them.
-* Only store event ids and get the related event from the event-history service when needed.
+* Only store relevant data to get the related event from the event-history service when needed, e.g.,
+  ```go
+    package pseudo_code
+
+    import (
+        "time"
+    )
+
+    type Activity struct {
+        ResourceId string
+        EventID string
+        Depth int64
+        Timestamp time.Time
+    }
+  ```
 * Store the activity in a human-readable way e.g. "resource A has been shared with user B."
 * Store each activity only on the resource itself.
 * Store each activity only on the resource itself and all its parents.
@@ -71,9 +85,9 @@ Besides the current resource, the user should also be able to decide if he wants
   * Other database types might be more efficient for storing activities.
   * Using the go-micro-store only allows storing the activity in a key-value format.
 * Activity Format:
-    * Storing only the event ids and getting the related data from the event-history service when needed
-      might introduce additional latency when querying activities.
-    * Adding each event-id to each resource parent leads to a lot of duplicated data.
+  * Storing only the event ids and getting the related data from the event-history service when needed
+    might introduce additional latency when querying activities.
+  * Adding each event-id to each resource parent leads to a lot of duplicated data.
 
 ## Pros and Cons of the Options <!-- optional -->
 
