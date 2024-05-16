@@ -81,6 +81,8 @@ config = {
                 "apiSearch1",
                 "apiSearch2",
                 "apiSharingNg",
+                "apiSharingNgShareInvitation",
+                "apiSharingNgLinkShare",
             ],
             "skip": False,
         },
