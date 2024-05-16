@@ -89,6 +89,21 @@ var (
 		"latitude",
 		"longitude",
 	}
+	imageKeys = []string{
+		"width",
+		"height",
+	}
+	photoKeys = []string{
+		"cameraMake",
+		"cameraModel",
+		"exposureDenominator",
+		"exposureNumerator",
+		"fNumber",
+		"focalLength",
+		"iso",
+		"orientation",
+		"takenDateTime",
+	}
 )
 
 type countingReader struct {
@@ -853,6 +868,10 @@ func metadataKeys(pf XML) ([]string, []string) {
 					metadataKeys = append(metadataKeys, metadataKeysWithPrefix("libre.graph.audio", audioKeys)...)
 				case "http://owncloud.org/ns/location":
 					metadataKeys = append(metadataKeys, metadataKeysWithPrefix("libre.graph.location", locationKeys)...)
+				case "http://owncloud.org/ns/image":
+					metadataKeys = append(metadataKeys, metadataKeysWithPrefix("libre.graph.image", imageKeys)...)
+				case "http://owncloud.org/ns/photo":
+					metadataKeys = append(metadataKeys, metadataKeysWithPrefix("libre.graph.photo", photoKeys)...)
 				default:
 					metadataKeys = append(metadataKeys, key)
 				}
@@ -910,7 +929,7 @@ func requiresExplicitFetching(n *xml.Name) bool {
 		}
 	case net.NsOwncloud:
 		switch n.Local {
-		case "favorite", "share-types", "checksums", "size", "tags", "audio", "location":
+		case "favorite", "share-types", "checksums", "size", "tags", "audio", "location", "image", "photo":
 			return true
 		default:
 			return false
@@ -1253,6 +1272,8 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 			propstatOK.Prop = append(propstatOK.Prop, prop.Raw("oc:tags", k["tags"]))
 			appendMetadataProp(k, "oc", "audio", "libre.graph.audio", audioKeys)
 			appendMetadataProp(k, "oc", "location", "libre.graph.location", locationKeys)
+			appendMetadataProp(k, "oc", "image", "libre.graph.image", imageKeys)
+			appendMetadataProp(k, "oc", "photo", "libre.graph.photo", photoKeys)
 		}
 
 		// ls do not report any properties as missing by default
@@ -1533,6 +1554,14 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 				case "location":
 					if k := md.GetArbitraryMetadata().GetMetadata(); k != nil {
 						appendMetadataProp(k, "oc", "location", "libre.graph.location", locationKeys)
+					}
+				case "image":
+					if k := md.GetArbitraryMetadata().GetMetadata(); k != nil {
+						appendMetadataProp(k, "oc", "image", "libre.graph.image", imageKeys)
+					}
+				case "photo":
+					if k := md.GetArbitraryMetadata().GetMetadata(); k != nil {
+						appendMetadataProp(k, "oc", "photo", "libre.graph.photo", photoKeys)
 					}
 				case "name":
 					appendToOK(prop.Escaped("oc:name", md.Name))

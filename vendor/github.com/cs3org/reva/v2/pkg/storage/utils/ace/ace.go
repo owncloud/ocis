@@ -316,10 +316,15 @@ func (e *ACE) granteeType() provider.GranteeType {
 // grantPermissionSet returns the set of CS3 resource permissions representing the ACE
 func (e *ACE) grantPermissionSet() *provider.ResourcePermissions {
 	p := &provider.ResourcePermissions{}
-	// r
-	if strings.Contains(e.permissions, "r") {
+	// t
+	if strings.Contains(e.permissions, "t") {
 		p.Stat = true
 		p.GetPath = true
+	}
+	// r
+	if strings.Contains(e.permissions, "r") {
+		p.Stat = true    // currently assumed
+		p.GetPath = true // currently assumed
 		p.InitiateFileDownload = true
 		p.ListContainer = true
 	}
@@ -336,10 +341,9 @@ func (e *ACE) grantPermissionSet() *provider.ResourcePermissions {
 		p.CreateContainer = true
 	}
 	// x
-	// if strings.Contains(e.Permissions, "x") {
-	// TODO execute file permission?
-	// TODO change directory permission?
-	// }
+	if strings.Contains(e.permissions, "x") {
+		p.ListContainer = true
+	}
 	// d
 	if strings.Contains(e.permissions, "d") {
 		p.Delete = true
@@ -436,10 +440,17 @@ func unmarshalKV(s string) (*ACE, error) {
 	return e, nil
 }
 
+// getACEPerm produces an NFSv4.x inspired permission string from a CS3 resource permissions set
 func getACEPerm(set *provider.ResourcePermissions) string {
 	var b strings.Builder
 
-	if set.Stat || set.InitiateFileDownload || set.ListContainer || set.GetPath {
+	if set.Stat || set.GetPath {
+		b.WriteString("t")
+	}
+	if set.ListContainer { // we have no dedicated traversal permission, but to listing a container allows traversing it
+		b.WriteString("x")
+	}
+	if set.InitiateFileDownload {
 		b.WriteString("r")
 	}
 	if set.InitiateFileUpload || set.Move {
