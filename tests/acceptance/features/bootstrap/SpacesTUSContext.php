@@ -135,6 +135,33 @@ class SpacesTUSContext implements Context {
 	}
 
 	/**
+	 * Uploads a file with content to the specified space using the TUS protocol via the WebDAV API.
+	 *
+	 * @param string $user
+	 * @param string $content
+	 * @param string $resource
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	private function uploadFileViaTus(string $user, string $content, string $resource, string $spaceName): void {
+		$this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$tmpFile = $this->tusContext->writeDataToTempFile($content);
+		try {
+			$this->tusContext->uploadFileUsingTus(
+				$user,
+				\basename($tmpFile),
+				$resource
+			);
+			$this->featureContext->setLastUploadDeleteTime(\time());
+		} catch (Exception $e) {
+			Assert::assertStringContainsString('Unable to create resource', (string)$e);
+		}
+		\unlink($tmpFile);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" uploads a file with content "([^"]*)" to "([^"]*)" via TUS inside of the space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
@@ -151,19 +178,7 @@ class SpacesTUSContext implements Context {
 		string $resource,
 		string $spaceName
 	): void {
-		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$tmpFile = $this->tusContext->writeDataToTempFile($content);
-		try {
-			$this->tusContext->uploadFileUsingTus(
-				$user,
-				\basename($tmpFile),
-				$resource
-			);
-			$this->featureContext->setLastUploadDeleteTime(\time());
-		} catch (Exception $e) {
-			Assert::assertStringContainsString('Unable to create resource', (string)$e);
-		}
-		\unlink($tmpFile);
+		$this->uploadFileViaTus($user, $content, $resource, $spaceName);
 	}
 
 	/**
@@ -183,7 +198,7 @@ class SpacesTUSContext implements Context {
 		string $resource,
 		string $spaceName
 	): void {
-		$this->userUploadsAFileWithContentToViaTusInsideOfTheSpaceUsingTheWebdavApi($user, $content, $resource, $spaceName);
+		$this->uploadFileViaTus($user, $content, $resource, $spaceName);
 	}
 
 	/**
