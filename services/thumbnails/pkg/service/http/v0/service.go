@@ -3,12 +3,11 @@ package svc
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/riandyrn/otelchi"
+	"net/http"
+	"strconv"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
