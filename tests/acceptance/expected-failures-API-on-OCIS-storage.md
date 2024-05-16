@@ -248,8 +248,8 @@ And other missing implementation of favorites
 
 #### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
 
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:652](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L652)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:653](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L653)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:650](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L650)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:651](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L651)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 
@@ -317,8 +317,8 @@ And other missing implementation of favorites
 
 #### [Shares to deleted group listed in the response](https://github.com/owncloud/ocis/issues/2441)
 
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:504](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L504)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:505](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L505)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:502](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L502)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:503](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L503)
 
 #### [copying the file inside Shares folder returns 404](https://github.com/owncloud/ocis/issues/3874)
 

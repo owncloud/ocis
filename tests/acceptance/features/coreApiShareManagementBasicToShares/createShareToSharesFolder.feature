@@ -395,25 +395,23 @@ Feature: sharing
     And the content of file "Shares/randomfile.txt" for user "brian" should be "Random data"
 
 
-  Scenario: creating a new share with user of a group when username contains capital letters
+  Scenario: creating a new share with user of a group when group name contains capital letters
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
-    And group "grp1" has been created
-    And user "Brian" has been added to group "grp1"
+    And group "GROUP" has been created
+    And user "Brian" has been added to group "GROUP"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
-    And user "Alice" has sent the following resource share invitation:
-      | resource        | randomfile.txt |
-      | space           | Personal       |
-      | sharee          | grp1           |
-      | shareType       | group          |
-      | permissionsRole | Viewer         |
-    Then user "Brian" should see the following elements
+    When user "Alice" shares file "randomfile.txt" with group "GROUP" using the sharing API
+    Then the OCS status code should be "100"
+    And the HTTP status code should be "200"
+    And user "Brian" should see the following elements
       | /Shares/randomfile.txt |
     And the content of file "/Shares/randomfile.txt" for user "Brian" should be "Random data"
 
 
-  Scenario: share of folder to a group with emoji in the name
+  Scenario Outline: share of folder to a group with emoji in the name
+    Given using OCS API version "<ocs-api-version>"
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -423,12 +421,8 @@ Feature: sharing
     And user "Carol" has been added to group "😀 😁"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "file in parent folder" to "/PARENT/parent.txt"
-    And user "Alice" has sent the following resource share invitation:
-      | resource        | PARENT   |
-      | space           | Personal |
-      | sharee          | 😀 😁    |
-      | shareType       | group    |
-      | permissionsRole | Viewer   |
+    When user "Alice" shares folder "/PARENT" with group "😀 😁" using the sharing API
+    Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     Then user "Brian" should see the following elements
       | /Shares/PARENT/           |
@@ -436,6 +430,10 @@ Feature: sharing
     And user "Carol" should see the following elements
       | /Shares/PARENT/           |
       | /Shares/PARENT/parent.txt |
+    Examples:
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |
 
   @skipOnReva
   Scenario Outline: share with a group and then add a user to that group

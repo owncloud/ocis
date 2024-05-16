@@ -218,9 +218,9 @@ Feature: sharing
 
   Scenario Outline: individual share recipient tries to delete the share
     Given using OCS API version "<ocs-api-version>"
+    And using SharingNG
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
-    And user "Alice" has shared entry "<entry-to-share>" with user "Brian"
     And user "Alice" has sent the following resource share invitation:
       | resource        | <entry-to-share>  |
       | space           | Personal          |
