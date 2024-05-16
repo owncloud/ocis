@@ -15,6 +15,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -183,6 +184,7 @@ func (s *Service) OpenInApp(
 
 	wopiContext := middleware.WopiContext{
 		AccessToken:   cryptedReqAccessToken,
+		ViewOnlyToken: utils.ReadPlainFromOpaque(req.Opaque, "viewOnlyToken"),
 		FileReference: providerFileRef,
 		User:          user,
 		ViewMode:      req.GetViewMode(),

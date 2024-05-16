@@ -9,10 +9,12 @@ import (
 	"strconv"
 	"time"
 
+	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/rs/zerolog"
@@ -72,6 +74,9 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 		Ref: &wopiContext.FileReference,
 	}
 
+	if wopiContext.ViewMode == appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY && wopiContext.ViewOnlyToken != "" {
+		ctx = revactx.ContextSetToken(ctx, wopiContext.ViewOnlyToken)
+	}
 	resp, err := c.gwc.InitiateFileDownload(ctx, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("GetFile: InitiateFileDownload failed")
@@ -130,7 +135,11 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 		// public link downloads have the token in the download endpoint
 		httpReq.Header.Add("X-Reva-Transfer", downloadToken)
 	}
-	httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
+	if wopiContext.ViewMode == appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY && wopiContext.ViewOnlyToken != "" {
+		httpReq.Header.Add("X-Access-Token", wopiContext.ViewOnlyToken)
+	} else {
+		httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
+	}
 
 	httpResp, err := httpClient.Do(httpReq)
 	if err != nil {

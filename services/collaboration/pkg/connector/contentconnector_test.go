@@ -15,6 +15,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
@@ -133,7 +134,7 @@ var _ = Describe("ContentConnector", func() {
 			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileDownloadResponse{
 				Status: status.NewOK(ctx),
 				Protocols: []*gateway.FileDownloadProtocol{
-					&gateway.FileDownloadProtocol{
+					{
 						Protocol:         "simple",
 						DownloadEndpoint: srv.URL + "/download/failed.png",
 						Token:            "MyDownloadToken",
@@ -156,7 +157,7 @@ var _ = Describe("ContentConnector", func() {
 			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileDownloadResponse{
 				Status: status.NewOK(ctx),
 				Protocols: []*gateway.FileDownloadProtocol{
-					&gateway.FileDownloadProtocol{
+					{
 						Protocol:         "simple",
 						DownloadEndpoint: srv.URL + "/download/test.txt",
 						Token:            "MyDownloadToken",
@@ -166,6 +167,49 @@ var _ = Describe("ContentConnector", func() {
 
 			err := cc.GetFile(ctx, sb)
 			Expect(srvReqHeader.Get("X-Access-Token")).To(Equal(wopiCtx.AccessToken))
+			Expect(srvReqHeader.Get("X-Reva-Transfer")).To(Equal("MyDownloadToken"))
+			Expect(err).To(Succeed())
+			Expect(sb.String()).To(Equal(randomContent))
+		})
+
+		It("ViewOnlyMode Download request success", func() {
+			sb := &strings.Builder{}
+
+			wopiCtx = middleware.WopiContext{
+				AccessToken:   "abcdef123456",
+				ViewOnlyToken: "view.only.123456",
+				FileReference: providerv1beta1.Reference{
+					ResourceId: &providerv1beta1.ResourceId{
+						StorageId: "abc",
+						OpaqueId:  "12345",
+						SpaceId:   "zzz",
+					},
+					Path: ".",
+				},
+				User:       &userv1beta1.User{}, // Not used for now
+				ViewMode:   appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY,
+				EditAppUrl: "http://test.ex.prv/edit",
+				ViewAppUrl: "http://test.ex.prv/view",
+			}
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("InitiateFileDownload",
+				mock.MatchedBy(func(ctx context.Context) bool {
+					return revactx.ContextMustGetToken(ctx) == "view.only.123456"
+				}), mock.Anything).Times(1).Return(&gateway.InitiateFileDownloadResponse{
+				Status: status.NewOK(ctx),
+				Protocols: []*gateway.FileDownloadProtocol{
+					{
+						Protocol:         "simple",
+						DownloadEndpoint: srv.URL + "/download/test.txt",
+						Token:            "MyDownloadToken",
+					},
+				},
+			}, nil)
+
+			err := cc.GetFile(ctx, sb)
+			Expect(srvReqHeader.Get("X-Access-Token")).To(Equal(wopiCtx.ViewOnlyToken))
 			Expect(srvReqHeader.Get("X-Reva-Transfer")).To(Equal("MyDownloadToken"))
 			Expect(err).To(Succeed())
 			Expect(sb.String()).To(Equal(randomContent))
@@ -369,7 +413,7 @@ var _ = Describe("ContentConnector", func() {
 			gatewayClient.On("InitiateFileUpload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileUploadResponse{
 				Status: status.NewOK(ctx),
 				Protocols: []*gateway.FileUploadProtocol{
-					&gateway.FileUploadProtocol{
+					{
 						Protocol:       "simple",
 						UploadEndpoint: srv.URL + "/upload/failed.png",
 					},
@@ -402,7 +446,7 @@ var _ = Describe("ContentConnector", func() {
 			gatewayClient.On("InitiateFileUpload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileUploadResponse{
 				Status: status.NewOK(ctx),
 				Protocols: []*gateway.FileUploadProtocol{
-					&gateway.FileUploadProtocol{
+					{
 						Protocol:       "simple",
 						UploadEndpoint: srv.URL + "/upload/test.txt",
 					},
