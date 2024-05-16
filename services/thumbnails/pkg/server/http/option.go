@@ -16,13 +16,14 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Namespace     string
-	Logger        log.Logger
-	Context       context.Context
-	Config        *config.Config
-	Metrics       *metrics.Metrics
-	Flags         []cli.Flag
-	TraceProvider trace.TracerProvider
+	Namespace             string
+	Logger                log.Logger
+	Context               context.Context
+	Config                *config.Config
+	Metrics               *metrics.Metrics
+	Flags                 []cli.Flag
+	TraceProvider         trace.TracerProvider
+	MaxConcurrentRequests int
 }
 
 // newOptions initializes the available default options.
@@ -79,5 +80,12 @@ func TraceProvider(traceProvider trace.TracerProvider) Option {
 		} else {
 			o.TraceProvider = noop.NewTracerProvider()
 		}
+	}
+}
+
+// MaxConcurrentRequests provides a function to set the MaxConcurrentRequests option.
+func MaxConcurrentRequests(val int) Option {
+	return func(o *Options) {
+		o.MaxConcurrentRequests = val
 	}
 }
