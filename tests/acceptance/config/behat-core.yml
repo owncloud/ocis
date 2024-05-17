@@ -253,7 +253,6 @@ default:
         - FeatureContext: *common_feature_context_params
         - SearchContext:
         - PublicWebDavContext:
-        - SpacesContext:
         - SharingNgContext:
         - WebDavPropertiesContext:
         - TrashbinContext:
