@@ -265,7 +265,7 @@ var _ = Describe("Driveitems", func() {
 				err = json.Unmarshal(data, &res)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(len(res.Value)).To(Equal(1))
+				Expect(len(res.Value)).To(Equal(length))
 				Expect(res.Value[0].GetLastModifiedDateTime().Equal(mtime)).To(BeTrue())
 				Expect(res.Value[0].GetETag()).To(Equal("etag"))
 				Expect(res.Value[0].GetId()).To(Equal("storageid$spaceid!opaqueid"))

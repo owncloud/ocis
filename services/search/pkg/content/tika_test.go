@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
@@ -165,9 +166,8 @@ var _ = Describe("Tika", func() {
 		It("adds image content", func() {
 			fullResponse = `[
 				{
-					"Content-Type": "image/png",
-					"width": "100",
-					"height": "100"
+					"tiff:ImageWidth": "100",
+					"tiff:ImageLength": "100"
 				}
 			]`
 			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
@@ -186,16 +186,14 @@ var _ = Describe("Tika", func() {
 		It("adds photo content", func() {
 			fullResponse = `[
 				{
-					"Content-Type": "image/png",
-					"cameraMake": "Canon",
-					"cameraModel": "Canon EOS 5D",
-					"exposureNumerator": "1",
-					"exposureDenominator": "1000",
-					"fNumber": "1.8",
-					"focalLength": "50",
-					"iso": "100",
-					"orientation": "1",
-					"takenDateTime": "2019-02-19T13:42:40.000Z",
+					"tiff:Make": "Canon",
+					"tiff:Model": "Canon EOS 5D",
+					"exif:ExposureTime": "0.001",
+					"exif:FNumber": "1.8",
+					"exif:FocalLength": "50",
+					"Base ISO": "100",
+					"tiff:Orientation": "1",
+					"exif:DateTimeOriginal": "2018-01-01T12:34:56"
 				}
 			]`
 			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
@@ -209,13 +207,13 @@ var _ = Describe("Tika", func() {
 
 			Expect(photo.CameraMake).To(Equal(libregraph.PtrString("Canon")))
 			Expect(photo.CameraModel).To(Equal(libregraph.PtrString("Canon EOS 5D")))
-			Expect(photo.ExposureNumerator).To(Equal(libregraph.PtrInt32(1)))
-			Expect(photo.ExposureDenominator).To(Equal(libregraph.PtrInt32(1000)))
+			Expect(photo.ExposureNumerator).To(Equal(libregraph.PtrFloat64(1)))
+			Expect(photo.ExposureDenominator).To(Equal(libregraph.PtrFloat64(1000)))
 			Expect(photo.FNumber).To(Equal(libregraph.PtrFloat64(1.8)))
 			Expect(photo.FocalLength).To(Equal(libregraph.PtrFloat64(50)))
 			Expect(photo.Iso).To(Equal(libregraph.PtrInt32(100)))
 			Expect(photo.Orientation).To(Equal(libregraph.PtrInt32(1)))
-			Expect(photo.TakenDateTime).To(Equal(libregraph.PtrString("2019-02-19T13:42:40.000Z")))
+			Expect(photo.TakenDateTime).To(Equal(libregraph.PtrTime(time.Date(2018, 1, 1, 12, 34, 56, 0, time.UTC))))
 		})
 
 		It("removes stop words", func() {

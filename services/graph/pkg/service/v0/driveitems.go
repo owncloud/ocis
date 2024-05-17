@@ -553,6 +553,7 @@ func getFieldName(structField reflect.StructField) string {
 func unmarshalStringMap(logger *log.Logger, out any, flatMap map[string]string, prefix string) bool {
 	nonEmpty := false
 	obj := reflect.ValueOf(out).Elem()
+	timeKind := reflect.TypeOf(&time.Time{}).Elem().Kind()
 	for i := 0; i < obj.NumField(); i++ {
 		field := obj.Field(i)
 		structField := obj.Type().Field(i)
@@ -576,6 +577,8 @@ func unmarshalStringMap(logger *log.Logger, out any, flatMap map[string]string, 
 					tmp, err = strconv.ParseFloat(value, 64)
 				case reflect.Bool:
 					tmp, err = strconv.ParseBool(value)
+				case timeKind:
+					tmp, err = time.Parse(time.RFC3339, value)
 				default:
 					err = errors.New("unsupported type")
 					logger.Error().Err(err).Str("type", t.String()).Str("mapKey", mapKey).Msg("target field type for value of mapKey is not supported")
