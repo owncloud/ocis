@@ -58,7 +58,12 @@ Feature: propagation of etags when creating folders
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
-    And user "Alice" has shared folder "/folder" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/folder"
     And user "Brian" has stored etag of element "/"
@@ -83,7 +88,12 @@ Feature: propagation of etags when creating folders
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
-    And user "Alice" has shared folder "/folder" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/folder"
     And user "Brian" has stored etag of element "/"
@@ -108,9 +118,11 @@ Feature: propagation of etags when creating folders
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
-    And user "Alice" has created a public link share with settings
-      | path        | folder |
-      | permissions | create |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | folder     |
+      | space           | Personal   |
+      | permissionsRole | createOnly |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/folder"
     When the public creates folder "created-by-public" using the new public WebDAV API
