@@ -722,7 +722,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userSetsOrUpdatesFollowingPasswordForLastLinkShareUsingTheGraphApi(string $user, TableNode  $body):void {
+	public function userSetsOrUpdatesFollowingPasswordForLastLinkShareUsingTheGraphApi(string $user, TableNode $body):void {
 		$this->featureContext->setResponse(
 			$this->setLinkSharePassword(
 				$user,

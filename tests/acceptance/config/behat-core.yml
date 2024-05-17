@@ -152,7 +152,6 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - OcisConfigContext:
-        - SpacesContext:
         - SharingNgContext:
 
     coreApiShareUpdateToShares:
