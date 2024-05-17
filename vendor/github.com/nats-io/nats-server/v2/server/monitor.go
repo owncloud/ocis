@@ -1,4 +1,4 @@
-// Copyright 2013-2023 The NATS Authors
+// Copyright 2013-2024 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,6 +20,7 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/json"
+	"expvar"
 	"fmt"
 	"net"
 	"net/http"
@@ -2202,9 +2203,9 @@ func (s *Server) Leafz(opts *LeafzOptions) (*Leafz, error) {
 	}
 	s.mu.Unlock()
 
-	var leafnodes []*LeafInfo
+	leafnodes := make([]*LeafInfo, 0, len(lconns))
+
 	if len(lconns) > 0 {
-		leafnodes = make([]*LeafInfo, 0, len(lconns))
 		for _, ln := range lconns {
 			ln.mu.Lock()
 			lni := &LeafInfo{
@@ -2231,6 +2232,7 @@ func (s *Server) Leafz(opts *LeafzOptions) (*Leafz, error) {
 			leafnodes = append(leafnodes, lni)
 		}
 	}
+
 	return &Leafz{
 		ID:       s.ID(),
 		Now:      time.Now().UTC(),
@@ -2695,7 +2697,7 @@ func (s *Server) accountInfo(accName string) (*AccountInfo, error) {
 		accName,
 		a.updated.UTC(),
 		isSys,
-		a.expired,
+		a.expired.Load(),
 		!a.incomplete,
 		a.js != nil,
 		a.numLocalLeafNodes(),
@@ -3669,6 +3671,30 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 	}
 	// Success.
 	return health
+}
+
+type ExpvarzStatus struct {
+	Memstats json.RawMessage `json:"memstats"`
+	Cmdline  json.RawMessage `json:"cmdline"`
+}
+
+func (s *Server) expvarz(_ *ExpvarzEventOptions) *ExpvarzStatus {
+	var stat ExpvarzStatus
+
+	const memStatsKey = "memstats"
+	const cmdLineKey = "cmdline"
+
+	expvar.Do(func(v expvar.KeyValue) {
+		switch v.Key {
+		case memStatsKey:
+			stat.Memstats = json.RawMessage(v.Value.String())
+
+		case cmdLineKey:
+			stat.Cmdline = json.RawMessage(v.Value.String())
+		}
+	})
+
+	return &stat
 }
 
 type ProfilezStatus struct {

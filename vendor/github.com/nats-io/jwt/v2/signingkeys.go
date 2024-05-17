@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The NATS Authors
+ * Copyright 2020-2024 The NATS Authors
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -67,10 +67,11 @@ func (t *ScopeType) UnmarshalJSON(b []byte) error {
 }
 
 type UserScope struct {
-	Kind     ScopeType            `json:"kind"`
-	Key      string               `json:"key"`
-	Role     string               `json:"role"`
-	Template UserPermissionLimits `json:"template"`
+	Kind        ScopeType            `json:"kind"`
+	Key         string               `json:"key"`
+	Role        string               `json:"role"`
+	Template    UserPermissionLimits `json:"template"`
+	Description string               `json:"description"`
 }
 
 func NewUserScope() *UserScope {

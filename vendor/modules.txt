@@ -1406,10 +1406,10 @@ github.com/mohae/deepcopy
 # github.com/mschoch/smat v0.2.0
 ## explicit; go 1.13
 github.com/mschoch/smat
-# github.com/nats-io/jwt/v2 v2.5.5
+# github.com/nats-io/jwt/v2 v2.5.6
 ## explicit; go 1.18
 github.com/nats-io/jwt/v2
-# github.com/nats-io/nats-server/v2 v2.10.14
+# github.com/nats-io/nats-server/v2 v2.10.15
 ## explicit; go 1.20
 github.com/nats-io/nats-server/v2/conf
 github.com/nats-io/nats-server/v2/internal/fastrand

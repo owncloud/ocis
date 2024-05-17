@@ -474,8 +474,8 @@ func (rcf readCacheFlag) isSet(c readCacheFlag) bool {
 }
 
 const (
-	defaultMaxPerAccountCacheSize   = 4096
-	defaultPrunePerAccountCacheSize = 256
+	defaultMaxPerAccountCacheSize   = 8192
+	defaultPrunePerAccountCacheSize = 1024
 	defaultClosedSubsCheckInterval  = 5 * time.Minute
 )
 
@@ -2349,24 +2349,11 @@ func (c *client) generateClientInfoJSON(info Info) []byte {
 	info.MaxPayload = c.mpay
 	if c.isWebsocket() {
 		info.ClientConnectURLs = info.WSConnectURLs
-		if c.srv != nil { // Otherwise lame duck info can panic
-			c.srv.websocket.mu.RLock()
-			info.TLSAvailable = c.srv.websocket.tls
-			if c.srv.websocket.tls && c.srv.websocket.server != nil {
-				if tc := c.srv.websocket.server.TLSConfig; tc != nil {
-					info.TLSRequired = !tc.InsecureSkipVerify
-				}
-			}
-			if c.srv.websocket.listener != nil {
-				laddr := c.srv.websocket.listener.Addr().String()
-				if h, p, err := net.SplitHostPort(laddr); err == nil {
-					if p, err := strconv.Atoi(p); err == nil {
-						info.Host = h
-						info.Port = p
-					}
-				}
-			}
-			c.srv.websocket.mu.RUnlock()
+		// Otherwise lame duck info can panic
+		if c.srv != nil {
+			ws := &c.srv.websocket
+			info.TLSAvailable, info.TLSRequired = ws.tls, ws.tls
+			info.Host, info.Port = ws.host, ws.port
 		}
 	}
 	info.WSConnectURLs = nil
@@ -4909,6 +4896,23 @@ func adjustPingInterval(kind int, d time.Duration) time.Duration {
 	return d
 }
 
+// This is used when a connection cannot yet start to send PINGs because
+// the remote would not be able to handle them (case of compression,
+// or outbound gateway, etc...), but we still want to close the connection
+// if the timer has not been reset by the time we reach the time equivalent
+// to have sent the max number of pings.
+//
+// Lock should be held
+func (c *client) watchForStaleConnection(pingInterval time.Duration, pingMax int) {
+	c.ping.tmr = time.AfterFunc(pingInterval*time.Duration(pingMax+1), func() {
+		c.mu.Lock()
+		c.Debugf("Stale Client Connection - Closing")
+		c.enqueueProto([]byte(fmt.Sprintf(errProto, "Stale Connection")))
+		c.mu.Unlock()
+		c.closeConnection(StaleConnection)
+	})
+}
+
 // Lock should be held
 func (c *client) setPingTimer() {
 	if c.srv == nil {
@@ -5436,13 +5440,13 @@ func (c *client) getAccAndResultFromCache() (*Account, *SublistResult) {
 		// Match against the account sublist.
 		r = sl.Match(string(c.pa.subject))
 
-		// Store in our cache
-		c.in.pacache[string(c.pa.pacache)] = &perAccountCache{acc, r, atomic.LoadUint64(&sl.genid)}
-
 		// Check if we need to prune.
-		if len(c.in.pacache) > maxPerAccountCacheSize {
+		if len(c.in.pacache) >= maxPerAccountCacheSize {
 			c.prunePerAccountCache()
 		}
+
+		// Store in our cache,make sure to do so after we prune.
+		c.in.pacache[string(c.pa.pacache)] = &perAccountCache{acc, r, atomic.LoadUint64(&sl.genid)}
 	}
 	return acc, r
 }

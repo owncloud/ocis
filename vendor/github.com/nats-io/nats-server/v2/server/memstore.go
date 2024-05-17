@@ -1012,7 +1012,7 @@ func (ms *memStore) LoadNextMsgMulti(sl *Sublist, start uint64, smp *StoreMsg) (
 		if !ok {
 			continue
 		}
-		if r := sl.Match(sm.subj); len(r.psubs) > 0 {
+		if sl.HasInterest(sm.subj) {
 			if smp == nil {
 				smp = new(StoreMsg)
 			}

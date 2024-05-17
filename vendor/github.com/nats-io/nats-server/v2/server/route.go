@@ -1398,7 +1398,7 @@ func (c *client) processRemoteSub(argo []byte, hasOrigin bool) (err error) {
 		var isNew bool
 		if acc, isNew = srv.LookupOrRegisterAccount(accountName); isNew {
 			acc.mu.Lock()
-			acc.expired = true
+			acc.expired.Store(true)
 			acc.incomplete = true
 			acc.mu.Unlock()
 		}
@@ -1788,13 +1788,7 @@ func (s *Server) createRoute(conn net.Conn, rURL *url.URL, accName string) *clie
 		if opts.Cluster.MaxPingsOut > 0 {
 			pingMax = opts.MaxPingsOut
 		}
-		c.ping.tmr = time.AfterFunc(pingInterval*time.Duration(pingMax+1), func() {
-			c.mu.Lock()
-			c.Debugf("Stale Client Connection - Closing")
-			c.enqueueProto([]byte(fmt.Sprintf(errProto, "Stale Connection")))
-			c.mu.Unlock()
-			c.closeConnection(StaleConnection)
-		})
+		c.watchForStaleConnection(adjustPingInterval(ROUTER, pingInterval), pingMax)
 	} else {
 		// Set the Ping timer
 		c.setFirstPingTimer()
