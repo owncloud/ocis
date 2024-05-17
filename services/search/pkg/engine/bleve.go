@@ -370,7 +370,33 @@ func unmarshalInterfaceMap(out any, flatMap map[string]interface{}, prefix strin
 		if value, ok := flatMap[mapKey]; ok {
 			if field.Kind() == reflect.Ptr {
 				alloc := reflect.New(field.Type().Elem())
-				alloc.Elem().Set(reflect.ValueOf(value).Convert(field.Type().Elem()))
+				elemType := field.Type().Elem()
+
+				// convert time strings from index for search requests
+				if elemType == reflect.TypeOf(timestamppb.Timestamp{}) {
+					if strValue, ok := value.(string); ok {
+						if parsedTime, err := time.Parse(time.RFC3339, strValue); err == nil {
+							alloc.Elem().Set(reflect.ValueOf(*timestamppb.New(parsedTime)))
+							field.Set(alloc)
+							nonEmpty = true
+						}
+					}
+					continue
+				}
+
+				// convert time strings from index for libregraph structs when updating resources
+				if elemType == reflect.TypeOf(time.Time{}) {
+					if strValue, ok := value.(string); ok {
+						if parsedTime, err := time.Parse(time.RFC3339, strValue); err == nil {
+							alloc.Elem().Set(reflect.ValueOf(parsedTime))
+							field.Set(alloc)
+							nonEmpty = true
+						}
+					}
+					continue
+				}
+
+				alloc.Elem().Set(reflect.ValueOf(value).Convert(elemType))
 				field.Set(alloc)
 				nonEmpty = true
 			}

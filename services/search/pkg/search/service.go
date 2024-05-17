@@ -584,6 +584,8 @@ func valueToString(value interface{}) string {
 		return strconv.FormatFloat(*v, 'f', -1, 64)
 	case *bool:
 		return strconv.FormatBool(*v)
+	case *time.Time:
+		return v.Format(time.RFC3339)
 	default:
 		return fmt.Sprintf("%v", v)
 	}
