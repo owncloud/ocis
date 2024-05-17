@@ -18,7 +18,6 @@ OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
 OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.2.1"
 OC_LITMUS = "owncloudci/litmus:latest"
-OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:latest"
 OC_UBUNTU = "owncloud/ubuntu:20.04"
 PLUGINS_CODACY = "plugins/codacy:1"
 PLUGINS_DOCKER = "plugins/docker:latest"
@@ -30,7 +29,6 @@ PLUGINS_S3 = "plugins/s3:latest"
 PLUGINS_S3_CACHE = "plugins/s3-cache:1"
 PLUGINS_SLACK = "plugins/slack:1"
 REDIS = "redis:6-alpine"
-SELENIUM_STANDALONE_CHROME = "selenium/standalone-chrome:104.0-20220812"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:5.0"
 
 DEFAULT_PHP_VERSION = "8.2"
@@ -133,11 +131,6 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
-        "skipExceptParts": [],
-    },
-    "uiTests": {
-        "filterTags": "@ocisSmokeTest",
         "skip": False,
         "skipExceptParts": [],
     },
@@ -352,9 +345,6 @@ def testPipelines(ctx):
 
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
         pipelines += apiTests(ctx)
-
-    if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
-        pipelines += uiTests(ctx)
 
     pipelines += e2eTestPipeline(ctx)
 
@@ -1091,120 +1081,6 @@ def apiTests(ctx):
             pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
 
     return pipelines
-
-def uiTests(ctx):
-    default = {
-        "filterTags": "",
-        "skip": False,
-        # only used if 'full-ci' is in build title or if run by cron
-        "numberOfParts": 20,
-        "skipExceptParts": [],
-    }
-    params = {}
-    pipelines = []
-
-    for item in default:
-        params[item] = config["uiTests"][item] if item in config["uiTests"] else default[item]
-
-    filterTags = params["filterTags"]
-
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
-        numberOfParts = params["numberOfParts"]
-        skipExceptParts = params["skipExceptParts"]
-        debugPartsEnabled = (len(skipExceptParts) != 0)
-
-        for runPart in range(1, numberOfParts + 1):
-            if (not debugPartsEnabled or (debugPartsEnabled and runPart in skipExceptParts)):
-                pipelines.append(uiTestPipeline(ctx, "", runPart, numberOfParts))
-
-    # For ordinary PRs, always run the "minimal" UI test pipeline
-    # That has its own expected-failures file, and we always want to know that it is correct,
-    if (ctx.build.event != "tag" and ctx.build.event != "cron" and "full-ci" not in ctx.build.title.lower()):
-        pipelines.append(uiTestPipeline(ctx, filterTags, 1, 2, "ocis", "smoke"))
-        pipelines.append(uiTestPipeline(ctx, filterTags, 2, 2, "ocis", "smoke"))
-
-    return pipelines
-
-def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "ocis", uniqueName = "", accounts_hash_difficulty = 4):
-    standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS and not @federated-server-needed"
-    if filterTags == "":
-        finalFilterTags = standardFilterTags
-        expectedFailuresFileFilterTags = ""
-    else:
-        finalFilterTags = filterTags + " and " + standardFilterTags
-        expectedFailuresFileFilterTags = "-" + filterTags.lstrip("@")
-
-    if uniqueName == "":
-        uniqueNameString = ""
-    else:
-        finalFilterTags = filterTags + " and " + standardFilterTags
-        uniqueNameString = "-" + uniqueName
-
-    if numberOfParts == 1:
-        pipelineName = "Web-Tests-ocis%s-%s-storage" % (uniqueNameString, storage)
-    else:
-        pipelineName = "Web-Tests-ocis%s-%s-storage-%s" % (uniqueNameString, storage, runPart)
-
-    extra_server_environment = {
-        "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD": False,
-        "OCIS_PASSWORD_POLICY_MIN_CHARACTERS": 1,
-        "OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS": 0,
-        "OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS": 0,
-        "OCIS_PASSWORD_POLICY_MIN_DIGITS": 0,
-        "OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS": 0,
-    }
-
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": pipelineName,
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 restoreWebCache() +
-                 restoreWebPnpmCache() +
-                 ocisServer(storage, accounts_hash_difficulty, extra_server_environment = extra_server_environment) +
-                 waitForSeleniumService() +
-                 waitForMiddlewareService() +
-                 [
-                     {
-                         "name": "webUITests",
-                         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-                         "environment": {
-                             "SERVER_HOST": "https://ocis-server:9200",
-                             "BACKEND_HOST": "https://ocis-server:9200",
-                             "OCIS_REVA_DATA_ROOT": "%s" % dirs["ocisRevaDataRoot"],
-                             "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
-                             "TEST_TAGS": finalFilterTags,
-                             "LOCAL_UPLOAD_DIR": "/uploads",
-                             "NODE_TLS_REJECT_UNAUTHORIZED": 0,
-                             "RUN_PART": runPart,
-                             "DIVIDE_INTO_NUM_PARTS": numberOfParts,
-                             "EXPECTED_FAILURES_FILE": "/%s/tests/acceptance/expected-failures-webUI-on-%s-storage%s.md" % (dirs["base"], storage.upper(), expectedFailuresFileFilterTags),
-                             "MIDDLEWARE_HOST": "http://middleware:3000",
-                         },
-                         "commands": [
-                             "cd %s/tests/acceptance" % dirs["web"],
-                             "./run.sh",
-                         ],
-                     },
-                 ],
-        "services": selenium() + middlewareService(),
-        "volumes": [{
-            "name": "uploads",
-            "temp": {},
-        }],
-        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/pull/**",
-            ],
-        },
-    }
 
 def e2eTestPipeline(ctx):
     defaults = {
@@ -2116,38 +1992,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         wait_for_ocis,
     ]
 
-def middlewareService():
-    return [{
-        "name": "middleware",
-        "image": OC_OC_TEST_MIDDLEWARE,
-        "environment": {
-            "BACKEND_HOST": "https://ocis-server:9200",
-            "OCIS_REVA_DATA_ROOT": "%s/storage/owncloud/" % dirs["ocis"],
-            "RUN_ON_OCIS": "true",
-            "HOST": "middleware",
-            "REMOTE_UPLOAD_DIR": "/uploads",
-            "NODE_TLS_REJECT_UNAUTHORIZED": "0",
-            "MIDDLEWARE_HOST": "middleware",
-            "TEST_WITH_GRAPH_API": "true",
-        },
-        "volumes": [{
-            "name": "uploads",
-            "path": "/uploads",
-        }, {
-            "name": "gopath",
-            "path": "/srv/app",
-        }],
-    }]
-
-def waitForMiddlewareService():
-    return [{
-        "name": "wait-for-middleware-service",
-        "image": OC_CI_WAIT_FOR,
-        "commands": [
-            "wait-for -it middleware:3000 -t 300",
-        ],
-    }]
-
 def redis():
     return [
         {
@@ -2161,27 +2005,6 @@ def redisForOCStorage(storage = "ocis"):
         return redis()
     else:
         return
-
-def selenium():
-    return [
-        {
-            "name": "selenium",
-            "image": SELENIUM_STANDALONE_CHROME,
-            "volumes": [{
-                "name": "uploads",
-                "path": "/uploads",
-            }],
-        },
-    ]
-
-def waitForSeleniumService():
-    return [{
-        "name": "wait-for-selenium-service",
-        "image": OC_CI_WAIT_FOR,
-        "commands": [
-            "wait-for -it selenium:4444 -t 300",
-        ],
-    }]
 
 def build():
     return [
