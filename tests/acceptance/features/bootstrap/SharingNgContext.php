@@ -1199,8 +1199,8 @@ class SharingNgContext implements Context {
 	 */
 	public function userTriesToDisableShareSyncOfResourceUsingTheGraphApi(string $user, string $resource):void {
 		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
-		$itemId = ($resource === 'nonexistent') ? WebDavHelper::generateUUIDv4() : $resource;
-
+		$shareID = ($resource === 'nonexistent') ? WebDavHelper::generateUUIDv4() : $resource;
+		$itemId = $shareSpaceId . '!' . $shareID;
 		$response =  GraphHelper::disableShareSync(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
