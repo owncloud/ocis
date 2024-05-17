@@ -5463,16 +5463,12 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theLastPublicDavResponseShouldContainTheseNodes(TableNode $table):void {
-		if ($this->isUsingSharingNG()) {
-			$user = $this->shareNgGetLastCreatedLinkShareToken();
-		} else {
-			$user = $this->getLastCreatedPublicShareToken();
-		}
+		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$this->verifyTableNodeColumns($table, ["name"]);
 		$type = $this->usingOldDavPath ? "public-files" : "public-files-new";
 		foreach ($table->getHash() as $row) {
 			$path = $this->substituteInLineCodes($row['name']);
-			$res = $this->findEntryFromPropfindResponse($path, $user, $type);
+			$res = $this->findEntryFromPropfindResponse($path, $token, $type);
 			Assert::assertNotFalse($res, "expected $path to be in DAV response but was not found");
 		}
 	}
@@ -5486,12 +5482,12 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theLastPublicDavResponseShouldNotContainTheseNodes(TableNode $table):void {
-		$user = $this->getLastCreatedPublicShareToken();
+		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$this->verifyTableNodeColumns($table, ["name"]);
 		$type = $this->usingOldDavPath ? "public-files" : "public-files-new";
 		foreach ($table->getHash() as $row) {
 			$path = $this->substituteInLineCodes($row['name']);
-			$res = $this->findEntryFromPropfindResponse($path, $user, $type);
+			$res = $this->findEntryFromPropfindResponse($path, $token, $type);
 			Assert::assertFalse($res, "expected $path to not be in DAV response but was found");
 		}
 	}
