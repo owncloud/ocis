@@ -301,6 +301,8 @@ default:
         - TrashbinContext:
         - PublicWebDavContext:
         - FilesVersionsContext:
+        - SpacesContext:
+        - SharingNgContext:
         - WebDavPropertiesContext:
 
     coreApiWebdavEtagPropagation2:
@@ -314,6 +316,8 @@ default:
         - FilesVersionsContext:
         - WebDavPropertiesContext:
         - OcisConfigContext:
+        - SpacesContext:
+        - SharingNgContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~

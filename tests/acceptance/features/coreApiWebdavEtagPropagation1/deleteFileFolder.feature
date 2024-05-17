@@ -89,7 +89,12 @@ Feature: propagation of etags when deleting a file or folder
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Alice" has stored etag of element "/upload/sub"
@@ -119,7 +124,12 @@ Feature: propagation of etags when deleting a file or folder
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Alice" has stored etag of element "/upload/sub"
@@ -149,7 +159,12 @@ Feature: propagation of etags when deleting a file or folder
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Alice" has stored etag of element "/upload/sub"
@@ -179,7 +194,12 @@ Feature: propagation of etags when deleting a file or folder
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Alice" has stored etag of element "/upload/sub"
@@ -207,10 +227,12 @@ Feature: propagation of etags when deleting a file or folder
   Scenario Outline: deleting a file in a publicly shared folder changes its etag for the sharer
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | upload   |
-      | permissions | change   |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | upload   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     When the public deletes file "file.txt" from the last public link share using the password "%public%" and new public WebDAV API
@@ -233,10 +255,12 @@ Feature: propagation of etags when deleting a file or folder
   Scenario Outline: deleting a folder in a publicly shared folder changes its etag for the sharer
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
-    And user "Alice" has created a public link share with settings
-      | path        | upload   |
-      | permissions | change   |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | upload   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     When the public deletes folder "sub" from the last public link share using the password "%public%" and new public WebDAV API
