@@ -273,7 +273,7 @@ Feature: create a public link share
       | 1               | 100             |
       | 2               | 200             |
 
-  @issue-1293
+  @issue-1293 @skipOnReva
   Scenario: delete a folder that has been publicly shared and try to access using the public WebDAV API
     Given user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file with content "Random data" to "/PARENT/parent.txt"
@@ -286,7 +286,7 @@ Feature: create a public link share
     When user "Alice" deletes folder "/PARENT" using the WebDAV API
     Then the public download of file "/parent.txt" from inside the last public link shared folder using the new public WebDAV API with password "%public%" should fail with HTTP status code "404"
 
-  @issue-1269 @issue-1293
+  @issue-1269 @issue-1293 @skipOnReva
   Scenario: try to download from a public share that has upload only permissions using the public webdav api
     Given user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file with content "Random data" to "/PARENT/parent.txt"
@@ -300,7 +300,7 @@ Feature: create a public link share
     Then the value of the item "//s:message" in the response should be "File not found: parent.txt"
     And the HTTP status code should be "404"
 
-  @env-config
+  @env-config @skipOnReva
   Scenario: get the size of a file shared by public link
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And user "Alice" has uploaded file with content "This is a test file" to "test-file.txt"
@@ -344,7 +344,7 @@ Feature: create a public link share
       | old              |
       | new              |
 
-  @env-config
+  @env-config @skipOnReva
   Scenario: get the mtime of a file inside a folder shared by public link using new webDAV version
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And user "Alice" has created folder "testFolder"
@@ -373,7 +373,7 @@ Feature: create a public link share
     And as "Alice" the mtime of the file "testFolder/file.txt" should be "Thu, 08 Aug 2019 04:18:13 GMT"
     And the mtime of file "file.txt" in the last shared public link using the WebDAV API should be "Thu, 08 Aug 2019 04:18:13 GMT"
 
-  @env-config
+  @env-config @skipOnReva
   Scenario: check the href of a public link file
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And using new DAV path
@@ -392,7 +392,7 @@ Feature: create a public link share
     Then the HTTP status code should be "207"
     And the value of the item "//d:href" in the response should match "/%base_path%\/remote.php\/dav\/public-files\/%public_token%\/file.txt$/"
 
-  @issue-6929 @skipOnRevaMaster
+  @issue-6929 @@skipOnReva
   Scenario Outline: create a password-protected public link on a file with the name same to the previously deleted one
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "test data 1" to "/test.txt"

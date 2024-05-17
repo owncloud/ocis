@@ -167,7 +167,7 @@ Feature: get file properties
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: file that is shared to a user has a share-types property
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -194,7 +194,7 @@ Feature: get file properties
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: file that is shared to a group has a share-types property
     Given using <dav-path-version> DAV path
     And group "grp1" has been created
@@ -221,7 +221,7 @@ Feature: get file properties
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: file that is shared by link has a share-types property
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/test"
@@ -246,7 +246,7 @@ Feature: get file properties
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: file that is shared by user,group and link has a share-types property
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

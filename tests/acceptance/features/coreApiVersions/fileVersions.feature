@@ -423,7 +423,7 @@ Feature: dav-versions
       | new              | Uploader         |
       | new              | Editor           |
 
-
+  @skipOnReva
   Scenario: sharee tries to get file versions of file not shared by the sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"

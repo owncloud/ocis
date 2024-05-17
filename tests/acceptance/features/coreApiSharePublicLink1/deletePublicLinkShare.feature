@@ -1,3 +1,4 @@
+@skipOnReva
 Feature: delete a public link share
   As a user
   I want to delete a public link
