@@ -838,6 +838,26 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" has removed the last link share of (?:file|folder) "([^"]*)" from space "([^"]*)"$/
+	 *
+	 * @param string $sharer
+	 * @param string $resource
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userHasRemovedTheLastLinkShareOfFileOrFolderFromSpace(
+		string $sharer,
+		string $resource,
+		string $space
+	): void {
+		$response = $this->removeAccessToSpaceItem($sharer, 'link', $space, $resource);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" removes the link of (?:file|folder) "([^"]*)" from space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $sharer

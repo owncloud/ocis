@@ -1151,7 +1151,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then /^the content of file "([^"]*)" for user "([^"]*)" should be "([^"]*)"$/
+	 * @Then the content of file :fileName for user :user should be :content
 	 *
 	 * @param string $fileName
 	 * @param string $user

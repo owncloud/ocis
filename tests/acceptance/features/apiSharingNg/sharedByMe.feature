@@ -1950,3 +1950,1472 @@ Feature: resources shared by user
         }
       }
       """
+
+
+  Scenario: sharer lists the file link share (Personal space)
+    Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | permissionsRole | view         |
+      | password        | %public%     |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "id",
+          "eTag",
+          "file",
+          "lastModifiedDateTime",
+          "size"
+        ],
+        "properties": {
+          "name": {
+            "const": "textfile.txt"
+          },
+          "file": {
+            "type": "object",
+            "required": ["mimeType"]
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          },
+          "parentReference": {
+            "type": "object",
+            "required": ["driveId", "driveType", "id", "name", "path"],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "personal"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["hasPassword", "id", "link", "createdDateTime"],
+              "properties": {
+                "link": {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.displayName",
+                    "@libre.graph.quickLink",
+                    "preventsDownload",
+                    "type",
+                    "webUrl"
+                  ],
+                  "properties": {
+                    "@libre.graph.displayName": {
+                      "const": ""
+                    },
+                    "@libre.graph.quickLink": {
+                      "const": false
+                    },
+                    "preventsDownload": {
+                      "const": false
+                    },
+                    "type": {
+                      "const": "view"
+                    },
+                    "webUrl": {
+                      "type": "string",
+                      "pattern": "^%base_url%/s/[a-zA-Z]+$"
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "[a-zA-Z]+"
+                },
+                "hasPassword": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the folder link share (Personal space)
+    Given user "Alice" has created folder "FolderToShare"
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | permissionsRole | edit          |
+      | password        | %public%      |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "FolderToShare" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "id",
+          "eTag",
+          "folder",
+          "lastModifiedDateTime",
+          "size"
+        ],
+        "properties": {
+          "name": {
+            "const": "FolderToShare"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          },
+          "folder": {
+            "const": {}
+          },
+          "parentReference": {
+            "type": "object",
+            "required": ["driveId", "driveType", "id", "name", "path"],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "personal"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["hasPassword", "id", "link", "createdDateTime"],
+              "properties": {
+                "link": {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.displayName",
+                    "@libre.graph.quickLink",
+                    "preventsDownload",
+                    "type",
+                    "webUrl"
+                  ],
+                  "properties": {
+                    "@libre.graph.displayName": {
+                      "const": ""
+                    },
+                    "@libre.graph.quickLink": {
+                      "const": false
+                    },
+                    "preventsDownload": {
+                      "const": false
+                    },
+                    "type": {
+                      "const": "edit"
+                    },
+                    "webUrl": {
+                      "type": "string",
+                      "pattern": "^%base_url%/s/[a-zA-Z]+$"
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "[a-zA-Z]+"
+                },
+                "hasPassword": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the link shares of same name files (Personal space)
+    Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has uploaded file with content "hello world" to "FolderToShare/textfile.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | permissionsRole | edit         |
+      | password        | %public%     |
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare/textfile.txt |
+      | space           | Personal                   |
+      | permissionsRole | view                       |
+      | password        | %public%                   |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "file"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "textfile.txt"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "personal"
+                        },
+                        "path": {
+                          "const": "/"
+                        },
+                        "name": {
+                          "const": "/"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "edit"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "file"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "textfile.txt"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "personal"
+                        },
+                        "path": {
+                          "const": "/FolderToShare"
+                        },
+                        "name": {
+                          "const": "FolderToShare"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "view"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the link shares of same name folders (Personal space)
+    Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has created folder "parent"
+    And user "Alice" has created folder "parent/FolderToShare"
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | permissionsRole | edit          |
+      | password        | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource        | parent/FolderToShare |
+      | space           | Personal             |
+      | permissionsRole | view                 |
+      | password        | %public%             |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "folder"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "FolderToShare"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "personal"
+                        },
+                        "path": {
+                          "const": "/"
+                        },
+                        "name": {
+                          "const": "/"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "edit"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "folder"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "FolderToShare"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "personal"
+                        },
+                        "path": {
+                          "const": "/parent"
+                        },
+                        "name": {
+                          "const": "parent"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "view"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the link shares of a file after deleting one link share (Personal space)
+    Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | permissionsRole | edit         |
+      | password        | %public%     |
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | permissionsRole | view         |
+      | password        | %public%     |
+    And user "Alice" has removed the last link share of file "textfile.txt" from space "Personal"
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "parentReference",
+                "permissions",
+                "name",
+                "id",
+                "eTag",
+                "file"
+              ],
+              "properties": {
+                "name": {
+                  "const": "textfile.txt"
+                },
+                "permissions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["hasPassword", "id", "link", "createdDateTime"],
+                    "properties": {
+                      "link": {
+                        "type": "object",
+                        "required": [
+                          "@libre.graph.displayName",
+                          "@libre.graph.quickLink",
+                          "preventsDownload",
+                          "type",
+                          "webUrl"
+                        ],
+                        "properties": {
+                          "type": {
+                            "const": "edit"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the link shares of a folder after deleting one link share (Personal space)
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | permissionsRole | edit          |
+      | password        | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | permissionsRole | view          |
+      | password        | %public%      |
+    And user "Alice" has removed the last link share of folder "FolderToShare" from space "Personal"
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "parentReference",
+                "permissions",
+                "name",
+                "id",
+                "eTag",
+                "folder"
+              ],
+              "properties": {
+                "name": {
+                  "const": "FolderToShare"
+                },
+                "permissions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["hasPassword", "id", "link", "createdDateTime"],
+                    "properties": {
+                      "link": {
+                        "type": "object",
+                        "required": [
+                          "@libre.graph.displayName",
+                          "@libre.graph.quickLink",
+                          "preventsDownload",
+                          "type",
+                          "webUrl"
+                        ],
+                        "properties": {
+                          "type": {
+                            "const": "edit"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the file link share (Project space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "textfile.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | NewSpace     |
+      | permissionsRole | view         |
+      | password        | %public%     |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "id",
+          "eTag",
+          "file",
+          "lastModifiedDateTime",
+          "size"
+        ],
+        "properties": {
+          "name": {
+            "const": "textfile.txt"
+          },
+          "file": {
+            "type": "object",
+            "required": ["mimeType"]
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          },
+          "parentReference": {
+            "type": "object",
+            "required": ["driveId", "driveType", "id", "name", "path"],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "project"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["hasPassword", "id", "link", "createdDateTime"],
+              "properties": {
+                "link": {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.displayName",
+                    "@libre.graph.quickLink",
+                    "preventsDownload",
+                    "type",
+                    "webUrl"
+                  ],
+                  "properties": {
+                    "@libre.graph.displayName": {
+                      "const": ""
+                    },
+                    "@libre.graph.quickLink": {
+                      "const": false
+                    },
+                    "preventsDownload": {
+                      "const": false
+                    },
+                    "type": {
+                      "const": "view"
+                    },
+                    "webUrl": {
+                      "type": "string",
+                      "pattern": "^%base_url%/s/[a-zA-Z]+$"
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "[a-zA-Z]+"
+                },
+                "hasPassword": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the folder link share (Project space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare |
+      | space           | NewSpace      |
+      | permissionsRole | edit          |
+      | password        | %public%      |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "FolderToShare" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "id",
+          "eTag",
+          "folder",
+          "lastModifiedDateTime",
+          "size"
+        ],
+        "properties": {
+          "name": {
+            "const": "FolderToShare"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          },
+          "folder": {
+            "const": {}
+          },
+          "parentReference": {
+            "type": "object",
+            "required": ["driveId", "driveType", "id", "name", "path"],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "project"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["hasPassword", "id", "link", "createdDateTime"],
+              "properties": {
+                "link": {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.displayName",
+                    "@libre.graph.quickLink",
+                    "preventsDownload",
+                    "type",
+                    "webUrl"
+                  ],
+                  "properties": {
+                    "@libre.graph.displayName": {
+                      "const": ""
+                    },
+                    "@libre.graph.quickLink": {
+                      "const": false
+                    },
+                    "preventsDownload": {
+                      "const": false
+                    },
+                    "type": {
+                      "const": "edit"
+                    },
+                    "webUrl": {
+                      "type": "string",
+                      "pattern": "^%base_url%/s/[a-zA-Z]+$"
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "[a-zA-Z]+"
+                },
+                "hasPassword": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the link shares of same name files (project space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "textfile.txt"
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "FolderToShare/textfile.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | NewSpace     |
+      | permissionsRole | edit         |
+      | password        | %public%     |
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare/textfile.txt |
+      | space           | NewSpace                   |
+      | permissionsRole | view                       |
+      | password        | %public%                   |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "file"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "textfile.txt"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "project"
+                        },
+                        "path": {
+                          "const": "/"
+                        },
+                        "name": {
+                          "const": "/"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "edit"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "file"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "textfile.txt"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "project"
+                        },
+                        "path": {
+                          "const": "/FolderToShare"
+                        },
+                        "name": {
+                          "const": "FolderToShare"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "view"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the link shares of same name folders (project space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has created a folder "parent" in space "NewSpace"
+    And user "Alice" has created a folder "parent/FolderToShare" in space "NewSpace"
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare |
+      | space           | NewSpace      |
+      | permissionsRole | edit          |
+      | password        | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource        | parent/FolderToShare |
+      | space           | NewSpace             |
+      | permissionsRole | view                 |
+      | password        | %public%             |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "folder"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "FolderToShare"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "project"
+                        },
+                        "path": {
+                          "const": "/"
+                        },
+                        "name": {
+                          "const": "/"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "edit"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "parentReference",
+                    "permissions",
+                    "name",
+                    "id",
+                    "eTag",
+                    "folder"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "FolderToShare"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType", "id", "name", "path"],
+                      "properties": {
+                        "driveType": {
+                          "const": "project"
+                        },
+                        "path": {
+                          "const": "/parent"
+                        },
+                        "name": {
+                          "const": "parent"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["hasPassword", "id", "link", "createdDateTime"],
+                        "properties": {
+                          "link": {
+                            "type": "object",
+                            "required": [
+                              "@libre.graph.displayName",
+                              "@libre.graph.quickLink",
+                              "preventsDownload",
+                              "type",
+                              "webUrl"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "view"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the link shares of a file after deleting one link share (Project space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "textfile.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | NewSpace     |
+      | permissionsRole | edit         |
+      | password        | %public%     |
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | NewSpace     |
+      | permissionsRole | view         |
+      | password        | %public%     |
+    And user "Alice" has removed the last link share of file "textfile.txt" from space "NewSpace"
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "parentReference",
+                "permissions",
+                "name",
+                "id",
+                "eTag",
+                "file"
+              ],
+              "properties": {
+                "name": {
+                  "const": "textfile.txt"
+                },
+                "permissions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["hasPassword", "id", "link", "createdDateTime"],
+                    "properties": {
+                      "link": {
+                        "type": "object",
+                        "required": [
+                          "@libre.graph.displayName",
+                          "@libre.graph.quickLink",
+                          "preventsDownload",
+                          "type",
+                          "webUrl"
+                        ],
+                        "properties": {
+                          "type": {
+                            "const": "edit"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer lists the link shares of a folder after deleting one link share (project space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare |
+      | space           | NewSpace      |
+      | permissionsRole | edit          |
+      | password        | %public%      |
+    And user "Alice" has created the following resource link share:
+      | resource        | FolderToShare |
+      | space           | NewSpace      |
+      | permissionsRole | view          |
+      | password        | %public%      |
+    And user "Alice" has removed the last link share of folder "FolderToShare" from space "NewSpace"
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "parentReference",
+                "permissions",
+                "name",
+                "id",
+                "eTag",
+                "folder"
+              ],
+              "properties": {
+                "name": {
+                  "const": "FolderToShare"
+                },
+                "permissions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["hasPassword", "id", "link", "createdDateTime"],
+                    "properties": {
+                      "link": {
+                        "type": "object",
+                        "required": [
+                          "@libre.graph.displayName",
+                          "@libre.graph.quickLink",
+                          "preventsDownload",
+                          "type",
+                          "webUrl"
+                        ],
+                        "properties": {
+                          "type": {
+                            "const": "edit"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @issue-8355
+  Scenario: sharer lists the link share of a project space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | NewSpace      |
+      | permissionsRole | view          |
+      | password        | %public%      |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "parentReference",
+                "permissions",
+                "name",
+                "id",
+                "eTag",
+                "folder",
+                "lastModifiedDateTime",
+                "size"
+              ],
+              "properties": {
+                "name": {
+                  "const": "."
+                },
+                "folder": {
+                  "const": {}
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%file_id_pattern%$"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": ["driveId", "driveType", "id", "name", "path"],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType": {
+                      "const": "project"
+                    },
+                    "path": {
+                      "const": "."
+                    },
+                    "name": {
+                      "const": "."
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    }
+                  }
+                },
+                "permissions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["hasPassword", "id", "link", "createdDateTime"],
+                    "properties": {
+                      "link": {
+                        "type": "object",
+                        "required": [
+                          "@libre.graph.displayName",
+                          "@libre.graph.quickLink",
+                          "preventsDownload",
+                          "type",
+                          "webUrl"
+                        ],
+                        "properties": {
+                          "@libre.graph.displayName": {
+                            "const": ""
+                          },
+                          "@libre.graph.quickLink": {
+                            "const": false
+                          },
+                          "preventsDownload": {
+                            "const": false
+                          },
+                          "type": {
+                            "const": "view"
+                          },
+                          "webUrl": {
+                            "type": "string",
+                            "pattern": "^%base_url%/s/[a-zA-Z]+$"
+                          }
+                        }
+                      },
+                      "id": {
+                        "type": "string",
+                        "pattern": "[a-zA-Z]+"
+                      },
+                      "hasPassword": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
