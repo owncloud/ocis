@@ -197,30 +197,52 @@ Feature: create files and folder
       | spaces           | '"double".txt'     |
 
 
-  Scenario Outline: try to create file and folder with '.', '..' and 'empty' 
+  Scenario Outline: try to create file with '.', '..' and 'empty' 
     Given using <dav-path-version> DAV path
-    When user "Alice" creates folder "<file-name>" using the WebDAV API
-    Then the HTTP status code should be "<http-status-code-folder>"
     When user "Alice" uploads file with content "some text" to "<file-name>" using the WebDAV API
-    Then the HTTP status code should be "<http-status-code-file>"
+    Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | dav-path-version | file-name | http-status-code-file | http-status-code-folder |
-      | old              | /.        | 500                   | 405                     |
-      | old              | /..       | 404                   | 404                     |
-      | old              | /../lorem | 404                   | 404                     |
-      | old              |           | 500                   | 405                     |
-      | new              | /.        | 500                   | 405                     |
-      | new              | /..       | 405                   | 405                     |
-      | new              | /../lorem | 404                   | 409                     |
-      | new              |           | 500                   | 405                     |
+      | dav-path-version | file-name | http-status-code |
+      | old              | /.        | 500              |
+      | old              | /..       | 404              |
+      | old              | /../lorem | 404              |
+      | old              |           | 500              |
+      | new              | /.        | 500              |
+      | new              | /..       | 405              |
+      | new              | /../lorem | 404              |
+      | new              |           | 500              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file-name | http-status-code-file | http-status-code-folder |
-      | spaces           | /.        | 500                   | 400                     |
-      | spaces           | /..       | 405                   | 405                     |
-      | spaces           | /../lorem | 404                   | 404                     |
-      | spaces           |           | 500                   | 400                     |
+      | dav-path-version | file-name | http-status-code |
+      | spaces           | /.        | 500              |
+      | spaces           | /..       | 405              |
+      | spaces           | /../lorem | 404              |
+      | spaces           |           | 500              |
+
+
+  Scenario Outline: try to create folder with '.', '..' and 'empty' 
+    Given using <dav-path-version> DAV path
+    When user "Alice" creates folder "<folder-name>" using the WebDAV API
+    Then the HTTP status code should be "<http-status-code>"
+    Examples:
+      | dav-path-version | folder-name | http-status-code |
+      | old              | /.          | 405              |
+      | old              | /..         | 404              |
+      | old              | /../lorem   | 404              |
+      | old              |             | 405              |
+      | new              | /.          | 405              |
+      | new              | /..         | 405              |
+      | new              | /../lorem   | 409              |
+      | new              |             | 405              |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav-path-version | folder-name | http-status-code |
+      | spaces           | /.          | 400              |
+      | spaces           | /..         | 405              |
+      | spaces           | /../lorem   | 404              |
+      | spaces           |             | 400              |
 
 
   Scenario Outline: create a file with dots in the name 
