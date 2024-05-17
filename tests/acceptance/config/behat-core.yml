@@ -314,10 +314,10 @@ default:
         - TrashbinContext:
         - PublicWebDavContext:
         - FilesVersionsContext:
-        - WebDavPropertiesContext:
-        - OcisConfigContext:
         - SpacesContext:
         - SharingNgContext:
+        - WebDavPropertiesContext:
+        - OcisConfigContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~

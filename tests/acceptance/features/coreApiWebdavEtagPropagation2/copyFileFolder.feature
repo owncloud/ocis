@@ -126,9 +126,11 @@ Feature: propagation of etags when copying files or folders
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | upload |
-      | permissions | change |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | upload   |
+      | space           | Personal |
+      | permissionsRole | edit     |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Alice" has stored etag of element "/upload/file.txt"
@@ -160,7 +162,12 @@ Feature: propagation of etags when copying files or folders
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Alice" has stored etag of element "/upload/file.txt"
@@ -196,7 +203,12 @@ Feature: propagation of etags when copying files or folders
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Alice" has stored etag of element "/upload/file.txt"
