@@ -1,4 +1,4 @@
-// Copyright 2020-2023 The NATS Authors
+// Copyright 2020-2024 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -150,6 +150,7 @@ type raft struct {
 	pae     map[uint64]*appendEntry        // Pending append entries
 
 	elect  *time.Timer // Election timer, normally accessed via electTimer
+	etlr   time.Time   // Election timer last reset time, for unit tests only
 	active time.Time   // Last activity time, i.e. for heartbeats
 	llqrt  time.Time   // Last quorum lost time
 	lsut   time.Time   // Last scale-up time
@@ -469,6 +470,11 @@ func (s *Server) startRaftNode(accName string, cfg *RaftConfig, labels pprofLabe
 				}
 			}
 		}
+	} else if n.pterm == 0 && n.pindex == 0 {
+		// We have recovered no state, either through our WAL or snapshots,
+		// so inherit from term from our tav.idx file and pindex from our last sequence.
+		n.pterm = n.term
+		n.pindex = state.LastSeq
 	}
 
 	// Make sure to track ourselves.
@@ -1766,6 +1772,7 @@ func (n *raft) resetElectionTimeoutWithLock() {
 
 // Lock should be held.
 func (n *raft) resetElect(et time.Duration) {
+	n.etlr = time.Now()
 	if n.elect == nil {
 		n.elect = time.NewTimer(et)
 	} else {
@@ -2342,31 +2349,38 @@ func (n *raft) runAsLeader() {
 			n.resp.recycle(&ars)
 		case <-n.prop.ch:
 			const maxBatch = 256 * 1024
+			const maxEntries = 512
 			var entries []*Entry
 
-			es := n.prop.pop()
-			sz := 0
-			for i, b := range es {
+			es, sz := n.prop.pop(), 0
+			for _, b := range es {
 				if b.Type == EntryRemovePeer {
 					n.doRemovePeerAsLeader(string(b.Data))
 				}
 				entries = append(entries, b)
-				sz += len(b.Data) + 1
-				if i != len(es)-1 && sz < maxBatch && len(entries) < math.MaxUint16 {
-					continue
-				}
-				n.sendAppendEntry(entries)
-
 				// If this is us sending out a leadership transfer stepdown inline here.
 				if b.Type == EntryLeaderTransfer {
+					// Send out what we have and switch to follower.
+					n.sendAppendEntry(entries)
 					n.prop.recycle(&es)
 					n.debug("Stepping down due to leadership transfer")
 					n.switchToFollower(noLeader)
 					return
 				}
+				// Increment size.
+				sz += len(b.Data) + 1
+				// If below thresholds go ahead and send.
+				if sz < maxBatch && len(entries) < maxEntries {
+					continue
+				}
+				n.sendAppendEntry(entries)
+				// Reset our sz and entries.
 				// We need to re-create `entries` because there is a reference
 				// to it in the node's pae map.
-				entries = nil
+				sz, entries = 0, nil
+			}
+			if len(entries) > 0 {
+				n.sendAppendEntry(entries)
 			}
 			n.prop.recycle(&es)
 
@@ -2411,9 +2425,9 @@ func (n *raft) Quorum() bool {
 	n.RLock()
 	defer n.RUnlock()
 
-	now, nc := time.Now().UnixNano(), 1
-	for _, peer := range n.peers {
-		if now-peer.ts < int64(lostQuorumInterval) {
+	now, nc := time.Now().UnixNano(), 0
+	for id, peer := range n.peers {
+		if id == n.id || time.Duration(now-peer.ts) < lostQuorumInterval {
 			nc++
 			if nc >= n.qn {
 				return true
@@ -2435,9 +2449,9 @@ func (n *raft) lostQuorumLocked() bool {
 		return false
 	}
 
-	now, nc := time.Now().UnixNano(), 1
-	for _, peer := range n.peers {
-		if now-peer.ts < int64(lostQuorumInterval) {
+	now, nc := time.Now().UnixNano(), 0
+	for id, peer := range n.peers {
+		if id == n.id || time.Duration(now-peer.ts) < lostQuorumInterval {
 			nc++
 			if nc >= n.qn {
 				return false
@@ -2682,14 +2696,10 @@ func (n *raft) applyCommit(index uint64) error {
 		n.debug("Ignoring apply commit for %d, already processed", index)
 		return nil
 	}
-	original := n.commit
-	n.commit = index
 
 	if n.State() == Leader {
 		delete(n.acks, index)
 	}
-
-	var fpae bool
 
 	ae := n.pae[index]
 	if ae == nil {
@@ -2708,15 +2718,14 @@ func (n *raft) applyCommit(index uint64) error {
 				// Reset and cancel any catchup.
 				n.resetWAL()
 				n.cancelCatchup()
-			} else {
-				n.commit = original
 			}
 			return errEntryLoadFailed
 		}
 	} else {
-		fpae = true
+		defer delete(n.pae, index)
 	}
 
+	n.commit = index
 	ae.buf = nil
 
 	var committed []*Entry
@@ -2790,9 +2799,6 @@ func (n *raft) applyCommit(index uint64) error {
 			// We pass these up as well.
 			committed = append(committed, e)
 		}
-	}
-	if fpae {
-		delete(n.pae, index)
 	}
 	// Pass to the upper layers if we have normal entries. It is
 	// entirely possible that 'committed' might be an empty slice here,
@@ -3121,9 +3127,13 @@ func (n *raft) processAppendEntry(ae *appendEntry, sub *subscription) {
 	if n.State() == Leader {
 		// If we are the same we should step down to break the tie.
 		if ae.term >= n.term {
-			n.term = ae.term
-			n.vote = noVote
-			n.writeTermVote()
+			// If the append entry term is newer than the current term, erase our
+			// vote.
+			if ae.term > n.term {
+				n.term = ae.term
+				n.vote = noVote
+				n.writeTermVote()
+			}
 			n.debug("Received append entry from another leader, stepping down to %q", ae.leader)
 			n.stepdown.push(ae.leader)
 		} else {
@@ -3142,13 +3152,18 @@ func (n *raft) processAppendEntry(ae *appendEntry, sub *subscription) {
 	// another node has taken on the leader role already, so we should convert
 	// to a follower of that node instead.
 	if n.State() == Candidate {
-		n.debug("Received append entry in candidate state from %q, converting to follower", ae.leader)
-		if n.term < ae.term {
-			n.term = ae.term
-			n.vote = noVote
-			n.writeTermVote()
+		// Ignore old terms, otherwise we might end up stepping down incorrectly.
+		if ae.term >= n.term {
+			// If the append entry term is newer than the current term, erase our
+			// vote.
+			if ae.term > n.term {
+				n.term = ae.term
+				n.vote = noVote
+				n.writeTermVote()
+			}
+			n.debug("Received append entry in candidate state from %q, converting to follower", ae.leader)
+			n.stepdown.push(ae.leader)
 		}
-		n.stepdown.push(ae.leader)
 	}
 
 	// Catching up state.
@@ -3258,19 +3273,20 @@ func (n *raft) processAppendEntry(ae *appendEntry, sub *subscription) {
 		// so make sure this is a snapshot entry. If it is not start the catchup process again since it
 		// means we may have missed additional messages.
 		if catchingUp {
+			// This means we already entered into a catchup state but what the leader sent us did not match what we expected.
+			// Snapshots and peerstate will always be together when a leader is catching us up in this fashion.
+			if len(ae.entries) != 2 || ae.entries[0].Type != EntrySnapshot || ae.entries[1].Type != EntryPeerState {
+				n.warn("Expected first catchup entry to be a snapshot and peerstate, will retry")
+				n.cancelCatchup()
+				n.Unlock()
+				return
+			}
+
 			// Check if only our terms do not match here.
 			if ae.pindex == n.pindex {
 				// Make sure pterms match and we take on the leader's.
 				// This prevents constant spinning.
 				n.truncateWAL(ae.pterm, ae.pindex)
-				n.cancelCatchup()
-				n.Unlock()
-				return
-			}
-			// This means we already entered into a catchup state but what the leader sent us did not match what we expected.
-			// Snapshots and peerstate will always be together when a leader is catching us up in this fashion.
-			if len(ae.entries) != 2 || ae.entries[0].Type != EntrySnapshot || ae.entries[1].Type != EntryPeerState {
-				n.warn("Expected first catchup entry to be a snapshot and peerstate, will retry")
 				n.cancelCatchup()
 				n.Unlock()
 				return
@@ -3739,11 +3755,11 @@ func (n *raft) readTermVote() (term uint64, voted string, err error) {
 	if err != nil {
 		return 0, noVote, err
 	}
-	if len(buf) < termVoteLen {
-		return 0, noVote, nil
-	}
 	var le = binary.LittleEndian
 	term = le.Uint64(buf[0:])
+	if len(buf) < termVoteLen {
+		return term, noVote, nil
+	}
 	voted = string(buf[8:])
 	return term, voted, nil
 }
@@ -3809,6 +3825,8 @@ func (n *raft) writeTermVote() {
 	// Stamp latest and write the term & vote file.
 	n.wtv = b
 	if err := writeTermVote(n.sd, n.wtv); err != nil && !n.isClosed() {
+		// Clear wtv since we failed.
+		n.wtv = nil
 		n.setWriteErrLocked(err)
 		n.warn("Error writing term and vote file for %q: %v", n.group, err)
 	}
@@ -3875,7 +3893,6 @@ func (n *raft) processVoteRequest(vr *voteRequest) error {
 	}
 
 	n.Lock()
-	n.resetElectionTimeout()
 
 	vresp := &voteResponse{n.term, n.id, false}
 	defer n.debug("Sending a voteResponse %+v -> %q", vresp, vr.reply)
@@ -3907,6 +3924,7 @@ func (n *raft) processVoteRequest(vr *voteRequest) error {
 		n.term = vr.term
 		n.vote = vr.candidate
 		n.writeTermVote()
+		n.resetElectionTimeout()
 	} else {
 		if vr.term >= n.term && n.vote == noVote {
 			n.term = vr.term
@@ -3996,25 +4014,27 @@ func (n *raft) updateLeadChange(isLeader bool) {
 
 // Lock should be held.
 func (n *raft) switchState(state RaftState) {
-	if n.State() == Closed {
+	pstate := n.State()
+	if pstate == Closed {
 		return
 	}
 
 	// Reset the election timer.
 	n.resetElectionTimeout()
+	// Set our state.
+	n.state.Store(int32(state))
 
-	if n.State() == Leader && state != Leader {
+	if pstate == Leader && state != Leader {
 		n.updateLeadChange(false)
 		// Drain the response queue.
 		n.resp.drain()
-	} else if state == Leader && n.State() != Leader {
+	} else if state == Leader && pstate != Leader {
 		if len(n.pae) > 0 {
 			n.pae = make(map[uint64]*appendEntry)
 		}
 		n.updateLeadChange(true)
 	}
 
-	n.state.Store(int32(state))
 	n.writeTermVote()
 }
 
