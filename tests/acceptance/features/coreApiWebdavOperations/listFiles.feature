@@ -132,7 +132,11 @@ Feature: list files
       | path                                                                       |
       | /simple-folder/simple-folder1/simple-folder2/simple-folder3                |
       | /simple-folder/simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
-    And user "Alice" has created a public link share of folder "simple-folder"
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | simple-folder |
+      | space           | Personal      |
+      | permissionsRole | view          |
     When the public lists the resources in the last created public link with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last public link DAV response should not contain these nodes
@@ -156,7 +160,11 @@ Feature: list files
       | path                                                                       |
       | /simple-folder/simple-folder1/simple-folder2/simple-folder3                |
       | /simple-folder/simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
-    And user "Alice" has created a public link share of folder "simple-folder"
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | simple-folder |
+      | space           | Personal      |
+      | permissionsRole | view          |
     When the public lists the resources in the last created public link with depth "1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the last public link DAV response should contain these nodes

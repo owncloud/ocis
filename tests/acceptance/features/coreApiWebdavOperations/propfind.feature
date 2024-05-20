@@ -48,10 +48,12 @@ Feature: PROPFIND
   Scenario: send PROPFIND request to a public link shared with password
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT"
-    And user "Alice" has created a public link share with settings
-      | path        | /PARENT  |
-      | permissions | read     |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
     When the public sends "PROPFIND" request to the last public link share using the new public WebDAV API with password "%public%"
     Then the HTTP status code should be "207"
     And the value of the item "//d:href" in the response should match "/%base_path%\/remote.php\/dav\/public-files\/%public_token%\/$/"
@@ -61,10 +63,12 @@ Feature: PROPFIND
   Scenario: send PROPFIND request to a public link shared with password (request without password)
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT"
-    And user "Alice" has created a public link share with settings
-      | path        | /PARENT  |
-      | permissions | read     |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
     When the public sends "PROPFIND" request to the last public link share using the new public WebDAV API
     Then the HTTP status code should be "401"
     And the value of the item "/d:error/s:exception" in the response should be "Sabre\DAV\Exception\NotAuthenticated"
@@ -73,10 +77,12 @@ Feature: PROPFIND
   Scenario: send PROPFIND request to a public link shared with password (request with incorrect password)
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT"
-    And user "Alice" has created a public link share with settings
-      | path        | /PARENT  |
-      | permissions | read     |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
     When the public sends "PROPFIND" request to the last public link share using the new public WebDAV API with password "1234"
     Then the HTTP status code should be "401"
     And the value of the item "/d:error/s:exception" in the response should be "Sabre\DAV\Exception\NotAuthenticated"

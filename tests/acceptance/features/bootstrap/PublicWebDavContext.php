@@ -1871,7 +1871,7 @@ class PublicWebDavContext implements Context {
 		} else {
 			$body = null;
 		}
-		$token = $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			null,
 			null,
