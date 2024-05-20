@@ -15,9 +15,24 @@ Feature: file versions remember the author of each version
   Scenario: enable file versioning and check the history of changes from multiple users
     Given user "David" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
-    And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
-    And user "Alice" has shared folder "/test" with user "Carol" with permissions "all"
-    And user "Alice" has shared folder "/test" with user "David" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | Carol    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | David    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test/textfile0.txt"
@@ -46,7 +61,12 @@ Feature: file versions remember the author of each version
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
-    And user "Alice" has shared folder "/test" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test/textfile0.txt"
@@ -71,6 +91,12 @@ Feature: file versions remember the author of each version
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
     And user "Alice" has uploaded file with content "uploaded content alice" to "/textfile0.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | File Editor   |
     And user "Alice" has shared file "/textfile0.txt" with group "grp1"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/textfile0.txt"
@@ -95,7 +121,12 @@ Feature: file versions remember the author of each version
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
-    And user "Alice" has shared folder "/test" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test/textfile0.txt"
@@ -126,7 +157,12 @@ Feature: file versions remember the author of each version
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
     And user "Alice" has uploaded file with content "uploaded content alice" to "/exist.txt"
-    And user "Alice" has shared file "/exist.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | exist.txt   |
+      | space           | Personal    |
+      | sharee          | grp1        |
+      | shareType       | group       |
+      | permissionsRole | File Editor |
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/exist.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/exist.txt"
     And user "Alice" has moved file "/exist.txt" to "/textfile0.txt"
@@ -151,7 +187,12 @@ Feature: file versions remember the author of each version
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
     And user "Alice" has uploaded file with content "uploaded content alice" to "/exist.txt"
-    And user "Alice" has shared file "/exist.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | exist.txt   |
+      | space           | Personal    |
+      | sharee          | grp1        |
+      | shareType       | group       |
+      | permissionsRole | File Editor |
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/exist.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/exist.txt"
     And user "Brian" has moved file "/Shares/exist.txt" to "/Shares/textfile0.txt"
@@ -180,13 +221,23 @@ Feature: file versions remember the author of each version
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
-    And user "Alice" has shared folder "/test" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test/textfile0.txt"
     And user "Alice" has deleted the last share
     And user "Alice" has uploaded file with content "uploaded content alice after unshared folder" to "/test/textfile0.txt"
-    And user "Alice" has shared folder "/test" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     When user "Alice" gets the number of versions of file "/test/textfile0.txt"
     Then the HTTP status code should be "207"
     And the number of versions should be "3"
@@ -210,15 +261,45 @@ Feature: file versions remember the author of each version
     And user "Brian" has created folder "/test"
     And user "Brian" has uploaded file with content "duplicate brian" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "overwrite brian" to "/test/textfile0.txt"
-    And user "Brian" has shared folder "/test" with user "Carol" with permissions "all"
-    And user "Brian" has shared folder "/test" with user "David" with permissions "all"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | Carol    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | David    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Carol" has created folder "/test"
     And user "Carol" has uploaded file with content "duplicate carol" to "/test/textfile0.txt"
-    And user "Carol" has shared folder "/test" with user "Brian" with permissions "all"
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | David    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has created folder "/test"
-    And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
-    And user "Alice" has shared folder "/test" with user "Carol" with permissions "all"
-    And user "Alice" has shared folder "/test" with user "David" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | Carol    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | David    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test (1)/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test (1)/textfile0.txt"
@@ -255,14 +336,44 @@ Feature: file versions remember the author of each version
     Given user "David" has been created with default attributes and without skeleton files
     And user "Brian" has uploaded file with content "duplicate brian" to "/textfile0.txt"
     And user "Brian" has uploaded file with content "overwrite brian" to "/textfile0.txt"
-    And user "Brian" has shared file "/textfile0.txt" with user "Carol"
-    And user "Brian" has shared file "/textfile0.txt" with user "David"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | David         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     And user "Carol" has uploaded file with content "duplicate carol" to "/textfile0.txt"
-    And user "Carol" has shared file "/textfile0.txt" with user "Brian"
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     And user "Alice" has uploaded file with content "uploaded content alice" to "/textfile0.txt"
-    And user "Alice" has shared file "/textfile0.txt" with user "Brian"
-    And user "Alice" has shared file "/textfile0.txt" with user "Carol"
-    And user "Alice" has shared file "/textfile0.txt" with user "David"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | David         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/textfile0 (1).txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/textfile0 (1).txt"
     And user "David" has uploaded file with content "uploaded content david" to "/Shares/textfile0 (1).txt"
@@ -296,8 +407,18 @@ Feature: file versions remember the author of each version
 
   Scenario: enable file versioning and check the version author after restoring a version of a file inside a folder
     Given user "Alice" has created folder "/test"
-    And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
-    And user "Alice" has shared folder "/test" with user "Carol" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | Carol    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test/textfile0.txt"
@@ -315,8 +436,18 @@ Feature: file versions remember the author of each version
 
   Scenario: enable file versioning and check the version author after restoring a version of a file
     Given user "Alice" has uploaded file with content "uploaded content alice" to "/textfile0.txt"
-    And user "Alice" has shared file "/textfile0.txt" with user "Brian"
-    And user "Alice" has shared file "/textfile0.txt" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/textfile0.txt"
     When user "Brian" restores version index "1" of file "/Shares/textfile0.txt" using the WebDAV API
