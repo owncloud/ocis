@@ -16,7 +16,12 @@ Feature: sharing works when a username and group name are the same
     And group "Brian" has been created
     And user "Carol" has been added to group "Brian"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
-    And user "Alice" has shared file "randomfile.txt" with group "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | randomfile.txt |
+      | space           | Personal       |
+      | sharee          | Brian          |
+      | shareType       | group          |
+      | permissionsRole | File Editor    |
     When user "Alice" shares file "randomfile.txt" with user "Brian" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
@@ -36,7 +41,12 @@ Feature: sharing works when a username and group name are the same
     And group "Brian" has been created
     And user "Carol" has been added to group "Brian"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
-    And user "Alice" has shared file "randomfile.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | randomfile.txt |
+      | space           | Personal       |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | File Editor    |
     When user "Alice" shares file "randomfile.txt" with group "Brian" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
@@ -56,7 +66,12 @@ Feature: sharing works when a username and group name are the same
     And group "brian" has been created
     And user "Carol" has been added to group "brian"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
-    And user "Alice" has shared file "randomfile.txt" with group "brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | randomfile.txt |
+      | space           | Personal       |
+      | sharee          | brian          |
+      | shareType       | group          |
+      | permissionsRole | File Editor    |
     When user "Alice" shares file "randomfile.txt" with user "Brian" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
@@ -76,7 +91,12 @@ Feature: sharing works when a username and group name are the same
     And group "brian" has been created
     And user "Carol" has been added to group "brian"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
-    And user "Alice" has shared file "randomfile.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | randomfile.txt |
+      | space           | Personal       |
+      | sharee          | Brian          |
+      | shareType       | user              |
+      | permissionsRole | File Editor    |
     When user "Alice" shares file "randomfile.txt" with group "brian" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"

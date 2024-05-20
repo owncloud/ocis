@@ -73,6 +73,7 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - SettingsContext:
+        - SharingNgContext:
 
     coreApiSharees:
       paths:
