@@ -172,11 +172,12 @@ Feature: get file properties
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
-    And user "Alice" has created a share with settings
-      | path        | test  |
-      | shareType   | user  |
-      | permissions | all   |
-      | shareWith   | Brian |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
       | propertyName   |
       | oc:share-types |
@@ -198,11 +199,12 @@ Feature: get file properties
     Given using <dav-path-version> DAV path
     And group "grp1" has been created
     And user "Alice" has created folder "/test"
-    And user "Alice" has created a share with settings
-      | path        | test  |
-      | shareType   | group |
-      | permissions | all   |
-      | shareWith   | grp1  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
       | propertyName   |
       | oc:share-types |
@@ -223,10 +225,11 @@ Feature: get file properties
   Scenario Outline: file that is shared by link has a share-types property
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/test"
-    And user "Alice" has created a public link share with settings
-      | path        | test     |
-      | permissions | all      |
-      | password    | %public% |
+    And user "Alice" has created the following resource link share:
+      | resource        | test     |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
       | propertyName   |
       | oc:share-types |
@@ -249,20 +252,23 @@ Feature: get file properties
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Alice" has created folder "/test"
-    And user "Alice" has created a share with settings
-      | path        | test  |
-      | shareType   | user  |
-      | permissions | all   |
-      | shareWith   | Brian |
-    And user "Alice" has created a share with settings
-      | path        | test  |
-      | shareType   | group |
-      | permissions | all   |
-      | shareWith   | grp1  |
-    And user "Alice" has created a public link share with settings
-      | path        | test     |
-      | permissions | all      |
-      | password    | %public% |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
+    And user "Alice" has created the following resource link share:
+      | resource        | test     |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
       | propertyName   |
       | oc:share-types |

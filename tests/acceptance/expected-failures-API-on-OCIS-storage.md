@@ -24,12 +24,12 @@ _ocdav: double-check the webdav property parsing when custom namespaces are used
 
 #### [Cannot set custom webDav properties](https://github.com/owncloud/product/issues/264)
 
-- [coreApiWebdavProperties/getFileProperties.feature:342](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getFileProperties.feature#L342)
-- [coreApiWebdavProperties/getFileProperties.feature:343](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getFileProperties.feature#L343)
 - [coreApiWebdavProperties/getFileProperties.feature:348](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getFileProperties.feature#L348)
-- [coreApiWebdavProperties/getFileProperties.feature:378](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getFileProperties.feature#L378)
-- [coreApiWebdavProperties/getFileProperties.feature:379](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getFileProperties.feature#L379)
+- [coreApiWebdavProperties/getFileProperties.feature:349](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getFileProperties.feature#L349)
+- [coreApiWebdavProperties/getFileProperties.feature:354](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getFileProperties.feature#L354)
 - [coreApiWebdavProperties/getFileProperties.feature:384](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getFileProperties.feature#L384)
+- [coreApiWebdavProperties/getFileProperties.feature:385](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getFileProperties.feature#L385)
+- [coreApiWebdavProperties/getFileProperties.feature:390](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getFileProperties.feature#L390)
 
 #### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
 
