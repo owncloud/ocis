@@ -274,7 +274,12 @@ Feature: dav-versions
   Scenario: sharer of a file can see the old version information when the sharee changes the content of the file
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
-    And user "Alice" has shared file "sharefile.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharefile.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Brian" uploads file with content "Second content" to "/Shares/sharefile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the version folder of file "/sharefile.txt" for user "Alice" should contain "1" element
@@ -285,7 +290,12 @@ Feature: dav-versions
   Scenario: sharer of a file can restore the original content of a shared file after the file has been modified by the sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
-    And user "Alice" has shared file "sharefile.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharefile.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     And user "Brian" has uploaded file with content "Second content" to "/Shares/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharefile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -296,7 +306,12 @@ Feature: dav-versions
   Scenario: sharer can restore a file inside a shared folder modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
-    And user "Alice" has shared folder "/sharingfolder" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharingfolder |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
     And user "Alice" has uploaded file with content "First content" to "/sharingfolder/sharefile.txt"
     And user "Brian" has uploaded file with content "Second content" to "/Shares/sharingfolder/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharingfolder/sharefile.txt" using the WebDAV API
@@ -308,7 +323,12 @@ Feature: dav-versions
   Scenario: sharee cannot see a version of a file inside a shared folder when modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
-    And user "Alice" has shared folder "/sharingfolder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharingfolder |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
     And user "Alice" has uploaded file with content "First content" to "/sharingfolder/sharefile.txt"
     When user "Brian" has uploaded file with content "Second content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Brian" gets the number of versions of file "/Shares/sharingfolder/sharefile.txt"
@@ -320,7 +340,12 @@ Feature: dav-versions
   Scenario: sharer can restore a file inside a shared folder created by sharee and modified by sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
-    And user "Alice" has shared folder "/sharingfolder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharingfolder |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
     And user "Brian" has uploaded file with content "First content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Alice" has uploaded file with content "Second content" to "/sharingfolder/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharingfolder/sharefile.txt" using the WebDAV API
@@ -332,7 +357,12 @@ Feature: dav-versions
   Scenario: sharer can restore a file inside a shared folder created by sharee and modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
-    And user "Alice" has shared folder "/sharingfolder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharingfolder |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
     And user "Brian" has uploaded file with content "old content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Brian" has uploaded file with content "new content" to "/Shares/sharingfolder/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharingfolder/sharefile.txt" using the WebDAV API
@@ -348,7 +378,12 @@ Feature: dav-versions
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/sharingfolder"
-    And user "Alice" has shared folder "/sharingfolder" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharingfolder |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Editor        |
     And user "Alice" has uploaded file with content "First content" to "/sharingfolder/sharefile.txt"
     And user "Brian" has uploaded file with content "Second content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Carol" has uploaded file with content "Third content" to "/Shares/sharingfolder/sharefile.txt"
@@ -363,11 +398,12 @@ Feature: dav-versions
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
-    And user "Brian" has created a share with settings
-      | path        | testshare     |
-      | shareType   | user          |
-      | permissions | <permissions> |
-      | shareWith   | Alice         |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     And user "Brian" has uploaded file with content "test data 1" to "/testfile.txt"
     And user "Brian" has uploaded file with content "test data 2" to "/testfile.txt"
     And user "Brian" has uploaded file with content "test data 3" to "/testfile.txt"
@@ -379,20 +415,25 @@ Feature: dav-versions
     And the version folder of file "Shares/testshare/testfile.txt" for user "Alice" should contain "0" elements
     And the version folder of file "testshare/testfile.txt" for user "Brian" should contain "2" elements
     Examples:
-      | dav-path-version | permissions |
-      | old              | read        |
-      | old              | change      |
-      | old              | all         |
-      | new              | read        |
-      | new              | change      |
-      | new              | all         |
+      | dav-path-version | permissions-role |
+      | old              | Viewer           |
+      | old              | Uploader         |
+      | old              | Editor           |
+      | new              | Viewer           |
+      | new              | Uploader         |
+      | new              | Editor           |
 
 
   Scenario: sharee tries to get file versions of file not shared by the sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
     And user "Alice" has uploaded file with content "textfile1" to "textfile1.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Brian" tries to get versions of file "textfile1.txt" from "Alice"
     Then the HTTP status code should be "404"
     And the value of the item "//s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
@@ -404,7 +445,12 @@ Feature: dav-versions
     And user "Alice" has uploaded file with content "version 1" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 2" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 3" to "textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Brian" tries to get versions of file "textfile0.txt" from "Alice"
     Then the HTTP status code should be "403"
 
@@ -414,7 +460,12 @@ Feature: dav-versions
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 1" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 2" to "textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Brian" tries to get versions of file "textfile0.txt" from "Alice"
     Then the HTTP status code should be "403"
     And the value of the item "//s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\Forbidden"

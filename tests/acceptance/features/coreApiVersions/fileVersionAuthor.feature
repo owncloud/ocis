@@ -97,7 +97,6 @@ Feature: file versions remember the author of each version
       | sharee          | grp1          |
       | shareType       | group         |
       | permissionsRole | File Editor   |
-    And user "Alice" has shared file "/textfile0.txt" with group "grp1"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/textfile0.txt"
     When user "Alice" gets the number of versions of file "textfile0.txt"
