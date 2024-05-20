@@ -34,7 +34,12 @@ Feature: sharing
   Scenario Outline: check webdav share-permissions for received file with edit
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has shared file "/tmp.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp.txt     |
+      | space           | Personal    |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | File Editor |
     When user "Brian" gets the following properties of file "/Shares/tmp.txt" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -70,7 +75,13 @@ Feature: sharing
   Scenario Outline: check webdav share-permissions for received file with edit permissions but no reshare permissions
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has shared file "tmp.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp.txt  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | update,read |
     Then the HTTP status code should be "200"
@@ -105,7 +116,13 @@ Feature: sharing
   Scenario Outline: check webdav share-permissions for received file without edit permissions
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has shared file "tmp.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp.txt  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | read |
     Then the HTTP status code should be "200"
@@ -159,7 +176,12 @@ Feature: sharing
   Scenario Outline: check webdav share-permissions for received folder with all permissions
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has shared file "/tmp" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -194,7 +216,13 @@ Feature: sharing
   Scenario Outline: check webdav share-permissions for received folder with all permissions but edit
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has shared file "/tmp" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | delete,create,read |
     Then the HTTP status code should be "200"
@@ -229,7 +257,13 @@ Feature: sharing
   Scenario Outline: check webdav share-permissions for received folder with all permissions but create
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has shared file "/tmp" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | delete,update,read |
     Then the HTTP status code should be "200"
@@ -264,7 +298,13 @@ Feature: sharing
   Scenario Outline: check webdav share-permissions for received folder with all permissions but delete
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has shared file "/tmp" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | create,update,read |
     Then the HTTP status code should be "200"
@@ -299,7 +339,13 @@ Feature: sharing
   Scenario Outline: check webdav share-permissions for received folder with all permissions but share
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has shared file "/tmp" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | change |
     Then the HTTP status code should be "200"

@@ -105,7 +105,13 @@ Feature: share access by ID
   Scenario Outline: decline a share using the share Id
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
+    And using SharingNG
     When user "Brian" declines share with ID "%last_share_id%" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"

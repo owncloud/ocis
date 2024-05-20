@@ -146,7 +146,12 @@ Feature: sharing
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Admin" has changed the quota of the personal space of "Brian Murphy" space to "0"
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/myfile.txt"
-    And user "Alice" has shared file "myfile.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | myfile.txt  |
+      | space           | Personal    |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | File Editor |
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the following headers should match these regular expressions for user "Brian"
@@ -266,7 +271,12 @@ Feature: sharing
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/folder-to-share"
-    And user "Brian" has shared folder "/folder-to-share" with user "Alice"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | folder-to-share |
+      | space           | Personal |
+      | sharee          | Alice    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Alice" uploads file "filesForUpload/zerobyte.txt" to "/Shares/folder-to-share/zerobyte.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/Shares/folder-to-share/zerobyte.txt" should exist
