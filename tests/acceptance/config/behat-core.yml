@@ -301,6 +301,7 @@ default:
         - TrashbinContext:
         - PublicWebDavContext:
         - FilesVersionsContext:
+        - SharingNgContext:
         - WebDavPropertiesContext:
 
     coreApiWebdavEtagPropagation2:
@@ -312,6 +313,7 @@ default:
         - TrashbinContext:
         - PublicWebDavContext:
         - FilesVersionsContext:
+        - SharingNgContext:
         - WebDavPropertiesContext:
         - OcisConfigContext:
 

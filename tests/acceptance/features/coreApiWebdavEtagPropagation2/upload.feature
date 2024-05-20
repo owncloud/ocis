@@ -56,7 +56,12 @@ Feature: propagation of etags when uploading data
   Scenario Outline: sharee uploading a file inside a received shared folder should update etags for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -80,7 +85,12 @@ Feature: propagation of etags when uploading data
   Scenario Outline: sharer uploading a file inside a shared folder should update etags for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -105,7 +115,12 @@ Feature: propagation of etags when uploading data
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -130,7 +145,12 @@ Feature: propagation of etags when uploading data
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -153,10 +173,12 @@ Feature: propagation of etags when uploading data
   @issue-4251
   Scenario Outline: uploading a file into a publicly shared folder changes its etag for the sharer
     Given using <dav-path-version> DAV path
-    And user "Alice" has created a public link share with settings
-      | path        | upload   |
-      | permissions | create   |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | upload     |
+      | space           | Personal   |
+      | permissionsRole | createOnly |
+      | password        | %public%   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     When the public uploads file "file.txt" with password "%public%" and content "new content" using the new public WebDAV API

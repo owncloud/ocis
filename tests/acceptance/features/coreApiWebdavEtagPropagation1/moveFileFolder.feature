@@ -162,7 +162,12 @@ Feature: propagation of etags when moving files or folders
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -188,7 +193,12 @@ Feature: propagation of etags when moving files or folders
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | upload   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -215,8 +225,18 @@ Feature: propagation of etags when moving files or folders
     And user "Alice" has created folder "/src"
     And user "Alice" has created folder "/dst"
     And user "Alice" has uploaded file with content "uploaded content" to "/src/file.txt"
-    And user "Alice" has shared folder "/src" with user "Brian"
-    And user "Alice" has shared folder "/dst" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | src      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | dst      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/src"
     And user "Alice" has stored etag of element "/dst"
@@ -247,8 +267,18 @@ Feature: propagation of etags when moving files or folders
     And user "Alice" has created folder "/src"
     And user "Alice" has created folder "/dst"
     And user "Alice" has created folder "/src/toMove"
-    And user "Alice" has shared folder "/src" with user "Brian"
-    And user "Alice" has shared folder "/dst" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | src      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | dst      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/src"
     And user "Alice" has stored etag of element "/dst"
@@ -277,10 +307,12 @@ Feature: propagation of etags when moving files or folders
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | upload   |
-      | permissions | change   |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | upload   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     When the public renames file "file.txt" to "renamed.txt" from the last public link share using the password "%public%" and the new public WebDAV API
@@ -304,10 +336,12 @@ Feature: propagation of etags when moving files or folders
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has created folder "/upload/sub"
-    And user "Alice" has created a public link share with settings
-      | path        | upload   |
-      | permissions | change   |
-      | password    | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | upload   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     When the public renames folder "sub" to "renamed" from the last public link share using the password "%public%" and the new public WebDAV API
