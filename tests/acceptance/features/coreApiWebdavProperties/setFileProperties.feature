@@ -64,11 +64,12 @@ Feature: set file properties
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/testcustompropshared.txt"
-    And user "Alice" has created a share with settings
-      | path        | testcustompropshared.txt |
-      | shareType   | user                     |
-      | permissions | all                      |
-      | shareWith   | Brian                    |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testcustompropshared.txt |
+      | space           | Personal                 |
+      | sharee          | Brian                    |
+      | shareType       | user                     |
+      | permissionsRole | File Editor              |
     And user "Alice" has set property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "/testcustompropshared.txt" to "valueForSharetest"
     When user "Brian" gets a custom property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "/testcustompropshared.txt"
     Then the response should contain a custom "very-custom-prop" property with namespace "x1='http://whatever.org/ns'" and value "valueForSharetest"
