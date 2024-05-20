@@ -40,11 +40,12 @@ Feature: get quota
     And user "Admin" has changed the quota of the personal space of "Brian Murphy" space to "10000"
     And user "Brian" has created folder "/testquota"
     And user "Brian" has uploaded file "/testquota/Brian.txt" of size 1000 bytes
-    And user "Brian" has created a share with settings
-      | path        | testquota |
-      | shareType   | user      |
-      | permissions | all       |
-      | shareWith   | Alice     |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testquota |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     When user "Alice" gets the following properties of folder "<folder-name>" inside space "Shares" using the WebDAV API
       | propertyName            |
       | d:quota-available-bytes |
@@ -78,7 +79,12 @@ Feature: get quota
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Admin" has changed the quota of the personal space of "Brian Murphy" space to "10000"
     And user "Alice" has uploaded file "/Alice.txt" of size 93 bytes
-    And user "Alice" has shared file "Alice.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | Alice.txt   |
+      | space           | Personal    |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | File Editor |
     When user "Brian" gets the following properties of folder "/" using the WebDAV API
       | propertyName            |
       | d:quota-available-bytes |
