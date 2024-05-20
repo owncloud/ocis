@@ -152,6 +152,7 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - OcisConfigContext:
+        - SharingNgContext:
 
     coreApiShareUpdateToShares:
       paths:

@@ -74,7 +74,7 @@ class SharingNgContext implements Context {
 		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 
 		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
-		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
+		$bodyRows['expirationDateTime'] = \array_key_exists('expirationDateTime', $bodyRows) ? \date('Y-m-d', \strtotime($bodyRows['expirationDateTime'])) . 'T14:00:00.000Z' : null;
 		$bodyRows['password'] = $bodyRows['password'] ?? null;
 		$body = [
 			'type' => $bodyRows['permissionsRole'],
@@ -584,6 +584,24 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has updated the last resource|space link share with$/
+	 *
+	 * @param string $user
+	 * @param TableNode $body
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userHasUpdatedLastPublicLinkShare(string $user, TableNode  $body):void {
+		$response = $this->updateLinkShare(
+			$user,
+			$body,
+			$this->featureContext->shareNgGetLastCreatedLinkShareID()
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while updating public share link!", $response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" updates the last public link share using the Graph API with$/
 	 *
 	 * @param string $user
@@ -608,6 +626,7 @@ class SharingNgContext implements Context {
 	 * @param string $permissionID
 	 *
 	 * @return ResponseInterface
+	 * @throws GuzzleException
 	 */
 	public function updateLinkShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
@@ -625,6 +644,10 @@ class SharingNgContext implements Context {
 			$body['expirationDateTime'] = empty($bodyRows['expirationDateTime']) ? null : $bodyRows['expirationDateTime'];
 		}
 
+		if (\array_key_exists('displayName', $bodyRows)) {
+			$body['displayName'] = $bodyRows['displayName'];
+		}
+
 		return GraphHelper::updateShare(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -638,16 +661,14 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When user :user sets the following password for the last link share using the Graph API:
-	 *
 	 * @param string $user
 	 * @param TableNode $body
+	 * @param string $permissionID
 	 *
-	 * @return void
-	 * @throws Exception
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function userSetsOrUpdatesFollowingPasswordForLastLinkShareUsingTheGraphApi(string $user, TableNode  $body):void {
+	public function setLinkSharePassword(string $user, TableNode  $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
 		$resource = $bodyRows['resource'];
@@ -662,7 +683,7 @@ class SharingNgContext implements Context {
 			throw new Error('Password is missing to set for share link!');
 		}
 
-		$response = GraphHelper::setLinkSharePassword(
+		return GraphHelper::setLinkSharePassword(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
@@ -670,9 +691,45 @@ class SharingNgContext implements Context {
 			$spaceId,
 			$itemId,
 			\json_encode($body),
+			$permissionID
+		);
+	}
+
+	/**
+	 * @Given user :user has set the following password for the last link share:
+	 *
+	 * @param string $user
+	 * @param TableNode $body
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHasSetTheFollowingPasswordForTheLastLinkShare(string $user, TableNode  $body):void {
+		$response = $this->setLinkSharePassword(
+			$user,
+			$body,
 			$this->featureContext->shareNgGetLastCreatedLinkShareID()
 		);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while setting public share link password!", $response);
+	}
+
+	/**
+	 * @When user :user sets the following password for the last link share using the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $body
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userSetsOrUpdatesFollowingPasswordForLastLinkShareUsingTheGraphApi(string $user, TableNode $body):void {
+		$this->featureContext->setResponse(
+			$this->setLinkSharePassword(
+				$user,
+				$body,
+				$this->featureContext->shareNgGetLastCreatedLinkShareID()
+			)
+		);
 	}
 
 	/**

@@ -1810,9 +1810,8 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function userGetsInfoOfLastPublicLinkShareUsingTheSharingApi(string $user, ?string $language = null):void {
-		if ($this->getLastCreatedPublicShare()->id !== null) {
-			$shareId = (string) $this->getLastCreatedPublicShare()->id;
-		} else {
+		$shareId = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareID() : $this->getLastCreatedPublicShare()->id;
+		if ($shareId === null) {
 			throw new Exception(
 				__METHOD__ . " last public link share data was not found"
 			);

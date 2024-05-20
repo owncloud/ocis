@@ -11,9 +11,12 @@ Feature: update a public link share
   Scenario Outline: change expiration date of a public link share and get its info
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path     | FOLDER   |
-      | password | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
     When user "Alice" updates the last public link share using the sharing API with
       | expireDate | 2040-01-01T23:59:59+0100 |
     Then the OCS status code should be "<ocs-status-code>"
@@ -52,11 +55,16 @@ Feature: update a public link share
   Scenario Outline: change expiration date of a newly created public link share and get its info
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path     | FOLDER   |
-      | password | %public% |
-    And user "Alice" has updated the last public link share with
-      | expireDate | 2033-01-31T23:59:59+0100 |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
+    And user "Alice" has updated the last resource link share with
+      | resource           | FOLDER                   |
+      | space              | Personal                 |
+      | expirationDateTime | 2033-01-31T23:59:59.000Z |
     When user "Alice" gets the info of the last public link share using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -86,15 +94,17 @@ Feature: update a public link share
   Scenario Outline: creating a new public link share with password and adding an expiration date using public API
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
-    And user "Alice" has created a public link share with settings
-      | path     | randomfile.txt |
-      | password | %public%       |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | randomfile.txt |
+      | space           | Personal       |
+      | permissionsRole | view           |
+      | password        | %public%       |
     When user "Alice" updates the last public link share using the sharing API with
       | expireDate | 2040-01-01T23:59:59+0100 |
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
-    And the public should be able to download the last publicly shared file using the old public WebDAV API with password "%public%" and the content should be "Random data"
-    And the public should be able to download the last publicly shared file using the new public WebDAV API with password "%public%" and the content should be "Random data"
+    And the public should be able to download file "randomfile.txt" from the last link share with password "%public%" and the content should be "Random data"
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
@@ -104,10 +114,15 @@ Feature: update a public link share
   Scenario Outline: creating a new public link share, updating its password and getting its info
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path     | FOLDER   |
-      | password | %public% |
-    And user "Alice" has updated the last public link share with
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
+    And user "Alice" has set the following password for the last link share:
+      | resource | FOLDER   |
+      | space    | Personal |
       | password | %public% |
     When user "Alice" gets the info of the last public link share using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -137,11 +152,16 @@ Feature: update a public link share
   Scenario Outline: creating a new public link share, updating its permissions and getting its info
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path     | FOLDER   |
-      | password | %public% |
-    And user "Alice" has updated the last public link share with
-      | permissions | read,update,create,delete |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
+    And user "Alice" has updated the last resource link share with
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | edit     |
     When user "Alice" gets the info of the last public link share using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -170,63 +190,35 @@ Feature: update a public link share
   Scenario Outline: creating a new public link share, updating its permissions to view download and upload and getting its info
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path     | FOLDER   |
-      | password | %public% |
-    And user "Alice" has updated the last public link share with
-      | permissions | read,update,create,delete |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
+    And user "Alice" has updated the last resource link share with
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | upload   |
     When user "Alice" gets the info of the last public link share using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
-      | id                | A_STRING                  |
-      | item_type         | folder                    |
-      | item_source       | A_STRING                  |
-      | share_type        | public_link               |
-      | file_source       | A_STRING                  |
-      | file_target       | /FOLDER                   |
-      | permissions       | read,update,create,delete |
-      | stime             | A_NUMBER                  |
-      | token             | A_TOKEN                   |
-      | storage           | A_STRING                  |
-      | mail_send         | 0                         |
-      | uid_owner         | %username%                |
-      | displayname_owner | %displayname%             |
-      | url               | AN_URL                    |
-      | mimetype          | httpd/unix-directory      |
-    Examples:
-      | ocs-api-version | ocs-status-code |
-      | 1               | 100             |
-      | 2               | 200             |
-
-
-  Scenario Outline: creating a new public link share, updating publicUpload option and getting its info
-    Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path     | FOLDER   |
-      | password | %public% |
-    And user "Alice" has updated the last public link share with
-      | publicUpload | true |
-    When user "Alice" gets the info of the last public link share using the sharing API
-    Then the OCS status code should be "<ocs-status-code>"
-    And the HTTP status code should be "200"
-    And the fields of the last response to user "Alice" should include
-      | id                | A_STRING                  |
-      | item_type         | folder                    |
-      | item_source       | A_STRING                  |
-      | share_type        | public_link               |
-      | file_source       | A_STRING                  |
-      | file_target       | /FOLDER                   |
-      | permissions       | read,update,create,delete |
-      | stime             | A_NUMBER                  |
-      | token             | A_TOKEN                   |
-      | storage           | A_STRING                  |
-      | mail_send         | 0                         |
-      | uid_owner         | %username%                |
-      | displayname_owner | %displayname%             |
-      | url               | AN_URL                    |
-      | mimetype          | httpd/unix-directory      |
+      | id                | A_STRING             |
+      | item_type         | folder               |
+      | item_source       | A_STRING             |
+      | share_type        | public_link          |
+      | file_source       | A_STRING             |
+      | file_target       | /FOLDER              |
+      | permissions       | read,create          |
+      | stime             | A_NUMBER             |
+      | token             | A_TOKEN              |
+      | storage           | A_STRING             |
+      | mail_send         | 0                    |
+      | uid_owner         | %username%           |
+      | displayname_owner | %displayname%        |
+      | url               | AN_URL               |
+      | mimetype          | httpd/unix-directory |
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
@@ -238,12 +230,16 @@ Feature: update a public link share
     And user "Alice" has created folder "PARENT"
     And user "Alice" has created folder "PARENT/CHILD"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/PARENT/CHILD/child.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | /PARENT                   |
-      | permissions | read,update,create,delete |
-      | password    | %public%                  |
-    And user "Alice" has updated the last public link share with
-      | permissions | read |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
+    And user "Alice" has updated the last resource link share with
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | view     |
     When the public deletes file "CHILD/child.txt" from the last public link share using the password "%public%" and new public WebDAV API
     Then the HTTP status code of responses on all endpoints should be "403"
     And as "Alice" file "PARENT/CHILD/child.txt" should exist
@@ -259,12 +255,16 @@ Feature: update a public link share
     And user "Alice" has created folder "PARENT/CHILD"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/PARENT/parent.txt"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/PARENT/CHILD/child.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | /PARENT  |
-      | permissions | read     |
-      | password    | %public% |
-    And user "Alice" has updated the last public link share with
-      | permissions | read,update,create,delete |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
+    And user "Alice" has updated the last resource link share with
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | edit     |
     When the public deletes file "CHILD/child.txt" from the last public link share using the password "%public%" and new public WebDAV API
     And the public deletes file "parent.txt" from the last public link share using the password "%public%" and new public WebDAV API
     Then the HTTP status code of responses on all endpoints should be "204"
@@ -280,9 +280,12 @@ Feature: update a public link share
     Given using OCS API version "<ocs-api-version>"
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path     | FOLDER   |
-      | password | %public% |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
     And user "Alice" has moved folder "/FOLDER" to "/RENAMED_FOLDER"
     When user "Alice" gets the info of the last public link share using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -327,9 +330,12 @@ Feature: update a public link share
     Given using OCS API version "<ocs-api-version>"
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "some content" to "/lorem.txt"
-    And user "Alice" has created a public link share with settings
-      | path     | lorem.txt |
-      | password | %public%  |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | lorem.txt |
+      | space           | Personal  |
+      | permissionsRole | view      |
+      | password        | %public%  |
     And user "Alice" has moved file "/lorem.txt" to "/new-lorem.txt"
     When user "Alice" gets the info of the last public link share using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -374,10 +380,12 @@ Feature: update a public link share
     Given using OCS API version "<ocs-api-version>"
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"
-    And user "Alice" has created a public link share with settings
-      | path        | /textfile.txt |
-      | permissions | read          |
-      | password    | %public%      |
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | permissionsRole | view         |
+      | password        | %public%     |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 0 |
     Then the OCS status code should be "<ocs-status-code>"
