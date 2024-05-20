@@ -65,7 +65,12 @@ Feature: files and folders exist in the trashbin after being deleted
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
-    And user "Alice" has shared folder "/shared" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | shared   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Alice" deletes file "/shared/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" the file with original path "/shared/shared_file.txt" should exist in the trashbin
@@ -86,7 +91,12 @@ Feature: files and folders exist in the trashbin after being deleted
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
-    And user "Alice" has shared folder "/shared" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | shared   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Alice" deletes folder "/shared" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" the folder with original path "/shared" should exist in the trashbin
