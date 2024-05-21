@@ -98,6 +98,7 @@ func Server(cfg *config.Config) *cli.Command {
 				http.Metrics(m),
 				http.Namespace(cfg.HTTP.Namespace),
 				http.TraceProvider(traceProvider),
+				http.MaxConcurrentRequests(cfg.HTTP.MaxConcurrentRequests),
 			)
 			if err != nil {
 				logger.Info().

@@ -13,6 +13,7 @@ import (
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
 	"github.com/go-chi/chi/v5"
@@ -37,10 +38,6 @@ func init() {
 	chi.RegisterMethod("REPORT")
 }
 
-const (
-	TokenHeader = "X-Access-Token"
-)
-
 var (
 	codesEnum = map[int]string{
 		http.StatusBadRequest:       "Sabre\\DAV\\Exception\\BadRequest",
@@ -52,8 +49,8 @@ var (
 
 // Service defines the extension handlers.
 type Service interface {
-	ServeHTTP(http.ResponseWriter, *http.Request)
-	Thumbnail(http.ResponseWriter, *http.Request)
+	ServeHTTP(w http.ResponseWriter, r *http.Request)
+	Thumbnail(w http.ResponseWriter, r *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -235,7 +232,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 		renderError(w, r, errBadRequest(err.Error()))
 		return
 	}
-	t := r.Header.Get(TokenHeader)
+	t := r.Header.Get(revactx.TokenHeader)
 
 	fullPath := filepath.Join(tr.Identifier, tr.Filepath)
 	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
@@ -284,7 +281,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t := r.Header.Get(TokenHeader)
+	t := r.Header.Get(revactx.TokenHeader)
 
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
@@ -312,7 +309,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		user = userRes.GetUser()
 	} else {
 		// look up user from URL via GetUserByClaim
-		ctx := grpcmetadata.AppendToOutgoingContext(r.Context(), TokenHeader, t)
+		ctx := grpcmetadata.AppendToOutgoingContext(r.Context(), revactx.TokenHeader, t)
 		userRes, err := gatewayClient.GetUserByClaim(ctx, &userv1beta1.GetUserByClaimRequest{
 			Claim: "username",
 			Value: tr.Identifier,
@@ -475,11 +472,11 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 
 	if dlRsp.StatusCode != http.StatusOK {
 		logger.Debug().
-			Str("transfer_token", rsp.TransferToken).
-			Str("data_endpoint", rsp.DataEndpoint).
+			Str("transfer_token", rsp.GetTransferToken()).
+			Str("data_endpoint", rsp.GetDataEndpoint()).
 			Str("response_status", dlRsp.Status).
 			Msg("could not download thumbnail")
-		renderError(w, r, errInternalError("could not download thumbnail"))
+		renderError(w, r, newErrResponse(dlRsp.StatusCode, "could not download thumbnail"))
 		return
 	}
 
