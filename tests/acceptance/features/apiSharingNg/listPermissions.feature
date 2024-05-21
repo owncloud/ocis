@@ -106,19 +106,19 @@ Feature: List a sharing permissions
                     "description": {
                       "type": "string",
                       "enum": [
-                        "View, download and upload."
+                        "View and download."
                       ]
                     },
                     "displayName": {
                       "type": "string",
                       "enum": [
-                        "Can upload"
+                        "Can view"
                       ]
                     },
                     "id": {
                       "type": "string",
                       "enum": [
-                        "1c996275-f1c9-4e71-abdf-a42f6495e960"
+                        "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
                       ]
                     }
                   }
@@ -141,19 +141,19 @@ Feature: List a sharing permissions
                     "description": {
                       "type": "string",
                       "enum": [
-                        "View and download."
+                        "View, download and upload."
                       ]
                     },
                     "displayName": {
                       "type": "string",
                       "enum": [
-                        "Can view"
+                        "Can upload"
                       ]
                     },
                     "id": {
                       "type": "string",
                       "enum": [
-                        "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
+                        "1c996275-f1c9-4e71-abdf-a42f6495e960"
                       ]
                     }
                   }
@@ -855,13 +855,13 @@ Feature: List a sharing permissions
                     "const": 2
                   },
                   "description": {
-                    "const": "View, download and upload."
+                    "const": "View and download."
                   },
                   "displayName": {
-                    "const": "Can upload"
+                    "const": "Can view"
                   },
                   "id": {
-                    "const": "1c996275-f1c9-4e71-abdf-a42f6495e960"
+                    "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
                   }
                 }
               },
@@ -878,13 +878,13 @@ Feature: List a sharing permissions
                     "const": 3
                   },
                   "description": {
-                    "const": "View and download."
+                    "const": "View, download and upload."
                   },
                   "displayName": {
-                    "const": "Can view"
+                    "const": "Can upload"
                   },
                   "id": {
-                    "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
+                    "const": "1c996275-f1c9-4e71-abdf-a42f6495e960"
                   }
                 }
               },

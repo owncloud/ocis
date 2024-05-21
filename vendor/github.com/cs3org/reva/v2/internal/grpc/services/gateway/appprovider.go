@@ -27,16 +27,21 @@ import (
 
 	providerpb "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	registry "github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1"
+	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
+	"github.com/cs3org/reva/v2/pkg/auth/scope"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/token"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -169,11 +174,9 @@ func (s *svc) openLocalResources(ctx context.Context, ri *storageprovider.Resour
 		return nil, errors.Wrap(err, "gateway: error calling GetAppProviderClient")
 	}
 
-	appProviderReq := &providerpb.OpenInAppRequest{
-		ResourceInfo: ri,
-		ViewMode:     providerpb.ViewMode(vm),
-		AccessToken:  accessToken,
-		Opaque:       opaque,
+	appProviderReq, err := buildOpenInAppRequest(ctx, ri, vm, s.tokenmgr, accessToken, opaque)
+	if err != nil {
+		return nil, errors.Wrap(err, "gateway: error building OpenInApp request")
 	}
 
 	res, err := appProviderClient.OpenInApp(ctx, appProviderReq)
@@ -182,6 +185,41 @@ func (s *svc) openLocalResources(ctx context.Context, ri *storageprovider.Resour
 	}
 
 	return res, nil
+}
+
+func buildOpenInAppRequest(ctx context.Context, ri *storageprovider.ResourceInfo, vm gateway.OpenInAppRequest_ViewMode, tokenmgr token.Manager, accessToken string, opaque *typespb.Opaque) (*providerpb.OpenInAppRequest, error) {
+	// in case of a view only mode and a stat permission we need to create a view only token
+	if vm == gateway.OpenInAppRequest_VIEW_MODE_VIEW_ONLY && ri.GetPermissionSet().GetStat() {
+		// Limit scope to the resource
+		scope, err := scope.AddResourceInfoScope(ri, providerv1beta1.Role_ROLE_VIEWER, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		// build a fake user object for the token
+		currentuser := ctxpkg.ContextMustGetUser(ctx)
+		scopedUser := &userpb.User{
+			Id:          ri.GetOwner(), // the owner of the resource is always set, right?
+			DisplayName: "View Only user for " + currentuser.GetUsername(),
+		}
+
+		// mint a view only token
+		viewOnlyToken, err := tokenmgr.MintToken(ctx, scopedUser, scope)
+		if err != nil {
+			return nil, err
+		}
+
+		// TODO we should not append the token to the opaque, we should have a dedicated field in the request
+		opaque = utils.AppendPlainToOpaque(opaque, "viewOnlyToken", viewOnlyToken)
+	}
+
+	return &providerpb.OpenInAppRequest{
+		ResourceInfo: ri,
+		ViewMode:     providerpb.ViewMode(vm),
+		AccessToken:  accessToken,
+		// ViewOnlyToken: viewOnlyToken // scoped to the shared resource if the stat response hase a ViewOnly permission
+		Opaque: opaque,
+	}, nil
 }
 
 func (s *svc) findAppProvider(ctx context.Context, ri *storageprovider.ResourceInfo, app string) (*registry.ProviderInfo, error) {

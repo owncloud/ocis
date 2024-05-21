@@ -20,6 +20,7 @@ package ocdav
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -28,6 +29,7 @@ import (
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
@@ -36,12 +38,18 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/grants"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/metadata"
 )
 
 const (
 	_trashbinPath = "trash-bin"
+
+	// WwwAuthenticate captures the Www-Authenticate header string.
+	WwwAuthenticate = "Www-Authenticate"
 )
 
 // DavHandler routes to the different sub handlers
@@ -248,6 +256,39 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 			var hasValidBasicAuthHeader bool
 			var pass string
 			var err error
+			// If user is authenticated
+			_, userExists := ctxpkg.ContextGetUser(ctx)
+			if userExists {
+				client, err := s.gatewaySelector.Next()
+				if err != nil {
+					log.Error().Err(err).Msg("error sending grpc stat request")
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				psRes, err := client.GetPublicShare(ctx, &link.GetPublicShareRequest{
+					Ref: &link.PublicShareReference{
+						Spec: &link.PublicShareReference_Token{
+							Token: token,
+						},
+					}})
+				if err != nil && !strings.Contains(err.Error(), "core access token not found") {
+					log.Error().Err(err).Msg("error sending grpc stat request")
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				// If the link is internal then 307 redirect
+				if psRes.Status.Code == rpc.Code_CODE_OK && grants.PermissionsEqual(psRes.Share.Permissions.GetPermissions(), &provider.ResourcePermissions{}) {
+					if psRes.GetShare().GetResourceId() != nil {
+						rUrl := path.Join("/dav/spaces", storagespace.FormatResourceID(*psRes.GetShare().GetResourceId()))
+						http.Redirect(w, r, rUrl, http.StatusTemporaryRedirect)
+						return
+					}
+					log.Debug().Str("token", token).Interface("status", res.Status).Msg("resource id not found")
+					w.WriteHeader(http.StatusNotFound)
+					return
+				}
+			}
+
 			if _, pass, hasValidBasicAuthHeader = r.BasicAuth(); hasValidBasicAuthHeader {
 				res, err = handleBasicAuth(r.Context(), s.gatewaySelector, token, pass)
 			} else {
@@ -286,6 +327,17 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 				return
 			}
 
+			if userExists {
+				// Build new context without an authenticated user.
+				// the public link should be resolved by the 'publicshares' authenticated user
+				baseURI := ctx.Value(net.CtxKeyBaseURI).(string)
+				logger := appctx.GetLogger(ctx)
+				span := trace.SpanFromContext(ctx)
+				span.End()
+				ctx = trace.ContextWithSpan(context.Background(), span)
+				ctx = appctx.WithLogger(ctx, logger)
+				ctx = context.WithValue(ctx, net.CtxKeyBaseURI, baseURI)
+			}
 			ctx = ctxpkg.ContextSetToken(ctx, res.Token)
 			ctx = ctxpkg.ContextSetUser(ctx, res.User)
 			ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, res.Token)
@@ -300,6 +352,16 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			case sRes.Status.Code == rpc.Code_CODE_PERMISSION_DENIED:
+				fallthrough
+			case sRes.Status.Code == rpc.Code_CODE_OK && grants.PermissionsEqual(sRes.GetInfo().GetPermissionSet(), &provider.ResourcePermissions{}):
+				// If the link is internal
+				if !userExists {
+					w.Header().Add(WwwAuthenticate, fmt.Sprintf("Bearer realm=\"%s\", charset=\"UTF-8\"", r.Host))
+					w.WriteHeader(http.StatusUnauthorized)
+					b, err := errors.Marshal(http.StatusUnauthorized, "No 'Authorization: Bearer' header found", "")
+					errors.HandleWebdavError(log, w, b, err)
+					return
+				}
 				fallthrough
 			case sRes.Status.Code == rpc.Code_CODE_NOT_FOUND:
 				log.Debug().Str("token", token).Interface("status", res.Status).Msg("resource not found")

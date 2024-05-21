@@ -794,6 +794,7 @@ var mimeTypes = map[string]string{
 	"s3m":                      "audio/s3m",
 	"saf":                      "application/vnd.yamaha.smaf-audio",
 	"sass":                     "text/x-sass",
+	"sb3":                      "application/x.scratch.sb3",
 	"sbml":                     "application/sbml+xml",
 	"sc":                       "application/vnd.ibm.secure-container",
 	"scd":                      "application/x-msschedule",

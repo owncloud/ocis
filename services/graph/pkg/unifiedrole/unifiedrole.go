@@ -23,8 +23,8 @@ const (
 	UnifiedRoleSpaceEditorID = "58c63c02-1d89-4572-916a-870abc5a1b7d"
 	// UnifiedRoleFileEditorID Unified role file editor id.
 	UnifiedRoleFileEditorID = "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
-	// UnifiedRoleUploaderID Unified role uploader id.
-	UnifiedRoleUploaderID = "1c996275-f1c9-4e71-abdf-a42f6495e960"
+	// UnifiedRoleEditorLiteID Unified role editor-lite id.
+	UnifiedRoleEditorLiteID = "1c996275-f1c9-4e71-abdf-a42f6495e960"
 	// UnifiedRoleManagerID Unified role manager id.
 	UnifiedRoleManagerID = "312c0871-5ef7-4b3a-85b6-0e4074c64049"
 	// UnifiedRoleSecureViewerID Unified role secure viewer id.
@@ -66,7 +66,7 @@ var legacyNames map[string]string = map[string]string{
 	UnifiedRoleSpaceEditorID:  "editor",
 	UnifiedRoleEditorID:       conversions.RoleEditor,
 	UnifiedRoleFileEditorID:   conversions.RoleFileEditor,
-	UnifiedRoleUploaderID:     conversions.RoleUploader,
+	UnifiedRoleEditorLiteID:   conversions.RoleEditorLite,
 	UnifiedRoleManagerID:      conversions.RoleManager,
 	UnifiedRoleSecureViewerID: conversions.RoleSecureViewer,
 }
@@ -160,11 +160,11 @@ func NewFileEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	}
 }
 
-// NewUploaderUnifiedRole creates an uploader role
-func NewUploaderUnifiedRole() *libregraph.UnifiedRoleDefinition {
-	r := conversions.NewUploaderRole()
+// NewEditorLiteUnifiedRole creates an editor-lite role
+func NewEditorLiteUnifiedRole() *libregraph.UnifiedRoleDefinition {
+	r := conversions.NewEditorLiteRole()
 	return &libregraph.UnifiedRoleDefinition{
-		Id:          proto.String(UnifiedRoleUploaderID),
+		Id:          proto.String(UnifiedRoleEditorLiteID),
 		Description: proto.String("View, download and upload."),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
@@ -239,7 +239,7 @@ func GetBuiltinRoleDefinitionList() []*libregraph.UnifiedRoleDefinition {
 		NewEditorUnifiedRole(),
 		NewSpaceEditorUnifiedRole(),
 		NewFileEditorUnifiedRole(),
-		NewUploaderUnifiedRole(),
+		NewEditorLiteUnifiedRole(),
 		NewManagerUnifiedRole(),
 		NewSecureViewerUnifiedRole(),
 	}
@@ -501,7 +501,7 @@ func displayName(role *conversions.Role) *string {
 		displayName = canEdit
 	case conversions.RoleFileEditor:
 		displayName = canEdit
-	case conversions.RoleUploader:
+	case conversions.RoleEditorLite:
 		displayName = "Can upload"
 	case conversions.RoleManager:
 		displayName = "Can manage"
