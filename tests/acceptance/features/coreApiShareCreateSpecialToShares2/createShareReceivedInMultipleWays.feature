@@ -17,7 +17,12 @@ Feature: share resources where the sharee receives the share in multiple ways
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | File Editor   |
     When user "Alice" shares file "/textfile0.txt" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -68,7 +73,12 @@ Feature: share resources where the sharee receives the share in multiple ways
     And group "grp1" has been created
     And user "Alice" has created folder "/test"
     And user "Alice" has created folder "/test/sub"
-    And user "Alice" has shared folder "/test" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     When user "Alice" shares folder "/test/sub" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -85,7 +95,12 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" has been added to group "grp0"
     And user "Alice" has created folder "/test"
     And user "Alice" has created folder "/test/sub"
-    And user "Alice" has shared folder "/test" with group "grp0"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | grp0     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     When user "Alice" shares folder "/test/sub" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -104,7 +119,7 @@ Feature: share resources where the sharee receives the share in multiple ways
     When user "Brian" shares file "randomfile.txt" with user "Alice" with permissions "read" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs-status-code>"
-    Then as "Alice" the info about the last share by user "Brian" with user "Alice" should include
+    And as "Alice" the info about the last share by user "Brian" with user "Alice" should include
       | uid_owner   | %username%      |
       | share_with  | %username%      |
       | file_target | /randomfile.txt |
@@ -137,7 +152,7 @@ Feature: share resources where the sharee receives the share in multiple ways
     When user "Brian" shares folder "zzzfolder" with user "Alice" with permissions "read,delete" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
-    Then as "Alice" the info about the last share by user "Brian" with user "Alice" should include
+    And as "Alice" the info about the last share by user "Brian" with user "Alice" should include
       | uid_owner   | %username%  |
       | share_with  | %username%  |
       | file_target | /zzzfolder  |
@@ -169,10 +184,12 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "Shared content" to "lorem.txt"
     And user "Carol" has uploaded file with content "My content" to "lorem.txt"
-    And user "Alice" has created a share with settings
-      | path      | /lorem.txt |
-      | shareType | group      |
-      | shareWith | grp1       |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | lorem.txt   |
+      | space           | Personal    |
+      | sharee          | grp1        |
+      | shareType       | group       |
+      | permissionsRole | File Editor |
     When the administrator adds user "Carol" to group "grp1" using the provisioning API
     Then the HTTP status code should be "204"
     And user "Carol" should be able to accept pending share "/lorem.txt" offered by user "Alice"
@@ -195,16 +212,18 @@ Feature: share resources where the sharee receives the share in multiple ways
       | /parent/child1/child2 |
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
-    And user "Carol" has created a share with settings
-      | path        | /parent |
-      | shareType   | user    |
-      | shareWith   | Brian   |
-      | permissions | all     |
-    And user "Carol" has created a share with settings
-      | path        | /parent/child1 |
-      | shareType   | group          |
-      | shareWith   | grp1           |
-      | permissions | read           |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent/child1 |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
     And user "Brian" should be able to create folder "/Shares/parent/fo1"
     And user "Brian" should be able to create folder "/Shares/parent/child1/fo2"
     And user "Alice" should not be able to create folder "/Shares/child1/fo3"
@@ -221,16 +240,18 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Carol" has uploaded file with content "some data" to "/parent/child1/child2/textfile-2.txt"
-    And user "Carol" has created a share with settings
-      | path        | /parent |
-      | shareType   | user    |
-      | shareWith   | Brian   |
-      | permissions | all     |
-    And user "Carol" has created a share with settings
-      | path        | /parent/child1 |
-      | shareType   | group          |
-      | shareWith   | grp1           |
-      | permissions | read           |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent/child1 |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
     And user "Brian" should be able to rename file "/Shares/parent/child1/child2/textfile-2.txt" to "/Shares/parent/child1/child2/rename.txt"
     And user "Brian" should not be able to rename file "/Shares/child1/child2/rename.txt" to "/Shares/child1/child2/rename2.txt"
     And user "Alice" should not be able to rename file "/Shares/child1/child2/rename.txt" to "/Shares/child1/child2/rename2.txt"
@@ -247,16 +268,18 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Carol" has uploaded file with content "some data" to "/parent/child1/child2/textfile-2.txt"
-    And user "Carol" has created a share with settings
-      | path        | /parent |
-      | shareType   | user    |
-      | shareWith   | Brian   |
-      | permissions | all     |
-    And user "Carol" has created a share with settings
-      | path        | /parent/child1 |
-      | shareType   | group          |
-      | shareWith   | grp1           |
-      | permissions | read           |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent/child1 |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
     And user "Brian" should be able to delete file "/Shares/parent/child1/child2/textfile-2.txt"
     And user "Brian" should not be able to delete folder "/Shares/child1/child2"
     And user "Alice" should not be able to delete folder "/Shares/child1/child2"
@@ -272,16 +295,18 @@ Feature: share resources where the sharee receives the share in multiple ways
       | /parent/child1/child2 |
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
-    And user "Carol" has created a share with settings
-      | path        | /parent |
-      | shareType   | group   |
-      | shareWith   | grp1    |
-      | permissions | read    |
-    And user "Carol" has created a share with settings
-      | path        | /parent/child1 |
-      | shareType   | user           |
-      | shareWith   | Brian          |
-      | permissions | all            |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent/child1 |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
     And user "Brian" should be able to create folder "/Shares/child1/fo1"
     And user "Brian" should be able to create folder "/Shares/child1/child2/fo2"
     But user "Brian" should not be able to create folder "/Shares/parent/fo3"
@@ -300,16 +325,18 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Carol" has uploaded file with content "some data" to "/parent/child1/child2/textfile-2.txt"
-    And user "Carol" has created a share with settings
-      | path        | /parent |
-      | shareType   | group   |
-      | shareWith   | grp1    |
-      | permissions | read    |
-    And user "Carol" has created a share with settings
-      | path        | /parent/child1 |
-      | shareType   | user           |
-      | shareWith   | Brian          |
-      | permissions | all            |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent/child1 |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
     And user "Brian" should be able to rename file "/Shares/child1/child2/textfile-2.txt" to "/Shares/child1/child2/rename.txt"
     And user "Brian" should not be able to rename file "/Shares/parent/child1/child2/rename.txt" to "/Shares/parent/child1/child2/rename2.txt"
     And user "Alice" should not be able to rename file "/Shares/parent/child1/child2/rename.txt" to "/Shares/parent/child1/child2/rename2.txt"
@@ -326,16 +353,18 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Carol" has uploaded file with content "some data" to "/parent/child1/child2/textfile-2.txt"
-    And user "Carol" has created a share with settings
-      | path        | /parent |
-      | shareType   | group   |
-      | shareWith   | grp1    |
-      | permissions | read    |
-    And user "Carol" has created a share with settings
-      | path        | /parent/child1 |
-      | shareType   | user           |
-      | shareWith   | Brian          |
-      | permissions | all            |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent/child1 |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
     And user "Brian" should be able to delete file "/Shares/child1/child2/textfile-2.txt"
     And user "Brian" should not be able to delete folder "/Shares/parent/child1"
     And user "Alice" should not be able to delete folder "/Shares/parent/child1"
@@ -356,16 +385,18 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp2"
     And user "Carol" has uploaded file with content "some data" to "/parent/child1/child2/textfile-2.txt"
-    And user "Carol" has created a share with settings
-      | path        | /parent |
-      | shareType   | group   |
-      | shareWith   | grp1    |
-      | permissions | all     |
-    And user "Carol" has created a share with settings
-      | path        | /parent/child1 |
-      | shareType   | group          |
-      | shareWith   | grp2           |
-      | permissions | read           |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | parent/child1 |
+      | space           | Personal      |
+      | sharee          | grp2          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
     And user "Alice" should be able to create folder "/Shares/parent/child1/fo1"
     And user "Alice" should be able to create folder "/Shares/parent/child1/child2/fo2"
     And user "Alice" should be able to delete folder "/Shares/parent/child1/fo1"
@@ -386,11 +417,12 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" has created folder "parent"
     And user "Alice" has created folder "parent/child"
     And user "Alice" has uploaded file with content "Share content" to "parent/child/lorem.txt"
-    And user "Alice" has created a share with settings
-      | path        | parent |
-      | shareType   | group  |
-      | shareWith   | grp    |
-      | permissions | read   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | parent   |
+      | space           | Personal |
+      | sharee          | grp      |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     And user "Brian" should be able to rename folder "/Shares/parent" to "/Shares/sharedParent"
     And user "Alice" should be able to share folder "parent" with user "Brian" with permissions "read" using the sharing API
     # Note: Brian has already accepted the share of this resource as a member of "grp".
@@ -410,11 +442,12 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" has created folder "parent"
     And user "Alice" has created folder "parent/child"
     And user "Alice" has uploaded file with content "Share content" to "parent/child/lorem.txt"
-    And user "Alice" has created a share with settings
-      | path        | parent |
-      | shareType   | group  |
-      | shareWith   | grp    |
-      | permissions | read   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | parent   |
+      | space           | Personal |
+      | sharee          | grp      |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     And user "Brian" has moved folder "/Shares/parent" to "/Shares/sharedParent"
     When user "Alice" shares folder "parent" with user "Brian" with permissions "all" using the sharing API
     # Note: Brian has already accepted the share of this resource as a member of "grp".
@@ -437,7 +470,12 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Alice" has created folder "parent"
     And user "Alice" has created folder "parent/child"
     And user "Alice" has uploaded file with content "Share content" to "parent/child/lorem.txt"
-    And user "Alice" has shared folder "parent" with group "grp" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | parent   |
+      | space           | Personal |
+      | sharee          | grp      |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     And user "Brian" should be able to rename folder "/Shares/parent" to "/Shares/sharedParent"
     And user "Alice" should be able to share folder "parent" with user "Brian" with permissions "read" using the sharing API
     # Note: Brian has already accepted the share of this resource as a member of "grp".
