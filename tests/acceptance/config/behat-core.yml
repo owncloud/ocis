@@ -94,6 +94,7 @@ default:
         - WebDavPropertiesContext:
         - FilesVersionsContext:
         - SettingsContext:
+        - SharingNgContext:
 
     coreApiShareManagementBasicToShares:
       paths:

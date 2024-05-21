@@ -83,8 +83,18 @@ Feature: accept/decline shares coming from internal users
   @smokeTest @issue-2131
   Scenario: accept a pending share
     Given user "Brian" has disabled auto-accepting
-    And user "Alice" has shared folder "/PARENT" with user "Brian"
-    And user "Alice" has shared file "/textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Brian" accepts share "/PARENT" offered by user "Alice" using the sharing API
     And user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
@@ -125,7 +135,12 @@ Feature: accept/decline shares coming from internal users
   Scenario: accept an accepted share
     Given user "Brian" has disabled auto-accepting
     And user "Alice" has created folder "/shared"
-    And user "Alice" has shared folder "/shared" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | shared   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" accepts share "/shared" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
@@ -138,8 +153,18 @@ Feature: accept/decline shares coming from internal users
   @smokeTest  @issue-2540
   Scenario: declines a pending share
     Given user "Brian" has disabled auto-accepting
-    And user "Alice" has shared folder "/PARENT" with user "Brian"
-    And user "Alice" has shared file "/textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Brian" declines share "/PARENT" offered by user "Alice" using the sharing API
     And user "Brian" declines share "/textfile0.txt" offered by user "Alice" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
@@ -160,8 +185,18 @@ Feature: accept/decline shares coming from internal users
   @smokeTest @issue-2128 @issue-2540
   Scenario: decline an accepted share
     Given user "Brian" has disabled auto-accepting
-    And user "Alice" has shared folder "/PARENT" with user "Brian"
-    And user "Alice" has shared file "/textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" declines share "/Shares/PARENT" offered by user "Alice" using the sharing API
@@ -180,7 +215,12 @@ Feature: accept/decline shares coming from internal users
 
   Scenario: deleting shares in pending state
     Given user "Alice" has shared folder "/PARENT" with user "Brian"
-    And user "Alice" has shared file "/textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Alice" deletes folder "/PARENT" using the WebDAV API
     And user "Alice" deletes file "/textfile0.txt" using the WebDAV API
     Then the HTTP status code of responses on all endpoints should be "204"
@@ -190,8 +230,18 @@ Feature: accept/decline shares coming from internal users
   Scenario: only one user in a group accepts a share
     Given user "Brian" has disabled auto-accepting
     And user "Carol" has disabled auto-accepting
-    And user "Alice" has shared folder "/PARENT" with group "grp1"
-    And user "Alice" has shared file "/textfile0.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
     When user "Brian" accepts share "/PARENT" offered by user "Alice" using the sharing API
     And user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
@@ -220,8 +270,18 @@ Feature: accept/decline shares coming from internal users
     And user "Alice" has created folder "/shared/Alice"
     And user "Brian" has created folder "/shared"
     And user "Brian" has created folder "/shared/Brian"
-    And user "Alice" has shared folder "/shared" with user "Carol"
-    And user "Brian" has shared folder "/shared" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | shared   |
+      | space           | Personal |
+      | sharee          | Carol    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | shared   |
+      | space           | Personal |
+      | sharee          | Carol    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Carol" accepts share "/shared" offered by user "Brian" using the sharing API
     And user "Carol" accepts share "/shared" offered by user "Alice" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
@@ -252,7 +312,12 @@ Feature: accept/decline shares coming from internal users
     And user "Brian" has uploaded file with content "Second file" to "/testfile.txt"
     And user "Carol" has created folder "Shares"
     And user "Carol" has uploaded file with content "Third file" to "/Shares/testfile.txt"
-    And user "Alice" has shared file "/testfile.txt" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | sharee          | Carol        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
     When user "Carol" declines share "/Shares/testfile (2).txt" offered by user "Alice" using the sharing API
     And user "Brian" shares file "/testfile.txt" with user "Carol" using the sharing API
     Then the HTTP status code should be "200"
@@ -270,9 +335,19 @@ Feature: accept/decline shares coming from internal users
     Given user "Alice" has disabled auto-accepting
     And user "David" has been created with default attributes and without skeleton files
     And user "David" has created folder "PARENT"
-    And user "Brian" has shared folder "/PARENT" with user "Alice"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Alice    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     And user "Carol" has created folder "PARENT"
-    And user "Carol" has shared folder "/PARENT" with user "Alice"
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Alice    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     And user "Alice" has created folder "Shares"
     And user "Alice" has created folder "Shares/PARENT"
     When user "Alice" accepts share "/PARENT" offered by user "Brian" using the sharing API
@@ -456,7 +531,12 @@ Feature: accept/decline shares coming from internal users
   @issue-1123 @issue-2540
   Scenario: deleting a share accepted file and folder
     Given user "Brian" has disabled auto-accepting
-    And user "Alice" has shared folder "/PARENT" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
     When user "Brian" deletes file "/Shares/PARENT" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -469,7 +549,12 @@ Feature: accept/decline shares coming from internal users
     Given user "Brian" has disabled auto-accepting
     And user "Alice" has uploaded file with content "Test Content." to "/toShareFile.txt"
     And user "Alice" has uploaded file with content "Content Test Updated." to "/toShareFile.txt"
-    And user "Alice" has shared file "/toShareFile.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | toShareFile.txt |
+      | space           | Personal        |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | File Editor     |
     And user "Brian" has accepted share "/toShareFile.txt" offered by user "Alice"
     When user "Alice" restores version index "1" of file "/toShareFile.txt" using the WebDAV API
     Then the HTTP status code should be "204"

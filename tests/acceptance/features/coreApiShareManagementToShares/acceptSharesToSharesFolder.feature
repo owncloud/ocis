@@ -16,7 +16,12 @@ Feature: accept/decline shares coming from internal users to the Shares folder
   Scenario: accept an incoming file share
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
     And user "Brian" has disabled auto-accepting
-    And user "Alice" has shared file "/textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
@@ -27,7 +32,12 @@ Feature: accept/decline shares coming from internal users to the Shares folder
     Given user "Alice" has created folder "/PARENT"
     And user "Brian" has disabled auto-accepting
     And user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
-    And user "Alice" has shared file "/PARENT" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" accepts share "/PARENT" offered by user "Alice" using the sharing API
     Then the content of file "/Shares/PARENT/parent.txt" for user "Brian" should be "ownCloud test text file parent"
 
@@ -35,7 +45,12 @@ Feature: accept/decline shares coming from internal users to the Shares folder
   Scenario: accept an incoming file share and check the response
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
     And user "Brian" has disabled auto-accepting
-    And user "Alice" has shared file "/textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | File Editor   |
     When user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
@@ -58,7 +73,12 @@ Feature: accept/decline shares coming from internal users to the Shares folder
     Given user "Alice" has created folder "/PARENT"
     And user "Brian" has disabled auto-accepting
     And user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
-    And user "Alice" has shared file "/PARENT" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" accepts share "/PARENT" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"

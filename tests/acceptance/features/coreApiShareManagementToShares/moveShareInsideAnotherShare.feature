@@ -14,8 +14,18 @@ Feature: moving a share inside another share
     And user "Alice" has created folder "folderB"
     And user "Alice" has uploaded file with content "text A" to "/folderA/fileA.txt"
     And user "Alice" has uploaded file with content "text B" to "/folderB/fileB.txt"
-    And user "Alice" has shared folder "folderA" with user "Brian"
-    And user "Alice" has shared folder "folderB" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderA  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderB  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
 
 
   Scenario: share receiver cannot move a whole share inside another share

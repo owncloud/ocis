@@ -13,8 +13,18 @@ Feature: sharing
   Scenario Outline: sharer renames the shared item (old/new webdav)
     Given user "Alice" has uploaded file with content "foo" to "sharefile.txt"
     And using <dav-path-version> DAV path
-    And user "Alice" has shared file "sharefile.txt" with user "Brian"
-    And user "Alice" has shared file "sharefile.txt" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharefile.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharefile.txt |
+      | space           | Personal      |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Alice" moves file "sharefile.txt" to "renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "renamedsharefile.txt" should exist
@@ -41,8 +51,18 @@ Feature: sharing
   @issue-8242
   Scenario Outline: sharer renames the shared item (spaces webdav)
     Given user "Alice" has uploaded file with content "foo" to "sharefile.txt"
-    And user "Alice" has shared file "sharefile.txt" with user "Brian"
-    And user "Alice" has shared file "sharefile.txt" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharefile.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharefile.txt |
+      | space           | Personal      |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Alice" moves file "sharefile.txt" to "renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "renamedsharefile.txt" should exist
@@ -70,8 +90,18 @@ Feature: sharing
   Scenario Outline: share receiver renames the shared item (old/new webdav)
     Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
     And using <dav-path-version> DAV path
-    And user "Alice" has shared file "sharefile.txt" with user "Brian"
-    And user "Alice" has shared file "sharefile.txt" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharefile.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharefile.txt |
+      | space           | Personal      |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Carol" moves file "Shares/sharefile.txt" to "Shares/renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "Shares/renamedsharefile.txt" should exist
@@ -98,8 +128,18 @@ Feature: sharing
   @issue-8242
   Scenario Outline: share receiver renames the shared item (spaces webdav)
     Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
-    And user "Alice" has shared file "sharefile.txt" with user "Brian"
-    And user "Alice" has shared file "sharefile.txt" with user "Carol"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharefile.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | sharefile.txt |
+      | space           | Personal      |
+      | sharee          | Carol         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Carol" moves file "Shares/sharefile.txt" to "Shares/renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "Shares/renamedsharefile.txt" should exist
@@ -129,7 +169,12 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/TMP"
-    And user "Alice" has shared folder "TMP" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | TMP      |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     When user "Carol" moves folder "/Shares/TMP" to "/Shares/new" using the WebDAV API
     And the administrator deletes user "Carol" using the provisioning API
     Then the HTTP status code of responses on each endpoint should be "201, 204" respectively
@@ -139,7 +184,12 @@ Feature: sharing
   Scenario: receiver renames a received share with read, change permissions inside the Shares folder
     Given user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/folderToShare/fileInside"
-    And user "Alice" has shared folder "folderToShare" with user "Brian" with permissions "read,change"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
     When user "Brian" moves folder "/Shares/folderToShare" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -154,7 +204,12 @@ Feature: sharing
   Scenario: receiver tries to rename a received share with read permissions inside the Shares folder
     Given user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/folderToShare/fileInside"
-    And user "Alice" has shared folder "folderToShare" with user "Brian" with permissions "read"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Brian" moves folder "/Shares/folderToShare" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -167,7 +222,12 @@ Feature: sharing
 
   Scenario: receiver renames a received folder share to a different name on the same folder
     Given user "Alice" has created folder "PARENT"
-    And user "Alice" has shared folder "PARENT" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -176,7 +236,12 @@ Feature: sharing
 
   Scenario: receiver renames a received file share to different name on the same folder
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
-    And user "Alice" has shared file "fileToShare.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | fileToShare.txt |
+      | space           | Personal        |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | File Editor     |
     When user "Brian" moves file "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -187,7 +252,12 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
-    And user "Alice" has shared file "fileToShare.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | fileToShare.txt |
+      | space           | Personal        |
+      | sharee          | grp1            |
+      | shareType       | group           |
+      | permissionsRole | File Editor     |
     When user "Brian" moves file "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -198,7 +268,12 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has shared folder "PARENT" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -209,7 +284,12 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
-    And user "Alice" has shared file "fileToShare.txt" with group "grp1" with permissions "read,update"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | fileToShare.txt |
+      | space           | Personal        |
+      | sharee          | grp1            |
+      | shareType       | group           |
+      | permissionsRole | File Editor     |
     When user "Brian" moves folder "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -220,7 +300,12 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has shared folder "PARENT" with group "grp1" with permissions "read,change"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -231,7 +316,12 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
-    And user "Alice" has shared file "fileToShare.txt" with group "grp1" with permissions "read"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | fileToShare.txt |
+      | space           | Personal        |
+      | sharee          | grp1            |
+      | shareType       | group           |
+      | permissionsRole | Viewer          |
     When user "Brian" moves file "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -242,7 +332,12 @@ Feature: sharing
     Given group "grp1" has been created
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has shared folder "PARENT" with group "grp1" with permissions "read"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -254,7 +349,12 @@ Feature: sharing
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "<sharer-folder>"
     And user "Alice" has created folder "<group-folder>"
-    And user "Alice" has shared folder "<sharer-folder>" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <sharer-folder> |
+      | space           | Personal        |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | Editor          |
     When user "Brian" moves folder "/Shares/<sharer-folder>" to "/Shares/<receiver-folder>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" folder "<receiver-folder>" should not exist
@@ -277,7 +377,12 @@ Feature: sharing
     And user "Alice" has created folder "<group-folder>"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/<sharer-folder>/fileInside"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/<group-folder>/fileInside"
-    And user "Alice" has shared folder "<sharer-folder>" with user "Brian" with permissions "read,change"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <sharer-folder> |
+      | space           | Personal        |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | Editor          |
     When user "Brian" moves folder "/Shares/<sharer-folder>/fileInside" to "/Shares/<sharer-folder>/<receiver_file>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "<sharer-folder>/<receiver_file>" should exist
