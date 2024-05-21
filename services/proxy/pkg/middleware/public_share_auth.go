@@ -48,6 +48,13 @@ func isPublicShareAppOpen(r *http.Request) bool {
 		(r.URL.Query().Get(headerShareToken) != "" || r.Header.Get(headerShareToken) != "")
 }
 
+// The public-files requests can also be made in authenticated context. In these cases the OIDCAuthenticator and
+// the BasicAuthenticator needs to ignore the request when the headerShareToken exist.
+func isPublicWithShareToken(r *http.Request) bool {
+	return (strings.HasPrefix(r.URL.Path, "/dav/public-files") || strings.HasPrefix(r.URL.Path, "/remote.php/dav/public-files")) &&
+		(r.URL.Query().Get(headerShareToken) != "" || r.Header.Get(headerShareToken) != "")
+}
+
 // Authenticate implements the authenticator interface to authenticate requests via public share auth.
 func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	if !isPublicPath(r.URL.Path) && !isPublicShareArchive(r) && !isPublicShareAppOpen(r) {

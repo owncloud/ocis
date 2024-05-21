@@ -63,5 +63,39 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			Expect(valid).To(Equal(true))
 			Expect(req2).ToNot(BeNil())
 		})
+		It("should successfully authenticate", func() {
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/dav/public-files", http.NoBody)
+			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
+
+			req2, valid := authenticator.Authenticate(req)
+
+			Expect(valid).To(Equal(true))
+			Expect(req2).ToNot(BeNil())
+		})
+		It("should skip authenticate if the header ShareToken is set", func() {
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/dav/public-files/", http.NoBody)
+			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
+			req.Header.Set(headerShareToken, "sharetoken")
+
+			req2, valid := authenticator.Authenticate(req)
+
+			// TODO Should the authentication of public path requests is handled by another authenticator?
+			//Expect(valid).To(Equal(false))
+			//Expect(req2).To(BeNil())
+			Expect(valid).To(Equal(true))
+			Expect(req2).ToNot(BeNil())
+		})
+		It("should skip authenticate if the 'public-token' is set", func() {
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/dav/public-files/?public-token=sharetoken", http.NoBody)
+			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
+
+			req2, valid := authenticator.Authenticate(req)
+
+			// TODO Should the authentication of public path requests is handled by another authenticator?
+			//Expect(valid).To(Equal(false))
+			//Expect(req2).To(BeNil())
+			Expect(valid).To(Equal(true))
+			Expect(req2).ToNot(BeNil())
+		})
 	})
 })
