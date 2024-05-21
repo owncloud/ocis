@@ -18,8 +18,19 @@ Feature: updating shares to users and groups that have the same name
 
   Scenario Outline: update permissions of a user share with a user and a group having the same name
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared folder "/TMP" with group "Brian"
-    And user "Alice" has shared folder "/TMP" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | TMP      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | TMP      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | read |
     Then the HTTP status code should be "200"
@@ -36,8 +47,19 @@ Feature: updating shares to users and groups that have the same name
 
   Scenario Outline: update permissions of a group share with a user and a group having the same name
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has shared folder "/TMP" with user "Brian"
-    And user "Alice" has shared folder "/TMP" with group "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | TMP      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | TMP      |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | read |
     Then the HTTP status code should be "200"
