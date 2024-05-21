@@ -410,13 +410,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getEtagOfASpace(string $user, string $spaceName): string {
-		$this->theUserLooksUpTheSingleSpaceUsingTheGraphApiByUsingItsId($user, $spaceName);
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			200,
-			"Expected response status code should be 200"
-		);
-		$decodedResponse = $this->featureContext->getJsonDecodedResponse();
-		return $decodedResponse["root"]["eTag"];
+		return $this->getSpaceByName($user, $spaceName)["root"]["eTag"];
 	}
 
 	/**
@@ -750,6 +744,29 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $foldersPath
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function propfindSpace(string $user, string $spaceName, string $foldersPath = ''): ResponseInterface {
+		$this->setSpaceIDByName($user, $spaceName);
+		return WebDavHelper::propfind(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$foldersPath,
+			[],
+			$this->featureContext->getStepLineRef(),
+			null,
+			'files',
+			WebDavHelper::DAV_VERSION_SPACES
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" lists the content of the space with the name "([^"]*)" using the WebDav Api$/
 	 *
 	 * @param string $user
@@ -764,20 +781,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $foldersPath = ''
 	): void {
-		$this->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->setResponse(
-			WebDavHelper::propfind(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$foldersPath,
-				[],
-				$this->featureContext->getStepLineRef(),
-				null,
-				'files',
-				WebDavHelper::DAV_VERSION_SPACES
-			)
-		);
+		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName, $foldersPath));
 	}
 
 	/**
@@ -849,10 +853,7 @@ class SpacesContext implements Context {
 		TableNode $expectedFiles
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
-			$user,
-			$spaceName
-		);
+		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName));
 		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
 		$this->featureContext->propfindResultShouldContainEntries($shouldOrNot, $expectedFiles, $user, 'PROPFIND');
 		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
@@ -879,11 +880,7 @@ class SpacesContext implements Context {
 		TableNode $expectedFiles
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
-			$user,
-			$spaceName,
-			$folderPath
-		);
+		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName, $folderPath));
 		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
 		$this->featureContext->propfindResultShouldContainEntries(
 			$shouldOrNot,
@@ -1202,7 +1199,8 @@ class SpacesContext implements Context {
 		$path = '';
 		for ($i = 0; $i < \count($exploded); $i++) {
 			$path = $path . $exploded[$i] . '/';
-			$this->theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $path, $spaceName);
+			$response = $this->createFolderInSpace($user, $path, $spaceName);
+			$this->featureContext->setResponse($response);
 		}
 	}
 
@@ -1222,7 +1220,8 @@ class SpacesContext implements Context {
 		string $subfolder,
 		string $spaceName
 	): void {
-		$this->theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $subfolder, $spaceName);
+		$response = $this->createFolderInSpace($user, $subfolder, $spaceName);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
