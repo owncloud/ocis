@@ -118,6 +118,42 @@ func (m *Audio) UnmarshalJSON(b []byte) error {
 
 var _ json.Unmarshaler = (*Audio)(nil)
 
+// ImageJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of Image. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var ImageJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *Image) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := ImageJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*Image)(nil)
+
+// ImageJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of Image. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var ImageJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *Image) UnmarshalJSON(b []byte) error {
+	return ImageJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*Image)(nil)
+
 // GeoCoordinatesJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of GeoCoordinates. This struct is safe to replace or modify but
 // should not be done so concurrently.
@@ -153,6 +189,42 @@ func (m *GeoCoordinates) UnmarshalJSON(b []byte) error {
 }
 
 var _ json.Unmarshaler = (*GeoCoordinates)(nil)
+
+// PhotoJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of Photo. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var PhotoJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *Photo) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := PhotoJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*Photo)(nil)
+
+// PhotoJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of Photo. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var PhotoJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *Photo) UnmarshalJSON(b []byte) error {
+	return PhotoJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*Photo)(nil)
 
 // EntityJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of Entity. This struct is safe to replace or modify but

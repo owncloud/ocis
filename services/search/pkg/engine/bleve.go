@@ -216,7 +216,9 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 				Tags:       getFieldSliceValue[string](hit.Fields, "Tags"),
 				Highlights: getFragmentValue(hit.Fragments, "Content", 0),
 				Audio:      getAudioValue[searchMessage.Audio](hit.Fields),
+				Image:      getImageValue[searchMessage.Image](hit.Fields),
 				Location:   getLocationValue[searchMessage.GeoCoordinates](hit.Fields),
+				Photo:      getPhotoValue[searchMessage.Photo](hit.Fields),
 			},
 		}
 
@@ -335,7 +337,9 @@ func (b *Bleve) getResource(id string) (*Resource, error) {
 			Content:  getFieldValue[string](fields, "Content"),
 			Tags:     getFieldSliceValue[string](fields, "Tags"),
 			Audio:    getAudioValue[libregraph.Audio](fields),
+			Image:    getImageValue[libregraph.Image](fields),
 			Location: getLocationValue[libregraph.GeoCoordinates](fields),
+			Photo:    getPhotoValue[libregraph.Photo](fields),
 		},
 	}, nil
 }
@@ -366,7 +370,33 @@ func unmarshalInterfaceMap(out any, flatMap map[string]interface{}, prefix strin
 		if value, ok := flatMap[mapKey]; ok {
 			if field.Kind() == reflect.Ptr {
 				alloc := reflect.New(field.Type().Elem())
-				alloc.Elem().Set(reflect.ValueOf(value).Convert(field.Type().Elem()))
+				elemType := field.Type().Elem()
+
+				// convert time strings from index for search requests
+				if elemType == reflect.TypeOf(timestamppb.Timestamp{}) {
+					if strValue, ok := value.(string); ok {
+						if parsedTime, err := time.Parse(time.RFC3339, strValue); err == nil {
+							alloc.Elem().Set(reflect.ValueOf(*timestamppb.New(parsedTime)))
+							field.Set(alloc)
+							nonEmpty = true
+						}
+					}
+					continue
+				}
+
+				// convert time strings from index for libregraph structs when updating resources
+				if elemType == reflect.TypeOf(time.Time{}) {
+					if strValue, ok := value.(string); ok {
+						if parsedTime, err := time.Parse(time.RFC3339, strValue); err == nil {
+							alloc.Elem().Set(reflect.ValueOf(parsedTime))
+							field.Set(alloc)
+							nonEmpty = true
+						}
+					}
+					continue
+				}
+
+				alloc.Elem().Set(reflect.ValueOf(value).Convert(elemType))
 				field.Set(alloc)
 				nonEmpty = true
 			}
@@ -389,10 +419,28 @@ func getAudioValue[T any](fields map[string]interface{}) *T {
 	return nil
 }
 
+func getImageValue[T any](fields map[string]interface{}) *T {
+	var image = newPointerOfType[T]()
+	if ok := unmarshalInterfaceMap(image, fields, "image."); ok {
+		return image
+	}
+
+	return nil
+}
+
 func getLocationValue[T any](fields map[string]interface{}) *T {
 	var location = newPointerOfType[T]()
 	if ok := unmarshalInterfaceMap(location, fields, "location."); ok {
 		return location
+	}
+
+	return nil
+}
+
+func getPhotoValue[T any](fields map[string]interface{}) *T {
+	var photo = newPointerOfType[T]()
+	if ok := unmarshalInterfaceMap(photo, fields, "photo."); ok {
+		return photo
 	}
 
 	return nil

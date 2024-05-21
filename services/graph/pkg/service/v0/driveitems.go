@@ -473,7 +473,9 @@ func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInf
 
 	if res.GetArbitraryMetadata() != nil {
 		driveItem.Audio = cs3ResourceToDriveItemAudioFacet(logger, res)
+		driveItem.Image = cs3ResourceToDriveItemImageFacet(logger, res)
 		driveItem.Location = cs3ResourceToDriveItemLocationFacet(logger, res)
+		driveItem.Photo = cs3ResourceToDriveItemPhotoFacet(logger, res)
 	}
 
 	return driveItem, nil
@@ -497,6 +499,20 @@ func cs3ResourceToDriveItemAudioFacet(logger *log.Logger, res *storageprovider.R
 	return nil
 }
 
+func cs3ResourceToDriveItemImageFacet(logger *log.Logger, res *storageprovider.ResourceInfo) *libregraph.Image {
+	k := res.GetArbitraryMetadata().GetMetadata()
+	if k == nil {
+		return nil
+	}
+
+	var image = &libregraph.Image{}
+	if ok := unmarshalStringMap(logger, image, k, "libre.graph.image."); ok {
+		return image
+	}
+
+	return nil
+}
+
 func cs3ResourceToDriveItemLocationFacet(logger *log.Logger, res *storageprovider.ResourceInfo) *libregraph.GeoCoordinates {
 	k := res.GetArbitraryMetadata().GetMetadata()
 	if k == nil {
@@ -506,6 +522,20 @@ func cs3ResourceToDriveItemLocationFacet(logger *log.Logger, res *storageprovide
 	var location = &libregraph.GeoCoordinates{}
 	if ok := unmarshalStringMap(logger, location, k, "libre.graph.location."); ok {
 		return location
+	}
+
+	return nil
+}
+
+func cs3ResourceToDriveItemPhotoFacet(logger *log.Logger, res *storageprovider.ResourceInfo) *libregraph.Photo {
+	k := res.GetArbitraryMetadata().GetMetadata()
+	if k == nil {
+		return nil
+	}
+
+	var photo = &libregraph.Photo{}
+	if ok := unmarshalStringMap(logger, photo, k, "libre.graph.photo."); ok {
+		return photo
 	}
 
 	return nil
@@ -523,6 +553,7 @@ func getFieldName(structField reflect.StructField) string {
 func unmarshalStringMap(logger *log.Logger, out any, flatMap map[string]string, prefix string) bool {
 	nonEmpty := false
 	obj := reflect.ValueOf(out).Elem()
+	timeKind := reflect.TypeOf(&time.Time{}).Elem().Kind()
 	for i := 0; i < obj.NumField(); i++ {
 		field := obj.Field(i)
 		structField := obj.Type().Field(i)
@@ -546,6 +577,8 @@ func unmarshalStringMap(logger *log.Logger, out any, flatMap map[string]string, 
 					tmp, err = strconv.ParseFloat(value, 64)
 				case reflect.Bool:
 					tmp, err = strconv.ParseBool(value)
+				case timeKind:
+					tmp, err = time.Parse(time.RFC3339, value)
 				default:
 					err = errors.New("unsupported type")
 					logger.Error().Err(err).Str("type", t.String()).Str("mapKey", mapKey).Msg("target field type for value of mapKey is not supported")

@@ -36,10 +36,27 @@ message Audio {
 	optional int32 year = 16;
 }
 
+message Image {
+	optional int32 width = 1;
+	optional int32 height = 2;
+}
+
 message GeoCoordinates {
-	optional double altitude  = 1;
-	optional double latitude = 2;
-	optional double longitude = 3;
+  optional double altitude  = 1;
+  optional double latitude = 2;
+  optional double longitude = 3;
+}
+
+message Photo {
+	optional string cameraMake = 1;
+	optional string cameraModel = 2;
+	optional float exposureDenominator = 3;
+	optional float exposureNumerator = 4;
+	optional float fNumber = 5;
+	optional float focalLength = 6;
+	optional int32 iso = 7;
+	optional int32 orientation = 8;
+	optional google.protobuf.Timestamp takenDateTime = 9;
 }
 
 message Entity {
@@ -48,7 +65,7 @@ message Entity {
 	string name = 3;
 	string etag = 4;
 	uint64 size = 5;
-    google.protobuf.Timestamp last_modified_time = 6;
+	google.protobuf.Timestamp last_modified_time = 6;
 	string mime_type = 7;
 	string permissions = 8;
 	uint64 type = 9;
@@ -60,6 +77,8 @@ message Entity {
 	Audio audio = 15;
 	GeoCoordinates location = 16;
 	ResourceID remote_item_id = 17;
+	Image image = 18;
+	Photo photo = 19;
 }
 
 message Match {

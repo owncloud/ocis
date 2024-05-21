@@ -499,7 +499,9 @@ func (s *Service) UpsertItem(ref *provider.Reference, uID *user.UserId) {
 	// determine if metadata needs to be stored in storage as well
 	metadata := map[string]string{}
 	addAudioMetadata(metadata, doc.Audio)
+	addImageMetadata(metadata, doc.Image)
 	addLocationMetadata(metadata, doc.Location)
+	addPhotoMetadata(metadata, doc.Photo)
 	if len(metadata) == 0 {
 		return
 	}
@@ -531,11 +533,25 @@ func addAudioMetadata(metadata map[string]string, audio *libregraph.Audio) {
 	marshalToStringMap(audio, metadata, "libre.graph.audio.")
 }
 
+func addImageMetadata(metadata map[string]string, image *libregraph.Image) {
+	if image == nil {
+		return
+	}
+	marshalToStringMap(image, metadata, "libre.graph.image.")
+}
+
 func addLocationMetadata(metadata map[string]string, location *libregraph.GeoCoordinates) {
 	if location == nil {
 		return
 	}
 	marshalToStringMap(location, metadata, "libre.graph.location.")
+}
+
+func addPhotoMetadata(metadata map[string]string, photo *libregraph.Photo) {
+	if photo == nil {
+		return
+	}
+	marshalToStringMap(photo, metadata, "libre.graph.photo.")
 }
 
 func marshalToStringMap[T libregraph.MappedNullable](source T, target map[string]string, prefix string) {
@@ -568,6 +584,8 @@ func valueToString(value interface{}) string {
 		return strconv.FormatFloat(*v, 'f', -1, 64)
 	case *bool:
 		return strconv.FormatBool(*v)
+	case *time.Time:
+		return v.Format(time.RFC3339)
 	default:
 		return fmt.Sprintf("%v", v)
 	}
