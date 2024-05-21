@@ -115,6 +115,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Reva: [#9132](https://github.com/owncloud/ocis/pull/9132)
 * Enhancement - Add watermark text: [#9144](https://github.com/owncloud/ocis/pull/9144)
 * Enhancement - Update selected attributes of autoprovisioned users: [#9166](https://github.com/owncloud/ocis/pull/9166)
+* Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
 
 ## Details
 
@@ -695,6 +696,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8955
    https://github.com/owncloud/ocis/pull/9166
+
+* Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
+
+   The number of concurrent requests to the thumbnail service can be limited now to
+   have more control over the consumed system resources.
+
+   https://github.com/owncloud/ocis/pull/9199
 
 # Changelog for [5.0.3] (2024-05-02)
 
