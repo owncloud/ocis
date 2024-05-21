@@ -853,10 +853,7 @@ class SpacesContext implements Context {
 		TableNode $expectedFiles
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$this->propfindSpace(
-			$user,
-			$spaceName
-		);
+		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName));
 		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
 		$this->featureContext->propfindResultShouldContainEntries($shouldOrNot, $expectedFiles, $user, 'PROPFIND');
 		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
@@ -883,11 +880,7 @@ class SpacesContext implements Context {
 		TableNode $expectedFiles
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$this->propfindSpace(
-			$user,
-			$spaceName,
-			$folderPath
-		);
+		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName, $folderPath));
 		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
 		$this->featureContext->propfindResultShouldContainEntries(
 			$shouldOrNot,
