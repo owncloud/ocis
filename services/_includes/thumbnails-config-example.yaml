@@ -26,6 +26,7 @@ http:
     cert: ""
     key: ""
   root: /thumbnails
+  max_concurrent_requests: 0
 grpc_client_tls: null
 thumbnail:
   resolutions:
