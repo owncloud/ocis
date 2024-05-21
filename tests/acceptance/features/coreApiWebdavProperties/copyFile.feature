@@ -65,11 +65,12 @@ Feature: copy file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | read      |
-      | shareWith   | Alice     |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And user "Alice" should not be able to download file "/Shares/testshare/textfile0.txt"
@@ -84,11 +85,12 @@ Feature: copy file
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | read      |
-      | shareWith   | Alice     |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
     And user "Brian" has copied file "textfile1.txt" to "/testshare/overwritethis.txt"
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/overwritethis.txt" using the WebDAV API
     Then the HTTP status code should be "403"
@@ -256,7 +258,12 @@ Feature: copy file
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/BRIAN-Folder"
     And user "Brian" has created folder "BRIAN-Folder/sample-folder"
-    And user "Brian" has shared folder "BRIAN-Folder" with user "Alice"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-Folder |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     When user "Alice" copies file "/textfile1.txt" to "/Shares/BRIAN-Folder" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "/Shares/BRIAN-Folder" for user "Alice" should be "ownCloud test text file 1"
@@ -273,7 +280,12 @@ Feature: copy file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has uploaded file with content "file to share" to "/sharedfile1.txt"
-    And user "Brian" has shared file "/sharedfile1.txt" with user "Alice"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | sharedfile1.txt |
+      | space           | Personal        |
+      | sharee          | Alice           |
+      | shareType       | user            |
+      | permissionsRole | File Editor     |
     And user "Alice" has created folder "FOLDER/sample-folder"
     When user "Alice" copies folder "/FOLDER" to "/Shares/sharedfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -292,7 +304,13 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
+    And using SharingNG
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b/sample-folder-c"
@@ -314,7 +332,13 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
+    And using SharingNG
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -337,7 +361,13 @@ Feature: copy file
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has uploaded file with content "file at second level" to "BRIAN-FOLDER/second-level-file.txt"
-    And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
+    And using SharingNG
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -361,7 +391,13 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has uploaded file with content "file at third level" to "BRIAN-FOLDER/second-level-folder/third-level-file.txt"
-    And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
+    And using SharingNG
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "FOLDER/second-level-folder"
     And user "Alice" has created folder "FOLDER/second-level-folder/third-level-folder"
     When user "Alice" copies folder "FOLDER/second-level-folder" to "/Shares/BRIAN-FOLDER/second-level-folder/third-level-file.txt" using the WebDAV API
@@ -386,7 +422,12 @@ Feature: copy file
     And user "Brian" has been added to group "grp1"
     And user "Brian" has created folder "/BRIAN-Folder"
     And user "Brian" has created folder "BRIAN-Folder/sample-folder"
-    And user "Brian" has shared folder "BRIAN-Folder" with group "grp1" with permissions "15"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-Folder |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     When user "Alice" copies file "/textfile1.txt" to "/Shares/BRIAN-Folder" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "/Shares/BRIAN-Folder" for user "Alice" should be "ownCloud test text file 1"
@@ -411,7 +452,12 @@ Feature: copy file
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     And user "Brian" has uploaded file with content "file to share" to "/sharedfile1.txt"
-    And user "Brian" has shared file "/sharedfile1.txt" with group "grp1"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | sharedfile1.txt |
+      | space           | Personal        |
+      | sharee          | grp1            |
+      | shareType       | group           |
+      | permissionsRole | File Editor     |
     And user "Alice" has created folder "FOLDER/sample-folder"
     When user "Alice" copies folder "/FOLDER" to "/Shares/sharedfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -438,7 +484,13 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
+    And using SharingNG
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b/sample-folder-c"
@@ -463,7 +515,13 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
-    And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
+    And using SharingNG
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -489,7 +547,13 @@ Feature: copy file
     And user "Brian" has been added to group "grp1"
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has uploaded file with content "file at second level" to "BRIAN-FOLDER/second-level-file.txt"
-    And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
+    And using SharingNG
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -516,7 +580,13 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has uploaded file with content "file at third level" to "BRIAN-FOLDER/second-level-folder/third-level-file.txt"
-    And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
+    And using SharingNG
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-FOLDER |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Editor       |
     And user "Alice" has created folder "FOLDER/second-level-folder"
     And user "Alice" has created folder "FOLDER/second-level-folder/third-level-folder"
     When user "Alice" copies folder "FOLDER/second-level-folder" to "Shares/BRIAN-FOLDER/second-level-folder/third-level-file.txt" using the WebDAV API
@@ -607,11 +677,12 @@ Feature: copy file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Alice     |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/Shares/testshare/textfile0.txt" for user "Alice" should be "ownCloud test text file 0"
@@ -626,11 +697,12 @@ Feature: copy file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Alice     |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     And user "Brian" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Brian" copies file "/textfile0.txt" to "/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -646,11 +718,12 @@ Feature: copy file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Alice     |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     And user "Alice" has uploaded file with content "ownCloud test text file inside share" to "/Shares/testshare/fileInsideShare.txt"
     When user "Alice" copies file "/Shares/testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -668,11 +741,12 @@ Feature: copy file
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "ownCloud test text file inside share" to "/testshare/fileInsideShare.txt"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Alice     |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     When user "Brian" copies file "testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/fileInsideShare.txt" should exist
@@ -718,16 +792,18 @@ Feature: copy file
     And user "Brian" has created folder "/testshare0"
     And user "Brian" has uploaded file with content "content inside testshare0" to "/testshare0/testshare0.txt"
     And user "Carol" has created folder "/testshare1"
-    And user "Brian" has created a share with settings
-      | path        | testshare0 |
-      | shareType   | user       |
-      | permissions | change     |
-      | shareWith   | Alice      |
-    And user "Carol" has created a share with settings
-      | path        | testshare1 |
-      | shareType   | user       |
-      | permissions | change     |
-      | shareWith   | Alice      |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare0 |
+      | space           | Personal   |
+      | sharee          | Alice      |
+      | shareType       | user       |
+      | permissionsRole | Editor     |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | testshare1 |
+      | space           | Personal   |
+      | sharee          | Alice      |
+      | shareType       | user       |
+      | permissionsRole | Editor     |
     When user "Alice" copies file "/Shares/testshare0/testshare0.txt" to "/Shares/testshare1/testshare0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "testshare1/testshare0.txt" should exist
@@ -748,16 +824,18 @@ Feature: copy file
     And user "Brian" has created folder "/testshare0/folder_to_copy/"
     And user "Brian" has uploaded file with content "content inside testshare0" to "/testshare0/folder_to_copy/testshare0.txt"
     And user "Carol" has created folder "/testshare1"
-    And user "Brian" has created a share with settings
-      | path        | testshare0 |
-      | shareType   | user       |
-      | permissions | change     |
-      | shareWith   | Alice      |
-    And user "Carol" has created a share with settings
-      | path        | testshare1 |
-      | shareType   | user       |
-      | permissions | change     |
-      | shareWith   | Alice      |
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare0 |
+      | space           | Personal   |
+      | sharee          | Alice      |
+      | shareType       | user       |
+      | permissionsRole | Editor     |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | testshare1 |
+      | space           | Personal   |
+      | sharee          | Alice      |
+      | shareType       | user       |
+      | permissionsRole | Editor     |
     When user "Alice" copies file "/Shares/testshare0/folder_to_copy/" to "/Shares/testshare1/folder_to_copy/" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "testshare1/folder_to_copy/testshare0.txt" should exist
@@ -775,16 +853,18 @@ Feature: copy file
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/testshare"
-    And user "Alice" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Brian     |
-    And user "Alice" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Carol     |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Carol     |
+      | shareType       | user      |
+      | permissionsRole | Editor    |
     When user "Alice" copies file "/textfile0.txt" to "/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/testshare/textfile0.txt" should exist
