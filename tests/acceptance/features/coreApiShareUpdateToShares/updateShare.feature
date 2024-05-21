@@ -16,7 +16,13 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | File Editor   |
+    And using SharingNG
     And user "Brian" has moved file "/Shares/textfile0.txt" to "/Shares/textfile_new.txt"
     When user "Alice" updates the last share using the sharing API with
       | permissions | read |
@@ -46,7 +52,13 @@ Feature: sharing
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | 0 |
     Then the OCS status code should be "400"
@@ -61,7 +73,13 @@ Feature: sharing
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | <permissions> |
     Then the OCS status code should be "400"
@@ -84,7 +102,13 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with group "grp1"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | <permissions> |
     Then the OCS status code should be "400"
@@ -109,8 +133,18 @@ Feature: sharing
     And user "Alice" has created folder "/Alice-folder"
     And user "Alice" has created folder "/Alice-folder/folder2"
     And user "Carol" has created folder "/Carol-folder"
-    And user "Alice" has shared folder "/Alice-folder" with user "Brian" with permissions "all"
-    And user "Carol" has shared folder "/Carol-folder" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | Alice-folder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | Carol-folder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     When user "Brian" moves folder "/Shares/Alice-folder/folder2" to "/Shares/Carol-folder/folder2" using the WebDAV API
     Then the HTTP status code should be "502"
 
@@ -120,7 +154,13 @@ Feature: sharing
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/Alice-folder"
-    And user "Alice" has shared folder "/Alice-folder" with user "Brian" with permissions "read"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | Alice-folder |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | all |
     Then the OCS status code should be "<ocs-status-code>"
@@ -170,7 +210,13 @@ Feature: sharing
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
     And user "Carol" has created folder "/FOLDER"
-    And user "Carol" has shared folder "/FOLDER" with group "grp1"
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
+    And using SharingNG
     And user "Carol" has updated the last share with
       | permissions | read |
     When user "Carol" updates the last share using the sharing API with

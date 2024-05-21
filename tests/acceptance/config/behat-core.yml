@@ -164,6 +164,7 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
+        - SharingNgContext:
 
     coreApiTrashbin:
       paths:
