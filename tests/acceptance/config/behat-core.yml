@@ -196,6 +196,7 @@ default:
         - FilesVersionsContext:
         - WebDavPropertiesContext:
         - TrashbinContext:
+        - SharingNgContext:
 
     coreApiWebdavDelete:
       paths:
