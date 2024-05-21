@@ -24,6 +24,7 @@ const (
 // WopiContext wraps all the information we need for WOPI
 type WopiContext struct {
 	AccessToken   string
+	ViewOnlyToken string
 	FileReference providerv1beta1.Reference
 	User          *userv1beta1.User
 	ViewMode      appproviderv1beta1.ViewMode
