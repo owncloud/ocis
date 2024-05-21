@@ -7,17 +7,19 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: backup.md
 ---
 
-This small guide aims to shed some light on the internal ocis data structure. You can refer to it when you are trying to optimize your backups or if you just curious how ocis stores its data.
+This small guide aims to shed some light on the internal ocis data structure. You can refer to it when you are trying to optimize your backups or if you are just curious about how ocis stores its data.
 
-## Ocis data structure
+Note, as a prerequisite backing up ocis, the instance has to be fully shut down for the time being.
 
-Ocis stores its data in folder that can be configured via the envvar `OCIS_BASE_DATA_PATH`.
+## Ocis Data Structure
 
-The default value for the `OCIS_BASE_DATA_PATH` variable is `$HOME/.ocis` (or `/etc/dev/ocis` when using the docker container.
+Ocis stores its data in a folder that can be configured via the envvar `OCIS_BASE_DATA_PATH`. Without further configuration, services derive from that path when they store data, though individual settings can be configured.
 
-Inside this folder ocis will store all its data. That includes metadata, configuration, queues and stores. The actual bytes of the uploaded files are also stored here by default. If an s3 store is used as blobstore, the blobs need to be backed up seperately.
+The default value for the `OCIS_BASE_DATA_PATH` variable is `$HOME/.ocis` (or `/var/lib/ocis` when using the docker container. Note: Configuration data is by default stored in `/etc/ocis/` in the container.).
 
-### Base Data Path overview
+Inside this folder, ocis will store all its data separated by subdirectories. That includes metadata, configurations, queues and stores etc. The actual bytes of files which are currently uploaded are also stored here by default. If an s3 store is used as blobstore, the blobs need to be backed up separately. Note: See special case for the `config` folder in a docker container.
+
+### Base Data Path Overview
 
 Listing the contents of the folder will return the following:
 ```bash
@@ -36,6 +38,8 @@ Listing the contents of the folder will return the following:
 10 directories, 0 files
 ```
 
+The following sections describe the content and background of the subdirectories to decide if a backup is required or recommended and its effect when it is not backed up.
+
 ### `config`
 
 Contains basic ocis configuration created by `ocis init`(Note: The location of the configuration folder can be specified with the `OCIS_CONFIG_DIR` envvar but for this readme we will assume this envvar is not set)
@@ -48,7 +52,7 @@ Contains basic ocis configuration created by `ocis init`(Note: The location of t
 1 directory, 1 file
 ```
 
-* `ocis.yaml`: BACKUP RECOMMENDED. Holds ocis configuration data. The contents can vary depending on your environment variables. In general most of this file can be recreated again by running `ocis init`. This will recreate secrets and certificates. However if not backed up completely, some fields MUST be copied over from the old config:
+* `ocis.yaml`: BACKUP RECOMMENDED. Holds ocis configuration data. The contents can vary depending on your environment variables. In general, most of this file can be recreated again by running `ocis init`. This will recreate secrets and certificates. However, if not backed up completely, some fields MUST be copied over from the old config manually to regain data access after a restore:
 
 | Field Name | Envvar Name | Description | If not backed up |
 | --- | --- | --- | --- |
@@ -66,9 +70,9 @@ Contains basic ocis configuration created by `ocis init`(Note: The location of t
 
 ### `idm`
 
-Note: this folder will not appear if you use an external idm. Refer to your idms documentation for backup details in this case.
+Note: This folder will not appear if you use an external idm. Refer to your idms documentation for backup details in this case.
 
-Contains the data for the internal ocis identity management. See IDM README.
+Contains the data for the internal ocis identity management. See the IDM README for more details.
 
 ```bash
     ~/.ocis/idm/:tree
@@ -87,9 +91,9 @@ Contains the data for the internal ocis identity management. See IDM README.
 
 ### `idp`
 
-Note: this folder will not appear if you use an external idp. Refer to your idps documentation for backup details in this case.
+Note: This folder will not appear if you use an external idp. Refer to your idp's documentation for backup details in this case.
 
-Contains the data for the internal ocis identity provider. SEE IDP README.
+Contains the data for the internal ocis identity provider. See the IDP README for more details.
 
 ```bash
     ~/.ocis/idp/:tree
@@ -108,9 +112,9 @@ Contains the data for the internal ocis identity provider. SEE IDP README.
 
 ### `nats`
 
-Note: this folder will not appear if you use an external nats installation
+Note: This folder will not appear if you use an external nats installation
 
-Contains nats data for streams and stores. SEE NATS README.
+Contains nats data for streams and stores. See the NATS README for more details.
 
 ```bash
     ~/.ocis/nats/:tree -L 1
@@ -119,11 +123,11 @@ Contains nats data for streams and stores. SEE NATS README.
 
 ```
 
-* `jetstream`: BACKUP RECOMMENDED. This folder contains nats data about streams and key-value stores. Use `NATS_NATS_STORE_DIR` to specify its part. Not backing it up can break history for multiple (non-vital) features such as history or notifications. Ocis functionality is not impacted.
+* `jetstream`: BACKUP RECOMMENDED. This folder contains nats data about streams and key-value stores. Use `NATS_NATS_STORE_DIR` to specify its path. Not backing it up can break history for multiple (non-vital) features such as history or notifications. The ocis functionality is not impacted if omitted.
 
 ### `proxy`
 
-Contains proxy service data. SEE PROXY README.
+Contains proxy service data. See the PROXY README for more details.
 
 ```bash
     ~/.ocis/proxy/:tree
@@ -149,7 +153,7 @@ Contains the search index.
 2 directories, 0 files
 ```
 
-* `bleve`: BACKUP RECOMMENDED/OPTIONAL. This contains the search index. Can be specified via `SEARCH_ENGINE_BLEVE_DATA_PATH`. If not backing it up the search index needs to be recreated. This can take a long time depending on amount of files.
+* `bleve`: BACKUP RECOMMENDED/OPTIONAL. This contains the search index. Can be specified via `SEARCH_ENGINE_BLEVE_DATA_PATH`. If not backed up, the search index needs to be recreated. This can take a long time depending on the amount of files.
 
 ### `storage`
 
@@ -167,7 +171,7 @@ Contains ocis meta (and blob) data.
 
 * `metadata`: BACKUP REQUIRED. Contains system data. Path can be specified via `STORAGE_SYSTEM_OCIS_ROOT`. Not backing it up will remove shares from the system and will also remove custom settings.
 * `ocm`: BACKUP REQUIRED/OMITABLE. Contains ocm share data. When not using ocm sharing, this folder does not need to be backed up.
-* `users`: BACKUP REQUIRED. Contains user data. Path can be specified via `STORAGE_USERS_OCIS_ROOT`. Not backing it up will remove all spaces and all files. Rendering ocis empty, but functionally.
+* `users`: BACKUP REQUIRED. Contains user data. Path can be specified via `STORAGE_USERS_OCIS_ROOT`. Not backing it up will remove all spaces and all files. As result, you will have a configured but empty ocis instance, which is fully functional accepting new data. Old data is lost.
 
 ### `thumbnails`
 
@@ -179,11 +183,11 @@ Contains thumbnails data.
 └── files
 ```
 
-* `files`: OPTIONAL/RECOMMENDED. This folder contains prerendered thumbnails. Can be specified via `THUMBNAILS_FILESYSTEMSTORAGE_ROOT`. If not backed up thumbnails will be regenerated automatically which leads to some load on thumbnails service.
+* `files`: OPTIONAL/RECOMMENDED. This folder contains prerendered thumbnails. Can be specified via `THUMBNAILS_FILESYSTEMSTORAGE_ROOT`. If not backed up, thumbnails will be regenerated automatically on access which leads to some load on the thumbnails service.
 
 ### `web`
 
-Contains web assests such as custom logos.
+Contains web assets such as custom logos, themes etc.
 
 ```bash
     ~/.ocis/web/:tree -L 1
@@ -193,9 +197,9 @@ Contains web assests such as custom logos.
 2 directories, 0 files
 ```
 
-* `assests`: BACKUP RECOMMENDED/OMITABLE. This folder contains custom web assests. Can be specified via `WEB_ASSET_CORE_PATH`. If no custom web assets are used, there is no need for a backup. If those exist but are not backed up, they need to be reuploaded.
+* `assets`: BACKUP RECOMMENDED/OMITABLE. This folder contains custom web assets. Can be specified via `WEB_ASSET_CORE_PATH`. If no custom web assets are used, there is no need for a backup. If those exist but are not backed up, they need to be reuploaded.
 
 ### `external services`
 
-When using an external idp/idm/nats or blobstore its data needs to be backed up separately. Refer to your idp/idm/nats/blobstore documentation for backup details.
+When using an external idp/idm/nats or blobstore, its data needs to be backed up separately. Refer to your idp/idm/nats/blobstore documentation for backup details.
 
