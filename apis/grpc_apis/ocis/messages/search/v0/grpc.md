@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.search.v0"
 url: /apis/grpc_apis/ocis_messages_search_v0
-date: 2024-05-21T08:03:01Z
+date: 2024-05-21T08:22:58Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -58,6 +58,8 @@ geekdocRepo: https://github.com/owncloud/ocis
 | audio | [Audio](#audio) |  |  |
 | location | [GeoCoordinates](#geocoordinates) |  |  |
 | remote_item_id | [ResourceID](#resourceid) |  |  |
+| image | [Image](#image) |  |  |
+| photo | [Photo](#photo) |  |  |
 
 ### GeoCoordinates
 
@@ -69,6 +71,15 @@ geekdocRepo: https://github.com/owncloud/ocis
 | latitude | [double](#double) | optional |  |
 | longitude | [double](#double) | optional |  |
 
+### Image
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| width | [int32](#int32) | optional |  |
+| height | [int32](#int32) | optional |  |
+
 ### Match
 
 
@@ -77,6 +88,22 @@ geekdocRepo: https://github.com/owncloud/ocis
 | ----- | ---- | ----- | ----------- |
 | entity | [Entity](#entity) |  | the matched entity |
 | score | [float](#float) |  | the match score |
+
+### Photo
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| cameraMake | [string](#string) | optional |  |
+| cameraModel | [string](#string) | optional |  |
+| exposureDenominator | [float](#float) | optional |  |
+| exposureNumerator | [float](#float) | optional |  |
+| fNumber | [float](#float) | optional |  |
+| focalLength | [float](#float) | optional |  |
+| iso | [int32](#int32) | optional |  |
+| orientation | [int32](#int32) | optional |  |
+| takenDateTime | [google.protobuf.Timestamp](#googleprotobuftimestamp) | optional |  |
 
 ### Reference
 

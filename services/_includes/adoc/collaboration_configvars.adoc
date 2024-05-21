@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-21-08-03-17]
+[#deprecation-note-2024-05-21-08-23-16]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -68,7 +68,7 @@ a|`OCIS_JWT_SECRET` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++A3k7thrn5miK4CHJ8ev8jFbbzSUThTh9 ++
+++YF6up60ge2gq2Zkkv6ejfEUJcfKsBLHH ++
 a| [subs=-attributes]
 Used as JWT token and to encrypt access token.
 
