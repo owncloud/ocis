@@ -62,18 +62,22 @@ Feature: Share spaces
 
 
   Scenario: user unshares a space
-    Given user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | share space  |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     When user "Alice" unshares a space "share space" to user "Brian"
     Then the HTTP status code should be "200"
     But the user "Brian" should not have a space called "share space"
 
 
   Scenario Outline: owner of a space cannot see the space after removing his access to the space
-    Given user "Alice" has shared a space "share space" with settings:
-      | shareWith | Brian   |
-      | role      | manager |
+    Given user "Alice" has sent the following space share invitation:
+      | space           | share space |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | Manager     |
     When user "<user>" unshares a space "share space" to user "Alice"
     Then the HTTP status code should be "200"
     But the user "Alice" should not have a space called "share space"
