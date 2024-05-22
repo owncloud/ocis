@@ -354,6 +354,32 @@ func (h *webRoleServiceHandler) ListRoleAssignments(w http.ResponseWriter, r *ht
 	render.JSON(w, r, resp)
 }
 
+func (h *webRoleServiceHandler) ListRoleAssignmentsFiltered(w http.ResponseWriter, r *http.Request) {
+	req := &ListRoleAssignmentsFilteredRequest{}
+	resp := &ListRoleAssignmentsResponse{}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
+		return
+	}
+
+	if err := h.h.ListRoleAssignmentsFiltered(
+		r.Context(),
+		req,
+		resp,
+	); err != nil {
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
+		return
+	}
+
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, resp)
+}
+
 func (h *webRoleServiceHandler) AssignRoleToUser(w http.ResponseWriter, r *http.Request) {
 	req := &AssignRoleToUserRequest{}
 	resp := &AssignRoleToUserResponse{}
@@ -414,6 +440,7 @@ func RegisterRoleServiceWeb(r chi.Router, i RoleServiceHandler, middlewares ...f
 
 	r.MethodFunc("POST", "/api/v0/settings/roles-list", handler.ListRoles)
 	r.MethodFunc("POST", "/api/v0/settings/assignments-list", handler.ListRoleAssignments)
+	r.MethodFunc("POST", "/api/v0/settings/assignments-list-filtered", handler.ListRoleAssignmentsFiltered)
 	r.MethodFunc("POST", "/api/v0/settings/assignments-add", handler.AssignRoleToUser)
 	r.MethodFunc("POST", "/api/v0/settings/assignments-remove", handler.RemoveRoleFromUser)
 }
@@ -1127,6 +1154,42 @@ func (m *ListRoleAssignmentsRequest) UnmarshalJSON(b []byte) error {
 }
 
 var _ json.Unmarshaler = (*ListRoleAssignmentsRequest)(nil)
+
+// ListRoleAssignmentsFilteredRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of ListRoleAssignmentsFilteredRequest. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var ListRoleAssignmentsFilteredRequestJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *ListRoleAssignmentsFilteredRequest) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := ListRoleAssignmentsFilteredRequestJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*ListRoleAssignmentsFilteredRequest)(nil)
+
+// ListRoleAssignmentsFilteredRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of ListRoleAssignmentsFilteredRequest. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var ListRoleAssignmentsFilteredRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *ListRoleAssignmentsFilteredRequest) UnmarshalJSON(b []byte) error {
+	return ListRoleAssignmentsFilteredRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*ListRoleAssignmentsFilteredRequest)(nil)
 
 // ListRoleAssignmentsResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of ListRoleAssignmentsResponse. This struct is safe to replace or modify but

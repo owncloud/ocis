@@ -342,6 +342,28 @@ func (g Service) ListRoleAssignments(ctx context.Context, req *settingssvc.ListR
 	return nil
 }
 
+func (g Service) ListRoleAssignmentsFiltered(ctx context.Context, req *settingssvc.ListRoleAssignmentsFilteredRequest, res *settingssvc.ListRoleAssignmentsResponse) error {
+	if validationError := validateListRoleAssignmentsFiltered(req); validationError != nil {
+		return merrors.BadRequest(g.id, "%s", validationError)
+	}
+	filters := req.GetFilters()
+
+	var r []*settingsmsg.UserRoleAssignment
+	var err error
+	switch filters[0].GetType() {
+	case settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT:
+		accountUUID := getValidatedAccountUUID(ctx, filters[0].GetAccountUuid())
+		r, err = g.manager.ListRoleAssignments(accountUUID)
+	case settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE:
+		err = fmt.Errorf("filtering by role not implemented")
+	}
+	if err != nil {
+		return merrors.NotFound(g.id, "%s", err)
+	}
+	res.Assignments = r
+	return nil
+}
+
 // AssignRoleToUser implements the RoleServiceHandler interface
 func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRoleToUserRequest, res *settingssvc.AssignRoleToUserResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)

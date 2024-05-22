@@ -52,6 +52,7 @@ type GetGatewayServiceClientFunc func() (gateway.GatewayAPIClient, error)
 type RoleService interface {
 	ListRoles(ctx context.Context, in *settingssvc.ListBundlesRequest, opts ...client.CallOption) (*settingssvc.ListBundlesResponse, error)
 	ListRoleAssignments(ctx context.Context, in *settingssvc.ListRoleAssignmentsRequest, opts ...client.CallOption) (*settingssvc.ListRoleAssignmentsResponse, error)
+	ListRoleAssignmentsFiltered(ctx context.Context, in *settingssvc.ListRoleAssignmentsFilteredRequest, opts ...client.CallOption) (*settingssvc.ListRoleAssignmentsResponse, error)
 	AssignRoleToUser(ctx context.Context, in *settingssvc.AssignRoleToUserRequest, opts ...client.CallOption) (*settingssvc.AssignRoleToUserResponse, error)
 	RemoveRoleFromUser(ctx context.Context, in *settingssvc.RemoveRoleFromUserRequest, opts ...client.CallOption) (*emptypb.Empty, error)
 }
