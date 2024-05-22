@@ -193,7 +193,8 @@ service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-u
     ocis storage-users trash-bin list [command options] ['spaceID' required]
     ```
 
-The restore option defines the behavior for an item to be restored, when the item name already exists in the target space. Supported options are: `skip`, `replace` and `keep-both`. The default value is `skip`
+The restore option defines the behavior for an item to be restored, when the item name already exists in the target space. Supported options are: `skip`, `replace` and `keep-both`. The default value is `skip`.
+
 When the cli tool restores the item with the `replace` option, the existing item will be moved to a trash-bin. When the cli tool restores the item with the `keep-both` option and the designated item already exists, the name of the restored item will be changed by adding a numeric suffix in parentheses. The variable `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE` defines a maximum number of attempts to rename an item.
 
 * Restore all trash-bin items for a space
