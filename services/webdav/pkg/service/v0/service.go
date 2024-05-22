@@ -33,11 +33,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/dav/requests"
 )
 
-func init() {
-	// register method with chi before any routing is set up
-	chi.RegisterMethod("REPORT")
-}
-
 var (
 	codesEnum = map[int]string{
 		http.StatusBadRequest:       "Sabre\\DAV\\Exception\\BadRequest",
@@ -57,6 +52,9 @@ type Service interface {
 func NewService(opts ...Option) (Service, error) {
 	options := newOptions(opts...)
 	conf := options.Config
+
+	// register method with chi before any routing is set up
+	chi.RegisterMethod("REPORT")
 
 	m := chi.NewMux()
 	m.Use(
@@ -454,13 +452,13 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 		// Timeout: time.Second * 5,
 	}
 
-	dlReq, err := http.NewRequest(http.MethodGet, rsp.DataEndpoint, http.NoBody)
+	dlReq, err := http.NewRequest(http.MethodGet, rsp.GetDataEndpoint(), http.NoBody)
 	if err != nil {
 		renderError(w, r, errInternalError(err.Error()))
 		logger.Error().Err(err).Msg("could not create download thumbnail request")
 		return
 	}
-	dlReq.Header.Set("Transfer-Token", rsp.TransferToken)
+	dlReq.Header.Set("Transfer-Token", rsp.GetTransferToken())
 
 	dlRsp, err := client.Do(dlReq)
 	if err != nil {
@@ -469,6 +467,15 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 		return
 	}
 	defer dlRsp.Body.Close()
+
+	if dlRsp.StatusCode == http.StatusTooManyRequests {
+		retryAfter := dlRsp.Header.Get("Retry-After")
+		if retryAfter != "" {
+			w.Header().Set("Retry-After", retryAfter)
+		}
+		w.WriteHeader(http.StatusTooManyRequests)
+		return
+	}
 
 	if dlRsp.StatusCode != http.StatusOK {
 		logger.Debug().
