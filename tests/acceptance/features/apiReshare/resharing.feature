@@ -34,10 +34,12 @@ Feature: re-share resources
 
   Scenario Outline: try to re-share folder
     Given using <dav-path-version> DAV path
-    And user "Alice" has created a share inside of space "Personal" with settings:
-      | path      | test   |
-      | shareWith | Brian  |
-      | role      | <role> |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test               |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" creates a share inside of space "Shares" with settings:
       | path      | test   |
       | shareWith | Carol  |
@@ -46,22 +48,24 @@ Feature: re-share resources
     And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     Examples:
-      | dav-path-version | role   |
-      | old              | editor |
-      | old              | viewer |
-      | new              | editor |
-      | new              | viewer |
-      | spaces           | editor |
-      | spaces           | viewer |
+      | dav-path-version | role   | permissions-role |
+      | old              | editor | Editor           |
+      | old              | viewer | Viewer           |
+      | new              | editor | Editor           |
+      | new              | viewer | Viewer           |
+      | spaces           | editor | Editor           |
+      | spaces           | viewer | Viewer           |
 
 
   Scenario Outline: try to re-share file
     Given user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
     Given using <dav-path-version> DAV path
-    And user "Alice" has created a share inside of space "Personal" with settings:
-      | path      | textfile1.txt |
-      | shareWith | Brian         |
-      | role      | <role>        |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile1.txt      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" creates a share inside of space "Shares" with settings:
       | path      | textfile1.txt |
       | shareWith | Carol         |
@@ -70,18 +74,23 @@ Feature: re-share resources
     And the OCS status code should be "403"
     And the OCS status message should be "No share permission"
     Examples:
-      | dav-path-version | role   |
-      | old              | editor |
-      | old              | viewer |
-      | new              | editor |
-      | new              | viewer |
-      | spaces           | editor |
-      | spaces           | viewer |
+      | dav-path-version | role   | permissions-role |
+      | old              | editor | File Editor      |
+      | old              | viewer | Viewer           |
+      | new              | editor | File Editor      |
+      | new              | viewer | Viewer           |
+      | spaces           | editor | File Editor      |
+      | spaces           | viewer | Viewer           |
 
 
   Scenario Outline: try to create a link to the shared folder
     Given using OCS API version "<ocs_api_version>"
-    And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | test     |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" creates a public link share using the sharing API with settings
       | path        | /Shares/test |
       | permissions | 1            |
@@ -99,9 +108,11 @@ Feature: re-share resources
     And using spaces DAV path
     And user "Alice" has created a space "project1" with the default quota using the Graph API
     And user "Alice" has created a folder "folder" in space "project1"
-    And user "Alice" has shared a space "project1" with settings:
-      | shareWith | Brian  |
-      | role      | viewer |
+    And user "Alice" has sent the following space share invitation:
+      | space           | project1     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
     When user "Alice" creates a share inside of space "project1" with settings:
       | path        | folder        |
       | shareWith   | Brian         |
@@ -140,4 +151,4 @@ Feature: re-share resources
       | 27          | share + view + edit + delete          |
       | 29          | share + view + create + delete        |
       | 31          | share + view + create + edit + delete |
-      
+
