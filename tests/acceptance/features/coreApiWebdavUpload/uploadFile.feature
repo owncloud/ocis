@@ -399,7 +399,12 @@ Feature: upload file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "file with content" to "/textfile.txt"
-    And user "Alice" has shared file "/textfile.txt" with user "Brian" with permissions "read,update"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     When user "Brian" uploads file with content "" to shared resource "Shares/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And for user "Brian" the content of the file "/test.txt" of the space "Shares" should be ""
@@ -427,9 +432,11 @@ Feature: upload file
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "file with content" to "textfile.txt"
-    And user "Alice" has shared a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | editor |
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Editor |
     When user "Brian" uploads a file inside space "new-space" with content "" to "textfile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And for user "Brian" the content of the file "/textfile.txt" of the space "new-space" should be ""
