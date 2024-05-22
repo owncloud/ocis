@@ -32,7 +32,7 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: mbarz@owncloud.com
-          OCIS_DOCKER_TAG: 5.0.3
+          OCIS_DOCKER_TAG: 5.0.4
           OCIS_DOMAIN: ocis.ocis-ldap.released.owncloud.works
           LDAP_MANAGER_DOMAIN: ldap.ocis-ldap.released.owncloud.works
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
