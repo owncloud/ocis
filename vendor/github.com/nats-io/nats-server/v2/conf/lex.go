@@ -332,12 +332,12 @@ func lexBlockStart(lx *lexer) stateFn {
 		lx.ignore()
 		return lx.pop()
 	case commentHashStart:
-		lx.push(lexBlockEnd)
+		lx.push(lexBlockStart)
 		return lexCommentStart
 	case commentSlashStart:
 		rn := lx.next()
 		if rn == commentSlashStart {
-			lx.push(lexBlockEnd)
+			lx.push(lexBlockStart)
 			return lexCommentStart
 		}
 		lx.backup()
