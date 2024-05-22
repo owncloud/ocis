@@ -173,7 +173,7 @@ ocis storage-users trash-bin purge-expired
 
 The behaviour of the `purge-expired` command can be configured by using the following environment variables.
 
-*   `STORAGE_USERS_PURGE_TRASH_BIN_USER_ID`
+*   `STORAGE_USERS_PURGE_TRASH_BIN_USER_ID`\
 Used to obtain space trash-bin information and takes the system admin user as the default which is the `OCIS_ADMIN_USER_ID` but can be set individually. It should be noted, that the `OCIS_ADMIN_USER_ID` is only assigned automatically when using the single binary deployment and must be manually assigned in all other deployments. The command only considers spaces to which the assigned user has access and delete permission.
 
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE`
