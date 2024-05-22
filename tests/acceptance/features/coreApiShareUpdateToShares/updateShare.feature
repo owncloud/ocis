@@ -234,11 +234,12 @@ Feature: sharing
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | create |
-      | shareWith   | Brian  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Uploader |
     And user "Brian" has uploaded file with content "some content" to "/Shares/FOLDER/textFile.txt"
     When user "Alice" deletes file "/FOLDER/textFile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
