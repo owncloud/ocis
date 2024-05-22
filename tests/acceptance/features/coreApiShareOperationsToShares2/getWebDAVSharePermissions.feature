@@ -56,52 +56,12 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has created a share with settings
-      | path        | /tmp.txt    |
-      | shareType   | group       |
-      | permissions | update,read |
-      | shareWith   | grp1        |
-    When user "Brian" gets the following properties of file "/Shares/tmp.txt" using the WebDAV API
-      | propertyName          |
-      | ocs:share-permissions |
-    Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "3"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-  @skipOnReva @issue-2213
-  Scenario Outline: check webdav share-permissions for received file with edit permissions but no reshare permissions
-    Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | tmp.txt  |
-      | space           | Personal |
-      | sharee          | Brian    |
-      | shareType       | user     |
-      | permissionsRole | Viewer   |
-    And using SharingNG
-    When user "Alice" updates the last share using the sharing API with
-      | permissions | update,read |
-    Then the HTTP status code should be "200"
-    And as user "Brian" file "/Shares/tmp.txt" should contain a property "ocs:share-permissions" with value "3"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-  @issue-2213
-  Scenario Outline: check webdav share-permissions for received group shared file with edit permissions but no reshare permissions
-    Given using <dav-path-version> DAV path
-    And group "grp1" has been created
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has created a share with settings
-      | path        | /tmp.txt    |
-      | shareType   | group       |
-      | permissions | update,read |
-      | shareWith   | grp1        |
+      | resource        | tmp.txt     |
+      | space           | Personal    |
+      | sharee          | grp1        |
+      | shareType       | group       |
+      | permissionsRole | File Editor |
     When user "Brian" gets the following properties of file "/Shares/tmp.txt" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -122,27 +82,6 @@ Feature: sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
-    And using SharingNG
-    When user "Alice" updates the last share using the sharing API with
-      | permissions | read |
-    Then the HTTP status code should be "200"
-    And as user "Brian" file "/Shares/tmp.txt" should contain a property "ocs:share-permissions" with value "1"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-
-  Scenario Outline: check webdav share-permissions for received group shared file with reshare permissions but no edit permissions
-    Given using <dav-path-version> DAV path
-    And group "grp1" has been created
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has uploaded file with content "foo" to "/tmp.txt"
-    And user "Alice" has created a share with settings
-      | path        | /tmp.txt |
-      | shareType   | group    |
-      | permissions | read     |
-      | shareWith   | grp1     |
     When user "Brian" gets the following properties of file "/Shares/tmp.txt" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -198,10 +137,12 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has created a share with settings
-      | path      | tmp   |
-      | shareType | group |
-      | shareWith | grp1  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -238,16 +179,17 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has created a share with settings
-      | path        | tmp                |
-      | shareType   | group              |
-      | shareWith   | grp1               |
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    When user "Alice" updates the last share using the sharing API with
       | permissions | delete,create,read |
-    When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
-      | propertyName          |
-      | ocs:share-permissions |
-    Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "13"
+    Then the HTTP status code should be "200"
+    And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "13"
     Examples:
       | dav-path-version |
       | old              |
@@ -279,16 +221,17 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has created a share with settings
-      | path        | tmp                |
-      | shareType   | group              |
-      | shareWith   | grp1               |
+    And using SharingNG
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | tmp      |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    When user "Alice" updates the last share using the sharing API with
       | permissions | delete,update,read |
-    When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
-      | propertyName          |
-      | ocs:share-permissions |
-    Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "11"
+    Then the HTTP status code should be "200"
+    And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "11"
     Examples:
       | dav-path-version |
       | old              |
@@ -320,57 +263,17 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
-    And user "Alice" has created a share with settings
-      | path        | tmp                |
-      | shareType   | group              |
-      | shareWith   | grp1               |
-      | permissions | create,update,read |
-    When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
-      | propertyName          |
-      | ocs:share-permissions |
-    Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "7"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-  @skipOnReva
-  Scenario Outline: check webdav share-permissions for received folder with all permissions but share
-    Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "/tmp"
+    And using SharingNG
     And user "Alice" has sent the following resource share invitation:
       | resource        | tmp      |
       | space           | Personal |
-      | sharee          | Brian    |
-      | shareType       | user     |
+      | sharee          | grp1     |
+      | shareType       | group    |
       | permissionsRole | Viewer   |
-    And using SharingNG
     When user "Alice" updates the last share using the sharing API with
-      | permissions | change |
+      | permissions | create,update,read |
     Then the HTTP status code should be "200"
-    And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "15"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-
-
-  Scenario Outline: check webdav share-permissions for received group shared folder with all permissions but share
-    Given using <dav-path-version> DAV path
-    And group "grp1" has been created
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has created folder "/tmp"
-    And user "Alice" has created a share with settings
-      | path        | tmp    |
-      | shareType   | group  |
-      | shareWith   | grp1   |
-      | permissions | change |
-    When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
-      | propertyName          |
-      | ocs:share-permissions |
-    Then the HTTP status code should be "207"
-    And the single response should contain a property "ocs:share-permissions" with value "15"
+    And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "7"
     Examples:
       | dav-path-version |
       | old              |
