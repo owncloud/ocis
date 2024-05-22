@@ -29,6 +29,7 @@ const (
 	ConnectionTypeLeafnodeWS = "LEAFNODE_WS"
 	ConnectionTypeMqtt       = "MQTT"
 	ConnectionTypeMqttWS     = "MQTT_WS"
+	ConnectionTypeInProcess  = "IN_PROCESS"
 )
 
 type UserPermissionLimits struct {
