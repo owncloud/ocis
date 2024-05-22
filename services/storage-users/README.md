@@ -45,7 +45,7 @@ When using Infinite Scale as user storage, a directory named `storage/users/uplo
 
 Example cases for expired uploads:
 
-*   In the final step the upload blob is moved from the upload area to the final blobstore (e.g. S3).
+*   In the final step, the upload blob is moved from the upload area to the final blobstore (e.g. S3).
 
 *   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed.
 
