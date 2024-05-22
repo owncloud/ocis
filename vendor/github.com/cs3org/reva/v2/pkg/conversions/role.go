@@ -106,6 +106,7 @@ func (r *Role) OCSPermissions() Permissions {
 // M = Mounted
 // Z = Deniable (NEW)
 // P = Purge from trashbin
+// X = SecureViewable
 func (r *Role) WebDAVPermissions(isDir, isShared, isMountpoint, isPublic bool) string {
 	var b strings.Builder
 	if !isPublic && isShared {
@@ -139,6 +140,10 @@ func (r *Role) WebDAVPermissions(isDir, isShared, isMountpoint, isPublic bool) s
 
 	if r.CS3ResourcePermissions().PurgeRecycle {
 		fmt.Fprintf(&b, "P")
+	}
+
+	if r.Name == RoleSecureViewer {
+		fmt.Fprintf(&b, "X")
 	}
 
 	return b.String()
@@ -541,6 +546,9 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 			r.Name = RoleViewer
 			return r
 		}
+	} else if rp.Stat && rp.GetPath && rp.ListContainer && !rp.InitiateFileUpload && !rp.Delete && !rp.AddGrant {
+		r.Name = RoleSecureViewer
+		return r
 	}
 	if r.ocsPermissions == PermissionCreate {
 		if rp.GetPath && rp.InitiateFileDownload && rp.ListContainer && rp.Move {
