@@ -42,7 +42,7 @@ The following sections describe the content and background of the subdirectories
 
 ### `config`
 
-Contains basic ocis configuration created by `ocis init`(Note: The location of the configuration folder can be specified with the `OCIS_CONFIG_DIR` envvar but for this readme we will assume this envvar is not set)
+Contains basic ocis configuration created by `ocis init`(Note: The location of the configuration folder can be specified with the `OCIS_CONFIG_DIR` envvar but for this readme we will assume this envvar is not set and the default is used.)
 
 ```bash
     ~/.ocis/config/:tree
@@ -52,7 +52,8 @@ Contains basic ocis configuration created by `ocis init`(Note: The location of t
 1 directory, 1 file
 ```
 
-* `ocis.yaml`: BACKUP RECOMMENDED. Holds ocis configuration data. The contents can vary depending on your environment variables. In general, most of this file can be recreated again by running `ocis init`. This will recreate secrets and certificates. However, if not backed up completely, some fields MUST be copied over from the old config manually to regain data access after a restore:
+* `ocis.yaml`:\
+BACKUP RECOMMENDED. Holds ocis configuration data. The contents can vary depending on your environment variables. In general, most of this file can be recreated again by running `ocis init`. This will recreate secrets and certificates. However, if not backed up completely, some fields MUST be copied over from the old config manually to regain data access after a restore:
 
 | Field Name | Envvar Name | Description | If not backed up |
 | --- | --- | --- | --- |
@@ -82,9 +83,12 @@ Contains the data for the internal ocis identity management. See the IDM README 
 1 directory, 3 files
 ```
 
-* `ocis.boltdb`: BACKUP REQUIRED. This is the boltdb database that stores user data. Use `IDM_DATABASE_PATH` to specify its path. If not backed up, ocis will have no users, therefore also all data is lost.
-* `ldap.crt`: BACKUP OPTIONAL. This is the certificate for the idm. Use `IDM_LDAPS_CERT` to specify its path. Will be auto-generated if not backed up.
-* `ldap.key`: BACKUP OPTIONAL. This is the certificate key for the idm. Use `IDM_LDAPS_KEY` to specify its path. Will be auto-generated if not backed up.
+* `ocis.boltdb`:\
+BACKUP REQUIRED. This is the boltdb database that stores user data. Use `IDM_DATABASE_PATH` to specify its path. If not backed up, ocis will have no users, therefore also all data is lost.
+* `ldap.crt`:\
+BACKUP OPTIONAL. This is the certificate for the idm. Use `IDM_LDAPS_CERT` to specify its path. Will be auto-generated if not backed up.
+* `ldap.key`:\
+BACKUP OPTIONAL. This is the certificate key for the idm. Use `IDM_LDAPS_KEY` to specify its path. Will be auto-generated if not backed up.
 
 
 ### `idp`
@@ -104,9 +108,12 @@ Contains the data for the internal ocis identity provider. See the IDP README fo
 2 directories, 3 files
 ```
 
-* `encryption.key`: BACKUP RECOMMENDED. This is the encryption secret. Use `IDP_ENCRYPTION_SECRET_FILE` to specify its paths. Not backing this up will force users to relogin.
-* `private-key.pem`: BACKUP RECOMMENDED. This is the encryption key. Use `IDP_SIGNING_PRIVATE_KEY_FILES` to specify its paths. Not backing this up will force users to relogin.
-* `identifier-registration.yml`: BACKUP OPTIONAL. It holds temporary data of active sessions. Will be recreated if not backed up.
+* `encryption.key`:\
+BACKUP RECOMMENDED. This is the encryption secret. Use `IDP_ENCRYPTION_SECRET_FILE` to specify its paths. Not backing this up will force users to relogin.
+* `private-key.pem`:\
+BACKUP RECOMMENDED. This is the encryption key. Use `IDP_SIGNING_PRIVATE_KEY_FILES` to specify its paths. Not backing this up will force users to relogin.
+* `identifier-registration.yml`:\
+BACKUP OPTIONAL. It holds temporary data of active sessions. Will be recreated if not backed up.
 
 ### `nats`
 
@@ -121,7 +128,8 @@ Contains nats data for streams and stores. See the NATS README for more details.
 
 ```
 
-* `jetstream`: BACKUP RECOMMENDED. This folder contains nats data about streams and key-value stores. Use `NATS_NATS_STORE_DIR` to specify its path. Not backing it up can break history for multiple (non-vital) features such as history or notifications. The ocis functionality is not impacted if omitted.
+* `jetstream`:\
+BACKUP RECOMMENDED. This folder contains nats data about streams and key-value stores. Use `NATS_NATS_STORE_DIR` to specify its path. Not backing it up can break history for multiple (non-vital) features such as history or notifications. The ocis functionality is not impacted if omitted.
 
 ### `proxy`
 
@@ -136,8 +144,10 @@ Contains proxy service data. See the PROXY README for more details.
 1 directory, 2 files
 ```
 
-* `server.crt`: BACKUP OPTIONAL. This is the certificate for the http services. Use `PROXY_TRANSPORT_TLS_CERT` to specify its path.
-* `server.key`: BACKUP OPTIONAL. This is the certificate key for the http services. Use `PROXY_TRANSPORT_TLS_KEY` to specify its path.
+* `server.crt`:\
+BACKUP OPTIONAL. This is the certificate for the http services. Use `PROXY_TRANSPORT_TLS_CERT` to specify its path.
+* `server.key`:\
+BACKUP OPTIONAL. This is the certificate key for the http services. Use `PROXY_TRANSPORT_TLS_KEY` to specify its path.
 
 ### `search`
 
@@ -151,7 +161,8 @@ Contains the search index.
 2 directories, 0 files
 ```
 
-* `bleve`: BACKUP RECOMMENDED/OPTIONAL. This contains the search index. Can be specified via `SEARCH_ENGINE_BLEVE_DATA_PATH`. If not backed up, the search index needs to be recreated. This can take a long time depending on the amount of files.
+* `bleve`:\
+BACKUP RECOMMENDED/OPTIONAL. This contains the search index. Can be specified via `SEARCH_ENGINE_BLEVE_DATA_PATH`. If not backed up, the search index needs to be recreated. This can take a long time depending on the amount of files.
 
 ### `storage`
 
@@ -167,9 +178,12 @@ Contains ocis meta (and blob) data.
 4 directories, 0 files
 ```
 
-* `metadata`: BACKUP REQUIRED. Contains system data. Path can be specified via `STORAGE_SYSTEM_OCIS_ROOT`. Not backing it up will remove shares from the system and will also remove custom settings.
-* `ocm`: BACKUP REQUIRED/OMITABLE. Contains ocm share data. When not using ocm sharing, this folder does not need to be backed up.
-* `users`: BACKUP REQUIRED. Contains user data. Path can be specified via `STORAGE_USERS_OCIS_ROOT`. Not backing it up will remove all spaces and all files. As result, you will have a configured but empty ocis instance, which is fully functional accepting new data. Old data is lost.
+* `metadata`:\
+BACKUP REQUIRED. Contains system data. Path can be specified via `STORAGE_SYSTEM_OCIS_ROOT`. Not backing it up will remove shares from the system and will also remove custom settings.
+* `ocm`:\
+BACKUP REQUIRED/OMITABLE. Contains ocm share data. When not using ocm sharing, this folder does not need to be backed up.
+* `users`:\
+BACKUP REQUIRED. Contains user data. Path can be specified via `STORAGE_USERS_OCIS_ROOT`. Not backing it up will remove all spaces and all files. As result, you will have a configured but empty ocis instance, which is fully functional accepting new data. Old data is lost.
 
 ### `thumbnails`
 
@@ -181,7 +195,8 @@ Contains thumbnails data.
 └── files
 ```
 
-* `files`: OPTIONAL/RECOMMENDED. This folder contains prerendered thumbnails. Can be specified via `THUMBNAILS_FILESYSTEMSTORAGE_ROOT`. If not backed up, thumbnails will be regenerated automatically on access which leads to some load on the thumbnails service.
+* `files`:\
+OPTIONAL/RECOMMENDED. This folder contains prerendered thumbnails. Can be specified via `THUMBNAILS_FILESYSTEMSTORAGE_ROOT`. If not backed up, thumbnails will be regenerated automatically on access which leads to some load on the thumbnails service.
 
 ### `web`
 
@@ -195,7 +210,8 @@ Contains web assets such as custom logos, themes etc.
 2 directories, 0 files
 ```
 
-* `assets`: BACKUP RECOMMENDED/OMITABLE. This folder contains custom web assets. Can be specified via `WEB_ASSET_CORE_PATH`. If no custom web assets are used, there is no need for a backup. If those exist but are not backed up, they need to be reuploaded.
+* `assets`:\
+BACKUP RECOMMENDED/OMITABLE. This folder contains custom web assets. Can be specified via `WEB_ASSET_CORE_PATH`. If no custom web assets are used, there is no need for a backup. If those exist but are not backed up, they need to be reuploaded.
 
 ### `external services`
 
