@@ -184,7 +184,7 @@ Has a default value of `720h` which equals `30 days`. This means, the command wi
 
 #### List and Restore Trash-Bins Items
 
-Restoring is possible only at the original location. The personal or project spase ID `spaceID` is required for the items restoring.
+Restoring is possible only to the original location. The personal or project space ID `spaceID` is required for the items to be restored.
 To authenticate the cli tool use `OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>` and `OCIS_SERVICE_ACCOUNT_ID=<acc-id>`. The `storage-users` cli tool uses the default address to establish the connection to the `gateway` service. If the connection is failed check your custom `gateway`
 service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-users` variable `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`.
 
