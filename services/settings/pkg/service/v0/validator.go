@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"errors"
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -114,6 +115,57 @@ func validateListRoles(req *settingssvc.ListBundlesRequest) error {
 
 func validateListRoleAssignments(req *settingssvc.ListRoleAssignmentsRequest) error {
 	return validation.Validate(req.AccountUuid, requireAccountID...)
+}
+
+func validateListRoleAssignmentsFiltered(req *settingssvc.ListRoleAssignmentsFilteredRequest) error {
+	return validation.ValidateStruct(
+		req,
+		validation.Field(&req.Filters,
+			validation.Required,
+			validation.Length(1, 1),
+			validation.Each(validation.By(validateUserRoleAssignmentFilter)),
+		),
+	)
+}
+
+func validateUserRoleAssignmentFilter(values interface{}) error {
+	filter, ok := values.(settingsmsg.UserRoleAssignmentFilter)
+	if !ok {
+		return errors.New("expected UserRoleAssignmentFilter")
+	}
+	return validation.ValidateStruct(
+		&filter,
+		validation.Field(&filter.Type,
+			validation.Required,
+			validation.In(settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT, settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE),
+		),
+		validation.Field(&filter.Term,
+			validation.When(
+				filter.Type == settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT,
+				validation.By(validateFilterAccountUUID),
+			),
+			validation.When(
+				filter.Type == settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
+				validation.By(validateFilterRoleID),
+			),
+		),
+	)
+}
+
+func validateFilterRoleID(value interface{}) error {
+	roleTerm, ok := value.(*settingsmsg.UserRoleAssignmentFilter_RoleId)
+	if !ok {
+		return errors.New("expected UserRoleAssignmentFilter_RoleId")
+	}
+	return validation.Validate(&roleTerm.RoleId, is.UUID)
+}
+
+func validateFilterAccountUUID(value interface{}) error {
+	accountTerm, ok := value.(*settingsmsg.UserRoleAssignmentFilter_AccountUuid)
+	if !ok {
+		return errors.New("expected UserRoleAssignmentFilter_AccountUuid")
+	}
+	return validation.Validate(&accountTerm.AccountUuid, requireAccountID...)
 }
 
 func validateAssignRoleToUser(req *settingssvc.AssignRoleToUserRequest) error {

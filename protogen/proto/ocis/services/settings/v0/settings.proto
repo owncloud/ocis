@@ -106,6 +106,12 @@ service RoleService {
       body: "*"
     };
   }
+  rpc ListRoleAssignmentsFiltered(ListRoleAssignmentsFilteredRequest) returns (ListRoleAssignmentsResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/assignments-list-filtered",
+      body: "*"
+    };
+  }
   rpc AssignRoleToUser(AssignRoleToUserRequest) returns (AssignRoleToUserResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/assignments-add",
@@ -222,6 +228,10 @@ message GetValueByUniqueIdentifiersRequest{
 
 message ListRoleAssignmentsRequest {
   string account_uuid = 1;
+}
+
+message ListRoleAssignmentsFilteredRequest {
+  repeated ocis.messages.settings.v0.UserRoleAssignmentFilter filters = 1;
 }
 
 message ListRoleAssignmentsResponse {

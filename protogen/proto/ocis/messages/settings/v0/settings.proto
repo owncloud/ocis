@@ -31,6 +31,19 @@ message UserRoleAssignment {
   string role_id = 3;
 }
 
+message UserRoleAssignmentFilter {
+  enum Type {
+    TYPE_UNKNOWN = 0;
+    TYPE_ACCOUNT = 1;
+    TYPE_ROLE = 2;
+  }
+  Type type = 1;
+  oneof term {
+    string account_uuid = 2;
+    string role_id = 3;
+  }
+}
+
 // ---
 // resource payloads
 // ---

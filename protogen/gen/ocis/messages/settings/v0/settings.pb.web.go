@@ -118,6 +118,42 @@ func (m *UserRoleAssignment) UnmarshalJSON(b []byte) error {
 
 var _ json.Unmarshaler = (*UserRoleAssignment)(nil)
 
+// UserRoleAssignmentFilterJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of UserRoleAssignmentFilter. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var UserRoleAssignmentFilterJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *UserRoleAssignmentFilter) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := UserRoleAssignmentFilterJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*UserRoleAssignmentFilter)(nil)
+
+// UserRoleAssignmentFilterJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of UserRoleAssignmentFilter. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var UserRoleAssignmentFilterJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *UserRoleAssignmentFilter) UnmarshalJSON(b []byte) error {
+	return UserRoleAssignmentFilterJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*UserRoleAssignmentFilter)(nil)
+
 // ResourceJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of Resource. This struct is safe to replace or modify but
 // should not be done so concurrently.

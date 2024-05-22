@@ -234,3 +234,105 @@ func TestListPermissionsOfOtherUser(t *testing.T) {
 	assert.Equal(t, int32(http.StatusNotFound), merr.Code)
 	assert.Contains(t, err.Error(), req.AccountUuid)
 }
+
+func TestListRoleAssignmentsFiltered(t *testing.T) {
+	manager := &mocks.Manager{}
+	svc := Service{
+		manager: manager,
+	}
+
+	tests := map[string]struct {
+		req        *v0.ListRoleAssignmentsFilteredRequest
+		statusCode int32
+	}{
+		"no filters": {
+			req:        &v0.ListRoleAssignmentsFilteredRequest{},
+			statusCode: http.StatusBadRequest,
+		},
+		"multiple filters": {
+			req: &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT,
+						Term: &settingsmsg.UserRoleAssignmentFilter_AccountUuid{
+							AccountUuid: "uid",
+						},
+					},
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
+						Term: &settingsmsg.UserRoleAssignmentFilter_RoleId{
+							RoleId: "rid",
+						},
+					},
+				},
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		"bad filtertype": {
+			req: &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_UNKNOWN,
+					},
+				},
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		"account filter without term": {
+			req: &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT,
+					},
+				},
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		"account filter with invalid term": {
+			req: &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT,
+						Term: &settingsmsg.UserRoleAssignmentFilter_AccountUuid{
+							AccountUuid: "invalid-&*&^%$#",
+						},
+					},
+				},
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		"role filter without term": {
+			req: &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
+					},
+				},
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		"role filter with invalid uuid": {
+			req: &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
+						Term: &settingsmsg.UserRoleAssignmentFilter_RoleId{
+							RoleId: "this is no uuid",
+						},
+					},
+				},
+			},
+			statusCode: http.StatusBadRequest,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			res := v0.ListRoleAssignmentsResponse{}
+			err := svc.ListRoleAssignmentsFiltered(ctxWithUUID, test.req, &res)
+			merr, ok := merrors.As(err)
+			assert.True(t, ok)
+			assert.Equal(t, int32(test.statusCode), merr.Code)
+		})
+	}
+}

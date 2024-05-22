@@ -395,6 +395,12 @@ func NewRoleServiceEndpoints() []*api.Endpoint {
 			Handler: "rpc",
 		},
 		{
+			Name:    "RoleService.ListRoleAssignmentsFiltered",
+			Path:    []string{"/api/v0/settings/assignments-list-filtered"},
+			Method:  []string{"POST"},
+			Handler: "rpc",
+		},
+		{
 			Name:    "RoleService.AssignRoleToUser",
 			Path:    []string{"/api/v0/settings/assignments-add"},
 			Method:  []string{"POST"},
@@ -414,6 +420,7 @@ func NewRoleServiceEndpoints() []*api.Endpoint {
 type RoleService interface {
 	ListRoles(ctx context.Context, in *ListBundlesRequest, opts ...client.CallOption) (*ListBundlesResponse, error)
 	ListRoleAssignments(ctx context.Context, in *ListRoleAssignmentsRequest, opts ...client.CallOption) (*ListRoleAssignmentsResponse, error)
+	ListRoleAssignmentsFiltered(ctx context.Context, in *ListRoleAssignmentsFilteredRequest, opts ...client.CallOption) (*ListRoleAssignmentsResponse, error)
 	AssignRoleToUser(ctx context.Context, in *AssignRoleToUserRequest, opts ...client.CallOption) (*AssignRoleToUserResponse, error)
 	RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, opts ...client.CallOption) (*emptypb.Empty, error)
 }
@@ -450,6 +457,16 @@ func (c *roleService) ListRoleAssignments(ctx context.Context, in *ListRoleAssig
 	return out, nil
 }
 
+func (c *roleService) ListRoleAssignmentsFiltered(ctx context.Context, in *ListRoleAssignmentsFilteredRequest, opts ...client.CallOption) (*ListRoleAssignmentsResponse, error) {
+	req := c.c.NewRequest(c.name, "RoleService.ListRoleAssignmentsFiltered", in)
+	out := new(ListRoleAssignmentsResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *roleService) AssignRoleToUser(ctx context.Context, in *AssignRoleToUserRequest, opts ...client.CallOption) (*AssignRoleToUserResponse, error) {
 	req := c.c.NewRequest(c.name, "RoleService.AssignRoleToUser", in)
 	out := new(AssignRoleToUserResponse)
@@ -475,6 +492,7 @@ func (c *roleService) RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFrom
 type RoleServiceHandler interface {
 	ListRoles(context.Context, *ListBundlesRequest, *ListBundlesResponse) error
 	ListRoleAssignments(context.Context, *ListRoleAssignmentsRequest, *ListRoleAssignmentsResponse) error
+	ListRoleAssignmentsFiltered(context.Context, *ListRoleAssignmentsFilteredRequest, *ListRoleAssignmentsResponse) error
 	AssignRoleToUser(context.Context, *AssignRoleToUserRequest, *AssignRoleToUserResponse) error
 	RemoveRoleFromUser(context.Context, *RemoveRoleFromUserRequest, *emptypb.Empty) error
 }
@@ -483,6 +501,7 @@ func RegisterRoleServiceHandler(s server.Server, hdlr RoleServiceHandler, opts .
 	type roleService interface {
 		ListRoles(ctx context.Context, in *ListBundlesRequest, out *ListBundlesResponse) error
 		ListRoleAssignments(ctx context.Context, in *ListRoleAssignmentsRequest, out *ListRoleAssignmentsResponse) error
+		ListRoleAssignmentsFiltered(ctx context.Context, in *ListRoleAssignmentsFilteredRequest, out *ListRoleAssignmentsResponse) error
 		AssignRoleToUser(ctx context.Context, in *AssignRoleToUserRequest, out *AssignRoleToUserResponse) error
 		RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, out *emptypb.Empty) error
 	}
@@ -499,6 +518,12 @@ func RegisterRoleServiceHandler(s server.Server, hdlr RoleServiceHandler, opts .
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "RoleService.ListRoleAssignments",
 		Path:    []string{"/api/v0/settings/assignments-list"},
+		Method:  []string{"POST"},
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "RoleService.ListRoleAssignmentsFiltered",
+		Path:    []string{"/api/v0/settings/assignments-list-filtered"},
 		Method:  []string{"POST"},
 		Handler: "rpc",
 	}))
@@ -527,6 +552,10 @@ func (h *roleServiceHandler) ListRoles(ctx context.Context, in *ListBundlesReque
 
 func (h *roleServiceHandler) ListRoleAssignments(ctx context.Context, in *ListRoleAssignmentsRequest, out *ListRoleAssignmentsResponse) error {
 	return h.RoleServiceHandler.ListRoleAssignments(ctx, in, out)
+}
+
+func (h *roleServiceHandler) ListRoleAssignmentsFiltered(ctx context.Context, in *ListRoleAssignmentsFilteredRequest, out *ListRoleAssignmentsResponse) error {
+	return h.RoleServiceHandler.ListRoleAssignmentsFiltered(ctx, in, out)
 }
 
 func (h *roleServiceHandler) AssignRoleToUser(ctx context.Context, in *AssignRoleToUserRequest, out *AssignRoleToUserResponse) error {

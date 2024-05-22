@@ -102,6 +102,38 @@
         ]
       }
     },
+    "/api/v0/settings/assignments-list-filtered": {
+      "post": {
+        "operationId": "RoleService_ListRoleAssignmentsFiltered",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListRoleAssignmentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListRoleAssignmentsFilteredRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
     "/api/v0/settings/assignments-remove": {
       "post": {
         "operationId": "RoleService_RemoveRoleFromUser",
@@ -935,6 +967,17 @@
         }
       }
     },
+    "v0ListRoleAssignmentsFilteredRequest": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0UserRoleAssignmentFilter"
+          }
+        }
+      }
+    },
     "v0ListRoleAssignmentsRequest": {
       "type": "object",
       "properties": {
@@ -1195,6 +1238,29 @@
           "title": "the role_id is a bundle_id internally"
         }
       }
+    },
+    "v0UserRoleAssignmentFilter": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v0UserRoleAssignmentFilterType"
+        },
+        "accountUuid": {
+          "type": "string"
+        },
+        "roleId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0UserRoleAssignmentFilterType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNKNOWN",
+        "TYPE_ACCOUNT",
+        "TYPE_ROLE"
+      ],
+      "default": "TYPE_UNKNOWN"
     },
     "v0ValueWithIdentifier": {
       "type": "object",
