@@ -59,8 +59,6 @@ Contains basic ocis configuration created by `ocis init`(Note: The location of t
 | `idp.ldap.bind_password` | `OCIS_LDAP_BIND_PASSWORD` | Password for the idp | no logins possible |
 | `idm.service_user_passwords.idp_password`| `IDM_IDPSVC_PASSWORD` | Same as above | no logins possible |
 | `system_user_id` | `OCIS_SYSTEM_USER_ID` | The id of storage-system user | no logins possible |
-| `graph.identity.ldap.bind_password` | `GRAPH_LDAP_BIND_PASSWORD` | The password for the idm | no logins possible |
-| `idm.service_user_passwords.idm_password` | `IDM_SVC_PASSWORD` | Same as above | no logins possible |
 | `idm.service_user_passwords.reva_password`| `IDM_REVASVC_PASSWORD` | The reva password | no logins possible |
 | `auth_basic.auth_providers.ldap.bind_password` | `AUTH_BASIC_LDAP_BIND_PASSWORD` | Same as above | no logins possible |
 | `users.drivers.ldap.bind_password` | `USERS_LDAP_BIND_PASSWORD` | Same as above | no logins possible |
@@ -106,9 +104,9 @@ Contains the data for the internal ocis identity provider. See the IDP README fo
 2 directories, 3 files
 ```
 
-* `encryption.key`: BACKUP OPTIONAL. This is the encryption secret. Use `IDP_ENCRYPTION_SECRET_FILE` to specify its paths. Will be auto-generated if not backed up.
-* `private-key.pem`: BACKUP OPTIONAL. This is the encryption key. Use `IDP_SIGNING_PRIVATE_KEY_FILES` to specify its paths. Will be auto-generated if not backed up.
-* `identifier-registration.yml`: BACKUP RECOMMENDED. It holds temporary data of active sessions. Not backing this up will force users to relogin.
+* `encryption.key`: BACKUP RECOMMENDED. This is the encryption secret. Use `IDP_ENCRYPTION_SECRET_FILE` to specify its paths. Not backing this up will force users to relogin.
+* `private-key.pem`: BACKUP RECOMMENDED. This is the encryption key. Use `IDP_SIGNING_PRIVATE_KEY_FILES` to specify its paths. Not backing this up will force users to relogin.
+* `identifier-registration.yml`: BACKUP OPTIONAL. It holds temporary data of active sessions. Will be recreated if not backed up.
 
 ### `nats`
 
