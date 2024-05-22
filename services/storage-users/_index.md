@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2024-05-22T08:59:28.306105802Z
+date: 2024-05-22T09:04:38.818657785Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -73,7 +73,7 @@ When using Infinite Scale as user storage, a directory named `storage/users/uplo
 
 Example cases for expired uploads:
 
-*   In the final step the upload blob is moved from the upload area to the final blobstore (e.g. S3). 
+*   In the final step, the upload blob is moved from the upload area to the final blobstore (e.g. S3).
 
 *   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed.
 
@@ -201,32 +201,43 @@ ocis storage-users trash-bin purge-expired
 
 The behaviour of the `purge-expired` command can be configured by using the following environment variables.
 
-*   `STORAGE_USERS_PURGE_TRASH_BIN_USER_ID`  
+*   `STORAGE_USERS_PURGE_TRASH_BIN_USER_ID`\
 Used to obtain space trash-bin information and takes the system admin user as the default which is the `OCIS_ADMIN_USER_ID` but can be set individually. It should be noted, that the `OCIS_ADMIN_USER_ID` is only assigned automatically when using the single binary deployment and must be manually assigned in all other deployments. The command only considers spaces to which the assigned user has access and delete permission.
 
-*   `STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE`  
+*   `STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE`\
 Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.owncloud.com/ocis/5.0/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
 
-*   `STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE`  
+*   `STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE`\
 Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.owncloud.com/ocis/5.0/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
 
 #### List and Restore Trash-Bins Items
 
-The variable `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE` defines a maximum number of attempts to rename a file when the admin restores the file with the CLI option `--option keep-both` to an existing destination with the same name.
+Restoring is possible only to the original location. The personal or project space ID `spaceID` is required for the items to be restored.
+To authenticate the cli tool use `OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>` and `OCIS_SERVICE_ACCOUNT_ID=<acc-id>`. The `storage-users` cli tool uses the default address to establish the connection to the `gateway` service. If the connection fails, check your custom `gateway`
+service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-users` variable `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`.
+
+*   Export the gateway address if your configuration differs from the default
+    ```bash
+    export STORAGE_USERS_GATEWAY_GRPC_ADDR=127.0.0.1:9142
+    ```
 
 *   Print a list of all trash-bin items of a space
     ```bash
-    ocis storage-users trash-bin list
+    ocis storage-users trash-bin list [command options] ['spaceID' required]
     ```
+
+The restore option defines the behavior for an item to be restored, when the item name already exists in the target space. Supported options are: `skip`, `replace` and `keep-both`. The default value is `skip`.
+
+When the cli tool restores the item with the `replace` option, the existing item will be moved to a trash-bin. When the cli tool restores the item with the `keep-both` option and the designated item already exists, the name of the restored item will be changed by adding a numeric suffix in parentheses. The variable `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE` defines a maximum number of attempts to rename an item.
 
 * Restore all trash-bin items for a space
     ```bash
-    ocis storage-users trash-bin restore-all
+    ocis storage-users trash-bin restore-all [command options] ['spaceID' required]
     ```
 
 * Restore a trash-bin item by ID
     ```bash
-    ocis storage-users trash-bin restore
+    ocis storage-users trash-bin restore [command options] ['spaceID' required] ['itemID' required]
     ```
 
 ## Caching
