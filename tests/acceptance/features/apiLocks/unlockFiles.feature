@@ -211,7 +211,6 @@ Feature: unlock locked items
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
-    And user "Alice" has shared folder "PARENT" with user "Brian"
     And user "Brian" has locked file "Shares/PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Alice" unlocks file "PARENT/parent.txt" with the last created lock of file "Shares/PARENT/parent.txt" of user "Brian" using the WebDAV API
