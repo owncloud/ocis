@@ -116,6 +116,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update selected attributes of autoprovisioned users: [#9166](https://github.com/owncloud/ocis/pull/9166)
 * Enhancement - Bump Reva: [#9188](https://github.com/owncloud/ocis/pull/9188)
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
+* Enhancement - The storage-users doc updated: [#9228](https://github.com/owncloud/ocis/pull/9228)
 
 ## Details
 
@@ -704,6 +705,13 @@ The following sections list the changes for unreleased.
    have more control over the consumed system resources.
 
    https://github.com/owncloud/ocis/pull/9199
+
+* Enhancement - The storage-users doc updated: [#9228](https://github.com/owncloud/ocis/pull/9228)
+
+   The storage-users doc was updated, added the details to the 'Restore Trash-Bins
+   Items' section.
+
+   https://github.com/owncloud/ocis/pull/9228
 
 # Changelog for [5.0.3] (2024-05-02)
 
