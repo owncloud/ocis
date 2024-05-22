@@ -302,6 +302,7 @@ default:
         - TUSContext:
         - FilesVersionsContext:
         - ChecksumContext:
+        - SharingNgContext:
 
     coreApiWebdavEtagPropagation1:
       paths:

@@ -39,7 +39,12 @@ Feature: upload file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" uploads file with content "uploaded content" to "/Shares/FOLDER/nonExistentFolder/textfile.txt" using the TUS protocol on the WebDAV API
     Then as "Brian" folder "/Shares/FOLDER/nonExistentFolder" should not exist
     And as "Brian" file "/Shares/FOLDER/nonExistentFolder/textfile.txt" should not exist
@@ -53,7 +58,12 @@ Feature: upload file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "read"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" uploads file with content "uploaded content" to "/Shares/FOLDER/nonExistentFolder/textfile.txt" using the TUS protocol on the WebDAV API
     Then as "Brian" folder "/Shares/FOLDER/nonExistentFolder" should not exist
     And as "Brian" file "/Shares/FOLDER/nonExistentFolder/textfile.txt" should not exist
