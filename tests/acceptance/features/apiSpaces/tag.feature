@@ -111,10 +111,12 @@ Feature: Tag
     Given user "Alice" has created the following tags for folder "folderMain" of the space "use-tag":
       | folderTag |
       | marketing |
-    And user "Alice" has created a share inside of space "use-tag" with settings:
-      | path      | folderMain |
-      | shareWith | Brian      |
-      | role      | viewer     |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderMain |
+      | space           | use-tag    |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     When user "Brian" lists all available tags via the Graph API
     Then the HTTP status code should be "200"
     And the response should contain following tags:
@@ -123,10 +125,12 @@ Feature: Tag
 
 
   Scenario Outline: recipient of the shared resource tries to create a tag
-    Given user "Alice" has created a share inside of space "use-tag" with settings:
-      | path      | folderMain   |
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following resource share invitation:
+      | resource        | folderMain         |
+      | space           | use-tag            |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" creates the following tags for <resource-type> "<resource>" of space "Shares":
       | tag in a shared resource |
       | second tag               |
@@ -137,18 +141,20 @@ Feature: Tag
       | tag in a shared resource |
       | second tag               |
     Examples:
-      | space-role | resource-type | resource                       | http-status-code | should-or-not |
-      | viewer     | file          | folderMain/insideTheFolder.txt | 403              | should not    |
-      | editor     | file          | folderMain/insideTheFolder.txt | 200              | should        |
-      | viewer     | folder        | folderMain                     | 403              | should not    |
-      | editor     | folder        | folderMain                     | 200              | should        |
+      | permissions-role | resource-type | resource                       | http-status-code | should-or-not |
+      | Viewer           | file          | folderMain/insideTheFolder.txt | 403              | should not    |
+      | Editor           | file          | folderMain/insideTheFolder.txt | 200              | should        |
+      | Viewer           | folder        | folderMain                     | 403              | should not    |
+      | Editor           | folder        | folderMain                     | 200              | should        |
 
 
   Scenario Outline: recipient of the shared resource tries to remove a tag
-    Given user "Alice" has created a share inside of space "use-tag" with settings:
-      | path      | folderMain   |
-      | shareWith | Brian        |
-      | role      | <space-role> |
+    Given user "Alice" has sent the following resource share invitation:
+      | resource        | folderMain         |
+      | space           | use-tag            |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     And user "Alice" has created the following tags for <resource-type> "<resource>" of the space "use-tag":
       | tag in a shared resource |
       | second tag               |
@@ -162,11 +168,11 @@ Feature: Tag
       | tag in a shared resource |
       | second tag               |
     Examples:
-      | space-role | resource-type | resource                       | http-status-code | should-or-not |
-      | viewer     | file          | folderMain/insideTheFolder.txt | 403              | should        |
-      | editor     | file          | folderMain/insideTheFolder.txt | 200              | should not    |
-      | viewer     | folder        | folderMain                     | 403              | should        |
-      | editor     | folder        | folderMain                     | 200              | should not    |
+      | permissions-role | resource-type | resource                       | http-status-code | should-or-not |
+      | Viewer           | file          | folderMain/insideTheFolder.txt | 403              | should        |
+      | Editor           | file          | folderMain/insideTheFolder.txt | 200              | should not    |
+      | Viewer           | folder        | folderMain                     | 403              | should        |
+      | Editor           | folder        | folderMain                     | 200              | should not    |
 
 
   Scenario: user removes folder tags
