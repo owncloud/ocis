@@ -11,11 +11,12 @@ Feature: sharing
   Scenario: uploading file to a user read-only share folder does not work
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | read   |
-      | shareWith   | Brian  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist
@@ -27,11 +28,12 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | read   |
-      | shareWith   | grp1   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist
@@ -45,11 +47,12 @@ Feature: sharing
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | create |
-      | shareWith   | Brian  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Uploader |
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Brian"
@@ -72,11 +75,12 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | create |
-      | shareWith   | grp1   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Uploader |
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Brian"
@@ -97,11 +101,12 @@ Feature: sharing
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | change |
-      | shareWith   | Brian  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
@@ -122,11 +127,12 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | change |
-      | shareWith   | grp1   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
@@ -172,11 +178,12 @@ Feature: sharing
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | change |
-      | shareWith   | Brian  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -193,11 +200,12 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | change |
-      | shareWith   | grp1   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Editor   |
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -212,11 +220,12 @@ Feature: sharing
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | create |
-      | shareWith   | Brian  |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Uploader |
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -233,11 +242,12 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | create |
-      | shareWith   | grp1   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Uploader |
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -252,19 +262,20 @@ Feature: sharing
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER        |
-      | shareType   | user          |
-      | permissions | <permissions> |
-      | shareWith   | Brian         |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER             |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" uploads file with content "some content" to "/Shares/FOLDER/textFile.txt" using the WebDAV API
     And user "Alice" downloads file "/FOLDER/textFile.txt" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
     Examples:
-      | dav-path-version | permissions |
-      | old              | change      |
-      | new              | create      |
+      | dav-path-version | permissions-role |
+      | old              | Editor           |
+      | new              | Uploader         |
 
 
   Scenario Outline: upload an empty file (size zero byte) to a shared folder
@@ -273,10 +284,10 @@ Feature: sharing
     And user "Brian" has created folder "/folder-to-share"
     And user "Brian" has sent the following resource share invitation:
       | resource        | folder-to-share |
-      | space           | Personal |
-      | sharee          | Alice    |
-      | shareType       | user     |
-      | permissionsRole | Editor   |
+      | space           | Personal        |
+      | sharee          | Alice           |
+      | shareType       | user            |
+      | permissionsRole | Editor          |
     When user "Alice" uploads file "filesForUpload/zerobyte.txt" to "/Shares/folder-to-share/zerobyte.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/Shares/folder-to-share/zerobyte.txt" should exist

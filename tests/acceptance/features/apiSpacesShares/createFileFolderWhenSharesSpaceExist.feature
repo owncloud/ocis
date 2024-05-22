@@ -9,7 +9,12 @@ Feature: create file or folder named similar to Shares folder
       | Alice    |
       | Brian    |
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "read,update"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
 
 
   Scenario Outline: create a folder with a name similar to Shares

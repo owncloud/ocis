@@ -14,7 +14,12 @@ Feature: upload file to shared folder
   Scenario Outline: uploading file to a received share folder
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" uploads file with content "uploaded content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
     Then as "Alice" file "/FOLDER/textfile.txt" should exist
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be "uploaded content"
@@ -27,7 +32,12 @@ Feature: upload file to shared folder
   Scenario Outline: uploading file to a user read/write share folder works
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "change"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Uploader |
     When user "Brian" uploads file with content "uploaded content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
     Then as "Alice" file "/FOLDER/textfile.txt" should exist
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be "uploaded content"
@@ -42,7 +52,12 @@ Feature: upload file to shared folder
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "FOLDER" with group "grp1" with permissions "change"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Uploader |
     When user "Brian" uploads file with content "uploaded content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
     Then as "Alice" file "/FOLDER/textfile.txt" should exist
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be "uploaded content"
@@ -56,7 +71,12 @@ Feature: upload file to shared folder
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has uploaded file with content "original content" to "/FOLDER/textfile.txt"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" uploads file with content "overwritten content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
     Then as "Alice" file "/FOLDER/textfile.txt" should exist
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be "overwritten content"
@@ -69,7 +89,12 @@ Feature: upload file to shared folder
   Scenario Outline: attempt to upload a file into a folder within correctly received read only share
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "read"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
     When user "Brian" uploads file with content "uploaded content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
     Then as "Brian" file "/Shares/FOLDER/textfile.txt" should not exist
     Examples:
@@ -81,7 +106,12 @@ Feature: upload file to shared folder
   Scenario Outline: upload a file to shared folder with checksum should return the checksum in the propfind for sharee
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                                     |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
@@ -99,7 +129,12 @@ Feature: upload file to shared folder
   Scenario Outline: upload a file to shared folder with checksum should return the checksum in the download header for sharee
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                                     |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
@@ -121,7 +156,12 @@ Feature: upload file to shared folder
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     And user "Alice" has uploaded file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12345" using the TUS protocol on the WebDAV API
-    And user "Alice" has shared file "/textFile.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textFile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     When user "Brian" requests the checksum of "/Shares/textFile.txt" via propfind
     Then the HTTP status code should be "207"
     And the webdav checksum should match "SHA1:8cb2237d0679ca88db6464eac60da96345513964 MD5:827ccb0eea8a706c4c34a16891f84e7b ADLER32:02f80100"
@@ -138,7 +178,12 @@ Feature: upload file to shared folder
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     And user "Alice" has uploaded file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12345" using the TUS protocol on the WebDAV API
-    And user "Alice" has shared file "/textFile.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textFile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     When user "Brian" downloads file "/Shares/textFile.txt" using the WebDAV API
     Then the HTTP status code should be "200"
     And the header checksum should match "SHA1:8cb2237d0679ca88db6464eac60da96345513964"
@@ -151,7 +196,12 @@ Feature: upload file to shared folder
   Scenario Outline: sharee uploads a file to a received share folder with correct checksum
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" creates a new TUS resource on the WebDAV API with these headers:
       | Tus-Resumable   | 1.0.0                                         |
       | Upload-Length   | 16                                            |
@@ -170,7 +220,12 @@ Feature: upload file to shared folder
   Scenario Outline: sharee uploads a file to a received share folder with wrong checksum should not work
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When user "Brian" creates a new TUS resource on the WebDAV API with these headers:
       | Tus-Resumable   | 1.0.0                                         |
       | Upload-Length   | 16                                            |
@@ -188,7 +243,12 @@ Feature: upload file to shared folder
   Scenario Outline: sharer uploads a file to shared folder with wrong correct checksum should not work
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                                     |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
@@ -223,7 +283,12 @@ Feature: upload file to shared folder
   Scenario Outline: sharee uploads a chunked file with correct checksum to a received share folder should work
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
-    And user "Alice" has shared folder "/FOLDER" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Brian" creates a new TUS resource on the WebDAV API with these headers:
       | Tus-Resumable   | 1.0.0                                         |
       | Upload-Length   | 10                                            |
@@ -247,7 +312,12 @@ Feature: upload file to shared folder
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     And user "Alice" has uploaded file with checksum "SHA1 c1dab0c0864b6ac9bdd3743a1408d679f1acd823" to the last created TUS Location with offset "0" and content "original content" using the TUS protocol on the WebDAV API
-    And user "Alice" has shared file "/textFile.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textFile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     When user "Brian" overwrites recently shared file with offset "0" and data "overwritten content" with checksum "SHA1 fe990d2686a0fc86004efc31f5bf2475a45d4905" using the TUS protocol on the WebDAV API with these headers:
       | Upload-Length   | 19                                    |
         #    dGV4dEZpbGUudHh0 is the base64 encode of /Shares/textFile.txt
@@ -267,7 +337,12 @@ Feature: upload file to shared folder
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
     And user "Alice" has uploaded file with checksum "SHA1 c1dab0c0864b6ac9bdd3743a1408d679f1acd823" to the last created TUS Location with offset "0" and content "original content" using the TUS protocol on the WebDAV API
-    And user "Alice" has shared file "/textFile.txt" with user "Brian"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textFile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
     When user "Brian" overwrites recently shared file with offset "0" and data "overwritten content" with checksum "SHA1 fe990d2686a0fc86004efc31f5bf2475a45d4906" using the TUS protocol on the WebDAV API with these headers:
       | Upload-Length   | 19                                    |
       #    dGV4dEZpbGUudHh0 is the base64 encode of /Shares/textFile.txt

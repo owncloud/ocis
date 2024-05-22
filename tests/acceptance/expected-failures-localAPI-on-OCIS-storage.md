@@ -20,8 +20,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [Shared mount folder gets deleted when overwritten by a file from personal space](https://github.com/owncloud/ocis/issues/7208)
 
-- [apiSpacesShares/copySpaces.feature:629](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L629)
-- [apiSpacesShares/copySpaces.feature:647](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L647)
+- [apiSpacesShares/copySpaces.feature:634](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L634)
+- [apiSpacesShares/copySpaces.feature:652](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L652)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 
@@ -148,12 +148,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/unlockFiles.feature:198](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L198)
 - [apiLocks/unlockFiles.feature:199](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L199)
 - [apiLocks/unlockFiles.feature:200](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L200)
+- [apiLocks/unlockFiles.feature:222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L222)
 - [apiLocks/unlockFiles.feature:223](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L223)
 - [apiLocks/unlockFiles.feature:224](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L224)
 - [apiLocks/unlockFiles.feature:225](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L225)
 - [apiLocks/unlockFiles.feature:226](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L226)
 - [apiLocks/unlockFiles.feature:227](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L227)
-- [apiLocks/unlockFiles.feature:228](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L228)
 
 #### [Trying to upload to a locked file gives 500](https://github.com/owncloud/ocis/issues/7638)
 

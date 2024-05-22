@@ -290,6 +290,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - PublicWebDavContext:
         - WebDavPropertiesContext:
+        - SharingNgContext:
 
     coreApiWebdavUploadTUS:
       paths:
@@ -301,6 +302,7 @@ default:
         - TUSContext:
         - FilesVersionsContext:
         - ChecksumContext:
+        - SharingNgContext:
 
     coreApiWebdavEtagPropagation1:
       paths:

@@ -160,7 +160,12 @@ Feature: copy file
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | <space-role> |
-    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "1"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare |
+      | space           | Personal  |
+      | sharee          | Alice     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
     When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" folder "testshare" of the space "Shares" should not contain these files:

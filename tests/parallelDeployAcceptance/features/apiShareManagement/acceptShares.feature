@@ -14,7 +14,12 @@ Feature: sharing files and folders
 
 
   Scenario: accept a pending share
-    Given user "Alice" has shared folder "/textfile.txt" with user "Brian"
+    Given user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
     And using "ocis" as owncloud selector
     And the sharing API should report to user "Brian" that these shares are in the accepted state
       | path                 |

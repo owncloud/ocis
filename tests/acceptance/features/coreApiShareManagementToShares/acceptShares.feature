@@ -214,7 +214,12 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: deleting shares in pending state
-    Given user "Alice" has shared folder "/PARENT" with user "Brian"
+    Given user "Alice" has sent the following resource share invitation:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
