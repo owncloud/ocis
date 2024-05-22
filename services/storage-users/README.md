@@ -188,6 +188,11 @@ Restoring is possible only to the original location. The personal or project spa
 To authenticate the cli tool use `OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>` and `OCIS_SERVICE_ACCOUNT_ID=<acc-id>`. The `storage-users` cli tool uses the default address to establish the connection to the `gateway` service. If the connection fails, check your custom `gateway`
 service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-users` variable `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`.
 
+*   Export the gateway address if your configuration differs from the default
+    ```bash
+    export STORAGE_USERS_GATEWAY_GRPC_ADDR=127.0.0.1:9142
+    ```
+
 *   Print a list of all trash-bin items of a space
     ```bash
     ocis storage-users trash-bin list [command options] ['spaceID' required]
