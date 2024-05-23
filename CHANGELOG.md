@@ -117,6 +117,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update selected attributes of autoprovisioned users: [#9166](https://github.com/owncloud/ocis/pull/9166)
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
 * Enhancement - The storage-users doc updated: [#9228](https://github.com/owncloud/ocis/pull/9228)
+* Enhancement - Docker compose example for ClamAV: [#9229](https://github.com/owncloud/ocis/pull/9229)
 * Enhancement - Bump Reva: [#9236](https://github.com/owncloud/ocis/pull/9236)
 
 ## Details
@@ -706,6 +707,14 @@ The following sections list the changes for unreleased.
    Items' section.
 
    https://github.com/owncloud/ocis/pull/9228
+
+* Enhancement - Docker compose example for ClamAV: [#9229](https://github.com/owncloud/ocis/pull/9229)
+
+   This PR adds a docker compose example for running a local oCIS together with
+   ClamAV as virus scanner. The example is for demonstration purposes only and
+   should not be used in production.
+
+   https://github.com/owncloud/ocis/pull/9229
 
 * Enhancement - Bump Reva: [#9236](https://github.com/owncloud/ocis/pull/9236)
 
