@@ -22,7 +22,7 @@ Besides the current resource, the user should also be able to decide if he wants
 * The user should be able to decide if he wants to include child resource activities.
 * Activities should be stored space efficiently.
 * Activities should be stored in a way that they can be queried efficiently.
-* Activities should stay in place event if the resource is gone.
+* Activities should stay in place even if the resource is gone.
 * Activities reflect the state at a given point in time and not the current state.
 * The Service should only store a configurable number of activities per resource.
 
@@ -94,12 +94,12 @@ Besides the current resource, the user should also be able to decide if he wants
 * Activity store:
   * (PRO) Introducing a new database type might be more efficient for storing activities.
   * (CON) Introducing a new database type brings extra complexity and maintenance overhead.
-  * (CON) Using the file system to store the activities might be inefficient and could be problematic specially in a distributed environment.
+  * (CON) Using the file system to store the activities might be inefficient and could be problematic especially in a distributed environment.
 * Activity format:
   * (PRO) Normalizing the activities before storing them might make it easier and more efficient to query them.
   * (PRO) Storing each activity only on the resource itself is more space-efficient.
   * (CON) Storing each activity only on the resource itself increases the complexity of querying activities.
-  * (CON) Storing each activity in a human-readable is not space-efficient.
+  * (CON) Storing each activity in a human-readable format is not space-efficient.
 
 ## Links <!-- optional -->
 
