@@ -1163,6 +1163,7 @@ def e2eTestPipeline(ctx):
             },
             "commands": [
                 "cd %s/tests/e2e" % dirs["web"],
+                "ocis backup consistency -p /var/lib/ocis/storage/users",
             ],
         }
 
