@@ -14,7 +14,7 @@ github.com/BurntSushi/toml/internal
 # github.com/CiscoM31/godata v1.0.10
 ## explicit; go 1.19
 github.com/CiscoM31/godata
-# github.com/KimMachineGun/automemlimit v0.6.0
+# github.com/KimMachineGun/automemlimit v0.6.1
 ## explicit; go 1.21
 github.com/KimMachineGun/automemlimit
 github.com/KimMachineGun/automemlimit/memlimit
