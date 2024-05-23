@@ -2,9 +2,9 @@ package command
 
 import (
 	"fmt"
-	"path/filepath"
 
-	"github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
+	ocisbs "github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
+	s3bs "github.com/cs3org/reva/v2/pkg/storage/fs/s3ng/blobstore"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis/pkg/backup"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
@@ -19,7 +19,7 @@ func BackupCommand(cfg *config.Config) *cli.Command {
 		Subcommands: []*cli.Command{
 			ConsistencyCommand(cfg),
 		},
-		Action: func(c *cli.Context) error {
+		Action: func(_ *cli.Context) error {
 			fmt.Println("Read the docs")
 			return nil
 		},
@@ -27,11 +27,17 @@ func BackupCommand(cfg *config.Config) *cli.Command {
 }
 
 // ConsistencyCommand is the entrypoint for the consistency Command
-func ConsistencyCommand(_ *config.Config) *cli.Command {
+func ConsistencyCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "consistency",
 		Usage: "check backup consistency",
 		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:     "basepath",
+				Aliases:  []string{"p"},
+				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/ocis/storage/users)",
+				Required: true,
+			},
 			&cli.StringFlag{
 				Name:    "blobstore",
 				Aliases: []string{"b"},
@@ -39,16 +45,34 @@ func ConsistencyCommand(_ *config.Config) *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			basePath := "/home/jkoberg/.ocis/storage/users"
+			basePath := c.String("basepath")
+			if basePath == "" {
+				fmt.Println("basepath is required")
+				return cli.ShowCommandHelp(c, "consistency")
+			}
 
-			// TODO: switch for s3ng blobstore
-			bs, err := blobstore.New(basePath)
+			var (
+				bs  backup.ListBlobstore
+				err error
+			)
+			switch c.String("blobstore") {
+			case "s3ng":
+				bs, err = s3bs.New(
+					cfg.StorageUsers.Drivers.S3NG.Endpoint,
+					cfg.StorageUsers.Drivers.S3NG.Region,
+					cfg.StorageUsers.Drivers.S3NG.Bucket,
+					cfg.StorageUsers.Drivers.S3NG.AccessKey,
+					cfg.StorageUsers.Drivers.S3NG.SecretKey,
+					s3bs.Options{},
+				)
+			case "ocis":
+				bs, err = ocisbs.New(basePath)
+			}
 			if err != nil {
 				fmt.Println(err)
 				return err
 			}
-
-			if err := backup.CheckSpaceConsistency(filepath.Join(basePath, "spaces/23/ebf113-76d4-43c0-8594-df974b02cd74"), bs); err != nil {
+			if err := backup.CheckSpaceConsistency(basePath, bs); err != nil {
 				fmt.Println(err)
 				return err
 			}
