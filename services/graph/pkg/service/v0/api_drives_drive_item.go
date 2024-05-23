@@ -64,6 +64,12 @@ var (
 
 	// ErrNoShares is returned when no shares are found
 	ErrNoShares = errorcode.New(errorcode.ItemNotFound, "no shares found")
+
+	// ErrAlreadyMounted is returned when all shares are already mounted
+	ErrAlreadyMounted = errorcode.New(errorcode.NameAlreadyExists, "shares already mounted")
+
+	// ErrAlreadyUnmounted is returned when all shares are already unmounted
+	ErrAlreadyUnmounted = errorcode.New(errorcode.NameAlreadyExists, "shares already unmounted")
 )
 
 type (
@@ -214,16 +220,38 @@ func (s DrivesDriveItemService) UnmountShare(ctx context.Context, shareID *colla
 		return err
 	}
 
-	availableShares, err := s.GetSharesForResource(ctx, share.GetShare().GetResourceId(), []*collaboration.Filter{
+	shares, err := s.GetSharesForResource(ctx, share.GetShare().GetResourceId(), []*collaboration.Filter{
 		{
 			Type: collaboration.Filter_TYPE_STATE,
 			Term: &collaboration.Filter_State{
 				State: collaboration.ShareState_SHARE_STATE_ACCEPTED,
 			},
 		},
+		{
+			Type: collaboration.Filter_TYPE_STATE,
+			Term: &collaboration.Filter_State{
+				State: collaboration.ShareState_SHARE_STATE_REJECTED,
+			},
+		},
 	})
 	if err != nil {
 		return err
+	}
+	availableShares := make([]*collaboration.ReceivedShare, 0, 1)
+	rejectedShares := make([]*collaboration.ReceivedShare, 0, 1)
+	for _, v := range shares {
+		switch v.GetState() {
+		case collaboration.ShareState_SHARE_STATE_ACCEPTED:
+			availableShares = append(availableShares, v)
+		case collaboration.ShareState_SHARE_STATE_REJECTED:
+			rejectedShares = append(rejectedShares, v)
+		}
+	}
+	if len(availableShares) == 0 {
+		if len(rejectedShares) > 0 {
+			return ErrAlreadyUnmounted
+		}
+		return ErrNoShares
 	}
 
 	_, err = s.UpdateShares(ctx, availableShares, func(_ *collaboration.ReceivedShare, request *collaboration.UpdateReceivedShareRequest) {
@@ -246,22 +274,26 @@ func (s DrivesDriveItemService) MountShare(ctx context.Context, resourceID *stor
 		name = filepath.Clean(name)
 	}
 
-	availableShares, err := s.GetSharesForResource(ctx, resourceID, []*collaboration.Filter{
-		{
-			Type: collaboration.Filter_TYPE_STATE,
-			Term: &collaboration.Filter_State{
-				State: collaboration.ShareState_SHARE_STATE_PENDING,
-			},
-		},
-		{
-			Type: collaboration.Filter_TYPE_STATE,
-			Term: &collaboration.Filter_State{
-				State: collaboration.ShareState_SHARE_STATE_REJECTED,
-			},
-		},
-	})
+	shares, err := s.GetSharesForResource(ctx, resourceID, nil)
 	if err != nil {
 		return nil, err
+	}
+
+	availableShares := make([]*collaboration.ReceivedShare, 0, len(shares))
+	mountedShares := make([]*collaboration.ReceivedShare, 0, 1)
+	for _, v := range shares {
+		switch v.GetState() {
+		case collaboration.ShareState_SHARE_STATE_ACCEPTED:
+			mountedShares = append(mountedShares, v)
+		case collaboration.ShareState_SHARE_STATE_PENDING, collaboration.ShareState_SHARE_STATE_REJECTED:
+			availableShares = append(availableShares, v)
+		}
+	}
+	if len(availableShares) == 0 {
+		if len(mountedShares) > 0 {
+			return nil, ErrAlreadyMounted
+		}
+		return nil, ErrNoShares
 	}
 
 	updatedShares, err := s.UpdateShares(ctx, availableShares, func(share *collaboration.ReceivedShare, request *collaboration.UpdateReceivedShareRequest) {
@@ -328,8 +360,8 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 
 	shareID := ExtractShareIdFromResourceId(itemID)
 	if err := api.drivesDriveItemService.UnmountShare(ctx, shareID); err != nil {
-		api.logger.Debug().Err(err).Msg(ErrUnmountShare.Error())
-		ErrUnmountShare.Render(w, r)
+		api.logger.Debug().Err(err).Msg(err.Error())
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -484,11 +516,10 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	mountedShares, err := api.drivesDriveItemService.
-		MountShare(ctx, &resourceId, requestDriveItem.GetName())
+	mountedShares, err := api.drivesDriveItemService.MountShare(ctx, &resourceId, requestDriveItem.GetName())
 	if err != nil {
-		api.logger.Debug().Err(err).Msg(ErrMountShare.Error())
-		ErrMountShare.Render(w, r)
+		api.logger.Debug().Err(err).Msg(err.Error())
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
