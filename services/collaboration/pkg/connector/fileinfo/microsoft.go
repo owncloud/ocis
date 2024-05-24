@@ -1,17 +1,10 @@
-package connector
+package fileinfo
 
-// FileInfo contains the properties of the file.
-// Some properties refer to capabilities in the WOPI client, and capabilities
-// that the WOPI server has.
+// Microsoft fileInfo properties
 //
-// For now, the FileInfo contains data for Microsoft, Collabora and OnlyOffice.
-// Not all the properties are supported by every system.
-type FileInfo struct {
-	// ------------
-	// Microsoft WOPI check file info specification:
-	// https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo
-	// ------------
-
+// Microsoft WOPI check file info specification:
+// https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo
+type Microsoft struct {
 	//
 	// Required response properties
 	//
@@ -168,166 +161,86 @@ type FileInfo struct {
 	BreadcrumbFolderName string `json:"BreadcrumbFolderName,omitempty"`
 	// A URI to a web page that the WOPI client should navigate to when the user clicks on UI that displays BreadcrumbFolderName.
 	BreadcrumbFolderUrl string `json:"BreadcrumbFolderUrl,omitempty"`
+}
 
-	// ------------
-	// Collabora WOPI check file info specification:
-	// https://sdk.collaboraonline.com/docs/advanced_integration.html
-	// ------------
+func (minfo *Microsoft) SetProperties(props map[string]interface{}) {
+	setters := map[string]func(value interface{}){
+		"BaseFileName": assignStringTo(&minfo.BaseFileName),
+		"OwnerId":      assignStringTo(&minfo.OwnerId),
+		"Size":         assignInt64To(&minfo.Size),
+		"UserId":       assignStringTo(&minfo.UserId),
+		"Version":      assignStringTo(&minfo.Version),
 
-	//
-	// Response properties
-	//
+		"SupportedShareUrlTypes":     assignStringListTo(&minfo.SupportedShareUrlTypes),
+		"SupportsCobalt":             assignBoolTo(&minfo.SupportsCobalt),
+		"SupportsContainers":         assignBoolTo(&minfo.SupportsContainers),
+		"SupportsDeleteFile":         assignBoolTo(&minfo.SupportsDeleteFile),
+		"SupportsEcosystem":          assignBoolTo(&minfo.SupportsEcosystem),
+		"SupportsExtendedLockLength": assignBoolTo(&minfo.SupportsExtendedLockLength),
+		"SupportsFolders":            assignBoolTo(&minfo.SupportsFolders),
+		//SupportsGetFileWopiSrc bool `json:"SupportsGetFileWopiSrc"`  // wopivalidator is complaining and the property isn't used for now -> commented
+		"SupportsGetLock":  assignBoolTo(&minfo.SupportsGetLock),
+		"SupportsLocks":    assignBoolTo(&minfo.SupportsLocks),
+		"SupportsRename":   assignBoolTo(&minfo.SupportsRename),
+		"SupportsUpdate":   assignBoolTo(&minfo.SupportsUpdate),
+		"SupportsUserInfo": assignBoolTo(&minfo.SupportsUserInfo),
 
-	//BaseFileName -> already in MS WOPI
-	//DisablePrint -> already in MS WOPI
-	//OwnerID -> already in MS WOPI
+		"IsAnonymousUser":              assignBoolTo(&minfo.IsAnonymousUser),
+		"IsEduUser":                    assignBoolTo(&minfo.IsEduUser),
+		"LicenseCheckForEditIsEnabled": assignBoolTo(&minfo.LicenseCheckForEditIsEnabled),
+		"UserFriendlyName":             assignStringTo(&minfo.UserFriendlyName),
+		"UserInfo":                     assignStringTo(&minfo.UserInfo),
 
-	// A string for the domain the host page sends/receives PostMessages from, we only listen to messages from this domain.
-	PostMessageOrigin string `json:"PostMessageOrigin,omitempty"`
+		"ReadOnly":                assignBoolTo(&minfo.ReadOnly),
+		"RestrictedWebViewOnly":   assignBoolTo(&minfo.RestrictedWebViewOnly),
+		"UserCanAttend":           assignBoolTo(&minfo.UserCanAttend),
+		"UserCanNotWriteRelative": assignBoolTo(&minfo.UserCanNotWriteRelative),
+		"UserCanPresent":          assignBoolTo(&minfo.UserCanPresent),
+		"UserCanRename":           assignBoolTo(&minfo.UserCanRename),
+		"UserCanWrite":            assignBoolTo(&minfo.UserCanWrite),
 
-	//Size -> already in MS WOPI
+		"CloseUrl":            assignStringTo(&minfo.CloseUrl),
+		"DownloadUrl":         assignStringTo(&minfo.DownloadUrl),
+		"FileEmbedCommandUrl": assignStringTo(&minfo.FileEmbedCommandUrl),
+		"FileSharingUrl":      assignStringTo(&minfo.FileSharingUrl),
+		"FileUrl":             assignStringTo(&minfo.FileUrl),
+		"FileVersionUrl":      assignStringTo(&minfo.FileVersionUrl),
+		"HostEditUrl":         assignStringTo(&minfo.HostEditUrl),
+		"HostEmbeddedViewUrl": assignStringTo(&minfo.HostEmbeddedViewUrl),
+		"HostViewUrl":         assignStringTo(&minfo.HostViewUrl),
+		"SignoutUrl":          assignStringTo(&minfo.SignoutUrl),
 
-	// The ID of file (like the wopi/files/ID) can be a non-existing file. In that case, the file will be created from a template when the template (eg. an OTT file) is specified as TemplateSource in the CheckFileInfo response. The TemplateSource is supposed to be an URL like https://somewhere/accessible/file.ott that is accessible by the Online. For the actual saving of the content, normal PutFile mechanism will be used.
-	TemplateSource string `json:"TemplateSource,omitempty"`
+		"AllowAdditionalMicrosoftServices": assignBoolTo(&minfo.AllowAdditionalMicrosoftServices),
+		"AllowErrorReportPrompt":           assignBoolTo(&minfo.AllowErrorReportPrompt),
+		"AllowExternalMarketplace":         assignBoolTo(&minfo.AllowExternalMarketplace),
+		"ClientThrottlingProtection":       assignStringTo(&minfo.ClientThrottlingProtection),
+		"CloseButtonClosesWindow":          assignBoolTo(&minfo.CloseButtonClosesWindow),
+		"CopyPasteRestrictions":            assignStringTo(&minfo.CopyPasteRestrictions),
+		"DisablePrint":                     assignBoolTo(&minfo.DisablePrint),
+		"DisableTranslation":               assignBoolTo(&minfo.DisableTranslation),
+		"FileExtension":                    assignStringTo(&minfo.FileExtension),
+		"FileNameMaxLength":                assignIntTo(&minfo.FileNameMaxLength),
+		"LastModifiedTime":                 assignStringTo(&minfo.LastModifiedTime),
+		"RequestedCallThrottling":          assignStringTo(&minfo.RequestedCallThrottling),
+		"SHA256":                           assignStringTo(&minfo.SHA256),
+		"SharingStatus":                    assignStringTo(&minfo.SharingStatus),
+		"TemporarilyNotWritable":           assignBoolTo(&minfo.TemporarilyNotWritable),
 
-	//UserCanWrite -> already in MS WOPI
-	//UserCanNotWriteRelative -> already in MS WOPI
-	//UserId -> already in MS WOPI
-	//UserFriendlyName -> already in MS WOPI
+		"BreadcrumbBrandName":  assignStringTo(&minfo.BreadcrumbBrandName),
+		"BreadcrumbBrandUrl":   assignStringTo(&minfo.BreadcrumbBrandUrl),
+		"BreadcrumbDocName":    assignStringTo(&minfo.BreadcrumbDocName),
+		"BreadcrumbFolderName": assignStringTo(&minfo.BreadcrumbFolderName),
+		"BreadcrumbFolderUrl":  assignStringTo(&minfo.BreadcrumbFolderUrl),
+	}
 
-	//
-	// Extended response properties
-	//
+	for key, value := range props {
+		setterFn := setters[key]
+		if setterFn != nil {
+			setterFn(value)
+		}
+	}
+}
 
-	// If set to true, this will enable the insertion of images chosen from the WOPI storage. A UI_InsertGraphic postMessage will be send to the WOPI host to request the UI to select the file.
-	EnableInsertRemoteImage bool `json:"EnableInsertRemoteImage,omitempty"`
-	// If set to true, this will disable the insertion of image chosen from the local device. If EnableInsertRemoteImage is not set to true, then inserting images files is not possible.
-	DisableInsertLocalImage bool `json:"DisableInsertLocalImage,omitempty"`
-	// If set to true, hides the print option from the file menu bar in the UI.
-	HidePrintOption bool `json:"HidePrintOption,omitempty"`
-	// If set to true, hides the save button from the toolbar and file menubar in the UI.
-	HideSaveOption bool `json:"HideSaveOption,omitempty"`
-	// Hides Download as option in the file menubar.
-	HideExportOption bool `json:"HideExportOption,omitempty"`
-	// Disables export functionality in backend. If set to true, HideExportOption is assumed to be true
-	DisableExport bool `json:"DisableExport,omitempty"`
-	// Disables copying from the document in libreoffice online backend. Pasting into the document would still be possible. However, it is still possible to do an “internal” cut/copy/paste.
-	DisableCopy bool `json:"DisableCopy,omitempty"`
-	// Disables displaying of the explanation text on the overlay when the document becomes inactive or killed. With this, the JS integration must provide the user with appropriate message when it gets Session_Closed or User_Idle postMessages.
-	DisableInactiveMessages bool `json:"DisableInactiveMessages,omitempty"`
-	// Indicate that the integration wants to handle the downloading of pdf for printing or svg for slideshows or exported document, because it cannot rely on browser’s support for downloading.
-	DownloadAsPostMessage bool `json:"DownloadAsPostMessage,omitempty"`
-	// Similar to download as, doctype extensions can be provided for save-as. In this case the new file is loaded in the integration instead of downloaded.
-	SaveAsPostmessage bool `json:"SaveAsPostmessage,omitempty"`
-	// If set to true, it allows the document owner (the one with OwnerId =UserId) to send a closedocument message (see protocol.txt)
-	EnableOwnerTermination bool `json:"EnableOwnerTermination,omitempty"`
-
-	// JSON object that contains additional info about the user, namely the avatar image.
-	//UserExtraInfo -> requires definition, currently not used
-	// JSON object that contains additional info about the user, but unlike the UserExtraInfo it is not shared among the views in collaborative editing sessions.
-	//UserPrivateInfo -> requires definition, currently not used
-
-	// If set to a non-empty string, is used for rendering a watermark-like text on each tile of the document.
-	WatermarkText string `json:"WatermarkText,omitempty"`
-
-	// ------------
-	// OnlyOffice WOPI check file info specification:
-	// https://api.onlyoffice.com/editors/wopi/restapi/checkfileinfo
-	// ------------
-
-	//
-	// Required response properties
-	//
-
-	//BaseFileName -> already in MS WOPI
-	//Version -> already in MS WOPI
-
-	//
-	// Breadcrumb properties
-	//
-
-	//BreadcrumbBrandName -> already in MS WOPI
-	//BreadcrumbBrandUrl -> already in MS WOPI
-	//BreadcrumbDocName -> already in MS WOPI
-	//BreadcrumbFolderName -> already in MS WOPI
-	//BreadcrumbFolderUrl -> already in MS WOPI
-
-	//
-	// PostMessage properties
-	//
-
-	// Specifies if the WOPI client should notify the WOPI server in case the user closes the rendering or editing client currently using this file. The host expects to receive the UI_Close PostMessage when the Close UI in the online office is activated.
-	ClosePostMessage bool `json:"ClosePostMessage,omitempty"`
-	// Specifies if the WOPI client should notify the WOPI server in case the user tries to edit a file. The host expects to receive the UI_Edit PostMessage when the Edit UI in the online office is activated.
-	EditModePostMessage bool `json:"EditModePostMessage,omitempty"`
-	// Specifies if the WOPI client should notify the WOPI server in case the user tries to edit a file. The host expects to receive the Edit_Notification PostMessage.
-	EditNotificationPostMessage bool `json:"EditNotificationPostMessage,omitempty"`
-	// Specifies if the WOPI client should notify the WOPI server in case the user tries to share a file. The host expects to receive the UI_Sharing PostMessage when the Share UI in the online office is activated.
-	FileSharingPostMessage bool `json:"FileSharingPostMessage,omitempty"`
-	// Specifies if the WOPI client will notify the WOPI server in case the user tries to navigate to the previous file version. The host expects to receive the UI_FileVersions PostMessage when the Previous Versions UI in the online office is activated.
-	FileVersionPostMessage bool `json:"FileVersionPostMessage,omitempty"`
-	// A domain that the WOPI client must use as the targetOrigin parameter when sending messages as described in [W3C-HTML5WEBMSG].
-	//PostMessageOrigin -> already in collabora WOPI
-
-	//
-	// File URL properties
-	//
-
-	//CloseUrl -> already in MS WOPI
-	//FileSharingUrl -> already in MS WOPI
-	//FileVersionUrl -> already in MS WOPI
-	//HostEditUrl -> already in MS WOPI
-
-	//
-	// Miscellaneous properties
-	//
-
-	// Specifies if the WOPI client must disable the Copy and Paste functionality within the application. By default, all Copy and Paste functionality is enabled, i.e. the setting has no effect. Possible property values:
-	// BlockAll - the Copy and Paste functionality is completely disabled within the application;
-	// CurrentDocumentOnly - the Copy and Paste functionality is enabled but content can only be copied and pasted within the file currently open in the application.
-	//CopyPasteRestrictions -> already in MS WOPI
-	//DisablePrint -> already in MS WOPI
-	//FileExtension -> already in MS WOPI
-	//FileNameMaxLength -> already in MS WOPI
-	//LastModifiedTime -> already in MS WOPI
-
-	//
-	// User metadata properties
-	//
-
-	//IsAnonymousUser -> already in MS WOPI
-	//UserFriendlyName -> already in MS WOPI
-	//UserId -> already in MS WOPI
-
-	//
-	// User permissions properties
-	//
-
-	//ReadOnly -> already in MS WOPI
-	//UserCanNotWriteRelative -> already in MS WOPI
-	//UserCanRename -> already in MS WOPI
-
-	// Specifies if the user has permissions to review a file.
-	UserCanReview bool `json:"UserCanReview,omitempty"`
-
-	//UserCanWrite -> already in MS WOPI
-
-	//
-	// Host capabilities properties
-	//
-
-	//SupportsLocks -> already in MS WOPI
-	//SupportsRename -> already in MS WOPI
-
-	// Specifies if the WOPI server supports the review permission.
-	SupportsReviewing bool `json:"SupportsReviewing,omitempty"`
-
-	//SupportsUpdate -> already in MS WOPI
-
-	//
-	// Other properties
-	//
-
-	//EnableInsertRemoteImage -> already in collabora WOPI
-	//HidePrintOption -> already in collabora WOPI
+func (minfo *Microsoft) GetTarget() string {
+	return "Microsoft"
 }

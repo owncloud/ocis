@@ -17,6 +17,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/rs/zerolog"
 )
@@ -50,7 +51,7 @@ type FileConnectorService interface {
 	// The current lockID will be returned if a conflict happens
 	UnLock(ctx context.Context, lockID string) (string, error)
 	// CheckFileInfo will return the file information of the target file
-	CheckFileInfo(ctx context.Context) (FileInfo, error)
+	CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, error)
 }
 
 // FileConnector implements the "File" endpoint.
@@ -475,10 +476,10 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 //
 // If the operation is successful, a "FileInfo" instance will be returned,
 // otherwise the "FileInfo" will be empty and an error will be returned.
-func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
+func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
-		return FileInfo{}, err
+		return nil, err
 	}
 
 	logger := zerolog.Ctx(ctx)
@@ -488,7 +489,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("CheckFileInfo: stat failed")
-		return FileInfo{}, err
+		return nil, err
 	}
 
 	if statRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
@@ -496,76 +497,87 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (FileInfo, error) {
 			Str("StatusCode", statRes.GetStatus().GetCode().String()).
 			Str("StatusMsg", statRes.GetStatus().GetMessage()).
 			Msg("CheckFileInfo: stat failed with unexpected status")
-		return FileInfo{}, NewConnectorError(500, statRes.GetStatus().GetCode().String()+" "+statRes.GetStatus().GetMessage())
+		return nil, NewConnectorError(500, statRes.GetStatus().GetCode().String()+" "+statRes.GetStatus().GetMessage())
 	}
 
-	fileInfo := FileInfo{
-		// OwnerId must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
-		OwnerId:           hex.EncodeToString([]byte(statRes.GetInfo().GetOwner().GetOpaqueId() + "@" + statRes.GetInfo().GetOwner().GetIdp())),
-		Size:              int64(statRes.GetInfo().GetSize()),
-		Version:           strconv.FormatUint(statRes.GetInfo().GetMtime().GetSeconds(), 10) + "." + strconv.FormatUint(uint64(statRes.GetInfo().GetMtime().GetNanos()), 10),
-		BaseFileName:      path.Base(statRes.GetInfo().GetPath()),
-		BreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
+	var info fileinfo.FileInfo
+	switch strings.ToLower(f.cfg.WopiApp.Provider) {
+	case "collabora":
+		info = &fileinfo.Collabora{}
+	case "onlyoffice":
+		info = &fileinfo.OnlyOffice{}
+	default:
+		info = &fileinfo.Microsoft{}
+	}
+
+	hexEncodedOwnerId := hex.EncodeToString([]byte(statRes.GetInfo().GetOwner().GetOpaqueId() + "@" + statRes.GetInfo().GetOwner().GetIdp()))
+	version := strconv.FormatUint(statRes.GetInfo().GetMtime().GetSeconds(), 10) + "." + strconv.FormatUint(uint64(statRes.GetInfo().GetMtime().GetNanos()), 10)
+
+	// UserId must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
+	// assign userId, userFriendlyName and isAnonymousUser
+	// assume we don't have a wopiContext.User
+	randomID, _ := uuid.NewUUID()
+	userId := hex.EncodeToString([]byte("guest-" + randomID.String()))
+	userFriendlyName := "Guest " + randomID.String()
+	isAnonymousUser := true
+
+	isPublicShare := false
+	if wopiContext.User != nil {
+		// if we have a wopiContext.User
+		isPublicShare = utils.ExistsInOpaque(wopiContext.User.GetOpaque(), "public-share-role")
+		if !isPublicShare {
+			hexEncodedWopiUserId := hex.EncodeToString([]byte(wopiContext.User.GetId().GetOpaqueId() + "@" + wopiContext.User.GetId().GetIdp()))
+			isAnonymousUser = false
+			userFriendlyName = wopiContext.User.GetDisplayName()
+			userId = hexEncodedWopiUserId
+		}
+	}
+
+	// fileinfo map
+	infoMap := map[string]interface{}{
+		"OwnerId":           hexEncodedOwnerId,
+		"Size":              int64(statRes.GetInfo().GetSize()),
+		"Version":           version,
+		"BaseFileName":      path.Base(statRes.GetInfo().GetPath()),
+		"BreadcrumbDocName": path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request
 		//BreadcrumbFolderName: path.Dir(statRes.Info.Path),
 
-		UserCanNotWriteRelative: true,
+		"HostViewUrl": wopiContext.ViewAppUrl,
+		"HostEditUrl": wopiContext.EditAppUrl,
 
-		HostViewUrl: wopiContext.ViewAppUrl,
-		HostEditUrl: wopiContext.EditAppUrl,
+		"EnableOwnerTermination":     true, // only for collabora
+		"SupportsExtendedLockLength": true,
+		"SupportsGetLock":            true,
+		"SupportsLocks":              true,
+		"SupportsUpdate":             true,
 
-		//EnableOwnerTermination: true,  // enable only for collabora? wopivalidator is complaining
-		EnableOwnerTermination: false,
-
-		SupportsExtendedLockLength: true,
-
-		SupportsGetLock: true,
-		SupportsLocks:   true,
-	}
-
-	// user logic from reva wopi driver #TODO: refactor
-	var isPublicShare bool = false
-	if wopiContext.User != nil {
-		// UserId must use only alphanumeric chars (https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-response#requirements-for-user-identity-properties)
-		if wopiContext.User.GetId().GetType() == userv1beta1.UserType_USER_TYPE_LIGHTWEIGHT {
-			fileInfo.UserId = hex.EncodeToString([]byte(statRes.GetInfo().GetOwner().GetOpaqueId() + "@" + statRes.GetInfo().GetOwner().GetIdp()))
-		} else {
-			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.GetId().GetOpaqueId() + "@" + wopiContext.User.GetId().GetIdp()))
-		}
-
-		isPublicShare = utils.ExistsInOpaque(wopiContext.User.GetOpaque(), "public-share-role")
-		if !isPublicShare {
-			fileInfo.UserFriendlyName = wopiContext.User.GetDisplayName()
-			fileInfo.UserId = hex.EncodeToString([]byte(wopiContext.User.GetId().GetOpaqueId() + "@" + wopiContext.User.GetId().GetIdp()))
-		}
-	}
-	if wopiContext.User == nil || isPublicShare {
-		randomID, _ := uuid.NewUUID()
-		fileInfo.UserId = hex.EncodeToString([]byte("guest-" + randomID.String()))
-		fileInfo.UserFriendlyName = "Guest " + randomID.String()
-		fileInfo.IsAnonymousUser = true
+		"UserCanNotWriteRelative": true,
+		"IsAnonymousUser":         isAnonymousUser,
+		"UserFriendlyName":        userFriendlyName,
+		"UserId":                  userId,
 	}
 
 	switch wopiContext.ViewMode {
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE:
-		fileInfo.SupportsUpdate = true
-		fileInfo.UserCanWrite = true
+		infoMap["UserCanWrite"] = true
 
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_ONLY:
 		// nothing special to do here for now
 
 	case appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY:
-		fileInfo.DisableExport = true
-		fileInfo.DisableCopy = true
-		fileInfo.DisablePrint = true
+		infoMap["DisableExport"] = true
+		infoMap["DisableCopy"] = true
+		infoMap["DisablePrint"] = true
 		if !isPublicShare {
-			// the fileInfo.WatermarkText supported by Collabora only
-			fileInfo.WatermarkText = f.watermarkText(wopiContext.User)
+			infoMap["WatermarkText"] = f.watermarkText(wopiContext.User) // only for collabora
 		}
 	}
 
+	info.SetProperties(infoMap)
+
 	logger.Debug().Msg("CheckFileInfo: success")
-	return fileInfo, nil
+	return info, nil
 }
 
 func (f *FileConnector) watermarkText(user *userv1beta1.User) string {
