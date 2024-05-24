@@ -2300,3 +2300,374 @@ Feature: Create a share link for a resource
       """
     And the public should be able to download file "textfile.txt" from the last link share with password "%public%" and the content should be "to share"
     And the public download of file "textfile.txt" from the last link share with password "$heLlo*1234*" should fail with HTTP status code "401" using shareNg
+
+  @issue-7879
+  Scenario Outline: try to create a link share of a Personal and Share drive using permission endpoint
+    When user "Alice" tries to create the following space link share using permission endpoint of the Graph API:
+      | space           | <drive>            |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "<message>"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | drive    | message                                   |
+      | view             | Shares   | no share permission                       |
+      | edit             | Shares   | no share permission                       |
+      | upload           | Shares   | no share permission                       |
+      | createOnly       | Shares   | no share permission                       |
+#      | blocksDownload   | Shares   | invalid link type                         |
+      | view             | Personal | cannot create link on personal space root |
+      | edit             | Personal | cannot create link on personal space root |
+      | upload           | Personal | cannot create link on personal space root |
+      | createOnly       | Personal | cannot create link on personal space root |
+#      | blocksDownload   | Personal | invalid link type                         |
+
+  @issue-7879
+  Scenario Outline: create a link share of a project-space drive with different permissions using permission endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    When user "Alice" creates the following space link share using permission endpoint of the Graph API:
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": true
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "<permissions-role>"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+#      | blocksDownload   |
+
+
+  Scenario Outline: try to create an internal link share of a Personal and Share drives using permission endpoint
+    When user "Alice" tries to create the following space link share using permission endpoint of the Graph API:
+      | space           | <drive>  |
+      | permissionsRole | internal |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "<message>"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | drive    | message                                   |
+      | Personal | cannot create link on personal space root |
+      | Shares   | no share permission                       |
+
+
+  Scenario Outline: try to create an internal link share with password of a Personal and Share drive using permission endpoint
+    When user "Alice" tries to create the following space link share using permission endpoint of the Graph API:
+      | space           | <drive>  |
+      | permissionsRole | internal |
+      | password        | %public% |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "password is redundant for the internal link"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | drive    |
+      | Personal |
+      | Shares   |
+
+
+  Scenario: create an internal link share of a project-space using permission endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    When user "Alice" creates the following space link share using permission endpoint of the Graph API:
+      | space           | projectSpace  |
+      | permissionsRole | internal      |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": false
+          },
+          "id": {
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "internal"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: try to create an internal link share of a project-space drive with password using permission endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    When user "Alice" creates the following space link share using permission endpoint of the Graph API:
+      | space           | projectSpace  |
+      | permissionsRole | internal      |
+      | password        | %public%      |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "password is redundant for the internal link"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario Outline: create a link share of a project-space drive with different permissions using permission endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    When user "Alice" creates the following space link share using permission endpoint of the Graph API:
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": true
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "<permissions-role>"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+#      | blocksDownload   |
