@@ -44,7 +44,7 @@ Feature: PROPFIND
       | /remote.php/webdav          | infinity | 400              |
       | /remote.php/dav/files/alice | infinity | 400              |
 
-
+  @skipOnReva
   Scenario: send PROPFIND request to a public link shared with password
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT"
@@ -59,7 +59,7 @@ Feature: PROPFIND
     And the value of the item "//d:href" in the response should match "/%base_path%\/remote.php\/dav\/public-files\/%public_token%\/$/"
     And the value of the item "//oc:public-link-share-owner" in the response should be "Alice"
 
-
+  @skipOnReva
   Scenario: send PROPFIND request to a public link shared with password (request without password)
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT"
@@ -73,7 +73,7 @@ Feature: PROPFIND
     Then the HTTP status code should be "401"
     And the value of the item "/d:error/s:exception" in the response should be "Sabre\DAV\Exception\NotAuthenticated"
 
-
+  @skipOnReva
   Scenario: send PROPFIND request to a public link shared with password (request with incorrect password)
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT"

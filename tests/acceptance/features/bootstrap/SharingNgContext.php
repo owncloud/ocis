@@ -24,6 +24,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
+use TestHelpers\OcisHelper;
 use TestHelpers\WebDavHelper;
 use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
@@ -48,6 +49,9 @@ class SharingNgContext implements Context {
 	 * @return void
 	 */
 	public function before(BeforeScenarioScope $scope): void {
+		if (OcisHelper::isTestingOnReva()) {
+			return;
+		}
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here

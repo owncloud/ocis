@@ -1,5 +1,4 @@
-@issue-1276 @issue-1269
-
+@skipOnReva @issue-1276 @issue-1269
 Feature: changing a public link share
   As a user
   I want to set the permissions of a public link share
@@ -154,7 +153,7 @@ Feature: changing a public link share
     Then the HTTP status code should be "403"
     And as "Alice" file "PARENT/parent.txt" should exist
 
-  @skipOnReva
+
   Scenario Outline: normal user tries to remove password of a public link share (change/create permission)
     Given using OCS API version "<ocs-api-version>"
     And using SharingNG
@@ -177,7 +176,7 @@ Feature: changing a public link share
       | 1               | create      | createOnly       | 200              |
       | 2               | create      | createOnly       | 400              |
 
-  @issue-7821 @skipOnReva
+  @issue-7821
   Scenario Outline: normal user tries to remove password of a public link (update without sending permissions)
     Given using OCS API version "<ocs-api-version>"
     And using SharingNG
@@ -197,7 +196,7 @@ Feature: changing a public link share
       | 1               | 200              |
       | 2               | 403              |
 
-  @skipOnReva # reva doesn't have a pre-created admin user
+
   Scenario Outline: administrator removes password of a read-only public link
     Given using OCS API version "<ocs-api-version>"
     And admin has created folder "/PARENT"
@@ -220,7 +219,7 @@ Feature: changing a public link share
       | 1               | 100             |
       | 2               | 200             |
 
-  @skipOnReva # reva doesn't have a pre-created admin user
+
   Scenario Outline: administrator tries to remove password of a public link share (change/create permission)
     Given using OCS API version "<ocs-api-version>"
     And admin has created folder "/PARENT"

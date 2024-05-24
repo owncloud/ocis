@@ -59,7 +59,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: deleting a file in a shared folder moves it to the trashbin root
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -85,7 +85,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path-version |
       | spaces           |
 
-
+  @skipOnReva
   Scenario Outline: deleting a shared folder moves it to trashbin
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
