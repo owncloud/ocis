@@ -6,7 +6,7 @@
 | COLLABORATION_APP_DESCRIPTION | string | Open office documents with a WOPI app | App description|
 | COLLABORATION_APP_ICON | string | image-edit | Icon for the app|
 | COLLABORATION_APP_LOCKNAME | string | com.github.owncloud.collaboration | Name for the app lock|
-| OCIS_JWT_SECRET<br/>COLLABORATION_JWT_SECRET | string | s6QIFe24gaM413oxRnvwT6yEvZut5dlW | Used as JWT token and to encrypt access token.|
+| OCIS_JWT_SECRET<br/>COLLABORATION_JWT_SECRET | string | V35CNhpgBPpObHodGdZQ5l0AnXaG0DqB | Used as JWT token and to encrypt access token.|
 | COLLABORATION_GRPC_ADDR | string | 0.0.0.0:9301 | The bind address of the GRPC service.|
 | COLLABORATION_HTTP_ADDR | string | 127.0.0.1:9300 | The external address of the collaboration service wihout a leading scheme. Either use an IP address or a hostname (127.0.0.1:9301 or wopi.private.prv). The configured 'Scheme' in another envvar will be used to finally build the public URL along with this address.|
 | COLLABORATION_HTTP_BINDADDR | string | 0.0.0.0:9300 | The bind address of the HTTP service. Use '<ip-address>:<port>', for example, '127.0.0.1:9301' or '0.0.0.0:9301'.|
