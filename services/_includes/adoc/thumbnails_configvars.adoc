@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-24-00-44-31]
+[#deprecation-note-2024-05-24-12-47-41]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -195,6 +195,15 @@ a| [subs=-attributes]
 ++/thumbnails ++
 a| [subs=-attributes]
 Subdirectory that serves as the root for this HTTP service.
+
+a|`THUMBNAILS_MAX_CONCURRENT_REQUESTS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Number of maximum concurrent thumbnail requests. Default is 0 which is unlimited.
 
 a|`THUMBNAILS_RESOLUTIONS` +
 
