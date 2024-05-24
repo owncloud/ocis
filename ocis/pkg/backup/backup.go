@@ -3,7 +3,6 @@ package backup
 
 import (
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -53,10 +52,8 @@ type Consistency struct {
 
 // ListBlobstore required to check blob consistency
 type ListBlobstore interface {
-	Upload(node *node.Node, source string) error
-	Download(node *node.Node) (io.ReadCloser, error)
-	Delete(node *node.Node) error
-	List() ([]string, error)
+	List() ([]*node.Node, error)
+	Path(node *node.Node) string
 }
 
 // New creates a new Consistency object
@@ -77,7 +74,7 @@ func CheckSpaceConsistency(storagepath string, lbs ListBlobstore) error {
 	fsys := os.DirFS(storagepath)
 
 	c := New(fsys, storagepath)
-	if err := c.Initialize(); err != nil {
+	if err := c.Initialize(lbs); err != nil {
 		return err
 	}
 
@@ -89,7 +86,7 @@ func CheckSpaceConsistency(storagepath string, lbs ListBlobstore) error {
 }
 
 // Initialize initializes the Consistency object
-func (c *Consistency) Initialize() error {
+func (c *Consistency) Initialize(lbs ListBlobstore) error {
 	dirs, err := fs.Glob(c.fsys, "spaces/*/*/nodes/*/*/*/*")
 	if err != nil {
 		return err
@@ -123,7 +120,7 @@ func (c *Consistency) Initialize() error {
 					dp := filepath.Join(c.discpath, d, e.Name())
 					c.Nodes[dp] = append(c.Nodes[dp], InconsistencyFilesMissing)
 				}
-				inc := c.checkNode(filepath.Join(d, e.Name()+".mpk"))
+				inc := c.checkNode(filepath.Join(d, e.Name()+".mpk"), lbs)
 				dp := filepath.Join(c.discpath, d, e.Name())
 				if inc != "" {
 					c.Nodes[dp] = append(c.Nodes[dp], inc)
@@ -170,12 +167,13 @@ func (c *Consistency) Evaluate(lbs ListBlobstore) error {
 		return err
 	}
 
-	for _, b := range blobs {
-		if _, ok := c.BlobReferences[b]; !ok {
-			c.Blobs[b] = append(c.Blobs[b], InconsistencyBlobOrphaned)
+	for _, bn := range blobs {
+		p := lbs.Path(bn)
+		if _, ok := c.BlobReferences[p]; !ok {
+			c.Blobs[p] = append(c.Blobs[p], InconsistencyBlobOrphaned)
 			continue
 		}
-		deleteInconsistency(c.BlobReferences, b)
+		deleteInconsistency(c.BlobReferences, p)
 	}
 
 	for b := range c.BlobReferences {
@@ -218,7 +216,7 @@ func (c *Consistency) PrintResults() error {
 
 }
 
-func (c *Consistency) checkNode(path string) Inconsistency {
+func (c *Consistency) checkNode(path string, lbs ListBlobstore) Inconsistency {
 	b, err := fs.ReadFile(c.fsys, path)
 	if err != nil {
 		return InconsistencyFilesMissing
@@ -230,26 +228,17 @@ func (c *Consistency) checkNode(path string) Inconsistency {
 	}
 
 	if bid := m["user.ocis.blobid"]; string(bid) != "" {
-		c.BlobReferences[string(bid)] = []Inconsistency{}
+		spaceID, _ := getIDsFromPath(filepath.Join(c.discpath, path))
+		p := lbs.Path(&node.Node{BlobID: string(bid), SpaceID: spaceID})
+		c.BlobReferences[p] = []Inconsistency{}
 	}
 
 	return ""
 }
 
 func (c *Consistency) requiresSymlink(path string) bool {
-	rawIDs := strings.Split(path, "/nodes/")
-	if len(rawIDs) != 2 {
-		return true
-	}
-
-	s := strings.Split(rawIDs[0], "/spaces/")
-	if len(s) != 2 {
-		return true
-	}
-
-	spaceID := strings.Replace(s[1], "/", "", -1)
-	nodeID := strings.Replace(rawIDs[1], "/", "", -1)
-	if spaceID == nodeID || _versionRegex.MatchString(nodeID) {
+	spaceID, nodeID := getIDsFromPath(path)
+	if nodeID != "" && spaceID != "" && (spaceID == nodeID || _versionRegex.MatchString(nodeID)) {
 		return false
 	}
 
@@ -268,4 +257,20 @@ func deleteInconsistency(incs map[string][]Inconsistency, path string) {
 	if len(incs[path]) == 0 {
 		delete(incs, path)
 	}
+}
+
+func getIDsFromPath(path string) (string, string) {
+	rawIDs := strings.Split(path, "/nodes/")
+	if len(rawIDs) != 2 {
+		return "", ""
+	}
+
+	s := strings.Split(rawIDs[0], "/spaces/")
+	if len(s) != 2 {
+		return "", ""
+	}
+
+	spaceID := strings.Replace(s[1], "/", "", -1)
+	nodeID := strings.Replace(rawIDs[1], "/", "", -1)
+	return spaceID, nodeID
 }

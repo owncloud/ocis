@@ -1133,6 +1133,8 @@ def e2eTestPipeline(ctx):
         for item in defaults:
             params[item] = suite[item] if item in suite else defaults[item]
 
+        ocis_bin = "ocis/bin/ocis"
+
         e2e_args = ""
         if params["totalParts"] > 0:
             e2e_args = "--total-parts %d" % params["totalParts"]
@@ -1163,7 +1165,7 @@ def e2eTestPipeline(ctx):
             },
             "commands": [
                 "cd %s/tests/e2e" % dirs["web"],
-                "ocis backup consistency -p /var/lib/ocis/storage/users",
+                "%s backup consistency -p /var/lib/ocis/storage/users" % ocis_bin,
             ],
         }
 
