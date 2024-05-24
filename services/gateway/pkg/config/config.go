@@ -35,6 +35,7 @@ type Config struct {
 	GroupsEndpoint            string `yaml:"-"`
 	PermissionsEndpoint       string `yaml:"-"`
 	SharingEndpoint           string `yaml:"-"`
+	AuthAppEndpoint           string `yaml:"-"`
 	AuthBasicEndpoint         string `yaml:"-"`
 	AuthBearerEndpoint        string `yaml:"-"`
 	AuthMachineEndpoint       string `yaml:"-"`
