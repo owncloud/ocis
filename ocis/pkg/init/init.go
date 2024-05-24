@@ -156,8 +156,13 @@ type Clientlog struct {
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
 
+type WopiApp struct {
+	Insecure bool   `yaml:"insecure"`
+	Secret   string `yaml:"secret"`
+}
+
 type Collaboration struct {
-	JWTSecret string `yaml:"jwt_secret"`
+	WopiApp WopiApp `yaml:"wopiapp"`
 }
 
 type Nats struct {
@@ -294,9 +299,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	if err != nil {
 		return fmt.Errorf("could not generate random password for tokenmanager: %s", err)
 	}
-	collaborationJwtSecret, err := generators.GenerateRandomPassword(passwordLength)
+	collaborationWOPISecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
-		return fmt.Errorf("could not generate random password for collaboration service: %s", err)
+		return fmt.Errorf("could not generate random wopi secret for collaboration service: %s", err)
 	}
 	machineAuthAPIKey, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
@@ -354,7 +359,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			},
 		},
 		Collaboration: Collaboration{
-			JWTSecret: collaborationJwtSecret,
+			WopiApp: WopiApp{
+				Secret: collaborationWOPISecret,
+			},
 		},
 		Groups: UsersAndGroupsService{
 			Drivers: LdapBasedService{
@@ -429,6 +436,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		cfg.AuthBearer = AuthbearerService{
 			AuthProviders: AuthProviderSettings{Oidc: _insecureService},
 		}
+		cfg.Collaboration.WopiApp.Insecure = true
 		cfg.Frontend.AppHandler = _insecureService
 		cfg.Frontend.Archiver = _insecureService
 		cfg.Graph.Spaces = _insecureService

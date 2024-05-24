@@ -22,11 +22,11 @@ There are a few variables that you need to set:
   The URL of the WOPI app (onlyoffice, collabora, etc).\
   For example: `https://office.example.com`.
 
-* `COLLABORATION_HTTP_ADDR`:\
-  The external address of the collaboration service. The target app (onlyoffice, collabora, etc) will use this address to read and write files from Infinite Scale.\
-  For example: `https://wopiserver.example.com`.
+* `COLLABORATION_WOPIAPP_INSECURE`:\
+  In case you are using a self signed certificate for the WOPI app you can tell the collaboration service to allow an insecure connection.
 
-* `COLLABORATION_HTTP_SCHEME`:\
-  The scheme to be used when accessing the collaboration service. Either `http` or `https`. This will be used to finally build the URL that the WOPI app needs in order to contact the collaboration service.
+* `COLLABORATION_WOPIAPP_WOPISRC`:\
+  The external address of the collaboration service. The target app (onlyoffice, collabora, etc) will use this address to read and write files from Infinite Scale. \
+  For example: `https://wopi.example.com`.
 
-The rest of the configuration options available can be left with the default values.
+The WOPI application can be customized further by changing the `COLLABORATION_APP_*` options to better describe the application.

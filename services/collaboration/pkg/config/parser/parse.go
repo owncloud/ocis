@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config/defaults"
-
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )
 
 // ParseConfig loads configuration from known paths.
@@ -34,5 +34,11 @@ func ParseConfig(cfg *config.Config) error {
 
 // Validate validates the configuration
 func Validate(cfg *config.Config) error {
+	if cfg.TokenManager.JWTSecret == "" {
+		return shared.MissingJWTTokenError(cfg.Service.Name)
+	}
+	if cfg.WopiApp.Secret == "" {
+		return shared.MissingWOPISecretError(cfg.Service.Name)
+	}
 	return nil
 }

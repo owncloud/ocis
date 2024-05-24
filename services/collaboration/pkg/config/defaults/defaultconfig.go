@@ -26,14 +26,12 @@ func DefaultConfig() *config.Config {
 			LockName:    "com.github.owncloud.collaboration",
 		},
 		GRPC: config.GRPC{
-			Addr:      "0.0.0.0:9301",
+			Addr:      "127.0.0.1:9301",
 			Namespace: "com.owncloud.api",
 		},
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9300",
-			BindAddr:  "0.0.0.0:9300",
 			Namespace: "com.owncloud.web",
-			Scheme:    "https",
 		},
 		Debug: config.Debug{
 			Addr:   "127.0.0.1:9304",
@@ -42,8 +40,9 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		WopiApp: config.WopiApp{
-			Addr:     "https://127.0.0.1:8080",
+			Addr:     "https://127.0.0.1:9980",
 			Insecure: false,
+			WopiSrc:  "https://localhost:9300",
 		},
 		CS3Api: config.CS3Api{
 			Gateway: config.Gateway{
@@ -80,6 +79,14 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
 	}
 }
 

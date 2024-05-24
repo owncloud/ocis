@@ -14,7 +14,7 @@ type Config struct {
 	Service Service `yaml:"-"`
 	App     App     `yaml:"app"`
 
-	JWTSecret string `yaml:"jwt_secret" env:"COLLABORATION_JWT_SECRET" desc:"Used as mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT token embedded in the WOPI JWT token." introductionVersion:"5.1"`
+	TokenManager *TokenManager `yaml:"token_manager"`
 
 	GRPC    GRPC    `yaml:"grpc"`
 	HTTP    HTTP    `yaml:"http"`

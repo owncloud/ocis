@@ -71,10 +71,7 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 			defer teardown()
 			if err != nil {
-				logger.Info().
-					Err(err).
-					Str("transport", "grpc").
-					Msg("Failed to initialize server")
+				logger.Error().Err(err).Str("transport", "grpc").Msg("Failed to initialize server")
 				return err
 			}
 
@@ -85,11 +82,8 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 				return grpcServer.Serve(l)
 			},
-				func(_ error) {
-					logger.Error().
-						Err(err).
-						Str("server", "grpc").
-						Msg("shutting down server")
+				func(err error) {
+					logger.Error().Err(err).Str("server", "grpc").Msg("shutting down server")
 					cancel()
 				})
 
@@ -100,7 +94,7 @@ func Server(cfg *config.Config) *cli.Command {
 				debug.Config(cfg),
 			)
 			if err != nil {
-				logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
+				logger.Error().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
 				return err
 			}
 
@@ -117,6 +111,10 @@ func Server(cfg *config.Config) *cli.Command {
 				http.Context(ctx),
 				http.TracerProvider(traceProvider),
 			)
+			if err != nil {
+				logger.Error().Err(err).Str("transport", "http").Msg("Failed to initialize server")
+				return err
+			}
 			gr.Add(httpServer.Run, func(_ error) {
 				cancel()
 			})
