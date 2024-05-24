@@ -10,7 +10,7 @@ Feature: Remove access to a drive
     And using spaces DAV path
 
 
-  Scenario Outline: user removes user member from project space
+  Scenario Outline: user removes user member from project space using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
@@ -28,7 +28,7 @@ Feature: Remove access to a drive
       | Manager          |
 
   @issue-8768
-  Scenario Outline: user removes group from project space
+  Scenario Outline: user removes group from project space using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And group "group1" has been created
@@ -48,7 +48,7 @@ Feature: Remove access to a drive
       | Manager          |
 
 
-  Scenario Outline: user of a group removes another user from project space
+  Scenario Outline: user of a group removes another user from project space using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
@@ -73,7 +73,7 @@ Feature: Remove access to a drive
       | Manager          | 204         | should not  |
 
 
-  Scenario Outline: user of a group removes own group from project space
+  Scenario Outline: user of a group removes own group from project space using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
@@ -93,7 +93,7 @@ Feature: Remove access to a drive
       | Manager          | 204         | should not  |
 
   @issue-8819
-  Scenario Outline: user removes himself from the project space
+  Scenario Outline: user removes himself from the project space using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
@@ -134,7 +134,7 @@ Feature: Remove access to a drive
       | Manager          | 204         | should not  |
 
 
-  Scenario: user cannot remove himself from the project space if he is the last manager
+  Scenario: user cannot remove himself from the project space if he is the last manager using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     When user "Alice" tries to remove the access of user "Alice" from space "NewSpace" using root endpoint of the Graph API
@@ -142,7 +142,7 @@ Feature: Remove access to a drive
     And the user "Alice" should have a space called "NewSpace"
 
 
-  Scenario: user of a group cannot remove own group from project space if it is the last manager
+  Scenario: user of a group cannot remove own group from project space if it is the last manager using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
@@ -158,7 +158,7 @@ Feature: Remove access to a drive
     And the user "Brian" should have a space called "NewSpace"
 
   @issue-7879
-  Scenario Outline: user removes link share from project space
+  Scenario Outline: user removes link share from project space using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
@@ -177,7 +177,7 @@ Feature: Remove access to a drive
       | blocksDownload   |
 
 
-  Scenario: user removes internal link share from project space
+  Scenario: user removes internal link share from project space using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
@@ -188,7 +188,7 @@ Feature: Remove access to a drive
     And user "Alice" should not have any "link" permissions on space "NewSpace"
 
   @issue-7879
-  Scenario Outline: user tries to remove link share of project space owned by next user
+  Scenario Outline: user tries to remove link share of project space owned by next user using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
@@ -206,7 +206,7 @@ Feature: Remove access to a drive
       | blocksDownload   |
 
 
-  Scenario: user tries to remove internal link share of project space owned by next user
+  Scenario: user tries to remove internal link share of project space owned by next user using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
@@ -216,13 +216,33 @@ Feature: Remove access to a drive
     Then the HTTP status code should be "404"
 
 
-  Scenario: remove link share of a project drive using permissions endpoint
+  Scenario Outline: user removes link share of a project drive using permissions endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    When user "Alice" removes the last link share of space "projectSpace" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "204"
+    And user "Alice" should not have any "link" permissions on space "projectSpace"
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
+
+
+  Scenario: user removes internal link share of a project drive using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
       | space           | projectSpace |
-      | permissionsRole | view         |
-      | password        | $heLlo*1234* |
-    When user "Alice" deletes the last link share of space "projectSpace" using permissions endpoint of the Graph API
+      | permissionsRole | internal     |
+    When user "Alice" removes the last link share of space "projectSpace" using permissions endpoint of the Graph API
     Then the HTTP status code should be "204"
+    And user "Alice" should not have any "link" permissions on space "projectSpace"
