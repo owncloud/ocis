@@ -35,7 +35,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.TLSConfig(options.Config.HTTP.TLS),
 		http.Logger(options.Logger),
 		http.Namespace(options.Config.HTTP.Namespace),
-		http.Name("graph"),
+		http.Name(options.Config.Service.Name),
 		http.Version(version.GetString()),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
@@ -66,7 +66,7 @@ func Server(opts ...Option) (http.Service, error) {
 		middleware.TraceContext,
 		chimiddleware.RequestID,
 		middleware.Version(
-			"graph",
+			options.Config.Service.Name,
 			version.GetString(),
 		),
 		middleware.Logger(

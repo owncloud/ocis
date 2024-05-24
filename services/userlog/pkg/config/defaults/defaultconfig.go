@@ -44,7 +44,7 @@ func DefaultConfig() *config.Config {
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:0",
 			Root:      "/",
-			Namespace: "com.owncloud.userlog",
+			Namespace: "com.owncloud.web",
 			CORS: config.CORS{
 				AllowedOrigins:   []string{"*"},
 				AllowedMethods:   []string{"GET"},
