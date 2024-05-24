@@ -54,7 +54,7 @@ policies:
   - endpoint: /ocs/v2.php/apps/notifications/api/v1/notifications/sse
     service: com.owncloud.sse.sse
   - endpoint: /ocs/v2.php/apps/notifications/api/v1/notifications
-    service: com.owncloud.userlog.userlog
+    service: com.owncloud.web.userlog
   - type: regex
     endpoint: /ocs/v[12].php/cloud/user/signing-key
     service: com.owncloud.web.ocs
@@ -106,9 +106,9 @@ policies:
   - endpoint: /app/
     service: com.owncloud.web.frontend
   - endpoint: /graph/v1.0/invitations
-    service: com.owncloud.graph.invitations
+    service: com.owncloud.web.invitations
   - endpoint: /graph/
-    service: com.owncloud.graph.graph
+    service: com.owncloud.web.graph
   - endpoint: /api/v0/settings
     service: com.owncloud.web.settings
 additional_policies: []
