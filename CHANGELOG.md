@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.5](#changelog-for-505-2024-05-22)
 * [Changelog for 5.0.4](#changelog-for-504-2024-05-13)
 * [Changelog for 5.0.3](#changelog-for-503-2024-05-02)
@@ -37,6 +38,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.5...master
+
+## Summary
+
+* Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
+
+## Details
+
+* Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
+
+   The number of concurrent requests to the thumbnail service can be limited now to
+   have more control over the consumed system resources.
+
+   https://github.com/owncloud/ocis/pull/9199
 
 # Changelog for [5.0.5] (2024-05-22)
 
