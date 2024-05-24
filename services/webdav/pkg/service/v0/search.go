@@ -47,7 +47,7 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t := r.Header.Get(TokenHeader)
+	t := r.Header.Get(revactx.TokenHeader)
 	ctx := revactx.ContextSetToken(r.Context(), t)
 	ctx = metadata.Set(ctx, revactx.TokenHeader, t)
 

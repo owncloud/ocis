@@ -41,19 +41,19 @@ Thumbnails can either be generated as `png`, `jpg` or `gif` files. These types a
 
 ## Thumbnail Query String Parameters
 
-Clients can request thumbnail previews for files by adding `?preview=1` to the file URL. Requests for files with thumbnail availabe respond with HTTP status `404`.
+Clients can request thumbnail previews for files by adding `?preview=1` to the file URL. Requests for files with thumbnail available respond with HTTP status `404`.
 
 The following query parameters are supported:
 
 | Parameter | Required | Default Value                                        | Description                                                                     |
-| --------- | -------- | ---------------------------------------------------- | ------------------------------------------------------------------------------- |
+|-----------|----------|------------------------------------------------------|---------------------------------------------------------------------------------|
 | preview   | YES      | 1                                                    | generates preview                                                               |
 | x         | YES      | first x-value configured in `THUMBNAILS_RESOLUTIONS` | horizontal target size                                                          |
 | y         | YES      | first y-value configured in `THUMBNAILS_RESOLUTIONS` | vertical target size                                                            |
-| scalingup | NO       | 0                                                    | prevents upscaling of small images                                              |
+| scalingup | NO       | 0                                                    | prevents up-scaling of small images                                             |
 | a         | NO       | 1                                                    | aspect ratio                                                                    |
 | c         | NO       | Caching string                                       | Clients should send the etag, so they get a fresh thumbnail after a file change |
-| processor | NO       | `resize` for gif's and `thumbnail` for all others    | preferred thumbnail processor                                                   |
+| processor | NO       | `resize` for gifs and `thumbnail` for all others     | preferred thumbnail processor                                                   |
 
 ## Thumbnail Resolution
 
@@ -61,21 +61,21 @@ Various resolutions can be defined via `THUMBNAILS_RESOLUTIONS`. A requestor can
 
 Example:
 
-Requested: 18x12  
-Available: 30x20, 15x10, 9x6  
-Returned: 15x10  
+Requested: 18x12
+Available: 30x20, 15x10, 9x6
+Returned: 15x10
 
 ## Thumbnail Processors
 
-Normally, an image might get cropped when creating a preview, depending on the aspect ratio of the original image. This can have negative 
+Normally, an image might get cropped when creating a preview, depending on the aspect ratio of the original image. This can have negative
 impacts on previews as only a part of the image will be shown. When using an _optional_ processor in the request, cropping can be avoided by defining on how the preview image generation will be done. The following processors are available:
 
 *   `resize` resizes the image to the specified width and height and returns the transformed image. If one of width or height is 0, the image aspect ratio is preserved.
 *   `fit` scales down the image to fit the specified maximum width and height and returns the transformed image.
 *   `fill`: creates an image with the specified dimensions and fills it with the scaled source image. To achieve the correct aspect ratio without stretching, the source image will be cropped.
-*   `thumbnail` scales the image up or down, crops it to the specified width and hight and returns the transformed image.
+*   `thumbnail` scales the image up or down, crops it to the specified width and height and returns the transformed image.
 
-To apply one of those, a query parameter has to be added to the request, like `?processor=fit`. If no query parameter or processor is added, the default behaviour applies which is `resize` for gif's and `thumbnail` for all others.
+To apply one of those, a query parameter has to be added to the request, like `?processor=fit`. If no query parameter or processor is added, the default behaviour applies which is `resize` for gifs and `thumbnail` for all others.
 
 ## Deleting Thumbnails
 
@@ -84,3 +84,4 @@ As of now, there is no automated thumbnail deletion. This is especially true whe
 ## Memory Considerations
 
 Since source files need to be loaded into memory when generating thumbnails, large source files could potentially crash this service if there is insufficient memory available. For bigger instances when using container orchestration deployment methods, this service can be dedicated to its own server(s) with more memory.
+To have more control over memory (and CPU) consumption the maximum number of concurrent requests can be limited by setting the environment variable `THUMBNAILS_MAX_CONCURRENT_REQUESTS`. The default value is 0 which does not apply any restrictions to the number of concurrent requests. As soon as the number of concurrent requests is reached any further request will be responded with `429/Too Many Requests` and the client can retry at a later point in time.

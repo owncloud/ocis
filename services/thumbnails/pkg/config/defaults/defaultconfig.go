@@ -32,9 +32,10 @@ func DefaultConfig() *config.Config {
 			Namespace: "com.owncloud.api",
 		},
 		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:9186",
-			Root:      "/thumbnails",
-			Namespace: "com.owncloud.web",
+			Addr:                  "127.0.0.1:9186",
+			Root:                  "/thumbnails",
+			Namespace:             "com.owncloud.web",
+			MaxConcurrentRequests: 0,
 		},
 		Service: config.Service{
 			Name: "thumbnails",
