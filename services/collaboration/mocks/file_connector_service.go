@@ -5,8 +5,7 @@ package mocks
 import (
 	context "context"
 
-	connector "github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
-
+	fileinfo "github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -24,22 +23,24 @@ func (_m *FileConnectorService) EXPECT() *FileConnectorService_Expecter {
 }
 
 // CheckFileInfo provides a mock function with given fields: ctx
-func (_m *FileConnectorService) CheckFileInfo(ctx context.Context) (connector.FileInfo, error) {
+func (_m *FileConnectorService) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CheckFileInfo")
 	}
 
-	var r0 connector.FileInfo
+	var r0 fileinfo.FileInfo
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (connector.FileInfo, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) (fileinfo.FileInfo, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) connector.FileInfo); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) fileinfo.FileInfo); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(connector.FileInfo)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(fileinfo.FileInfo)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -69,12 +70,12 @@ func (_c *FileConnectorService_CheckFileInfo_Call) Run(run func(ctx context.Cont
 	return _c
 }
 
-func (_c *FileConnectorService_CheckFileInfo_Call) Return(_a0 connector.FileInfo, _a1 error) *FileConnectorService_CheckFileInfo_Call {
+func (_c *FileConnectorService_CheckFileInfo_Call) Return(_a0 fileinfo.FileInfo, _a1 error) *FileConnectorService_CheckFileInfo_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FileConnectorService_CheckFileInfo_Call) RunAndReturn(run func(context.Context) (connector.FileInfo, error)) *FileConnectorService_CheckFileInfo_Call {
+func (_c *FileConnectorService_CheckFileInfo_Call) RunAndReturn(run func(context.Context) (fileinfo.FileInfo, error)) *FileConnectorService_CheckFileInfo_Call {
 	_c.Call.Return(run)
 	return _c
 }

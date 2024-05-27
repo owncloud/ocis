@@ -566,8 +566,8 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 		// nothing special to do here for now
 
 	case appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY:
-		infoMap["DisableExport"] = true
-		infoMap["DisableCopy"] = true
+		infoMap["DisableExport"] = true // only for collabora
+		infoMap["DisableCopy"] = true   // only for collabora
 		infoMap["DisablePrint"] = true
 		if !isPublicShare {
 			infoMap["WatermarkText"] = f.watermarkText(wopiContext.User) // only for collabora
