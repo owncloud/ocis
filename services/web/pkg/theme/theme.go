@@ -46,8 +46,8 @@ var themeDefaults = KV{
 				"label":    "UnifiedRoleManager",
 				"iconName": "user-star",
 			},
-			unifiedrole.UnifiedRoleUploaderID: KV{
-				"label":    "UnifiedRoleUploader",
+			unifiedrole.UnifiedRoleEditorLiteID: KV{
+				"label":    "UnifiedRoleEditorLite",
 				"iconName": "upload",
 			},
 			unifiedrole.UnifiedRoleSecureViewerID: KV{
