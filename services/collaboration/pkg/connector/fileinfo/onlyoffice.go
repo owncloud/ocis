@@ -21,13 +21,13 @@ type OnlyOffice struct {
 	// copied from MS WOPI
 	BreadcrumbBrandName string `json:"BreadcrumbBrandName,omitempty"`
 	// copied from MS WOPI
-	BreadcrumbBrandUrl string `json:"BreadcrumbBrandUrl,omitempty"`
+	BreadcrumbBrandURL string `json:"BreadcrumbBrandUrl,omitempty"`
 	// copied from MS WOPI
 	BreadcrumbDocName string `json:"BreadcrumbDocName,omitempty"`
 	// copied from MS WOPI
 	BreadcrumbFolderName string `json:"BreadcrumbFolderName,omitempty"`
 	// copied from MS WOPI
-	BreadcrumbFolderUrl string `json:"BreadcrumbFolderUrl,omitempty"`
+	BreadcrumbFolderURL string `json:"BreadcrumbFolderUrl,omitempty"`
 
 	//
 	// PostMessage properties
@@ -52,13 +52,13 @@ type OnlyOffice struct {
 	//
 
 	// copied from MS WOPI
-	CloseUrl string `json:"CloseUrl,omitempty"`
+	CloseURL string `json:"CloseUrl,omitempty"`
 	// copied from MS WOPI
-	FileSharingUrl string `json:"FileSharingUrl,omitempty"`
+	FileSharingURL string `json:"FileSharingUrl,omitempty"`
 	// copied from MS WOPI
-	FileVersionUrl string `json:"FileVersionUrl,omitempty"`
+	FileVersionURL string `json:"FileVersionUrl,omitempty"`
 	// copied from MS WOPI
-	HostEditUrl string `json:"HostEditUrl,omitempty"`
+	HostEditURL string `json:"HostEditUrl,omitempty"`
 
 	//
 	// Miscellaneous properties
@@ -87,7 +87,7 @@ type OnlyOffice struct {
 	// copied from MS WOPI
 	UserFriendlyName string `json:"UserFriendlyName,omitempty"`
 	// copied from MS WOPI
-	UserId string `json:"UserId,omitempty"`
+	UserID string `json:"UserId,omitempty"`
 
 	//
 	// User permissions properties
@@ -127,16 +127,17 @@ type OnlyOffice struct {
 	HidePrintOption bool `json:"HidePrintOption,omitempty"`
 }
 
+// SetProperties will set the file properties for the OnlyOffice implementation.
 func (oinfo *OnlyOffice) SetProperties(props map[string]interface{}) {
 	setters := map[string]func(value interface{}){
 		"BaseFileName": assignStringTo(&oinfo.BaseFileName),
 		"Version":      assignStringTo(&oinfo.Version),
 
 		"BreadcrumbBrandName":  assignStringTo(&oinfo.BreadcrumbBrandName),
-		"BreadcrumbBrandUrl":   assignStringTo(&oinfo.BreadcrumbBrandUrl),
+		"BreadcrumbBrandURL":   assignStringTo(&oinfo.BreadcrumbBrandURL),
 		"BreadcrumbDocName":    assignStringTo(&oinfo.BreadcrumbDocName),
 		"BreadcrumbFolderName": assignStringTo(&oinfo.BreadcrumbFolderName),
-		"BreadcrumbFolderUrl":  assignStringTo(&oinfo.BreadcrumbFolderUrl),
+		"BreadcrumbFolderURL":  assignStringTo(&oinfo.BreadcrumbFolderURL),
 
 		"ClosePostMessage":            assignBoolTo(&oinfo.ClosePostMessage),
 		"EditModePostMessage":         assignBoolTo(&oinfo.EditModePostMessage),
@@ -145,10 +146,10 @@ func (oinfo *OnlyOffice) SetProperties(props map[string]interface{}) {
 		"FileVersionPostMessage":      assignBoolTo(&oinfo.FileVersionPostMessage),
 		"PostMessageOrigin":           assignStringTo(&oinfo.PostMessageOrigin),
 
-		"CloseUrl":       assignStringTo(&oinfo.CloseUrl),
-		"FileSharingUrl": assignStringTo(&oinfo.FileSharingUrl),
-		"FileVersionUrl": assignStringTo(&oinfo.FileVersionUrl),
-		"HostEditUrl":    assignStringTo(&oinfo.HostEditUrl),
+		"CloseURL":       assignStringTo(&oinfo.CloseURL),
+		"FileSharingURL": assignStringTo(&oinfo.FileSharingURL),
+		"FileVersionURL": assignStringTo(&oinfo.FileVersionURL),
+		"HostEditURL":    assignStringTo(&oinfo.HostEditURL),
 
 		"CopyPasteRestrictions": assignStringTo(&oinfo.CopyPasteRestrictions),
 		"DisablePrint":          assignBoolTo(&oinfo.DisablePrint),
@@ -158,7 +159,7 @@ func (oinfo *OnlyOffice) SetProperties(props map[string]interface{}) {
 
 		"IsAnonymousUser":  assignBoolTo(&oinfo.IsAnonymousUser),
 		"UserFriendlyName": assignStringTo(&oinfo.UserFriendlyName),
-		"UserId":           assignStringTo(&oinfo.UserId),
+		"UserID":           assignStringTo(&oinfo.UserID),
 
 		"ReadOnly":                assignBoolTo(&oinfo.ReadOnly),
 		"UserCanNotWriteRelative": assignBoolTo(&oinfo.UserCanNotWriteRelative),
@@ -183,6 +184,7 @@ func (oinfo *OnlyOffice) SetProperties(props map[string]interface{}) {
 	}
 }
 
+// GetTarget will always return "OnlyOffice"
 func (oinfo *OnlyOffice) GetTarget() string {
 	return "OnlyOffice"
 }

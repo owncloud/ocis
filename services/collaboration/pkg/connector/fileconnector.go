@@ -535,7 +535,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 
 	// fileinfo map
 	infoMap := map[string]interface{}{
-		"OwnerId":           hexEncodedOwnerId,
+		"OwnerID":           hexEncodedOwnerId,
 		"Size":              int64(statRes.GetInfo().GetSize()),
 		"Version":           version,
 		"BaseFileName":      path.Base(statRes.GetInfo().GetPath()),
@@ -543,8 +543,8 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 		// to get the folder we actually need to do a GetPath() request
 		//BreadcrumbFolderName: path.Dir(statRes.Info.Path),
 
-		"HostViewUrl": wopiContext.ViewAppUrl,
-		"HostEditUrl": wopiContext.EditAppUrl,
+		"HostViewURL": wopiContext.ViewAppUrl,
+		"HostEditURL": wopiContext.EditAppUrl,
 
 		"EnableOwnerTermination":     true, // only for collabora
 		"SupportsExtendedLockLength": true,
@@ -555,7 +555,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 		"UserCanNotWriteRelative": true,
 		"IsAnonymousUser":         isAnonymousUser,
 		"UserFriendlyName":        userFriendlyName,
-		"UserId":                  userId,
+		"UserID":                  userId,
 	}
 
 	switch wopiContext.ViewMode {

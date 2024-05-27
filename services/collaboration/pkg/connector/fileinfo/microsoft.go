@@ -12,11 +12,11 @@ type Microsoft struct {
 	// The string name of the file, including extension, without a path. Used for display in user interface (UI), and determining the extension of the file.
 	BaseFileName string `json:"BaseFileName,omitempty"`
 	//A string that uniquely identifies the owner of the file. In most cases, the user who uploaded or created the file should be considered the owner.
-	OwnerId string `json:"OwnerId,omitempty"`
+	OwnerID string `json:"OwnerId,omitempty"`
 	// The size of the file in bytes, expressed as a long, a 64-bit signed integer.
 	Size int64 `json:"Size"`
 	// A string value uniquely identifying the user currently accessing the file.
-	UserId string `json:"UserId,omitempty"`
+	UserID string `json:"UserId,omitempty"`
 	// The current version of the file based on the server’s file version schema, as a string. This value must change when the file changes, and version values must never repeat for a given file.
 	Version string `json:"Version,omitempty"`
 
@@ -25,7 +25,7 @@ type Microsoft struct {
 	//
 
 	// An array of strings containing the Share URL types supported by the host.
-	SupportedShareUrlTypes []string `json:"SupportedShareUrlTypes,omitempty"`
+	SupportedShareURLTypes []string `json:"SupportedShareUrlTypes,omitempty"`
 	// A Boolean value that indicates that the host supports the following WOPI operations: ExecuteCellStorageRequest, ExecuteCellStorageRelativeRequest
 	SupportsCobalt bool `json:"SupportsCobalt"`
 	// A Boolean value that indicates that the host supports the following WOPI operations: CheckContainerInfo, CreateChildContainer, CreateChildFile, DeleteContainer, DeleteFile, EnumerateAncestors (containers), EnumerateAncestors (files), EnumerateChildren (containers), GetEcosystem (containers), RenameContainer
@@ -90,25 +90,25 @@ type Microsoft struct {
 	//
 
 	// A URI to a web page that the WOPI client should navigate to when the application closes, or in the event of an unrecoverable error.
-	CloseUrl string `json:"CloseUrl,omitempty"`
+	CloseURL string `json:"CloseUrl,omitempty"`
 	// A user-accessible URI to the file intended to allow the user to download a copy of the file.
-	DownloadUrl string `json:"DownloadUrl,omitempty"`
+	DownloadURL string `json:"DownloadUrl,omitempty"`
 	// A URI to a location that allows the user to create an embeddable URI to the file.
-	FileEmbedCommandUrl string `json:"FileEmbedCommandUrl,omitempty"`
+	FileEmbedCommandURL string `json:"FileEmbedCommandUrl,omitempty"`
 	// A URI to a location that allows the user to share the file.
-	FileSharingUrl string `json:"FileSharingUrl,omitempty"`
+	FileSharingURL string `json:"FileSharingUrl,omitempty"`
 	// A URI to the file location that the WOPI client uses to get the file. If this is provided, the WOPI client may use this URI to get the file instead of a GetFile request. A host might set this property if it is easier or provides better performance to serve files from a different domain than the one handling standard WOPI requests. WOPI clients must not add or remove parameters from the URL; no other parameters, including the access token, should be appended to the FileUrl before it is used.
-	FileUrl string `json:"FileUrl,omitempty"`
+	FileURL string `json:"FileUrl,omitempty"`
 	// A URI to a location that allows the user to view the version history for the file.
-	FileVersionUrl string `json:"FileVersionUrl,omitempty"`
+	FileVersionURL string `json:"FileVersionUrl,omitempty"`
 	// A URI to a host page that loads the edit WOPI action.
-	HostEditUrl string `json:"HostEditUrl,omitempty"`
+	HostEditURL string `json:"HostEditUrl,omitempty"`
 	// A URI to a web page that provides access to a viewing experience for the file that can be embedded in another HTML page. This is typically a URI to a host page that loads the embedview WOPI action.
-	HostEmbeddedViewUrl string `json:"HostEmbeddedViewUrl,omitempty"`
+	HostEmbeddedViewURL string `json:"HostEmbeddedViewUrl,omitempty"`
 	// A URI to a host page that loads the view WOPI action. This URL is used by Office Online to navigate between view and edit mode.
-	HostViewUrl string `json:"HostViewUrl,omitempty"`
+	HostViewURL string `json:"HostViewUrl,omitempty"`
 	// A URI that will sign the current user out of the host’s authentication system.
-	SignoutUrl string `json:"SignoutUrl,omitempty"`
+	SignoutURL string `json:"SignoutUrl,omitempty"`
 
 	//
 	// Miscellaneous properties
@@ -154,24 +154,25 @@ type Microsoft struct {
 	// A string that indicates the brand name of the host.
 	BreadcrumbBrandName string `json:"BreadcrumbBrandName,omitempty"`
 	// A URI to a web page that the WOPI client should navigate to when the user clicks on UI that displays BreadcrumbBrandName.
-	BreadcrumbBrandUrl string `json:"BreadcrumbBrandUrl,omitempty"`
+	BreadcrumbBrandURL string `json:"BreadcrumbBrandUrl,omitempty"`
 	// A string that indicates the name of the file. If this is not provided, WOPI clients may use the BaseFileName value.
 	BreadcrumbDocName string `json:"BreadcrumbDocName,omitempty"`
 	// A string that indicates the name of the container that contains the file.
 	BreadcrumbFolderName string `json:"BreadcrumbFolderName,omitempty"`
 	// A URI to a web page that the WOPI client should navigate to when the user clicks on UI that displays BreadcrumbFolderName.
-	BreadcrumbFolderUrl string `json:"BreadcrumbFolderUrl,omitempty"`
+	BreadcrumbFolderURL string `json:"BreadcrumbFolderUrl,omitempty"`
 }
 
+// SetProperties will set the file properties for the Microsoft implementation.
 func (minfo *Microsoft) SetProperties(props map[string]interface{}) {
 	setters := map[string]func(value interface{}){
 		"BaseFileName": assignStringTo(&minfo.BaseFileName),
-		"OwnerId":      assignStringTo(&minfo.OwnerId),
+		"OwnerID":      assignStringTo(&minfo.OwnerID),
 		"Size":         assignInt64To(&minfo.Size),
-		"UserId":       assignStringTo(&minfo.UserId),
+		"UserID":       assignStringTo(&minfo.UserID),
 		"Version":      assignStringTo(&minfo.Version),
 
-		"SupportedShareUrlTypes":     assignStringListTo(&minfo.SupportedShareUrlTypes),
+		"SupportedShareURLTypes":     assignStringListTo(&minfo.SupportedShareURLTypes),
 		"SupportsCobalt":             assignBoolTo(&minfo.SupportsCobalt),
 		"SupportsContainers":         assignBoolTo(&minfo.SupportsContainers),
 		"SupportsDeleteFile":         assignBoolTo(&minfo.SupportsDeleteFile),
@@ -199,16 +200,16 @@ func (minfo *Microsoft) SetProperties(props map[string]interface{}) {
 		"UserCanRename":           assignBoolTo(&minfo.UserCanRename),
 		"UserCanWrite":            assignBoolTo(&minfo.UserCanWrite),
 
-		"CloseUrl":            assignStringTo(&minfo.CloseUrl),
-		"DownloadUrl":         assignStringTo(&minfo.DownloadUrl),
-		"FileEmbedCommandUrl": assignStringTo(&minfo.FileEmbedCommandUrl),
-		"FileSharingUrl":      assignStringTo(&minfo.FileSharingUrl),
-		"FileUrl":             assignStringTo(&minfo.FileUrl),
-		"FileVersionUrl":      assignStringTo(&minfo.FileVersionUrl),
-		"HostEditUrl":         assignStringTo(&minfo.HostEditUrl),
-		"HostEmbeddedViewUrl": assignStringTo(&minfo.HostEmbeddedViewUrl),
-		"HostViewUrl":         assignStringTo(&minfo.HostViewUrl),
-		"SignoutUrl":          assignStringTo(&minfo.SignoutUrl),
+		"CloseURL":            assignStringTo(&minfo.CloseURL),
+		"DownloadURL":         assignStringTo(&minfo.DownloadURL),
+		"FileEmbedCommandURL": assignStringTo(&minfo.FileEmbedCommandURL),
+		"FileSharingURL":      assignStringTo(&minfo.FileSharingURL),
+		"FileURL":             assignStringTo(&minfo.FileURL),
+		"FileVersionURL":      assignStringTo(&minfo.FileVersionURL),
+		"HostEditURL":         assignStringTo(&minfo.HostEditURL),
+		"HostEmbeddedViewURL": assignStringTo(&minfo.HostEmbeddedViewURL),
+		"HostViewURL":         assignStringTo(&minfo.HostViewURL),
+		"SignoutURL":          assignStringTo(&minfo.SignoutURL),
 
 		"AllowAdditionalMicrosoftServices": assignBoolTo(&minfo.AllowAdditionalMicrosoftServices),
 		"AllowErrorReportPrompt":           assignBoolTo(&minfo.AllowErrorReportPrompt),
@@ -227,10 +228,10 @@ func (minfo *Microsoft) SetProperties(props map[string]interface{}) {
 		"TemporarilyNotWritable":           assignBoolTo(&minfo.TemporarilyNotWritable),
 
 		"BreadcrumbBrandName":  assignStringTo(&minfo.BreadcrumbBrandName),
-		"BreadcrumbBrandUrl":   assignStringTo(&minfo.BreadcrumbBrandUrl),
+		"BreadcrumbBrandURL":   assignStringTo(&minfo.BreadcrumbBrandURL),
 		"BreadcrumbDocName":    assignStringTo(&minfo.BreadcrumbDocName),
 		"BreadcrumbFolderName": assignStringTo(&minfo.BreadcrumbFolderName),
-		"BreadcrumbFolderUrl":  assignStringTo(&minfo.BreadcrumbFolderUrl),
+		"BreadcrumbFolderURL":  assignStringTo(&minfo.BreadcrumbFolderURL),
 	}
 
 	for key, value := range props {
@@ -241,6 +242,7 @@ func (minfo *Microsoft) SetProperties(props map[string]interface{}) {
 	}
 }
 
+// GetTarget will always return "Microsoft"
 func (minfo *Microsoft) GetTarget() string {
 	return "Microsoft"
 }

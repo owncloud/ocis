@@ -785,20 +785,20 @@ var _ = Describe("FileConnector", func() {
 			}, nil)
 
 			expectedFileInfo := &fileinfo.Microsoft{
-				OwnerId:                    "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
+				OwnerID:                    "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                       int64(998877),
 				Version:                    "16273849.0",
 				BaseFileName:               "test.txt",
 				BreadcrumbDocName:          "test.txt",
 				UserCanNotWriteRelative:    true,
-				HostViewUrl:                "http://test.ex.prv/view",
-				HostEditUrl:                "http://test.ex.prv/edit",
+				HostViewURL:                "http://test.ex.prv/view",
+				HostEditURL:                "http://test.ex.prv/edit",
 				SupportsExtendedLockLength: true,
 				SupportsGetLock:            true,
 				SupportsLocks:              true,
 				SupportsUpdate:             true,
 				UserCanWrite:               true,
-				UserId:                     "6f7061717565496440696e6d656d6f7279", // hex of opaqueId@inmemory
+				UserID:                     "6f7061717565496440696e6d656d6f7279", // hex of opaqueId@inmemory
 				UserFriendlyName:           "Pet Shaft",
 			}
 
@@ -843,26 +843,26 @@ var _ = Describe("FileConnector", func() {
 			cfg.WopiApp.Provider = "Collabora"
 
 			expectedFileInfo := &fileinfo.Collabora{
-				OwnerId:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
+				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                    int64(998877),
 				BaseFileName:            "test.txt",
 				UserCanNotWriteRelative: true,
 				DisableExport:           true,
 				DisableCopy:             true,
 				DisablePrint:            true,
-				UserId:                  "guest-zzz000",
+				UserID:                  "guest-zzz000",
 				UserFriendlyName:        "guest zzz000",
 				EnableOwnerTermination:  true,
 			}
 
 			newFileInfo, err := fc.CheckFileInfo(ctx)
 
-			// UserId and UserFriendlyName have random Ids generated which are impossible to guess
+			// UserID and UserFriendlyName have random Ids generated which are impossible to guess
 			// Check both separately
-			Expect(newFileInfo.(*fileinfo.Collabora).UserId).To(HavePrefix(hex.EncodeToString([]byte("guest-"))))
+			Expect(newFileInfo.(*fileinfo.Collabora).UserID).To(HavePrefix(hex.EncodeToString([]byte("guest-"))))
 			Expect(newFileInfo.(*fileinfo.Collabora).UserFriendlyName).To(HavePrefix("Guest "))
-			// overwrite UserId and UserFriendlyName here for easier matching
-			newFileInfo.(*fileinfo.Collabora).UserId = "guest-zzz000"
+			// overwrite UserID and UserFriendlyName here for easier matching
+			newFileInfo.(*fileinfo.Collabora).UserID = "guest-zzz000"
 			newFileInfo.(*fileinfo.Collabora).UserFriendlyName = "guest zzz000"
 
 			Expect(err).To(Succeed())
@@ -896,14 +896,14 @@ var _ = Describe("FileConnector", func() {
 			cfg.WopiApp.Provider = "Collabora"
 
 			expectedFileInfo := &fileinfo.Collabora{
-				OwnerId:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
+				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                    int64(998877),
 				BaseFileName:            "test.txt",
 				UserCanNotWriteRelative: true,
 				DisableExport:           true,
 				DisableCopy:             true,
 				DisablePrint:            true,
-				UserId:                  hex.EncodeToString([]byte("opaqueId@inmemory")),
+				UserID:                  hex.EncodeToString([]byte("opaqueId@inmemory")),
 				UserFriendlyName:        "Pet Shaft",
 				EnableOwnerTermination:  true,
 				WatermarkText:           "Pet Shaft shaft@example.com",

@@ -14,7 +14,7 @@ type Collabora struct {
 	// Copied from MS WOPI
 	DisablePrint bool `json:"DisablePrint"`
 	// Copied from MS WOPI
-	OwnerId string `json:"OwnerId,omitempty"`
+	OwnerID string `json:"OwnerId,omitempty"`
 	// A string for the domain the host page sends/receives PostMessages from, we only listen to messages from this domain.
 	PostMessageOrigin string `json:"PostMessageOrigin,omitempty"`
 	// copied from MS WOPI
@@ -26,7 +26,7 @@ type Collabora struct {
 	// copied from MS WOPI
 	UserCanNotWriteRelative bool `json:"UserCanNotWriteRelative"`
 	// copied from MS WOPI
-	UserId string `json:"UserId,omitempty"`
+	UserID string `json:"UserId,omitempty"`
 	// copied from MS WOPI
 	UserFriendlyName string `json:"UserFriendlyName,omitempty"`
 
@@ -66,17 +66,18 @@ type Collabora struct {
 	WatermarkText string `json:"WatermarkText,omitempty"`
 }
 
+// SetProperties will set the file properties for the Collabora implementation.
 func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 	setters := map[string]func(value interface{}){
 		"BaseFileName":            assignStringTo(&cinfo.BaseFileName),
 		"DisablePrint":            assignBoolTo(&cinfo.DisablePrint),
-		"OwnerId":                 assignStringTo(&cinfo.OwnerId),
+		"OwnerID":                 assignStringTo(&cinfo.OwnerID),
 		"PostMessageOrigin":       assignStringTo(&cinfo.PostMessageOrigin),
 		"Size":                    assignInt64To(&cinfo.Size),
 		"TemplateSource":          assignStringTo(&cinfo.TemplateSource),
 		"UserCanWrite":            assignBoolTo(&cinfo.UserCanWrite),
 		"UserCanNotWriteRelative": assignBoolTo(&cinfo.UserCanNotWriteRelative),
-		"UserId":                  assignStringTo(&cinfo.UserId),
+		"UserID":                  assignStringTo(&cinfo.UserID),
 		"UserFriendlyName":        assignStringTo(&cinfo.UserFriendlyName),
 
 		"EnableInsertRemoteImage": assignBoolTo(&cinfo.EnableInsertRemoteImage),
@@ -103,6 +104,7 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 	}
 }
 
+// GetTarget will always return "Collabora"
 func (cinfo *Collabora) GetTarget() string {
 	return "Collabora"
 }
