@@ -78,6 +78,5 @@
 * [ ] DEV/QA: Ping documentation in RC about the new release tag (for ocis/helm chart version bump in docs)
 * [ ] DEV/QA: Ping marketing to update all download links (download mirrors are updated at the full hour, wait with ping until download is actually available)
 * [ ] DEV/QA: Ping @hodyroff once the demo instances are running this release
-* [ ] DEV/QA: notify @michaelstingl @hosy @fmoc @jesmrec to publish client finals
 * [ ] DEV: Merge back release branch
 * [ ] DEV: Create stable-x.y branch in the ocis repo from final tag
