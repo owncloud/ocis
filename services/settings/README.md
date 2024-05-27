@@ -86,7 +86,7 @@ The `OCIS_DEFAULT_LANGUAGE` setting impacts the `notification` and `userlog` ser
 
 ## Custom Roles
 
-Is it possible to replace the default ocis roles (`admin`, `user`) with custom roles that contain custom permissions. One can set `SETTINGS_BUNDLES_PATH` to the path of a `json` file containing the new roles.
+It is possible to replace the default ocis roles (`admin`, `user`) with custom roles that contain custom permissions. One can set `SETTINGS_BUNDLES_PATH` to the path of a `json` file containing the new roles.
 
 Role Example:
 ```json
