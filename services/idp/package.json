@@ -141,7 +141,7 @@
     "postcss-flexbugs-fixes": "5.0.2",
     "postcss-loader": "4.3.0",
     "postcss-normalize": "10.0.1",
-    "postcss-preset-env": "9.5.13",
+    "postcss-preset-env": "9.5.14",
     "postcss-safe-parser": "7.0.0",
     "react-dev-utils": "^12.0.1",
     "resolve": "1.22.8",
