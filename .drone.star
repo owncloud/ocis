@@ -1133,8 +1133,6 @@ def e2eTestPipeline(ctx):
         for item in defaults:
             params[item] = suite[item] if item in suite else defaults[item]
 
-        ocis_bin = "ocis/bin/ocis"
-
         e2e_args = ""
         if params["totalParts"] > 0:
             e2e_args = "--total-parts %d" % params["totalParts"]
@@ -1165,7 +1163,6 @@ def e2eTestPipeline(ctx):
             },
             "commands": [
                 "cd %s/tests/e2e" % dirs["web"],
-                "%s backup consistency -p /var/lib/ocis/storage/users" % ocis_bin,
             ],
         }
 
@@ -1992,6 +1989,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "commands": [
                 "%s init --insecure true" % ocis_bin,
                 "cat $OCIS_CONFIG_DIR/ocis.yaml",
+                "%s backup consistency -p /var/lib/ocis/storage/users" % ocis_bin,
             ] + (wrapper_commands),
             "volumes": volumes,
             "depends_on": depends_on,
