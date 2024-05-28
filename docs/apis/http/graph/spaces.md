@@ -102,7 +102,7 @@ Create a new space with properties.
 curl -L -X POST 'https://localhost:9200/graph/v1.0/drives/' \
 -H 'Content-Type: application/json' \
 --data-raw '{
-    "Name": "Marketing",
+    "name": "Marketing",
     "description": "Marketing team resources",
     "quota": {
         "total": 5368709120

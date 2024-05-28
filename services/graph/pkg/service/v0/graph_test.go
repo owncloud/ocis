@@ -575,7 +575,7 @@ var _ = Describe("Graph", func() {
 						Constraint: v0.Permission_CONSTRAINT_ALL,
 					},
 				}, nil)
-				jsonBody := []byte(`{"Name": "Test Space"`)
+				jsonBody := []byte(`{"name": "Test Space"`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
@@ -596,7 +596,7 @@ var _ = Describe("Graph", func() {
 					},
 				}, nil)
 				gatewayClient.On("CreateStorageSpace", mock.Anything, mock.Anything).Return(&provider.CreateStorageSpaceResponse{}, errors.New("transport error"))
-				jsonBody := []byte(`{"Name": "Test Space"}`)
+				jsonBody := []byte(`{"name": "Test Space"}`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
@@ -620,7 +620,7 @@ var _ = Describe("Graph", func() {
 					Status: status.NewPermissionDenied(ctx, nil, "grpc permission denied"),
 				}, nil)
 
-				jsonBody := []byte(`{"Name": "Test Space"}`)
+				jsonBody := []byte(`{"name": "Test Space"}`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
@@ -644,7 +644,7 @@ var _ = Describe("Graph", func() {
 					Status: status.NewInternal(ctx, "grpc error"),
 				}, nil)
 
-				jsonBody := []byte(`{"Name": "Test Space"}`)
+				jsonBody := []byte(`{"name": "Test Space"}`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
@@ -664,7 +664,7 @@ var _ = Describe("Graph", func() {
 						Constraint: v0.Permission_CONSTRAINT_ALL,
 					},
 				}, nil)
-				jsonBody := []byte(`{"Name": ""}`)
+				jsonBody := []byte(`{"name": ""}`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
@@ -684,7 +684,7 @@ var _ = Describe("Graph", func() {
 						Constraint: v0.Permission_CONSTRAINT_ALL,
 					},
 				}, nil)
-				jsonBody := []byte(`{"Name": "uufZ2MEUjUMJa84RkPsjJ1zf4XXRTdVMxRsJGfevwHuUBojo5JEdNU22O1FGgzXXTi9tl5ZKWaluIef8pPmEAxn9lHGIjyDVYeRQPiX5PCAZ7rVszrpLJryY5x1p6fFGQ6WQsPpNaqnKnfMliJDsbkAwMf7rCpzo0GUuadgHY9s2mfoXHDnpxqEmDsheucqVAFcNlFZNbNHoZAebHfv78KYc8C0WnhWvqvSPGBkNPQbZUkFCOAIlqpQ2Q3MubgI2"}`)
+				jsonBody := []byte(`{"name": "uufZ2MEUjUMJa84RkPsjJ1zf4XXRTdVMxRsJGfevwHuUBojo5JEdNU22O1FGgzXXTi9tl5ZKWaluIef8pPmEAxn9lHGIjyDVYeRQPiX5PCAZ7rVszrpLJryY5x1p6fFGQ6WQsPpNaqnKnfMliJDsbkAwMf7rCpzo0GUuadgHY9s2mfoXHDnpxqEmDsheucqVAFcNlFZNbNHoZAebHfv78KYc8C0WnhWvqvSPGBkNPQbZUkFCOAIlqpQ2Q3MubgI2"}`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
@@ -704,7 +704,7 @@ var _ = Describe("Graph", func() {
 						Constraint: v0.Permission_CONSTRAINT_ALL,
 					},
 				}, nil)
-				jsonBody := []byte(`{"Name": "Test", "DriveType": "media"}`)
+				jsonBody := []byte(`{"name": "Test", "DriveType": "media"}`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
@@ -724,7 +724,7 @@ var _ = Describe("Graph", func() {
 						Constraint: v0.Permission_CONSTRAINT_ALL,
 					},
 				}, nil)
-				jsonBody := []byte(`{"Name": "Space / Name"}`)
+				jsonBody := []byte(`{"name": "Space / Name"}`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
@@ -770,7 +770,7 @@ var _ = Describe("Graph", func() {
 					TotalBytes: 500,
 				}, nil)
 
-				jsonBody := []byte(`{"Name": "Test Space", "DriveType": "project", "Description": "This space is for testing", "DriveAlias": "project/testspace"}`)
+				jsonBody := []byte(`{"name": "Test Space", "driveType": "project", "description": "This space is for testing", "DriveAlias": "project/testspace"}`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
@@ -801,7 +801,7 @@ var _ = Describe("Graph", func() {
 						Constraint: v0.Permission_CONSTRAINT_ALL,
 					},
 				}, nil)
-				jsonBody := []byte(`{"Name": "Test Space"}`)
+				jsonBody := []byte(`{"name": "Test Space"}`)
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)

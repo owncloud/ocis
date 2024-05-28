@@ -701,7 +701,7 @@ class SpacesContext implements Context {
 		string $spaceType,
 		?int $quota = null
 	): void {
-		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
+		$space = ["name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
 		$response = GraphHelper::createSpace(
 			$this->featureContext->getBaseUrl(),
@@ -1657,7 +1657,7 @@ class SpacesContext implements Context {
 		string $spaceType,
 		int $quota
 	): void {
-		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
+		$space = ["name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$response = $this->createSpace($user, $space);
 		$this->addCreatedSpace($user, $response);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
@@ -1682,7 +1682,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	): void {
-		$space = ["Name" => $spaceName];
+		$space = ["name" => $spaceName];
 		$response = $this->createSpace($user, $space);
 		$this->addCreatedSpace($user, $response);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
