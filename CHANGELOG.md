@@ -104,6 +104,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Secure viewer share role: [#8907](https://github.com/owncloud/ocis/pull/8907)
 * Enhancement - Add Link SSEs: [#8908](https://github.com/owncloud/ocis/pull/8908)
 * Enhancement - ShareeIDs in SSEs: [#8915](https://github.com/owncloud/ocis/pull/8915)
+* Enhancement - Allow to resolve public shares without the ocs tokeninfo endpoint: [#8926](https://github.com/owncloud/ocis/pull/8926)
 * Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
 * Enhancement - Add endpoint for getting drive items: [#8939](https://github.com/owncloud/ocis/pull/8939)
 * Enhancement - Improve infected file handling: [#8947](https://github.com/owncloud/ocis/pull/8947)
@@ -606,6 +607,21 @@ The following sections list the changes for unreleased.
    share related SSEs
 
    https://github.com/owncloud/ocis/pull/8915
+
+* Enhancement - Allow to resolve public shares without the ocs tokeninfo endpoint: [#8926](https://github.com/owncloud/ocis/pull/8926)
+
+   Instead of querying the /v1.php/apps/files_sharing/api/v1/tokeninfo/ endpoint, a
+   client can now resolve public and internal links by sending a PROPFIND request
+   to /dav/public-files/{sharetoken}
+
+  * authenticated clients accessing an internal link are redirected to the "real" resource (`/dav/spaces/{target-resource-id}
+  * authenticated clients are able to resolve public links like before. For password protected links they need to supply the password even if they have access to the underlying resource by other means.
+  * unauthenticated clients accessing an internal link get a 401 returned with  WWW-Authenticate set to Bearer (so that the client knows that it need to get a token via the IDP login page.
+  * unauthenticated clients accessing a password protected link get a 401 returned with an error message to indicate the requirement for needing the link's password.
+
+   https://github.com/owncloud/ocis/issues/8858
+   https://github.com/owncloud/ocis/pull/8926
+   https://github.com/cs3org/reva/pull/4653
 
 * Enhancement - Initiator-IDs: [#8936](https://github.com/owncloud/ocis/pull/8936)
 
