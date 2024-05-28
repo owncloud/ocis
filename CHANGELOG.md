@@ -119,7 +119,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
 * Enhancement - The storage-users doc updated: [#9228](https://github.com/owncloud/ocis/pull/9228)
 * Enhancement - Docker compose example for ClamAV: [#9229](https://github.com/owncloud/ocis/pull/9229)
-* Enhancement - Bump Reva: [#9236](https://github.com/owncloud/ocis/pull/9236)
+* Enhancement - Bump Reva: [#9269](https://github.com/owncloud/ocis/pull/9269)
 
 ## Details
 
@@ -732,10 +732,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9229
 
-* Enhancement - Bump Reva: [#9236](https://github.com/owncloud/ocis/pull/9236)
+* Enhancement - Bump Reva: [#9269](https://github.com/owncloud/ocis/pull/9269)
 
    Bumps reva version
 
+   https://github.com/owncloud/ocis/pull/9269
    https://github.com/owncloud/ocis/pull/9236
    https://github.com/owncloud/ocis/pull/9188
    https://github.com/owncloud/ocis/pull/9132
