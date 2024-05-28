@@ -36,6 +36,12 @@ func DefaultConfig() *config.Config {
 			Root:                  "/thumbnails",
 			Namespace:             "com.owncloud.web",
 			MaxConcurrentRequests: 0,
+			CORS: config.CORS{
+				AllowedOrigins:   []string{"*"},
+				AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+				AllowedHeaders:   []string{"Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With", "X-Request-Id", "Cache-Control"},
+				AllowCredentials: true,
+			},
 		},
 		Service: config.Service{
 			Name: "thumbnails",

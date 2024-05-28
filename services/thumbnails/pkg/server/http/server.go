@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	ocismiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -40,6 +41,13 @@ func Server(opts ...Option) (http.Service, error) {
 			middleware.RealIP,
 			middleware.RequestID,
 			ocismiddleware.Throttle(options.MaxConcurrentRequests),
+			ocismiddleware.Cors(
+				cors.Logger(options.Logger),
+				cors.AllowedOrigins(options.Config.HTTP.CORS.AllowedOrigins),
+				cors.AllowedMethods(options.Config.HTTP.CORS.AllowedMethods),
+				cors.AllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
+				cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
+			),
 			ocismiddleware.Version(
 				options.Config.Service.Name,
 				version.GetString(),
