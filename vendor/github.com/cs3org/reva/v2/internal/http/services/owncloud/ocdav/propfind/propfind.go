@@ -52,6 +52,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/iancoleman/strcase"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -1147,18 +1148,18 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 	appendMetadataProp := func(metadata map[string]string, tagNamespace string, name string, metadataPrefix string, keys []string) {
 		content := strings.Builder{}
 		for _, key := range keys {
-			lowerCaseKey := strings.ToLower(key)
+			kebabCaseKey := strcase.ToKebab(key)
 			if v, ok := metadata[fmt.Sprintf("%s.%s", metadataPrefix, key)]; ok {
 				content.WriteString("<")
 				content.WriteString(tagNamespace)
 				content.WriteString(":")
-				content.WriteString(lowerCaseKey)
+				content.WriteString(kebabCaseKey)
 				content.WriteString(">")
 				content.Write(prop.Escaped("", v).InnerXML)
 				content.WriteString("</")
 				content.WriteString(tagNamespace)
 				content.WriteString(":")
-				content.WriteString(lowerCaseKey)
+				content.WriteString(kebabCaseKey)
 				content.WriteString(">")
 			}
 		}

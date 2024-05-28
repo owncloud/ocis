@@ -24,6 +24,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
@@ -107,6 +108,30 @@ func (bs *Blobstore) Delete(node *node.Node) error {
 		return errors.Wrapf(err, "could not delete blob '%s'", dest)
 	}
 	return nil
+}
+
+// List lists all blobs in the Blobstore
+func (bs *Blobstore) List() ([]string, error) {
+	dirs, err := filepath.Glob(filepath.Join(bs.root, "spaces", "*", "*", "blobs", "*", "*", "*", "*", "*"))
+	if err != nil {
+		return nil, err
+	}
+	blobids := make([]string, 0, len(dirs))
+	for _, d := range dirs {
+		seps := strings.Split(d, "/")
+		var b string
+		var now bool
+		for _, s := range seps {
+			if now {
+				b += s
+			}
+			if s == "blobs" {
+				now = true
+			}
+		}
+		blobids = append(blobids, b)
+	}
+	return blobids, nil
 }
 
 func (bs *Blobstore) path(node *node.Node) (string, error) {
