@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
@@ -125,6 +126,23 @@ func (bs *Blobstore) Delete(node *node.Node) error {
 		return errors.Wrapf(err, "could not delete object '%s' from bucket '%s'", bs.path(node), bs.bucket)
 	}
 	return nil
+}
+
+// List lists all blobs in the Blobstore
+func (bs *Blobstore) List() ([]string, error) {
+	ch := bs.client.ListObjects(context.Background(), bs.bucket, minio.ListObjectsOptions{Recursive: true})
+
+	var err error
+	ids := make([]string, 0)
+	for oi := range ch {
+		if oi.Err != nil {
+			err = oi.Err
+			continue
+		}
+		_, blobid, _ := strings.Cut(oi.Key, "/")
+		ids = append(ids, strings.ReplaceAll(blobid, "/", ""))
+	}
+	return ids, err
 }
 
 func (bs *Blobstore) path(node *node.Node) string {
