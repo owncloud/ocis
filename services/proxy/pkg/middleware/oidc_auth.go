@@ -168,13 +168,16 @@ func (m OIDCAuthenticator) shouldServe(req *http.Request) bool {
 // Authenticate implements the authenticator interface to authenticate requests via oidc auth.
 func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	// there is no bearer token on the request,
-	if !m.shouldServe(r) || isPublicPath(r.URL.Path) {
+	if !m.shouldServe(r) {
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.
 		return nil, false
 	}
 	token := strings.TrimPrefix(r.Header.Get(_headerAuthorization), _bearerPrefix)
+	if token == "" {
+		return nil, false
+	}
 
 	claims, err := m.getClaims(token, r)
 	if err != nil {
