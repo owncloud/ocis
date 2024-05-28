@@ -58,7 +58,7 @@ This can be done by setting the `WEB_UI_THEME_PATH` environment variable.
 The final theme is composed of the built-in and the custom theme provided by the
 administrator via `WEB_ASSET_THEMES_PATH` and `WEB_UI_THEME_PATH`.
 
-For example, Infinite Scale by default contains a built in ownCloud theme.
+For example, Infinite Scale by default contains a built-in ownCloud theme.
 If the administrator provides a custom theme via the `WEB_ASSET_THEMES_PATH` directory like,
 `WEB_ASSET_THEMES_PATH/owncloud/themes.json`, this one will be used instead of the built-in one.
 

@@ -77,7 +77,7 @@ func Server(opts ...Option) (http.Service, error) {
 		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/themes"),
 	)
 	// oCis is Apache licensed, and the ownCloud branding is AGPLv3.
-	// we are not allowed to have the ownCloud branding as part of the oCis repository,
+	// we are not allowed to have the ownCloud branding as part of the oCIS repository,
 	// as workaround we layer the embedded core fs on top of the theme fs to provide the ownCloud branding.
 	// each asset that is part of the embedded core fs (coreFS secondary fs)
 	// is downloaded at build time from the ownCloud web repository,
