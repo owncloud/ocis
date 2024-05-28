@@ -92,8 +92,8 @@ Role Example:
 ```json
 [
     {
-        "id": "38071a68-456a-4553-846a-fa67bf5596cc", // ID of the role. Use a random uuid
-        "name": "user-light",                         // Internal name of the role.
+        "id": "38071a68-456a-4553-846a-fa67bf5596cc", // ID of the role. Recommendation is to use a random uuidv4. But any unique string will do.
+        "name": "user-light",                         // Internal name of the role. This is used by the system to identify the role. Any string will do here, but it should be unique among the other roles.
         "type": "TYPE_ROLE",                          // Always use `TYPE_ROLE`
         "extension": "ocis-roles",                    // Always use `ocis-roles`
         "displayName": "User Light",                  // DisplayName of the role used in webui
@@ -106,25 +106,11 @@ Role Example:
 ]
 ```
 
-Example Permission:
-```json
-{
-    "id": "79e13b30-3e22-11eb-bc51-0b9f0bad9a58",                   // ID of the permission
-    "name": "Drives.Create",                                        // Internal name of the permission
-    "displayName": "Create Space",                                  // Display name of the permission
-    "description": "This permission allows creating new spaces.",   // Description of the permission
-    "permissionValue": {
-        "operation": "OPERATION_READWRITE",                         // Operation of the permission
-        "constraint": "CONSTRAINT_ALL"                              // Constraint of the permission
-    },
-    "resource": {
-        "type": "TYPE_SYSTEM"                                       // Resource type of the permission
-    }
-}
-```
-
-To create custom roles, copy the role example to a `json` file. Then change `id`, `name`, and `displayName` to your liking. Finally copy the desired permissions to the `settings` array of the role.
-You can define multiple roles within one file, see example below.
+To create custom roles:
+* Copy the role example to a `json` file.
+* Change `id`, `name`, and `displayName` to your liking.
+* Copy the desired permissions from the `user-all-permissions` example below to the `settings` array of the role.
+* Set the `SETTINGS_BUNDLE_PATH` envvar to the path of the json file and start ocis
 
 Example File:
 ```json
