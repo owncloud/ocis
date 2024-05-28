@@ -20,6 +20,7 @@ package config
 
 import (
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/data"
+	"github.com/cs3org/reva/v2/pkg/owncloud/ocs"
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
 )
@@ -28,7 +29,7 @@ import (
 type Config struct {
 	Prefix                                string                            `mapstructure:"prefix"`
 	Config                                data.ConfigData                   `mapstructure:"config"`
-	Capabilities                          data.CapabilitiesData             `mapstructure:"capabilities"`
+	Capabilities                          ocs.CapabilitiesData              `mapstructure:"capabilities"`
 	GatewaySvc                            string                            `mapstructure:"gatewaysvc"`
 	StorageregistrySvc                    string                            `mapstructure:"storage_registry_svc"`
 	DefaultUploadProtocol                 string                            `mapstructure:"default_upload_protocol"`

@@ -366,7 +366,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.19.2-0.20240525160759-56879111e06a
+# github.com/cs3org/reva/v2 v2.19.2-0.20240525160759-56879111e06a => github.com/fschade/reva/v2 v2.0.0-20240528171610-0a0508fe8625
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -569,6 +569,7 @@ github.com/cs3org/reva/v2/pkg/ocm/share/repository/loader
 github.com/cs3org/reva/v2/pkg/ocm/share/repository/nextcloud
 github.com/cs3org/reva/v2/pkg/ocm/share/repository/registry
 github.com/cs3org/reva/v2/pkg/ocm/storage/received
+github.com/cs3org/reva/v2/pkg/owncloud/ocs
 github.com/cs3org/reva/v2/pkg/password
 github.com/cs3org/reva/v2/pkg/permission
 github.com/cs3org/reva/v2/pkg/permission/manager/demo
@@ -2361,3 +2362,4 @@ stash.kopano.io/kgol/rndm
 # github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
 # github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240424132259-5b29166734cb
+# github.com/cs3org/reva/v2 => github.com/fschade/reva/v2 v2.0.0-20240528171610-0a0508fe8625

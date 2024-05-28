@@ -21,7 +21,7 @@ package capabilities
 import (
 	"strings"
 
-	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/data"
+	"github.com/cs3org/reva/v2/pkg/owncloud/ocs"
 )
 
 type chunkProtocol string
@@ -32,7 +32,7 @@ var (
 	chunkTUS chunkProtocol = "tus"
 )
 
-func (h *Handler) getCapabilitiesForUserAgent(userAgent string) data.CapabilitiesData {
+func (h *Handler) getCapabilitiesForUserAgent(userAgent string) ocs.CapabilitiesData {
 	if userAgent != "" {
 		for k, v := range h.userAgentChunkingMap {
 			// we could also use a regexp for pattern matching
@@ -47,7 +47,7 @@ func (h *Handler) getCapabilitiesForUserAgent(userAgent string) data.Capabilitie
 	return h.c
 }
 
-func setCapabilitiesForChunkProtocol(cp chunkProtocol, c *data.CapabilitiesData) {
+func setCapabilitiesForChunkProtocol(cp chunkProtocol, c *ocs.CapabilitiesData) {
 	switch cp {
 	case chunkV1:
 		// 2.7+ will use Chunking V1 if "capabilities > files > bigfilechunking" is "true" AND "capabilities > dav > chunking" is not there

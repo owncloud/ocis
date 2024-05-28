@@ -362,6 +362,9 @@ replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-2
 
 replace github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240424132259-5b29166734cb
 
+// fixme: remove after reva pr merged
+replace github.com/cs3org/reva/v2 => github.com/fschade/reva/v2 v2.0.0-20240528171610-0a0508fe8625
+
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible

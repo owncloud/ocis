@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/capabilities"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -290,6 +291,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 								"share_jail": true,
 								"max_quota":  cfg.MaxQuota,
 							},
+							"theme": capabilities.Default().Theme,
 							"search": map[string]interface{}{
 								"property": map[string]interface{}{
 									"name": map[string]interface{}{

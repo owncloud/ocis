@@ -3,18 +3,13 @@ package theme
 import (
 	"path"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/capabilities"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
 var (
-	_brandingRoot         = "_branding"
-	_themeFileName        = "theme.json"
-	_allowedLogoFileTypes = map[string]string{
-		".jpg":  "image/jpeg",
-		".jpeg": "image/jpeg",
-		".png":  "image/png",
-		".gif":  "image/gif",
-	}
+	_brandingRoot  = "_branding"
+	_themeFileName = "theme.json"
 )
 
 // themeDefaults contains the default values for the theme.
@@ -58,9 +53,9 @@ var themeDefaults = KV{
 	},
 }
 
-// isFiletypePermitted checks if the given file extension is allowed and if the given mediatype matches the extension
-func isFiletypePermitted(allowed map[string]string, filename string, givenMime string) bool {
+// isFiletypePermitted checks if the given file extension is allowed.
+func isFiletypePermitted(filename string, givenMime string) bool {
 	// Check if we allow that extension and if the mediatype matches the extension
-	extensionMime, ok := allowed[path.Ext(filename)]
+	extensionMime, ok := capabilities.Default().Theme.Logo.PermittedFileTypes[path.Ext(filename)]
 	return ok && extensionMime == givenMime
 }

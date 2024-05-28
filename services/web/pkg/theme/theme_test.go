@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/web/pkg/theme"
 )
 
+// TestAllowedLogoFileTypes is here to ensure that a certain set of bare minimum file types are allowed for logos.
 func TestAllowedLogoFileTypes(t *testing.T) {
 	type test struct {
 		filename string
@@ -24,6 +25,6 @@ func TestAllowedLogoFileTypes(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		assert.Equal(t, theme.IsFiletypePermitted(theme.AllowedLogoFileTypes, tc.filename, tc.mimetype), tc.allowed)
+		assert.Equal(t, theme.IsFiletypePermitted(tc.filename, tc.mimetype), tc.allowed)
 	}
 }
