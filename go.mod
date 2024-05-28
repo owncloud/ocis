@@ -94,7 +94,7 @@ require (
 	github.com/xhit/go-simple-mail/v2 v2.16.0
 	go-micro.dev/v4 v4.10.2
 	go.etcd.io/bbolt v1.3.10
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.51.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.52.0
 	go.opentelemetry.io/contrib/zpages v0.51.0
 	go.opentelemetry.io/otel v1.27.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0
