@@ -43,11 +43,16 @@ type FeedbackLink struct {
 // Sidebar are the sidebar option
 type Sidebar struct {
 	Shares SidebarShares `json:"shares" yaml:"shares"`
+	Exif   SidebarExif   `json:"exif" yaml:"exif"`
 }
 
 // SidebarShares are the options for the shares sidebar
 type SidebarShares struct {
 	ShowAllOnLoad bool `json:"showAllOnLoad" yaml:"showAllOnLoad" env:"WEB_OPTION_SIDEBAR_SHARES_SHOW_ALL_ON_LOAD" desc:"Sets the list of the (link) shares list in the sidebar to be initially expanded. Default is a collapsed state, only showing the first three shares." introductionVersion:"pre5.0"`
+}
+
+type SidebarExif struct {
+	ShowLocation bool `json:"showLocation" yaml:"showLocation" env:"WEB_OPTION_SIDEBAR_EXIF_SHOW_LOCATION" desc:"Shows the location data in the EXIF sidebar panel. Default is the location data being shown." introductionVersion:"6.0"`
 }
 
 // Routing are the routing options
