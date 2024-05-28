@@ -641,3 +641,116 @@ Feature:  enable or disable sync of incoming shares
         }
       }
       """
+
+  @issue-9001
+  Scenario: try to disable share sync of a non-existent resource
+    When user "Brian" tries to disable share sync of a resource "nonexistent" using the Graph API
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code" : {
+                "const": "itemNotFound"
+              },
+              "innererror" : {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message" : {
+                "const": "error getting received share"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: try to disable share sync with empty resource id
+    When user "Brian" tries to disable share sync of a resource "" using the Graph API
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code" : {
+                "const": "invalidRequest"
+              },
+              "innererror" : {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message" : {
+                "const": "invalid driveID or itemID"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: try to disable share sync with not shared resource id
+    Given user "Alice" has uploaded file with content "some data" to "/fileNotShared.txt"
+    And we save it into "FILEID"
+    When user "Brian" tries to disable share sync of a resource "<<FILEID>>" using the Graph API
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code" : {
+                "const": "itemNotFound"
+              },
+              "innererror" : {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message" : {
+                "const": "error getting received share"
+              }
+            }
+          }
+        }
+      }
+      """

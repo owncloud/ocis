@@ -1189,6 +1189,30 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When user :user tries to disable share sync of a resource :resource using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userTriesToDisableShareSyncOfResourceUsingTheGraphApi(string $user, string $resource):void {
+		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$shareID = ($resource === 'nonexistent') ? WebDavHelper::generateUUIDv4() : $resource;
+		$itemId = $shareSpaceId . '!' . $shareID;
+		$response =  GraphHelper::disableShareSync(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$itemId,
+			$shareSpaceId
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @Then /^user "([^"]*)" should have sync (enabled|disabled) for share "([^"]*)"$/
 	 *
 	 * @param string $user
