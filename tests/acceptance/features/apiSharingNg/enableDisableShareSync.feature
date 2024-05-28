@@ -642,7 +642,7 @@ Feature:  enable or disable sync of incoming shares
       }
       """
 
-
+  @issue-9001
   Scenario: try to disable share sync of a non-existent resource
     When user "Brian" tries to disable share sync of a resource "nonexistent" using the Graph API
     Then the HTTP status code should be "404"
