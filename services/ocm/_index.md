@@ -1,6 +1,6 @@
 ---
 title: OCM
-date: 2024-05-28T00:40:08.152617239Z
+date: 2024-05-28T07:18:07.684631627Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/ocm
