@@ -1,6 +1,6 @@
 ---
 title: Web
-date: 2024-05-29T13:39:58.790587663Z
+date: 2024-05-29T13:50:30.123003908Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/web
@@ -27,6 +27,7 @@ The web service also provides a minimal API for branding functionality like chan
   * [Web UI Config File](#web-ui-config-file)
   * [Embedding Web](#embedding-web)
 * [Web Apps](#web-apps)
+  * [Loading Themes](#loading-themes)
   * [Loading Applications](#loading-applications)
   * [Application Structure](#application-structure)
   * [Application Configuration](#application-configuration)
@@ -72,6 +73,28 @@ This feature is useful for organizations that want to provide third party or cus
 It's important to note that the feature at the moment is only capable of providing static (js, mjs, e.g.) web applications
 and does not support injection of dynamic web applications (custom dynamic backends).
 
+### Loading Themes
+
+Web themes are loaded, if added in the Infinite Scale source code, at build-time from
+`<ocis_repo>/services/web/assets/themes`.
+This cannot be manipulated at runtime.
+
+Additionally, the administrator can provide custom themes by storing it in the path defined by the environment
+variable `WEB_ASSET_THEMES_PATH`.
+
+With the theme root directory defined, the system needs to know which theme to use.
+This can be done by setting the `WEB_UI_THEME_PATH` environment variable.
+
+The final theme is composed of the built-in and the custom theme provided by the
+administrator via `WEB_ASSET_THEMES_PATH` and `WEB_UI_THEME_PATH`.
+
+For example, Infinite Scale by default contains a built-in ownCloud theme.
+If the administrator provides a custom theme via the `WEB_ASSET_THEMES_PATH` directory like,
+`WEB_ASSET_THEMES_PATH/owncloud/themes.json`, this one will be used instead of the built-in one.
+
+Some theme keys are mandatory, like the `common.shareRoles` settings.
+Such mandatory keys are injected automatically at runtime if not provided.
+
 ### Loading Applications
 
 Web applications are loaded, if added in the Infinite Scale source code, at build-time from
@@ -86,7 +109,7 @@ but can be redefined with any path set manually.
 The final list of available applications is composed of the built-in and the custom applications provided by the
 administrator via `WEB_ASSET_APPS_PATH`.
 
-For example, if Infinite Scale would contain a built-in extension named `image-viewer-dfx` and the administrator provides a custom application named `image-viewer-obj` via the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both
+For example, if Infinite Scale contains a built-in extension named `image-viewer-dfx` and the administrator provides a custom application named `image-viewer-obj` via the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both
 applications from the WebUI.
 
 ### Application Structure
