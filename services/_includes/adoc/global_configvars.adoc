@@ -24,7 +24,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 a| `OCIS_ADMIN_USER_ID`
 
 a| [subs=attributes+]
@@ -76,7 +76,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=attributes+]
@@ -99,7 +99,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=attributes+]
@@ -116,7 +116,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++settings-cache ++
+++cache-providers ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
@@ -141,7 +141,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+Disables persistence of the provider cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
 a| `OCIS_CACHE_SIZE`
 
 a| [subs=attributes+]
@@ -182,10 +182,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++nats-js-kv ++
+++noop ++
 
 a| [subs=-attributes]
-The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.
+The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
 a| `OCIS_CACHE_STORE_NODES`
 
 a| [subs=attributes+]
@@ -208,7 +208,7 @@ a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
 
 a| [subs=-attributes]
-A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 a| `OCIS_CACHE_TTL`
 
 a| [subs=attributes+]
@@ -228,10 +228,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++12h0m0s ++
+++5m0s ++
 
 a| [subs=-attributes]
-Default time to live for signing keys. See the Environment Variable Types description for more details.
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
 a| [subs=attributes+]
@@ -278,7 +278,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Purge Restore] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -303,7 +303,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
+++[GET POST PUT PATCH DELETE OPTIONS] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
@@ -388,7 +388,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
+Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
 a| `OCIS_EDITION`
 
 a| [subs=attributes+]
@@ -402,7 +402,7 @@ a| [subs=-attributes]
 ++Community ++
 
 a| [subs=-attributes]
-Edition of oCIS. Used for branding pruposes.
+Edition of oCIS. Used for branding purposes.
 a| `OCIS_ENABLE_RESHARING`
 
 a| [subs=attributes+]
@@ -573,7 +573,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided AUDIT_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=attributes+]
@@ -1007,7 +1007,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter like 'groupOfNames'.
+The object class to use for groups in the default group search filter ('groupOfNames').
 a| `OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
 a| [subs=attributes+]
@@ -1054,7 +1054,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=attributes+]
@@ -1070,7 +1070,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
 a| `OCIS_LDAP_GROUP_SCHEMA_MAIL`
 
 a| [subs=attributes+]
@@ -1232,7 +1232,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter like 'inetOrgPerson'.
+The object class to use for users in the default user search filter ('inetOrgPerson').
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
 a| [subs=attributes+]
@@ -1280,7 +1280,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
+Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
 a| `OCIS_LDAP_USER_SCHEMA_MAIL`
 
 a| [subs=attributes+]
@@ -1591,7 +1591,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
 a| [subs=attributes+]
@@ -2220,10 +2220,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://localhost:9200/ ++
+++https://localhost:9200 ++
 
 a| [subs=-attributes]
-Base url to navigate back from the app to the containing folder in the file list.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=attributes+]
