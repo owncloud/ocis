@@ -71,11 +71,20 @@ class SharingNgContext implements Context {
 	 */
 	public function createLinkShare(string $user, TableNode $body): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
-		$space = $bodyRows['space'];
 		$resource = $bodyRows['resource'] ?? "";
 
-		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		if ($bodyRows['space'] === 'Personal' || $bodyRows['space'] === 'Shares') {
+			$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
+		} else {
+			$space = $this->spacesContext->getCreatedSpace($bodyRows['space']);
+		}
+		$spaceId = $space['id'];
+
+		if ($resource === '' && !\in_array($bodyRows['space'], ['Personal', 'Shares'])) {
+			$itemId = $space['fileId'];
+		} else {
+			$itemId = $this->spacesContext->getResourceId($user, $bodyRows['space'], $resource);
+		}
 
 		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
 		$bodyRows['expirationDateTime'] = \array_key_exists('expirationDateTime', $bodyRows) ? \date('Y-m-d', \strtotime($bodyRows['expirationDateTime'])) . 'T14:00:00.000Z' : null;
@@ -551,6 +560,19 @@ class SharingNgContext implements Context {
 	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode  $body):void {
 		$response = $this->createLinkShare($user, $body);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" (?:tries to create|creates) the following space link share using permissions endpoint of the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $body
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userCreatesTheFollowingSpaceLinkShareUsingPermissionsEndpointOfTheGraphApi(string $user, TableNode $body):void {
+		$this->featureContext->setResponse($this->createLinkShare($user, $body));
 	}
 
 	/**
