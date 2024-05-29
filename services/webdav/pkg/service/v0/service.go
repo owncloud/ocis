@@ -354,6 +354,8 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
+		case http.StatusForbidden:
+			renderError(w, r, errPermissionDenied(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
@@ -529,6 +531,10 @@ func errInternalError(msg string) *errResponse {
 
 func errBadRequest(msg string) *errResponse {
 	return newErrResponse(http.StatusBadRequest, msg)
+}
+
+func errPermissionDenied(msg string) *errResponse {
+	return newErrResponse(http.StatusForbidden, msg)
 }
 
 func errNotFound(msg string) *errResponse {
