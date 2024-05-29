@@ -7,7 +7,6 @@ import (
 )
 
 // Server initializes a new grpc service ready to run
-// THIS SERVICE IS REGISTERED AGAINST REVA, NOT GO-MICRO
 func Server(opts ...Option) (*grpc.Server, func(), error) {
 	grpcOpts := []grpc.ServerOption{}
 	options := newOptions(opts...)

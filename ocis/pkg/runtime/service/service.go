@@ -323,6 +323,14 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.Audit.Commons = cfg.Commons
 		return audit.Execute(cfg.Audit)
 	})
+	// cannot be started because the approvider dies if it cannot reach the wopi client service
+	/*
+		areg(opts.Config.Collaboration.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+			cfg.Collaboration.Context = ctx
+			cfg.Collaboration.Commons = cfg.Commons
+			return collaboration.Execute(cfg.Collaboration)
+		})
+	*/
 	areg(opts.Config.Policies.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.Policies.Context = ctx
 		cfg.Policies.Commons = cfg.Commons

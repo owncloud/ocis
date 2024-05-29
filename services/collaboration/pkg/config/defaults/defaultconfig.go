@@ -29,13 +29,11 @@ func DefaultConfig() *config.Config {
 		JWTSecret: secret,
 		GRPC: config.GRPC{
 			Addr:      "0.0.0.0:9301",
-			Namespace: "com.owncloud.collaboration",
+			Namespace: "com.owncloud.api",
 		},
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9300",
-			BindAddr:  "0.0.0.0:9300",
-			Namespace: "com.owncloud.collaboration",
-			Scheme:    "https",
+			Namespace: "com.owncloud.web",
 		},
 		Debug: config.Debug{
 			Addr:   "127.0.0.1:9304",
@@ -46,6 +44,7 @@ func DefaultConfig() *config.Config {
 		WopiApp: config.WopiApp{
 			Addr:     "https://127.0.0.1:8080",
 			Insecure: false,
+			WopiSrc:  "https://localhost:9200",
 		},
 		CS3Api: config.CS3Api{
 			Gateway: config.Gateway{

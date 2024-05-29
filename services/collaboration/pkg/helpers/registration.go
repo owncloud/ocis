@@ -11,6 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 )
 
@@ -18,7 +19,7 @@ import (
 // There are no explicit requirements for the context, and it will be passed
 // without changes to the underlying RegisterService method.
 func RegisterOcisService(ctx context.Context, cfg *config.Config, logger log.Logger) error {
-	svc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, uuid.Must(uuid.NewV4()).String(), cfg.GRPC.Addr, "0.0.0")
+	svc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, uuid.Must(uuid.NewV4()).String(), cfg.GRPC.Addr, version.GetString())
 	return registry.RegisterService(ctx, svc, logger)
 }
 
