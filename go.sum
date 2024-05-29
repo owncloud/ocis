@@ -1025,6 +1025,8 @@ github.com/crewjam/saml v0.4.14 h1:g9FBNx62osKusnFzs3QTN5L9CVA/Egfgm+stJShzw/c=
 github.com/crewjam/saml v0.4.14/go.mod h1:UVSZCf18jJkk6GpWNVqcyQJMD5HsRugBPf4I1nl2mME=
 github.com/cs3org/go-cs3apis v0.0.0-20231023073225-7748710e0781 h1:BUdwkIlf8IS2FasrrPg8gGPHQPOrQ18MS1Oew2tmGtY=
 github.com/cs3org/go-cs3apis v0.0.0-20231023073225-7748710e0781/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
+github.com/cs3org/reva/v2 v2.19.2-0.20240529081036-419196f2342e h1:nooOncj0aaM6S8TuNSLY4d7KEb8xSzO9/LfqL0loV60=
+github.com/cs3org/reva/v2 v2.19.2-0.20240529081036-419196f2342e/go.mod h1:BOlJApKFrWRiaOoBCRxCTG5bghTTMlYaEZrRxOzKaS8=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
 github.com/cyphar/filepath-securejoin v0.2.4 h1:Ugdm7cg7i6ZK6x3xDF1oEu1nfkyfH53EtKeQYTC3kyg=
 github.com/cyphar/filepath-securejoin v0.2.4/go.mod h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=
@@ -1118,8 +1120,6 @@ github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHk
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf h1:3IzYXRblwIxeis+EtLLWTK0QitcefZT7YfpF7jfTFYA=
 github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf/go.mod h1:Curjbe9P7SKWAtoXuu/huL8VnqzuBzetEpEPt9TLToE=
-github.com/fschade/reva/v2 v2.0.0-20240528171610-0a0508fe8625 h1:meXJC8h8F4G78dzJekZfGZr8F2bS5q23MhgZZqCiWag=
-github.com/fschade/reva/v2 v2.0.0-20240528171610-0a0508fe8625/go.mod h1:BOlJApKFrWRiaOoBCRxCTG5bghTTMlYaEZrRxOzKaS8=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=
