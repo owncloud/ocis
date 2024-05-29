@@ -12,7 +12,7 @@ Feature:  enable or disable sync of incoming shares
 
 
   Scenario Outline: disable sync of shared resource
-    And user "Alice" has created folder "FolderToShare"
+    Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
@@ -297,6 +297,7 @@ Feature:  enable or disable sync of incoming shares
       | resource      |
       | textfile0.txt |
       | FolderToShare |
+
 
   Scenario: try to enable share sync of a non-existent resource
     Given user "Brian" has disabled the auto-sync share
@@ -754,3 +755,205 @@ Feature:  enable or disable sync of incoming shares
         }
       }
       """
+
+  @issue-8876
+  Scenario Outline: try to enable sync of already synced share
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has created folder "folder"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Brian" enables sync of share "<resource>" offered by "Alice" from "Personal" space using the Graph API
+    Then the HTTP status code should be "409"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code" : {
+                "const": "nameAlreadyExists"
+              },
+              "innererror" : {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message" : {
+                "const": "shares already mounted"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | folder        |
+
+  @issue-8876
+  Scenario Outline: try to disable sync of already unsynced share
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has created folder "folder"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Brian" has disabled sync of last shared resource
+    When user "Brian" disables sync of share "<resource>" using the Graph API
+    Then the HTTP status code should be "409"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code" : {
+                "const": "nameAlreadyExists"
+              },
+              "innererror" : {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message" : {
+                "const": "shares already unmounted"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | folder        |
+
+  @issue-8876
+  Scenario Outline: try to enable sync of already synced share shared from Project space
+    When the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | NewSpace   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Brian" enables sync of share "<resource>" offered by "Alice" from "NewSpace" space using the Graph API
+    Then the HTTP status code should be "409"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code" : {
+                "const": "nameAlreadyExists"
+              },
+              "innererror" : {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message" : {
+                "const": "shares already mounted"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | FolderToShare |
+
+  @issue-8876
+  Scenario Outline: try to disable sync of already unsynced share shared from Project space
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | NewSpace   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Brian" has disabled sync of last shared resource
+    And user "Brian" disables sync of share "<resource>" using the Graph API
+    Then the HTTP status code should be "409"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code" : {
+                "const": "nameAlreadyExists"
+              },
+              "innererror" : {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message" : {
+                "const": "shares already unmounted"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource      |
+      | textfile0.txt |
+      | FolderToShare |
