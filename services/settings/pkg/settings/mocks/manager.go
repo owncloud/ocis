@@ -256,6 +256,64 @@ func (_c *Manager_ListRoleAssignments_Call) RunAndReturn(run func(string) ([]*v0
 	return _c
 }
 
+// ListRoleAssignmentsByRole provides a mock function with given fields: roleID
+func (_m *Manager) ListRoleAssignmentsByRole(roleID string) ([]*v0.UserRoleAssignment, error) {
+	ret := _m.Called(roleID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListRoleAssignmentsByRole")
+	}
+
+	var r0 []*v0.UserRoleAssignment
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]*v0.UserRoleAssignment, error)); ok {
+		return rf(roleID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []*v0.UserRoleAssignment); ok {
+		r0 = rf(roleID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*v0.UserRoleAssignment)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(roleID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Manager_ListRoleAssignmentsByRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRoleAssignmentsByRole'
+type Manager_ListRoleAssignmentsByRole_Call struct {
+	*mock.Call
+}
+
+// ListRoleAssignmentsByRole is a helper method to define mock.On call
+//   - roleID string
+func (_e *Manager_Expecter) ListRoleAssignmentsByRole(roleID interface{}) *Manager_ListRoleAssignmentsByRole_Call {
+	return &Manager_ListRoleAssignmentsByRole_Call{Call: _e.mock.On("ListRoleAssignmentsByRole", roleID)}
+}
+
+func (_c *Manager_ListRoleAssignmentsByRole_Call) Run(run func(roleID string)) *Manager_ListRoleAssignmentsByRole_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Manager_ListRoleAssignmentsByRole_Call) Return(_a0 []*v0.UserRoleAssignment, _a1 error) *Manager_ListRoleAssignmentsByRole_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Manager_ListRoleAssignmentsByRole_Call) RunAndReturn(run func(string) ([]*v0.UserRoleAssignment, error)) *Manager_ListRoleAssignmentsByRole_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListValues provides a mock function with given fields: bundleID, accountUUID
 func (_m *Manager) ListValues(bundleID string, accountUUID string) ([]*v0.Value, error) {
 	ret := _m.Called(bundleID, accountUUID)

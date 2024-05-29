@@ -62,6 +62,59 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 	return ass, nil
 }
 
+// ListRoleAssignmentsByRole returns all role assignmentes matching the give roleID
+func (s *Store) ListRoleAssignmentsByRole(roleID string) ([]*settingsmsg.UserRoleAssignment, error) {
+	s.Init()
+	ctx := context.TODO()
+	accountIDs, err := s.mdc.ReadDir(ctx, accountsFolderLocation)
+	switch err.(type) {
+	case nil:
+		// continue
+	case errtypes.NotFound:
+		return make([]*settingsmsg.UserRoleAssignment, 0), nil
+	default:
+		return nil, err
+	}
+	assignments := make([]*settingsmsg.UserRoleAssignment, 0, len(accountIDs))
+
+	// This is very inefficient, with the current layout we need to iterated through all
+	// account folders and read each assignment file in there to check if that contains
+	// the give role ID.
+	for _, account := range accountIDs {
+		assignmentIDs, err := s.mdc.ReadDir(ctx, accountPath(account))
+		switch err.(type) {
+		case nil:
+			// continue
+		case errtypes.NotFound:
+			return make([]*settingsmsg.UserRoleAssignment, 0), nil
+		default:
+			return nil, err
+		}
+
+		for _, assignmentID := range assignmentIDs {
+			b, err := s.mdc.SimpleDownload(ctx, assignmentPath(account, assignmentID))
+			switch err.(type) {
+			case nil:
+				// continue
+			case errtypes.NotFound:
+				continue
+			default:
+				return nil, err
+			}
+
+			a := &settingsmsg.UserRoleAssignment{}
+			err = json.Unmarshal(b, a)
+			if err != nil {
+				return nil, err
+			}
+			if a.GetRoleId() == roleID {
+				assignments = append(assignments, a)
+			}
+		}
+	}
+	return assignments, nil
+}
+
 // WriteRoleAssignment appends the given role assignment to the existing assignments of the respective account.
 func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.UserRoleAssignment, error) {
 	s.Init()

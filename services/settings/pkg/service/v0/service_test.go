@@ -235,7 +235,7 @@ func TestListPermissionsOfOtherUser(t *testing.T) {
 	assert.Contains(t, err.Error(), req.AccountUuid)
 }
 
-func TestListRoleAssignmentsFiltered(t *testing.T) {
+func TestListRoleAssignmentsFilteredValidation(t *testing.T) {
 	manager := &mocks.Manager{}
 	svc := Service{
 		manager: manager,
@@ -333,6 +333,120 @@ func TestListRoleAssignmentsFiltered(t *testing.T) {
 			merr, ok := merrors.As(err)
 			assert.True(t, ok)
 			assert.Equal(t, int32(test.statusCode), merr.Code)
+		})
+	}
+}
+
+func TestListRoleAssignmentsFilteredByAccount(t *testing.T) {
+	accountUUID := "61445573-4dbe-4d56-88dc-88ab47aceba7"
+
+	tests := map[string]struct {
+		result []*settingsmsg.UserRoleAssignment
+		err    error
+		status int32
+	}{
+		"handles manager error": {
+			result: nil,
+			err:    assert.AnError,
+			status: http.StatusNotFound,
+		},
+		"succeeds with results": {
+			result: []*settingsmsg.UserRoleAssignment{
+				{
+					Id:          "00000000-0000-0000-0000-000000000001",
+					AccountUuid: accountUUID,
+					RoleId:      "aceb15b8-7486-479f-ae32-c91118e07a39",
+				},
+			},
+			err:    nil,
+			status: http.StatusOK,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			manager := &mocks.Manager{}
+			svc := Service{
+				manager: manager,
+			}
+			manager.On("ListRoleAssignments", mock.Anything).Return(test.result, test.err)
+			req := &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT,
+						Term: &settingsmsg.UserRoleAssignmentFilter_AccountUuid{
+							AccountUuid: accountUUID,
+						},
+					},
+				},
+			}
+			res := v0.ListRoleAssignmentsResponse{}
+			err := svc.ListRoleAssignmentsFiltered(ctxWithUUID, req, &res)
+			switch test.err {
+			case nil:
+				assert.Nil(t, err)
+			default:
+				merr, ok := merrors.As(err)
+				assert.True(t, ok)
+				assert.Equal(t, int32(test.status), merr.Code)
+			}
+		})
+	}
+}
+
+func TestListRoleAssignmentsFilteredByRole(t *testing.T) {
+	roleID := "61445573-4dbe-4d56-88dc-88ab47aceba7"
+
+	tests := map[string]struct {
+		result []*settingsmsg.UserRoleAssignment
+		err    error
+		status int32
+	}{
+		"handles manager error": {
+			result: nil,
+			err:    assert.AnError,
+			status: http.StatusNotFound,
+		},
+		"succeeds with results": {
+			result: []*settingsmsg.UserRoleAssignment{
+				{
+					Id:          "00000000-0000-0000-0000-000000000001",
+					AccountUuid: "aceb15b8-7486-479f-ae32-c91118e07a39",
+					RoleId:      roleID,
+				},
+			},
+			err:    nil,
+			status: http.StatusOK,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			manager := &mocks.Manager{}
+			svc := Service{
+				manager: manager,
+			}
+			manager.On("ListRoleAssignmentsByRole", mock.Anything).Return(test.result, test.err)
+			req := &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
+						Term: &settingsmsg.UserRoleAssignmentFilter_RoleId{
+							RoleId: roleID,
+						},
+					},
+				},
+			}
+			res := v0.ListRoleAssignmentsResponse{}
+			err := svc.ListRoleAssignmentsFiltered(ctxWithUUID, req, &res)
+			switch test.err {
+			case nil:
+				assert.Nil(t, err)
+			default:
+				merr, ok := merrors.As(err)
+				assert.True(t, ok)
+				assert.Equal(t, int32(test.status), merr.Code)
+			}
 		})
 	}
 }
