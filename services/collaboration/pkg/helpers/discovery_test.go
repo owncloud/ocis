@@ -67,7 +67,7 @@ var _ = Describe("Discovery", func() {
 	Describe("GetAppURLs", func() {
 		It("Good discovery URL", func() {
 			cfg := &config.Config{
-				WopiApp: config.WopiApp{
+				App: config.App{
 					Addr:     srv.URL + "/good",
 					Insecure: true,
 				},
@@ -95,7 +95,7 @@ var _ = Describe("Discovery", func() {
 
 		It("Wrong discovery URL", func() {
 			cfg := &config.Config{
-				WopiApp: config.WopiApp{
+				App: config.App{
 					Addr:     srv.URL + "/bad",
 					Insecure: true,
 				},
@@ -109,7 +109,7 @@ var _ = Describe("Discovery", func() {
 
 		It("Not XML formatted", func() {
 			cfg := &config.Config{
-				WopiApp: config.WopiApp{
+				App: config.App{
 					Addr:     srv.URL + "/wrongformat",
 					Insecure: true,
 				},

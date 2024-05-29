@@ -16,10 +16,11 @@ type Config struct {
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 
-	GRPC    GRPC    `yaml:"grpc"`
-	HTTP    HTTP    `yaml:"http"`
-	WopiApp WopiApp `yaml:"wopiapp"`
-	CS3Api  CS3Api  `yaml:"cs3api"`
+	GRPC GRPC `yaml:"grpc"`
+	HTTP HTTP `yaml:"http"`
+
+	Wopi   Wopi   `yaml:"wopi"`
+	CS3Api CS3Api `yaml:"cs3api"`
 
 	Tracing *Tracing `yaml:"tracing"`
 	Log     *Log     `yaml:"log"`

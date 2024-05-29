@@ -928,9 +928,14 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                     "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
                     "COLLABORATION_LOG_LEVEL": "debug",
                     "COLLABORATION_APP_NAME": "FakeOffice",
-                    "COLLABORATION_WOPIAPP_WOPISRC": "http://fakeoffice:8080",
-                    "COLLABORATION_WOPIAPP_INSECURE": "true",
+                    "COLLABORATION_APP_ADDR": "http://fakeoffice:8080",
+                    "COLLABORATION_APP_INSECURE": "true",
+					"COLLABORATION_WOPI_SRC": "http://wopiserver",
+					"COLLABORATION_WOPI_SECRET": "some-wopi-secret",
                     "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
+                    "OCIS_JWT_SECRET": {
+                        "from_secret": "ocis_jwt_secret",
+                    },
                 },
                 "commands": [
                     "%s collaboration server" % ocis_bin,

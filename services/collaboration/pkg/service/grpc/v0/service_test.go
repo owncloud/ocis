@@ -103,7 +103,7 @@ var _ = Describe("Discovery", func() {
 		It("Invalid access token", func() {
 			ctx := context.Background()
 
-			cfg.WopiApp.WopiSrc = "https://wopiserver.test.prv"
+			cfg.Wopi.WopiSrc = "https://wopiserver.test.prv"
 
 			req := &appproviderv1beta1.OpenInAppRequest{
 				ResourceInfo: &providerv1beta1.ResourceInfo{
@@ -139,8 +139,8 @@ var _ = Describe("Discovery", func() {
 			ctx := context.Background()
 			nowTime := time.Now()
 
-			cfg.WopiApp.WopiSrc = "https://wopiserver.test.prv"
-			cfg.WopiApp.Secret = "my_supa_secret"
+			cfg.Wopi.WopiSrc = "https://wopiserver.test.prv"
+			cfg.Wopi.Secret = "my_supa_secret"
 
 			myself := &userv1beta1.User{
 				Id: &userv1beta1.UserId{
@@ -161,7 +161,7 @@ var _ = Describe("Discovery", func() {
 					Path: "/path/to/file.docx",
 				},
 				ViewMode:    appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE,
-				AccessToken: MintToken(myself, cfg.WopiApp.Secret, nowTime),
+				AccessToken: MintToken(myself, cfg.Wopi.Secret, nowTime),
 			}
 
 			gatewayClient.On("WhoAmI", mock.Anything, mock.Anything).Times(1).Return(&gatewayv1beta1.WhoAmIResponse{

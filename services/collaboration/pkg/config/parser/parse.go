@@ -2,8 +2,11 @@ package parser
 
 import (
 	"errors"
+	"fmt"
+	"net/url"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	ocisdefaults "github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -37,8 +40,24 @@ func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
 	}
-	if cfg.WopiApp.Secret == "" {
+	if cfg.Wopi.Secret == "" {
 		return shared.MissingWOPISecretError(cfg.Service.Name)
 	}
+	url, err := url.Parse(cfg.Wopi.WopiSrc)
+	if err != nil {
+		return fmt.Errorf("The WOPI Src has not been set properly in your config for %s. "+
+			"Make sure your %s config contains the proper values "+
+			"(e.g. by running ocis init or setting it manually in "+
+			"the config/corresponding environment variable): %s",
+			cfg.Service.Name, ocisdefaults.BaseConfigPath(), err.Error())
+	}
+	if url.Path != "" {
+		return fmt.Errorf("The WOPI Src must not contain a path in your config for %s. "+
+			"Make sure your %s config contains the proper values "+
+			"(e.g. by running ocis init or setting it manually in "+
+			"the config/corresponding environment variable)",
+			cfg.Service.Name, ocisdefaults.BaseConfigPath())
+	}
+
 	return nil
 }

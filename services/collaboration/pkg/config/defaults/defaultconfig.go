@@ -24,6 +24,8 @@ func DefaultConfig() *config.Config {
 			Description: "Open office documents with a WOPI app",
 			Icon:        "image-edit",
 			LockName:    "com.github.owncloud.collaboration",
+			Addr:        "https://127.0.0.1:9980",
+			Insecure:    false,
 		},
 		GRPC: config.GRPC{
 			Addr:      "127.0.0.1:9301",
@@ -39,10 +41,8 @@ func DefaultConfig() *config.Config {
 			Pprof:  false,
 			Zpages: false,
 		},
-		WopiApp: config.WopiApp{
-			Addr:     "https://127.0.0.1:9980",
-			Insecure: false,
-			WopiSrc:  "https://localhost:9300",
+		Wopi: config.Wopi{
+			WopiSrc: "https://localhost:9300",
 		},
 		CS3Api: config.CS3Api{
 			Gateway: config.Gateway{

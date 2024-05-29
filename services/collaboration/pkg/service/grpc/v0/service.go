@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"path"
 	"strconv"
-	"strings"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -124,13 +123,11 @@ func (s *Service) OpenInApp(
 		viewAppURL = editAppURL
 	}
 
-	wopiSrcURL, err := url.Parse(strings.Replace(s.config.WopiApp.WopiSrc, "{fileid}", fileRef, 1))
+	wopiSrcURL, err := url.Parse(s.config.Wopi.WopiSrc)
 	if err != nil {
 		return nil, err
 	}
-	if wopiSrcURL.Path == "" {
-		wopiSrcURL.Path = path.Join("wopi", "files", fileRef)
-	}
+	wopiSrcURL.Path = path.Join("wopi", "files", fileRef)
 
 	addWopiSrcQueryParam := func(baseURL string) (string, error) {
 		u, err := url.Parse(baseURL)
@@ -172,7 +169,7 @@ func (s *Service) OpenInApp(
 		appURL = editAppURL
 	}
 
-	cryptedReqAccessToken, err := middleware.EncryptAES([]byte(s.config.WopiApp.Secret), req.GetAccessToken())
+	cryptedReqAccessToken, err := middleware.EncryptAES([]byte(s.config.Wopi.Secret), req.GetAccessToken())
 	if err != nil {
 		s.logger.Error().
 			Err(err).
@@ -216,7 +213,7 @@ func (s *Service) OpenInApp(
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	accessToken, err := token.SignedString([]byte(s.config.WopiApp.Secret))
+	accessToken, err := token.SignedString([]byte(s.config.Wopi.Secret))
 
 	if err != nil {
 		s.logger.Error().
