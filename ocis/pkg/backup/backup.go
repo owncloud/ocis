@@ -47,15 +47,19 @@ type ListBlobstore interface {
 
 // Consistency holds the node and blob data of a space
 type Consistency struct {
+	// Storing the data like this might take a lot of memory
+	// we might need to optimize this if we run into memory issues
 	Nodes          map[string][]Inconsistency
 	LinkedNodes    map[string][]Inconsistency
 	BlobReferences map[string][]Inconsistency
 	Blobs          map[string][]Inconsistency
 
 	nodeToLink map[string]string
-	fsys       fs.FS
-	discpath   string
-	lbs        ListBlobstore
+	blobToNode map[string]string
+
+	fsys     fs.FS
+	discpath string
+	lbs      ListBlobstore
 }
 
 // New creates a new Consistency object
@@ -67,9 +71,11 @@ func New(fsys fs.FS, discpath string, lbs ListBlobstore) *Consistency {
 		Blobs:          make(map[string][]Inconsistency),
 
 		nodeToLink: make(map[string]string),
-		fsys:       fsys,
-		discpath:   discpath,
-		lbs:        lbs,
+		blobToNode: make(map[string]string),
+
+		fsys:     fsys,
+		discpath: discpath,
+		lbs:      lbs,
 	}
 }
 
@@ -112,14 +118,11 @@ func (c *Consistency) Initialize() error {
 				}
 				for _, l := range ls {
 					linkpath := filepath.Join(d, e.Name(), l.Name())
-					r, err := os.Readlink(linkpath)
-					if err != nil {
-						// this can not happen as we just listed the directory
-						fmt.Println("directory entries changed while checking. Exiting.", err)
-						// return err
-					}
+
+					// we always set InconsistencyNodeMissing as we later delete all referenced nodes from LinkedNodes
+					r, _ := os.Readlink(linkpath)
 					nodePath := filepath.Join(c.discpath, d, e.Name(), r)
-					c.LinkedNodes[nodePath] = []Inconsistency{}
+					c.LinkedNodes[nodePath] = []Inconsistency{InconsistencyNodeMissing}
 					c.nodeToLink[nodePath] = linkpath
 				}
 				fallthrough
@@ -128,7 +131,7 @@ func (c *Consistency) Initialize() error {
 					dp := filepath.Join(c.discpath, d, e.Name())
 					c.Nodes[dp] = append(c.Nodes[dp], InconsistencyFilesMissing)
 				}
-				inc := c.checkNode(filepath.Join(d, e.Name()+".mpk"))
+				inc := c.checkNode(filepath.Join(d, e.Name()))
 				dp := filepath.Join(c.discpath, d, e.Name())
 				if inc != "" {
 					c.Nodes[dp] = append(c.Nodes[dp], inc)
@@ -166,10 +169,6 @@ func (c *Consistency) Evaluate() error {
 		deleteInconsistency(c.Nodes, n)
 	}
 
-	for l := range c.LinkedNodes {
-		c.LinkedNodes[l] = append(c.LinkedNodes[l], InconsistencyNodeMissing)
-	}
-
 	blobs, err := c.lbs.List()
 	if err != nil {
 		return err
@@ -194,28 +193,28 @@ func (c *Consistency) Evaluate() error {
 // PrintResults prints the results of the evaluation
 func (c *Consistency) PrintResults() error {
 	if len(c.Nodes) != 0 {
-		fmt.Println("🚨 Inconsistent Nodes:")
+		fmt.Println("\n🚨 Inconsistent Nodes:")
 	}
 	for n := range c.Nodes {
 		fmt.Printf("\t👉️ %v\tpath: %s\n", c.Nodes[n], n)
 	}
 	if len(c.LinkedNodes) != 0 {
-		fmt.Println("🚨 Inconsistent Links:")
+		fmt.Println("\n🚨 Inconsistent Links:")
 	}
 	for l := range c.LinkedNodes {
-		fmt.Printf("\t👉️ %v\tpath: %s\tmissing node:%s\n", c.LinkedNodes[l], c.nodeToLink[l], l)
+		fmt.Printf("\t👉️ %v\tpath: %s\n\t\t\t\tmissing node:%s\n", c.LinkedNodes[l], c.nodeToLink[l], l)
 	}
 	if len(c.Blobs) != 0 {
-		fmt.Println("🚨 Inconsistent Blobs:")
+		fmt.Println("\n🚨 Inconsistent Blobs:")
 	}
 	for b := range c.Blobs {
 		fmt.Printf("\t👉️ %v\tblob: %s\n", c.Blobs[b], b)
 	}
 	if len(c.BlobReferences) != 0 {
-		fmt.Println("🚨 Inconsistent BlobReferences:")
+		fmt.Println("\n🚨 Inconsistent BlobReferences:")
 	}
 	for b := range c.BlobReferences {
-		fmt.Printf("\t👉️ %v\tblob: %s\n", c.BlobReferences[b], b)
+		fmt.Printf("\t👉️ %v\tblob: %s\n\t\t\t\treferencing node:%s\n", c.BlobReferences[b], b, c.blobToNode[b])
 	}
 	if len(c.Nodes) == 0 && len(c.LinkedNodes) == 0 && len(c.Blobs) == 0 && len(c.BlobReferences) == 0 {
 		fmt.Printf("💚 No inconsistency found. The backup in '%s' seems to be valid.\n", c.discpath)
@@ -225,7 +224,7 @@ func (c *Consistency) PrintResults() error {
 }
 
 func (c *Consistency) checkNode(path string) Inconsistency {
-	b, err := fs.ReadFile(c.fsys, path)
+	b, err := fs.ReadFile(c.fsys, path+".mpk")
 	if err != nil {
 		return InconsistencyFilesMissing
 	}
@@ -239,6 +238,7 @@ func (c *Consistency) checkNode(path string) Inconsistency {
 		spaceID, _ := getIDsFromPath(filepath.Join(c.discpath, path))
 		p := c.lbs.Path(&node.Node{BlobID: string(bid), SpaceID: spaceID})
 		c.BlobReferences[p] = []Inconsistency{}
+		c.blobToNode[p] = filepath.Join(c.discpath, path)
 	}
 
 	return ""
