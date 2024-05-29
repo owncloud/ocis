@@ -9,7 +9,7 @@ import (
 // allow the consuming part to change defaults, e.g., tests
 var defaultCapabilities atomic.Pointer[ocs.Capabilities]
 
-func init() {
+func init() { //nolint:gochecknoinits
 	ResetDefault()
 }
 
