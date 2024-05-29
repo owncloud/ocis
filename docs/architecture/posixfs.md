@@ -114,6 +114,7 @@ The tech preview comes with the following limitations:
 1. User Management: Manipulations in the file system have to be done by the same user that runs Infinte Scale
 2. Only inotify and GPFS file system change notification methods are supported
 3. Advanced features versioning and trashbin are not supported yet
+4. The space/project folders in the filesystem are named after the UUID, not the real space name
 
 ## Setup
 
@@ -128,18 +129,20 @@ To run PosixFS, the following prerequisites have to be fulfilled:
 1. There must be storage available to store meta data and blobs, available under a root path
 2. When using inotify, the storage must be local on the same machine. Network mounts do not work with Inotify
 3. The storage root path must be writeable and executable by the same user Infinite Scale is running under
-4. An appropiate version of Infinte Scale is installed
+4. An appropiate version of Infinte Scale is installed, version number 5.0.5 and later
+5. Either redis or nats-js-kv cache service
+
 
 ### Setup Configuration
 
-This is an example configuration with environment variables that configures Infinite Scale to use PosixFS for all spaces it works with, ie. Personal and Project Spaces
+This is an example configuration with environment variables that configures Infinite Scale to use PosixFS for all spaces it works with, ie. Personal and Project Spaces:
 
 ```
     "STORAGE_USERS_DRIVER": "posix",
     "STORAGE_USERS_POSIX_ROOT" : "/home/kf/tmp/posix-storage",
     "STORAGE_USERS_POSIX_WATCH_TYPE" : "inotifywait",
-    // "STORAGE_USERS_ID_CACHE_STORE" : "redis",
-    "STORAGE_USERS_ID_CACHE_STORE_NODES": "127.0.0.1:6379"
+    "STORAGE_USERS_ID_CACHE_STORE": "nats-js-kv",              // for redis "redis"
+    "STORAGE_USERS_ID_CACHE_STORE_NODES": "localhost:9233",    // for redis "127.0.0.1:6379"
 ```
 
 
