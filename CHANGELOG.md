@@ -114,6 +114,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add virus filter to sessions command: [#9041](https://github.com/owncloud/ocis/pull/9041)
 * Enhancement - Assimilate `clean` into `sessions` command: [#9041](https://github.com/owncloud/ocis/pull/9041)
 * Enhancement - Add remote item id to WebDAV report responses: [#9094](https://github.com/owncloud/ocis/issues/9094)
+* Enhancement - Theme Processing and Logo Customization: [#9133](https://github.com/owncloud/ocis/pull/9133)
 * Enhancement - Add watermark text: [#9144](https://github.com/owncloud/ocis/pull/9144)
 * Enhancement - Update selected attributes of autoprovisioned users: [#9166](https://github.com/owncloud/ocis/pull/9166)
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
@@ -695,6 +696,27 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9094
    https://github.com/owncloud/ocis/pull/9095
+
+* Enhancement - Theme Processing and Logo Customization: [#9133](https://github.com/owncloud/ocis/pull/9133)
+
+   We have made significant improvements to the theme processing in Infinite Scale.
+   The changes include:
+
+   - Enhanced the way themes are composed. Now, the final theme is a combination of
+   the built-in theme and the custom theme provided by the administrator via
+   `WEB_ASSET_THEMES_PATH` and `WEB_UI_THEME_PATH`. - Introduced a new mechanism to
+   load custom assets. This is particularly useful when a single asset, such as a
+   logo, needs to be overwritten. - Fixed the logo customization option.
+   Previously, small theme changes would copy the entire theme. Now, only the
+   changed keys are considered, making the process more efficient. - Default themes
+   are now part of ocis. This change simplifies the theme management process for
+   web.
+
+   These changes enhance the robustness of the theme handling in Infinite Scale and
+   provide a better user experience.
+
+   https://github.com/owncloud/ocis/issues/8966
+   https://github.com/owncloud/ocis/pull/9133
 
 * Enhancement - Add watermark text: [#9144](https://github.com/owncloud/ocis/pull/9144)
 
