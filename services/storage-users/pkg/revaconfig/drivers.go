@@ -84,6 +84,33 @@ func Local(cfg *config.Config) map[string]interface{} {
 	}
 }
 
+// Posix is the config mapping for the Posix storage driver
+func Posix(cfg *config.Config) map[string]interface{} {
+	return map[string]interface{}{
+		"root":                       cfg.Drivers.Posix.Root,
+		"personalspacepath_template": cfg.Drivers.Posix.PersonalSpacePathTemplate,
+		"generalspacepath_template":  cfg.Drivers.Posix.GeneralSpacePathTemplate,
+		"permissionssvc":             cfg.Drivers.Posix.PermissionsEndpoint,
+		"permissionssvc_tls_mode":    cfg.Commons.GRPCClientTLS.Mode,
+		"treetime_accounting":        true,
+		"treesize_accounting":        true,
+		"idcache": map[string]interface{}{
+			"cache_store":               cfg.IDCache.Store,
+			"cache_nodes":               cfg.IDCache.Nodes,
+			"cache_database":            cfg.IDCache.Database,
+			"cache_ttl":                 cfg.IDCache.TTL,
+			"cache_size":                cfg.IDCache.Size,
+			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":       cfg.IDCache.AuthUsername,
+			"cache_auth_password":       cfg.IDCache.AuthPassword,
+		},
+		"use_space_groups":           cfg.Drivers.Posix.UseSpaceGroups,
+		"watch_type":                 cfg.Drivers.Posix.WatchType,
+		"watch_path":                 cfg.Drivers.Posix.WatchPath,
+		"watch_folder_kafka_brokers": cfg.Drivers.Posix.WatchFolderKafkaBrokers,
+	}
+}
+
 // LocalHome is the config mapping for the LocalHome storage driver
 func LocalHome(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
@@ -122,7 +149,9 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 		"user_layout":                 cfg.Drivers.OCIS.UserLayout,
 		"share_folder":                cfg.Drivers.OCIS.ShareFolder,
 		"personalspacealias_template": cfg.Drivers.OCIS.PersonalSpaceAliasTemplate,
+		"personalspacepath_template":  cfg.Drivers.OCIS.PersonalSpacePathTemplate,
 		"generalspacealias_template":  cfg.Drivers.OCIS.GeneralSpaceAliasTemplate,
+		"generalspacepath_template":   cfg.Drivers.OCIS.GeneralSpacePathTemplate,
 		"treetime_accounting":         true,
 		"treesize_accounting":         true,
 		"permissionssvc":              cfg.Drivers.OCIS.PermissionsEndpoint,
@@ -176,7 +205,9 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 		"user_layout":                 cfg.Drivers.OCIS.UserLayout,
 		"share_folder":                cfg.Drivers.OCIS.ShareFolder,
 		"personalspacealias_template": cfg.Drivers.OCIS.PersonalSpaceAliasTemplate,
+		"personalspacepath_template":  cfg.Drivers.OCIS.PersonalSpacePathTemplate,
 		"generalspacealias_template":  cfg.Drivers.OCIS.GeneralSpaceAliasTemplate,
+		"generalspacepath_template":   cfg.Drivers.OCIS.GeneralSpacePathTemplate,
 		"treetime_accounting":         true,
 		"treesize_accounting":         true,
 		"permissionssvc":              cfg.Drivers.OCIS.PermissionsEndpoint,
@@ -232,8 +263,10 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 		"root":                        cfg.Drivers.S3NG.Root,
 		"user_layout":                 cfg.Drivers.S3NG.UserLayout,
 		"share_folder":                cfg.Drivers.S3NG.ShareFolder,
-		"personalspacealias_template": cfg.Drivers.S3NG.PersonalSpaceAliasTemplate,
-		"generalspacealias_template":  cfg.Drivers.S3NG.GeneralSpaceAliasTemplate,
+		"personalspacealias_template": cfg.Drivers.OCIS.PersonalSpaceAliasTemplate,
+		"personalspacepath_template":  cfg.Drivers.OCIS.PersonalSpacePathTemplate,
+		"generalspacealias_template":  cfg.Drivers.OCIS.GeneralSpaceAliasTemplate,
+		"generalspacepath_template":   cfg.Drivers.OCIS.GeneralSpacePathTemplate,
 		"treetime_accounting":         true,
 		"treesize_accounting":         true,
 		"permissionssvc":              cfg.Drivers.S3NG.PermissionsEndpoint,
@@ -296,8 +329,10 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 		"root":                        cfg.Drivers.S3NG.Root,
 		"user_layout":                 cfg.Drivers.S3NG.UserLayout,
 		"share_folder":                cfg.Drivers.S3NG.ShareFolder,
-		"personalspacealias_template": cfg.Drivers.S3NG.PersonalSpaceAliasTemplate,
-		"generalspacealias_template":  cfg.Drivers.S3NG.GeneralSpaceAliasTemplate,
+		"personalspacealias_template": cfg.Drivers.OCIS.PersonalSpaceAliasTemplate,
+		"personalspacepath_template":  cfg.Drivers.OCIS.PersonalSpacePathTemplate,
+		"generalspacealias_template":  cfg.Drivers.OCIS.GeneralSpaceAliasTemplate,
+		"generalspacepath_template":   cfg.Drivers.OCIS.GeneralSpacePathTemplate,
 		"treetime_accounting":         true,
 		"treesize_accounting":         true,
 		"permissionssvc":              cfg.Drivers.S3NG.PermissionsEndpoint,
