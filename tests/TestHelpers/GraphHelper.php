@@ -2134,6 +2134,7 @@ class GraphHelper {
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/invite");
 		$body = self::createShareInviteBody($shareeIds, $shareTypes, $permissionsRole, $permissionsAction, $expireDate);
+
 		return HttpRequestHelper::post(
 			$url,
 			$xRequestId,

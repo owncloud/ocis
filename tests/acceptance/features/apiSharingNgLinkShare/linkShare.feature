@@ -2302,8 +2302,8 @@ Feature: Create a share link for a resource
     And the public download of file "textfile.txt" from the last link share with password "$heLlo*1234*" should fail with HTTP status code "401" using shareNg
 
   @issue-7879
-  Scenario Outline: try to create a link share of a Personal and Share drive using permission endpoint
-    When user "Alice" tries to create the following space link share using permission endpoint of the Graph API:
+  Scenario Outline: try to create a link share of a Personal and Shares drives using permissions endpoint
+    When user "Alice" tries to create the following space link share using permissions endpoint of the Graph API:
       | space           | <drive>            |
       | permissionsRole | <permissions-role> |
       | password        | %public%           |
@@ -2346,19 +2346,19 @@ Feature: Create a share link for a resource
       | edit             | Shares   | no share permission                       |
       | upload           | Shares   | no share permission                       |
       | createOnly       | Shares   | no share permission                       |
-#      | blocksDownload   | Shares   | invalid link type                         |
+      | blocksDownload   | Shares   | invalid link type                         |
       | view             | Personal | cannot create link on personal space root |
       | edit             | Personal | cannot create link on personal space root |
       | upload           | Personal | cannot create link on personal space root |
       | createOnly       | Personal | cannot create link on personal space root |
-#      | blocksDownload   | Personal | invalid link type                         |
+      | blocksDownload   | Personal | invalid link type                         |
 
   @issue-7879
-  Scenario Outline: create a link share of a project-space drive with different permissions using permission endpoint
+  Scenario Outline: create a link share of a project-space drive using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
-    When user "Alice" creates the following space link share using permission endpoint of the Graph API:
+    When user "Alice" creates the following space link share using permissions endpoint of the Graph API:
       | space           | projectSpace       |
       | permissionsRole | <permissions-role> |
       | password        | %public%           |
@@ -2417,11 +2417,11 @@ Feature: Create a share link for a resource
       | edit             |
       | upload           |
       | createOnly       |
-#      | blocksDownload   |
+      | blocksDownload   |
 
 
-  Scenario Outline: try to create an internal link share of a Personal and Share drives using permission endpoint
-    When user "Alice" tries to create the following space link share using permission endpoint of the Graph API:
+  Scenario Outline: try to create an internal link share of a Personal and Shares drives using permissions endpoint
+    When user "Alice" tries to create the following space link share using permissions endpoint of the Graph API:
       | space           | <drive>  |
       | permissionsRole | internal |
     Then the HTTP status code should be "400"
@@ -2463,8 +2463,8 @@ Feature: Create a share link for a resource
       | Shares   | no share permission                       |
 
 
-  Scenario Outline: try to create an internal link share with password of a Personal and Share drive using permission endpoint
-    When user "Alice" tries to create the following space link share using permission endpoint of the Graph API:
+  Scenario Outline: try to create an internal link share with password of a Personal and Shares drives using permissions endpoint
+    When user "Alice" tries to create the following space link share using permissions endpoint of the Graph API:
       | space           | <drive>  |
       | permissionsRole | internal |
       | password        | %public% |
@@ -2507,11 +2507,11 @@ Feature: Create a share link for a resource
       | Shares   |
 
 
-  Scenario: create an internal link share of a project-space using permission endpoint
+  Scenario: create an internal link share of a project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
-    When user "Alice" creates the following space link share using permission endpoint of the Graph API:
+    When user "Alice" creates the following space link share using permissions endpoint of the Graph API:
       | space           | projectSpace  |
       | permissionsRole | internal      |
     Then the HTTP status code should be "200"
@@ -2564,11 +2564,11 @@ Feature: Create a share link for a resource
       """
 
 
-  Scenario: try to create an internal link share of a project-space drive with password using permission endpoint
+  Scenario: try to create an internal link share of a project-space with password using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
-    When user "Alice" creates the following space link share using permission endpoint of the Graph API:
+    When user "Alice" creates the following space link share using permissions endpoint of the Graph API:
       | space           | projectSpace  |
       | permissionsRole | internal      |
       | password        | %public%      |
@@ -2607,14 +2607,144 @@ Feature: Create a share link for a resource
       """
 
 
-  Scenario Outline: create a link share of a project-space drive with different permissions using permission endpoint
+  Scenario Outline: create a link share of a project-space with display name and expiry date using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
-    When user "Alice" creates the following space link share using permission endpoint of the Graph API:
+    When user "Alice" creates the following space link share using permissions endpoint of the Graph API:
+      | space              | projectSpace             |
+      | permissionsRole    | <permissions-role>       |
+      | password           | %public%                 |
+      | displayName        | Homework                 |
+      | expirationDateTime | 2200-07-15T14:00:00.000Z |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link",
+          "expirationDateTime"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": true
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "expirationDateTime": {
+            "const": "2200-07-15T23:59:59Z"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": "Homework"
+              },
+              "@libre.graph.quickLink": {
+                "const": false
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "<permissions-role>"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+      | upload           |
+      | createOnly       |
+      | blocksDownload   |
+
+
+  Scenario Outline: try to create a link share of a project-space with a password that is listed in the Banned-Password-List using permissions endpoint
+    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    When user "Alice" creates the following space link share using permissions endpoint of the Graph API:
       | space           | projectSpace       |
       | permissionsRole | <permissions-role> |
-      | password        | %public%           |
+      | password        | <banned-password>  |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "invalidRequest"
+              },
+              "message": {
+                "const": "unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | banned-password | permissions-role |
+      | 123             | view             |
+      | password        | view             |
+      | ownCloud        | view             |
+      | 123             | edit             |
+      | password        | edit             |
+      | ownCloud        | edit             |
+      | 123             | upload           |
+      | password        | upload           |
+      | ownCloud        | upload           |
+      | 123             | createOnly       |
+      | password        | createOnly       |
+      | ownCloud        | createOnly       |
+      | 123             | blocksDownload   |
+      | password        | blocksDownload   |
+      | ownCloud        | blocksDownload   |
+
+
+  Scenario Outline: create a link share of a project-space without password using permissions endpoint
+    Given the following configs have been set:
+      | config                                       | value |
+      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    When user "Alice" creates the following space link share using permissions endpoint of the Graph API:
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -2627,7 +2757,7 @@ Feature: Create a share link for a resource
         ],
         "properties": {
           "hasPassword": {
-            "const": true
+            "const": false
           },
           "id": {
             "type": "string",
@@ -2670,4 +2800,4 @@ Feature: Create a share link for a resource
       | edit             |
       | upload           |
       | createOnly       |
-#      | blocksDownload   |
+      | blocksDownload   |

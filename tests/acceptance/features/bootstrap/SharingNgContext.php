@@ -563,7 +563,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:tries to create|creates) the following space link share using permission endpoint of the Graph API:$/
+	 * @When /^user "([^"]*)" (?:tries to create|creates) the following space link share using permissions endpoint of the Graph API:$/
 	 *
 	 * @param string $user
 	 * @param TableNode $body
@@ -571,7 +571,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userCreatesTheFollowingSpaceLinkShareUsingTheGraphApi(string $user, TableNode $body):void {
+	public function userCreatesTheFollowingSpaceLinkShareUsingPermissionsEndpointOfTheGraphApi(string $user, TableNode $body):void {
 		$this->featureContext->setResponse($this->createLinkShare($user, $body));
 	}
 
