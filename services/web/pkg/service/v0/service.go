@@ -23,6 +23,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 	"github.com/owncloud/ocis/v2/services/web/pkg/assets"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
+	"github.com/owncloud/ocis/v2/services/web/pkg/theme"
 )
 
 // ErrConfigInvalid is returned when the config parse is invalid.
@@ -30,14 +31,12 @@ var ErrConfigInvalid = `Invalid or missing config`
 
 // Service defines the service handlers.
 type Service interface {
-	ServeHTTP(http.ResponseWriter, *http.Request)
-	Config(http.ResponseWriter, *http.Request)
-	UploadLogo(http.ResponseWriter, *http.Request)
-	ResetLogo(http.ResponseWriter, *http.Request)
+	ServeHTTP(w http.ResponseWriter, r *http.Request)
+	Config(w http.ResponseWriter, r *http.Request)
 }
 
 // NewService returns a service implementation for Service.
-func NewService(opts ...Option) Service {
+func NewService(opts ...Option) (Service, error) {
 	options := newOptions(opts...)
 
 	m := chi.NewMux()
@@ -57,7 +56,17 @@ func NewService(opts ...Option) Service {
 		config:          options.Config,
 		mux:             m,
 		coreFS:          options.CoreFS,
+		themeFS:         options.ThemeFS,
 		gatewaySelector: options.GatewaySelector,
+	}
+
+	themeService, err := theme.NewService(
+		theme.ServiceOptions{}.
+			WithThemeFS(options.ThemeFS).
+			WithGatewaySelector(options.GatewaySelector),
+	)
+	if err != nil {
+		return svc, err
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -67,8 +76,16 @@ func NewService(opts ...Option) Service {
 				account.Logger(options.Logger),
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			))
-			r.Post("/", svc.UploadLogo)
-			r.Delete("/", svc.ResetLogo)
+			r.Post("/", themeService.LogoUpload)
+			r.Delete("/", themeService.LogoReset)
+		})
+		r.Route("/themes", func(r chi.Router) {
+			r.Get("/{id}/theme.json", themeService.Get)
+			r.Mount("/", svc.Static(
+				options.ThemeFS.IOFS(),
+				path.Join(svc.config.HTTP.Root, "/themes"),
+				options.Config.HTTP.CacheTTL,
+			))
 		})
 		r.Mount(options.AppsHTTPEndpoint, svc.Static(
 			options.AppFS,
@@ -76,18 +93,17 @@ func NewService(opts ...Option) Service {
 			options.Config.HTTP.CacheTTL,
 		))
 		r.Mount("/", svc.Static(
-			svc.coreFS.IOFS(),
+			svc.coreFS,
 			svc.config.HTTP.Root,
 			options.Config.HTTP.CacheTTL,
 		))
 	})
-
 	_ = chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		options.Logger.Debug().Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")
 		return nil
 	})
 
-	return svc
+	return svc, nil
 }
 
 // Web defines the handlers for the web service.
@@ -95,7 +111,8 @@ type Web struct {
 	logger          log.Logger
 	config          *config.Config
 	mux             *chi.Mux
-	coreFS          *fsx.FallbackFS
+	coreFS          fs.FS
+	themeFS         *fsx.FallbackFS
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 

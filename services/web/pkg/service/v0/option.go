@@ -23,9 +23,10 @@ type Options struct {
 	Middleware       []func(http.Handler) http.Handler
 	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 	TraceProvider    trace.TracerProvider
-	AppFS            fs.FS
 	AppsHTTPEndpoint string
-	CoreFS           *fsx.FallbackFS
+	CoreFS           fs.FS
+	AppFS            fs.FS
+	ThemeFS          *fsx.FallbackFS
 }
 
 // newOptions initializes the available default options.
@@ -81,6 +82,13 @@ func AppFS(val fs.FS) Option {
 	}
 }
 
+// ThemeFS provides a function to set the themeFS option.
+func ThemeFS(val *fsx.FallbackFS) Option {
+	return func(o *Options) {
+		o.ThemeFS = val
+	}
+}
+
 // AppsHTTPEndpoint provides a function to set the appsHTTPEndpoint option.
 func AppsHTTPEndpoint(val string) Option {
 	return func(o *Options) {
@@ -89,7 +97,7 @@ func AppsHTTPEndpoint(val string) Option {
 }
 
 // CoreFS provides a function to set the coreFS option.
-func CoreFS(val *fsx.FallbackFS) Option {
+func CoreFS(val fs.FS) Option {
 	return func(o *Options) {
 		o.CoreFS = val
 	}

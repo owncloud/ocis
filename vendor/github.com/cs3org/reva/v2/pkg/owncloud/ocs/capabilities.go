@@ -16,7 +16,7 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-package data
+package ocs
 
 import (
 	"encoding/xml"
@@ -42,7 +42,7 @@ func (c ocsBool) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement("0", start)
 }
 
-// CapabilitiesData TODO document
+// CapabilitiesData holds the capabilities data
 type CapabilitiesData struct {
 	Capabilities *Capabilities `json:"capabilities" xml:"capabilities"`
 	Version      *Version      `json:"version" xml:"version"`
@@ -59,6 +59,7 @@ type Capabilities struct {
 	Graph          *CapabilitiesGraph          `json:"graph,omitempty" xml:"graph,omitempty" mapstructure:"graph"`
 	PasswordPolicy *CapabilitiesPasswordPolicy `json:"password_policy,omitempty" xml:"password_policy,omitempty" mapstructure:"password_policy"`
 	Search         *CapabilitiesSearch         `json:"search,omitempty" xml:"search,omitempty" mapstructure:"search"`
+	Theme          *CapabilitiesTheme          `json:"theme,omitempty" xml:"theme,omitempty" mapstructure:"theme"`
 	Notifications  *CapabilitiesNotifications  `json:"notifications,omitempty" xml:"notifications,omitempty"`
 }
 
@@ -288,6 +289,17 @@ type CapabilitiesFilesSharingFederation struct {
 // CapabilitiesNotifications holds a list of notification endpoints
 type CapabilitiesNotifications struct {
 	Endpoints []string `json:"ocs-endpoints,omitempty" xml:"ocs-endpoints>element,omitempty" mapstructure:"endpoints"`
+}
+
+// CapabilitiesTheme holds theming capabilities
+type CapabilitiesTheme struct {
+	Logo *CapabilitiesThemeLogo `json:"logo" xml:"logo" mapstructure:"logo"`
+}
+
+// CapabilitiesThemeLogo holds theming logo capabilities
+type CapabilitiesThemeLogo struct {
+	// xml marshal, unmarshal does not support map[string]string, needs a custom type with MarshalXML and UnmarshalXML implementations
+	PermittedFileTypes map[string]string `json:"permitted_file_types" xml:"-" mapstructure:"permitted_file_types"`
 }
 
 // Version holds version information

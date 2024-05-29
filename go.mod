@@ -15,7 +15,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.10.0
 	github.com/cs3org/go-cs3apis v0.0.0-20231023073225-7748710e0781
-	github.com/cs3org/reva/v2 v2.19.2-0.20240525160759-56879111e06a
+	github.com/cs3org/reva/v2 v2.19.2-0.20240529081036-419196f2342e
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -88,6 +88,7 @@ require (
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.5
 	github.com/tidwall/gjson v1.17.1
+	github.com/tidwall/sjson v1.2.5
 	github.com/tus/tusd v1.13.0
 	github.com/unrolled/secure v1.14.0
 	github.com/urfave/cli/v2 v2.27.2
