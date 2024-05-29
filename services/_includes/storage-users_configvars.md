@@ -38,7 +38,9 @@
 | STORAGE_USERS_OCIS_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the user directory.|
 | STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT | string | com.owncloud.api.settings | Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.|
 | STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username \| lower}} | Template string to construct personal space aliases.|
+| STORAGE_USERS_OCIS_PERSONAL_SPACE_PATH_TEMPLATE | string |  | Template string to construct the paths of the personal space roots.|
 | STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName \| replace &#34; &#34; &#34;-&#34; \| lower}} | Template string to construct general space aliases.|
+| STORAGE_USERS_OCIS_GENERAL_SPACE_PATH_TEMPLATE | string |  | Template string to construct the paths of the projects space roots.|
 | STORAGE_USERS_OCIS_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
 | STORAGE_USERS_OCIS_MAX_ACQUIRE_LOCK_CYCLES | int | 20 | When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value will be used.|
 | STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR | int | 30 | When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value will be used.|
@@ -63,7 +65,9 @@
 | STORAGE_USERS_S3NG_PUT_OBJECT_NUM_THREADS | uint | 4 | Number of concurrent uploads to use when copying objects to S3.|
 | STORAGE_USERS_S3NG_PUT_OBJECT_PART_SIZE | uint64 | 0 | Part size for concurrent uploads to S3.|
 | STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username \| lower}} | Template string to construct personal space aliases.|
+| STORAGE_USERS_S3NG_PERSONAL_SPACE_PATH_TEMPLATE | string |  | Template string to construct the paths of the personal space roots.|
 | STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName \| replace &#34; &#34; &#34;-&#34; \| lower}} | Template string to construct general space aliases.|
+| STORAGE_USERS_S3NG_GENERAL_SPACE_PATH_TEMPLATE | string |  | Template string to construct the paths of the projects space roots.|
 | STORAGE_USERS_S3NG_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
 | STORAGE_USERS_S3NG_MAX_ACQUIRE_LOCK_CYCLES | int | 20 | When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.|
 | STORAGE_USERS_S3NG_LOCK_CYCLE_DURATION_FACTOR | int | 30 | When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.|
@@ -78,6 +82,14 @@
 | STORAGE_USERS_OWNCLOUDSQL_DB_PORT | int | 3306 | Port that the database server is listening on.|
 | STORAGE_USERS_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the database to be used.|
 | STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT | string | com.owncloud.api.users | Endpoint of the users provider.|
+| STORAGE_USERS_POSIX_ROOT | string |  | The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud.|
+| STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE | string | users/{{.User.Username}} | Template string to construct the paths of the personal space roots.|
+| STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE | string | projects/{{.SpaceId}} | Template string to construct the paths of the projects space roots.|
+| STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT | string | com.owncloud.api.settings | Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'.|
+| STORAGE_USERS_POSIX_USE_SPACE_GROUPS | bool | false | Use space groups to manage permissions on spaces.|
+| STORAGE_USERS_POSIX_WATCH_TYPE | string |  | Type of the watcher to use for getting notified about changes to the filesystem. Currently available options are 'inotifywait' (default), 'gpfswatchfolder' and 'gpfsfileauditlogging'.|
+| STORAGE_USERS_POSIX_WATCH_PATH | string |  | Path to the watch directory/file. Only applies to the 'gpfsfileauditlogging' and 'inotifywait' watcher, in which case it is the path of the file audit log file/base directory to watch.|
+| STORAGE_USERS_POSIX_WATCH_FOLDER_KAFKA_BROKERS | string |  | Comma-separated list of kafka brokers to read the watchfolder events from.|
 | STORAGE_USERS_DATA_SERVER_URL | string | http://localhost:9158/data | URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.|
 | STORAGE_USERS_DATA_GATEWAY_URL | string | https://localhost:9200/data | URL of the data gateway server|
 | STORAGE_USERS_TRANSFER_EXPIRES | int64 | 86400 | The time after which the token for upload postprocessing expires|

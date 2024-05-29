@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-29-13-20-26]
+[#deprecation-note-2024-05-29-13-39-54]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -368,6 +368,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Template string to construct personal space aliases.
 
+a|`STORAGE_USERS_OCIS_PERSONAL_SPACE_PATH_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Template string to construct the paths of the personal space roots.
+
 a|`STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE` +
 
 a| [subs=-attributes]
@@ -376,6 +385,15 @@ a| [subs=-attributes]
 ++{{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}} ++
 a| [subs=-attributes]
 Template string to construct general space aliases.
+
+a|`STORAGE_USERS_OCIS_GENERAL_SPACE_PATH_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Template string to construct the paths of the projects space roots.
 
 a|`STORAGE_USERS_OCIS_SHARE_FOLDER` +
 
@@ -596,6 +614,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Template string to construct personal space aliases.
 
+a|`STORAGE_USERS_S3NG_PERSONAL_SPACE_PATH_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Template string to construct the paths of the personal space roots.
+
 a|`STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE` +
 
 a| [subs=-attributes]
@@ -604,6 +631,15 @@ a| [subs=-attributes]
 ++{{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}} ++
 a| [subs=-attributes]
 Template string to construct general space aliases.
+
+a|`STORAGE_USERS_S3NG_GENERAL_SPACE_PATH_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Template string to construct the paths of the projects space roots.
 
 a|`STORAGE_USERS_S3NG_SHARE_FOLDER` +
 
@@ -730,6 +766,79 @@ a| [subs=-attributes]
 ++com.owncloud.api.users ++
 a| [subs=-attributes]
 Endpoint of the users provider.
+
+a|`STORAGE_USERS_POSIX_ROOT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud.
+
+a|`STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++users/{{.User.Username}} ++
+a| [subs=-attributes]
+Template string to construct the paths of the personal space roots.
+
+a|`STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++projects/{{.SpaceId}} ++
+a| [subs=-attributes]
+Template string to construct the paths of the projects space roots.
+
+a|`STORAGE_USERS_PERMISSION_ENDPOINT` +
+`STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.settings ++
+a| [subs=-attributes]
+Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'.
+
+a|`STORAGE_USERS_POSIX_USE_SPACE_GROUPS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Use space groups to manage permissions on spaces.
+
+a|`STORAGE_USERS_POSIX_WATCH_TYPE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Type of the watcher to use for getting notified about changes to the filesystem. Currently available options are 'inotifywait' (default), 'gpfswatchfolder' and 'gpfsfileauditlogging'.
+
+a|`STORAGE_USERS_POSIX_WATCH_PATH` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path to the watch directory/file. Only applies to the 'gpfsfileauditlogging' and 'inotifywait' watcher, in which case it is the path of the file audit log file/base directory to watch.
+
+a|`STORAGE_USERS_POSIX_WATCH_FOLDER_KAFKA_BROKERS` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Comma-separated list of kafka brokers to read the watchfolder events from.
 
 a|`STORAGE_USERS_DATA_SERVER_URL` +
 

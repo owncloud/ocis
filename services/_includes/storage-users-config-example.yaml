@@ -84,7 +84,9 @@ drivers:
     user_layout: '{{.Id.OpaqueId}}'
     permissions_endpoint: com.owncloud.api.settings
     personalspacealias_template: '{{.SpaceType}}/{{.User.Username | lower}}'
+    personalspacepath_template: ""
     generalspacealias_template: '{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}'
+    generalspacepath_template: ""
     share_folder: /Shares
     max_acquire_lock_cycles: 20
     lock_cycle_duration_factor: 30
@@ -111,7 +113,9 @@ drivers:
     put_object_num_threads: 4
     put_object_part_size: 0
     personalspacealias_template: '{{.SpaceType}}/{{.User.Username | lower}}'
+    personalspacepath_template: ""
     generalspacealias_template: '{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}'
+    generalspacepath_template: ""
     share_folder: /Shares
     max_acquire_lock_cycles: 20
     lock_cycle_duration_factor: 30
@@ -127,6 +131,15 @@ drivers:
     db_port: 3306
     db_name: owncloud
     users_provider_endpoint: com.owncloud.api.users
+  posix:
+    root: ""
+    personalspacepath_template: users/{{.User.Username}}
+    generalspacepath_template: projects/{{.SpaceId}}
+    permissions_endpoint: com.owncloud.api.settings
+    use_space_groups: false
+    watch_type: ""
+    watch_path: ""
+    watch_folder_kafka_hosts: ""
 data_server_url: http://localhost:9158/data
 data_gateway_url: https://localhost:9200/data
 transfer_expires: 86400
