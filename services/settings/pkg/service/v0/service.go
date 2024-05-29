@@ -355,7 +355,8 @@ func (g Service) ListRoleAssignmentsFiltered(ctx context.Context, req *settingss
 		accountUUID := getValidatedAccountUUID(ctx, filters[0].GetAccountUuid())
 		r, err = g.manager.ListRoleAssignments(accountUUID)
 	case settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE:
-		err = fmt.Errorf("filtering by role not implemented")
+		roleID := filters[0].GetRoleId()
+		r, err = g.manager.ListRoleAssignmentsByRole(roleID)
 	}
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)

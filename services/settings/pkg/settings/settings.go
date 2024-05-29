@@ -63,6 +63,7 @@ type ValueManager interface {
 // RoleAssignmentManager is a role assignment service interface for abstraction of storage implementations
 type RoleAssignmentManager interface {
 	ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error)
+	ListRoleAssignmentsByRole(roleID string) ([]*settingsmsg.UserRoleAssignment, error)
 	WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.UserRoleAssignment, error)
 	RemoveRoleAssignment(assignmentID string) error
 }

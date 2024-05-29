@@ -14,8 +14,12 @@ import (
 )
 
 var (
-	einstein = "a4d07560-a670-4be9-8d60-9b547751a208"
-	//marie    = "3c054db3-eec1-4ca4-b985-bc56dcf560cb"
+	einstein = "00000000-0000-0000-0000-000000000001"
+	marie    = "00000000-0000-0000-0000-000000000002"
+	moss     = "00000000-0000-0000-0000-000000000003"
+
+	role1 = "11111111-1111-1111-1111-111111111111"
+	role2 = "22222222-2222-2222-2222-222222222222"
 
 	s = &Store{
 		Logger: logger,
@@ -149,6 +153,79 @@ func TestAssignmentUniqueness(t *testing.T) {
 	}
 }
 
+func TestListRoleAssignmentByRole(t *testing.T) {
+	type assignment struct {
+		userID string
+		roleID string
+	}
+
+	var scenarios = map[string]struct {
+		assignments []assignment
+		queryRole   string
+		numResults  int
+	}{
+		"just 2 assignments": {
+			assignments: []assignment{
+				{
+					userID: einstein,
+					roleID: role1,
+				}, {
+					userID: marie,
+					roleID: role1,
+				},
+			},
+			queryRole:  role1,
+			numResults: 2,
+		},
+		"no assignments match": {
+			assignments: []assignment{
+				{
+					userID: einstein,
+					roleID: role1,
+				}, {
+					userID: marie,
+					roleID: role1,
+				},
+			},
+			queryRole:  role2,
+			numResults: 0,
+		},
+		"only one assignment matches": {
+			assignments: []assignment{
+				{
+					userID: einstein,
+					roleID: role1,
+				}, {
+					userID: marie,
+					roleID: role1,
+				}, {
+					userID: moss,
+					roleID: role2,
+				},
+			},
+			queryRole:  role2,
+			numResults: 1,
+		},
+	}
+
+	for name, scenario := range scenarios {
+		scenario := scenario
+		t.Run(name, func(t *testing.T) {
+			for _, a := range scenario.assignments {
+				ass, err := s.WriteRoleAssignment(a.userID, a.roleID)
+				require.NoError(t, err)
+				require.Equal(t, ass.RoleId, a.roleID)
+			}
+
+			list, err := s.ListRoleAssignmentsByRole(scenario.queryRole)
+			require.NoError(t, err)
+			require.Equal(t, scenario.numResults, len(list))
+			for _, ass := range list {
+				require.Equal(t, ass.RoleId, scenario.queryRole)
+			}
+		})
+	}
+}
 func TestDeleteAssignment(t *testing.T) {
 	var scenarios = []struct {
 		name       string
