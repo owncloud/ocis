@@ -107,8 +107,9 @@ type Auth struct {
 }
 
 type AppHandler struct {
-	Prefix   string `yaml:"-"`
-	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_APP_HANDLER_INSECURE" desc:"Allow insecure connections to the frontend." introductionVersion:"pre5.0"`
+	Prefix        string `yaml:"-"`
+	Insecure      bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_APP_HANDLER_INSECURE" desc:"Allow insecure connections to the frontend." introductionVersion:"pre5.0"`
+	SecureViewApp string `yaml:"secure_view_app" env:"FRONTEND_APP_HANDLER_SECURE_VIEW_APP" desc:"Name of the app to use for secure view. Should match the Name configured for the CS3 app provider." introductionVersion:"pre5.1"`
 }
 
 type Archiver struct {
