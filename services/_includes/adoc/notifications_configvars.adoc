@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-29-03-43-17]
+[#deprecation-note-2024-05-30-00-32-09]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -221,7 +221,7 @@ a| [subs=-attributes]
 Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none' or 'auto'. If set to 'auto' or unset, the authentication method is automatically negotiated with the server.
 
 a|`NOTIFICATIONS_SMTP_ENCRYPTION` +
-xref:deprecation-note-2024-05-29-03-43-17[Deprecation Note]
+xref:deprecation-note-2024-05-30-00-32-09[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
