@@ -121,6 +121,7 @@ The following sections list the changes for unreleased.
 * Enhancement - The storage-users doc updated: [#9228](https://github.com/owncloud/ocis/pull/9228)
 * Enhancement - Docker compose example for ClamAV: [#9229](https://github.com/owncloud/ocis/pull/9229)
 * Enhancement - Bump Reva: [#9269](https://github.com/owncloud/ocis/pull/9269)
+* Enhancement - Add secureview flag when listing apps via http: [#9277](https://github.com/owncloud/ocis/pull/9277)
 
 ## Details
 
@@ -769,6 +770,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8701
    https://github.com/owncloud/ocis/pull/8606
    https://github.com/owncloud/ocis/pull/8937
+
+* Enhancement - Add secureview flag when listing apps via http: [#9277](https://github.com/owncloud/ocis/pull/9277)
+
+   To allow clients to see which application supports secure view we add a flag to
+   the http response when the app name matches a configured secure view app. The
+   app can be configured by setting `FRONTEND_APP_HANDLER_SECURE_VIEW_APP` to the
+   name of the app registered as a CS3 app provider.
+
+   https://github.com/owncloud/ocis/pull/9277
 
 # Changelog for [5.0.3] (2024-05-02)
 
