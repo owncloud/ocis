@@ -10,7 +10,7 @@ import (
 	"unicode"
 
 	"github.com/asaskevich/govalidator"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/invopop/validation"
 )
 
 var (
@@ -58,6 +58,8 @@ var (
 	ErrUUIDv5 = validation.NewError("validation_is_uuid_v5", "must be a valid UUID v5")
 	// ErrUUID is the error that returns in case of an invalid UUID value.
 	ErrUUID = validation.NewError("validation_is_uuid", "must be a valid UUID")
+	// ErrULID is the error that returns in case of an invalid ULID value.
+	ErrULID = validation.NewError("validation_is_ulid", "must be a valid ULID")
 	// ErrCreditCard is the error that returns in case of an invalid credit card number.
 	ErrCreditCard = validation.NewError("validation_is_credit_card", "must be a valid credit card number")
 	// ErrISBN10 is the error that returns in case of an invalid ISBN-10 value.
@@ -84,7 +86,7 @@ var (
 	ErrBase64 = validation.NewError("validation_is_base64", "must be encoded in Base64")
 	// ErrDataURI is the error that returns in case of an invalid data URI.
 	ErrDataURI = validation.NewError("validation_is_data_uri", "must be a Base64-encoded data URI")
-	// ErrE164 is the error that returns in case of an invalid e165.
+	// ErrE164 is the error that returns in case of an invalid e164.
 	ErrE164 = validation.NewError("validation_is_e164_number", "must be a valid E164 number")
 	// ErrCountryCode2 is the error that returns in case of an invalid two-letter country code.
 	ErrCountryCode2 = validation.NewError("validation_is_country_code_2_letter", "must be a valid two-letter country code")
@@ -197,7 +199,7 @@ var (
 	Base64 = validation.NewStringRuleWithError(govalidator.IsBase64, ErrBase64)
 	// DataURI validates if a string is a valid base64-encoded data URI
 	DataURI = validation.NewStringRuleWithError(govalidator.IsDataURI, ErrDataURI)
-	// E164 validates if a string is a valid ISO3166 Alpha 2 country code
+	// E164 validates if a string is a valid E164 telephone number
 	E164 = validation.NewStringRuleWithError(isE164Number, ErrE164)
 	// CountryCode2 validates if a string is a valid ISO3166 Alpha 2 country code
 	CountryCode2 = validation.NewStringRuleWithError(govalidator.IsISO3166Alpha2, ErrCountryCode2)
@@ -275,7 +277,7 @@ func isDomain(value string) bool {
 
 func isUTFNumeric(value string) bool {
 	for _, c := range value {
-		if unicode.IsNumber(c) == false {
+		if !unicode.IsNumber(c) {
 			return false
 		}
 	}

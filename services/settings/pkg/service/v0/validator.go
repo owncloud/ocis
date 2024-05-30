@@ -4,8 +4,8 @@ import (
 	"errors"
 	"regexp"
 
-	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
+	validation "github.com/invopop/validation"
+	"github.com/invopop/validation/is"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
@@ -129,12 +129,12 @@ func validateListRoleAssignmentsFiltered(req *settingssvc.ListRoleAssignmentsFil
 }
 
 func validateUserRoleAssignmentFilter(values interface{}) error {
-	filter, ok := values.(settingsmsg.UserRoleAssignmentFilter)
+	filter, ok := values.(*settingsmsg.UserRoleAssignmentFilter)
 	if !ok {
 		return errors.New("expected UserRoleAssignmentFilter")
 	}
 	return validation.ValidateStruct(
-		&filter,
+		filter,
 		validation.Field(&filter.Type,
 			validation.Required,
 			validation.In(settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT, settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE),

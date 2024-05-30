@@ -41,10 +41,11 @@ type (
 // Use Key() to specify map keys that need to be validated. Each Key() call specifies a single key which can
 // be associated with multiple rules.
 // For example,
-//    validation.Map(
-//        validation.Key("Name", validation.Required),
-//        validation.Key("Value", validation.Required, validation.Length(5, 10)),
-//    )
+//
+//	validation.Map(
+//	    validation.Key("Name", validation.Required),
+//	    validation.Key("Value", validation.Required, validation.Length(5, 10)),
+//	)
 //
 // A nil value is considered valid. Use the Required rule to make sure a map value is present.
 func Map(keys ...*KeyRules) MapRule {
@@ -59,7 +60,7 @@ func (r MapRule) AllowExtraKeys() MapRule {
 
 // Validate checks if the given value is valid or not.
 func (r MapRule) Validate(m interface{}) error {
-	return r.ValidateWithContext(nil, m)
+	return r.ValidateWithContext(context.Background(), m)
 }
 
 // ValidateWithContext checks if the given value is valid or not.
