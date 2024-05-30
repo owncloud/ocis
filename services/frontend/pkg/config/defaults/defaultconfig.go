@@ -94,7 +94,7 @@ func DefaultConfig() *config.Config {
 		},
 		AppHandler: config.AppHandler{
 			Prefix:        "app",
-			SecureViewApp: "Collabora Online",
+			SecureViewApp: "Collabora",
 		},
 		Archiver: config.Archiver{
 			Insecure:    false,
