@@ -42,11 +42,10 @@ Deleting items using this method moves the items to the recycle bin instead of p
 
 Mounted shares in the share jail are unmounted. The `@client.synchronize` property of the `driveItem` in the [sharedWithMe](#/me.drive/ListSharedWithMe) endpoint will change to false.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param itemId key: id of item
- @return ApiDeleteDriveItemRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param itemId key: id of item
+	@return ApiDeleteDriveItemRequest
 */
 func (a *DriveItemApiService) DeleteDriveItem(ctx context.Context, driveId string, itemId string) ApiDeleteDriveItemRequest {
 	return ApiDeleteDriveItemRequest{
@@ -147,11 +146,10 @@ GetDriveItem Get a DriveItem.
 
 Get a DriveItem by using its ID.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param itemId key: id of item
- @return ApiGetDriveItemRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param itemId key: id of item
+	@return ApiGetDriveItemRequest
 */
 func (a *DriveItemApiService) GetDriveItem(ctx context.Context, driveId string, itemId string) ApiGetDriveItemRequest {
 	return ApiGetDriveItemRequest{
@@ -163,7 +161,8 @@ func (a *DriveItemApiService) GetDriveItem(ctx context.Context, driveId string, 
 }
 
 // Execute executes the request
-//  @return DriveItem
+//
+//	@return DriveItem
 func (a *DriveItemApiService) GetDriveItemExecute(r ApiGetDriveItemRequest) (*DriveItem, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -277,11 +276,10 @@ Currently it supports updating the following properties:
 
 * `@UI.Hidden` - Hides the item from the UI.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param itemId key: id of item
- @return ApiUpdateDriveItemRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param itemId key: id of item
+	@return ApiUpdateDriveItemRequest
 */
 func (a *DriveItemApiService) UpdateDriveItem(ctx context.Context, driveId string, itemId string) ApiUpdateDriveItemRequest {
 	return ApiUpdateDriveItemRequest{
@@ -293,7 +291,8 @@ func (a *DriveItemApiService) UpdateDriveItem(ctx context.Context, driveId strin
 }
 
 // Execute executes the request
-//  @return DriveItem
+//
+//	@return DriveItem
 func (a *DriveItemApiService) UpdateDriveItemExecute(r ApiUpdateDriveItemRequest) (*DriveItem, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPatch

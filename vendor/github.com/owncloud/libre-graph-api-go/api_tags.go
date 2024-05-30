@@ -39,8 +39,8 @@ func (r ApiAssignTagsRequest) Execute() (*http.Response, error) {
 /*
 AssignTags Assign tags to a resource
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAssignTagsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAssignTagsRequest
 */
 func (a *TagsApiService) AssignTags(ctx context.Context) ApiAssignTagsRequest {
 	return ApiAssignTagsRequest{
@@ -135,8 +135,8 @@ func (r ApiGetTagsRequest) Execute() (*CollectionOfTags, *http.Response, error) 
 /*
 GetTags Get all known tags
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetTagsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetTagsRequest
 */
 func (a *TagsApiService) GetTags(ctx context.Context) ApiGetTagsRequest {
 	return ApiGetTagsRequest{
@@ -146,7 +146,8 @@ func (a *TagsApiService) GetTags(ctx context.Context) ApiGetTagsRequest {
 }
 
 // Execute executes the request
-//  @return CollectionOfTags
+//
+//	@return CollectionOfTags
 func (a *TagsApiService) GetTagsExecute(r ApiGetTagsRequest) (*CollectionOfTags, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -246,8 +247,8 @@ func (r ApiUnassignTagsRequest) Execute() (*http.Response, error) {
 /*
 UnassignTags Unassign tags from a resource
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiUnassignTagsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiUnassignTagsRequest
 */
 func (a *TagsApiService) UnassignTags(ctx context.Context) ApiUnassignTagsRequest {
 	return ApiUnassignTagsRequest{

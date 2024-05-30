@@ -40,8 +40,8 @@ func (r ApiCreateGroupRequest) Execute() (*Group, *http.Response, error) {
 /*
 CreateGroup Add new entity to groups
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateGroupRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateGroupRequest
 */
 func (a *GroupsApiService) CreateGroup(ctx context.Context) ApiCreateGroupRequest {
 	return ApiCreateGroupRequest{
@@ -51,7 +51,8 @@ func (a *GroupsApiService) CreateGroup(ctx context.Context) ApiCreateGroupReques
 }
 
 // Execute executes the request
-//  @return Group
+//
+//	@return Group
 func (a *GroupsApiService) CreateGroupExecute(r ApiCreateGroupRequest) (*Group, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -178,8 +179,8 @@ func (r ApiListGroupsRequest) Execute() (*CollectionOfGroup, *http.Response, err
 /*
 ListGroups Get entities from groups
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListGroupsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListGroupsRequest
 */
 func (a *GroupsApiService) ListGroups(ctx context.Context) ApiListGroupsRequest {
 	return ApiListGroupsRequest{
@@ -189,7 +190,8 @@ func (a *GroupsApiService) ListGroups(ctx context.Context) ApiListGroupsRequest 
 }
 
 // Execute executes the request
-//  @return CollectionOfGroup
+//
+//	@return CollectionOfGroup
 func (a *GroupsApiService) ListGroupsExecute(r ApiListGroupsRequest) (*CollectionOfGroup, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

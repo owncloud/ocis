@@ -47,8 +47,8 @@ func (r ApiListAllDrivesRequest) Execute() (*CollectionOfDrives1, *http.Response
 /*
 ListAllDrives Get all available drives
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListAllDrivesRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListAllDrivesRequest
 */
 func (a *DrivesGetDrivesApiService) ListAllDrives(ctx context.Context) ApiListAllDrivesRequest {
 	return ApiListAllDrivesRequest{
@@ -58,7 +58,8 @@ func (a *DrivesGetDrivesApiService) ListAllDrives(ctx context.Context) ApiListAl
 }
 
 // Execute executes the request
-//  @return CollectionOfDrives1
+//
+//	@return CollectionOfDrives1
 func (a *DrivesGetDrivesApiService) ListAllDrivesExecute(r ApiListAllDrivesRequest) (*CollectionOfDrives1, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -172,8 +173,8 @@ func (r ApiListAllDrivesBetaRequest) Execute() (*CollectionOfDrives1, *http.Resp
 /*
 ListAllDrivesBeta Alias for '/v1.0/drives', the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListAllDrivesBetaRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListAllDrivesBetaRequest
 */
 func (a *DrivesGetDrivesApiService) ListAllDrivesBeta(ctx context.Context) ApiListAllDrivesBetaRequest {
 	return ApiListAllDrivesBetaRequest{
@@ -183,7 +184,8 @@ func (a *DrivesGetDrivesApiService) ListAllDrivesBeta(ctx context.Context) ApiLi
 }
 
 // Execute executes the request
-//  @return CollectionOfDrives1
+//
+//	@return CollectionOfDrives1
 func (a *DrivesGetDrivesApiService) ListAllDrivesBetaExecute(r ApiListAllDrivesBetaRequest) (*CollectionOfDrives1, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

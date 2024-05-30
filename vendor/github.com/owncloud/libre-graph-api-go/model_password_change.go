@@ -11,7 +11,9 @@ API version: v1.0.4
 package libregraph
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 )
 
 // checks if the PasswordChange type satisfies the MappedNullable interface at compile time
@@ -22,6 +24,8 @@ type PasswordChange struct {
 	CurrentPassword string `json:"currentPassword"`
 	NewPassword     string `json:"newPassword"`
 }
+
+type _PasswordChange PasswordChange
 
 // NewPasswordChange instantiates a new PasswordChange object
 // This constructor will assign default values to properties that have it defined,
@@ -103,6 +107,44 @@ func (o PasswordChange) ToMap() (map[string]interface{}, error) {
 	toSerialize["currentPassword"] = o.CurrentPassword
 	toSerialize["newPassword"] = o.NewPassword
 	return toSerialize, nil
+}
+
+func (o *PasswordChange) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"currentPassword",
+		"newPassword",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varPasswordChange := _PasswordChange{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varPasswordChange)
+
+	if err != nil {
+		return err
+	}
+
+	*o = PasswordChange(varPasswordChange)
+
+	return err
 }
 
 type NullablePasswordChange struct {

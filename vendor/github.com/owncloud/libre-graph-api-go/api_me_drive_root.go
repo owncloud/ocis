@@ -33,8 +33,8 @@ func (r ApiHomeGetRootRequest) Execute() (*DriveItem, *http.Response, error) {
 /*
 HomeGetRoot Get root from personal space
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiHomeGetRootRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiHomeGetRootRequest
 */
 func (a *MeDriveRootApiService) HomeGetRoot(ctx context.Context) ApiHomeGetRootRequest {
 	return ApiHomeGetRootRequest{
@@ -44,7 +44,8 @@ func (a *MeDriveRootApiService) HomeGetRoot(ctx context.Context) ApiHomeGetRootR
 }
 
 // Execute executes the request
-//  @return DriveItem
+//
+//	@return DriveItem
 func (a *MeDriveRootApiService) HomeGetRootExecute(r ApiHomeGetRootRequest) (*DriveItem, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

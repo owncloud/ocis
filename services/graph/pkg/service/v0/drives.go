@@ -470,7 +470,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	drive := libregraph.Drive{}
+	drive := libregraph.DriveUpdate{}
 	if err = StrictJSONUnmarshal(r.Body, &drive); err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update drive, invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: error: %v", err.Error()))
@@ -522,8 +522,8 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if drive.Name != "" {
-		spacename := strings.TrimSpace(drive.Name)
+	if drive.GetName() != "" {
+		spacename := strings.TrimSpace(drive.GetName())
 		if err := validateSpaceName(spacename); err != nil {
 			logger.Info().Err(err).Msg("could not update drive: spacename invalid")
 			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())

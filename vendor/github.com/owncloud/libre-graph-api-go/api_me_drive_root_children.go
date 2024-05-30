@@ -33,8 +33,8 @@ func (r ApiHomeGetChildrenRequest) Execute() (*CollectionOfDriveItems, *http.Res
 /*
 HomeGetChildren Get children from drive
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiHomeGetChildrenRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiHomeGetChildrenRequest
 */
 func (a *MeDriveRootChildrenApiService) HomeGetChildren(ctx context.Context) ApiHomeGetChildrenRequest {
 	return ApiHomeGetChildrenRequest{
@@ -44,7 +44,8 @@ func (a *MeDriveRootChildrenApiService) HomeGetChildren(ctx context.Context) Api
 }
 
 // Execute executes the request
-//  @return CollectionOfDriveItems
+//
+//	@return CollectionOfDriveItems
 func (a *MeDriveRootChildrenApiService) HomeGetChildrenExecute(r ApiHomeGetChildrenRequest) (*CollectionOfDriveItems, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

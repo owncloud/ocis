@@ -35,9 +35,9 @@ func (r ApiGetApplicationRequest) Execute() (*Application, *http.Response, error
 /*
 GetApplication Get application by id
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param applicationId key: id of application
- @return ApiGetApplicationRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param applicationId key: id of application
+	@return ApiGetApplicationRequest
 */
 func (a *ApplicationsApiService) GetApplication(ctx context.Context, applicationId string) ApiGetApplicationRequest {
 	return ApiGetApplicationRequest{
@@ -48,7 +48,8 @@ func (a *ApplicationsApiService) GetApplication(ctx context.Context, application
 }
 
 // Execute executes the request
-//  @return Application
+//
+//	@return Application
 func (a *ApplicationsApiService) GetApplicationExecute(r ApiGetApplicationRequest) (*Application, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -143,8 +144,8 @@ func (r ApiListApplicationsRequest) Execute() (*CollectionOfApplications, *http.
 /*
 ListApplications Get all applications
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListApplicationsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListApplicationsRequest
 */
 func (a *ApplicationsApiService) ListApplications(ctx context.Context) ApiListApplicationsRequest {
 	return ApiListApplicationsRequest{
@@ -154,7 +155,8 @@ func (a *ApplicationsApiService) ListApplications(ctx context.Context) ApiListAp
 }
 
 // Execute executes the request
-//  @return CollectionOfApplications
+//
+//	@return CollectionOfApplications
 func (a *ApplicationsApiService) ListApplicationsExecute(r ApiListApplicationsRequest) (*CollectionOfApplications, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
