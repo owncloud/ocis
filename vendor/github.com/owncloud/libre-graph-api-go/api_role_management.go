@@ -37,10 +37,9 @@ GetPermissionRoleDefinition Get unifiedRoleDefinition
 
 Read the properties and relationships of a `unifiedRoleDefinition` object.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param roleId key: id of roleDefinition
- @return ApiGetPermissionRoleDefinitionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param roleId key: id of roleDefinition
+	@return ApiGetPermissionRoleDefinitionRequest
 */
 func (a *RoleManagementApiService) GetPermissionRoleDefinition(ctx context.Context, roleId string) ApiGetPermissionRoleDefinitionRequest {
 	return ApiGetPermissionRoleDefinitionRequest{
@@ -51,7 +50,8 @@ func (a *RoleManagementApiService) GetPermissionRoleDefinition(ctx context.Conte
 }
 
 // Execute executes the request
-//  @return UnifiedRoleDefinition
+//
+//	@return UnifiedRoleDefinition
 func (a *RoleManagementApiService) GetPermissionRoleDefinitionExecute(r ApiGetPermissionRoleDefinitionRequest) (*UnifiedRoleDefinition, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -148,9 +148,8 @@ ListPermissionRoleDefinitions List roleDefinitions
 
 Get a list of `unifiedRoleDefinition` objects for the permissions provider. This list determines the roles that can be selected when creating sharing invites.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListPermissionRoleDefinitionsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListPermissionRoleDefinitionsRequest
 */
 func (a *RoleManagementApiService) ListPermissionRoleDefinitions(ctx context.Context) ApiListPermissionRoleDefinitionsRequest {
 	return ApiListPermissionRoleDefinitionsRequest{
@@ -160,7 +159,8 @@ func (a *RoleManagementApiService) ListPermissionRoleDefinitions(ctx context.Con
 }
 
 // Execute executes the request
-//  @return UnifiedRoleDefinition
+//
+//	@return UnifiedRoleDefinition
 func (a *RoleManagementApiService) ListPermissionRoleDefinitionsExecute(r ApiListPermissionRoleDefinitionsRequest) (*UnifiedRoleDefinition, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

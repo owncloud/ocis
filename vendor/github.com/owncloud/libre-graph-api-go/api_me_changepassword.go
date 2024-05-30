@@ -40,8 +40,8 @@ func (r ApiChangeOwnPasswordRequest) Execute() (*http.Response, error) {
 /*
 ChangeOwnPassword Chanage your own password
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiChangeOwnPasswordRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiChangeOwnPasswordRequest
 */
 func (a *MeChangepasswordApiService) ChangeOwnPassword(ctx context.Context) ApiChangeOwnPasswordRequest {
 	return ApiChangeOwnPasswordRequest{

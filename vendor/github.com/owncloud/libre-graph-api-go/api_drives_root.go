@@ -44,10 +44,9 @@ CreateDriveItem Create a drive item
 
 You can use the root childrens endpoint to mount a remoteItem in the share jail. The `@client.synchronize` property of the `driveItem` in the [sharedWithMe](#/me.drive/ListSharedWithMe) endpoint will change to true.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @return ApiCreateDriveItemRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@return ApiCreateDriveItemRequest
 */
 func (a *DrivesRootApiService) CreateDriveItem(ctx context.Context, driveId string) ApiCreateDriveItemRequest {
 	return ApiCreateDriveItemRequest{
@@ -58,7 +57,8 @@ func (a *DrivesRootApiService) CreateDriveItem(ctx context.Context, driveId stri
 }
 
 // Execute executes the request
-//  @return DriveItem
+//
+//	@return DriveItem
 func (a *DrivesRootApiService) CreateDriveItemExecute(r ApiCreateDriveItemRequest) (*DriveItem, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -179,10 +179,9 @@ For now, The following values are allowed for the type parameter.
 | createOnly     | File Drop         | Creates an upload-only link to the folder driveItem.            |
 | blocksDownload | Secure View       | Creates a read-only link that blocks download to the driveItem. |
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @return ApiCreateLinkSpaceRootRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@return ApiCreateLinkSpaceRootRequest
 */
 func (a *DrivesRootApiService) CreateLinkSpaceRoot(ctx context.Context, driveId string) ApiCreateLinkSpaceRootRequest {
 	return ApiCreateLinkSpaceRootRequest{
@@ -193,7 +192,8 @@ func (a *DrivesRootApiService) CreateLinkSpaceRoot(ctx context.Context, driveId 
 }
 
 // Execute executes the request
-//  @return Permission
+//
+//	@return Permission
 func (a *DrivesRootApiService) CreateLinkSpaceRootExecute(r ApiCreateLinkSpaceRootRequest) (*Permission, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -296,11 +296,10 @@ Remove access to the root item of a drive.
 
 Only sharing permissions that are not inherited can be deleted. The `inheritedFrom` property must be `null`.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param permId key: id of permission
- @return ApiDeletePermissionSpaceRootRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param permId key: id of permission
+	@return ApiDeletePermissionSpaceRootRequest
 */
 func (a *DrivesRootApiService) DeletePermissionSpaceRoot(ctx context.Context, driveId string, permId string) ApiDeletePermissionSpaceRootRequest {
 	return ApiDeletePermissionSpaceRootRequest{
@@ -401,11 +400,10 @@ GetPermissionSpaceRoot Get a single sharing permission for the root item of a dr
 
 Return the effective sharing permission for a particular permission resource.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param permId key: id of permission
- @return ApiGetPermissionSpaceRootRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param permId key: id of permission
+	@return ApiGetPermissionSpaceRootRequest
 */
 func (a *DrivesRootApiService) GetPermissionSpaceRoot(ctx context.Context, driveId string, permId string) ApiGetPermissionSpaceRootRequest {
 	return ApiGetPermissionSpaceRootRequest{
@@ -417,7 +415,8 @@ func (a *DrivesRootApiService) GetPermissionSpaceRoot(ctx context.Context, drive
 }
 
 // Execute executes the request
-//  @return Permission
+//
+//	@return Permission
 func (a *DrivesRootApiService) GetPermissionSpaceRootExecute(r ApiGetPermissionSpaceRootRequest) (*Permission, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -514,9 +513,9 @@ func (r ApiGetRootRequest) Execute() (*DriveItem, *http.Response, error) {
 /*
 GetRoot Get root from arbitrary space
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @return ApiGetRootRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@return ApiGetRootRequest
 */
 func (a *DrivesRootApiService) GetRoot(ctx context.Context, driveId string) ApiGetRootRequest {
 	return ApiGetRootRequest{
@@ -527,7 +526,8 @@ func (a *DrivesRootApiService) GetRoot(ctx context.Context, driveId string) ApiG
 }
 
 // Execute executes the request
-//  @return DriveItem
+//
+//	@return DriveItem
 func (a *DrivesRootApiService) GetRootExecute(r ApiGetRootRequest) (*DriveItem, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -638,10 +638,9 @@ The response will be a permission object with the grantedToV2 property containin
 ## Roles property values
 For now, roles are only identified by a uuid. There are no hardcoded aliases like `read` or `write` because role actions can be completely customized.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @return ApiInviteSpaceRootRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@return ApiInviteSpaceRootRequest
 */
 func (a *DrivesRootApiService) InviteSpaceRoot(ctx context.Context, driveId string) ApiInviteSpaceRootRequest {
 	return ApiInviteSpaceRootRequest{
@@ -652,7 +651,8 @@ func (a *DrivesRootApiService) InviteSpaceRoot(ctx context.Context, driveId stri
 }
 
 // Execute executes the request
-//  @return CollectionOfPermissions
+//
+//	@return CollectionOfPermissions
 func (a *DrivesRootApiService) InviteSpaceRootExecute(r ApiInviteSpaceRootRequest) (*CollectionOfPermissions, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -771,10 +771,9 @@ All permission objects have an `id`. A permission representing
 * a link has the `link` facet filled with details.
 * a share has the `roles` property set and the `grantedToV2` property filled with the grant recipient details.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @return ApiListPermissionsSpaceRootRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@return ApiListPermissionsSpaceRootRequest
 */
 func (a *DrivesRootApiService) ListPermissionsSpaceRoot(ctx context.Context, driveId string) ApiListPermissionsSpaceRootRequest {
 	return ApiListPermissionsSpaceRootRequest{
@@ -785,7 +784,8 @@ func (a *DrivesRootApiService) ListPermissionsSpaceRoot(ctx context.Context, dri
 }
 
 // Execute executes the request
-//  @return CollectionOfPermissionsWithAllowedValues
+//
+//	@return CollectionOfPermissionsWithAllowedValues
 func (a *DrivesRootApiService) ListPermissionsSpaceRootExecute(r ApiListPermissionsSpaceRootRequest) (*CollectionOfPermissionsWithAllowedValues, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -893,11 +893,10 @@ Set the password of a sharing permission.
 
 Only the `password` property can be modified this way.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param permId key: id of permission
- @return ApiSetPermissionPasswordSpaceRootRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param permId key: id of permission
+	@return ApiSetPermissionPasswordSpaceRootRequest
 */
 func (a *DrivesRootApiService) SetPermissionPasswordSpaceRoot(ctx context.Context, driveId string, permId string) ApiSetPermissionPasswordSpaceRootRequest {
 	return ApiSetPermissionPasswordSpaceRootRequest{
@@ -909,7 +908,8 @@ func (a *DrivesRootApiService) SetPermissionPasswordSpaceRoot(ctx context.Contex
 }
 
 // Execute executes the request
-//  @return Permission
+//
+//	@return Permission
 func (a *DrivesRootApiService) SetPermissionPasswordSpaceRootExecute(r ApiSetPermissionPasswordSpaceRootRequest) (*Permission, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -1023,11 +1023,10 @@ Update the properties of a sharing permission by patching the permission resourc
 
 Only the `roles`, `expirationDateTime` and `password` properties can be modified this way.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param permId key: id of permission
- @return ApiUpdatePermissionSpaceRootRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param permId key: id of permission
+	@return ApiUpdatePermissionSpaceRootRequest
 */
 func (a *DrivesRootApiService) UpdatePermissionSpaceRoot(ctx context.Context, driveId string, permId string) ApiUpdatePermissionSpaceRootRequest {
 	return ApiUpdatePermissionSpaceRootRequest{
@@ -1039,7 +1038,8 @@ func (a *DrivesRootApiService) UpdatePermissionSpaceRoot(ctx context.Context, dr
 }
 
 // Execute executes the request
-//  @return Permission
+//
+//	@return Permission
 func (a *DrivesRootApiService) UpdatePermissionSpaceRootExecute(r ApiUpdatePermissionSpaceRootRequest) (*Permission, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPatch

@@ -42,9 +42,9 @@ func (r ApiAddMemberRequest) Execute() (*http.Response, error) {
 /*
 AddMember Add a member to a group
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param groupId key: id of group
- @return ApiAddMemberRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param groupId key: id of group
+	@return ApiAddMemberRequest
 */
 func (a *GroupApiService) AddMember(ctx context.Context, groupId string) ApiAddMemberRequest {
 	return ApiAddMemberRequest{
@@ -152,9 +152,9 @@ func (r ApiDeleteGroupRequest) Execute() (*http.Response, error) {
 /*
 DeleteGroup Delete entity from groups
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param groupId key: id of group
- @return ApiDeleteGroupRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param groupId key: id of group
+	@return ApiDeleteGroupRequest
 */
 func (a *GroupApiService) DeleteGroup(ctx context.Context, groupId string) ApiDeleteGroupRequest {
 	return ApiDeleteGroupRequest{
@@ -261,10 +261,10 @@ func (r ApiDeleteMemberRequest) Execute() (*http.Response, error) {
 /*
 DeleteMember Delete member from a group
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param groupId key: id of group
- @param directoryObjectId key: id of group member to remove
- @return ApiDeleteMemberRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param groupId key: id of group
+	@param directoryObjectId key: id of group member to remove
+	@return ApiDeleteMemberRequest
 */
 func (a *GroupApiService) DeleteMember(ctx context.Context, groupId string, directoryObjectId string) ApiDeleteMemberRequest {
 	return ApiDeleteMemberRequest{
@@ -379,9 +379,9 @@ func (r ApiGetGroupRequest) Execute() (*Group, *http.Response, error) {
 /*
 GetGroup Get entity from groups by key
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param groupId key: id or name of group
- @return ApiGetGroupRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param groupId key: id or name of group
+	@return ApiGetGroupRequest
 */
 func (a *GroupApiService) GetGroup(ctx context.Context, groupId string) ApiGetGroupRequest {
 	return ApiGetGroupRequest{
@@ -392,7 +392,8 @@ func (a *GroupApiService) GetGroup(ctx context.Context, groupId string) ApiGetGr
 }
 
 // Execute executes the request
-//  @return Group
+//
+//	@return Group
 func (a *GroupApiService) GetGroupExecute(r ApiGetGroupRequest) (*Group, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -494,9 +495,9 @@ func (r ApiListMembersRequest) Execute() (*CollectionOfUsers, *http.Response, er
 /*
 ListMembers Get a list of the group's direct members
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param groupId key: id or name of group
- @return ApiListMembersRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param groupId key: id or name of group
+	@return ApiListMembersRequest
 */
 func (a *GroupApiService) ListMembers(ctx context.Context, groupId string) ApiListMembersRequest {
 	return ApiListMembersRequest{
@@ -507,7 +508,8 @@ func (a *GroupApiService) ListMembers(ctx context.Context, groupId string) ApiLi
 }
 
 // Execute executes the request
-//  @return CollectionOfUsers
+//
+//	@return CollectionOfUsers
 func (a *GroupApiService) ListMembersExecute(r ApiListMembersRequest) (*CollectionOfUsers, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -610,9 +612,9 @@ func (r ApiUpdateGroupRequest) Execute() (*http.Response, error) {
 /*
 UpdateGroup Update entity in groups
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param groupId key: id of group
- @return ApiUpdateGroupRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param groupId key: id of group
+	@return ApiUpdateGroupRequest
 */
 func (a *GroupApiService) UpdateGroup(ctx context.Context, groupId string) ApiUpdateGroupRequest {
 	return ApiUpdateGroupRequest{

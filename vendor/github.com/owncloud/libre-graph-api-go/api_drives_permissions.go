@@ -59,11 +59,10 @@ For now, The following values are allowed for the type parameter.
 | createOnly     | File Drop         | Creates an upload-only link to the folder driveItem.            |
 | blocksDownload | Secure View       | Creates a read-only link that blocks download to the driveItem. |
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param itemId key: id of item
- @return ApiCreateLinkRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param itemId key: id of item
+	@return ApiCreateLinkRequest
 */
 func (a *DrivesPermissionsApiService) CreateLink(ctx context.Context, driveId string, itemId string) ApiCreateLinkRequest {
 	return ApiCreateLinkRequest{
@@ -75,7 +74,8 @@ func (a *DrivesPermissionsApiService) CreateLink(ctx context.Context, driveId st
 }
 
 // Execute executes the request
-//  @return Permission
+//
+//	@return Permission
 func (a *DrivesPermissionsApiService) CreateLinkExecute(r ApiCreateLinkRequest) (*Permission, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -180,12 +180,11 @@ Remove access to a DriveItem.
 
 Only sharing permissions that are not inherited can be deleted. The `inheritedFrom` property must be `null`.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param itemId key: id of item
- @param permId key: id of permission
- @return ApiDeletePermissionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param itemId key: id of item
+	@param permId key: id of permission
+	@return ApiDeletePermissionRequest
 */
 func (a *DrivesPermissionsApiService) DeletePermission(ctx context.Context, driveId string, itemId string, permId string) ApiDeletePermissionRequest {
 	return ApiDeletePermissionRequest{
@@ -289,12 +288,11 @@ GetPermission Get sharing permission for a file or folder
 
 Return the effective sharing permission for a particular permission resource.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param itemId key: id of item
- @param permId key: id of permission
- @return ApiGetPermissionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param itemId key: id of item
+	@param permId key: id of permission
+	@return ApiGetPermissionRequest
 */
 func (a *DrivesPermissionsApiService) GetPermission(ctx context.Context, driveId string, itemId string, permId string) ApiGetPermissionRequest {
 	return ApiGetPermissionRequest{
@@ -307,7 +305,8 @@ func (a *DrivesPermissionsApiService) GetPermission(ctx context.Context, driveId
 }
 
 // Execute executes the request
-//  @return Permission
+//
+//	@return Permission
 func (a *DrivesPermissionsApiService) GetPermissionExecute(r ApiGetPermissionRequest) (*Permission, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -421,11 +420,10 @@ The response will be a permission object with the grantedToV2 property containin
 ## Roles property values
 For now, roles are only identified by a uuid. There are no hardcoded aliases like `read` or `write` because role actions can be completely customized.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param itemId key: id of item
- @return ApiInviteRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param itemId key: id of item
+	@return ApiInviteRequest
 */
 func (a *DrivesPermissionsApiService) Invite(ctx context.Context, driveId string, itemId string) ApiInviteRequest {
 	return ApiInviteRequest{
@@ -437,7 +435,8 @@ func (a *DrivesPermissionsApiService) Invite(ctx context.Context, driveId string
 }
 
 // Execute executes the request
-//  @return CollectionOfPermissions
+//
+//	@return CollectionOfPermissions
 func (a *DrivesPermissionsApiService) InviteExecute(r ApiInviteRequest) (*CollectionOfPermissions, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -558,11 +557,10 @@ All permission objects have an `id`. A permission representing
 * a link has the `link` facet filled with details.
 * a share has the `roles` property set and the `grantedToV2` property filled with the grant recipient details.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param itemId key: id of item
- @return ApiListPermissionsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param itemId key: id of item
+	@return ApiListPermissionsRequest
 */
 func (a *DrivesPermissionsApiService) ListPermissions(ctx context.Context, driveId string, itemId string) ApiListPermissionsRequest {
 	return ApiListPermissionsRequest{
@@ -574,7 +572,8 @@ func (a *DrivesPermissionsApiService) ListPermissions(ctx context.Context, drive
 }
 
 // Execute executes the request
-//  @return CollectionOfPermissionsWithAllowedValues
+//
+//	@return CollectionOfPermissionsWithAllowedValues
 func (a *DrivesPermissionsApiService) ListPermissionsExecute(r ApiListPermissionsRequest) (*CollectionOfPermissionsWithAllowedValues, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -684,12 +683,11 @@ Set the password of a sharing permission.
 
 Only the `password` property can be modified this way.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param itemId key: id of item
- @param permId key: id of permission
- @return ApiSetPermissionPasswordRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param itemId key: id of item
+	@param permId key: id of permission
+	@return ApiSetPermissionPasswordRequest
 */
 func (a *DrivesPermissionsApiService) SetPermissionPassword(ctx context.Context, driveId string, itemId string, permId string) ApiSetPermissionPasswordRequest {
 	return ApiSetPermissionPasswordRequest{
@@ -702,7 +700,8 @@ func (a *DrivesPermissionsApiService) SetPermissionPassword(ctx context.Context,
 }
 
 // Execute executes the request
-//  @return Permission
+//
+//	@return Permission
 func (a *DrivesPermissionsApiService) SetPermissionPasswordExecute(r ApiSetPermissionPasswordRequest) (*Permission, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -818,12 +817,11 @@ Update the properties of a sharing permission by patching the permission resourc
 
 Only the `roles`, `expirationDateTime` and `password` properties can be modified this way.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @param itemId key: id of item
- @param permId key: id of permission
- @return ApiUpdatePermissionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@param itemId key: id of item
+	@param permId key: id of permission
+	@return ApiUpdatePermissionRequest
 */
 func (a *DrivesPermissionsApiService) UpdatePermission(ctx context.Context, driveId string, itemId string, permId string) ApiUpdatePermissionRequest {
 	return ApiUpdatePermissionRequest{
@@ -836,7 +834,8 @@ func (a *DrivesPermissionsApiService) UpdatePermission(ctx context.Context, driv
 }
 
 // Execute executes the request
-//  @return Permission
+//
+//	@return Permission
 func (a *DrivesPermissionsApiService) UpdatePermissionExecute(r ApiUpdatePermissionRequest) (*Permission, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPatch

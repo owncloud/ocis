@@ -345,11 +345,11 @@ Feature: Share spaces
 
   Scenario Outline: update the expiration date of a space in user share
     Given user "Alice" has sent the following space share invitation:
-      | space           | share space              |
-      | sharee          | Brian                    |
-      | shareType       | user                     |
-      | permissionsRole | <space-role>             |
-      | expireDate      | 2042-03-25T23:59:59.000Z |
+      | space              | share space              |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | <space-role>             |
+      | expirationDateTime | 2042-03-25T23:59:59.000Z |
     When user "Alice" updates the space "share space" with settings:
       | shareWith  | Brian                         |
       | expireDate | 2044-01-01T23:59:59.999+01:00 |
@@ -367,11 +367,11 @@ Feature: Share spaces
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using the Graph API
     And user "Alice" has sent the following space share invitation:
-      | space           | share space              |
-      | sharee          | sales                    |
-      | shareType       | group                    |
-      | permissionsRole | <space-role>             |
-      | expireDate      | 2042-03-25T23:59:59.000Z |
+      | space              | share space              |
+      | sharee             | sales                    |
+      | shareType          | group                    |
+      | permissionsRole    | <space-role>             |
+      | expirationDateTime | 2042-03-25T23:59:59.000Z |
     When user "Alice" updates the space "share space" with settings:
       | shareWith  | sales                         |
       | shareType  | 8                             |
@@ -388,11 +388,11 @@ Feature: Share spaces
 
   Scenario Outline: delete the expiration date of a space in user share
     Given user "Alice" has sent the following space share invitation:
-      | space           | share space              |
-      | sharee          | Brian                    |
-      | shareType       | user                     |
-      | permissionsRole | <space-role>             |
-      | expireDate      | 2042-03-25T23:59:59.000Z |
+      | space              | share space              |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | <space-role>             |
+      | expirationDateTime | 2042-03-25T23:59:59.000Z |
     When user "Alice" updates the space "share space" with settings:
       | shareWith  | Brian              |
       | expireDate |                    |
@@ -410,11 +410,11 @@ Feature: Share spaces
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using the Graph API
     And user "Alice" has sent the following space share invitation:
-      | space           | share space              |
-      | sharee          | sales                    |
-      | shareType       | group                    |
-      | permissionsRole | <space-role>             |
-      | expireDate      | 2042-03-25T23:59:59.000Z |
+      | space              | share space              |
+      | sharee             | sales                    |
+      | shareType          | group                    |
+      | permissionsRole    | <space-role>             |
+      | expirationDateTime | 2042-03-25T23:59:59.000Z |
     When user "Alice" updates the space "share space" with settings:
       | shareWith  | sales              |
       | shareType  | 8                  |
@@ -431,11 +431,11 @@ Feature: Share spaces
 
   Scenario Outline: check the end of expiration of a space in user share
     Given user "Alice" has sent the following space share invitation:
-      | space           | share space              |
-      | sharee          | Brian                    |
-      | shareType       | user                     |
-      | permissionsRole | <space-role>             |
-      | expireDate      | 2042-03-25T23:59:59.000Z |
+      | space              | share space              |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | <space-role>             |
+      | expirationDateTime | 2042-03-25T23:59:59.000Z |
     When user "Alice" expires the user share of space "share space" for user "Brian"
     Then the HTTP status code should be "200"
     And the user "Brian" should not have a space called "share space"
@@ -450,11 +450,11 @@ Feature: Share spaces
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using the Graph API
     And user "Alice" has sent the following space share invitation:
-      | space           | share space              |
-      | sharee          | sales                    |
-      | shareType       | group                    |
-      | permissionsRole | <space-role>             |
-      | expireDate      | 2042-03-25T23:59:59.000Z |
+      | space              | share space              |
+      | sharee             | sales                    |
+      | shareType          | group                    |
+      | permissionsRole    | <space-role>             |
+      | expirationDateTime | 2042-03-25T23:59:59.000Z |
     When user "Alice" expires the group share of space "share space" for group "sales"
     Then the HTTP status code should be "200"
     And the user "Brian" should not have a space called "share space"

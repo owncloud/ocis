@@ -125,12 +125,12 @@ Feature: Share a file or folder that is inside a space
   Scenario: user changes the expiration date
     Given using SharingNG
     And user "Alice" has sent the following resource share invitation:
-      | resource        | folder                   |
-      | space           | share sub-item           |
-      | sharee          | Brian                    |
-      | shareType       | user                     |
-      | permissionsRole | Viewer                   |
-      | expireDate      | 2042-01-01T23:59:59.000Z |
+      | resource           | folder                   |
+      | space              | share sub-item           |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | Viewer                   |
+      | expirationDateTime | 2042-01-01T23:59:59.000Z |
     When user "Alice" changes the last share with settings:
       | expireDate | 2044-01-01T23:59:59.999+01:00 |
       | role       | viewer                        |
@@ -142,12 +142,12 @@ Feature: Share a file or folder that is inside a space
   Scenario: user deletes the expiration date
     Given using SharingNG
     And user "Alice" has sent the following resource share invitation:
-      | resource        | folder                   |
-      | space           | share sub-item           |
-      | sharee          | Brian                    |
-      | shareType       | user                     |
-      | permissionsRole | Viewer                   |
-      | expireDate      | 2042-01-01T23:59:59.000Z |
+      | resource           | folder                   |
+      | space              | share sub-item           |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | Viewer                   |
+      | expirationDateTime | 2042-01-01T23:59:59.000Z |
     When user "Alice" changes the last share with settings:
       | expireDate |        |
       | role       | viewer |
@@ -160,12 +160,12 @@ Feature: Share a file or folder that is inside a space
     Given using OCS API version "<ocs_api_version>"
     And using SharingNG
     And user "Alice" has sent the following resource share invitation:
-      | resource        | folder                   |
-      | space           | share sub-item           |
-      | sharee          | Brian                    |
-      | shareType       | user                     |
-      | permissionsRole | Viewer                   |
-      | expireDate      | 2042-01-01T23:59:59.000Z |
+      | resource           | folder                   |
+      | space              | share sub-item           |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | Viewer                   |
+      | expirationDateTime | 2042-01-01T23:59:59.000Z |
     When user "Alice" changes the last share with settings:
       | role |  |
     Then the HTTP status code should be "400"
@@ -174,12 +174,12 @@ Feature: Share a file or folder that is inside a space
   Scenario: check the end of expiration date in user share
     Given using SharingNG
     And user "Alice" has sent the following resource share invitation:
-      | resource        | folder                   |
-      | space           | share sub-item           |
-      | sharee          | Brian                    |
-      | shareType       | user                     |
-      | permissionsRole | Viewer                   |
-      | expireDate      | 2042-01-01T23:59:59.000Z |
+      | resource           | folder                   |
+      | space              | share sub-item           |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | Viewer                   |
+      | expirationDateTime | 2042-01-01T23:59:59.000Z |
     When user "Alice" expires the last share of resource "folder" inside of the space "share sub-item"
     Then the HTTP status code should be "200"
     And as "Brian" folder "Shares/folder" should not exist
@@ -190,12 +190,12 @@ Feature: Share a file or folder that is inside a space
     And using SharingNG
     And the administrator has added a user "Brian" to the group "sales" using the Graph API
     And user "Alice" has sent the following resource share invitation:
-      | resource        | folder                   |
-      | space           | share sub-item           |
-      | sharee          | sales                    |
-      | shareType       | group                    |
-      | permissionsRole | Viewer                   |
-      | expireDate      | 2042-01-01T23:59:59.000Z |
+      | resource           | folder                   |
+      | space              | share sub-item           |
+      | sharee             | sales                    |
+      | shareType          | group                    |
+      | permissionsRole    | Viewer                   |
+      | expirationDateTime | 2042-01-01T23:59:59.000Z |
     When user "Alice" expires the last share of resource "folder" inside of the space "share sub-item"
     Then the HTTP status code should be "200"
     And as "Brian" folder "Shares/folder" should not exist

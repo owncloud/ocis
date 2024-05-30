@@ -11,7 +11,9 @@ API version: v1.0.4
 package libregraph
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 )
 
 // checks if the AppRole type satisfies the MappedNullable interface at compile time
@@ -28,6 +30,8 @@ type AppRole struct {
 	// Unique role identifier inside the appRoles collection. When creating a new app role, a new GUID identifier must be provided.
 	Id string `json:"id"`
 }
+
+type _AppRole AppRole
 
 // NewAppRole instantiates a new AppRole object
 // This constructor will assign default values to properties that have it defined,
@@ -210,6 +214,43 @@ func (o AppRole) ToMap() (map[string]interface{}, error) {
 	}
 	toSerialize["id"] = o.Id
 	return toSerialize, nil
+}
+
+func (o *AppRole) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varAppRole := _AppRole{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varAppRole)
+
+	if err != nil {
+		return err
+	}
+
+	*o = AppRole(varAppRole)
+
+	return err
 }
 
 type NullableAppRole struct {

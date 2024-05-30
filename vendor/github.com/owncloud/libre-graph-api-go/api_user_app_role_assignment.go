@@ -47,10 +47,9 @@ Use this API to assign a global role to a user. To grant an app role assignment 
 * `resourceId`: The `id` of the resource `servicePrincipal` or `application` that has defined the app role.
 * `appRoleId`: The `id` of the `appRole` (defined on the resource service principal or application) to assign to the user.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param userId key: id of user
- @return ApiUserCreateAppRoleAssignmentsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId key: id of user
+	@return ApiUserCreateAppRoleAssignmentsRequest
 */
 func (a *UserAppRoleAssignmentApiService) UserCreateAppRoleAssignments(ctx context.Context, userId string) ApiUserCreateAppRoleAssignmentsRequest {
 	return ApiUserCreateAppRoleAssignmentsRequest{
@@ -61,7 +60,8 @@ func (a *UserAppRoleAssignmentApiService) UserCreateAppRoleAssignments(ctx conte
 }
 
 // Execute executes the request
-//  @return AppRoleAssignment
+//
+//	@return AppRoleAssignment
 func (a *UserAppRoleAssignmentApiService) UserCreateAppRoleAssignmentsExecute(r ApiUserCreateAppRoleAssignmentsRequest) (*AppRoleAssignment, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -170,10 +170,10 @@ func (r ApiUserDeleteAppRoleAssignmentsRequest) Execute() (*http.Response, error
 /*
 UserDeleteAppRoleAssignments Delete the appRoleAssignment from a user
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param userId key: id of user
- @param appRoleAssignmentId key: id of appRoleAssignment. This is the concatenated {user-id}:{appRole-id} separated by a colon.
- @return ApiUserDeleteAppRoleAssignmentsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId key: id of user
+	@param appRoleAssignmentId key: id of appRoleAssignment. This is the concatenated {user-id}:{appRole-id} separated by a colon.
+	@return ApiUserDeleteAppRoleAssignmentsRequest
 */
 func (a *UserAppRoleAssignmentApiService) UserDeleteAppRoleAssignments(ctx context.Context, userId string, appRoleAssignmentId string) ApiUserDeleteAppRoleAssignmentsRequest {
 	return ApiUserDeleteAppRoleAssignmentsRequest{
@@ -276,9 +276,9 @@ UserListAppRoleAssignments Get appRoleAssignments from a user
 
 Represents the global roles a user has been granted for an application.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param userId key: id of user
- @return ApiUserListAppRoleAssignmentsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId key: id of user
+	@return ApiUserListAppRoleAssignmentsRequest
 */
 func (a *UserAppRoleAssignmentApiService) UserListAppRoleAssignments(ctx context.Context, userId string) ApiUserListAppRoleAssignmentsRequest {
 	return ApiUserListAppRoleAssignmentsRequest{
@@ -289,7 +289,8 @@ func (a *UserAppRoleAssignmentApiService) UserListAppRoleAssignments(ctx context
 }
 
 // Execute executes the request
-//  @return CollectionOfAppRoleAssignments
+//
+//	@return CollectionOfAppRoleAssignments
 func (a *UserAppRoleAssignmentApiService) UserListAppRoleAssignmentsExecute(r ApiUserListAppRoleAssignmentsRequest) (*CollectionOfAppRoleAssignments, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

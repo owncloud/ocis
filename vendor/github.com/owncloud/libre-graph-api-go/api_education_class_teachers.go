@@ -42,9 +42,9 @@ func (r ApiAddTeacherToClassRequest) Execute() (*http.Response, error) {
 /*
 AddTeacherToClass Assign a teacher to a class
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param classId key: id or externalId of class
- @return ApiAddTeacherToClassRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param classId key: id or externalId of class
+	@return ApiAddTeacherToClassRequest
 */
 func (a *EducationClassTeachersApiService) AddTeacherToClass(ctx context.Context, classId string) ApiAddTeacherToClassRequest {
 	return ApiAddTeacherToClassRequest{
@@ -146,10 +146,10 @@ func (r ApiDeleteTeacherFromClassRequest) Execute() (*http.Response, error) {
 /*
 DeleteTeacherFromClass Unassign user as teacher of a class
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param classId key: id or externalId of class
- @param userId key: id or username of the user to unassign as teacher
- @return ApiDeleteTeacherFromClassRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param classId key: id or externalId of class
+	@param userId key: id or username of the user to unassign as teacher
+	@return ApiDeleteTeacherFromClassRequest
 */
 func (a *EducationClassTeachersApiService) DeleteTeacherFromClass(ctx context.Context, classId string, userId string) ApiDeleteTeacherFromClassRequest {
 	return ApiDeleteTeacherFromClassRequest{
@@ -247,9 +247,9 @@ func (r ApiGetTeachersRequest) Execute() (*CollectionOfEducationUser, *http.Resp
 /*
 GetTeachers Get the teachers for a class
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param classId key: id or externalId of class
- @return ApiGetTeachersRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param classId key: id or externalId of class
+	@return ApiGetTeachersRequest
 */
 func (a *EducationClassTeachersApiService) GetTeachers(ctx context.Context, classId string) ApiGetTeachersRequest {
 	return ApiGetTeachersRequest{
@@ -260,7 +260,8 @@ func (a *EducationClassTeachersApiService) GetTeachers(ctx context.Context, clas
 }
 
 // Execute executes the request
-//  @return CollectionOfEducationUser
+//
+//	@return CollectionOfEducationUser
 func (a *EducationClassTeachersApiService) GetTeachersExecute(r ApiGetTeachersRequest) (*CollectionOfEducationUser, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

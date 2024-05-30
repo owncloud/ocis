@@ -28,6 +28,9 @@ func (c contextKey) String() string {
 }
 
 var (
+	// ContextBasicAuth takes BasicAuth as authentication for the request.
+	ContextBasicAuth = contextKey("basic")
+
 	// ContextAccessToken takes a string oauth2 access token as authentication for the request.
 	ContextAccessToken = contextKey("accesstoken")
 

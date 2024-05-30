@@ -33,8 +33,8 @@ func (r ApiGetHomeRequest) Execute() (*Drive, *http.Response, error) {
 /*
 GetHome Get personal space for user
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetHomeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetHomeRequest
 */
 func (a *MeDriveApiService) GetHome(ctx context.Context) ApiGetHomeRequest {
 	return ApiGetHomeRequest{
@@ -44,7 +44,8 @@ func (a *MeDriveApiService) GetHome(ctx context.Context) ApiGetHomeRequest {
 }
 
 // Execute executes the request
-//  @return Drive
+//
+//	@return Drive
 func (a *MeDriveApiService) GetHomeExecute(r ApiGetHomeRequest) (*Drive, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -140,9 +141,8 @@ ListSharedByMe Get a list of driveItem objects shared by the current user.
 
 The `driveItems` returned from the `sharedByMe` method always include the `permissions` relation that indicates they are shared items.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListSharedByMeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListSharedByMeRequest
 */
 func (a *MeDriveApiService) ListSharedByMe(ctx context.Context) ApiListSharedByMeRequest {
 	return ApiListSharedByMeRequest{
@@ -152,7 +152,8 @@ func (a *MeDriveApiService) ListSharedByMe(ctx context.Context) ApiListSharedByM
 }
 
 // Execute executes the request
-//  @return CollectionOfDriveItems1
+//
+//	@return CollectionOfDriveItems1
 func (a *MeDriveApiService) ListSharedByMeExecute(r ApiListSharedByMeRequest) (*CollectionOfDriveItems1, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -248,9 +249,8 @@ ListSharedWithMe Get a list of driveItem objects shared with the owner of a driv
 
 The `driveItems` returned from the `sharedWithMe` method always include the `remoteItem` facet that indicates they are items from a different drive.
 
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListSharedWithMeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListSharedWithMeRequest
 */
 func (a *MeDriveApiService) ListSharedWithMe(ctx context.Context) ApiListSharedWithMeRequest {
 	return ApiListSharedWithMeRequest{
@@ -260,7 +260,8 @@ func (a *MeDriveApiService) ListSharedWithMe(ctx context.Context) ApiListSharedW
 }
 
 // Execute executes the request
-//  @return CollectionOfDriveItems1
+//
+//	@return CollectionOfDriveItems1
 func (a *MeDriveApiService) ListSharedWithMeExecute(r ApiListSharedWithMeRequest) (*CollectionOfDriveItems1, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

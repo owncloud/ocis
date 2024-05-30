@@ -11,7 +11,9 @@ API version: v1.0.4
 package libregraph
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 )
 
 // checks if the Application type satisfies the MappedNullable interface at compile time
@@ -26,6 +28,8 @@ type Application struct {
 	// The display name for the application.
 	DisplayName NullableString `json:"displayName,omitempty"`
 }
+
+type _Application Application
 
 // NewApplication instantiates a new Application object
 // This constructor will assign default values to properties that have it defined,
@@ -162,6 +166,43 @@ func (o Application) ToMap() (map[string]interface{}, error) {
 		toSerialize["displayName"] = o.DisplayName.Get()
 	}
 	return toSerialize, nil
+}
+
+func (o *Application) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varApplication := _Application{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varApplication)
+
+	if err != nil {
+		return err
+	}
+
+	*o = Application(varApplication)
+
+	return err
 }
 
 type NullableApplication struct {

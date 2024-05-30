@@ -40,8 +40,8 @@ func (r ApiCreateUserRequest) Execute() (*User, *http.Response, error) {
 /*
 CreateUser Add new entity to users
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateUserRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateUserRequest
 */
 func (a *UsersApiService) CreateUser(ctx context.Context) ApiCreateUserRequest {
 	return ApiCreateUserRequest{
@@ -51,7 +51,8 @@ func (a *UsersApiService) CreateUser(ctx context.Context) ApiCreateUserRequest {
 }
 
 // Execute executes the request
-//  @return User
+//
+//	@return User
 func (a *UsersApiService) CreateUserExecute(r ApiCreateUserRequest) (*User, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -185,8 +186,8 @@ func (r ApiListUsersRequest) Execute() (*CollectionOfUser, *http.Response, error
 /*
 ListUsers Get entities from users
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListUsersRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListUsersRequest
 */
 func (a *UsersApiService) ListUsers(ctx context.Context) ApiListUsersRequest {
 	return ApiListUsersRequest{
@@ -196,7 +197,8 @@ func (a *UsersApiService) ListUsers(ctx context.Context) ApiListUsersRequest {
 }
 
 // Execute executes the request
-//  @return CollectionOfUser
+//
+//	@return CollectionOfUser
 func (a *UsersApiService) ListUsersExecute(r ApiListUsersRequest) (*CollectionOfUser, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
