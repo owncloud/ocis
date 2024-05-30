@@ -3143,7 +3143,9 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->userUploadsAFileWithChecksumAndContentTo($user, $checksum, $content, $destination);
+		$this->featureContext->setResponse(
+			$this->featureContext->uploadFileWithChecksumAndContent($user, $checksum, $content, $destination)
+		);
 	}
 
 	/**
@@ -3575,7 +3577,7 @@ class SpacesContext implements Context {
 	 */
 	public function userHasStoredIdOfPathOfTheSpace(string $user, string $path, string $spaceName): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->userStoresFileIdForPath($user, $path);
+		$this->featureContext->setStoredFileID($this->featureContext->getFileIdForPath($user, $path));
 	}
 
 	/**
@@ -3592,7 +3594,15 @@ class SpacesContext implements Context {
 	 */
 	public function userFolderOfTheSpaceShouldHaveThePreviouslyStoredId(string $user, string $fileOrFolder, string $path, string $spaceName): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->userFileShouldHaveStoredId($user, $fileOrFolder, $path);
+		$user = $this->featureContext->getActualUsername($user);
+		$currentFileID = $this->featureContext->getFileIdForPath($user, $path);
+		$storedFileID = $this->featureContext->getStoredFileID();
+		Assert::assertEquals(
+			$currentFileID,
+			$storedFileID,
+			__METHOD__
+			. " User '$user' $fileOrFolder '$path' does not have the previously stored id '$storedFileID', but has '$currentFileID'."
+		);
 	}
 
 	/**

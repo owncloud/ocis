@@ -1567,10 +1567,10 @@ class PublicWebDavContext implements Context {
 	/**
 	 * @When the public uploads file :fileName to the last public link shared folder with password :password with mtime :mtime using the :davVersion public WebDAV API
 	 *
-	 * @param String $fileName
-	 * @param String $password
-	 * @param String $mtime
-	 * @param String $davVersion
+	 * @param string $fileName
+	 * @param string $password
+	 * @param string $mtime
+	 * @param string $davVersion
 	 *
 	 * @return void
 	 * @throws Exception

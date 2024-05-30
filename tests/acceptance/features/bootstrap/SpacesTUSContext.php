@@ -14,6 +14,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
 use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
+use TestHelpers\WebDavHelper;
 
 require_once 'bootstrap.php';
 
@@ -394,6 +395,17 @@ class SpacesTUSContext implements Context {
 		string $mtime
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->featureContext->theMtimeOfTheFileShouldBe($user, $resource, $mtime);
+		$mtime = new DateTime($mtime);
+		Assert::assertEquals(
+			$mtime->format('U'),
+			WebDavHelper::getMtimeOfResource(
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				$this->featureContext->getBaseUrl(),
+				$resource,
+				$this->featureContext->getStepLineRef(),
+				$this->featureContext->getDavPathVersion()
+			)
+		);
 	}
 }

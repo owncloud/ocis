@@ -349,7 +349,7 @@ class FilesVersionsContext implements Context {
 				$this->getFileVersionMetadata($actualUsername, $filename)
 			);
 			foreach ($requiredVersionMetadata as $versionMetadata) {
-				$this->featureContext->theAuthorOfEditedVersionFile(
+				$this->featureContext->checkAuthorOfAVersionOfFile(
 					$versionMetadata['index'],
 					$versionMetadata['author']
 				);
