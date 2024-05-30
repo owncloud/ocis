@@ -289,7 +289,7 @@ class SharingNgContext implements Context {
 
 		$permissionsRole = $rows['permissionsRole'] ?? null;
 		$permissionsAction = $rows['permissionsAction'] ?? null;
-		$expireDate = $rows["expireDate"] ?? null;
+		$expirationDateTime = $rows["expirationDateTime"] ?? null;
 
 		$response = GraphHelper::sendSharingInvitation(
 			$this->featureContext->getBaseUrl(),
@@ -302,7 +302,7 @@ class SharingNgContext implements Context {
 			$shareTypes,
 			$permissionsRole,
 			$permissionsAction,
-			$expireDate
+			$expirationDateTime
 		);
 		if ($response->getStatusCode() === 200) {
 			$this->featureContext->shareNgAddToCreatedUserGroupShares($response);
@@ -354,7 +354,7 @@ class SharingNgContext implements Context {
 
 		$permissionsRole = $rows['permissionsRole'] ?? null;
 		$permissionsAction = $rows['permissionsAction'] ?? null;
-		$expireDate = $rows["expireDate"] ?? null;
+		$expirationDateTime = $rows["expirationDateTime"] ?? null;
 
 		return GraphHelper::sendSharingInvitationForDrive(
 			$this->featureContext->getBaseUrl(),
@@ -366,7 +366,7 @@ class SharingNgContext implements Context {
 			$shareTypes,
 			$permissionsRole,
 			$permissionsAction,
-			$expireDate
+			$expirationDateTime
 		);
 	}
 
