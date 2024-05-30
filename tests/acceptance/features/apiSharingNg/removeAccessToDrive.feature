@@ -215,3 +215,15 @@ Feature: Remove access to a drive
       | permissionsRole | internal |
     When user "Brian" tries to remove the link from space "NewSpace" owned by "Alice" using root endpoint of the Graph API
     Then the HTTP status code should be "500"
+
+
+  Scenario: remove link share of a project drive using permissions endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | projectSpace |
+      | permissionsRole | view         |
+      | password        | $heLlo*1234* |
+    When user "Alice" deletes the last link share of space "projectSpace" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "204"
