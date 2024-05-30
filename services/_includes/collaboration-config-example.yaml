@@ -6,7 +6,7 @@ app:
   description: Open office documents with Collabora Online
   icon: image-edit
   lockname: com.github.owncloud.collaboration
-jwt_secret: hVD8ILWk7CbVOkqwGPawTc7m0ivOMJU0
+jwt_secret: arRVTTodLNkLEoOgTT7rL7tLWA46h5Kn
 grpc:
   addr: 0.0.0.0:9301
 http:
