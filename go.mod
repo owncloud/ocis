@@ -41,7 +41,6 @@ require (
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0
 	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.2.0
 	github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry v1.2.0
-	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.0
@@ -52,6 +51,7 @@ require (
 	github.com/gookit/config/v2 v2.2.5
 	github.com/gorilla/mux v1.8.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0
+	github.com/invopop/validation v0.3.0
 	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/jellydator/ttlcache/v3 v3.2.0
 	github.com/jinzhu/now v1.1.5
