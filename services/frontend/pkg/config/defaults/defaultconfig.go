@@ -93,7 +93,8 @@ func DefaultConfig() *config.Config {
 			PreferredUploadType: "sha1",
 		},
 		AppHandler: config.AppHandler{
-			Prefix: "app",
+			Prefix:        "app",
+			SecureViewApp: "Collabora Online",
 		},
 		Archiver: config.Archiver{
 			Insecure:    false,
