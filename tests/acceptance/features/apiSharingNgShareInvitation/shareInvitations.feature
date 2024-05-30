@@ -562,12 +562,12 @@ Feature: Send a sharing invitations
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following resource share invitation using the Graph API:
-      | resource        | <resource>               |
-      | space           | Personal                 |
-      | sharee          | Brian                    |
-      | shareType       | user                     |
-      | permissionsRole | <permissions-role>       |
-      | expireDate      | 2043-07-15T14:00:00.000Z |
+      | resource           | <resource>               |
+      | space              | Personal                 |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | <permissions-role>       |
+      | expirationDateTime | 2043-07-15T14:00:00.000Z |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -658,12 +658,12 @@ Feature: Send a sharing invitations
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     When user "Alice" sends the following resource share invitation using the Graph API:
-      | resource        | <resource>               |
-      | space           | Personal                 |
-      | sharee          | grp1                     |
-      | shareType       | group                    |
-      | permissionsRole | <permissions-role>       |
-      | expireDate      | 2043-07-15T14:00:00.000Z |
+      | resource           | <resource>               |
+      | space              | Personal                 |
+      | sharee             | grp1                     |
+      | shareType          | group                    |
+      | permissionsRole    | <permissions-role>       |
+      | expirationDateTime | 2043-07-15T14:00:00.000Z |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
