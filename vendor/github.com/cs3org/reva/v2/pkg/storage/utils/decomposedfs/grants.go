@@ -20,7 +20,6 @@ package decomposedfs
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -29,11 +28,11 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/ace"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/rogpeppe/go-internal/lockedfile"
 )
 
 // DenyGrant denies access to a resource.
@@ -80,7 +79,9 @@ func (fs *Decomposedfs) AddGrant(ctx context.Context, ref *provider.Reference, g
 	if err != nil {
 		return err
 	}
-	defer unlockFunc()
+	defer func() {
+		_ = unlockFunc()
+	}()
 
 	if grant != nil {
 		return errtypes.AlreadyExists(filepath.Join(grantNode.ParentID, grantNode.Name))
@@ -176,7 +177,9 @@ func (fs *Decomposedfs) RemoveGrant(ctx context.Context, ref *provider.Reference
 	if err != nil {
 		return err
 	}
-	defer unlockFunc()
+	defer func() {
+		_ = unlockFunc()
+	}()
 
 	if grant == nil {
 		return errtypes.NotFound("grant not found")
@@ -237,7 +240,9 @@ func (fs *Decomposedfs) UpdateGrant(ctx context.Context, ref *provider.Reference
 	if err != nil {
 		return err
 	}
-	defer unlockFunc()
+	defer func() {
+		_ = unlockFunc()
+	}()
 
 	if grant == nil {
 		// grant not found
@@ -264,9 +269,7 @@ func (fs *Decomposedfs) UpdateGrant(ctx context.Context, ref *provider.Reference
 }
 
 // checks if the given grant exists and returns it. Nil grant means it doesn't exist
-func (fs *Decomposedfs) loadGrant(ctx context.Context, ref *provider.Reference, g *provider.Grant) (*node.Node, func(), *provider.Grant, error) {
-	var unlockFunc func()
-
+func (fs *Decomposedfs) loadGrant(ctx context.Context, ref *provider.Reference, g *provider.Grant) (*node.Node, metadata.UnlockFunc, *provider.Grant, error) {
 	n, err := fs.lu.NodeFromResource(ctx, ref)
 	if err != nil {
 		return nil, nil, nil, err
@@ -275,11 +278,11 @@ func (fs *Decomposedfs) loadGrant(ctx context.Context, ref *provider.Reference, 
 		return nil, nil, nil, errtypes.NotFound(filepath.Join(n.ParentID, n.Name))
 	}
 
-	f, err := lockedfile.OpenFile(fs.lu.MetadataBackend().LockfilePath(n.InternalPath()), os.O_RDWR|os.O_CREATE, 0600)
+	// lock the metadata file
+	unlockFunc, err := fs.lu.MetadataBackend().Lock(n.InternalPath())
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	unlockFunc = func() { f.Close() }
 
 	grants, err := n.ListGrants(ctx)
 	if err != nil {

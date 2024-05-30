@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/google/uuid"
@@ -180,6 +181,13 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 	session.SetStorageValue("SpaceRoot", n.SpaceRoot.ID)                                     // TODO SpaceRoot -> SpaceID
 	session.SetStorageValue("SpaceOwnerOrManager", n.SpaceOwnerOrManager(ctx).GetOpaqueId()) // TODO needed for what?
 
+	// remember the gid of the space
+	fi, err := os.Stat(n.SpaceRoot.InternalPath())
+	if err != nil {
+		return nil, err
+	}
+	session.SetStorageValue("SpaceGid", fmt.Sprintf("%d", (fi.Sys().(*syscall.Stat_t).Gid)))
+
 	iid, _ := ctxpkg.ContextGetInitiator(ctx)
 	session.SetMetadata("initiatorid", iid)
 
@@ -298,18 +306,20 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 	session.SetStorageValue("LogLevel", log.GetLevel().String())
 
 	log.Debug().Interface("session", session).Msg("Decomposedfs: built session info")
-	// Create binary file in the upload folder with no content
-	// It will be used when determining the current offset of an upload
-	err = session.TouchBin()
+
+	err = fs.um.RunInBaseScope(func() error {
+		// Create binary file in the upload folder with no content
+		// It will be used when determining the current offset of an upload
+		err := session.TouchBin()
+		if err != nil {
+			return err
+		}
+
+		return session.Persist(ctx)
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	err = session.Persist(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	metrics.UploadSessionsInitiated.Inc()
 
 	if uploadLength == 0 {
@@ -345,7 +355,13 @@ func (fs *Decomposedfs) NewUpload(ctx context.Context, info tusd.FileInfo) (tusd
 
 // GetUpload returns the Upload for the given upload id
 func (fs *Decomposedfs) GetUpload(ctx context.Context, id string) (tusd.Upload, error) {
-	return fs.sessionStore.Get(ctx, id)
+	var ul tusd.Upload
+	var err error
+	_ = fs.um.RunInBaseScope(func() error {
+		ul, err = fs.sessionStore.Get(ctx, id)
+		return nil
+	})
+	return ul, err
 }
 
 // ListUploadSessions returns the upload sessions for the given filter

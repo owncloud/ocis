@@ -21,8 +21,8 @@ func DefaultConfig() *config.Config {
 			Name: "collaboration",
 		},
 		App: config.App{
-			Name:        "WOPI app",
-			Description: "Open office documents with a WOPI app",
+			Name:        "Collabora Online",
+			Description: "Open office documents with Collabora Online",
 			Icon:        "image-edit",
 			LockName:    "com.github.owncloud.collaboration",
 		},

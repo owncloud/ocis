@@ -101,20 +101,20 @@ func (c *config) init() {
 	}
 }
 
-type service struct {
+type Service struct {
 	conf          *config
-	storage       storage.FS
+	Storage       storage.FS
 	dataServerURL *url.URL
 	availableXS   []*provider.ResourceChecksumPriority
 }
 
-func (s *service) Close() error {
-	return s.storage.Shutdown(context.Background())
+func (s *Service) Close() error {
+	return s.Storage.Shutdown(context.Background())
 }
 
-func (s *service) UnprotectedEndpoints() []string { return []string{} }
+func (s *Service) UnprotectedEndpoints() []string { return []string{} }
 
-func (s *service) Register(ss *grpc.Server) {
+func (s *Service) Register(ss *grpc.Server) {
 	provider.RegisterProviderAPIServer(ss, s)
 }
 
@@ -199,9 +199,9 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		return nil, err
 	}
 
-	service := &service{
+	service := &Service{
 		conf:          c,
-		storage:       fs,
+		Storage:       fs,
 		dataServerURL: u,
 		availableXS:   xsTypes,
 	}
@@ -209,20 +209,20 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 	return service, nil
 }
 
-func (s *service) SetArbitraryMetadata(ctx context.Context, req *provider.SetArbitraryMetadataRequest) (*provider.SetArbitraryMetadataResponse, error) {
+func (s *Service) SetArbitraryMetadata(ctx context.Context, req *provider.SetArbitraryMetadataRequest) (*provider.SetArbitraryMetadataResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
-	err := s.storage.SetArbitraryMetadata(ctx, req.Ref, req.ArbitraryMetadata)
+	err := s.Storage.SetArbitraryMetadata(ctx, req.Ref, req.ArbitraryMetadata)
 
 	return &provider.SetArbitraryMetadataResponse{
 		Status: status.NewStatusFromErrType(ctx, "set arbitrary metadata", err),
 	}, nil
 }
 
-func (s *service) UnsetArbitraryMetadata(ctx context.Context, req *provider.UnsetArbitraryMetadataRequest) (*provider.UnsetArbitraryMetadataResponse, error) {
+func (s *Service) UnsetArbitraryMetadata(ctx context.Context, req *provider.UnsetArbitraryMetadataRequest) (*provider.UnsetArbitraryMetadataResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
-	err := s.storage.UnsetArbitraryMetadata(ctx, req.Ref, req.ArbitraryMetadataKeys)
+	err := s.Storage.UnsetArbitraryMetadata(ctx, req.Ref, req.ArbitraryMetadataKeys)
 
 	return &provider.UnsetArbitraryMetadataResponse{
 		Status: status.NewStatusFromErrType(ctx, "unset arbitrary metadata", err),
@@ -230,13 +230,13 @@ func (s *service) UnsetArbitraryMetadata(ctx context.Context, req *provider.Unse
 }
 
 // SetLock puts a lock on the given reference
-func (s *service) SetLock(ctx context.Context, req *provider.SetLockRequest) (*provider.SetLockResponse, error) {
+func (s *Service) SetLock(ctx context.Context, req *provider.SetLockRequest) (*provider.SetLockResponse, error) {
 	if !canLockPublicShare(ctx) {
 		return &provider.SetLockResponse{
 			Status: status.NewPermissionDenied(ctx, nil, "no permission to lock the share"),
 		}, nil
 	}
-	err := s.storage.SetLock(ctx, req.Ref, req.Lock)
+	err := s.Storage.SetLock(ctx, req.Ref, req.Lock)
 
 	return &provider.SetLockResponse{
 		Status: status.NewStatusFromErrType(ctx, "set lock", err),
@@ -244,8 +244,8 @@ func (s *service) SetLock(ctx context.Context, req *provider.SetLockRequest) (*p
 }
 
 // GetLock returns an existing lock on the given reference
-func (s *service) GetLock(ctx context.Context, req *provider.GetLockRequest) (*provider.GetLockResponse, error) {
-	lock, err := s.storage.GetLock(ctx, req.Ref)
+func (s *Service) GetLock(ctx context.Context, req *provider.GetLockRequest) (*provider.GetLockResponse, error) {
+	lock, err := s.Storage.GetLock(ctx, req.Ref)
 
 	return &provider.GetLockResponse{
 		Status: status.NewStatusFromErrType(ctx, "get lock", err),
@@ -254,14 +254,14 @@ func (s *service) GetLock(ctx context.Context, req *provider.GetLockRequest) (*p
 }
 
 // RefreshLock refreshes an existing lock on the given reference
-func (s *service) RefreshLock(ctx context.Context, req *provider.RefreshLockRequest) (*provider.RefreshLockResponse, error) {
+func (s *Service) RefreshLock(ctx context.Context, req *provider.RefreshLockRequest) (*provider.RefreshLockResponse, error) {
 	if !canLockPublicShare(ctx) {
 		return &provider.RefreshLockResponse{
 			Status: status.NewPermissionDenied(ctx, nil, "no permission to refresh the share lock"),
 		}, nil
 	}
 
-	err := s.storage.RefreshLock(ctx, req.Ref, req.Lock, req.ExistingLockId)
+	err := s.Storage.RefreshLock(ctx, req.Ref, req.Lock, req.ExistingLockId)
 
 	return &provider.RefreshLockResponse{
 		Status: status.NewStatusFromErrType(ctx, "refresh lock", err),
@@ -269,21 +269,21 @@ func (s *service) RefreshLock(ctx context.Context, req *provider.RefreshLockRequ
 }
 
 // Unlock removes an existing lock from the given reference
-func (s *service) Unlock(ctx context.Context, req *provider.UnlockRequest) (*provider.UnlockResponse, error) {
+func (s *Service) Unlock(ctx context.Context, req *provider.UnlockRequest) (*provider.UnlockResponse, error) {
 	if !canLockPublicShare(ctx) {
 		return &provider.UnlockResponse{
 			Status: status.NewPermissionDenied(ctx, nil, "no permission to unlock the share"),
 		}, nil
 	}
 
-	err := s.storage.Unlock(ctx, req.Ref, req.Lock)
+	err := s.Storage.Unlock(ctx, req.Ref, req.Lock)
 
 	return &provider.UnlockResponse{
 		Status: status.NewStatusFromErrType(ctx, "unlock", err),
 	}, nil
 }
 
-func (s *service) InitiateFileDownload(ctx context.Context, req *provider.InitiateFileDownloadRequest) (*provider.InitiateFileDownloadResponse, error) {
+func (s *Service) InitiateFileDownload(ctx context.Context, req *provider.InitiateFileDownloadRequest) (*provider.InitiateFileDownloadResponse, error) {
 	// TODO(labkode): maybe add some checks before download starts? eg. check permissions?
 	// TODO(labkode): maybe add short-lived token?
 	// We now simply point the client to the data server.
@@ -329,7 +329,7 @@ func validateIfUnmodifiedSince(ifUnmodifiedSince *typesv1beta1.Timestamp, info *
 	}
 }
 
-func (s *service) InitiateFileUpload(ctx context.Context, req *provider.InitiateFileUploadRequest) (*provider.InitiateFileUploadResponse, error) {
+func (s *Service) InitiateFileUpload(ctx context.Context, req *provider.InitiateFileUploadRequest) (*provider.InitiateFileUploadResponse, error) {
 	// TODO(labkode): same considerations as download
 	log := appctx.GetLogger(ctx)
 	if req.Ref.GetPath() == "/" {
@@ -412,7 +412,7 @@ func (s *service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 		metadata["expires"] = strconv.Itoa(int(expirationTimestamp.Seconds))
 	}
 
-	uploadIDs, err := s.storage.InitiateUpload(ctx, req.Ref, uploadLength, metadata)
+	uploadIDs, err := s.Storage.InitiateUpload(ctx, req.Ref, uploadLength, metadata)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -477,9 +477,9 @@ func (s *service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 	return res, nil
 }
 
-func (s *service) GetPath(ctx context.Context, req *provider.GetPathRequest) (*provider.GetPathResponse, error) {
+func (s *Service) GetPath(ctx context.Context, req *provider.GetPathRequest) (*provider.GetPathResponse, error) {
 	// TODO(labkode): check that the storage ID is the same as the storage provider id.
-	fn, err := s.storage.GetPathByID(ctx, req.ResourceId)
+	fn, err := s.Storage.GetPathByID(ctx, req.ResourceId)
 	if err != nil {
 		return &provider.GetPathResponse{
 			Status: status.NewStatusFromErrType(ctx, "get path", err),
@@ -492,17 +492,17 @@ func (s *service) GetPath(ctx context.Context, req *provider.GetPathRequest) (*p
 	return res, nil
 }
 
-func (s *service) GetHome(ctx context.Context, req *provider.GetHomeRequest) (*provider.GetHomeResponse, error) {
+func (s *Service) GetHome(ctx context.Context, req *provider.GetHomeRequest) (*provider.GetHomeResponse, error) {
 	return nil, errtypes.NotSupported("unused, use the gateway to look up the user home")
 }
 
-func (s *service) CreateHome(ctx context.Context, req *provider.CreateHomeRequest) (*provider.CreateHomeResponse, error) {
+func (s *Service) CreateHome(ctx context.Context, req *provider.CreateHomeRequest) (*provider.CreateHomeResponse, error) {
 	return nil, errtypes.NotSupported("use CreateStorageSpace with type personal")
 }
 
 // CreateStorageSpace creates a storage space
-func (s *service) CreateStorageSpace(ctx context.Context, req *provider.CreateStorageSpaceRequest) (*provider.CreateStorageSpaceResponse, error) {
-	resp, err := s.storage.CreateStorageSpace(ctx, req)
+func (s *Service) CreateStorageSpace(ctx context.Context, req *provider.CreateStorageSpaceRequest) (*provider.CreateStorageSpaceResponse, error) {
+	resp, err := s.Storage.CreateStorageSpace(ctx, req)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -513,7 +513,7 @@ func (s *service) CreateStorageSpace(ctx context.Context, req *provider.CreateSt
 		case errtypes.NotSupported:
 			// if trying to create a user home fall back to CreateHome
 			if u, ok := ctxpkg.ContextGetUser(ctx); ok && req.Type == "personal" && utils.UserEqual(req.GetOwner().Id, u.Id) {
-				if err := s.storage.CreateHome(ctx); err != nil {
+				if err := s.Storage.CreateHome(ctx); err != nil {
 					st = status.NewInternal(ctx, "error creating home")
 				} else {
 					st = status.NewOK(ctx)
@@ -544,7 +544,7 @@ func (s *service) CreateStorageSpace(ctx context.Context, req *provider.CreateSt
 	return resp, nil
 }
 
-func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStorageSpacesRequest) (*provider.ListStorageSpacesResponse, error) {
+func (s *Service) ListStorageSpaces(ctx context.Context, req *provider.ListStorageSpacesRequest) (*provider.ListStorageSpacesResponse, error) {
 	log := appctx.GetLogger(ctx)
 
 	// TODO this is just temporary. Update the API to include this flag.
@@ -555,7 +555,7 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 		}
 	}
 
-	spaces, err := s.storage.ListStorageSpaces(ctx, req.Filters, unrestricted)
+	spaces, err := s.Storage.ListStorageSpaces(ctx, req.Filters, unrestricted)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -593,8 +593,8 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 	}, nil
 }
 
-func (s *service) UpdateStorageSpace(ctx context.Context, req *provider.UpdateStorageSpaceRequest) (*provider.UpdateStorageSpaceResponse, error) {
-	res, err := s.storage.UpdateStorageSpace(ctx, req)
+func (s *Service) UpdateStorageSpace(ctx context.Context, req *provider.UpdateStorageSpaceRequest) (*provider.UpdateStorageSpaceResponse, error) {
+	res, err := s.Storage.UpdateStorageSpace(ctx, req)
 	if err != nil {
 		appctx.GetLogger(ctx).
 			Error().
@@ -607,14 +607,14 @@ func (s *service) UpdateStorageSpace(ctx context.Context, req *provider.UpdateSt
 	return res, nil
 }
 
-func (s *service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) (*provider.DeleteStorageSpaceResponse, error) {
+func (s *Service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) (*provider.DeleteStorageSpaceResponse, error) {
 	// we need to get the space before so we can return critical information
 	// FIXME: why is this string parsing necessary?
 	idraw, _ := storagespace.ParseID(req.Id.GetOpaqueId())
 	idraw.OpaqueId = idraw.GetSpaceId()
 	id := &provider.StorageSpaceId{OpaqueId: storagespace.FormatResourceID(idraw)}
 
-	spaces, err := s.storage.ListStorageSpaces(ctx, []*provider.ListStorageSpacesRequest_Filter{{Type: provider.ListStorageSpacesRequest_Filter_TYPE_ID, Term: &provider.ListStorageSpacesRequest_Filter_Id{Id: id}}}, true)
+	spaces, err := s.Storage.ListStorageSpaces(ctx, []*provider.ListStorageSpacesRequest_Filter{{Type: provider.ListStorageSpacesRequest_Filter_TYPE_ID, Term: &provider.ListStorageSpacesRequest_Filter_Id{Id: id}}}, true)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -636,7 +636,7 @@ func (s *service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteSt
 		}, nil
 	}
 
-	if err := s.storage.DeleteStorageSpace(ctx, req); err != nil {
+	if err := s.Storage.DeleteStorageSpace(ctx, req); err != nil {
 		var st *rpc.Status
 		switch err.(type) {
 		case errtypes.IsNotFound:
@@ -670,7 +670,7 @@ func (s *service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteSt
 	return res, nil
 }
 
-func (s *service) CreateContainer(ctx context.Context, req *provider.CreateContainerRequest) (*provider.CreateContainerResponse, error) {
+func (s *Service) CreateContainer(ctx context.Context, req *provider.CreateContainerRequest) (*provider.CreateContainerResponse, error) {
 	// FIXME these should be part of the CreateContainerRequest object
 	if req.Opaque != nil {
 		if e, ok := req.Opaque.Map["lockid"]; ok && e.Decoder == "plain" {
@@ -678,14 +678,14 @@ func (s *service) CreateContainer(ctx context.Context, req *provider.CreateConta
 		}
 	}
 
-	err := s.storage.CreateDir(ctx, req.Ref)
+	err := s.Storage.CreateDir(ctx, req.Ref)
 
 	return &provider.CreateContainerResponse{
 		Status: status.NewStatusFromErrType(ctx, "create container", err),
 	}, nil
 }
 
-func (s *service) TouchFile(ctx context.Context, req *provider.TouchFileRequest) (*provider.TouchFileResponse, error) {
+func (s *Service) TouchFile(ctx context.Context, req *provider.TouchFileRequest) (*provider.TouchFileResponse, error) {
 	// FIXME these should be part of the TouchFileRequest object
 	var mtime string
 	if req.Opaque != nil {
@@ -695,14 +695,14 @@ func (s *service) TouchFile(ctx context.Context, req *provider.TouchFileRequest)
 		mtime = utils.ReadPlainFromOpaque(req.Opaque, "X-OC-Mtime")
 	}
 
-	err := s.storage.TouchFile(ctx, req.Ref, utils.ExistsInOpaque(req.Opaque, "markprocessing"), mtime)
+	err := s.Storage.TouchFile(ctx, req.Ref, utils.ExistsInOpaque(req.Opaque, "markprocessing"), mtime)
 
 	return &provider.TouchFileResponse{
 		Status: status.NewStatusFromErrType(ctx, "touch file", err),
 	}, nil
 }
 
-func (s *service) Delete(ctx context.Context, req *provider.DeleteRequest) (*provider.DeleteResponse, error) {
+func (s *Service) Delete(ctx context.Context, req *provider.DeleteRequest) (*provider.DeleteResponse, error) {
 	if req.Ref.GetPath() == "/" {
 		return &provider.DeleteResponse{
 			Status: status.NewInternal(ctx, "can't delete mount path"),
@@ -720,7 +720,7 @@ func (s *service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 		}
 	}
 
-	md, err := s.storage.GetMD(ctx, req.Ref, []string{}, []string{"id", "status"})
+	md, err := s.Storage.GetMD(ctx, req.Ref, []string{}, []string{"id", "status"})
 	if err != nil {
 		return &provider.DeleteResponse{
 			Status: status.NewStatusFromErrType(ctx, "can't stat resource to delete", err),
@@ -741,7 +741,7 @@ func (s *service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 		}, nil
 	}
 
-	err = s.storage.Delete(ctx, req.Ref)
+	err = s.Storage.Delete(ctx, req.Ref)
 
 	return &provider.DeleteResponse{
 		Status: status.NewStatusFromErrType(ctx, "delete", err),
@@ -753,17 +753,17 @@ func (s *service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 	}, nil
 }
 
-func (s *service) Move(ctx context.Context, req *provider.MoveRequest) (*provider.MoveResponse, error) {
+func (s *Service) Move(ctx context.Context, req *provider.MoveRequest) (*provider.MoveResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
-	err := s.storage.Move(ctx, req.Source, req.Destination)
+	err := s.Storage.Move(ctx, req.Source, req.Destination)
 
 	return &provider.MoveResponse{
 		Status: status.NewStatusFromErrType(ctx, "move", err),
 	}, nil
 }
 
-func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provider.StatResponse, error) {
+func (s *Service) Stat(ctx context.Context, req *provider.StatRequest) (*provider.StatResponse, error) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "stat")
 	defer span.End()
 
@@ -772,7 +772,7 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 		Value: attribute.StringValue(req.GetRef().String()),
 	})
 
-	md, err := s.storage.GetMD(ctx, req.GetRef(), req.GetArbitraryMetadataKeys(), req.GetFieldMask().GetPaths())
+	md, err := s.Storage.GetMD(ctx, req.GetRef(), req.GetArbitraryMetadataKeys(), req.GetFieldMask().GetPaths())
 	if err != nil {
 		return &provider.StatResponse{
 			Status: status.NewStatusFromErrType(ctx, "stat", err),
@@ -789,11 +789,11 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 	}, nil
 }
 
-func (s *service) ListContainerStream(req *provider.ListContainerStreamRequest, ss provider.ProviderAPI_ListContainerStreamServer) error {
+func (s *Service) ListContainerStream(req *provider.ListContainerStreamRequest, ss provider.ProviderAPI_ListContainerStreamServer) error {
 	ctx := ss.Context()
 	log := appctx.GetLogger(ctx)
 
-	mds, err := s.storage.ListFolder(ctx, req.GetRef(), req.GetArbitraryMetadataKeys(), req.GetFieldMask().GetPaths())
+	mds, err := s.Storage.ListFolder(ctx, req.GetRef(), req.GetArbitraryMetadataKeys(), req.GetFieldMask().GetPaths())
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -836,8 +836,8 @@ func (s *service) ListContainerStream(req *provider.ListContainerStreamRequest, 
 	return nil
 }
 
-func (s *service) ListContainer(ctx context.Context, req *provider.ListContainerRequest) (*provider.ListContainerResponse, error) {
-	mds, err := s.storage.ListFolder(ctx, req.GetRef(), req.GetArbitraryMetadataKeys(), req.GetFieldMask().GetPaths())
+func (s *Service) ListContainer(ctx context.Context, req *provider.ListContainerRequest) (*provider.ListContainerResponse, error) {
+	mds, err := s.Storage.ListFolder(ctx, req.GetRef(), req.GetArbitraryMetadataKeys(), req.GetFieldMask().GetPaths())
 	res := &provider.ListContainerResponse{
 		Status: status.NewStatusFromErrType(ctx, "list container", err),
 		Infos:  mds,
@@ -854,8 +854,8 @@ func (s *service) ListContainer(ctx context.Context, req *provider.ListContainer
 	return res, nil
 }
 
-func (s *service) ListFileVersions(ctx context.Context, req *provider.ListFileVersionsRequest) (*provider.ListFileVersionsResponse, error) {
-	revs, err := s.storage.ListRevisions(ctx, req.Ref)
+func (s *Service) ListFileVersions(ctx context.Context, req *provider.ListFileVersionsRequest) (*provider.ListFileVersionsResponse, error) {
+	revs, err := s.Storage.ListRevisions(ctx, req.Ref)
 
 	sort.Sort(descendingMtime(revs))
 
@@ -865,22 +865,22 @@ func (s *service) ListFileVersions(ctx context.Context, req *provider.ListFileVe
 	}, nil
 }
 
-func (s *service) RestoreFileVersion(ctx context.Context, req *provider.RestoreFileVersionRequest) (*provider.RestoreFileVersionResponse, error) {
+func (s *Service) RestoreFileVersion(ctx context.Context, req *provider.RestoreFileVersionRequest) (*provider.RestoreFileVersionResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
-	err := s.storage.RestoreRevision(ctx, req.Ref, req.Key)
+	err := s.Storage.RestoreRevision(ctx, req.Ref, req.Key)
 
 	return &provider.RestoreFileVersionResponse{
 		Status: status.NewStatusFromErrType(ctx, "restore file version", err),
 	}, nil
 }
 
-func (s *service) ListRecycleStream(req *provider.ListRecycleStreamRequest, ss provider.ProviderAPI_ListRecycleStreamServer) error {
+func (s *Service) ListRecycleStream(req *provider.ListRecycleStreamRequest, ss provider.ProviderAPI_ListRecycleStreamServer) error {
 	ctx := ss.Context()
 	log := appctx.GetLogger(ctx)
 
 	key, itemPath := router.ShiftPath(req.Key)
-	items, err := s.storage.ListRecycle(ctx, req.Ref, key, itemPath)
+	items, err := s.Storage.ListRecycle(ctx, req.Ref, key, itemPath)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -922,9 +922,9 @@ func (s *service) ListRecycleStream(req *provider.ListRecycleStreamRequest, ss p
 	return nil
 }
 
-func (s *service) ListRecycle(ctx context.Context, req *provider.ListRecycleRequest) (*provider.ListRecycleResponse, error) {
+func (s *Service) ListRecycle(ctx context.Context, req *provider.ListRecycleRequest) (*provider.ListRecycleResponse, error) {
 	key, itemPath := router.ShiftPath(req.Key)
-	items, err := s.storage.ListRecycle(ctx, req.Ref, key, itemPath)
+	items, err := s.Storage.ListRecycle(ctx, req.Ref, key, itemPath)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -957,12 +957,12 @@ func (s *service) ListRecycle(ctx context.Context, req *provider.ListRecycleRequ
 	return res, nil
 }
 
-func (s *service) RestoreRecycleItem(ctx context.Context, req *provider.RestoreRecycleItemRequest) (*provider.RestoreRecycleItemResponse, error) {
+func (s *Service) RestoreRecycleItem(ctx context.Context, req *provider.RestoreRecycleItemRequest) (*provider.RestoreRecycleItemResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
 	// TODO(labkode): CRITICAL: fill recycle info with storage provider.
 	key, itemPath := router.ShiftPath(req.Key)
-	err := s.storage.RestoreRecycleItem(ctx, req.Ref, key, itemPath, req.RestoreRef)
+	err := s.Storage.RestoreRecycleItem(ctx, req.Ref, key, itemPath, req.RestoreRef)
 
 	res := &provider.RestoreRecycleItemResponse{
 		Status: status.NewStatusFromErrType(ctx, "restore recycle item", err),
@@ -970,7 +970,7 @@ func (s *service) RestoreRecycleItem(ctx context.Context, req *provider.RestoreR
 	return res, nil
 }
 
-func (s *service) PurgeRecycle(ctx context.Context, req *provider.PurgeRecycleRequest) (*provider.PurgeRecycleResponse, error) {
+func (s *Service) PurgeRecycle(ctx context.Context, req *provider.PurgeRecycleRequest) (*provider.PurgeRecycleResponse, error) {
 	// FIXME these should be part of the PurgeRecycleRequest object
 	if req.Opaque != nil {
 		if e, ok := req.Opaque.Map["lockid"]; ok && e.Decoder == "plain" {
@@ -981,7 +981,7 @@ func (s *service) PurgeRecycle(ctx context.Context, req *provider.PurgeRecycleRe
 	// if a key was sent as opaque id purge only that item
 	key, itemPath := router.ShiftPath(req.Key)
 	if key != "" {
-		if err := s.storage.PurgeRecycleItem(ctx, req.Ref, key, itemPath); err != nil {
+		if err := s.Storage.PurgeRecycleItem(ctx, req.Ref, key, itemPath); err != nil {
 			st := status.NewStatusFromErrType(ctx, "error purging recycle item", err)
 			appctx.GetLogger(ctx).
 				Error().
@@ -994,7 +994,7 @@ func (s *service) PurgeRecycle(ctx context.Context, req *provider.PurgeRecycleRe
 				Status: st,
 			}, nil
 		}
-	} else if err := s.storage.EmptyRecycle(ctx, req.Ref); err != nil {
+	} else if err := s.Storage.EmptyRecycle(ctx, req.Ref); err != nil {
 		// otherwise try emptying the whole recycle bin
 		st := status.NewStatusFromErrType(ctx, "error emptying recycle", err)
 		appctx.GetLogger(ctx).
@@ -1015,8 +1015,8 @@ func (s *service) PurgeRecycle(ctx context.Context, req *provider.PurgeRecycleRe
 	return res, nil
 }
 
-func (s *service) ListGrants(ctx context.Context, req *provider.ListGrantsRequest) (*provider.ListGrantsResponse, error) {
-	grants, err := s.storage.ListGrants(ctx, req.Ref)
+func (s *Service) ListGrants(ctx context.Context, req *provider.ListGrantsRequest) (*provider.ListGrantsResponse, error) {
+	grants, err := s.Storage.ListGrants(ctx, req.Ref)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -1045,7 +1045,7 @@ func (s *service) ListGrants(ctx context.Context, req *provider.ListGrantsReques
 	return res, nil
 }
 
-func (s *service) DenyGrant(ctx context.Context, req *provider.DenyGrantRequest) (*provider.DenyGrantResponse, error) {
+func (s *Service) DenyGrant(ctx context.Context, req *provider.DenyGrantRequest) (*provider.DenyGrantResponse, error) {
 	// check grantee type is valid
 	if req.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_INVALID {
 		return &provider.DenyGrantResponse{
@@ -1053,7 +1053,7 @@ func (s *service) DenyGrant(ctx context.Context, req *provider.DenyGrantRequest)
 		}, nil
 	}
 
-	err := s.storage.DenyGrant(ctx, req.Ref, req.Grantee)
+	err := s.Storage.DenyGrant(ctx, req.Ref, req.Grantee)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -1086,7 +1086,7 @@ func (s *service) DenyGrant(ctx context.Context, req *provider.DenyGrantRequest)
 	return res, nil
 }
 
-func (s *service) AddGrant(ctx context.Context, req *provider.AddGrantRequest) (*provider.AddGrantResponse, error) {
+func (s *Service) AddGrant(ctx context.Context, req *provider.AddGrantRequest) (*provider.AddGrantResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
 	// TODO: update CS3 APIs
@@ -1109,14 +1109,14 @@ func (s *service) AddGrant(ctx context.Context, req *provider.AddGrantRequest) (
 		}, nil
 	}
 
-	err := s.storage.AddGrant(ctx, req.Ref, req.Grant)
+	err := s.Storage.AddGrant(ctx, req.Ref, req.Grant)
 
 	return &provider.AddGrantResponse{
 		Status: status.NewStatusFromErrType(ctx, "add grant", err),
 	}, nil
 }
 
-func (s *service) UpdateGrant(ctx context.Context, req *provider.UpdateGrantRequest) (*provider.UpdateGrantResponse, error) {
+func (s *Service) UpdateGrant(ctx context.Context, req *provider.UpdateGrantRequest) (*provider.UpdateGrantResponse, error) {
 	// FIXME these should be part of the UpdateGrantRequest object
 	if req.Opaque != nil {
 		if e, ok := req.Opaque.Map["lockid"]; ok && e.Decoder == "plain" {
@@ -1144,14 +1144,14 @@ func (s *service) UpdateGrant(ctx context.Context, req *provider.UpdateGrantRequ
 		}, nil
 	}
 
-	err := s.storage.UpdateGrant(ctx, req.Ref, req.Grant)
+	err := s.Storage.UpdateGrant(ctx, req.Ref, req.Grant)
 
 	return &provider.UpdateGrantResponse{
 		Status: status.NewStatusFromErrType(ctx, "update grant", err),
 	}, nil
 }
 
-func (s *service) RemoveGrant(ctx context.Context, req *provider.RemoveGrantRequest) (*provider.RemoveGrantResponse, error) {
+func (s *Service) RemoveGrant(ctx context.Context, req *provider.RemoveGrantRequest) (*provider.RemoveGrantResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
 	// check targetType is valid
@@ -1168,14 +1168,14 @@ func (s *service) RemoveGrant(ctx context.Context, req *provider.RemoveGrantRequ
 		ctx = context.WithValue(ctx, utils.SpaceGrant, struct{}{})
 	}
 
-	err := s.storage.RemoveGrant(ctx, req.Ref, req.Grant)
+	err := s.Storage.RemoveGrant(ctx, req.Ref, req.Grant)
 
 	return &provider.RemoveGrantResponse{
 		Status: status.NewStatusFromErrType(ctx, "remove grant", err),
 	}, nil
 }
 
-func (s *service) CreateReference(ctx context.Context, req *provider.CreateReferenceRequest) (*provider.CreateReferenceResponse, error) {
+func (s *Service) CreateReference(ctx context.Context, req *provider.CreateReferenceRequest) (*provider.CreateReferenceResponse, error) {
 	log := appctx.GetLogger(ctx)
 
 	// parse uri is valid
@@ -1187,7 +1187,7 @@ func (s *service) CreateReference(ctx context.Context, req *provider.CreateRefer
 		}, nil
 	}
 
-	if err := s.storage.CreateReference(ctx, req.Ref.GetPath(), u); err != nil {
+	if err := s.Storage.CreateReference(ctx, req.Ref.GetPath(), u); err != nil {
 		var st *rpc.Status
 		switch err.(type) {
 		case errtypes.IsNotFound:
@@ -1212,14 +1212,14 @@ func (s *service) CreateReference(ctx context.Context, req *provider.CreateRefer
 	}, nil
 }
 
-func (s *service) CreateSymlink(ctx context.Context, req *provider.CreateSymlinkRequest) (*provider.CreateSymlinkResponse, error) {
+func (s *Service) CreateSymlink(ctx context.Context, req *provider.CreateSymlinkRequest) (*provider.CreateSymlinkResponse, error) {
 	return &provider.CreateSymlinkResponse{
 		Status: status.NewUnimplemented(ctx, errtypes.NotSupported("CreateSymlink not implemented"), "CreateSymlink not implemented"),
 	}, nil
 }
 
-func (s *service) GetQuota(ctx context.Context, req *provider.GetQuotaRequest) (*provider.GetQuotaResponse, error) {
-	total, used, remaining, err := s.storage.GetQuota(ctx, req.Ref)
+func (s *Service) GetQuota(ctx context.Context, req *provider.GetQuotaRequest) (*provider.GetQuotaResponse, error) {
+	total, used, remaining, err := s.Storage.GetQuota(ctx, req.Ref)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -1257,7 +1257,7 @@ func (s *service) GetQuota(ctx context.Context, req *provider.GetQuotaRequest) (
 	return res, nil
 }
 
-func (s *service) addMissingStorageProviderID(resourceID *provider.ResourceId, spaceID *provider.StorageSpaceId) {
+func (s *Service) addMissingStorageProviderID(resourceID *provider.ResourceId, spaceID *provider.StorageSpaceId) {
 	// The storage driver might set the mount ID by itself, in which case skip this step
 	if resourceID != nil && resourceID.GetStorageId() == "" {
 		resourceID.StorageId = s.conf.MountID

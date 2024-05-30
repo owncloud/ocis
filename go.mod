@@ -15,7 +15,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.10.0
 	github.com/cs3org/go-cs3apis v0.0.0-20231023073225-7748710e0781
-	github.com/cs3org/reva/v2 v2.19.2-0.20240529081036-419196f2342e
+	github.com/cs3org/reva/v2 v2.19.2-0.20240530092407-7f72f379ea89
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -290,8 +290,10 @@ require (
 	github.com/opencontainers/runtime-spec v1.1.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
+	github.com/pablodz/inotifywaitgo v0.0.6 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
+	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/pquerna/cachecontrol v0.2.0 // indirect
@@ -306,6 +308,7 @@ require (
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/russellhaering/goxmldsig v1.4.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/segmentio/kafka-go v0.4.47 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sethvargo/go-password v0.2.0 // indirect

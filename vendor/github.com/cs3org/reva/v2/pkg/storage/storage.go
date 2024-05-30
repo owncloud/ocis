@@ -23,6 +23,8 @@ import (
 	"io"
 	"net/url"
 
+	tusd "github.com/tus/tusd/pkg/handler"
+
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	registry "github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1"
 )
@@ -69,6 +71,15 @@ type FS interface {
 	CreateStorageSpace(ctx context.Context, req *provider.CreateStorageSpaceRequest) (*provider.CreateStorageSpaceResponse, error)
 	UpdateStorageSpace(ctx context.Context, req *provider.UpdateStorageSpaceRequest) (*provider.UpdateStorageSpaceResponse, error)
 	DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) error
+}
+
+// UnscopeFunc is a function that unscopes a user
+type UnscopeFunc func()
+
+// Composable is the interface that a struct needs to implement
+// to be composable, so that it can support the TUS methods
+type ComposableFS interface {
+	UseIn(composer *tusd.StoreComposer)
 }
 
 // Registry is the interface that storage registries implement
