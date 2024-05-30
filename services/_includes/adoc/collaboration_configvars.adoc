@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-30-09-07-41]
+[#deprecation-note-2024-05-30-10-06-36]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -31,7 +31,7 @@ a|`COLLABORATION_APP_NAME` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++WOPI app ++
+++Collabora Online ++
 a| [subs=-attributes]
 The name of the app
 
@@ -40,7 +40,7 @@ a|`COLLABORATION_APP_DESCRIPTION` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++Open office documents with a WOPI app ++
+++Open office documents with Collabora Online ++
 a| [subs=-attributes]
 App description
 
@@ -68,7 +68,7 @@ a|`OCIS_JWT_SECRET` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++JgveEoeECrkbKNWMMwsAXhMwS5DiZM7q ++
+++InVe9q3Jlt6CP84tQZL12CzDrCpxf3n2 ++
 a| [subs=-attributes]
 Used as JWT token and to encrypt access token.
 

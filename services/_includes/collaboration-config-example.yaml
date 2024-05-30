@@ -2,11 +2,11 @@
 # Filename: collaboration-config-example.yaml
 
 app:
-  name: WOPI app
-  description: Open office documents with a WOPI app
+  name: Collabora Online
+  description: Open office documents with Collabora Online
   icon: image-edit
   lockname: com.github.owncloud.collaboration
-jwt_secret: jArUEVls5AjiCAlUScxTHB8fqyb7QEnC
+jwt_secret: hVD8ILWk7CbVOkqwGPawTc7m0ivOMJU0
 grpc:
   addr: 0.0.0.0:9301
 http:

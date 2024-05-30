@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-30-09-07-41]
+[#deprecation-note-2024-05-30-10-06-36]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -395,6 +395,15 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Allow insecure connections to the frontend.
+
+a|`FRONTEND_APP_HANDLER_SECURE_VIEW_APP` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++Collabora Online ++
+a| [subs=-attributes]
+Name of the app to use for secure view. Should match COLLABORATION_APP_NAME, the name configured for the CS3 app provider.
 
 a|`FRONTEND_ARCHIVER_MAX_NUM_FILES` +
 
