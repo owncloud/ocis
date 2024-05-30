@@ -23,6 +23,7 @@ import (
 	"os"
 	"syscall"
 
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/pkg/errors"
 	"github.com/pkg/xattr"
 )
@@ -30,6 +31,9 @@ import (
 // IsNotExist checks if there is a os not exists error buried inside the xattr error,
 // as we cannot just use os.IsNotExist().
 func IsNotExist(err error) bool {
+	if _, ok := err.(errtypes.IsNotFound); ok {
+		return true
+	}
 	if os.IsNotExist(errors.Cause(err)) {
 		return true
 	}
@@ -56,6 +60,11 @@ func IsAttrUnset(err error) bool {
 func IsNotDir(err error) bool {
 	if perr, ok := errors.Cause(err).(*fs.PathError); ok {
 		if serr, ok2 := perr.Err.(syscall.Errno); ok2 {
+			return serr == syscall.ENOTDIR
+		}
+	}
+	if xerr, ok := errors.Cause(err).(*xattr.Error); ok {
+		if serr, ok2 := xerr.Err.(syscall.Errno); ok2 {
 			return serr == syscall.ENOTDIR
 		}
 	}

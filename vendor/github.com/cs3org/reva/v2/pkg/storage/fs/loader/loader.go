@@ -31,7 +31,6 @@ import (
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/nextcloud"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/ocis"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/owncloudsql"
-	_ "github.com/cs3org/reva/v2/pkg/storage/fs/posix"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/s3"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/s3ng"
 	// Add your own here

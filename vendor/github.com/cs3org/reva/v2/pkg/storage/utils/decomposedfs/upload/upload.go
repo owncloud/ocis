@@ -26,6 +26,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -143,6 +144,22 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 		prefixes.ChecksumPrefix + "adler32": adler32h.Sum(nil),
 	}
 
+	// At this point we scope by the space to create the final file in the final location
+	if session.store.um != nil && session.info.Storage["SpaceGid"] != "" {
+		gid, err := strconv.Atoi(session.info.Storage["SpaceGid"])
+		if err != nil {
+			return errors.Wrap(err, "failed to parse space gid")
+		}
+
+		unscope, err := session.store.um.ScopeUserByIds(-1, gid)
+		if err != nil {
+			return errors.Wrap(err, "failed to scope user")
+		}
+		if unscope != nil {
+			defer func() { _ = unscope() }()
+		}
+	}
+
 	n, err := session.store.CreateNodeForUpload(session, attrs)
 	if err != nil {
 		session.store.Cleanup(ctx, session, true, false, false)
@@ -198,7 +215,9 @@ func (session *OcisSession) Terminate(_ context.Context) error {
 func (session *OcisSession) DeclareLength(ctx context.Context, length int64) error {
 	session.info.Size = length
 	session.info.SizeIsDeferred = false
-	return session.Persist(session.Context(ctx))
+	return session.store.um.RunInBaseScope(func() error {
+		return session.Persist(session.Context(ctx))
+	})
 }
 
 // ConcatUploads concatenates multiple uploads
@@ -231,7 +250,8 @@ func (session *OcisSession) Finalize() (err error) {
 	ctx, span := tracer.Start(session.Context(context.Background()), "Finalize")
 	defer span.End()
 
-	revisionNode := &node.Node{SpaceID: session.SpaceID(), BlobID: session.ID(), Blobsize: session.Size()}
+	revisionNode := node.New(session.SpaceID(), session.NodeID(), "", "", session.Size(), session.ID(),
+		provider.ResourceType_RESOURCE_TYPE_FILE, session.SpaceOwner(), session.store.lu)
 
 	// upload the data to the blobstore
 	_, subspan := tracer.Start(ctx, "WriteBlob")
@@ -270,9 +290,9 @@ func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool
 	if revertNodeMetadata {
 		n, err := session.Node(ctx)
 		if err != nil {
-			appctx.GetLogger(ctx).Error().Err(err).Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Str("uploadid", session.ID()).Msg("reading node for session failed")
+			appctx.GetLogger(ctx).Error().Err(err).Str("sessionid", session.ID()).Msg("reading node for session failed")
 		}
-		if session.NodeExists() {
+		if session.NodeExists() && session.info.MetaData["versionsPath"] != "" {
 			p := session.info.MetaData["versionsPath"]
 			if err := session.store.lu.CopyMetadata(ctx, p, n.InternalPath(), func(attributeName string, value []byte) (newValue []byte, copy bool) {
 				return value, strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||

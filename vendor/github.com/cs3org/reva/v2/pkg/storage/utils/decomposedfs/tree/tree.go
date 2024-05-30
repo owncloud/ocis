@@ -601,9 +601,13 @@ func (t *Tree) RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPa
 				return errors.Wrap(err, "Decomposedfs: could not resolve trash root")
 			}
 			deletePath = filepath.Join(resolvedTrashRoot, trashPath)
-		}
-		if err = os.Remove(deletePath); err != nil {
-			logger.Error().Err(err).Str("trashItem", trashItem).Msg("error deleting trash item")
+			if err = os.Remove(deletePath); err != nil {
+				logger.Error().Err(err).Str("trashItem", trashItem).Str("deletePath", deletePath).Str("trashPath", trashPath).Msg("error deleting trash item")
+			}
+		} else {
+			if err = utils.RemoveItem(deletePath); err != nil {
+				logger.Error().Err(err).Str("trashItem", trashItem).Str("deletePath", deletePath).Str("trashPath", trashPath).Msg("error recursively deleting trash item")
+			}
 		}
 
 		var sizeDiff int64
@@ -651,7 +655,7 @@ func (t *Tree) PurgeRecycleItemFunc(ctx context.Context, spaceid, key string, pa
 			}
 			deletePath = filepath.Join(resolvedTrashRoot, path)
 		}
-		if err = os.Remove(deletePath); err != nil {
+		if err = utils.RemoveItem(deletePath); err != nil {
 			logger.Error().Err(err).Str("deletePath", deletePath).Msg("error deleting trash item")
 			return err
 		}

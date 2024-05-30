@@ -56,11 +56,12 @@ func init() {
 
 // Config holds the config options for the HTTP appprovider service
 type Config struct {
-	Prefix     string `mapstructure:"prefix"`
-	GatewaySvc string `mapstructure:"gatewaysvc"`
-	Insecure   bool   `mapstructure:"insecure"`
-	WebBaseURI string `mapstructure:"webbaseuri"`
-	Web        Web    `mapstructure:"web"`
+	Prefix        string `mapstructure:"prefix"`
+	GatewaySvc    string `mapstructure:"gatewaysvc"`
+	Insecure      bool   `mapstructure:"insecure"`
+	WebBaseURI    string `mapstructure:"webbaseuri"`
+	Web           Web    `mapstructure:"web"`
+	SecureViewApp string `mapstructure:"secure_view_app"`
 }
 
 // Web holds the config options for the URL parameters for Web
@@ -342,6 +343,16 @@ func (s *svc) handleList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res := filterAppsByUserAgent(listRes.MimeTypes, r.UserAgent())
+
+	// if app name or address matches the configured secure view app add that flag to the response
+	for _, mt := range res {
+		for _, app := range mt.AppProviders {
+			if app.Name == s.conf.SecureViewApp {
+				app.SecureView = true
+			}
+		}
+	}
+
 	js, err := json.Marshal(map[string]interface{}{"mime-types": res})
 	if err != nil {
 		writeError(w, r, appErrorServerError, "error marshalling JSON response", err)
@@ -545,22 +556,38 @@ func newOpenInWebResponse(baseURI string, params, staticParams map[string]string
 	return openInWebResponse{URI: uri.String()}, nil
 }
 
-func filterAppsByUserAgent(mimeTypes []*appregistry.MimeTypeInfo, userAgent string) []*appregistry.MimeTypeInfo {
+// MimeTypeInfo wraps the appregistry.MimeTypeInfo to change the app providers to ProviderInfos with a secure view flag
+type MimeTypeInfo struct {
+	appregistry.MimeTypeInfo
+	AppProviders []*ProviderInfo `json:"app_providers"`
+}
+
+// ProviderInfo wraps the appregistry.ProviderInfo to add a secure view flag
+type ProviderInfo struct {
+	appregistry.ProviderInfo
+	// TODO make this part of the CS3 provider info
+	SecureView bool `json:"secure_view"`
+}
+
+// filterAppsByUserAgent rewrites the mime type info to only include apps that can be called by the user agent
+// it also wraps the provider info to be able to add a secure view flag
+func filterAppsByUserAgent(mimeTypes []*appregistry.MimeTypeInfo, userAgent string) []*MimeTypeInfo {
 	ua := ua.Parse(userAgent)
-	res := []*appregistry.MimeTypeInfo{}
+	res := []*MimeTypeInfo{}
 	for _, m := range mimeTypes {
-		apps := []*appregistry.ProviderInfo{}
+		apps := []*ProviderInfo{}
 		for _, p := range m.AppProviders {
 			p.Address = "" // address is internal only and not needed in the client
 			// apps are called by name, so if it has no name it cannot be called and should not be advertised
 			// also filter Desktop-only apps if ua is not Desktop
 			if p.Name != "" && (ua.Desktop || !p.DesktopOnly) {
-				apps = append(apps, p)
+				apps = append(apps, &ProviderInfo{ProviderInfo: *p})
 			}
 		}
 		if len(apps) > 0 {
-			m.AppProviders = apps
-			res = append(res, m)
+			mt := &MimeTypeInfo{MimeTypeInfo: *m}
+			mt.AppProviders = apps
+			res = append(res, mt)
 		}
 	}
 	return res

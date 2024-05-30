@@ -366,7 +366,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.19.2-0.20240529081036-419196f2342e
+# github.com/cs3org/reva/v2 v2.19.2-0.20240530092407-7f72f379ea89
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -666,6 +666,7 @@ github.com/cs3org/reva/v2/pkg/storage/fs/owncloudsql/filecache
 github.com/cs3org/reva/v2/pkg/storage/fs/posix
 github.com/cs3org/reva/v2/pkg/storage/fs/posix/blobstore
 github.com/cs3org/reva/v2/pkg/storage/fs/posix/lookup
+github.com/cs3org/reva/v2/pkg/storage/fs/posix/options
 github.com/cs3org/reva/v2/pkg/storage/fs/posix/tree
 github.com/cs3org/reva/v2/pkg/storage/fs/registry
 github.com/cs3org/reva/v2/pkg/storage/fs/s3
@@ -692,6 +693,7 @@ github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/spaceidindex
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree/propagator
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload
+github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/usermapper
 github.com/cs3org/reva/v2/pkg/storage/utils/downloader
 github.com/cs3org/reva/v2/pkg/storage/utils/eosfs
 github.com/cs3org/reva/v2/pkg/storage/utils/filelocks
@@ -702,6 +704,7 @@ github.com/cs3org/reva/v2/pkg/storage/utils/indexer/index
 github.com/cs3org/reva/v2/pkg/storage/utils/indexer/option
 github.com/cs3org/reva/v2/pkg/storage/utils/localfs
 github.com/cs3org/reva/v2/pkg/storage/utils/metadata
+github.com/cs3org/reva/v2/pkg/storage/utils/middleware
 github.com/cs3org/reva/v2/pkg/storage/utils/sync
 github.com/cs3org/reva/v2/pkg/storage/utils/templates
 github.com/cs3org/reva/v2/pkg/storage/utils/walker
@@ -1253,9 +1256,18 @@ github.com/justinas/alice
 github.com/kevinburke/ssh_config
 # github.com/klauspost/compress v1.17.8
 ## explicit; go 1.20
+github.com/klauspost/compress
 github.com/klauspost/compress/flate
+github.com/klauspost/compress/fse
+github.com/klauspost/compress/gzip
+github.com/klauspost/compress/huff0
+github.com/klauspost/compress/internal/cpuinfo
 github.com/klauspost/compress/internal/race
+github.com/klauspost/compress/internal/snapref
 github.com/klauspost/compress/s2
+github.com/klauspost/compress/snappy
+github.com/klauspost/compress/zstd
+github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/klauspost/cpuid/v2 v2.2.6
 ## explicit; go 1.15
 github.com/klauspost/cpuid/v2
@@ -1617,12 +1629,22 @@ github.com/owncloud/libre-graph-api-go
 # github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
 ## explicit; go 1.12
 github.com/oxtoacart/bpool
+# github.com/pablodz/inotifywaitgo v0.0.6
+## explicit; go 1.21
+github.com/pablodz/inotifywaitgo/inotifywaitgo
 # github.com/patrickmn/go-cache v2.1.0+incompatible
 ## explicit
 github.com/patrickmn/go-cache
 # github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58
 ## explicit; go 1.16
 github.com/pbnjay/memory
+# github.com/pierrec/lz4/v4 v4.1.15
+## explicit; go 1.14
+github.com/pierrec/lz4/v4
+github.com/pierrec/lz4/v4/internal/lz4block
+github.com/pierrec/lz4/v4/internal/lz4errors
+github.com/pierrec/lz4/v4/internal/lz4stream
+github.com/pierrec/lz4/v4/internal/xxh32
 # github.com/pjbgf/sha1cd v0.3.0
 ## explicit; go 1.19
 github.com/pjbgf/sha1cd
@@ -1711,6 +1733,57 @@ github.com/russellhaering/goxmldsig/types
 # github.com/russross/blackfriday/v2 v2.1.0
 ## explicit
 github.com/russross/blackfriday/v2
+# github.com/segmentio/kafka-go v0.4.47
+## explicit; go 1.15
+github.com/segmentio/kafka-go
+github.com/segmentio/kafka-go/compress
+github.com/segmentio/kafka-go/compress/gzip
+github.com/segmentio/kafka-go/compress/lz4
+github.com/segmentio/kafka-go/compress/snappy
+github.com/segmentio/kafka-go/compress/zstd
+github.com/segmentio/kafka-go/protocol
+github.com/segmentio/kafka-go/protocol/addoffsetstotxn
+github.com/segmentio/kafka-go/protocol/addpartitionstotxn
+github.com/segmentio/kafka-go/protocol/alterclientquotas
+github.com/segmentio/kafka-go/protocol/alterconfigs
+github.com/segmentio/kafka-go/protocol/alterpartitionreassignments
+github.com/segmentio/kafka-go/protocol/alteruserscramcredentials
+github.com/segmentio/kafka-go/protocol/apiversions
+github.com/segmentio/kafka-go/protocol/consumer
+github.com/segmentio/kafka-go/protocol/createacls
+github.com/segmentio/kafka-go/protocol/createpartitions
+github.com/segmentio/kafka-go/protocol/createtopics
+github.com/segmentio/kafka-go/protocol/deleteacls
+github.com/segmentio/kafka-go/protocol/deletegroups
+github.com/segmentio/kafka-go/protocol/deletetopics
+github.com/segmentio/kafka-go/protocol/describeacls
+github.com/segmentio/kafka-go/protocol/describeclientquotas
+github.com/segmentio/kafka-go/protocol/describeconfigs
+github.com/segmentio/kafka-go/protocol/describegroups
+github.com/segmentio/kafka-go/protocol/describeuserscramcredentials
+github.com/segmentio/kafka-go/protocol/electleaders
+github.com/segmentio/kafka-go/protocol/endtxn
+github.com/segmentio/kafka-go/protocol/fetch
+github.com/segmentio/kafka-go/protocol/findcoordinator
+github.com/segmentio/kafka-go/protocol/heartbeat
+github.com/segmentio/kafka-go/protocol/incrementalalterconfigs
+github.com/segmentio/kafka-go/protocol/initproducerid
+github.com/segmentio/kafka-go/protocol/joingroup
+github.com/segmentio/kafka-go/protocol/leavegroup
+github.com/segmentio/kafka-go/protocol/listgroups
+github.com/segmentio/kafka-go/protocol/listoffsets
+github.com/segmentio/kafka-go/protocol/listpartitionreassignments
+github.com/segmentio/kafka-go/protocol/metadata
+github.com/segmentio/kafka-go/protocol/offsetcommit
+github.com/segmentio/kafka-go/protocol/offsetdelete
+github.com/segmentio/kafka-go/protocol/offsetfetch
+github.com/segmentio/kafka-go/protocol/produce
+github.com/segmentio/kafka-go/protocol/rawproduce
+github.com/segmentio/kafka-go/protocol/saslauthenticate
+github.com/segmentio/kafka-go/protocol/saslhandshake
+github.com/segmentio/kafka-go/protocol/syncgroup
+github.com/segmentio/kafka-go/protocol/txnoffsetcommit
+github.com/segmentio/kafka-go/sasl
 # github.com/segmentio/ksuid v1.0.4
 ## explicit; go 1.12
 github.com/segmentio/ksuid

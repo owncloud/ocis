@@ -76,6 +76,24 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 		spaceID = reqSpaceID
 	}
 
+	// Check if space already exists
+	rootPath := ""
+	switch req.Type {
+	case _spaceTypePersonal:
+		if fs.o.PersonalSpacePathTemplate != "" {
+			rootPath = filepath.Join(fs.o.Root, templates.WithUser(u, fs.o.PersonalSpacePathTemplate))
+		}
+	default:
+		if fs.o.GeneralSpacePathTemplate != "" {
+			rootPath = filepath.Join(fs.o.Root, templates.WithSpacePropertiesAndUser(u, req.Type, req.Name, spaceID, fs.o.GeneralSpacePathTemplate))
+		}
+	}
+	if rootPath != "" {
+		if _, err := os.Stat(rootPath); err == nil {
+			return nil, errtypes.AlreadyExists("decomposedfs: spaces: space already exists")
+		}
+	}
+
 	description := utils.ReadPlainFromOpaque(req.Opaque, "description")
 	alias := utils.ReadPlainFromOpaque(req.Opaque, "spaceAlias")
 	if alias == "" {
@@ -97,20 +115,18 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 
 	// create a directory node
 	root.SetType(provider.ResourceType_RESOURCE_TYPE_CONTAINER)
-	rootPath := root.InternalPath()
-	switch req.Type {
-	case _spaceTypePersonal:
-		if fs.o.PersonalSpacePathTemplate != "" {
-			rootPath = filepath.Join(fs.o.Root, templates.WithUser(u, fs.o.PersonalSpacePathTemplate))
-		}
-	default:
-		if fs.o.GeneralSpacePathTemplate != "" {
-			rootPath = filepath.Join(fs.o.Root, templates.WithSpacePropertiesAndUser(u, req.Type, req.Name, spaceID, fs.o.GeneralSpacePathTemplate))
-		}
+	if rootPath == "" {
+		rootPath = root.InternalPath()
 	}
 
-	if err := os.MkdirAll(rootPath, 0700); err != nil {
-		return nil, errors.Wrap(err, "Decomposedfs: error creating node")
+	// set 755 permissions for the base dir
+	if err := os.MkdirAll(filepath.Dir(rootPath), 0755); err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("Decomposedfs: error creating spaces base dir %s", filepath.Dir(rootPath)))
+	}
+
+	// 770 permissions for the space
+	if err := os.MkdirAll(rootPath, 0770); err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("Decomposedfs: error creating space %s", rootPath))
 	}
 
 	// Store id in cache
@@ -199,7 +215,7 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 		}
 	}
 
-	space, err := fs.storageSpaceFromNode(ctx, root, true)
+	space, err := fs.StorageSpaceFromNode(ctx, root, true)
 	if err != nil {
 		return nil, err
 	}
@@ -289,7 +305,7 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 			// return empty list
 			return spaces, nil
 		}
-		space, err := fs.storageSpaceFromNode(ctx, n, checkNodePermissions)
+		space, err := fs.StorageSpaceFromNode(ctx, n, checkNodePermissions)
 		if err != nil {
 			return nil, err
 		}
@@ -432,7 +448,7 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 					continue
 				}
 
-				space, err := fs.storageSpaceFromNode(ctx, n, checkNodePermissions)
+				space, err := fs.StorageSpaceFromNode(ctx, n, checkNodePermissions)
 				if err != nil {
 					switch err.(type) {
 					case errtypes.IsPermissionDenied:
@@ -485,7 +501,7 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 			return nil, err
 		}
 		if n.Exists {
-			space, err := fs.storageSpaceFromNode(ctx, n, checkNodePermissions)
+			space, err := fs.StorageSpaceFromNode(ctx, n, checkNodePermissions)
 			if err != nil {
 				return nil, err
 			}
@@ -670,7 +686,7 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 	}
 
 	// send back the updated data from the storage
-	updatedSpace, err := fs.storageSpaceFromNode(ctx, spaceNode, false)
+	updatedSpace, err := fs.StorageSpaceFromNode(ctx, spaceNode, false)
 	if err != nil {
 		return nil, err
 	}
@@ -779,7 +795,7 @@ func (fs *Decomposedfs) linkStorageSpaceType(ctx context.Context, spaceType, spa
 	return fs.spaceTypeIndex.Add(spaceType, spaceID, target)
 }
 
-func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, checkPermissions bool) (*provider.StorageSpace, error) {
+func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, checkPermissions bool) (*provider.StorageSpace, error) {
 	user := ctxpkg.ContextMustGetUser(ctx)
 	if checkPermissions {
 		rp, err := fs.p.AssemblePermissions(ctx, n)
