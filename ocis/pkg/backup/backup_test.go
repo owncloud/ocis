@@ -90,31 +90,24 @@ func TestGatherData(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		nodes := make(chan backup.NodeData)
-		links := make(chan backup.LinkData)
-		blobs := make(chan backup.BlobData)
-		quit := make(chan struct{})
+		events := make(chan interface{})
 
 		go func() {
 			for _, ev := range tc.Events {
 				switch e := ev.(type) {
 				case backup.NodeData:
-					nodes <- e
+					events <- e
 				case backup.LinkData:
-					links <- e
+					events <- e
 				case backup.BlobData:
-					blobs <- e
+					events <- e
 				}
 			}
-			quit <- struct{}{}
-			close(nodes)
-			close(links)
-			close(blobs)
-			close(quit)
+			close(events)
 		}()
 
 		c := backup.NewConsistency()
-		c.GatherData(nodes, links, blobs, quit)
+		c.GatherData(events)
 
 		require.Equal(t, tc.Expected.Nodes, c.Nodes)
 		require.Equal(t, tc.Expected.LinkedNodes, c.LinkedNodes)

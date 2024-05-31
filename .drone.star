@@ -1989,7 +1989,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "commands": [
                 "%s init --insecure true" % ocis_bin,
                 "cat $OCIS_CONFIG_DIR/ocis.yaml",
-                "%s backup consistency -p /var/lib/ocis/storage/users" % ocis_bin,
             ] + (wrapper_commands),
             "volumes": volumes,
             "depends_on": depends_on,

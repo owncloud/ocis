@@ -21,10 +21,7 @@ type ListBlobstore interface {
 
 // DataProvider provides data for the consistency check
 type DataProvider struct {
-	Nodes chan NodeData
-	Links chan LinkData
-	Blobs chan BlobData
-	Quit  chan struct{}
+	Events chan interface{}
 
 	fsys     fs.FS
 	discpath string
@@ -53,10 +50,7 @@ type BlobData struct {
 // NewProvider creates a new DataProvider object
 func NewProvider(fsys fs.FS, discpath string, lbs ListBlobstore) *DataProvider {
 	return &DataProvider{
-		Nodes: make(chan NodeData),
-		Links: make(chan LinkData),
-		Blobs: make(chan BlobData),
-		Quit:  make(chan struct{}),
+		Events: make(chan interface{}),
 
 		fsys:     fsys,
 		discpath: discpath,
@@ -82,47 +76,7 @@ func (dp *DataProvider) ProduceData() error {
 	wg.Add(1)
 	go func() {
 		for _, d := range dirs {
-			entries, err := fs.ReadDir(dp.fsys, d)
-			if err != nil {
-				fmt.Println("error reading dir", err)
-				continue
-			}
-
-			if len(entries) == 0 {
-				fmt.Println("empty dir", filepath.Join(dp.discpath, d))
-				continue
-			}
-
-			for _, e := range entries {
-				switch {
-				case e.IsDir():
-					ls, err := fs.ReadDir(dp.fsys, filepath.Join(d, e.Name()))
-					if err != nil {
-						fmt.Println("error reading dir", err)
-						continue
-					}
-					for _, l := range ls {
-						linkpath := filepath.Join(dp.discpath, d, e.Name(), l.Name())
-
-						r, _ := os.Readlink(linkpath)
-						nodePath := filepath.Join(dp.discpath, d, e.Name(), r)
-						dp.Links <- LinkData{LinkPath: linkpath, NodePath: nodePath}
-					}
-					fallthrough
-				case filepath.Ext(e.Name()) == "" || _versionRegex.MatchString(e.Name()) || _trashRegex.MatchString(e.Name()):
-					np := filepath.Join(dp.discpath, d, e.Name())
-					var inc []Inconsistency
-					if !dp.filesExist(filepath.Join(d, e.Name())) {
-						inc = append(inc, InconsistencyFilesMissing)
-					}
-					bp, i := dp.getBlobPath(filepath.Join(d, e.Name()))
-					if i != "" {
-						inc = append(inc, i)
-					}
-
-					dp.Nodes <- NodeData{NodePath: np, BlobPath: bp, RequiresSymlink: requiresSymlink(np), Inconsistencies: inc}
-				}
-			}
+			dp.evaluateNodeDir(d)
 		}
 		wg.Done()
 	}()
@@ -130,16 +84,7 @@ func (dp *DataProvider) ProduceData() error {
 	// crawl trash
 	wg.Add(1)
 	go func() {
-		linkpaths, err := fs.Glob(dp.fsys, "spaces/*/*/trash/*/*/*/*/*")
-		if err != nil {
-			fmt.Println("error reading trash", err)
-		}
-		for _, l := range linkpaths {
-			linkpath := filepath.Join(dp.discpath, l)
-			r, _ := os.Readlink(linkpath)
-			p := filepath.Join(dp.discpath, l, "..", r)
-			dp.Links <- LinkData{LinkPath: linkpath, NodePath: p}
-		}
+		dp.evaluateTrashDir()
 		wg.Done()
 	}()
 
@@ -152,7 +97,7 @@ func (dp *DataProvider) ProduceData() error {
 		}
 
 		for _, bn := range bs {
-			dp.Blobs <- BlobData{BlobPath: dp.lbs.Path(bn)}
+			dp.Events <- BlobData{BlobPath: dp.lbs.Path(bn)}
 		}
 		wg.Done()
 	}()
@@ -187,6 +132,65 @@ func (dp *DataProvider) getBlobPath(path string) (string, Inconsistency) {
 	return "", ""
 }
 
+func (dp *DataProvider) evaluateNodeDir(d string) {
+	// d is something like spaces/a8/e5d981-41e4-4468-b532-258d5fb457d3/nodes/2d/08/8d/24
+	// we could have multiple nodes under this, but we are only interested in one file per node - the one with "" extension
+	entries, err := fs.ReadDir(dp.fsys, d)
+	if err != nil {
+		fmt.Println("error reading dir", err)
+		return
+	}
+
+	if len(entries) == 0 {
+		fmt.Println("empty dir", filepath.Join(dp.discpath, d))
+		return
+	}
+
+	for _, e := range entries {
+		switch {
+		case e.IsDir():
+			ls, err := fs.ReadDir(dp.fsys, filepath.Join(d, e.Name()))
+			if err != nil {
+				fmt.Println("error reading dir", err)
+				continue
+			}
+			for _, l := range ls {
+				linkpath := filepath.Join(dp.discpath, d, e.Name(), l.Name())
+
+				r, _ := os.Readlink(linkpath)
+				nodePath := filepath.Join(dp.discpath, d, e.Name(), r)
+				dp.Events <- LinkData{LinkPath: linkpath, NodePath: nodePath}
+			}
+			fallthrough
+		case filepath.Ext(e.Name()) == "" || _versionRegex.MatchString(e.Name()) || _trashRegex.MatchString(e.Name()):
+			np := filepath.Join(dp.discpath, d, e.Name())
+			var inc []Inconsistency
+			if !dp.filesExist(filepath.Join(d, e.Name())) {
+				inc = append(inc, InconsistencyFilesMissing)
+			}
+			bp, i := dp.getBlobPath(filepath.Join(d, e.Name()))
+			if i != "" {
+				inc = append(inc, i)
+			}
+
+			dp.Events <- NodeData{NodePath: np, BlobPath: bp, RequiresSymlink: requiresSymlink(np), Inconsistencies: inc}
+		}
+	}
+}
+
+func (dp *DataProvider) evaluateTrashDir() {
+	linkpaths, err := fs.Glob(dp.fsys, "spaces/*/*/trash/*/*/*/*/*")
+	if err != nil {
+		fmt.Println("error reading trash", err)
+	}
+	for _, l := range linkpaths {
+		linkpath := filepath.Join(dp.discpath, l)
+		r, _ := os.Readlink(linkpath)
+		p := filepath.Join(dp.discpath, l, "..", r)
+		dp.Events <- LinkData{LinkPath: linkpath, NodePath: p}
+	}
+}
+
 func (dp *DataProvider) filesExist(path string) bool {
 	check := func(p string) bool {
 		_, err := fs.Stat(dp.fsys, p)
@@ -196,11 +200,7 @@ func (dp *DataProvider) filesExist(path string) bool {
 }
 
 func (dp *DataProvider) quit() {
-	dp.Quit <- struct{}{}
-	close(dp.Nodes)
-	close(dp.Links)
-	close(dp.Blobs)
-	close(dp.Quit)
+	close(dp.Events)
 }
 
 func requiresSymlink(path string) bool {

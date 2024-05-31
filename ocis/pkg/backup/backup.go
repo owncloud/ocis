@@ -69,14 +69,53 @@ func CheckProviderConsistency(storagepath string, lbs ListBlobstore) error {
 	}
 
 	c := NewConsistency()
-	c.GatherData(p.Nodes, p.Links, p.Blobs, p.Quit)
+	c.GatherData(p.Events)
 
 	return c.PrintResults(storagepath)
 }
 
 // GatherData gathers and evaluates data produced by the DataProvider
-func (c *Consistency) GatherData(nodes <-chan NodeData, links <-chan LinkData, blobs <-chan BlobData, quit <-chan struct{}) {
-	c.gatherData(nodes, links, blobs, quit)
+func (c *Consistency) GatherData(events <-chan interface{}) {
+	for ev := range events {
+		switch d := ev.(type) {
+		case NodeData:
+			// does it have inconsistencies?
+			if len(d.Inconsistencies) != 0 {
+				c.Nodes[d.NodePath] = append(c.Nodes[d.NodePath], d.Inconsistencies...)
+			}
+			// is it linked?
+			if _, ok := c.LinkedNodes[d.NodePath]; ok {
+				deleteInconsistency(c.LinkedNodes, d.NodePath)
+			} else if d.RequiresSymlink && c.Nodes[d.NodePath] == nil {
+				c.Nodes[d.NodePath] = []Inconsistency{}
+			}
+			// does it have a blob?
+			if d.BlobPath != "" {
+				if _, ok := c.Blobs[d.BlobPath]; ok {
+					deleteInconsistency(c.Blobs, d.BlobPath)
+				} else {
+					c.BlobReferences[d.BlobPath] = []Inconsistency{}
+					c.blobToNode[d.BlobPath] = d.NodePath
+				}
+			}
+		case LinkData:
+			// does it have a node?
+			if _, ok := c.Nodes[d.NodePath]; ok {
+				deleteInconsistency(c.Nodes, d.NodePath)
+			} else {
+				c.LinkedNodes[d.NodePath] = []Inconsistency{}
+				c.nodeToLink[d.NodePath] = d.LinkPath
+			}
+		case BlobData:
+			// does it have a reference?
+			if _, ok := c.BlobReferences[d.BlobPath]; ok {
+				deleteInconsistency(c.BlobReferences, d.BlobPath)
+			} else {
+				c.Blobs[d.BlobPath] = []Inconsistency{}
+			}
+
+		}
+	}
 
 	for n := range c.Nodes {
 		if len(c.Nodes[n]) == 0 {
@@ -92,52 +131,6 @@ func (c *Consistency) GatherData(nodes <-chan NodeData, links <-chan LinkData, b
 	for b := range c.BlobReferences {
 		c.BlobReferences[b] = append(c.BlobReferences[b], InconsistencyBlobMissing)
 	}
-}
-
-func (c *Consistency) gatherData(nodes <-chan NodeData, links <-chan LinkData, blobs <-chan BlobData, quit <-chan struct{}) {
-	for {
-		select {
-		case n := <-nodes:
-			// does it have inconsistencies?
-			if len(n.Inconsistencies) != 0 {
-				c.Nodes[n.NodePath] = append(c.Nodes[n.NodePath], n.Inconsistencies...)
-			}
-			// is it linked?
-			if _, ok := c.LinkedNodes[n.NodePath]; ok {
-				deleteInconsistency(c.LinkedNodes, n.NodePath)
-			} else if n.RequiresSymlink {
-				c.Nodes[n.NodePath] = c.Nodes[n.NodePath]
-			}
-			// does it have a blob?
-			if n.BlobPath != "" {
-				if _, ok := c.Blobs[n.BlobPath]; ok {
-					deleteInconsistency(c.Blobs, n.BlobPath)
-				} else {
-					c.BlobReferences[n.BlobPath] = []Inconsistency{}
-					c.blobToNode[n.BlobPath] = n.NodePath
-				}
-			}
-		case l := <-links:
-			// does it have a node?
-			if _, ok := c.Nodes[l.NodePath]; ok {
-				deleteInconsistency(c.Nodes, l.NodePath)
-			} else {
-				c.LinkedNodes[l.NodePath] = []Inconsistency{}
-				c.nodeToLink[l.NodePath] = l.LinkPath
-			}
-		case b := <-blobs:
-			// does it have a reference?
-			if _, ok := c.BlobReferences[b.BlobPath]; ok {
-				deleteInconsistency(c.BlobReferences, b.BlobPath)
-			} else {
-				c.Blobs[b.BlobPath] = []Inconsistency{}
-			}
-		case <-quit:
-			return
-
-		}
-	}
-
 }
 
 // PrintResults prints the results of the evaluation
