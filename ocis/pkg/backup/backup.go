@@ -3,10 +3,8 @@ package backup
 
 import (
 	"fmt"
-	"io/fs"
 	"os"
 	"regexp"
-	"strings"
 )
 
 // Inconsistency describes the type of inconsistency
@@ -65,19 +63,19 @@ func NewConsistency() *Consistency {
 func CheckProviderConsistency(storagepath string, lbs ListBlobstore) error {
 	fsys := os.DirFS(storagepath)
 
-	nodes, links, blobs, quit, err := NewProvider(fsys, storagepath, lbs).ProduceData()
-	if err != nil {
+	p := NewProvider(fsys, storagepath, lbs)
+	if err := p.ProduceData(); err != nil {
 		return err
 	}
 
 	c := NewConsistency()
-	c.GatherData(nodes, links, blobs, quit)
+	c.GatherData(p.Nodes, p.Links, p.Blobs, p.Quit)
 
 	return c.PrintResults(storagepath)
 }
 
 // GatherData gathers and evaluates data produced by the DataProvider
-func (c *Consistency) GatherData(nodes chan NodeData, links chan LinkData, blobs chan BlobData, quit chan struct{}) {
+func (c *Consistency) GatherData(nodes <-chan NodeData, links <-chan LinkData, blobs <-chan BlobData, quit <-chan struct{}) {
 	c.gatherData(nodes, links, blobs, quit)
 
 	for n := range c.Nodes {
@@ -96,7 +94,7 @@ func (c *Consistency) GatherData(nodes chan NodeData, links chan LinkData, blobs
 	}
 }
 
-func (c *Consistency) gatherData(nodes chan NodeData, links chan LinkData, blobs chan BlobData, quit chan struct{}) {
+func (c *Consistency) gatherData(nodes <-chan NodeData, links <-chan LinkData, blobs <-chan BlobData, quit <-chan struct{}) {
 	for {
 		select {
 		case n := <-nodes:
@@ -107,8 +105,7 @@ func (c *Consistency) gatherData(nodes chan NodeData, links chan LinkData, blobs
 			// is it linked?
 			if _, ok := c.LinkedNodes[n.NodePath]; ok {
 				deleteInconsistency(c.LinkedNodes, n.NodePath)
-				deleteInconsistency(c.Nodes, n.NodePath)
-			} else if requiresSymlink(n.NodePath) {
+			} else if n.RequiresSymlink {
 				c.Nodes[n.NodePath] = c.Nodes[n.NodePath]
 			}
 			// does it have a blob?
@@ -176,41 +173,8 @@ func (c *Consistency) PrintResults(discpath string) error {
 
 }
 
-func requiresSymlink(path string) bool {
-	spaceID, nodeID := getIDsFromPath(path)
-	if nodeID != "" && spaceID != "" && (spaceID == nodeID || _versionRegex.MatchString(nodeID)) {
-		return false
-	}
-
-	return true
-}
-
-func (c *DataProvider) filesExist(path string) bool {
-	check := func(p string) bool {
-		_, err := fs.Stat(c.fsys, p)
-		return err == nil
-	}
-	return check(path) && check(path+".mpk")
-}
-
 func deleteInconsistency(incs map[string][]Inconsistency, path string) {
 	if len(incs[path]) == 0 {
 		delete(incs, path)
 	}
-}
-
-func getIDsFromPath(path string) (string, string) {
-	rawIDs := strings.Split(path, "/nodes/")
-	if len(rawIDs) != 2 {
-		return "", ""
-	}
-
-	s := strings.Split(rawIDs[0], "/spaces/")
-	if len(s) != 2 {
-		return "", ""
-	}
-
-	spaceID := strings.Replace(s[1], "/", "", -1)
-	nodeID := strings.Replace(rawIDs[1], "/", "", -1)
-	return spaceID, nodeID
 }
