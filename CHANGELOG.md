@@ -122,6 +122,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Docker compose example for ClamAV: [#9229](https://github.com/owncloud/ocis/pull/9229)
 * Enhancement - Bump Reva: [#9269](https://github.com/owncloud/ocis/pull/9269)
 * Enhancement - Add secureview flag when listing apps via http: [#9280](https://github.com/owncloud/ocis/pull/9280)
+* Enhancement - Web server compression: [#9287](https://github.com/owncloud/ocis/pull/9287)
 
 ## Details
 
@@ -780,6 +781,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9280
    https://github.com/owncloud/ocis/pull/9277
+
+* Enhancement - Web server compression: [#9287](https://github.com/owncloud/ocis/pull/9287)
+
+   We've added a compression middleware to the web server to reduce the request
+   size when delivering static files. This speeds up loading times in web clients.
+
+   https://github.com/owncloud/web/issues/7964
+   https://github.com/owncloud/ocis/pull/9287
 
 # Changelog for [5.0.3] (2024-05-02)
 
