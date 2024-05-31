@@ -123,11 +123,11 @@ func (s *Service) OpenInApp(
 		viewAppURL = editAppURL
 	}
 
-	wopiSrcURL := url.URL{
-		Scheme: s.config.HTTP.Scheme,
-		Host:   s.config.HTTP.Addr,
-		Path:   path.Join("wopi", "files", fileRef),
+	wopiSrcURL, err := url.Parse(s.config.Wopi.WopiSrc)
+	if err != nil {
+		return nil, err
 	}
+	wopiSrcURL.Path = path.Join("wopi", "files", fileRef)
 
 	addWopiSrcQueryParam := func(baseURL string) (string, error) {
 		u, err := url.Parse(baseURL)
@@ -169,7 +169,7 @@ func (s *Service) OpenInApp(
 		appURL = editAppURL
 	}
 
-	cryptedReqAccessToken, err := middleware.EncryptAES([]byte(s.config.JWTSecret), req.GetAccessToken())
+	cryptedReqAccessToken, err := middleware.EncryptAES([]byte(s.config.Wopi.Secret), req.GetAccessToken())
 	if err != nil {
 		s.logger.Error().
 			Err(err).
@@ -184,7 +184,7 @@ func (s *Service) OpenInApp(
 
 	wopiContext := middleware.WopiContext{
 		AccessToken:   cryptedReqAccessToken,
-		ViewOnlyToken: utils.ReadPlainFromOpaque(req.Opaque, "viewOnlyToken"),
+		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
 		FileReference: providerFileRef,
 		User:          user,
 		ViewMode:      req.GetViewMode(),
@@ -213,7 +213,7 @@ func (s *Service) OpenInApp(
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	accessToken, err := token.SignedString([]byte(s.config.JWTSecret))
+	accessToken, err := token.SignedString([]byte(s.config.Wopi.Secret))
 
 	if err != nil {
 		s.logger.Error().

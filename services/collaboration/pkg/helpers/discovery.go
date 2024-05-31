@@ -17,12 +17,12 @@ import (
 // target WOPI app (onlyoffice, collabora, etc) via their "/hosting/discovery"
 // endpoint.
 func GetAppURLs(cfg *config.Config, logger log.Logger) (map[string]map[string]string, error) {
-	wopiAppUrl := cfg.WopiApp.Addr + "/hosting/discovery"
+	wopiAppUrl := cfg.App.Addr + "/hosting/discovery"
 
 	httpClient := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: cfg.WopiApp.Insecure,
+				InsecureSkipVerify: cfg.App.Insecure,
 			},
 		},
 	}

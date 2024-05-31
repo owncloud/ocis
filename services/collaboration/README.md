@@ -10,7 +10,7 @@ The collaboration service requires the target document server (ONLYOFFICE, Colla
 
 * External document server.
 * The gateway service.
-* The app-provider service.
+* The app-registry service.
 
 If any of the named services above have not been started or are not reachable, the collaboration service won't start. For the binary or the docker release of Infinite Scale, check with the `ocis list` command if they have been started. If not, you must start them manually upfront before starting the collaboration service.
 
@@ -18,15 +18,15 @@ If any of the named services above have not been started or are not reachable, t
 
 There are a few variables that you need to set:
 
-* `COLLABORATION_WOPIAPP_ADDR`:\
-  The URL of the WOPI app (onlyoffice, collabora, etc).\
+* `COLLABORATION_APP_ADDR`:\
+  The URL of the collaborative editing app (onlyoffice, collabora, etc).\
   For example: `https://office.example.com`.
 
-* `COLLABORATION_HTTP_ADDR`:\
-  The external address of the collaboration service. The target app (onlyoffice, collabora, etc) will use this address to read and write files from Infinite Scale.\
-  For example: `https://wopiserver.example.com`.
+* `COLLABORATION_APP_INSECURE`:\
+  In case you are using a self signed certificate for the WOPI app you can tell the collaboration service to allow an insecure connection.
 
-* `COLLABORATION_HTTP_SCHEME`:\
-  The scheme to be used when accessing the collaboration service. Either `http` or `https`. This will be used to finally build the URL that the WOPI app needs in order to contact the collaboration service.
+* `COLLABORATION_APP_WOPISRC`:\
+  The external address of the collaboration service. The target app (onlyoffice, collabora, etc) will use this address to read and write files from Infinite Scale. \
+  For example: `https://wopi.example.com`.
 
-The rest of the configuration options available can be left with the default values.
+The application can be customized further by changing the `COLLABORATION_APP_*` options to better describe the application.

@@ -25,10 +25,11 @@ func Server(opts ...Option) (http.Service, error) {
 		http.TLSConfig(options.Config.HTTP.TLS),
 		http.Logger(options.Logger),
 		http.Namespace(options.Config.HTTP.Namespace),
-		http.Name("wopi"),
+		http.Name(options.Config.Service.Name),
 		http.Version(version.GetString()),
-		http.Address(options.Config.HTTP.BindAddr),
+		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
+		http.TraceProvider(options.TracerProvider),
 	)
 	if err != nil {
 		options.Logger.Error().
@@ -40,7 +41,7 @@ func Server(opts ...Option) (http.Service, error) {
 	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
 		chimiddleware.RequestID,
 		middleware.Version(
-			"userlog",
+			options.Config.Service.Name,
 			version.GetString(),
 		),
 		middleware.Logger(
@@ -48,7 +49,7 @@ func Server(opts ...Option) (http.Service, error) {
 		),
 		middleware.ExtractAccountUUID(
 			account.Logger(options.Logger),
-			account.JWTSecret(options.Config.JWTSecret), // previously, secret came from Config.TokenManager.JWTSecret
+			account.JWTSecret(options.Config.TokenManager.JWTSecret),
 		),
 		/*
 			// Need CORS? not in the original server
@@ -68,7 +69,7 @@ func Server(opts ...Option) (http.Service, error) {
 
 	mux.Use(
 		otelchi.Middleware(
-			"collaboration",
+			options.Config.Service.Name,
 			otelchi.WithChiRoutes(mux),
 			otelchi.WithTracerProvider(options.TracerProvider),
 			otelchi.WithPropagators(tracing.GetPropagator()),
@@ -76,6 +77,12 @@ func Server(opts ...Option) (http.Service, error) {
 	)
 
 	prepareRoutes(mux, options)
+
+	// in debug mode print out the actual routes
+	_ = chi.Walk(mux, func(method string, route string, handler stdhttp.Handler, middlewares ...func(stdhttp.Handler) stdhttp.Handler) error {
+		options.Logger.Debug().Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")
+		return nil
+	})
 
 	if err := micro.RegisterHandler(service.Server(), mux); err != nil {
 		return http.Service{}, err
@@ -110,7 +117,7 @@ func prepareRoutes(r *chi.Mux, options Options) {
 
 			r.Use(func(h stdhttp.Handler) stdhttp.Handler {
 				// authentication and wopi context
-				return colabmiddleware.WopiContextAuthMiddleware(options.Config.JWTSecret, h)
+				return colabmiddleware.WopiContextAuthMiddleware(options.Config.Wopi.Secret, h)
 			},
 			)
 

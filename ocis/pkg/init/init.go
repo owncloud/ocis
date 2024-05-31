@@ -156,6 +156,15 @@ type Clientlog struct {
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 }
 
+type WopiApp struct {
+	Insecure bool   `yaml:"insecure"`
+	Secret   string `yaml:"secret"`
+}
+
+type Collaboration struct {
+	WopiApp WopiApp `yaml:"wopiapp"`
+}
+
 type Nats struct {
 	// The nats config has a field called nats
 	Nats struct {
@@ -191,6 +200,7 @@ type OcisConfig struct {
 	Graph             GraphService
 	Idp               LdapBasedService
 	Idm               IdmService
+	Collaboration     Collaboration
 	Proxy             ProxyService
 	Frontend          FrontendService
 	AuthBasic         AuthbasicService  `yaml:"auth_basic"`
@@ -289,6 +299,10 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	if err != nil {
 		return fmt.Errorf("could not generate random password for tokenmanager: %s", err)
 	}
+	collaborationWOPISecret, err := generators.GenerateRandomPassword(passwordLength)
+	if err != nil {
+		return fmt.Errorf("could not generate random wopi secret for collaboration service: %s", err)
+	}
 	machineAuthAPIKey, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
@@ -342,6 +356,11 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 				Ldap: LdapSettings{
 					BindPassword: revaServicePassword,
 				},
+			},
+		},
+		Collaboration: Collaboration{
+			WopiApp: WopiApp{
+				Secret: collaborationWOPISecret,
 			},
 		},
 		Groups: UsersAndGroupsService{
@@ -417,6 +436,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		cfg.AuthBearer = AuthbearerService{
 			AuthProviders: AuthProviderSettings{Oidc: _insecureService},
 		}
+		cfg.Collaboration.WopiApp.Insecure = true
 		cfg.Frontend.AppHandler = _insecureService
 		cfg.Frontend.Archiver = _insecureService
 		cfg.Graph.Spaces = _insecureService

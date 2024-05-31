@@ -14,12 +14,13 @@ type Config struct {
 	Service Service `yaml:"-"`
 	App     App     `yaml:"app"`
 
-	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;COLLABORATION_JWT_SECRET" desc:"Used as JWT token and to encrypt access token." introductionVersion:"5.1"`
+	TokenManager *TokenManager `yaml:"token_manager"`
 
-	GRPC    GRPC    `yaml:"grpc"`
-	HTTP    HTTP    `yaml:"http"`
-	WopiApp WopiApp `yaml:"wopiapp"`
-	CS3Api  CS3Api  `yaml:"cs3api"`
+	GRPC GRPC `yaml:"grpc"`
+	HTTP HTTP `yaml:"http"`
+
+	Wopi   Wopi   `yaml:"wopi"`
+	CS3Api CS3Api `yaml:"cs3api"`
 
 	Tracing *Tracing `yaml:"tracing"`
 	Log     *Log     `yaml:"log"`

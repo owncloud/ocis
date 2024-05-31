@@ -927,12 +927,15 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                     "MICRO_REGISTRY": "nats-js-kv",
                     "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
                     "COLLABORATION_LOG_LEVEL": "debug",
+                    "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
+                    "COLLABORATION_GRPC_ADDR": "0.0.0.0:9301",
                     "COLLABORATION_APP_NAME": "FakeOffice",
-                    "COLLABORATION_HTTP_ADDR": "wopiserver:9300",
-                    "COLLABORATION_HTTP_SCHEME": "http",
-                    "COLLABORATION_WOPIAPP_ADDR": "http://fakeoffice:8080",
-                    "COLLABORATION_WOPIAPP_INSECURE": "true",
+                    "COLLABORATION_APP_ADDR": "http://fakeoffice:8080",
+                    "COLLABORATION_APP_INSECURE": "true",
+                    "COLLABORATION_WOPI_SRC": "http://wopiserver",
+                    "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
                     "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
+                    "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
                 },
                 "commands": [
                     "%s collaboration server" % ocis_bin,
@@ -1920,6 +1923,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
         "NATS_NATS_HOST": "0.0.0.0",
         "NATS_NATS_PORT": 9233,
+        "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
     }
 
     if deploy_type == "":

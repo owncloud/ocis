@@ -85,3 +85,11 @@ func MissingServiceAccountSecret(service string) error {
 		"the config/corresponding environment variable).",
 		service, defaults.BaseConfigPath())
 }
+
+func MissingWOPISecretError(service string) error {
+	return fmt.Errorf("The WOPI secret has not been set properly in your config for %s. "+
+		"Make sure your %s config contains the proper values "+
+		"(e.g. by running ocis init or setting it manually in "+
+		"the config/corresponding environment variable).",
+		service, defaults.BaseConfigPath())
+}

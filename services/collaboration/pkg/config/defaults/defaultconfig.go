@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 )
 
@@ -15,7 +15,6 @@ func FullDefaultConfig() *config.Config {
 
 // DefaultConfig returns a basic default configuration
 func DefaultConfig() *config.Config {
-	secret, _ := generators.GenerateRandomString(generators.AlphaNumChars, 32) // anything to do with the error?
 	return &config.Config{
 		Service: config.Service{
 			Name: "collaboration",
@@ -25,17 +24,16 @@ func DefaultConfig() *config.Config {
 			Description: "Open office documents with Collabora",
 			Icon:        "image-edit",
 			LockName:    "com.github.owncloud.collaboration",
+			Addr:        "https://127.0.0.1:9980",
+			Insecure:    false,
 		},
-		JWTSecret: secret,
 		GRPC: config.GRPC{
-			Addr:      "0.0.0.0:9301",
-			Namespace: "com.owncloud.collaboration",
+			Addr:      "127.0.0.1:9301",
+			Namespace: "com.owncloud.api",
 		},
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9300",
-			BindAddr:  "0.0.0.0:9300",
-			Namespace: "com.owncloud.collaboration",
-			Scheme:    "https",
+			Namespace: "com.owncloud.web",
 		},
 		Debug: config.Debug{
 			Addr:   "127.0.0.1:9304",
@@ -43,13 +41,12 @@ func DefaultConfig() *config.Config {
 			Pprof:  false,
 			Zpages: false,
 		},
-		WopiApp: config.WopiApp{
-			Addr:     "https://127.0.0.1:8080",
-			Insecure: false,
+		Wopi: config.Wopi{
+			WopiSrc: "https://localhost:9300",
 		},
 		CS3Api: config.CS3Api{
 			Gateway: config.Gateway{
-				Name: "com.owncloud.api.gateway",
+				Name: shared.DefaultRevaConfig().Address,
 			},
 			DataGateway: config.DataGateway{
 				Insecure: false,
@@ -82,6 +79,14 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
 	}
 }
 
