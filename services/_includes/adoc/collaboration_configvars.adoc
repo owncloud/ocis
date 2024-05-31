@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-31-06-53-15]
+[#deprecation-note-2024-05-31-11-51-05]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -62,22 +62,40 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Name for the app lock
 
+a|`COLLABORATION_APP_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://127.0.0.1:9980 ++
+a| [subs=-attributes]
+The URL where the WOPI app is located, such as \https://127.0.0.1:8080.
+
+a|`COLLABORATION_APP_INSECURE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Skip TLS certificate verification when connecting to the WOPI app
+
 a|`OCIS_JWT_SECRET` +
 `COLLABORATION_JWT_SECRET` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++HyntQwWAIULs6AgdLIiK1prlxZJg79Dh ++
+++ ++
 a| [subs=-attributes]
-Used as JWT token and to encrypt access token.
+The secret to mint and validate jwt tokens.
 
 a|`COLLABORATION_GRPC_ADDR` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++0.0.0.0:9301 ++
+++127.0.0.1:9301 ++
 a| [subs=-attributes]
 The bind address of the GRPC service.
 
@@ -88,25 +106,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++127.0.0.1:9300 ++
 a| [subs=-attributes]
-The external address of the collaboration service wihout a leading scheme. Either use an IP address or a hostname (127.0.0.1:9301 or wopi.private.prv). The configured 'Scheme' in another envvar will be used to finally build the public URL along with this address.
-
-a|`COLLABORATION_HTTP_BINDADDR` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++0.0.0.0:9300 ++
-a| [subs=-attributes]
-The bind address of the HTTP service. Use '<ip-address>:<port>', for example, '127.0.0.1:9301' or '0.0.0.0:9301'.
-
-a|`COLLABORATION_HTTP_SCHEME` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++https ++
-a| [subs=-attributes]
-The scheme to use for the HTTP address, which is either 'http' or 'https'.
+The bind address of the HTTP service.
 
 a|`OCIS_HTTP_TLS_ENABLED` +
 
@@ -135,23 +135,33 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
 
-a|`COLLABORATION_WOPIAPP_ADDR` +
+a|`COLLABORATION_WOPI_SRC` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++https://127.0.0.1:8080 ++
+++https://localhost:9300 ++
 a| [subs=-attributes]
-The URL where the WOPI app is located, such as \https://127.0.0.1:8080.
+The WOPISrc base URL containing schema, host and port. Set this to the schema and domain where the collaboration service is reachable for the wopi app, such as \https://office.owncloud.test.
 
-a|`COLLABORATION_WOPIAPP_INSECURE` +
+a|`COLLABORATION_WOPI_SECRET` +
 
 a| [subs=-attributes]
-++bool ++
+++string ++
 a| [subs=-attributes]
-++false ++
+++ ++
 a| [subs=-attributes]
-Skip TLS certificate verification when connecting to the WOPI app
+Used to mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT token embedded in the WOPI JWT token.
+
+a|`OCIS_REVA_GATEWAY` +
+`COLLABORATION_CS3API_GATEWAY_NAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.gateway ++
+a| [subs=-attributes]
+The service name of the CS3API gateway.
 
 a|`COLLABORATION_CS3API_DATAGATEWAY_INSECURE` +
 

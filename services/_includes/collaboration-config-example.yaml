@@ -6,20 +6,21 @@ app:
   description: Open office documents with Collabora
   icon: image-edit
   lockname: com.github.owncloud.collaboration
-jwt_secret: WxNycqSKxJprXEqo8OWuANxb1qR4o0g1
+  addr: https://127.0.0.1:9980
+  insecure: false
+token_manager:
+  jwt_secret: ""
 grpc:
-  addr: 0.0.0.0:9301
+  addr: 127.0.0.1:9301
 http:
   addr: 127.0.0.1:9300
-  bindaddr: 0.0.0.0:9300
-  scheme: https
   tls:
     enabled: false
     cert: ""
     key: ""
-wopiapp:
-  addr: https://127.0.0.1:8080
-  insecure: false
+wopi:
+  wopisrc: https://localhost:9300
+  secret: ""
 cs3api:
   gateway:
     name: com.owncloud.api.gateway
