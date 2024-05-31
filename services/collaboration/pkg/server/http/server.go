@@ -78,6 +78,7 @@ func Server(opts ...Option) (http.Service, error) {
 
 	prepareRoutes(mux, options)
 
+	// in debug mode print out the actual routes
 	_ = chi.Walk(mux, func(method string, route string, handler stdhttp.Handler, middlewares ...func(stdhttp.Handler) stdhttp.Handler) error {
 		options.Logger.Debug().Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")
 		return nil
