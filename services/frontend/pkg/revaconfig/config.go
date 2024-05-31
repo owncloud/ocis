@@ -137,7 +137,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 							"contextRouteName": "files-spaces-personal", // TODO: remove when https://github.com/owncloud/web/pull/7437 arrived in oCIS
 						},
 					},
-					"secure_view_app": cfg.AppHandler.SecureViewApp,
+					"secure_view_app_addr": cfg.AppHandler.SecureViewAppAddr,
 				},
 				"archiver": map[string]interface{}{
 					"prefix":        cfg.Archiver.Prefix,

@@ -93,8 +93,8 @@ func DefaultConfig() *config.Config {
 			PreferredUploadType: "sha1",
 		},
 		AppHandler: config.AppHandler{
-			Prefix:        "app",
-			SecureViewApp: "Collabora",
+			Prefix:            "app",
+			SecureViewAppAddr: "com.owncloud.api.collaboration",
 		},
 		Archiver: config.Archiver{
 			Insecure:    false,
