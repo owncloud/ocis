@@ -128,6 +128,7 @@ func DefaultConfig() *config.Config {
 					},
 					Sidebar: config.Sidebar{
 						Shares: config.SidebarShares{},
+						Exif:   config.SidebarExif{},
 					},
 					Upload:                  &config.Upload{},
 					OpenLinksWithDefaultApp: true,
