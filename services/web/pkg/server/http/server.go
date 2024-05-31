@@ -99,6 +99,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Middleware(
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
+			chimiddleware.Compress(5),
 			middleware.NoCache,
 			webmid.SilentRefresh,
 			middleware.Version(
