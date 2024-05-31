@@ -2801,3 +2801,81 @@ Feature: Create a share link for a resource
       | upload           |
       | createOnly       |
       | blocksDownload   |
+
+
+  Scenario Outline: update link share of a file inside personal drive using permissions endpoint
+    Given user "Alice" has uploaded file with content "text content" to "textfile1.txt"
+    And user "Alice" has created the following resource link share:
+      | space           | Personal           |
+      | resource        | textfile1.txt      |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+      | displayName     | Homework           |
+    When user "Alice" updates the last public link share using the permissions endpoint of the Graph API:
+      | resource           | textfile1.txt          |
+      | space              | Personal               |
+      | permissionsRole    | <new-permissions-role> |
+      | password           | p@$$w0rD               |
+      | expirationDateTime | 2201-07-15T14:00:00Z   |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+        {
+          "type": "object",
+          "required": [
+            "hasPassword",
+            "id",
+            "link",
+            "expirationDateTime",
+            "createdDateTime"
+          ],
+          "properties": {
+            "hasPassword": {
+              "const": true
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z]{15}$"
+            },
+            "expirationDateTime": {
+              "const": "2201-07-15T23:59:59Z"
+            },
+            "link": {
+              "type": "object",
+              "required": [
+                "@libre.graph.displayName",
+                "@libre.graph.quickLink",
+                "preventsDownload",
+                "type",
+                "webUrl"
+              ],
+              "properties": {
+                "@libre.graph.displayName": {
+                  "const": "Homework"
+                },
+                "@libre.graph.quickLink": {
+                  "const": false
+                },
+                "preventsDownload": {
+                  "const": false
+                },
+                "type": {
+                  "const": "<new-permissions-role>"
+                },
+                "webUrl": {
+                  "type": "string",
+                  "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+                }
+              }
+            }
+          }
+        }
+        """
+    Examples:
+      | permissions-role | new-permissions-role |
+      | view             | edit                 |
+      | edit             | view                 |
+      | view             | blocksDownload       |
+      | edit             | blocksDownload       |
+      | blocksDownload   | view                 |
+      | blocksDownload   | edit                 |
