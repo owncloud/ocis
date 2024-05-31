@@ -628,7 +628,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" updates the last public link share using the Graph API with$/
+	 * @When user :user updates the last public link share using the permissions endpoint of the Graph API:
 	 *
 	 * @param string $user
 	 * @param TableNode $body
@@ -636,7 +636,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userUpdatesLastPublicLinkShareUsingTheGraphApiWith(string $user, TableNode  $body):void {
+	public function userUpdatesTheLastPublicLinkShareUsingThePermissionsEndpointOfTheGraphApi(string $user, TableNode  $body):void {
 		$this->featureContext->setResponse(
 			$this->updateLinkShare(
 				$user,
@@ -657,9 +657,12 @@ class SharingNgContext implements Context {
 	public function updateLinkShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
-		$resource = $bodyRows['resource'];
+		if (isset($bodyRows['resource'])) {
+			$itemId = $this->spacesContext->getResourceId($user, $space, $bodyRows['resource']);
+		} else {
+			$itemId = $this->spacesContext->getResourceId($user, $space, $space);
+		}
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))['id'];
-		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 		$body = [];
 
 		if (\array_key_exists('permissionsRole', $bodyRows)) {
