@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-05-31-00-07-22]
+[#deprecation-note-2024-05-31-06-17-44]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -401,7 +401,7 @@ a|`FRONTEND_APP_HANDLER_SECURE_VIEW_APP` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++Collabora Online ++
+++Collabora ++
 a| [subs=-attributes]
 Name of the app to use for secure view. Should match COLLABORATION_APP_NAME, the name configured for the CS3 app provider.
 
