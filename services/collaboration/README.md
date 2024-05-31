@@ -19,7 +19,7 @@ If any of the named services above have not been started or are not reachable, t
 There are a few variables that you need to set:
 
 * `COLLABORATION_APP_ADDR`:\
-  The URL of the WOPI app (onlyoffice, collabora, etc).\
+  The URL of the collaborative editing app (onlyoffice, collabora, etc).\
   For example: `https://office.example.com`.
 
 * `COLLABORATION_APP_INSECURE`:\
@@ -29,4 +29,4 @@ There are a few variables that you need to set:
   The external address of the collaboration service. The target app (onlyoffice, collabora, etc) will use this address to read and write files from Infinite Scale. \
   For example: `https://wopi.example.com`.
 
-The WOPI application can be customized further by changing the `COLLABORATION_APP_*` options to better describe the application.
+The application can be customized further by changing the `COLLABORATION_APP_*` options to better describe the application.
