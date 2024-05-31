@@ -2,6 +2,7 @@
 package backup
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -79,8 +80,8 @@ func New(fsys fs.FS, discpath string, lbs ListBlobstore) *Consistency {
 	}
 }
 
-// CheckSpaceConsistency checks the consistency of a space
-func CheckSpaceConsistency(storagepath string, lbs ListBlobstore) error {
+// CheckProviderConsistency checks the consistency of a space
+func CheckProviderConsistency(storagepath string, lbs ListBlobstore) error {
 	fsys := os.DirFS(storagepath)
 
 	c := New(fsys, storagepath, lbs)
@@ -102,10 +103,19 @@ func (c *Consistency) Initialize() error {
 		return err
 	}
 
+	if len(dirs) == 0 {
+		return errors.New("no backup found. Double check storage path")
+	}
+
 	for _, d := range dirs {
 		entries, err := fs.ReadDir(c.fsys, d)
 		if err != nil {
 			return err
+		}
+
+		if len(entries) == 0 {
+			fmt.Println("empty dir", filepath.Join(c.discpath, d))
+			continue
 		}
 
 		for _, e := range entries {
@@ -117,12 +127,11 @@ func (c *Consistency) Initialize() error {
 					continue
 				}
 				for _, l := range ls {
-					linkpath := filepath.Join(d, e.Name(), l.Name())
+					linkpath := filepath.Join(c.discpath, d, e.Name(), l.Name())
 
-					// we always set InconsistencyNodeMissing as we later delete all referenced nodes from LinkedNodes
 					r, _ := os.Readlink(linkpath)
 					nodePath := filepath.Join(c.discpath, d, e.Name(), r)
-					c.LinkedNodes[nodePath] = []Inconsistency{InconsistencyNodeMissing}
+					c.LinkedNodes[nodePath] = []Inconsistency{}
 					c.nodeToLink[nodePath] = linkpath
 				}
 				fallthrough
@@ -147,12 +156,11 @@ func (c *Consistency) Initialize() error {
 		return err
 	}
 	for _, l := range links {
-		p, err := os.Readlink(filepath.Join(c.discpath, l))
-		if err != nil {
-			fmt.Println("error reading symlink", err)
-		}
-		p = filepath.Join(c.discpath, l, "..", p)
+		linkpath := filepath.Join(c.discpath, l)
+		r, _ := os.Readlink(linkpath)
+		p := filepath.Join(c.discpath, l, "..", r)
 		c.LinkedNodes[p] = []Inconsistency{}
+		c.nodeToLink[p] = linkpath
 	}
 	return nil
 }
@@ -169,6 +177,11 @@ func (c *Consistency) Evaluate() error {
 		deleteInconsistency(c.Nodes, n)
 	}
 
+	// LinkedNodes should be empty now
+	for l := range c.LinkedNodes {
+		c.LinkedNodes[l] = append(c.LinkedNodes[l], InconsistencyNodeMissing)
+	}
+
 	blobs, err := c.lbs.List()
 	if err != nil {
 		return err
@@ -183,6 +196,7 @@ func (c *Consistency) Evaluate() error {
 		deleteInconsistency(c.BlobReferences, p)
 	}
 
+	// BlobReferences should be empty now
 	for b := range c.BlobReferences {
 		c.BlobReferences[b] = append(c.BlobReferences[b], InconsistencyBlobMissing)
 	}

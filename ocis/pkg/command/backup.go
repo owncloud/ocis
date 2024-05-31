@@ -81,7 +81,7 @@ func ConsistencyCommand(cfg *config.Config) *cli.Command {
 				fmt.Println(err)
 				return err
 			}
-			if err := backup.CheckSpaceConsistency(basePath, bs); err != nil {
+			if err := backup.CheckProviderConsistency(basePath, bs); err != nil {
 				fmt.Println(err)
 				return err
 			}
