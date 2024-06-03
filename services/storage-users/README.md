@@ -165,11 +165,10 @@ COMMANDS:
 
 #### Purge Expired
 
-Purge all expired items from the trash-bin.
-
-```bash
-ocis storage-users trash-bin purge-expired
-```
+*   Purge all expired items from the trash-bin.
+    ```bash
+    ocis storage-users trash-bin purge-expired
+    ```
 
 The behaviour of the `purge-expired` command can be configured by using the following environment variables.
 
@@ -177,16 +176,22 @@ The behaviour of the `purge-expired` command can be configured by using the foll
 Used to obtain space trash-bin information and takes the system admin user as the default which is the `OCIS_ADMIN_USER_ID` but can be set individually. It should be noted, that the `OCIS_ADMIN_USER_ID` is only assigned automatically when using the single binary deployment and must be manually assigned in all other deployments. The command only considers spaces to which the assigned user has access and delete permission.
 
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE`\
-Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.owncloud.com/ocis/5.0/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
+Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.owncloud.com/ocis/latest/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
 
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE`\
-Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.owncloud.com/ocis/5.0/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
+Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.owncloud.com/ocis/latest/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
 
 #### List and Restore Trash-Bins Items
 
-Restoring is possible only to the original location. The personal or project space ID `spaceID` is required for the items to be restored.
-To authenticate the cli tool use `OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>` and `OCIS_SERVICE_ACCOUNT_ID=<acc-id>`. The `storage-users` cli tool uses the default address to establish the connection to the `gateway` service. If the connection fails, check your custom `gateway`
-service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-users` variable `OCIS_GATEWAY_GRPC_ADDR` or `STORAGE_USERS_GATEWAY_GRPC_ADDR`.
+Restoring is possible only to the original location. The personal or project `spaceID` is required for the items to be restored. To authenticate the CLI tool use:
+
+```bash
+OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>
+ and
+OCIS_SERVICE_ACCOUNT_ID=<acc-id>
+```
+
+The `storage-users` CLI tool uses the default address to establish the connection to the `gateway` service. If the connection fails, check the `GATEWAY_GRPC_ADDR` configuration from your `gateway` service and set the same address to the `storage-users` variable `STORAGE_USERS_GATEWAY_GRPC_ADDR` or globally with `OCIS_GATEWAY_GRPC_ADDR`.
 
 *   Export the gateway address if your configuration differs from the default
     ```bash
@@ -200,7 +205,7 @@ service `GATEWAY_GRPC_ADDR` configuration and set the same address to `storage-u
 
 The restore option defines the behavior for an item to be restored, when the item name already exists in the target space. Supported options are: `skip`, `replace` and `keep-both`. The default value is `skip`.
 
-When the cli tool restores the item with the `replace` option, the existing item will be moved to a trash-bin. When the cli tool restores the item with the `keep-both` option and the designated item already exists, the name of the restored item will be changed by adding a numeric suffix in parentheses. The variable `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE` defines a maximum number of attempts to rename an item.
+When the CLI tool restores the item with the `replace` option, the existing item will be moved to a trash-bin. When the CLI tool restores the item with the `keep-both` option and the designated item already exists, the name of the restored item will be changed by adding a numeric suffix in parentheses. The variable `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE` defines a maximum number of attempts to rename an item.
 
 * Restore all trash-bin items for a space
     ```bash
