@@ -63,7 +63,7 @@ Example:
 
 Requested: 18x12\
 Available: 30x20, 15x10, 9x6\
-Returned: 15x10\
+Returned: 15x10
 
 ## Thumbnail Processors
 
