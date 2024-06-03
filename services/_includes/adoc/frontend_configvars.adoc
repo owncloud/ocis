@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-03-08-48-07]
+[#deprecation-note-2024-06-03-13-02-55]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -396,14 +396,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Allow insecure connections to the frontend.
 
-a|`FRONTEND_APP_HANDLER_SECURE_VIEW_APP` +
+a|`FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++Collabora ++
+++com.owncloud.api.collaboration ++
 a| [subs=-attributes]
-Name of the app to use for secure view. Should match COLLABORATION_APP_NAME, the name configured for the CS3 app provider.
+Service name or address of the app provider to use for secure view. Should match the service name or address of the registered CS3 app provider.
 
 a|`FRONTEND_ARCHIVER_MAX_NUM_FILES` +
 

@@ -41,7 +41,7 @@
 | FRONTEND_DEFAULT_LINK_PERMISSIONS | int | 1 | Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1.|
 | OCIS_URL<br/>FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
 | OCIS_INSECURE<br/>FRONTEND_APP_HANDLER_INSECURE | bool | false | Allow insecure connections to the frontend.|
-| FRONTEND_APP_HANDLER_SECURE_VIEW_APP | string | Collabora | Name of the app to use for secure view. Should match COLLABORATION_APP_NAME, the name configured for the CS3 app provider.|
+| FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR | string | com.owncloud.api.collaboration | Service name or address of the app provider to use for secure view. Should match the service name or address of the registered CS3 app provider.|
 | FRONTEND_ARCHIVER_MAX_NUM_FILES | int64 | 10000 | Max number of files that can be packed into an archive.|
 | FRONTEND_ARCHIVER_MAX_SIZE | int64 | 1073741824 | Max size in bytes of the zip archive the archiver can create.|
 | OCIS_INSECURE<br/>FRONTEND_ARCHIVER_INSECURE | bool | false | Allow insecure connections to the archiver.|
