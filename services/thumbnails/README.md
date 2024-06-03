@@ -41,7 +41,7 @@ Thumbnails can either be generated as `png`, `jpg` or `gif` files. These types a
 
 ## Thumbnail Query String Parameters
 
-Clients can request thumbnail previews for files by adding `?preview=1` to the file URL. Requests for files with thumbnail available respond with HTTP status `404`.
+Clients can request thumbnail previews for files by adding `?preview=1` to the file URL. Requests for files with no thumbnail available respond with HTTP status `404`.
 
 The following query parameters are supported:
 
@@ -61,9 +61,9 @@ Various resolutions can be defined via `THUMBNAILS_RESOLUTIONS`. A requestor can
 
 Example:
 
-Requested: 18x12
-Available: 30x20, 15x10, 9x6
-Returned: 15x10
+Requested: 18x12\
+Available: 30x20, 15x10, 9x6\
+Returned: 15x10\
 
 ## Thumbnail Processors
 
