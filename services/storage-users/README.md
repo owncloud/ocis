@@ -187,7 +187,6 @@ Restoring is possible only to the original location. The personal or project `sp
 
 ```bash
 OCIS_SERVICE_ACCOUNT_SECRET=<acc-secret>
- and
 OCIS_SERVICE_ACCOUNT_ID=<acc-id>
 ```
 
