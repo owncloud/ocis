@@ -56,12 +56,12 @@ func init() {
 
 // Config holds the config options for the HTTP appprovider service
 type Config struct {
-	Prefix        string `mapstructure:"prefix"`
-	GatewaySvc    string `mapstructure:"gatewaysvc"`
-	Insecure      bool   `mapstructure:"insecure"`
-	WebBaseURI    string `mapstructure:"webbaseuri"`
-	Web           Web    `mapstructure:"web"`
-	SecureViewApp string `mapstructure:"secure_view_app"`
+	Prefix            string `mapstructure:"prefix"`
+	GatewaySvc        string `mapstructure:"gatewaysvc"`
+	Insecure          bool   `mapstructure:"insecure"`
+	WebBaseURI        string `mapstructure:"webbaseuri"`
+	Web               Web    `mapstructure:"web"`
+	SecureViewAppAddr string `mapstructure:"secure_view_app_addr"`
 }
 
 // Web holds the config options for the URL parameters for Web
@@ -342,16 +342,7 @@ func (s *svc) handleList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := filterAppsByUserAgent(listRes.MimeTypes, r.UserAgent())
-
-	// if app name or address matches the configured secure view app add that flag to the response
-	for _, mt := range res {
-		for _, app := range mt.AppProviders {
-			if app.Name == s.conf.SecureViewApp {
-				app.SecureView = true
-			}
-		}
-	}
+	res := buildApps(listRes.MimeTypes, r.UserAgent(), s.conf.SecureViewAppAddr)
 
 	js, err := json.Marshal(map[string]interface{}{"mime-types": res})
 	if err != nil {
@@ -569,19 +560,29 @@ type ProviderInfo struct {
 	SecureView bool `json:"secure_view"`
 }
 
-// filterAppsByUserAgent rewrites the mime type info to only include apps that can be called by the user agent
-// it also wraps the provider info to be able to add a secure view flag
-func filterAppsByUserAgent(mimeTypes []*appregistry.MimeTypeInfo, userAgent string) []*MimeTypeInfo {
+// buildApps rewrites the mime type info to only include apps that
+// * have a name
+// * can be called by the user agent, eg Desktop-only
+//
+// it also
+// * wraps the provider info to be able to add a secure view flag
+// * adds a secure view flag if the address matches the secure view app address and
+// * removes the address from the provider info to not expose internal addresses
+func buildApps(mimeTypes []*appregistry.MimeTypeInfo, userAgent, secureViewAppAddr string) []*MimeTypeInfo {
 	ua := ua.Parse(userAgent)
 	res := []*MimeTypeInfo{}
 	for _, m := range mimeTypes {
 		apps := []*ProviderInfo{}
 		for _, p := range m.AppProviders {
+			ep := &ProviderInfo{ProviderInfo: *p}
+			if p.Address == secureViewAppAddr {
+				ep.SecureView = true
+			}
 			p.Address = "" // address is internal only and not needed in the client
 			// apps are called by name, so if it has no name it cannot be called and should not be advertised
 			// also filter Desktop-only apps if ua is not Desktop
 			if p.Name != "" && (ua.Desktop || !p.DesktopOnly) {
-				apps = append(apps, &ProviderInfo{ProviderInfo: *p})
+				apps = append(apps, ep)
 			}
 		}
 		if len(apps) > 0 {

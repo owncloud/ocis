@@ -92,6 +92,8 @@ services:
       PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp.yaml
       COLLABORA_DOMAIN: ${COLLABORA_DOMAIN:-collabora.owncloud.test}
       ONLYOFFICE_DOMAIN: ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
+      # make collabora the secure view app
+      FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR: com.owncloud.api.app-provider-collabora
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
       - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml

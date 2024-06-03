@@ -32,6 +32,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ErrBlobIDEmpty is returned when the BlobID is empty
+var ErrBlobIDEmpty = fmt.Errorf("blobstore: BlobID is empty")
+
 // Blobstore provides an interface to an filesystem based blobstore
 type Blobstore struct {
 	root string
@@ -51,10 +54,12 @@ func New(root string) (*Blobstore, error) {
 
 // Upload stores some data in the blobstore under the given key
 func (bs *Blobstore) Upload(node *node.Node, source string) error {
-	dest, err := bs.path(node)
-	if err != nil {
-		return err
+	if node.BlobID == "" {
+		return ErrBlobIDEmpty
 	}
+
+	dest := bs.Path(node)
+
 	// ensure parent path exists
 	if err := os.MkdirAll(filepath.Dir(dest), 0700); err != nil {
 		return errors.Wrap(err, "Decomposedfs: oCIS blobstore: error creating parent folders for blob")
@@ -87,10 +92,11 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 
 // Download retrieves a blob from the blobstore for reading
 func (bs *Blobstore) Download(node *node.Node) (io.ReadCloser, error) {
-	dest, err := bs.path(node)
-	if err != nil {
-		return nil, err
+	if node.BlobID == "" {
+		return nil, ErrBlobIDEmpty
 	}
+
+	dest := bs.Path(node)
 	file, err := os.Open(dest)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not read blob '%s'", dest)
@@ -100,10 +106,10 @@ func (bs *Blobstore) Download(node *node.Node) (io.ReadCloser, error) {
 
 // Delete deletes a blob from the blobstore
 func (bs *Blobstore) Delete(node *node.Node) error {
-	dest, err := bs.path(node)
-	if err != nil {
-		return err
+	if node.BlobID == "" {
+		return ErrBlobIDEmpty
 	}
+	dest := bs.Path(node)
 	if err := utils.RemoveItem(dest); err != nil {
 		return errors.Wrapf(err, "could not delete blob '%s'", dest)
 	}
@@ -111,37 +117,28 @@ func (bs *Blobstore) Delete(node *node.Node) error {
 }
 
 // List lists all blobs in the Blobstore
-func (bs *Blobstore) List() ([]string, error) {
+func (bs *Blobstore) List() ([]*node.Node, error) {
 	dirs, err := filepath.Glob(filepath.Join(bs.root, "spaces", "*", "*", "blobs", "*", "*", "*", "*", "*"))
 	if err != nil {
 		return nil, err
 	}
-	blobids := make([]string, 0, len(dirs))
+	blobids := make([]*node.Node, 0, len(dirs))
 	for _, d := range dirs {
-		seps := strings.Split(d, "/")
-		var b string
-		var now bool
-		for _, s := range seps {
-			if now {
-				b += s
-			}
-			if s == "blobs" {
-				now = true
-			}
-		}
-		blobids = append(blobids, b)
+		_, s, _ := strings.Cut(d, "spaces")
+		spaceraw, blobraw, _ := strings.Cut(s, "blobs")
+		blobids = append(blobids, &node.Node{
+			SpaceID: strings.ReplaceAll(spaceraw, "/", ""),
+			BlobID:  strings.ReplaceAll(blobraw, "/", ""),
+		})
 	}
 	return blobids, nil
 }
 
-func (bs *Blobstore) path(node *node.Node) (string, error) {
-	if node.BlobID == "" {
-		return "", fmt.Errorf("blobstore: BlobID is empty")
-	}
+func (bs *Blobstore) Path(node *node.Node) string {
 	return filepath.Join(
 		bs.root,
 		filepath.Clean(filepath.Join(
 			"/", "spaces", lookup.Pathify(node.SpaceID, 1, 2), "blobs", lookup.Pathify(node.BlobID, 4, 2)),
 		),
-	), nil
+	)
 }

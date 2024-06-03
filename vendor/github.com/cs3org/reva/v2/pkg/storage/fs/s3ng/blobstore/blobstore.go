@@ -84,7 +84,7 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 	}
 	defer reader.Close()
 
-	_, err = bs.client.PutObject(context.Background(), bs.bucket, bs.path(node), reader, node.Blobsize, minio.PutObjectOptions{
+	_, err = bs.client.PutObject(context.Background(), bs.bucket, bs.Path(node), reader, node.Blobsize, minio.PutObjectOptions{
 		ContentType:           "application/octet-stream",
 		SendContentMd5:        bs.defaultPutOptions.SendContentMd5,
 		ConcurrentStreamParts: bs.defaultPutOptions.ConcurrentStreamParts,
@@ -95,21 +95,21 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 	})
 
 	if err != nil {
-		return errors.Wrapf(err, "could not store object '%s' into bucket '%s'", bs.path(node), bs.bucket)
+		return errors.Wrapf(err, "could not store object '%s' into bucket '%s'", bs.Path(node), bs.bucket)
 	}
 	return nil
 }
 
 // Download retrieves a blob from the blobstore for reading
 func (bs *Blobstore) Download(node *node.Node) (io.ReadCloser, error) {
-	reader, err := bs.client.GetObject(context.Background(), bs.bucket, bs.path(node), minio.GetObjectOptions{})
+	reader, err := bs.client.GetObject(context.Background(), bs.bucket, bs.Path(node), minio.GetObjectOptions{})
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not download object '%s' from bucket '%s'", bs.path(node), bs.bucket)
+		return nil, errors.Wrapf(err, "could not download object '%s' from bucket '%s'", bs.Path(node), bs.bucket)
 	}
 
 	stat, err := reader.Stat()
 	if err != nil {
-		return nil, errors.Wrapf(err, "blob path: %s", bs.path(node))
+		return nil, errors.Wrapf(err, "blob path: %s", bs.Path(node))
 	}
 
 	if node.Blobsize != stat.Size {
@@ -121,31 +121,34 @@ func (bs *Blobstore) Download(node *node.Node) (io.ReadCloser, error) {
 
 // Delete deletes a blob from the blobstore
 func (bs *Blobstore) Delete(node *node.Node) error {
-	err := bs.client.RemoveObject(context.Background(), bs.bucket, bs.path(node), minio.RemoveObjectOptions{})
+	err := bs.client.RemoveObject(context.Background(), bs.bucket, bs.Path(node), minio.RemoveObjectOptions{})
 	if err != nil {
-		return errors.Wrapf(err, "could not delete object '%s' from bucket '%s'", bs.path(node), bs.bucket)
+		return errors.Wrapf(err, "could not delete object '%s' from bucket '%s'", bs.Path(node), bs.bucket)
 	}
 	return nil
 }
 
 // List lists all blobs in the Blobstore
-func (bs *Blobstore) List() ([]string, error) {
+func (bs *Blobstore) List() ([]*node.Node, error) {
 	ch := bs.client.ListObjects(context.Background(), bs.bucket, minio.ListObjectsOptions{Recursive: true})
 
 	var err error
-	ids := make([]string, 0)
+	ids := make([]*node.Node, 0)
 	for oi := range ch {
 		if oi.Err != nil {
 			err = oi.Err
 			continue
 		}
-		_, blobid, _ := strings.Cut(oi.Key, "/")
-		ids = append(ids, strings.ReplaceAll(blobid, "/", ""))
+		spaceid, blobid, _ := strings.Cut(oi.Key, "/")
+		ids = append(ids, &node.Node{
+			SpaceID: strings.ReplaceAll(spaceid, "/", ""),
+			BlobID:  strings.ReplaceAll(blobid, "/", ""),
+		})
 	}
 	return ids, err
 }
 
-func (bs *Blobstore) path(node *node.Node) string {
+func (bs *Blobstore) Path(node *node.Node) string {
 	// https://aws.amazon.com/de/premiumsupport/knowledge-center/s3-prefix-nested-folders-difference/
 	// Prefixes are used to partion a bucket. A prefix is everything except the filename.
 	// For a file `BucketName/foo/bar/lorem.ipsum`, `BucketName/foo/bar/` is the prefix.
