@@ -194,8 +194,8 @@ devDependencies:
     specifier: 29.7.0
     version: 29.7.0(@types/node@20.5.9)
   license-checker-rseidelsohn:
-    specifier: ^4.2.10
-    version: 4.2.10
+    specifier: ^4.3.0
+    version: 4.3.0
   mini-css-extract-plugin:
     specifier: 1.6.2
     version: 1.6.2(webpack@4.47.0)
@@ -6865,6 +6865,7 @@ packages:
 
   /glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -8589,8 +8590,8 @@ packages:
       type-check: 0.4.0
     dev: true
 
-  /license-checker-rseidelsohn@4.2.10:
-    resolution: {integrity: sha512-phvcph9WTQ/Kb209kqwLxVA6CV8BAeUnFMIo+I+wBlp74El4ngbMwq49qSqqPYC5bfj49EWBXqwjvTFswGE2Fg==}
+  /license-checker-rseidelsohn@4.3.0:
+    resolution: {integrity: sha512-A2LQ+3kUIG1hCJ/hh4WUvPsyhooT7o5mFhNyTean0cqH3rZeB1ZUCthxlcdgWESSqx+3DLC6J/8ghbiWRYKdUA==}
     engines: {node: '>=18', npm: '>=8'}
     hasBin: true
     dependencies:
@@ -9132,7 +9133,7 @@ packages:
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dependencies:
       hosted-git-info: 6.1.1
-      is-core-module: 2.13.0
+      is-core-module: 2.13.1
       semver: 7.5.4
       validate-npm-package-license: 3.0.4
     dev: true
@@ -10832,6 +10833,7 @@ packages:
   /read-package-json@6.0.4:
     resolution: {integrity: sha512-AEtWXYfopBj2z5N5PbkAOeNHRPUg5q+Nen7QLxV8M2zJq1ym6/lCz3fYNTCXe19puu2d06jfHhrP7v/S2PtMMw==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
+    deprecated: This package is no longer supported. Please use @npmcli/package-json instead.
     dependencies:
       glob: 10.3.4
       json-parse-even-better-errors: 3.0.0
@@ -11153,7 +11155,7 @@ packages:
     resolution: {integrity: sha512-iMDbmAWtfU+MHpxt/I5iWI7cY6YVEZUQ3MBgPQ++XD1PELuJHIl82xBmObyP2KyQmkNB2dsqF7seoQQiAn5yDQ==}
     hasBin: true
     dependencies:
-      is-core-module: 2.13.0
+      is-core-module: 2.13.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
