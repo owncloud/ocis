@@ -2887,3 +2887,87 @@ Feature: Create a share link for a resource
       | createOnly       | edit                 |
       | createOnly       | upload               |
       | blocksDownload   | blocksDownload       |
+
+
+  Scenario Outline: update link share of a folder inside project-space using permissions endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    And user "Alice" has created the following resource link share:
+      | resource        | folderToShare      |
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | displayName     | Link               |
+      | password        | %public%           |
+    When user "Alice" updates the last public link share using the permissions endpoint of the Graph API:
+      | resource           | folderToShare          |
+      | space              | projectSpace           |
+      | permissionsRole    | <new-permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+        {
+          "type": "object",
+          "required": [
+            "hasPassword",
+            "id",
+            "link",
+            "createdDateTime"
+          ],
+          "properties": {
+            "hasPassword": {
+              "const": true
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z]{15}$"
+            },
+            "expirationDateTime": {
+              "const": "2201-07-15T23:59:59Z"
+            },
+            "link": {
+              "type": "object",
+              "required": [
+                "@libre.graph.displayName",
+                "@libre.graph.quickLink",
+                "preventsDownload",
+                "type",
+                "webUrl"
+              ],
+              "properties": {
+                "@libre.graph.displayName": {
+                  "const": "Link"
+                },
+                "@libre.graph.quickLink": {
+                  "const": false
+                },
+                "preventsDownload": {
+                  "const": false
+                },
+                "type": {
+                  "const": "<new-permissions-role>"
+                },
+                "webUrl": {
+                  "type": "string",
+                  "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+                }
+              }
+            }
+          }
+        }
+        """
+    Examples:
+      | permissions-role | new-permissions-role |
+      | view             | edit                 |
+      | view             | upload               |
+      | view             | createOnly           |
+      | edit             | view                 |
+      | edit             | upload               |
+      | edit             | createOnly           |
+      | upload           | view                 |
+      | upload           | edit                 |
+      | upload           | createOnly           |
+      | createOnly       | view                 |
+      | createOnly       | edit                 |
+      | createOnly       | upload               |
