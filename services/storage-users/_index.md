@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2024-06-03T08:16:40.962207544Z
+date: 2024-06-03T08:48:12.021222122Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -73,7 +73,7 @@ When using Infinite Scale as user storage, a directory named `storage/users/uplo
 
 Example cases for expired uploads:
 
-*   In the final step, the upload blob is moved from the upload area to the final blobstore (e.g. S3).
+*   When a user uploads a big file but the file exceeds the user-quota, the upload can't be moved to the target after it has finished. The file stays at the upload location until it is manually cleared.
 
 *   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed.
 
