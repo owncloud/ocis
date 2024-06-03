@@ -123,6 +123,10 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 		return "", err
 	}
 
+	if !sRes.GetInfo().GetPermissionSet().GetInitiateFileDownload() {
+		return "", merrors.Forbidden(g.serviceID, "no download permission")
+	}
+
 	tType := thumbnail.GetExtForMime(sRes.GetInfo().GetMimeType())
 	if tType == "" {
 		tType = req.GetThumbnailType().String()
@@ -204,6 +208,10 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	sRes, err := g.stat(statPath, auth)
 	if err != nil {
 		return "", err
+	}
+
+	if !sRes.GetInfo().GetPermissionSet().GetInitiateFileDownload() {
+		return "", merrors.Forbidden(g.serviceID, "no download permission")
 	}
 
 	tType := thumbnail.GetExtForMime(sRes.GetInfo().GetMimeType())

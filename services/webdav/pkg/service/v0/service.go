@@ -261,6 +261,8 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
+		case http.StatusForbidden:
+			renderError(w, r, errPermissionDenied(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
