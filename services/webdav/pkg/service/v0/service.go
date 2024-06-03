@@ -33,11 +33,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/dav/requests"
 )
 
-func init() {
-	// register method with chi before any routing is set up
-	chi.RegisterMethod("REPORT")
-}
-
 var (
 	codesEnum = map[int]string{
 		http.StatusBadRequest:       "Sabre\\DAV\\Exception\\BadRequest",
@@ -94,6 +89,10 @@ func NewService(opts ...Option) (Service, error) {
 	if svc.config.DisablePreviews {
 		svc.thumbnailsClient = nil
 	}
+
+	// register method with chi before any routing is set up
+	chi.RegisterMethod("REPORT")
+
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 
 		if !svc.config.DisablePreviews {
