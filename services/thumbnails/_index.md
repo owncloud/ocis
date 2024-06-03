@@ -1,6 +1,6 @@
 ---
 title: Thumbnails
-date: 2024-06-03T13:02:56.601140952Z
+date: 2024-06-03T13:30:28.660792219Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/thumbnails
@@ -90,7 +90,7 @@ Example:
 
 Requested: 18x12\
 Available: 30x20, 15x10, 9x6\
-Returned: 15x10\
+Returned: 15x10
 
 ## Thumbnail Processors
 
