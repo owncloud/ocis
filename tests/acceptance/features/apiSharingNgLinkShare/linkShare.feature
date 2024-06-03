@@ -7,7 +7,7 @@ Feature: Create a share link for a resource
       | Alice    |
 
   @issue-7879
-  Scenario Outline: create a link share of a folder
+  Scenario Outline: create a link share of a folder using permissions endpoint
     Given user "Alice" has created folder "folder"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folder             |
@@ -72,7 +72,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @issue-8619
-  Scenario: create an internal link share of a folder
+  Scenario: create an internal link share of a folder using permissions endpoint
     Given user "Alice" has created folder "folder"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folder   |
@@ -129,7 +129,7 @@ Feature: Create a share link for a resource
       """
 
   @issue-8619
-  Scenario: try to create an internal link share of a folder with password
+  Scenario: try to create an internal link share of a folder with password using permissions endpoint
     Given user "Alice" has created folder "folder"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | folder   |
@@ -139,7 +139,7 @@ Feature: Create a share link for a resource
     Then the HTTP status code should be "400"
 
   @issue-7879
-  Scenario Outline: create a link share of a file
+  Scenario Outline: create a link share of a file using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile1.txt      |
@@ -202,7 +202,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @issue-8619
-  Scenario: create an internal link share of a file
+  Scenario: create an internal link share of a file using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile1.txt |
@@ -259,7 +259,7 @@ Feature: Create a share link for a resource
       """
 
   @issue-8619
-  Scenario: try to create an internal link share of a file with password
+  Scenario: try to create an internal link share of a file with password using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile1.txt |
@@ -269,7 +269,7 @@ Feature: Create a share link for a resource
     Then the HTTP status code should be "400"
 
   @issue-7879
-  Scenario Outline: create a link share of a folder with display name and expiry date
+  Scenario Outline: create a link share of a folder with display name and expiry date using permissions endpoint
     Given user "Alice" has created folder "folder"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource           | folder                   |
@@ -340,7 +340,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @issue-7879
-  Scenario Outline: create a link share of a file with display name and expiry date
+  Scenario Outline: create a link share of a file with display name and expiry date using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource           | textfile1.txt            |
@@ -409,7 +409,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @env-config @issue-7879
-  Scenario Outline: create a link share of a file without password
+  Scenario Outline: create a link share of a file without password using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -475,7 +475,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @issue-7879
-  Scenario Outline: update role of a file's link share
+  Scenario Outline: update role of a file's link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:
       | resource        | textfile1.txt      |
@@ -545,7 +545,7 @@ Feature: Create a share link for a resource
       | blocksDownload   | blocksDownload       |
 
   @issue-8619
-  Scenario Outline: update role of a file's to internal link share
+  Scenario Outline: update role of a file's to internal link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:
       | resource        | textfile1.txt      |
@@ -611,7 +611,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
 
-  Scenario: update expiration date of a file's link share
+  Scenario: update expiration date of a file's link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:
       | resource           | textfile1.txt            |
@@ -674,7 +674,7 @@ Feature: Create a share link for a resource
       """
 
   @issues-8405
-  Scenario Outline: remove expiration date of a resource link share
+  Scenario Outline: remove expiration date of a resource link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created folder "folder"
     And user "Alice" has created the following resource link share:
@@ -739,7 +739,7 @@ Feature: Create a share link for a resource
       | folder        |
 
   @env-config
-  Scenario: set password on a file's link share
+  Scenario: set password on a file's link share using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -769,7 +769,7 @@ Feature: Create a share link for a resource
       """
     And the public should be able to download file "textfile1.txt" from the last link share with password "%public%" and the content should be "other data"
 
-  Scenario: update password of a file's link share
+  Scenario: update password of a file's link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:
       | resource        | textfile1.txt |
@@ -799,7 +799,7 @@ Feature: Create a share link for a resource
     And the public download of file "textfile1.txt" from the last link share with password "$heLlo*1234*" should fail with HTTP status code "401" using shareNg
 
 
-  Scenario Outline: create a file's link share with a password that is listed in the Banned-Password-List
+  Scenario Outline: create a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
     When user "Alice" creates the following resource link share using the Graph API:
@@ -842,7 +842,7 @@ Feature: Create a share link for a resource
       | ownCloud        |
 
 
-  Scenario Outline: update a file's link share with a password that is listed in the Banned-Password-List
+  Scenario Outline: update a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
     And user "Alice" has created the following resource link share:
@@ -890,7 +890,7 @@ Feature: Create a share link for a resource
       | ownCloud        |
 
   @issue-7879
-  Scenario Outline: create a share link of a folder inside project-space
+  Scenario Outline: create a share link of a folder inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -958,7 +958,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
 
-  Scenario: create an internal link share of a folder inside project-space
+  Scenario: create an internal link share of a folder inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1017,7 +1017,7 @@ Feature: Create a share link for a resource
       """
 
   @issue-8619
-  Scenario: try to create an internal share link of a folder inside project-space with password
+  Scenario: try to create an internal share link of a folder inside project-space with password using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1030,7 +1030,7 @@ Feature: Create a share link for a resource
     Then the HTTP status code should be "400"
 
   @issue-7879
-  Scenario Outline: create a share link of a folder inside project-space with display name and expiry date
+  Scenario Outline: create a share link of a folder inside project-space with display name and expiry date using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1104,7 +1104,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
 
-  Scenario Outline: create a share link of a folder inside project-space with a password that is listed in the Banned-Password-List
+  Scenario Outline: create a share link of a folder inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -1162,7 +1162,7 @@ Feature: Create a share link for a resource
       | ownCloud        | blocksDownload   |
 
   @env-config
-  Scenario: set password on a existing share link of a folder inside project-space
+  Scenario: set password on a existing share link of a folder inside project-space using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -1197,7 +1197,7 @@ Feature: Create a share link for a resource
     And the public should be able to download file "/textfile.txt" from the last link share with password "%public%" and the content should be "to share"
 
   @env-config @issue-7879
-  Scenario Outline: create a share link of a file inside project-space without password
+  Scenario Outline: create a share link of a file inside project-space without password using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -1267,7 +1267,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @issue-7879
-  Scenario Outline: create a share link of a file inside project-space
+  Scenario Outline: create a share link of a file inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1333,7 +1333,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @issue-8619
-  Scenario: create an internal share link of a file inside project-space
+  Scenario: create an internal share link of a file inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1393,7 +1393,7 @@ Feature: Create a share link for a resource
       """
 
   @issue-8619
-  Scenario: try to create an internal share link of a file inside project-space with password from project-space
+  Scenario: try to create an internal share link of a file inside project-space with password from project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1406,7 +1406,7 @@ Feature: Create a share link for a resource
     Then the HTTP status code should be "400"
 
   @issue-7879
-  Scenario Outline: create a share link of a file inside project-space with display name and expiry date
+  Scenario Outline: create a share link of a file inside project-space with display name and expiry date using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1477,7 +1477,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @env-config @issue-7879
-  Scenario Outline: create a share link of a file inside project-space without password
+  Scenario Outline: create a share link of a file inside project-space without password using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -1546,7 +1546,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
 
-  Scenario Outline: create a share link of a file inside project-space with a password that is listed in the Banned-Password-List
+  Scenario Outline: create a share link of a file inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -1598,7 +1598,7 @@ Feature: Create a share link for a resource
       | ownCloud        | blocksDownload   |
 
   @env-config
-  Scenario: set password on a existing share link of a file inside project-space
+  Scenario: set password on a existing share link of a file inside project-space using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -2889,7 +2889,7 @@ Feature: Create a share link for a resource
       | blocksDownload   | blocksDownload       |
 
 
-  Scenario Outline: update link share of a folder inside project-space using permissions endpoint
+  Scenario Outline: update role of a folder's link share inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -2971,3 +2971,221 @@ Feature: Create a share link for a resource
       | createOnly       | view                 |
       | createOnly       | edit                 |
       | createOnly       | upload               |
+
+
+  Scenario Outline: update role of a file's link share inside a project-space using permissions endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt       |
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | displayName     | Link               |
+      | password        | %public%           |
+    When user "Alice" updates the last public link share using the permissions endpoint of the Graph API:
+      | resource           | textfile.txt           |
+      | space              | projectSpace           |
+      | permissionsRole    | <new-permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+        {
+          "type": "object",
+          "required": [
+            "hasPassword",
+            "id",
+            "link",
+            "createdDateTime"
+          ],
+          "properties": {
+            "hasPassword": {
+              "const": true
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z]{15}$"
+            },
+            "link": {
+              "type": "object",
+              "required": [
+                "@libre.graph.displayName",
+                "@libre.graph.quickLink",
+                "preventsDownload",
+                "type",
+                "webUrl"
+              ],
+              "properties": {
+                "@libre.graph.displayName": {
+                  "const": "Link"
+                },
+                "@libre.graph.quickLink": {
+                  "const": false
+                },
+                "preventsDownload": {
+                  "const": false
+                },
+                "type": {
+                  "const": "<new-permissions-role>"
+                },
+                "webUrl": {
+                  "type": "string",
+                  "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+                }
+              }
+            }
+          }
+        }
+        """
+    Examples:
+      | permissions-role | new-permissions-role |
+      | view             | edit                 |
+      | edit             | view                 |
+
+
+  Scenario Outline: update role of a file's link share to internal inside a project-space using permissions endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt       |
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | displayName     | Link               |
+      | password        | %public%           |
+    When user "Alice" updates the last public link share using the permissions endpoint of the Graph API:
+      | resource           | textfile.txt           |
+      | space              | projectSpace           |
+      | permissionsRole    | <new-permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+        {
+          "type": "object",
+          "required": [
+            "hasPassword",
+            "id",
+            "link",
+            "createdDateTime"
+          ],
+          "properties": {
+            "hasPassword": {
+              "const": false
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z]{15}$"
+            },
+            "link": {
+              "type": "object",
+              "required": [
+                "@libre.graph.displayName",
+                "@libre.graph.quickLink",
+                "preventsDownload",
+                "type",
+                "webUrl"
+              ],
+              "properties": {
+                "@libre.graph.displayName": {
+                  "const": "Link"
+                },
+                "@libre.graph.quickLink": {
+                  "const": false
+                },
+                "preventsDownload": {
+                  "const": false
+                },
+                "type": {
+                  "const": "<new-permissions-role>"
+                },
+                "webUrl": {
+                  "type": "string",
+                  "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+                }
+              }
+            }
+          }
+        }
+        """
+    Examples:
+      | permissions-role | new-permissions-role |
+      | view             | internal             |
+      | edit             | internal             |
+
+
+  Scenario Outline: update role of a folder's link share to internal inside project-space using permissions endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    And user "Alice" has created the following resource link share:
+      | resource        | folderToShare      |
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | displayName     | Link               |
+      | password        | %public%           |
+    When user "Alice" updates the last public link share using the permissions endpoint of the Graph API:
+      | resource           | folderToShare          |
+      | space              | projectSpace           |
+      | permissionsRole    | <new-permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+        {
+          "type": "object",
+          "required": [
+            "hasPassword",
+            "id",
+            "link",
+            "createdDateTime"
+          ],
+          "properties": {
+            "hasPassword": {
+              "const": false
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z]{15}$"
+            },
+            "expirationDateTime": {
+              "const": "2201-07-15T23:59:59Z"
+            },
+            "link": {
+              "type": "object",
+              "required": [
+                "@libre.graph.displayName",
+                "@libre.graph.quickLink",
+                "preventsDownload",
+                "type",
+                "webUrl"
+              ],
+              "properties": {
+                "@libre.graph.displayName": {
+                  "const": "Link"
+                },
+                "@libre.graph.quickLink": {
+                  "const": false
+                },
+                "preventsDownload": {
+                  "const": false
+                },
+                "type": {
+                  "const": "<new-permissions-role>"
+                },
+                "webUrl": {
+                  "type": "string",
+                  "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+                }
+              }
+            }
+          }
+        }
+        """
+    Examples:
+      | permissions-role | new-permissions-role |
+      | view             | internal             |
+      | edit             | internal             |
+      | upload           | internal             |
+      | createOnly       | internal             |
