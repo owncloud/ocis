@@ -13,6 +13,7 @@ directives:
     - '''none'''
   frame-src:
     - '''self'''
+    - 'blob:'
     - 'https://embed.diagrams.net/'
   img-src:
     - '''self'''
