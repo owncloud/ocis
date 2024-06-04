@@ -33,11 +33,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/dav/requests"
 )
 
-func init() {
-	// register method with chi before any routing is set up
-	chi.RegisterMethod("REPORT")
-}
-
 var (
 	codesEnum = map[int]string{
 		http.StatusBadRequest:       "Sabre\\DAV\\Exception\\BadRequest",
@@ -94,6 +89,10 @@ func NewService(opts ...Option) (Service, error) {
 	if svc.config.DisablePreviews {
 		svc.thumbnailsClient = nil
 	}
+
+	// register method with chi before any routing is set up
+	chi.RegisterMethod("REPORT")
+
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 
 		if !svc.config.DisablePreviews {
@@ -261,6 +260,8 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
+		case http.StatusForbidden:
+			renderError(w, r, errPermissionDenied(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
@@ -354,6 +355,8 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
+		case http.StatusForbidden:
+			renderError(w, r, errPermissionDenied(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
@@ -529,6 +532,10 @@ func errInternalError(msg string) *errResponse {
 
 func errBadRequest(msg string) *errResponse {
 	return newErrResponse(http.StatusBadRequest, msg)
+}
+
+func errPermissionDenied(msg string) *errResponse {
+	return newErrResponse(http.StatusForbidden, msg)
 }
 
 func errNotFound(msg string) *errResponse {
