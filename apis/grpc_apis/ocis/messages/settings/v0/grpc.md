@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.settings.v0"
 url: /apis/grpc_apis/ocis_messages_settings_v0
-date: 2024-06-04T03:43:14Z
+date: 2024-06-04T09:01:36Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -158,6 +158,16 @@ geekdocRepo: https://github.com/owncloud/ocis
 | account_uuid | [string](#string) |  |  |
 | role_id | [string](#string) |  | the role_id is a bundle_id internally |
 
+### UserRoleAssignmentFilter
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| type | [UserRoleAssignmentFilter.Type](#userroleassignmentfiltertype) |  |  |
+| account_uuid | [string](#string) |  |  |
+| role_id | [string](#string) |  |  |
+
 ### Value
 
 
@@ -229,6 +239,15 @@ geekdocRepo: https://github.com/owncloud/ocis
 | TYPE_BUNDLE | 5 |  |
 | TYPE_USER | 6 |  |
 | TYPE_GROUP | 7 |  |
+### UserRoleAssignmentFilter.Type
+
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| TYPE_UNKNOWN | 0 |  |
+| TYPE_ACCOUNT | 1 |  |
+| TYPE_ROLE | 2 |  |
 
 ## Scalar Value Types
 

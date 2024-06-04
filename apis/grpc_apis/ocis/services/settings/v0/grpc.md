@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.settings.v0"
 url: /apis/grpc_apis/ocis_services_settings_v0
-date: 2024-06-04T03:43:14Z
+date: 2024-06-04T09:01:36Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -151,6 +151,14 @@ geekdocRepo: https://github.com/owncloud/ocis
 | ----- | ---- | ----- | ----------- |
 | permissions | [string](#string) | repeated |  |
 
+### ListRoleAssignmentsFilteredRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| filters | [ocis.messages.settings.v0.UserRoleAssignmentFilter](/apis/grpc_apis/ocis_messages_settings_v0/#userroleassignmentfilter) | repeated |  |
+
 ### ListRoleAssignmentsRequest
 
 
@@ -266,6 +274,7 @@ requests and responses for settings bundles
 | ----------- | ------------ | ------------- | ------------|
 | ListRoles | [ListBundlesRequest](#listbundlesrequest) | [ListBundlesResponse](#listbundlesresponse) |  |
 | ListRoleAssignments | [ListRoleAssignmentsRequest](#listroleassignmentsrequest) | [ListRoleAssignmentsResponse](#listroleassignmentsresponse) |  |
+| ListRoleAssignmentsFiltered | [ListRoleAssignmentsFilteredRequest](#listroleassignmentsfilteredrequest) | [ListRoleAssignmentsResponse](#listroleassignmentsresponse) |  |
 | AssignRoleToUser | [AssignRoleToUserRequest](#assignroletouserrequest) | [AssignRoleToUserResponse](#assignroletouserresponse) |  |
 | RemoveRoleFromUser | [RemoveRoleFromUserRequest](#removerolefromuserrequest) | [.google.protobuf.Empty](#googleprotobufempty) |  |
 
