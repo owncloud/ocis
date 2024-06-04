@@ -2,6 +2,7 @@ Enhancement: Bump Reva
 
 bumps reva version
 
+https://github.com/owncloud/ocis/pull/9318
 https://github.com/owncloud/ocis/pull/9269
 https://github.com/owncloud/ocis/pull/9236
 https://github.com/owncloud/ocis/pull/9188
