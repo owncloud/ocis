@@ -1,4 +1,4 @@
-package apps
+package apps_test
 
 import (
 	"io/fs"
@@ -8,12 +8,13 @@ import (
 	"github.com/onsi/gomega"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/web/pkg/apps"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 )
 
 func TestApplication_ToExternal(t *testing.T) {
 	g := gomega.NewWithT(t)
-	app := Application{
+	app := apps.Application{
 		ID:         "app",
 		Entrypoint: "entrypoint.js",
 		Config: map[string]interface{}{
@@ -34,31 +35,31 @@ func TestBuild(t *testing.T) {
 		Mode: fs.ModeDir,
 	}
 
-	_, err := build(fstest.MapFS{
+	_, err := apps.Build(fstest.MapFS{
 		"app": &fstest.MapFile{},
 	}, "app", map[string]any{})
-	g.Expect(err).To(gomega.MatchError(ErrInvalidApp))
+	g.Expect(err).To(gomega.MatchError(apps.ErrInvalidApp))
 
-	_, err = build(fstest.MapFS{
+	_, err = apps.Build(fstest.MapFS{
 		"app": dir,
 	}, "app", map[string]any{})
-	g.Expect(err).To(gomega.MatchError(ErrMissingManifest))
+	g.Expect(err).To(gomega.MatchError(apps.ErrMissingManifest))
 
-	_, err = build(fstest.MapFS{
+	_, err = apps.Build(fstest.MapFS{
 		"app":               dir,
 		"app/manifest.json": dir,
 	}, "app", map[string]any{})
-	g.Expect(err).To(gomega.MatchError(ErrInvalidManifest))
+	g.Expect(err).To(gomega.MatchError(apps.ErrInvalidManifest))
 
-	_, err = build(fstest.MapFS{
+	_, err = apps.Build(fstest.MapFS{
 		"app": dir,
 		"app/manifest.json": &fstest.MapFile{
 			Data: []byte("{}"),
 		},
 	}, "app", map[string]any{})
-	g.Expect(err).To(gomega.MatchError(ErrInvalidManifest))
+	g.Expect(err).To(gomega.MatchError(apps.ErrInvalidManifest))
 
-	_, err = build(fstest.MapFS{
+	_, err = apps.Build(fstest.MapFS{
 		"app":               dir,
 		"app/entrypoint.js": &fstest.MapFile{},
 		"app/manifest.json": &fstest.MapFile{
@@ -67,24 +68,24 @@ func TestBuild(t *testing.T) {
 	}, "app", map[string]any{})
 	g.Expect(err).ToNot(gomega.HaveOccurred())
 
-	_, err = build(fstest.MapFS{
+	_, err = apps.Build(fstest.MapFS{
 		"app":               dir,
 		"app/entrypoint.js": dir,
 		"app/manifest.json": &fstest.MapFile{
 			Data: []byte(`{"id":"app", "entrypoint":"entrypoint.js"}`),
 		},
 	}, "app", map[string]any{})
-	g.Expect(err).To(gomega.MatchError(ErrEntrypointDoesNotExist))
+	g.Expect(err).To(gomega.MatchError(apps.ErrEntrypointDoesNotExist))
 
-	_, err = build(fstest.MapFS{
+	_, err = apps.Build(fstest.MapFS{
 		"app": dir,
 		"app/manifest.json": &fstest.MapFile{
 			Data: []byte(`{"id":"app", "entrypoint":"entrypoint.js"}`),
 		},
 	}, "app", map[string]any{})
-	g.Expect(err).To(gomega.MatchError(ErrEntrypointDoesNotExist))
+	g.Expect(err).To(gomega.MatchError(apps.ErrEntrypointDoesNotExist))
 
-	application, err := build(fstest.MapFS{
+	application, err := apps.Build(fstest.MapFS{
 		"app":               dir,
 		"app/entrypoint.js": &fstest.MapFile{},
 		"app/manifest.json": &fstest.MapFile{
@@ -102,20 +103,20 @@ func TestBuild(t *testing.T) {
 func TestList(t *testing.T) {
 	g := gomega.NewWithT(t)
 
-	applications := List(log.NopLogger(), map[string]config.App{})
+	applications := apps.List(log.NopLogger(), map[string]config.App{})
 	g.Expect(applications).To(gomega.BeEmpty())
 
-	applications = List(log.NopLogger(), map[string]config.App{}, nil)
+	applications = apps.List(log.NopLogger(), map[string]config.App{}, nil)
 	g.Expect(applications).To(gomega.BeEmpty())
 
-	applications = List(log.NopLogger(), map[string]config.App{}, fstest.MapFS{})
+	applications = apps.List(log.NopLogger(), map[string]config.App{}, fstest.MapFS{})
 	g.Expect(applications).To(gomega.BeEmpty())
 
 	dir := &fstest.MapFile{
 		Mode: fs.ModeDir,
 	}
 
-	applications = List(log.NopLogger(), map[string]config.App{
+	applications = apps.List(log.NopLogger(), map[string]config.App{
 		"app": {
 			Disabled: true,
 		},
@@ -124,14 +125,14 @@ func TestList(t *testing.T) {
 	})
 	g.Expect(applications).To(gomega.BeEmpty())
 
-	applications = List(log.NopLogger(), map[string]config.App{
+	applications = apps.List(log.NopLogger(), map[string]config.App{
 		"app": {},
 	}, fstest.MapFS{
 		"app": dir,
 	})
 	g.Expect(applications).To(gomega.BeEmpty())
 
-	applications = List(log.NopLogger(), map[string]config.App{
+	applications = apps.List(log.NopLogger(), map[string]config.App{
 		"app-3": {
 			Config: map[string]any{
 				"foo": "local conf 1",
