@@ -98,7 +98,21 @@ func (lu *Lookup) GetCachedID(ctx context.Context, spaceID, nodeID string) (stri
 func (lu *Lookup) WarmupIDCache(root string) error {
 	spaceID := []byte("")
 
-	var gid int
+	scopeSpace := func(spaceCandidate string) error {
+		if !lu.Options.UseSpaceGroups {
+			return nil
+		}
+
+		// set the uid and gid for the space
+		fi, err := os.Stat(spaceCandidate)
+		if err != nil {
+			return err
+		}
+		sys := fi.Sys().(*syscall.Stat_t)
+		gid := int(sys.Gid)
+		_, err = lu.userMapper.ScopeUserByIds(-1, gid)
+		return err
+	}
 
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -107,41 +121,23 @@ func (lu *Lookup) WarmupIDCache(root string) error {
 
 		attribs, err := lu.metadataBackend.All(context.Background(), path)
 		if err == nil {
-			nodeSpaceID, ok := attribs[prefixes.SpaceIDAttr]
-			if ok {
+			nodeSpaceID := attribs[prefixes.SpaceIDAttr]
+			if len(nodeSpaceID) > 0 {
 				spaceID = nodeSpaceID
 
-				// set the uid and gid for the space
-				fi, err := os.Stat(path)
+				err = scopeSpace(path)
 				if err != nil {
 					return err
 				}
-				sys := fi.Sys().(*syscall.Stat_t)
-				gid = int(sys.Gid)
-				_, err = lu.userMapper.ScopeUserByIds(-1, gid)
-				if err != nil {
-					return err
-				}
-			}
-
-			if len(spaceID) == 0 {
+			} else {
 				// try to find space
 				spaceCandidate := path
 				for strings.HasPrefix(spaceCandidate, lu.Options.Root) {
 					spaceID, err = lu.MetadataBackend().Get(context.Background(), spaceCandidate, prefixes.SpaceIDAttr)
 					if err == nil {
-						if lu.Options.UseSpaceGroups {
-							// set the uid and gid for the space
-							fi, err := os.Stat(spaceCandidate)
-							if err != nil {
-								return err
-							}
-							sys := fi.Sys().(*syscall.Stat_t)
-							gid := int(sys.Gid)
-							_, err = lu.userMapper.ScopeUserByIds(-1, gid)
-							if err != nil {
-								return err
-							}
+						err = scopeSpace(path)
+						if err != nil {
+							return err
 						}
 						break
 					}

@@ -22,6 +22,7 @@ import (
 	"context"
 	"io"
 	"strconv"
+	"time"
 
 	"github.com/pkg/xattr"
 )
@@ -57,6 +58,11 @@ func (md Attributes) UInt64(key string) (uint64, error) {
 // SetInt64 sets an uint64 value
 func (md Attributes) SetUInt64(key string, val uint64) {
 	md[key] = []byte(strconv.FormatUint(val, 10))
+}
+
+// Time reads a time value
+func (md Attributes) Time(key string) (time.Time, error) {
+	return time.Parse(time.RFC3339Nano, string(md[key]))
 }
 
 // SetXattrs sets multiple extended attributes on the write-through cache/node

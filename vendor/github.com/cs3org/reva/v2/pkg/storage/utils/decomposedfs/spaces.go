@@ -325,7 +325,8 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 
 	if requestedUserID != nil {
 		allMatches, err = fs.userSpaceIndex.Load(requestedUserID.GetOpaqueId())
-		if err != nil {
+		// do not return an error if the user has no spaces
+		if err != nil && !os.IsNotExist(err) {
 			return nil, errors.Wrap(err, "error reading user index")
 		}
 

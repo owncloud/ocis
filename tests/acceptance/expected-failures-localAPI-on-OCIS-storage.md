@@ -299,9 +299,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:208](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L208)
 - [apiSpacesDavOperation/moveByFileId.feature:209](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L209)
 
-### [500 when deleting share role](https://github.com/owncloud/ocis/issues/8747)
-
-- [apiSpacesShares/shareSubItemOfSpace.feature:159](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L159)
 
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.

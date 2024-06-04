@@ -58,7 +58,7 @@ func (c *StoreIDCache) Set(_ context.Context, spaceID, nodeID, val string) error
 // Get returns the value for a given key
 func (c *StoreIDCache) Get(_ context.Context, spaceID, nodeID string) (string, bool) {
 	records, err := c.cache.Read(cacheKey(spaceID, nodeID))
-	if err != nil {
+	if err != nil || len(records) == 0 {
 		return "", false
 	}
 	return string(records[0].Value), true

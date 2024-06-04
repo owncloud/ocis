@@ -217,15 +217,19 @@ assimilate:
 		return nil, errors.Wrap(err, "failed to stat item")
 	}
 
-	previousAttribs, err := t.lookup.MetadataBackend().All(context.Background(), path)
+	attrs, err := t.lookup.MetadataBackend().All(context.Background(), path)
 	if err != nil && !metadata.IsAttrUnset(err) {
 		return nil, errors.Wrap(err, "failed to get item attribs")
 	}
+	previousAttribs := node.Attributes(attrs)
 
 	attributes := node.Attributes{
-		prefixes.IDAttr:    []byte(id),
-		prefixes.NameAttr:  []byte(filepath.Base(path)),
-		prefixes.MTimeAttr: []byte(fi.ModTime().Format(time.RFC3339)),
+		prefixes.IDAttr:   []byte(id),
+		prefixes.NameAttr: []byte(filepath.Base(path)),
+	}
+	prevMtime, err := previousAttribs.Time(prefixes.MTimeAttr)
+	if err != nil || prevMtime.Before(fi.ModTime()) {
+		attributes[prefixes.MTimeAttr] = []byte(fi.ModTime().Format(time.RFC3339Nano))
 	}
 	if len(parentID) > 0 {
 		attributes[prefixes.ParentidAttr] = []byte(parentID)
