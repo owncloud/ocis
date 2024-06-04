@@ -2,7 +2,6 @@ package svc
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/fs"
 	"net/http"
 	"net/url"
@@ -182,7 +181,7 @@ func (p Web) Static(f fs.FS, root string, ttl int) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s", strconv.Itoa(ttl)))
+		w.Header().Set("Cache-Control", "max-age="+strconv.Itoa(ttl))
 		w.Header().Set("Expires", expires)
 		w.Header().Set("Last-Modified", lastModified)
 		w.Header().Set("SameSite", "Strict")
