@@ -108,7 +108,7 @@ func (s Service) LogoUpload(w http.ResponseWriter, r *http.Request) {
 		Permission: "Logo.Write",
 		SubjectRef: &permissionsapi.SubjectReference{
 			Spec: &permissionsapi.SubjectReference_UserId{
-				UserId: user.Id,
+				UserId: user.GetId(),
 			},
 		},
 	})
@@ -116,7 +116,7 @@ func (s Service) LogoUpload(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if rsp.Status.Code != rpc.Code_CODE_OK {
+	if rsp.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
@@ -170,7 +170,7 @@ func (s Service) LogoReset(w http.ResponseWriter, r *http.Request) {
 		Permission: "Logo.Write",
 		SubjectRef: &permissionsapi.SubjectReference{
 			Spec: &permissionsapi.SubjectReference_UserId{
-				UserId: user.Id,
+				UserId: user.GetId(),
 			},
 		},
 	})
@@ -178,7 +178,7 @@ func (s Service) LogoReset(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if rsp.Status.Code != rpc.Code_CODE_OK {
+	if rsp.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}

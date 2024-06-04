@@ -16,8 +16,6 @@ import (
 )
 
 var (
-	validate *validator.Validate
-
 	// ErrInvalidApp is the error when an app is invalid
 	ErrInvalidApp = errors.New("invalid app")
 
@@ -29,6 +27,8 @@ var (
 
 	// ErrEntrypointDoesNotExist is the error when the entrypoint does not exist or is not a file
 	ErrEntrypointDoesNotExist = errors.New("entrypoint does not exist")
+
+	validate = validator.New(validator.WithRequiredStructEnabled())
 )
 
 const (
@@ -36,14 +36,10 @@ const (
 	_manifest = "manifest.json"
 )
 
-func init() {
-	validate = validator.New(validator.WithRequiredStructEnabled())
-}
-
 // Application contains the metadata of an application
 type Application struct {
 	// ID is the unique identifier of the application
-	ID string
+	ID string `json:"-"`
 
 	// Entrypoint is the entrypoint of the application within the bundle
 	Entrypoint string `json:"entrypoint" validate:"required"`
@@ -92,7 +88,7 @@ func List(logger log.Logger, data map[string]config.App, fSystems ...fs.FS) []Ap
 				continue
 			}
 
-			application, err := Build(fSystem, name, appData.Config)
+			application, err := build(fSystem, name, appData.Config)
 			if err != nil {
 				// if app creation fails, log the error and continue with the next app
 				logger.Debug().Err(err).Str("path", entry.Name()).Msg("failed to load application")
@@ -107,7 +103,7 @@ func List(logger log.Logger, data map[string]config.App, fSystems ...fs.FS) []Ap
 	return maps.Values(registry)
 }
 
-func Build(fSystem fs.FS, id string, conf map[string]any) (Application, error) {
+func build(fSystem fs.FS, id string, conf map[string]any) (Application, error) {
 	// skip non-directory listings, every app needs to be contained inside a directory
 	entry, err := fs.Stat(fSystem, id)
 	if err != nil || !entry.IsDir() {

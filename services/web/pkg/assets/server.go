@@ -16,6 +16,7 @@ type fileServer struct {
 	fsys http.FileSystem
 }
 
+// FileServer defines the http handler for the embedded files
 func FileServer(fsys fs.FS) http.Handler {
 	return &fileServer{http.FS(fsys)}
 }
