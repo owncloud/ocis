@@ -75,6 +75,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix collaboration registry setting: [#9105](https://github.com/owncloud/ocis/pull/9105)
 * Bugfix - Service startup of WOPI example: [#9127](https://github.com/owncloud/ocis/pull/9127)
 * Bugfix - Fix the status code for multiple mount and unmount share: [#9193](https://github.com/owncloud/ocis/pull/9193)
+* Bugfix - Don't show thumbnails for secureview shares: [#9299](https://github.com/owncloud/ocis/pull/9299)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Change - Define maximum input image dimensions and size when generating previews: [#9035](https://github.com/owncloud/ocis/pull/9035)
@@ -341,6 +342,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8876
    https://github.com/owncloud/ocis/pull/9193
+
+* Bugfix - Don't show thumbnails for secureview shares: [#9299](https://github.com/owncloud/ocis/pull/9299)
+
+   We have fixed a bug where thumbnails were shown for secureview shares.
+
+   https://github.com/owncloud/ocis/issues/9249
+   https://github.com/owncloud/ocis/pull/9299
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
