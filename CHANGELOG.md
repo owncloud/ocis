@@ -523,6 +523,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8777
    https://github.com/owncloud/ocis/pull/9025
    https://github.com/owncloud/ocis/pull/9167
+   https://github.com/owncloud/ocis/pull/9313
 
 * Enhancement - Add FileTouched SSE Event: [#8778](https://github.com/owncloud/ocis/pull/8778)
 
