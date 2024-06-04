@@ -17,6 +17,17 @@ When run, **ociswrapper** starts an API server that exposes some endpoints to re
     ```bash
     ./bin/ociswrapper serve --bin=<path-to-ocis-binary>
     ```
+    To check other available options:
+    ```bash
+    ./bin/ociswrapper serve --help
+    ```
+    ```bash
+     --url string              oCIS server url (default "https://localhost:9200")
+     --retry string            Number of retries to start oCIS server (default "5")
+     -p, --port string         Wrapper API server port (default "5200")
+     --admin-username string   admin username for oCIS server
+     --admin-password string   admin password for oCIS server
+    ```
 
 Access the API server at `http://localhost:5200`.
 
