@@ -5,4 +5,5 @@ General hardening of oCIS
 https://github.com/owncloud/ocis/pull/8777
 https://github.com/owncloud/ocis/pull/9025
 https://github.com/owncloud/ocis/pull/9167
+https://github.com/owncloud/ocis/pull/9313
 

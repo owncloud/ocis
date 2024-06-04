@@ -132,7 +132,7 @@ Feature: download file
     Then the following headers should be set
       | header                            | value                                                              |
       | Content-Disposition               | attachment; filename*=UTF-8''textfile.txt; filename="textfile.txt" |
-      | Content-Security-Policy           | child-src 'self'; connect-src 'self'; default-src 'none'; font-src 'self'; frame-ancestors 'self'; frame-src 'self' https://embed.diagrams.net/; img-src 'self' data: blob:; manifest-src 'self'; media-src 'self'; object-src 'self' blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'                                                |
+      | Content-Security-Policy           | child-src 'self'; connect-src 'self'; default-src 'none'; font-src 'self'; frame-ancestors 'self'; frame-src 'self' blob: https://embed.diagrams.net/; img-src 'self' data: blob:; manifest-src 'self'; media-src 'self'; object-src 'self' blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'                                                |
       | X-Content-Type-Options            | nosniff                                                            |
       | X-Download-Options                | noopen                                                             |
       | X-Frame-Options                   | SAMEORIGIN                                                         |
