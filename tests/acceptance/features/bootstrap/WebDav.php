@@ -2619,31 +2619,35 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then the HTTP status code of responses on each endpoint should be :statusCode respectively
+	 * @Then the HTTP status code of responses on each endpoint should be :statusCodes respectively
 	 *
-	 * @param string $statusCodes
+	 * @param string $statusCodes a comma-separated string of expected HTTP status codes
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
 	public function theHTTPStatusCodeOfResponsesOnEachEndpointShouldBe(string $statusCodes):void {
-		$statusCodes = \explode(',', $statusCodes);
-		$count = \count($statusCodes);
-		if ($count === \count($this->lastHttpStatusCodesArray)) {
+		$expectedStatusCodes = \explode(',', $statusCodes);
+		$actualStatusCodes = $this->lastHttpStatusCodesArray;
+		$count = \count($expectedStatusCodes);
+		$statusCodesAreAllOk = true;
+		if ($count === \count($actualStatusCodes)) {
 			for ($i = 0; $i < $count; $i++) {
-				Assert::assertSame(
-					(int)\trim($statusCodes[$i]),
-					(int)$this->lastHttpStatusCodesArray[$i],
-					'Responses did not return expected HTTP status code'
-				);
+				$expectedCode = (int)\trim($expectedStatusCodes[$i]);
+				$actualCode = (int)$actualStatusCodes[$i];
+				if ($expectedCode !== $actualCode) {
+					$statusCodesAreAllOk = false;
+				}
 			}
-			$this->emptyLastHTTPStatusCodesArray();
 		} else {
-			throw new Exception(
-				'Expected HTTP status codes: "' . \implode(',', $statusCodes) .
-				'". Found HTTP status codes: "' . \implode(',', $this->lastHttpStatusCodesArray) . '"'
-			);
+			$statusCodesAreAllOk = false;
 		}
+		$this->emptyLastHTTPStatusCodesArray();
+		Assert::assertTrue(
+			$statusCodesAreAllOk,
+			'Expected HTTP status codes: "' . $statusCodes .
+			'". Found HTTP status codes: "' . \implode(',', $actualStatusCodes) . '"'
+		);
 	}
 
 	/**
