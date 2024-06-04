@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-04-09-10-56]
+[#deprecation-note-2024-06-04-10-30-32]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -242,7 +242,7 @@ a| [subs=-attributes]
 Allow credentials for CORS. See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 
 a|`WEB_ASSET_PATH` +
-xref:deprecation-note-2024-06-04-09-10-56[Deprecation Note]
+xref:deprecation-note-2024-06-04-10-30-32[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -304,7 +304,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/themes/owncloud/theme.json ++
 a| [subs=-attributes]
-Subpath/file to load the theme. Will be appended to the URL of the theme server.
+Path to the theme json file. Will be appended to the URL of the theme server.
 
 a|`OCIS_URL` +
 `WEB_UI_CONFIG_SERVER` +
@@ -417,7 +417,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Set this option to 'true' to disable the feedback link in the topbar. Keeping it enabled by setting the value to 'false' or with the absence of the option, allows ownCloud to get feedback from your user base through a dedicated survey website.
+Set this option to 'true' to disable the feedback link in the top bar. Keeping it enabled by setting the value to 'false' or with the absence of the option, allows ownCloud to get feedback from your user base through a dedicated survey website.
 
 a|`WEB_OPTION_SHARING_RECIPIENTS_PER_PAGE` +
 

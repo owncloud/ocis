@@ -30,7 +30,7 @@
 | WEB_ASSET_APPS_PATH | string | /var/lib/ocis/web/assets/apps | Serve ownCloud Web apps assets from a path on the filesystem instead of the builtin assets. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/web/assets/apps|
 | WEB_UI_CONFIG_FILE | string |  | Read the ownCloud Web json based configuration from this path/file. The config file takes precedence over WEB_OPTION_xxx environment variables. See the text description for more details.|
 | OCIS_URL<br/>WEB_UI_THEME_SERVER | string | https://localhost:9200 | Base URL to load themes from. Will be prepended to the theme path.|
-| WEB_UI_THEME_PATH | string | /themes/owncloud/theme.json | Subpath/file to load the theme. Will be appended to the URL of the theme server.|
+| WEB_UI_THEME_PATH | string | /themes/owncloud/theme.json | Path to the theme json file. Will be appended to the URL of the theme server.|
 | OCIS_URL<br/>WEB_UI_CONFIG_SERVER | string | https://localhost:9200 | URL, where the oCIS APIs are reachable for ownCloud Web.|
 | WEB_OIDC_METADATA_URL | string | https://localhost:9200/.well-known/openid-configuration | URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + '/.well-known/openid-configuration'.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>WEB_OIDC_AUTHORITY | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
@@ -42,7 +42,7 @@
 | WEB_OPTION_OPEN_APPS_IN_TAB | bool | false | Configures whether apps and extensions should generally open in a new tab. Defaults to false.|
 | OCIS_DISABLE_PREVIEWS<br/>WEB_OPTION_DISABLE_PREVIEWS | bool | false | Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.|
 | WEB_OPTION_PREVIEW_FILE_MIMETYPES | []string | [image/gif image/png image/jpeg text/plain image/tiff image/bmp image/x-ms-bmp application/vnd.geogebra.slides] | A list of mimeTypes to specify which ones will be previewed in the UI. For example, to only preview jpg and text files, set this option to 'image/jpeg,text/plain'. See the Environment Variable Types description for more details.|
-| WEB_OPTION_DISABLE_FEEDBACK_LINK | bool | false | Set this option to 'true' to disable the feedback link in the topbar. Keeping it enabled by setting the value to 'false' or with the absence of the option, allows ownCloud to get feedback from your user base through a dedicated survey website.|
+| WEB_OPTION_DISABLE_FEEDBACK_LINK | bool | false | Set this option to 'true' to disable the feedback link in the top bar. Keeping it enabled by setting the value to 'false' or with the absence of the option, allows ownCloud to get feedback from your user base through a dedicated survey website.|
 | WEB_OPTION_SHARING_RECIPIENTS_PER_PAGE | int | 200 | Sets the number of users shown as recipients in the dropdown menu when sharing resources.|
 | WEB_OPTION_SIDEBAR_SHARES_SHOW_ALL_ON_LOAD | bool | false | Sets the list of the (link) shares list in the sidebar to be initially expanded. Default is a collapsed state, only showing the first three shares.|
 | WEB_OPTION_RUNNING_ON_EOS | bool | false | Set this option to 'true' if running on an EOS storage backend (https://eos-web.web.cern.ch/eos-web/) to enable its specific features. Defaults to 'false'.|
