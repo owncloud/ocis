@@ -517,6 +517,16 @@ var _ = Describe("Users", func() {
 			identityBackend.On("GetGroupMembers", mock.Anything, "25cb7bc0-3168-4a0c-adbe-396f478ad494", mock.Anything).Return(users, nil)
 			identityBackend.On("GetGroupMembers", mock.Anything, "2713f1d5-6822-42bd-ad56-9f6c55a3a8fa", mock.Anything).Return([]*libregraph.User{}, nil)
 			identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{user}, nil)
+			roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).
+				Return(func(ctx context.Context, in *settings.ListRoleAssignmentsFilteredRequest, opts ...client.CallOption) *settings.ListRoleAssignmentsResponse {
+					return &settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
+						{
+							Id:          "some-appRoleAssignment-ID",
+							AccountUuid: user.GetId(),
+							RoleId:      "some-appRole-ID",
+						},
+					}}
+				}, nil)
 			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).
 				Return(func(ctx context.Context, in *settings.ListRoleAssignmentsRequest, opts ...client.CallOption) *settings.ListRoleAssignmentsResponse {
 					return &settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
