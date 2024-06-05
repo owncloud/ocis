@@ -85,3 +85,7 @@ As of now, there is no automated thumbnail deletion. This is especially true whe
 
 Since source files need to be loaded into memory when generating thumbnails, large source files could potentially crash this service if there is insufficient memory available. For bigger instances when using container orchestration deployment methods, this service can be dedicated to its own server(s) with more memory.
 To have more control over memory (and CPU) consumption the maximum number of concurrent requests can be limited by setting the environment variable `THUMBNAILS_MAX_CONCURRENT_REQUESTS`. The default value is 0 which does not apply any restrictions to the number of concurrent requests. As soon as the number of concurrent requests is reached any further request will be responded with `429/Too Many Requests` and the client can retry at a later point in time.
+
+## Thumbnails and SecureView
+
+If a resource is shared using SecureView, the share reciever will get a 403 (forbidden) response when requesting a thumbnail. The requesting client needs to decide what to show and usually a placeholder thumbnail is used.
