@@ -853,6 +853,8 @@ var _ = Describe("FileConnector", func() {
 				UserID:                  "guest-zzz000",
 				UserFriendlyName:        "guest zzz000",
 				EnableOwnerTermination:  true,
+				SupportsLocks:           true,
+				BreadcrumbDocName:       "test.txt",
 			}
 
 			newFileInfo, err := fc.CheckFileInfo(ctx)
@@ -907,6 +909,8 @@ var _ = Describe("FileConnector", func() {
 				UserFriendlyName:        "Pet Shaft",
 				EnableOwnerTermination:  true,
 				WatermarkText:           "Pet Shaft shaft@example.com",
+				SupportsLocks:           true,
+				BreadcrumbDocName:       "test.txt",
 			}
 
 			newFileInfo, err := fc.CheckFileInfo(ctx)
