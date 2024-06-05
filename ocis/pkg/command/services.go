@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/v2/ocis/pkg/command/helper"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	activitylog "github.com/owncloud/ocis/v2/services/activitylog/pkg/command"
 	antivirus "github.com/owncloud/ocis/v2/services/antivirus/pkg/command"
 	appprovider "github.com/owncloud/ocis/v2/services/app-provider/pkg/command"
 	appregistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/command"
@@ -52,6 +53,11 @@ import (
 )
 
 var svccmds = []register.Command{
+	func(cfg *config.Config) *cli.Command {
+		return ServiceCommand(cfg, cfg.Activitylog.Service.Name, activitylog.GetCommands(cfg.Activitylog), func(c *config.Config) {
+			cfg.Activitylog.Commons = cfg.Commons
+		})
+	},
 	func(cfg *config.Config) *cli.Command {
 		return ServiceCommand(cfg, cfg.Antivirus.Service.Name, antivirus.GetCommands(cfg.Antivirus), func(c *config.Config) {
 			// cfg.Antivirus.Commons = cfg.Commons // antivirus needs no commons atm
