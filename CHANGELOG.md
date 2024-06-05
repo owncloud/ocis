@@ -122,9 +122,9 @@ The following sections list the changes for unreleased.
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
 * Enhancement - The storage-users doc updated: [#9228](https://github.com/owncloud/ocis/pull/9228)
 * Enhancement - Docker compose example for ClamAV: [#9229](https://github.com/owncloud/ocis/pull/9229)
-* Enhancement - Bump Reva: [#9269](https://github.com/owncloud/ocis/pull/9269)
 * Enhancement - Web server compression: [#9287](https://github.com/owncloud/ocis/pull/9287)
 * Enhancement - Add secureview flag when listing apps via http: [#9289](https://github.com/owncloud/ocis/pull/9289)
+* Enhancement - Bump Reva: [#9318](https://github.com/owncloud/ocis/pull/9318)
 
 ## Details
 
@@ -773,22 +773,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9229
 
-* Enhancement - Bump Reva: [#9269](https://github.com/owncloud/ocis/pull/9269)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/9269
-   https://github.com/owncloud/ocis/pull/9236
-   https://github.com/owncloud/ocis/pull/9188
-   https://github.com/owncloud/ocis/pull/9132
-   https://github.com/owncloud/ocis/pull/9041
-   https://github.com/owncloud/ocis/pull/9002
-   https://github.com/owncloud/ocis/pull/8917
-   https://github.com/owncloud/ocis/pull/8795
-   https://github.com/owncloud/ocis/pull/8701
-   https://github.com/owncloud/ocis/pull/8606
-   https://github.com/owncloud/ocis/pull/8937
-
 * Enhancement - Web server compression: [#9287](https://github.com/owncloud/ocis/pull/9287)
 
    We've added a compression middleware to the web server to reduce the request
@@ -808,6 +792,23 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9289
    https://github.com/owncloud/ocis/pull/9280
    https://github.com/owncloud/ocis/pull/9277
+
+* Enhancement - Bump Reva: [#9318](https://github.com/owncloud/ocis/pull/9318)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/9318
+   https://github.com/owncloud/ocis/pull/9269
+   https://github.com/owncloud/ocis/pull/9236
+   https://github.com/owncloud/ocis/pull/9188
+   https://github.com/owncloud/ocis/pull/9132
+   https://github.com/owncloud/ocis/pull/9041
+   https://github.com/owncloud/ocis/pull/9002
+   https://github.com/owncloud/ocis/pull/8917
+   https://github.com/owncloud/ocis/pull/8795
+   https://github.com/owncloud/ocis/pull/8701
+   https://github.com/owncloud/ocis/pull/8606
+   https://github.com/owncloud/ocis/pull/8937
 
 # Changelog for [5.0.3] (2024-05-02)
 
