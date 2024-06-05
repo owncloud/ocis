@@ -645,6 +645,7 @@ Feature: List a sharing permissions
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
+      | Secure viewer    |
 
   @issues-8331
   Scenario: user lists permissions of a file in personal space
@@ -1681,6 +1682,7 @@ Feature: List a sharing permissions
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
+      | Secure viewer    |
 
 
   Scenario: user sends share invitation with all allowed roles for a project space using root endpoint
