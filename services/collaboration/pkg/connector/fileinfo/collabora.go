@@ -64,6 +64,20 @@ type Collabora struct {
 
 	// If set to a non-empty string, is used for rendering a watermark-like text on each tile of the document.
 	WatermarkText string `json:"WatermarkText,omitempty"`
+
+	//
+	// Undocumented (from source code)
+	//
+
+	EnableShare bool `json:"EnableShare,omitempty"`
+	// If set to "true", user list on the status bar will be hidden
+	// If set to "mobile" | "tablet" | "desktop", will be hidden on a specified device
+	// (may be joint, delimited by commas eg. "mobile,tablet")
+	HideUserList      string `json:"HideUserList,omitempty"`
+	SupportsLocks     bool   `json:"SupportsLocks"`
+	SupportsRename    bool   `json:"SupportsRename"`
+	UserCanRename     bool   `json:"UserCanRename"`
+	BreadcrumbDocName string `json:"BreadcrumbDocName,omitempty"`
 }
 
 // SetProperties will set the file properties for the Collabora implementation.
@@ -94,6 +108,13 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 		//UserExtraInfo -> requires definition, currently not used
 		//UserPrivateInfo -> requires definition, currently not used
 		"WatermarkText": assignStringTo(&cinfo.WatermarkText),
+
+		"EnableShare":       assignBoolTo(&cinfo.EnableShare),
+		"HideUserList":      assignStringTo(&cinfo.HideUserList),
+		"SupportsLocks":     assignBoolTo(&cinfo.SupportsLocks),
+		"SupportsRename":    assignBoolTo(&cinfo.SupportsRename),
+		"UserCanRename":     assignBoolTo(&cinfo.UserCanRename),
+		"BreadcrumbDocName": assignStringTo(&cinfo.BreadcrumbDocName),
 	}
 
 	for key, value := range props {
