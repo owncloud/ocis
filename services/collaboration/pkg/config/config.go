@@ -31,10 +31,10 @@ type Config struct {
 
 // Tracing defines the available tracing configuration. Not used at the moment
 type Tracing struct {
-	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;COLLABORATION_TRACING_ENABLED" desc:"Activates tracing." introductionVersion:"5.1"`
-	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;COLLABORATION_TRACING_TYPE" desc:"The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now." introductionVersion:"5.1"`
-	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;COLLABORATION_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent." introductionVersion:"5.1"`
-	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;COLLABORATION_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset." introductionVersion:"5.1"`
+	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;COLLABORATION_TRACING_ENABLED" desc:"Activates tracing." introductionVersion:"%%NEXT%%"`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;COLLABORATION_TRACING_TYPE" desc:"The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now." introductionVersion:"%%NEXT%%"`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;COLLABORATION_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent." introductionVersion:"%%NEXT%%"`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;COLLABORATION_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset." introductionVersion:"%%NEXT%%"`
 }
 
 // Convert Tracing to the tracing package's Config struct.
