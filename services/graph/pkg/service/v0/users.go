@@ -82,7 +82,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// expand appRoleAssignments if requested
-	if slices.Contains(exp, "appRoleAssignments") {
+	if slices.Contains(exp, appRoleAssignments) {
 		var err error
 		me.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), me.GetId())
 		if err != nil {
@@ -295,7 +295,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	expandAppRoleAssignments := slices.Contains(exp, "appRoleAssignments")
+	expandAppRoleAssignments := slices.Contains(exp, appRoleAssignments)
 	expandMemberOf := slices.Contains(exp, "memberOf")
 	for _, u := range users {
 		if expandAppRoleAssignments && u.AppRoleAssignments == nil {
@@ -539,7 +539,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// expand appRoleAssignments if requested
-	if slices.Contains(exp, "appRoleAssignments") {
+	if slices.Contains(exp, appRoleAssignments) {
 		user.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), user.GetId())
 		if err != nil {
 			logger.Debug().Err(err).Str("userid", user.GetId()).Msg("could not get appRoleAssignments for user")
