@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	appRoleID = "appRoleId"
+	appRoleID          = "appRoleId"
+	appRoleAssignments = "appRoleAssignments"
 )
 
 func invalidFilterError() error {
@@ -237,7 +238,7 @@ func (g Graph) applyFilterLambda(ctx context.Context, req *godata.GoDataRequest,
 	switch nodes[0].Token.Value {
 	case "memberOf":
 		return g.applyLambdaMemberOfAny(ctx, req, nodes[1].Children)
-	case "appRoleAssignments":
+	case appRoleAssignments:
 		return g.applyLambdaAppRoleAssignmentAny(ctx, req, nodes[1].Children)
 	}
 	logger.Debug().Str("Token", nodes[0].Token.Value).Msg("unsupported relation for lambda filter")
@@ -349,7 +350,7 @@ func (g Graph) filterUsersByAppRoleID(ctx context.Context, req *godata.GoDataReq
 	var expand bool
 	if exp := req.Query.GetExpand(); exp != nil {
 		for _, item := range exp.ExpandItems {
-			if item.Path[0].Value == "appRoleAssignments" {
+			if item.Path[0].Value == appRoleAssignments {
 				expand = true
 				break
 			}
@@ -405,7 +406,7 @@ func (g Graph) isAppRoleAssignmentFilter(ctx context.Context, node *godata.Parse
 		return false, "", ""
 	}
 
-	if node.Children[0].Token.Type != godata.ExpressionTokenLiteral || node.Children[0].Token.Value != "appRoleAssignments" {
+	if node.Children[0].Token.Type != godata.ExpressionTokenLiteral || node.Children[0].Token.Value != appRoleAssignments {
 		return false, "", ""
 	}
 
