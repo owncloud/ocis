@@ -156,7 +156,7 @@ func (g Graph) applyFilterLogicalAnd(ctx context.Context, req *godata.GoDataRequ
 			return []*libregraph.User{}, err
 		}
 		logger.Debug().Str("property", property).Str("value", value).Msg("applying approleAssignments filter on result set")
-		return g.filterUsersByAppRoleID(ctx, value, res2)
+		return g.filterUsersByAppRoleID(ctx, req, value, res2)
 	}
 
 	// 1st part is no appRoleAssignmentFilter, run the filter query
@@ -172,7 +172,7 @@ func (g Graph) applyFilterLogicalAnd(ctx context.Context, req *godata.GoDataRequ
 			return users, unsupportedFilterError()
 		}
 		logger.Debug().Str("property", property).Str("value", value).Msg("applying approleAssignments filter on result set")
-		return g.filterUsersByAppRoleID(ctx, value, res1)
+		return g.filterUsersByAppRoleID(ctx, req, value, res1)
 	}
 
 	// 2nd part is no appRoleAssignmentFilter either
@@ -329,21 +329,38 @@ func (g Graph) applyAppRoleAssignmentEq(ctx context.Context, req *godata.GoDataR
 			return users, err
 		}
 
-		return g.filterUsersByAppRoleID(ctx, filterValue, users)
+		return g.filterUsersByAppRoleID(ctx, req, filterValue, users)
 	}
 	return users, unsupportedFilterError()
 }
 
-func (g Graph) filterUsersByAppRoleID(ctx context.Context, id string, users []*libregraph.User) ([]*libregraph.User, error) {
+func (g Graph) filterUsersByAppRoleID(ctx context.Context, req *godata.GoDataRequest, id string, users []*libregraph.User) ([]*libregraph.User, error) {
 	// We're using a map for the results here, in order to avoid returning
 	// a user twice. The settings API, still has an issue that causes it to
 	// duplicate some assignments on restart:
 	// https://github.com/owncloud/ocis/issues/3432
+
+	var expand bool
+	if exp := req.Query.GetExpand(); exp != nil {
+		for _, item := range exp.ExpandItems {
+			if item.Path[0].Value == "appRoleAssignments" {
+				expand = true
+				break
+			}
+		}
+	}
+
 	resultUsersMap := make(map[string]*libregraph.User, len(users))
 	for _, user := range users {
 		assignments, err := g.fetchAppRoleAssignments(ctx, user.GetId())
 		if err != nil {
 			return users, err
+		}
+		// To avoid re-fetching all assignments in the upper layer handler when
+		// the $expand query parameter is set, we're adding the assignments to the
+		// resulting users here already.
+		if expand {
+			user.AppRoleAssignments = assignments
 		}
 		for _, assignment := range assignments {
 			if assignment.GetAppRoleId() == id {
