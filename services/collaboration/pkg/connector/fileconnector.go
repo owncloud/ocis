@@ -501,7 +501,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 	}
 
 	var info fileinfo.FileInfo
-	switch strings.ToLower(f.cfg.WopiApp.Provider) {
+	switch strings.ToLower(f.cfg.App.Name) {
 	case "collabora":
 		info = &fileinfo.Collabora{}
 	case "onlyoffice":

@@ -162,7 +162,7 @@ type WopiApp struct {
 }
 
 type Collaboration struct {
-	WopiApp WopiApp `yaml:"wopiapp"`
+	WopiApp WopiApp `yaml:"wopi"`
 }
 
 type Nats struct {
