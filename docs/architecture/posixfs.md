@@ -45,13 +45,17 @@ Underneath the Infinite Scale file system root, there is a collection of differe
 
 Infinite Scale is highly dependent on the efficient usage of meta data which are attached to file resources, but also logical elements such as spaces.
 
-Metadata are stored in extended file attributes or in message pack files, as it is with other storage drivers, namely decompsed FS. All indexing and caching of metadata is located in higher system levels than the storage driver, and thus are not different to the components used with other storage drivers like the decomposed FS.
+Metadata are stored in extended attributes (as also supported by decompsed FS) which poses the benefit that metadata is always directly attached to the actual resources. As a result care has to be taken that extended attributes are considered when working with the file tree however, e.g. when creating or restoring backups.
+
+Note: The maximum number and size of extended attributes are limited depending on the filesystem and block size. See [GPFS Specifics](#gpfs-specifics) for more details on GPFS file systems.
+
+All indexing and caching of metadata is implemented in higher system levels than the storage driver, and thus are not different to the components used with other storage drivers like the decomposed FS.
 
 ### Monitoring
 
-To get information about changes such as new files added, files edited or removed, Infinte Sale uses a monitoring system to directly watch the file system. This starts with the Linux inotify system and ranges to much more sophisticated services as for example in Spectrum Scale.
+To get information about changes such as new files added, files edited or removed, Infinte Sale uses a monitoring system to directly watch the file system. This starts with the Linux inotify system and ranges to much more sophisticated services as for example in Spectrum Scale (see [GPFS Specifics](#gpfs-specifics) for more details on GPFS file systems).
 
-Based on the information transmitted by the watching service, Infinite Scale is able to "register" new or changed files into its own caches and internal management structures. That entitles Infinte Scale to deliver resource changes through the "traditional" channels such as APIs and clients.
+Based on the information transmitted by the watching service, Infinite Scale is able to "register" new or changed files into its own caches and internal management structures. This enables Infinite Scale to deliver resource changes through the "traditional" channels such as APIs and clients.
 
 Since the most important metadata is the file tree structure itself, the "split brain" situation between data and metadata is impossible to cause trouble.
 
@@ -59,15 +63,15 @@ Since the most important metadata is the file tree structure itself, the "split 
 
 The ETag of a resource can be understood as a content fingerprint of any file- or folder resource in Infinite Scale. It is mainly used by clients to detect changes of resources. The rule is that if the content of a file changed the ETag has to change as well, as well as the ETag of all parent folders up to the root of the space.
 
-A sophisticated underlying file system provides any attribute that fulfills this requirement and changes whenever content or metadata of a resource changes, and - which is most important - also changes the attribute of the parent resource and the parent of the parent etc.
+Infinite Scale uses a built in mechanism to maintain the ETag for each resource in the file meta data, and also propagates it automatically.
 
-If that is not available, Infinite Sale uses a built in mechanism to the maintain the ETag for each resource in the file meta data, and also propagates it automatically.
+In the future a sophisticated underlying file system could provide an attribute that fulfills this requirement and changes whenever content or metadata of a resource changes, and - which is most important - also changes the attribute of the parent resource and the parent of the parent etc.
 
 ### Automatic Tree Size Propagation
 
 Similar to the ETag propagation described before, Infinite Scale also tracks the accumulated tree size in all nodes of the file tree. A change to any file requires a re-calculation of the size attribute in all parent folders.
 
-If the file system supports that natively that is a huge benefit.
+In the future Infinite Scale could benefit from file systems with native tree size propagation.
 
 ### Quota
 
@@ -81,14 +85,16 @@ Other systems store quota data in the metadata storage and implement propagation
 
 Infinite Scale uses an Id based approach to work with resources, rather than a file path based mechanism. The reason for that is that Id based lookups can be done way more efficient compared to tree traversals, just to name one reason.
 
-The most important component of the Id is a unique file Id that identifies the resource within a space. Typically the Inode of a file could be used here. However, some file systems re-use inodes which must be avoided. Infinite Scale does not use the file Inode, but generates a UUID by default.
+The most important component of the Id is a unique file Id that identifies the resource within a space. Ideally the Inode of a file could be used here. However, some file systems re-use inodes which must be avoided. Infinite Scale thus does not use the file Inode, but generates a UUID instead.
 
-A powerful underlying file system would support Infinite Scale big times by providing an API that
+ID based lookups utilize an Id cache which needs to be shared between all storageprovider and dataprovider instances. During startup a scan of the whole file tree is performed to detect and cache new entities.
+
+In the future a powerful underlying file system could support Infinite Scale by providing an API that
 
 1. Provides the Id for a given file path referenced resource
 2. Provides the path for a given Id.
 
-These two operations are very crucial for the performance of the entire system. For file systems that do not provide these APIs, Infinite Scale  provides internal caches to support the look ups.
+These two operations are very crucial for the performance of the entire system.
 
 ### User Management
 
@@ -162,4 +168,6 @@ This is an example configuration with environment variables that configures Infi
     "STORAGE_USERS_ID_CACHE_STORE_NODES": "localhost:9233",    // for redis "127.0.0.1:6379"
 ```
 
+## GPFS Specifics
 
+T.B.D.
