@@ -6,6 +6,8 @@ import (
 
 	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
 const (
@@ -339,6 +341,10 @@ func (g Graph) filterUsersByAppRoleID(ctx context.Context, req *godata.GoDataReq
 	// a user twice. The settings API, still has an issue that causes it to
 	// duplicate some assignments on restart:
 	// https://github.com/owncloud/ocis/issues/3432
+	usersByIdMap := make(map[string]*libregraph.User, len(users))
+	for _, user := range users {
+		usersByIdMap[user.GetId()] = user
+	}
 
 	var expand bool
 	if exp := req.Query.GetExpand(); exp != nil {
@@ -350,29 +356,28 @@ func (g Graph) filterUsersByAppRoleID(ctx context.Context, req *godata.GoDataReq
 		}
 	}
 
-	resultUsersMap := make(map[string]*libregraph.User, len(users))
-	for _, user := range users {
-		assignments, err := g.fetchAppRoleAssignments(ctx, user.GetId())
-		if err != nil {
-			return users, err
-		}
-		// To avoid re-fetching all assignments in the upper layer handler when
-		// the $expand query parameter is set, we're adding the assignments to the
-		// resulting users here already.
-		if expand {
-			user.AppRoleAssignments = assignments
-		}
-		for _, assignment := range assignments {
-			if assignment.GetAppRoleId() == id {
-				if _, ok := resultUsersMap[user.GetId()]; !ok {
-					resultUsersMap[user.GetId()] = user
-				}
-			}
-		}
+	assignmentsForRole, err := g.roleService.ListRoleAssignmentsFiltered(
+		ctx,
+		&settingssvc.ListRoleAssignmentsFilteredRequest{
+			Filters: []*settingsmsg.UserRoleAssignmentFilter{
+				{
+					Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
+					Term: &settingsmsg.UserRoleAssignmentFilter_RoleId{RoleId: id},
+				},
+			},
+		},
+	)
+	if err != nil {
+		return users, err
 	}
-	resultUsers := make([]*libregraph.User, 0, len(resultUsersMap))
-	for _, user := range resultUsersMap {
-		resultUsers = append(resultUsers, user)
+	resultUsers := make([]*libregraph.User, 0, len(assignmentsForRole.GetAssignments()))
+	for _, assignment := range assignmentsForRole.GetAssignments() {
+		if user, ok := usersByIdMap[assignment.GetAccountUuid()]; ok {
+			if expand {
+				user.AppRoleAssignments = []libregraph.AppRoleAssignment{g.assignmentToAppRoleAssignment(assignment)}
+			}
+			resultUsers = append(resultUsers, user)
+		}
 	}
 	return resultUsers, nil
 }
