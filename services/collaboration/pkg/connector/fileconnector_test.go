@@ -840,7 +840,7 @@ var _ = Describe("FileConnector", func() {
 			}, nil)
 
 			// change wopi app provider
-			cfg.WopiApp.Provider = "Collabora"
+			cfg.App.Name = "Collabora"
 
 			expectedFileInfo := &fileinfo.Collabora{
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
@@ -893,7 +893,7 @@ var _ = Describe("FileConnector", func() {
 			}, nil)
 
 			// change wopi app provider
-			cfg.WopiApp.Provider = "Collabora"
+			cfg.App.Name = "Collabora"
 
 			expectedFileInfo := &fileinfo.Collabora{
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp

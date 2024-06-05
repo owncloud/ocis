@@ -500,6 +500,9 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 		return nil, NewConnectorError(500, statRes.GetStatus().GetCode().String()+" "+statRes.GetStatus().GetMessage())
 	}
 
+	// If a not known app name is used, consider "Microsoft" as default.
+	// This will help with the CI because we're using a "FakeOffice" app
+	// for the wopi validator, which requires a Microsoft fileinfo
 	var info fileinfo.FileInfo
 	switch strings.ToLower(f.cfg.App.Name) {
 	case "collabora":
