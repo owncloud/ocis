@@ -859,6 +859,9 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, share *col
 		case rpc.Code_CODE_LOCKED:
 			response.WriteOCSError(w, r, response.MetaLocked.StatusCode, uRes.GetStatus().GetMessage(), nil)
 			return
+		case rpc.Code_CODE_INVALID_ARGUMENT, rpc.Code_CODE_FAILED_PRECONDITION:
+			response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, uRes.GetStatus().GetMessage(), nil)
+			return
 		}
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "grpc update share request failed", err)
 		return
