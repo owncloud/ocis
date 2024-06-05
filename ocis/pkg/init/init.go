@@ -172,6 +172,10 @@ type Nats struct {
 	}
 }
 
+type Activitylog struct {
+	ServiceAccount ServiceAccount `yaml:"service_account"`
+}
+
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id"`
@@ -221,6 +225,7 @@ type OcisConfig struct {
 	Userlog           Userlog
 	AuthService       AuthService `yaml:"auth_service"`
 	Clientlog         Clientlog
+	Activitylog       Activitylog
 }
 
 func checkConfigPath(configPath string) error {
@@ -428,6 +433,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		},
 		Settings: SettingsService{
 			ServiceAccountIDs: []string{serviceAccount.ServiceAccountID},
+		},
+		Activitylog: Activitylog{
+			ServiceAccount: serviceAccount,
 		},
 	}
 

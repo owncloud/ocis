@@ -7,10 +7,12 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -24,7 +26,7 @@ import (
 )
 
 var _registeredEvents = []events.Unmarshaller{
-	events.PostprocessingFinished{},
+	events.UploadReady{},
 }
 
 // Server is the entrypoint for the server command.
@@ -40,6 +42,7 @@ func Server(cfg *config.Config) *cli.Command {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			tracerProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
+				logger.Error().Err(err).Msg("Failed to initialize tracer")
 				return err
 			}
 
@@ -58,6 +61,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			evStream, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Events))
 			if err != nil {
+				logger.Error().Err(err).Msg("Failed to initialize event stream")
 				return err
 			}
 
@@ -71,6 +75,23 @@ func Server(cfg *config.Config) *cli.Command {
 				store.Authentication(cfg.Store.AuthUsername, cfg.Store.AuthPassword),
 			)
 
+			tm, err := pool.StringToTLSMode(cfg.GRPCClientTLS.Mode)
+			if err != nil {
+				logger.Error().Err(err).Msg("Failed to parse tls mode")
+				return err
+			}
+			gatewaySelector, err := pool.GatewaySelector(
+				cfg.RevaGateway,
+				pool.WithTLSCACert(cfg.GRPCClientTLS.CACert),
+				pool.WithTLSMode(tm),
+				pool.WithRegistry(registry.GetRegistry()),
+				pool.WithTracerProvider(tracerProvider),
+			)
+			if err != nil {
+				logger.Error().Err(err).Msg("Failed to initialize gateway selector")
+				return fmt.Errorf("could not get reva client selector: %s", err)
+			}
+
 			{
 				svc, err := service.New(
 					service.Logger(logger),
@@ -79,10 +100,11 @@ func Server(cfg *config.Config) *cli.Command {
 					service.Stream(evStream),
 					service.RegisteredEvents(_registeredEvents),
 					service.Store(evStore),
+					service.GatewaySelector(gatewaySelector),
 				)
 
 				if err != nil {
-					logger.Info().Err(err).Str("transport", "http").Msg("Failed to initialize server")
+					logger.Error().Err(err).Str("transport", "http").Msg("Failed to initialize server")
 					return err
 				}
 

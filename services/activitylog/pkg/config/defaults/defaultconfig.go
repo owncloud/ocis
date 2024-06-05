@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
 )
 
@@ -32,9 +34,10 @@ func DefaultConfig() *config.Config {
 		Store: config.Store{
 			Store:    "nats-js-kv",
 			Nodes:    []string{"127.0.0.1:9233"},
-			Database: "postprocessing",
+			Database: "activitylog",
 			Table:    "",
 		},
+		RevaGateway: shared.DefaultRevaConfig().Address,
 	}
 }
 
@@ -62,6 +65,10 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
+		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
 }
 

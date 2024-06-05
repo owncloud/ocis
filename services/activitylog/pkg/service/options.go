@@ -1,7 +1,9 @@
 package service
 
 import (
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
 	microstore "go-micro.dev/v4/store"
@@ -19,6 +21,7 @@ type Options struct {
 	Stream           events.Stream
 	RegisteredEvents []events.Unmarshaller
 	Store            microstore.Store
+	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 }
 
 // Logger configures a logger for the activitylog service
@@ -60,5 +63,12 @@ func RegisteredEvents(e []events.Unmarshaller) Option {
 func Store(store microstore.Store) Option {
 	return func(o *Options) {
 		o.Store = store
+	}
+}
+
+// GatewaySelector adds a grpc client selector for the gateway service
+func GatewaySelector(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) Option {
+	return func(o *Options) {
+		o.GatewaySelector = gatewaySelector
 	}
 }
