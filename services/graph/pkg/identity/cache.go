@@ -142,6 +142,9 @@ func (cache IdentityCache) GetGroup(ctx context.Context, groupID string) (libreg
 	var group libregraph.Group
 	if item := cache.groups.Get(groupID); item == nil {
 		gatewayClient, err := cache.gatewaySelector.Next()
+		if err != nil {
+			return group, errorcode.New(errorcode.GeneralException, err.Error())
+		}
 		cs3GroupID := &cs3Group.GroupId{
 			OpaqueId: groupID,
 		}
