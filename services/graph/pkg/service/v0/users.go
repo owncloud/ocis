@@ -298,7 +298,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	expandAppRoleAssignments := slices.Contains(exp, "appRoleAssignments")
 	expandMemberOf := slices.Contains(exp, "memberOf")
 	for _, u := range users {
-		if expandAppRoleAssignments {
+		if expandAppRoleAssignments && u.AppRoleAssignments == nil {
 			u.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), u.GetId())
 			if err != nil {
 				// TODO I think we should not continue here, see http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionexpand

@@ -175,6 +175,80 @@ func (_c *RoleService_ListRoleAssignments_Call) RunAndReturn(run func(context.Co
 	return _c
 }
 
+// ListRoleAssignmentsFiltered provides a mock function with given fields: ctx, in, opts
+func (_m *RoleService) ListRoleAssignmentsFiltered(ctx context.Context, in *v0.ListRoleAssignmentsFilteredRequest, opts ...client.CallOption) (*v0.ListRoleAssignmentsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListRoleAssignmentsFiltered")
+	}
+
+	var r0 *v0.ListRoleAssignmentsResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *v0.ListRoleAssignmentsFilteredRequest, ...client.CallOption) (*v0.ListRoleAssignmentsResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *v0.ListRoleAssignmentsFilteredRequest, ...client.CallOption) *v0.ListRoleAssignmentsResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v0.ListRoleAssignmentsResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *v0.ListRoleAssignmentsFilteredRequest, ...client.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// RoleService_ListRoleAssignmentsFiltered_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRoleAssignmentsFiltered'
+type RoleService_ListRoleAssignmentsFiltered_Call struct {
+	*mock.Call
+}
+
+// ListRoleAssignmentsFiltered is a helper method to define mock.On call
+//   - ctx context.Context
+//   - in *v0.ListRoleAssignmentsFilteredRequest
+//   - opts ...client.CallOption
+func (_e *RoleService_Expecter) ListRoleAssignmentsFiltered(ctx interface{}, in interface{}, opts ...interface{}) *RoleService_ListRoleAssignmentsFiltered_Call {
+	return &RoleService_ListRoleAssignmentsFiltered_Call{Call: _e.mock.On("ListRoleAssignmentsFiltered",
+		append([]interface{}{ctx, in}, opts...)...)}
+}
+
+func (_c *RoleService_ListRoleAssignmentsFiltered_Call) Run(run func(ctx context.Context, in *v0.ListRoleAssignmentsFilteredRequest, opts ...client.CallOption)) *RoleService_ListRoleAssignmentsFiltered_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]client.CallOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(client.CallOption)
+			}
+		}
+		run(args[0].(context.Context), args[1].(*v0.ListRoleAssignmentsFilteredRequest), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *RoleService_ListRoleAssignmentsFiltered_Call) Return(_a0 *v0.ListRoleAssignmentsResponse, _a1 error) *RoleService_ListRoleAssignmentsFiltered_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *RoleService_ListRoleAssignmentsFiltered_Call) RunAndReturn(run func(context.Context, *v0.ListRoleAssignmentsFilteredRequest, ...client.CallOption) (*v0.ListRoleAssignmentsResponse, error)) *RoleService_ListRoleAssignmentsFiltered_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListRoles provides a mock function with given fields: ctx, in, opts
 func (_m *RoleService) ListRoles(ctx context.Context, in *v0.ListBundlesRequest, opts ...client.CallOption) (*v0.ListBundlesResponse, error) {
 	_va := make([]interface{}, len(opts))
