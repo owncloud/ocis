@@ -8,7 +8,7 @@ geekdocFilePath: envvar-scopes.md
 geekdocCollapseSection: true
 ---
 
-The scope of an environment variable can be derived from its name. Therefore it is important to follow the correct naming scheme to enable easy and proper identification. This is important when either:
+The scope of an environment variable can be derived from its name. Therefore, it is important to follow the correct naming scheme to enable easy and proper identification. This is important when either:
 
 -   a new local envvar is introduced.
 -   a new global envvar is added to an existing local envvar.
@@ -24,7 +24,7 @@ The scope of an environment variable can be derived from its name. Therefore it 
 
 ### Local Envvars
 
-A local envvar always starts with the the service name like `POSTPROCESSING_LOG_FILE`.
+A local envvar always starts with the service name like `POSTPROCESSING_LOG_FILE`.
 
 ### Global Envvars
 
@@ -36,7 +36,7 @@ To get a list of global envvars used in all services, see the [Global Environmen
 
 ### Lifecycle
 
-In the struct tag values of our config data types, we are using three key/value pairs to document the lifecycle of a config variable: `introductionVersion`, `deprecationVersion` and `removalVersion`. During the development cycle, a new value should set to `%%NEXT%%` as long as no release is scheduled. During the release process, the palceholder will be replaced with the actual version number. Our docs helper scripts will then automatically generate the correct documentation based on the version number.
+In the struct tag values of our config data types, we are using three key/value pairs to document the lifecycle of a config variable: `introductionVersion`, `deprecationVersion` and `removalVersion`. During the development cycle, a new value should set to `%%NEXT%%` as long as no release is scheduled. During the release process, the placeholder will be replaced with the actual version number. Our docs helper scripts will then automatically generate the correct documentation based on the version number.
 
 ## Deprecations
 
