@@ -70,7 +70,7 @@ func (a *ActivitylogService) Run() error {
 		var err error
 		switch ev := e.Event.(type) {
 		case events.UploadReady:
-			err = a.addActivity(ev.FileRef, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(ev.FileRef, e.ID, utils.TSToTime(ev.Timestamp))
 		}
 
 		if err != nil {
@@ -80,7 +80,8 @@ func (a *ActivitylogService) Run() error {
 	return nil
 }
 
-func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID string, timestamp time.Time) error {
+// AddActivity addds the activity to the given resource and all its parents
+func (a *ActivitylogService) AddActivity(initRef *provider.Reference, eventID string, timestamp time.Time) error {
 	gwc, err := a.gws.Next()
 	if err != nil {
 		return fmt.Errorf("cant get gateway client: %w", err)
@@ -91,20 +92,55 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 		return fmt.Errorf("cant get service user context: %w", err)
 	}
 
-	var info *provider.ResourceInfo
-	depth, ref := 0, initRef
+	return a.addActivity(initRef, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
+		return utils.GetResource(ctx, ref, gwc)
+	})
+}
+
+// Activities returns the activities for the given reference
+func (a *ActivitylogService) Activities(ref *provider.Reference) ([]Activity, error) {
+	resourceID, err := storagespace.FormatReference(ref)
+	if err != nil {
+		return nil, fmt.Errorf("could not format reference: %w", err)
+	}
+
+	records, err := a.store.Read(resourceID)
+	if err != nil && err != microstore.ErrNotFound {
+		return nil, fmt.Errorf("could not read activities: %w", err)
+	}
+
+	if len(records) == 0 {
+		return []Activity{}, nil
+	}
+
+	var activities []Activity
+	if err := json.Unmarshal(records[0].Value, &activities); err != nil {
+		return nil, fmt.Errorf("could not unmarshal activities: %w", err)
+	}
+
+	return activities, nil
+}
+
+// note: getResource is abstracted to allow unit testing, in general this will just be utils.GetResource
+func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID string, timestamp time.Time, getResource func(*provider.Reference) (*provider.ResourceInfo, error)) error {
+	var (
+		info  *provider.ResourceInfo
+		err   error
+		depth int
+		ref   = initRef
+	)
 	for {
 		if err := a.addActivityToReference(ref, eventID, depth, timestamp); err != nil {
 			return fmt.Errorf("could not store activity: %w", err)
 		}
 
-		if info != nil && utils.IsSpaceRoot(info) {
-			return nil
-		}
-
-		info, err = utils.GetResource(ctx, ref, gwc)
+		info, err = getResource(ref)
 		if err != nil {
 			return fmt.Errorf("could not get resource info: %w", err)
+		}
+
+		if info != nil && utils.IsSpaceRoot(info) {
+			return nil
 		}
 
 		depth++
@@ -127,7 +163,7 @@ func (a *ActivitylogService) addActivityToReference(ref *provider.Reference, eve
 
 func (a *ActivitylogService) storeActivity(resourceID string, activity Activity) error {
 	records, err := a.store.Read(resourceID)
-	if err != nil {
+	if err != nil && err != microstore.ErrNotFound {
 		return err
 	}
 
