@@ -109,9 +109,13 @@ All possibilities have pros and cons for operations.
 
 One for all, it seems reasonable to use LDAP to manage users which is the base for the Infinite Scale IDP as well as the system login system via PAM.
 
+### GID based space access
+
+Posix FS supports GID based space access to support the problem that project spaces might have to be accessible by multiple users on disk. In order to enable this feature the `ocis` binary needs to have the `setgid` capability and `STORAGE_USERS_POSIX_USE_SPACE_GROUPS` needs to be set to `true`. Inifinite Scale will then use the space GID (the gid of the space root) for all file system access using the `setfsgid` syscall, i.e. all files and directories created by Infinite Scale will belong to the same group as the space root.
+
 ## Advanced Features
 
-Depending on the capabilities of the underlying file system, the Infinite Scale PosixFS can benefit from more advanced funcitonality described here.
+Depending on the capabilities of the underlying file system, the Infinite Scale Posix FS can benefit from more advanced functionality described here.
 
 ### Versioning
 
@@ -133,11 +137,10 @@ As of Q2/2024 the PosixFS is in technical preview state which means that it is n
 
 The tech preview comes with the following limitations:
 
-1. User Management: Manipulations in the file system have to be done by the same user that runs Infinte Scale
-2. Only inotify and GPFS file system change notification methods are supported
-3. Advanced features versioning and trashbin are not supported yet
-4. The space/project folders in the filesystem are named after the UUID, not the real space name
-5. No CephFS support yet
+1. Only inotify and GPFS file system change notification methods are supported
+1. Advanced features versioning and trashbin are not supported yet
+1. The space/project folders in the filesystem are named after the UUID, not the real space name
+1. No CephFS support yet
 
 ## Setup
 
@@ -150,10 +153,10 @@ It is possible to use different storage drivers in the same Infinite Scale insta
 To run PosixFS, the following prerequisites have to be fulfilled:
 
 1. There must be storage available to store meta data and blobs, available under a root path
-2. When using inotify, the storage must be local on the same machine. Network mounts do not work with Inotify
-3. The storage root path must be writeable and executable by the same user Infinite Scale is running under
-4. An appropiate version of Infinte Scale is installed, version number 5.0.5 and later
-5. Either redis or nats-js-kv cache service
+1. When using inotify, the storage must be local on the same machine. Network mounts do not work with inotify. `inotifywait` needs to be installed.
+1. The storage root path must be writeable and executable by the same user Infinite Scale is running under
+1. An appropiate version of Infinite Scale is installed, version number 5.0.5 and later
+1. Either redis or nats-js-kv cache service
 
 
 ### Setup Configuration
@@ -161,13 +164,43 @@ To run PosixFS, the following prerequisites have to be fulfilled:
 This is an example configuration with environment variables that configures Infinite Scale to use PosixFS for all spaces it works with, ie. Personal and Project Spaces:
 
 ```
-    "STORAGE_USERS_DRIVER": "posix",
-    "STORAGE_USERS_POSIX_ROOT" : "/home/kf/tmp/posix-storage",
-    "STORAGE_USERS_POSIX_WATCH_TYPE" : "inotifywait",
-    "STORAGE_USERS_ID_CACHE_STORE": "nats-js-kv",              // for redis "redis"
-    "STORAGE_USERS_ID_CACHE_STORE_NODES": "localhost:9233",    // for redis "127.0.0.1:6379"
+export STORAGE_USERS_DRIVER="posix"
+export STORAGE_USERS_POSIX_ROOT="/home/kf/tmp/posix-storage"
+export STORAGE_USERS_POSIX_WATCH_TYPE="inotifywait"
+export STORAGE_USERS_ID_CACHE_STORE="nats-js-kv"            # for redis "redis"
+export STORAGE_USERS_ID_CACHE_STORE_NODES="localhost:9233"  # for redis "127.0.0.1:6379"
+export STORAGE_USERS_POSIX_USE_SPACE_GROUPS="true"          # optional. Enable when using gid based space access
 ```
 
 ## GPFS Specifics
 
-T.B.D.
+When using GPFS as the underlying filesystem the machine running the according `storage-users` service needs to have the GPFS filesystem mounted locally. The mount path is given to ocis as the `STORAGE_USERS_POSIX_ROOT` path.
+
+Other than that there a few other points to consider:
+
+### Extended Attributes
+
+As described above metadata is stored as extended attributes of the according entities and thus is suspect to their limitations. In GPFS extended attributes are first stored in the inode itself but can then also use an overflow block which is at least 64KB and up to the metadata block size. Inode and metadata block size should be chosen accordingly.
+
+### FS Watcher
+
+Posix FS supports two different watchers for detecting changes to the filesystem. The watchfolder watcher is better tested and supported at that point.
+
+#### GPFS File Audit Logging
+
+The gpfsfileauditlogging watcher tails a GPFS file audit log and parses the JSON events to detect relevant changes.
+
+```
+export STORAGE_USERS_POSIX_WATCH_TYPE="gpfsfileauditlogging"
+export STORAGE_USERS_POSIX_WATCH_PATH="/path/to/current/audit/log"
+```
+
+#### GPFS Watchfolder
+
+The gpfswatchfolder watcher connects to a kafka cluster which is being filled with filesystem events by the GPFS watchfolder service.
+
+```
+export STORAGE_USERS_POSIX_WATCH_TYPE="gpfswatchfolder"
+export STORAGE_USERS_POSIX_WATCH_PATH="fs1_audit"                               # the kafka topic to watch
+export STORAGE_USERS_POSIX_WATCH_FOLDER_KAFKA_BROKERS="192.168.1.180:29092"
+```
