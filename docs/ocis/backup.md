@@ -217,3 +217,12 @@ BACKUP RECOMMENDED/OMITABLE. This folder contains custom web assets. Can be spec
 
 When using an external idp/idm/nats or blobstore, its data needs to be backed up separately. Refer to your idp/idm/nats/blobstore documentation for backup details.
 
+## Backup Consistency command
+
+Infinite Scale now allows checking an existing backup for consistency. Use command
+```bash
+ocis backup consistency -p "<path-to-base-folder>"
+```
+
+`path-to-base-folder` needs to be replaced with the path to the storage providers base path. For example: "/var/lib/ocis/storage/users" or "$HOME/storage/users".
+Use the `-b s3ng` when using an external (s3) blobstore. Note: When using this flag the blobstore must be configured via envvars or yaml file the same as in ocis. Consistency checks for other blobstores than `ocis` and `s3ng` are not supported at the moment.
