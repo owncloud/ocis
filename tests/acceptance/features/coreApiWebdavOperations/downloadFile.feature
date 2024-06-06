@@ -167,13 +167,13 @@ Feature: download file
       | Content-Type   | /^multipart\/byteranges; boundary=[a-zA-Z0-9_.-]*$/ |
     And if the HTTP status code was "206" then the downloaded content for multipart byterange should be:
       """
-      Content-type: text/plain;charset=UTF-8
-      Content-range: bytes 0-6/52
+      Content-Range: bytes 0-6/52
+      Content-Type: text/plain;charset=UTF-8
 
       Welcome
 
-      Content-type: text/plain;charset=UTF-8
-      Content-range: bytes 40-51/52
+      Content-Range: bytes 40-51/52
+      Content-Type: text/plain;charset=UTF-8
 
       developers.
       """
