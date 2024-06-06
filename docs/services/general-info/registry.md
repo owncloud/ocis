@@ -16,7 +16,7 @@ The type of registry to use can be configured with the `MICRO_REGISTRY` environm
 
 ### `memory`
 
-Setting the environment variable to `memory` starts an inmemory registry. This only works with the single binary deployment.
+Setting the environment variable to `memory` starts an in-memory registry. This only works with the single binary deployment.
 
 ### `nats-js-kv` (Default)
 
@@ -25,15 +25,15 @@ Set the environment variable to `nats-js-kv` or leave it empty to use a nats-js 
 - Optional: Use `MICRO_REGISTRY_AUTH_USERNAME` and `MICRO_REGISTRY_AUTH_PASSWORD` to authenticate with the nats cluster.
 ### `kubernetes`
 
-When deploying in a kubernetes cluster, the kubernetes registry can be used. Additionally the `MICRO_REGISTRY_ADDRESS` environment
+When deploying in a kubernetes cluster, the kubernetes registry can be used. Additionally, the `MICRO_REGISTRY_ADDRESS` environment
 variable needs to be set to the url of the kubernetes registry.
 
 ### Deprecated Registries
 
 These registries are currently working but will be removed in a later version. It is recommended to switch to a supported one.
 
-- `nats`. Uses a registry based on nats streams. Requires `MICRO_REGISTRY_ADDRESS` to bet set.
-- `etcd`. Uses an etcd cluster as registry. Requires `MICRO_REGISTRY_ADDRESS` to bet set.
-- `consul`. Uses `HashiCorp Consul` as registry. Requires `MICRO_REGISTRY_ADDRESS` to bet set.
+- `nats`. Uses a registry based on nats streams. Requires `MICRO_REGISTRY_ADDRESS` to be set.
+- `etcd`. Uses an etcd cluster as the registry. Requires `MICRO_REGISTRY_ADDRESS` to be set.
+- `consul`. Uses `HashiCorp Consul` as registry. Requires `MICRO_REGISTRY_ADDRESS` to be set.
 - `mdns`.  Uses multicast dns for registration. This type can have unwanted side effects when other devices in the local network use mdns too.
 

@@ -8,7 +8,7 @@ geekdocFilePath: port-ranges.md
 geekdocCollapseSection: true
 ---
 
-oCIS services often need a port to expose their services to other services or the outside world. As users may have many different extensions running on the same machine, we should track port usage in the oCIS ecosystem. In the best case we ensure that each extension uses a non colliding port range, to make life of users easier.
+oCIS services often need a port to expose their services to other services or the outside world. As users may have many different extensions running on the same machine, we should track port usage in the oCIS ecosystem. In the best case, we ensure that each extension uses a non-colliding port range, to make life easier for users.
 
 This page tracks the knowingly used port ranges.
 
@@ -16,7 +16,7 @@ Feel free to "reserve" a free port range when you're developing an extension by 
 
 If you're developing a non-public extension, we recommend using ports outside of the ranges listed below.
 
-We also suggest to use the last port in your extensions' range as a debug/metrics port.
+We also suggest using the last port in your extensions' range as a debug/metrics port.
 
 ## Allocations
 
