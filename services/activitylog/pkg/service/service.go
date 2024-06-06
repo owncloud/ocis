@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -71,6 +72,34 @@ func (a *ActivitylogService) Run() error {
 		switch ev := e.Event.(type) {
 		case events.UploadReady:
 			err = a.AddActivity(ev.FileRef, e.ID, utils.TSToTime(ev.Timestamp))
+		case events.FileTouched:
+			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+		case events.ContainerCreated:
+			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+		case events.ItemTrashed:
+			err = a.AddActivityTrashed(ev.ID, ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+		case events.ItemPurged:
+			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+		case events.ItemMoved:
+			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+		case events.ShareCreated:
+			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
+		case events.ShareUpdated:
+			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.MTime))
+		case events.ShareRemoved:
+			err = a.AddActivity(toRef(ev.ItemID), e.ID, ev.Timestamp)
+		case events.LinkCreated:
+			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
+		case events.LinkUpdated:
+			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
+		case events.LinkRemoved:
+			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.Timestamp))
+		case events.SpaceShared:
+			err = a.AddActivity(sToRef(ev.ID), e.ID, ev.Timestamp)
+		case events.SpaceShareUpdated:
+			err = a.AddActivity(sToRef(ev.ID), e.ID, ev.Timestamp)
+		case events.SpaceUnshared:
+			err = a.AddActivity(sToRef(ev.ID), e.ID, ev.Timestamp)
 		}
 
 		if err != nil {
@@ -121,6 +150,34 @@ func (a *ActivitylogService) Activities(ref *provider.Reference) ([]Activity, er
 	return activities, nil
 }
 
+// AddActivityTrashed adds the activity to trashed item
+func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId, reference *provider.Reference, eventID string, timestamp time.Time) error {
+	gwc, err := a.gws.Next()
+	if err != nil {
+		return fmt.Errorf("cant get gateway client: %w", err)
+	}
+
+	ctx, err := utils.GetServiceUserContext(a.cfg.ServiceAccount.ServiceAccountID, gwc, a.cfg.ServiceAccount.ServiceAccountSecret)
+	if err != nil {
+		return fmt.Errorf("cant get service user context: %w", err)
+	}
+
+	// store activity on trashed item
+	if err := a.storeActivity(resourceID, eventID, 0, timestamp); err != nil {
+		return fmt.Errorf("could not store activity: %w", err)
+	}
+
+	// get previous parent
+	ref := &provider.Reference{
+		ResourceId: reference.GetResourceId(),
+		Path:       filepath.Dir(reference.GetPath()),
+	}
+
+	return a.addActivity(ref, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
+		return utils.GetResource(ctx, ref, gwc)
+	})
+}
+
 // note: getResource is abstracted to allow unit testing, in general this will just be utils.GetResource
 func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID string, timestamp time.Time, getResource func(*provider.Reference) (*provider.ResourceInfo, error)) error {
 	var (
@@ -130,13 +187,13 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 		ref   = initRef
 	)
 	for {
-		if err := a.addActivityToReference(ref, eventID, depth, timestamp); err != nil {
-			return fmt.Errorf("could not store activity: %w", err)
-		}
-
 		info, err = getResource(ref)
 		if err != nil {
 			return fmt.Errorf("could not get resource info: %w", err)
+		}
+
+		if err := a.storeActivity(info.GetId(), eventID, depth, timestamp); err != nil {
+			return fmt.Errorf("could not store activity: %w", err)
 		}
 
 		if info != nil && utils.IsSpaceRoot(info) {
@@ -148,20 +205,9 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 	}
 }
 
-func (a *ActivitylogService) addActivityToReference(ref *provider.Reference, eventID string, depth int, timestamp time.Time) error {
-	fileID, err := storagespace.FormatReference(ref)
-	if err != nil {
-		return err
-	}
+func (a *ActivitylogService) storeActivity(rid *provider.ResourceId, eventID string, depth int, timestamp time.Time) error {
+	resourceID := storagespace.FormatResourceID(*rid)
 
-	return a.storeActivity(fileID, Activity{
-		EventID:   eventID,
-		Depth:     depth,
-		Timestamp: timestamp,
-	})
-}
-
-func (a *ActivitylogService) storeActivity(resourceID string, activity Activity) error {
 	records, err := a.store.Read(resourceID)
 	if err != nil && err != microstore.ErrNotFound {
 		return err
@@ -175,7 +221,11 @@ func (a *ActivitylogService) storeActivity(resourceID string, activity Activity)
 	}
 
 	// TODO: max len check?
-	activities = append(activities, activity)
+	activities = append(activities, Activity{
+		EventID:   eventID,
+		Depth:     depth,
+		Timestamp: timestamp,
+	})
 
 	b, err := json.Marshal(activities)
 	if err != nil {
@@ -186,4 +236,19 @@ func (a *ActivitylogService) storeActivity(resourceID string, activity Activity)
 		Key:   resourceID,
 		Value: b,
 	})
+}
+
+func toRef(r *provider.ResourceId) *provider.Reference {
+	return &provider.Reference{
+		ResourceId: r,
+	}
+}
+
+func sToRef(s *provider.StorageSpaceId) *provider.Reference {
+	return &provider.Reference{
+		ResourceId: &provider.ResourceId{
+			OpaqueId: s.GetOpaqueId(),
+			SpaceId:  s.GetOpaqueId(),
+		},
+	}
 }
