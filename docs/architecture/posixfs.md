@@ -4,7 +4,7 @@ date: 2024-05-27T14:31:00+01:00
 weight: 30
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/architecture
-geekdocFilePath: posixfs.md
+geekdocFilePath: Posix FS.md
 ---
 
 {{< toc >}}
@@ -17,15 +17,15 @@ The scope of this document is to give an high level overview to the technical as
 
 Posix FS is a backend component that manages files on the server utilizing a "real" file tree that represents the data with folders and files in the file system as users are used to it. That is the big difference compared to Decomposed FS which is the default storage driver in Infinite Scale.
 
-This does not mean that Infinte Scale is trading any of it's benefits to this new feature: It still implements simplicity by running without a database, it continues to store metadata in the file system and adds them transparently to chaches and search index, and it also features the full spaces concept as before, just to name a few example.
+This does not mean that Infinite Scale is trading any of its benefits to this new feature: It still implements simplicity by running without a database, it continues to store metadata in the file system and adds them transparently to chaches and search index, and it also features the full spaces concept as before, just to name a few example.
 
 The architecture of Infinite Scale allows to configure different storage drivers for specific storage types and purposes on a space granularity. The Posix FS storage driver is an alternative to the default driver called Decomposed FS.
 
-However, the clearance of the file structure in the underlying file system is not the only benefit of the Posix FS. This new technology allows users to manipulate the data directly in the file system, and any changes to files made aside of Infinite Scale are monitored and directly reflected in Infinite Scale.
+However, the clarity of the file structure in the underlying file system is not the only benefit of the Posix FS. This new technology allows users to manipulate the data directly in the file system, and any changes made to files outside of Infinite Scale are monitored and directly reflected in Infinite Scale.
 
-The first time ever with feature rich open source file synce & share systems, users can either choose to work with their data through the clients of the system, it's API's or even directly in the underlying file system on the server.
+The first time ever with feature rich open source file sync & share systems, users can either choose to work with their data through the clients of the system, its APIs or even directly in the underlying file system on the server.
 
-That is another powerful vector for integration and enables a new spectrum of use cases across all domains. Just imagine how many software can write files, and can now directly make them accessible real time in a convenient, secure and efficient way.
+That is another powerful vector for integration and enables a new spectrum of use cases across all domains. Just imagine how much software can write files, and can now directly make them accessible real time in a convenient, secure and efficient way.
 
 ## Technical Aspects
 
@@ -45,7 +45,7 @@ Underneath the Infinite Scale file system root, there is a collection of differe
 
 Infinite Scale is highly dependent on the efficient usage of meta data which are attached to file resources, but also logical elements such as spaces.
 
-Metadata are stored in extended attributes (as also supported by decompsed FS) which poses the benefit that metadata is always directly attached to the actual resources. As a result care has to be taken that extended attributes are considered when working with the file tree however, e.g. when creating or restoring backups.
+Metadata is stored in extended attributes (as also supported by decompsed FS) which poses the benefit that metadata is always directly attached to the actual resources. As a result, care has to be taken that extended attributes are considered when working with the file tree however, e.g. when creating or restoring backups.
 
 Note: The maximum number and size of extended attributes are limited depending on the filesystem and block size. See [GPFS Specifics](#gpfs-specifics) for more details on GPFS file systems.
 
@@ -53,7 +53,7 @@ All indexing and caching of metadata is implemented in higher system levels than
 
 ### Monitoring
 
-To get information about changes such as new files added, files edited or removed, Infinte Sale uses a monitoring system to directly watch the file system. This starts with the Linux inotify system and ranges to much more sophisticated services as for example in Spectrum Scale (see [GPFS Specifics](#gpfs-specifics) for more details on GPFS file systems).
+To get information about changes such as new files added, files edited or removed, Infinite Sale uses a monitoring system to directly watch the file system. This starts with the Linux inotify system and ranges to much more sophisticated services as for example in Spectrum Scale (see [GPFS Specifics](#gpfs-specifics) for more details on GPFS file systems).
 
 Based on the information transmitted by the watching service, Infinite Scale is able to "register" new or changed files into its own caches and internal management structures. This enables Infinite Scale to deliver resource changes through the "traditional" channels such as APIs and clients.
 
@@ -121,7 +121,7 @@ Depending on the capabilities of the underlying file system, the Infinite Scale 
 
 If the underlying file system is able to create versions of single resources (imagine a git based file system) this functionality could directly be used by Infinite Scale.
 
-In the current state of the PosixFS, versioning is not supported.
+In the current state of the Posix FS, versioning is not supported.
 
 ### Trashbin
 
@@ -129,11 +129,11 @@ If the underlying file system handles deleted files in a trash bin that allows r
 
 If not available it will follow the [the Free Desktop Trash specificaton](https://specifications.freedesktop.org/trash-spec/trashspec-latest.html).
 
-In the current state of the PosixFS, trash bin is not supported.
+In the current state of the Posix FS, trash bin is not supported.
 
 ## Limitations
 
-As of Q2/2024 the PosixFS is in technical preview state which means that it is not officially supported.
+As of Q2/2024 the Posix FS is in technical preview state which means that it is not officially supported.
 
 The tech preview comes with the following limitations:
 
@@ -144,13 +144,13 @@ The tech preview comes with the following limitations:
 
 ## Setup
 
-This describes the steps to use the PosixFS storage driver with Infinite Scale.
+This describes the steps to use the Posix FS storage driver with Infinite Scale.
 
-It is possible to use different storage drivers in the same Infinite Scale installation. For example it is possible to set up one space running on PosixFS while others run decomposedFS.
+It is possible to use different storage drivers in the same Infinite Scale installation. For example it is possible to set up one space running on Posix FS while others run decomposedFS.
 
 ### Prerequisites
 
-To run PosixFS, the following prerequisites have to be fulfilled:
+To run Posix FS, the following prerequisites have to be fulfilled:
 
 1. There must be storage available to store meta data and blobs, available under a root path
 1. When using inotify, the storage must be local on the same machine. Network mounts do not work with inotify. `inotifywait` needs to be installed.
@@ -161,7 +161,7 @@ To run PosixFS, the following prerequisites have to be fulfilled:
 
 ### Setup Configuration
 
-This is an example configuration with environment variables that configures Infinite Scale to use PosixFS for all spaces it works with, ie. Personal and Project Spaces:
+This is an example configuration with environment variables that configures Infinite Scale to use Posix FS for all spaces it works with, ie. Personal and Project Spaces:
 
 ```
 export STORAGE_USERS_DRIVER="posix"
@@ -169,7 +169,11 @@ export STORAGE_USERS_POSIX_ROOT="/home/kf/tmp/posix-storage"
 export STORAGE_USERS_POSIX_WATCH_TYPE="inotifywait"
 export STORAGE_USERS_ID_CACHE_STORE="nats-js-kv"            # for redis "redis"
 export STORAGE_USERS_ID_CACHE_STORE_NODES="localhost:9233"  # for redis "127.0.0.1:6379"
-export STORAGE_USERS_POSIX_USE_SPACE_GROUPS="true"          # optional. Enable when using gid based space access
+
+
+
+# Optionally enable gid based space access
+export STORAGE_USERS_POSIX_USE_SPACE_GROUPS="true"          
 ```
 
 ## GPFS Specifics
