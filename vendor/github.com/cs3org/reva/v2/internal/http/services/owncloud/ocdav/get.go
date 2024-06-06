@@ -131,7 +131,19 @@ func (s *svc) handleGet(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	}
 	defer httpRes.Body.Close()
 
-	copyHeader(w.Header(), httpRes.Header)
+	// copy only the headers relevant for the content served by the datagateway
+	// more headers are already present from the GET request
+	copyHeader(w.Header(), httpRes.Header, net.HeaderContentType)
+	copyHeader(w.Header(), httpRes.Header, net.HeaderContentLength)
+	copyHeader(w.Header(), httpRes.Header, net.HeaderContentRange)
+	copyHeader(w.Header(), httpRes.Header, net.HeaderOCFileID)
+	copyHeader(w.Header(), httpRes.Header, net.HeaderOCETag)
+	copyHeader(w.Header(), httpRes.Header, net.HeaderOCChecksum)
+	copyHeader(w.Header(), httpRes.Header, net.HeaderETag)
+	copyHeader(w.Header(), httpRes.Header, net.HeaderLastModified)
+	copyHeader(w.Header(), httpRes.Header, net.HeaderAcceptRanges)
+	copyHeader(w.Header(), httpRes.Header, net.HeaderContentDisposistion)
+
 	w.WriteHeader(httpRes.StatusCode)
 
 	if httpRes.StatusCode != http.StatusOK && httpRes.StatusCode != http.StatusPartialContent {
@@ -156,11 +168,9 @@ func (s *svc) handleGet(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	// TODO we need to send the If-Match etag in the GET to the datagateway to prevent race conditions between stating and reading the file
 }
 
-func copyHeader(dst, src http.Header) {
-	for key, values := range src {
-		for i := range values {
-			dst.Add(key, values[i])
-		}
+func copyHeader(dist, src http.Header, header string) {
+	if src.Get(header) != "" {
+		dist.Set(header, src.Get(header))
 	}
 }
 
