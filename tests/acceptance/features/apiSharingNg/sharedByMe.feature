@@ -12,14 +12,14 @@ Feature: resources shared by user
       | Brian    |
 
 
-  Scenario: sharer lists the file share (Personal space)
+  Scenario Outline: sharer lists the file share (Personal space)
     Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | textfile.txt |
-      | space           | Personal     |
-      | sharee          | Brian        |
-      | shareType       | user         |
-      | permissionsRole | Viewer       |
+      | resource        | textfile.txt       |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
@@ -133,6 +133,11 @@ Feature: resources shared by user
       }
     }
     """
+    Examples:
+      | permissions-role |
+      | File Editor      |
+      | Viewer           |
+      | Secure viewer    |
 
 
   Scenario: sharer lists the file share shared from inside a folder (Personal space)
@@ -259,14 +264,14 @@ Feature: resources shared by user
     """
 
 
-  Scenario: sharer lists the folder share (Personal space)
+  Scenario Outline: sharer lists the folder share (Personal space)
     Given user "Alice" has created folder "FolderToShare"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | FolderToShare |
-      | space           | Personal      |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+      | resource        | FolderToShare      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "FolderToShare" with the following data:
@@ -373,6 +378,11 @@ Feature: resources shared by user
       }
     }
     """
+    Examples:
+      | permissions-role |
+      | Editor           |
+      | Viewer           |
+      | Secure viewer    |
 
 
   Scenario: sharer lists the file and folder shares (Personal space)
@@ -820,17 +830,17 @@ Feature: resources shared by user
       """
 
 
-  Scenario: sharer lists the file share (Project space)
+  Scenario Outline: sharer lists the file share (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | textfile.txt |
-      | space           | NewSpace     |
-      | sharee          | Brian        |
-      | shareType       | user         |
-      | permissionsRole | Viewer       |
+      | resource        | textfile.txt       |
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
@@ -944,6 +954,11 @@ Feature: resources shared by user
       }
     }
     """
+    Examples:
+      | permissions-role |
+      | File Editor      |
+      | Viewer           |
+      | Secure viewer    |
 
 
   Scenario: sharer lists the file share shared from inside a folder (Project space)
@@ -1073,17 +1088,17 @@ Feature: resources shared by user
     """
 
 
-  Scenario: sharer lists the folder share (Project space)
+  Scenario Outline: sharer lists the folder share (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | FolderToShare |
-      | space           | NewSpace      |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+      | resource        | FolderToShare      |
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "FolderToShare" with the following data:
@@ -1190,6 +1205,11 @@ Feature: resources shared by user
       }
     }
     """
+    Examples:
+      | permissions-role |
+      | Editor           |
+      | Viewer           |
+      | Secure viewer    |
 
 
   Scenario: sharer lists the file and folder shares (Project space)

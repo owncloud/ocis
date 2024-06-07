@@ -12,14 +12,14 @@ Feature: an user gets the resources shared to them
       | Brian    |
 
 
-  Scenario: sharee lists the file share (Personal space)
+  Scenario Outline: sharee lists the file share (Personal space)
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | textfile0.txt |
-      | space           | Personal      |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+      | resource        | textfile0.txt      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" lists the shares shared with him after clearing user cache using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -309,16 +309,21 @@ Feature: an user gets the resources shared to them
       }
     }
     """
+    Examples:
+      | permissions-role |
+      | File Editor      |
+      | Viewer           |
+      | Secure viewer    |
 
 
-  Scenario: sharee lists the folder share (Personal space)
+  Scenario Outline: sharee lists the folder share (Personal space)
     Given user "Alice" has created folder "folder"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | folder   |
-      | space           | Personal |
-      | sharee          | Brian    |
-      | shareType       | user     |
-      | permissionsRole | Viewer   |
+      | resource        | folder             |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -597,6 +602,11 @@ Feature: an user gets the resources shared to them
       }
     }
     """
+    Examples:
+      | permissions-role |
+      | Editor           |
+      | Viewer           |
+      | Secure viewer    |
 
 
   Scenario: sharee lists the file share received via group invitation (Personal space)
@@ -2499,17 +2509,17 @@ Feature: an user gets the resources shared to them
     """
 
   @issue-8027 @issue-8314
-  Scenario: sharee lists the file share (Project space)
+  Scenario Outline: sharee lists the file share (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | testfile.txt |
-      | space           | new-space    |
-      | sharee          | Brian        |
-      | shareType       | user         |
-      | permissionsRole | Viewer       |
+      | resource        | testfile.txt       |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -2725,19 +2735,24 @@ Feature: an user gets the resources shared to them
       }
     }
     """
+    Examples:
+      | permissions-role |
+      | File Editor      |
+      | Viewer           |
+      | Secure viewer    |
 
   @issue-8027 @issue-8314
-  Scenario: sharee lists the folder share (Project space)
+  Scenario Outline: sharee lists the folder share (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a folder "folder" in space "new-space"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | folder    |
-      | space           | new-space |
-      | sharee          | Brian     |
-      | shareType       | user      |
-      | permissionsRole | Viewer    |
+      | resource        | folder             |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -2934,6 +2949,11 @@ Feature: an user gets the resources shared to them
       }
     }
     """
+    Examples:
+      | permissions-role |
+      | Editor           |
+      | Viewer           |
+      | Secure viewer    |
 
 
   Scenario: sharee lists the file share received via group invitation (Project space)
