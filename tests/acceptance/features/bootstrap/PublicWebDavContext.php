@@ -1207,11 +1207,7 @@ class PublicWebDavContext implements Context {
 
 		$responseContent = $response->getBody()->getContents();
 		\libxml_use_internal_errors(true);
-		Assert::assertNotFalse(
-			\simplexml_load_string($responseContent),
-			"response body is not valid XML, maybe download did work\n" .
-			"response body: \n$responseContent\n"
-		);
+		Assert::assertEmpty($responseContent, "response body is not empty, maybe download did work");
 		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode, "", $response);
 	}
 

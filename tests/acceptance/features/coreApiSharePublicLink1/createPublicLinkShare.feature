@@ -296,9 +296,7 @@ Feature: create a public link share
       | space           | Personal   |
       | permissionsRole | createOnly |
       | password        | %public%   |
-    When the public downloads file "parent.txt" from inside the last public link shared folder using the new public WebDAV API
-    Then the value of the item "//s:message" in the response should be "File not found: parent.txt"
-    And the HTTP status code should be "404"
+    Then the public download of file "/parent.txt" from inside the last public link shared folder using the new public WebDAV API with password "%public%" should fail with HTTP status code "403"
 
   @env-config @skipOnReva
   Scenario: get the size of a file shared by public link
