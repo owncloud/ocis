@@ -34,7 +34,7 @@ type ActivitylogService struct {
 	gws    pool.Selectable[gateway.GatewayAPIClient]
 }
 
-// New is what you need to implement.
+// New creates a new ActivitylogService
 func New(opts ...Option) (*ActivitylogService, error) {
 	o := &Options{}
 	for _, opt := range opts {
@@ -109,7 +109,7 @@ func (a *ActivitylogService) Run() error {
 	return nil
 }
 
-// AddActivity addds the activity to the given resource and all its parents
+// AddActivity adds the activity to the given resource and all its parents
 func (a *ActivitylogService) AddActivity(initRef *provider.Reference, eventID string, timestamp time.Time) error {
 	gwc, err := a.gws.Next()
 	if err != nil {
@@ -126,31 +126,7 @@ func (a *ActivitylogService) AddActivity(initRef *provider.Reference, eventID st
 	})
 }
 
-// Activities returns the activities for the given reference
-func (a *ActivitylogService) Activities(ref *provider.Reference) ([]Activity, error) {
-	resourceID, err := storagespace.FormatReference(ref)
-	if err != nil {
-		return nil, fmt.Errorf("could not format reference: %w", err)
-	}
-
-	records, err := a.store.Read(resourceID)
-	if err != nil && err != microstore.ErrNotFound {
-		return nil, fmt.Errorf("could not read activities: %w", err)
-	}
-
-	if len(records) == 0 {
-		return []Activity{}, nil
-	}
-
-	var activities []Activity
-	if err := json.Unmarshal(records[0].Value, &activities); err != nil {
-		return nil, fmt.Errorf("could not unmarshal activities: %w", err)
-	}
-
-	return activities, nil
-}
-
-// AddActivityTrashed adds the activity to trashed item
+// AddActivityTrashed adds the activity to given trashed resource and all its former parents
 func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId, reference *provider.Reference, eventID string, timestamp time.Time) error {
 	gwc, err := a.gws.Next()
 	if err != nil {
@@ -176,6 +152,27 @@ func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId,
 	return a.addActivity(ref, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
 		return utils.GetResource(ctx, ref, gwc)
 	})
+}
+
+// Activities returns the activities for the given resource
+func (a *ActivitylogService) Activities(rid *provider.ResourceId) ([]Activity, error) {
+	resourceID := storagespace.FormatResourceID(*rid)
+
+	records, err := a.store.Read(resourceID)
+	if err != nil && err != microstore.ErrNotFound {
+		return nil, fmt.Errorf("could not read activities: %w", err)
+	}
+
+	if len(records) == 0 {
+		return []Activity{}, nil
+	}
+
+	var activities []Activity
+	if err := json.Unmarshal(records[0].Value, &activities); err != nil {
+		return nil, fmt.Errorf("could not unmarshal activities: %w", err)
+	}
+
+	return activities, nil
 }
 
 // note: getResource is abstracted to allow unit testing, in general this will just be utils.GetResource
@@ -206,6 +203,10 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 }
 
 func (a *ActivitylogService) storeActivity(rid *provider.ResourceId, eventID string, depth int, timestamp time.Time) error {
+	if rid == nil {
+		return errors.New("resource id is required")
+	}
+
 	resourceID := storagespace.FormatResourceID(*rid)
 
 	records, err := a.store.Read(resourceID)

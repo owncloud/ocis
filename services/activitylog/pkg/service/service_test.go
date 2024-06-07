@@ -136,7 +136,7 @@ func TestAddActivity(t *testing.T) {
 		}
 
 		for id, acts := range tc.Expected {
-			activities, err := alog.Activities(reference(id))
+			activities, err := alog.Activities(resourceID(id))
 			require.NoError(t, err, tc.Name+":"+id)
 			require.ElementsMatch(t, acts, activities, tc.Name+":"+id)
 		}

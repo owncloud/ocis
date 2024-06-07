@@ -172,6 +172,7 @@ type Nats struct {
 	}
 }
 
+// Activitylog is the configuration for the activitylog service
 type Activitylog struct {
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 }

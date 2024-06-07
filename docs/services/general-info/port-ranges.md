@@ -49,7 +49,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9180-9184  | FREE (formerly used by accounts)                                                       |
 | 9185-9189  | [thumbnails]({{< ref "../thumbnails/_index.md" >}})                                    |
 | 9190-9194  | [settings]({{< ref "../settings/_index.md" >}})                                        |
-| 9195-9197  | [activitylog]({{< ref "../activitylog/_index.md >}})                                   |
+| 9195-9197  | [activitylog]({{< ref "../activitylog/_index.md" >}})                                   |
 | 9198-9199  | [auth-service]({{< ref "../auth-service/_index.md" >}})                                |
 | 9200-9204  | [proxy]({{< ref "../proxy/_index.md" >}})                                              |
 | 9205-9209  | [proxy]({{< ref "../proxy/_index.md" >}})                                              |
