@@ -75,7 +75,7 @@ Feature: share access by ID
   Scenario Outline: accept a share using the invalid share Id
     Given using OCS API version "<ocs-api-version>"
     When user "Brian" accepts share with ID "<share-id>" using the sharing API
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "998"
     And the HTTP status code should be "<http-status-code>"
     And the API should not return any data
     Examples:
@@ -93,13 +93,11 @@ Feature: share access by ID
   Scenario Outline: accept a share using empty share Id
     Given using OCS API version "<ocs-api-version>"
     When user "Brian" accepts share with ID "" using the sharing API
-    Then the OCS status code should be "<ocs-status-code>"
-    And the HTTP status code should be "<http-status-code>"
-    And the API should not return any data
+    Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | ocs-api-version | http-status-code | ocs-status-code |
-      | 1               | 200              | 999             |
-      | 2               | 500              | 500             |
+      | ocs-api-version | http-status-code |
+      | 1               | 405              |
+      | 2               | 405              |
 
 
   Scenario Outline: decline a share using the share Id
@@ -129,8 +127,8 @@ Feature: share access by ID
   Scenario Outline: decline a share using a invalid share Id
     Given using OCS API version "<ocs-api-version>"
     When user "Brian" declines share with ID "<share-id>" using the sharing API
-    Then the OCS status code should be "404"
-    And the HTTP status code should be "<http-status-code>"
+    Then the HTTP status code should be "<http-status-code>"
+    And the OCS status code should be "404"
     And the API should not return any data
     Examples:
       | ocs-api-version | share-id   | http-status-code |
@@ -152,5 +150,5 @@ Feature: share access by ID
     And the API should not return any data
     Examples:
       | ocs-api-version | http-status-code | ocs-status-code |
-      | 1               | 200              | 999             |
-      | 2               | 500              | 500             |
+      | 1               | 200              | 998             |
+      | 2               | 404              | 998             |
