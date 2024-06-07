@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-07-06-34-55]
+[#deprecation-note-2024-06-07-08-23-34]
 [caption=]
 .Deprecation notes for the webfinger service
 [width="100%",cols="~,~,~,~",options="header"]
