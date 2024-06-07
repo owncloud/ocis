@@ -1128,6 +1128,8 @@ class SharingNgContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastStatusCodesArrays();
+		// disable check for client.synchronize
+		$this->featureContext->rememberUserAutoSyncSetting($user, false);
 	}
 
 	/**
