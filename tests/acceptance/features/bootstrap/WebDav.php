@@ -26,6 +26,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Stream\StreamInterface;
+use TestHelpers\OcisHelper;
 use TestHelpers\UploadHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
@@ -2619,14 +2620,12 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then the HTTP status code of responses on each endpoint should be :statusCodes respectively
-	 *
 	 * @param string $statusCodes a comma-separated string of expected HTTP status codes
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theHTTPStatusCodeOfResponsesOnEachEndpointShouldBe(string $statusCodes):void {
+	public function checkTheHTTPStatusCodeOfResponsesOnEachEndpoint(string $statusCodes):void {
 		$expectedStatusCodes = \explode(',', $statusCodes);
 		$actualStatusCodes = $this->lastHttpStatusCodesArray;
 		$count = \count($expectedStatusCodes);
@@ -2648,6 +2647,36 @@ trait WebDav {
 			'Expected HTTP status codes: "' . $statusCodes .
 			'". Found HTTP status codes: "' . \implode(',', $actualStatusCodes) . '"'
 		);
+	}
+
+	/**
+	 * @Then the HTTP status code of responses on each endpoint should be :statusCodes respectively
+	 *
+	 * @param string $statusCodes a comma-separated string of expected HTTP status codes
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theHTTPStatusCodeOfResponsesOnEachEndpointShouldBe(string $statusCodes):void {
+		$this->checkTheHTTPStatusCodeOfResponsesOnEachEndpoint($statusCodes);
+	}
+
+	/**
+	 * @Then the HTTP status code of responses on each endpoint should be :ocisStatusCodes on oCIS or :revaStatusCodes on reva
+	 *
+	 * @param string $ocisStatusCodes a comma-separated string of expected HTTP status codes when running on oCIS
+	 * @param string $revaStatusCodes a comma-separated string of expected HTTP status codes when running on reva
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theHTTPStatusCodeOfResponsesOnEachEndpointShouldBeOcisReva(string $ocisStatusCodes, string $revaStatusCodes):void {
+		if (OcisHelper::isTestingOnReva()) {
+			$expectedStatusCodes = $revaStatusCodes;
+		} else {
+			$expectedStatusCodes = $ocisStatusCodes;
+		}
+		$this->checkTheHTTPStatusCodeOfResponsesOnEachEndpoint($expectedStatusCodes);
 	}
 
 	/**
