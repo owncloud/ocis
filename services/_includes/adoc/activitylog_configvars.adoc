@@ -6,7 +6,7 @@ ifeval::[{show-deprecation} == true]
 
 [#deprecation-note-2024-06-10-10-31-18]
 [caption=]
-.Deprecation notes for the ocs service
+.Deprecation notes for the activitylog service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Deprecation Info
@@ -18,7 +18,7 @@ ifeval::[{show-deprecation} == true]
 endif::[]
 
 [caption=]
-.Environment variables for the ocs service
+.Environment variables for the activitylog service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
@@ -27,7 +27,7 @@ endif::[]
 | Description
 
 a|`OCIS_TRACING_ENABLED` +
-`OCS_TRACING_ENABLED` +
+`CLIENTLOG_TRACING_ENABLED` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -37,7 +37,7 @@ a| [subs=-attributes]
 Activates tracing.
 
 a|`OCIS_TRACING_TYPE` +
-`OCS_TRACING_TYPE` +
+`CLIENTLOG_TRACING_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -47,7 +47,7 @@ a| [subs=-attributes]
 The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a|`OCIS_TRACING_ENDPOINT` +
-`OCS_TRACING_ENDPOINT` +
+`CLIENTLOG_TRACING_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -57,7 +57,7 @@ a| [subs=-attributes]
 The endpoint of the tracing agent.
 
 a|`OCIS_TRACING_COLLECTOR` +
-`OCS_TRACING_COLLECTOR` +
+`CLIENTLOG_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
 ++string ++
@@ -67,7 +67,7 @@ a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 a|`OCIS_LOG_LEVEL` +
-`OCS_LOG_LEVEL` +
+`CLIENTLOG_USERLOG_LOG_LEVEL` +
 
 a| [subs=-attributes]
 ++string ++
@@ -77,7 +77,7 @@ a| [subs=-attributes]
 The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
-`OCS_LOG_PRETTY` +
+`CLIENTLOG_USERLOG_LOG_PRETTY` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -87,7 +87,7 @@ a| [subs=-attributes]
 Activates pretty log output.
 
 a|`OCIS_LOG_COLOR` +
-`OCS_LOG_COLOR` +
+`CLIENTLOG_USERLOG_LOG_COLOR` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -97,7 +97,7 @@ a| [subs=-attributes]
 Activates colorized log output.
 
 a|`OCIS_LOG_FILE` +
-`OCS_LOG_FILE` +
+`CLIENTLOG_USERLOG_LOG_FILE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -106,16 +106,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 
-a|`OCS_DEBUG_ADDR` +
+a|`CLIENTLOG_DEBUG_ADDR` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9114 ++
+++127.0.0.1:9197 ++
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
-a|`OCS_DEBUG_TOKEN` +
+a|`CLIENTLOG_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
 ++string ++
@@ -124,7 +124,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
 
-a|`OCS_DEBUG_PPROF` +
+a|`CLIENTLOG_DEBUG_PPROF` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -133,7 +133,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
 
-a|`OCS_DEBUG_ZPAGES` +
+a|`CLIENTLOG_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -142,123 +142,129 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
 
-a|`OCS_HTTP_ADDR` +
+a|`OCIS_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9110 ++
+++127.0.0.1:9233 ++
 a| [subs=-attributes]
-The bind address of the HTTP service.
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
-a|`OCS_HTTP_ROOT` +
+a|`OCIS_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++/ocs ++
+++ocis-cluster ++
 a| [subs=-attributes]
-Subdirectory that serves as the root for this HTTP service.
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
-a|`OCIS_CORS_ALLOW_ORIGINS` +
-`OCS_CORS_ALLOW_ORIGINS` +
-
-a| [subs=-attributes]
-++[]string ++
-a| [subs=-attributes]
-++[*] ++
-a| [subs=-attributes]
-A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
-
-a|`OCIS_CORS_ALLOW_METHODS` +
-`OCS_CORS_ALLOW_METHODS` +
-
-a| [subs=-attributes]
-++[]string ++
-a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
-a| [subs=-attributes]
-A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
-
-a|`OCIS_CORS_ALLOW_HEADERS` +
-`OCS_CORS_ALLOW_HEADERS` +
-
-a| [subs=-attributes]
-++[]string ++
-a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Cache-Control] ++
-a| [subs=-attributes]
-A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
-
-a|`OCIS_CORS_ALLOW_CREDENTIALS` +
-`OCS_CORS_ALLOW_CREDENTIALS` +
-
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++true ++
-a| [subs=-attributes]
-Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
-
-a|`OCIS_HTTP_TLS_ENABLED` +
+a|`OCIS_INSECURE` +
 
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.
+Whether to verify the server TLS certificates.
 
-a|`OCIS_HTTP_TLS_CERTIFICATE` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-Path/File name of the TLS server certificate (in PEM format) for the http services.
-
-a|`OCIS_HTTP_TLS_KEY` +
+a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 
-a|`OCIS_CACHE_STORE` +
-`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE` +
+a|`OCIS_EVENTS_ENABLE_TLS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_PERSISTENT_STORE` +
+`ACTIVITYLOG_STORE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++nats-js-kv ++
 a| [subs=-attributes]
-The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.
+The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
-a|`OCIS_CACHE_STORE_NODES` +
-`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` +
+a|`OCIS_PERSISTENT_STORE_NODES` +
+`ACTIVITYLOG_STORE_NODES` +
 
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
 a| [subs=-attributes]
-A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
-a|`OCIS_CACHE_TTL` +
-`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL` +
+a|`ACTIVITYLOG_STORE_DATABASE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++activitylog ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`ACTIVITYLOG_STORE_TABLE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The database table the store should use.
+
+a|`OCIS_PERSISTENT_STORE_TTL` +
+`ACTIVITYLOG_STORE_TTL` +
 
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
-++12h0m0s ++
+++0s ++
 a| [subs=-attributes]
-Default time to live for signing keys. See the Environment Variable Types description for more details.
+Time to live for events in the store. See the Environment Variable Types description for more details.
 
-a|`OCIS_CACHE_AUTH_USERNAME` +
-`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME` +
+a|`OCIS_PERSISTENT_STORE_SIZE` +
+`ACTIVITYLOG_STORE_SIZE` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
+`ACTIVITYLOG_STORE_AUTH_USERNAME` +
 
 a| [subs=-attributes]
 ++string ++
@@ -267,8 +273,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 
-a|`OCIS_CACHE_AUTH_PASSWORD` +
-`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD` +
+a|`OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
+`ACTIVITYLOG_STORE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
 ++string ++
@@ -277,14 +283,33 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 
-a|`OCIS_JWT_SECRET` +
-`OCS_JWT_SECRET` +
+a|`OCIS_REVA_GATEWAY` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.gateway ++
+a| [subs=-attributes]
+CS3 gateway used to look up user metadata
+
+a|`OCIS_SERVICE_ACCOUNT_ID` +
+`ACTIVITYLOG_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+The ID of the service account the service should use. See the 'auth-service' service description for more details.
+
+a|`OCIS_SERVICE_ACCOUNT_SECRET` +
+`ACTIVITYOG_SERVICE_ACCOUNT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The service account secret.
 |===
 
