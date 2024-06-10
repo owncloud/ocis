@@ -125,6 +125,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Web server compression: [#9287](https://github.com/owncloud/ocis/pull/9287)
 * Enhancement - Add secureview flag when listing apps via http: [#9289](https://github.com/owncloud/ocis/pull/9289)
 * Enhancement - Bump Reva: [#9318](https://github.com/owncloud/ocis/pull/9318)
+* Enhancement - Activitylog Service: [#9327](https://github.com/owncloud/ocis/pull/9327)
 
 ## Details
 
@@ -809,6 +810,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8701
    https://github.com/owncloud/ocis/pull/8606
    https://github.com/owncloud/ocis/pull/8937
+
+* Enhancement - Activitylog Service: [#9327](https://github.com/owncloud/ocis/pull/9327)
+
+   Adds a new service `activitylog` which stores events (activities) per resource.
+   This data can be retrieved by clients to show item activities
+
+   https://github.com/owncloud/ocis/pull/9327
 
 # Changelog for [5.0.3] (2024-05-02)
 
