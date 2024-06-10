@@ -5,15 +5,16 @@
 # 
 # Translators:
 # Nichole Haines <NicholeHaines54@gmail.com>, 2024
+# dutty5, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-05-24 00:41+0000\n"
+"POT-Creation-Date: 2024-06-10 00:47+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
-"Last-Translator: Nichole Haines <NicholeHaines54@gmail.com>, 2024\n"
+"Last-Translator: dutty5, 2024\n"
 "Language-Team: Russian (Russia) (https://app.transifex.com/owncloud-org/teams/6149/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,11 +24,11 @@ msgstr ""
 
 #: pkg/service/templates.go:39
 msgid "Access to Space {space} lost"
-msgstr "Доступ к пространству {scope} потерян"
+msgstr "Доступ к пространству {space} потерян"
 
 #: pkg/service/templates.go:54
 msgid "Access to {resource} expired"
-msgstr "Срок действия доступа к {resource} истек"
+msgstr "Срок действия доступа к {resource} истёк"
 
 #: pkg/service/templates.go:59
 msgid ""
@@ -35,12 +36,12 @@ msgid ""
 "Download all your data before that date as no access past that date is "
 "possible."
 msgstr ""
-"Внимание! Сервер будет отключен и деинициализирован {дата}. Скачайте все "
+"Внимание! Сервер будет отключен и деинициализирован {date}. Скачайте все "
 "свои данные до этой даты, так как доступ после этой даты невозможен."
 
 #: pkg/service/templates.go:14
 msgid "File {resource} was deleted because it violates the policies"
-msgstr "Файл {resource} был удален, в связи с нарушением правил использования"
+msgstr "Файл {resource} был удален в связи с нарушением правил использования"
 
 #: pkg/service/templates.go:58
 msgid "Instance will be shut down and deprovisioned"
@@ -48,27 +49,27 @@ msgstr "Сервер будет отключен и деинициализиро
 
 #: pkg/service/templates.go:38
 msgid "Membership expired"
-msgstr "Срок действия членства истек"
+msgstr "Срок действия членства истёк"
 
 #: pkg/service/templates.go:13
 msgid "Policies enforced"
-msgstr "Соблюдение правил"
+msgstr "Применены правила использования"
 
 #: pkg/service/templates.go:23
 msgid "Removed from Space"
-msgstr "Удалено из Пространство"
+msgstr "Удален из пространства"
 
 #: pkg/service/templates.go:43
 msgid "Resource shared"
-msgstr "Общий ресурс"
+msgstr "Предоставлен общий доступ"
 
 #: pkg/service/templates.go:48
 msgid "Resource unshared"
-msgstr "Ресурс не используется"
+msgstr "Удален общий доступ"
 
 #: pkg/service/templates.go:53
 msgid "Share expired"
-msgstr "Срок действия совместного доступа истек"
+msgstr "Срок действия общего доступа истёк"
 
 #: pkg/service/templates.go:33
 msgid "Space deleted"
@@ -80,7 +81,7 @@ msgstr "Пространство отключено"
 
 #: pkg/service/templates.go:18
 msgid "Space shared"
-msgstr "Общее пространство"
+msgstr "Предоставлен общий доступ к пространству"
 
 #: pkg/service/templates.go:8
 msgid "Virus found"
@@ -92,7 +93,7 @@ msgstr "Найден вирус в {resource}. Загрузка не возмо�
 
 #: pkg/service/templates.go:19
 msgid "{user} added you to Space {space}"
-msgstr "{user} добавил вас в Пространство {space}"
+msgstr "{user} добавил вас в пространство {space}"
 
 #: pkg/service/templates.go:34
 msgid "{user} deleted Space {space}"
@@ -104,12 +105,12 @@ msgstr "{user} отключил пространство {space}"
 
 #: pkg/service/templates.go:24
 msgid "{user} removed you from Space {space}"
-msgstr "{user} удалил вас из Пространства {space}"
+msgstr "{user} удалил вас из пространства {space}"
 
 #: pkg/service/templates.go:44
 msgid "{user} shared {resource} with you"
-msgstr "{user} предоставил вам доступ к {resource}"
+msgstr "{user} предоставил вам общий доступ к {resource}"
 
 #: pkg/service/templates.go:49
 msgid "{user} unshared {resource} with you"
-msgstr "{user} удалил доступ к {resource}"
+msgstr "{user} удалил ваш общий доступ к {resource}"
