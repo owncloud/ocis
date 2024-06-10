@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-06-05 00:48+0000\n"
+"POT-Creation-Date: 2024-06-10 12:45+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
 "Last-Translator: dutty5, 2024\n"
 "Language-Team: Russian (https://app.transifex.com/owncloud-org/teams/6149/ru/)\n"
@@ -83,7 +83,7 @@ msgstr "Пространство отключено"
 
 #: pkg/service/templates.go:18
 msgid "Space shared"
-msgstr "Общее пространство"
+msgstr "К пространству предоставлен общий доступ"
 
 #: pkg/service/templates.go:8
 msgid "Virus found"
@@ -115,4 +115,4 @@ msgstr "{user} предоставил вам доступ к {resource}"
 
 #: pkg/service/templates.go:49
 msgid "{user} unshared {resource} with you"
-msgstr "{user} удалил доступ к {resource}"
+msgstr "{user} удалил ваш доступ к {resource}"

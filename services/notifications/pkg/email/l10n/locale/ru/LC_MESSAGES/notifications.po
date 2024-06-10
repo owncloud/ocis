@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-06-05 00:48+0000\n"
+"POT-Creation-Date: 2024-06-10 12:45+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: dutty5, 2024\n"
 "Language-Team: Russian (https://app.transifex.com/owncloud-org/teams/6149/ru/)\n"
@@ -32,7 +32,7 @@ msgstr "Нажмите здесь, чтобы проверить: {ShareLink}"
 #. SharedSpace email template, resolves via {{ .CallToAction }}
 #: pkg/email/templates.go:18 pkg/email/templates.go:45
 msgid "Click here to view it: {ShareLink}"
-msgstr "Нажмите здесь, чтобы просмотреть: {ShareLink}"
+msgstr "Нажмите здесь, чтобы посмотреть: {ShareLink}"
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:14
