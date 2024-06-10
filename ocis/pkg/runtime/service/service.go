@@ -25,6 +25,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	activitylog "github.com/owncloud/ocis/v2/services/activitylog/pkg/command"
 	antivirus "github.com/owncloud/ocis/v2/services/antivirus/pkg/command"
 	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/command"
 	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/command"
@@ -144,6 +145,11 @@ func NewService(options ...Option) (*Service, error) {
 	// priority group 2 is empty for now
 
 	// most services are in priority group 3
+	reg(3, opts.Config.Activitylog.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Activitylog.Context = ctx
+		cfg.Activitylog.Commons = cfg.Commons
+		return activitylog.Execute(cfg.Activitylog)
+	})
 	reg(3, opts.Config.AppProvider.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.AppProvider.Context = ctx
 		cfg.AppProvider.Commons = cfg.Commons
