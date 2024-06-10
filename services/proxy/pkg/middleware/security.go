@@ -1,13 +1,14 @@
 package middleware
 
 import (
+	"net/http"
+	"os"
+
 	gofig "github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/unrolled/secure"
 	"github.com/unrolled/secure/cspbuilder"
-	"net/http"
-	"os"
 )
 
 // LoadCSPConfig loads CSP header configuration from a yaml file.
@@ -54,14 +55,16 @@ func Security(cspConfig *config.CSP) func(h http.Handler) http.Handler {
 	}
 
 	secureMiddleware := secure.New(secure.Options{
-		BrowserXssFilter:        true,
-		ContentSecurityPolicy:   cspBuilder.MustBuild(),
-		ContentTypeNosniff:      true,
-		CustomFrameOptionsValue: "SAMEORIGIN",
-		FrameDeny:               true,
-		ReferrerPolicy:          "strict-origin-when-cross-origin",
-		STSSeconds:              315360000,
-		STSPreload:              true,
+		BrowserXssFilter:             true,
+		ContentSecurityPolicy:        cspBuilder.MustBuild(),
+		ContentTypeNosniff:           true,
+		CustomFrameOptionsValue:      "SAMEORIGIN",
+		FrameDeny:                    true,
+		ReferrerPolicy:               "strict-origin-when-cross-origin",
+		STSSeconds:                   315360000,
+		STSPreload:                   true,
+		PermittedCrossDomainPolicies: "none",
+		RobotTag:                     "none",
 	})
 	return func(next http.Handler) http.Handler {
 		return secureMiddleware.Handler(next)
