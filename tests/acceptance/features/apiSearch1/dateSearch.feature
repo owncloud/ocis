@@ -5,6 +5,7 @@ Feature: date search
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
+
   Scenario Outline: search resources using different dav path
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "uploadFolder"

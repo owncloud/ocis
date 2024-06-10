@@ -23,292 +23,292 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him after clearing user cache using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "createdBy",
-              "eTag",
-              "file",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem",
-              "size"
-            ],
-            "properties": {
-              "@UI.Hidden": {
-                "type": "boolean",
-                "enum": [false]
-              },
-              "@client.synchronize": {
-                "type": "boolean",
-                "enum": [true]
-              },
-              "createdBy": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": ["displayName", "id"],
-                    "properties": {
-                      "displayName": {
-                        "type": "string",
-                        "enum": ["Alice Hansen"]
-                      },
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "createdBy",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden": {
+                  "type": "boolean",
+                  "enum": [false]
+                },
+                "@client.synchronize": {
+                  "type": "boolean",
+                  "enum": [true]
+                },
+                "createdBy": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": ["displayName", "id"],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "enum": ["Alice Hansen"]
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
                       }
                     }
                   }
-                }
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "file": {
-                "type": "object",
-                "required": ["mimeType"],
-                "properties": {
-                  "mimeType": {
-                    "type": "string",
-                    "enum": ["text/plain"]
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "file": {
+                  "type": "object",
+                  "required": ["mimeType"],
+                  "properties": {
+                    "mimeType": {
+                      "type": "string",
+                      "enum": ["text/plain"]
+                    }
                   }
-                }
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "type": "string",
-                "enum": [
-                  "textfile0.txt"
-                ]
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType": {
-                    "type": "string",
-                    "enum": ["virtual"]
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "type": "string",
+                  "enum": [
+                    "textfile0.txt"
+                  ]
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType": {
+                      "type": "string",
+                      "enum": ["virtual"]
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    }
                   }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "createdBy",
-                  "eTag",
-                  "file",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions",
-                  "size"
-                ],
-                "properties": {
-                  "createdBy": {
-                    "type": "object",
-                    "required": [
-                      "user"
-                    ],
-                    "properties": {
-                      "user": {
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions",
+                    "size"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": [
+                        "user"
+                      ],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "displayName"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%user_id_pattern%$"
+                            },
+                            "displayName": {
+                              "type": "string",
+                              "enum": [
+                                "Alice Hansen"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "file": {
+                      "type": "object",
+                      "required": [
+                        "mimeType"
+                      ],
+                      "properties": {
+                        "mimeType": {
+                          "type": "string",
+                          "pattern": "text/plain"
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "type": "string",
+                      "enum": [
+                        "textfile0.txt"
+                      ]
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": [
+                        "driveId",
+                        "driveType"
+                      ],
+                      "properties": {
+                        "driveId": {
+                          "type": "string",
+                          "pattern": "^%file_id_pattern%$"
+                        },
+                        "driveType": {
+                          "type": "string",
+                          "enum": ["personal"]
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
                         "type": "object",
                         "required": [
+                          "grantedToV2",
                           "id",
-                          "displayName"
+                          "invitation",
+                          "roles"
                         ],
                         "properties": {
                           "id": {
                             "type": "string",
-                            "pattern": "^%user_id_pattern%$"
+                            "pattern": "^%permissions_id_pattern%$"
                           },
-                          "displayName": {
-                            "type": "string",
-                            "enum": [
-                              "Alice Hansen"
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "file": {
-                    "type": "object",
-                    "required": [
-                      "mimeType"
-                    ],
-                    "properties": {
-                      "mimeType": {
-                        "type": "string",
-                        "pattern": "text/plain"
-                      }
-                    }
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "enum": [
-                      "textfile0.txt"
-                    ]
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "^%file_id_pattern%$"
-                      },
-                      "driveType": {
-                        "type": "string",
-                        "enum": ["personal"]
-                      }
-                    }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "minItems": 1,
-                    "maxItems": 1,
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
-                        },
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": [
-                            "user"
-                          ],
-                          "properties": {
-                            "user": {
-                              "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
-                              "properties": {
-                                "displayName": {
-                                  "type": "string",
-                                  "enum": ["Brian Murphy"]
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": [
+                              "user"
+                            ],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "required": [
+                                  "displayName",
+                                  "id"
+                                ],
+                                "properties": {
+                                  "displayName": {
+                                    "type": "string",
+                                    "enum": ["Brian Murphy"]
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
                                 }
                               }
                             }
-                          }
-                        },
-                        "invitation": {
-                          "type": "object",
-                          "properties": {
-                            "invitedBy": {
-                              "type": "object",
-                              "properties": {
-                                "user": {
-                                  "type": "object",
-                                  "properties": {
-                                    "displayName": {
-                                      "type": "string",
-                                      "enum": ["Alice Hansen"]
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  },
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ]
-                                }
-                              },
-                              "required": [
-                                "user"
-                              ]
-                            }
                           },
-                          "required": [
-                            "invitedBy"
-                          ]
-                        },
-                        "roles": {
-                          "type": "array",
-                          "minItems": 1,
-                          "maxItems": 1,
-                          "items": {
-                            "type": "string",
-                            "pattern": "^%role_id_pattern%$"
+                          "invitation": {
+                            "type": "object",
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Alice Hansen"]
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    },
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "user"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "invitedBy"
+                            ]
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^%role_id_pattern%$"
+                            }
                           }
                         }
                       }
                     }
                   }
+                },
+                "size": {
+                  "type": "number",
+                  "enum": [11]
                 }
-              },
-              "size": {
-                "type": "number",
-                "enum": [11]
               }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | File Editor      |
@@ -327,268 +327,269 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "createdBy",
-              "eTag",
-              "folder",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem"
-            ],
-            "properties": {
-              "@UI.Hidden": {
-                "type": "boolean",
-                "enum": [false]
-              },
-              "@client.synchronize": {
-                "type": "boolean",
-                "enum": [true]
-              },
-              "createdBy": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": ["displayName", "id"],
-                    "properties": {
-                      "displayName": {
-                        "type": "string",
-                        "enum": ["Alice Hansen"]
-                      },
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "createdBy",
+                "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden": {
+                  "type": "boolean",
+                  "enum": [false]
+                },
+                "@client.synchronize": {
+                  "type": "boolean",
+                  "enum": [true]
+                },
+                "createdBy": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": ["displayName", "id"],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "enum": ["Alice Hansen"]
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
                       }
                     }
                   }
-                }
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "folder": {
-                "type": "object",
-                "required": [],
-                "properties": {}
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "type": "string",
-                "enum": [
-                  "folder"
-                ]
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType": {
-                    "type": "string",
-                    "enum": ["virtual"]
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "folder": {
+                  "type": "object",
+                  "required": [],
+                  "properties": {}
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "type": "string",
+                  "enum": [
+                    "folder"
+                  ]
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType": {
+                      "type": "string",
+                      "enum": ["virtual"]
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    }
                   }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "createdBy",
-                  "eTag",
-                  "folder",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions"
-                ],
-                "properties": {
-                  "createdBy": {
-                    "type": "object",
-                    "required": [
-                      "user"
-                    ],
-                    "properties": {
-                      "user": {
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": [
+                        "user"
+                      ],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "displayName"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%user_id_pattern%$"
+                            },
+                            "displayName": {
+                              "type": "string",
+                              "enum": [
+                                "Alice Hansen"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "file": {
+                      "type": "object",
+                      "required": [
+                        "mimeType"
+                      ],
+                      "properties": {
+                        "mimeType": {
+                          "type": "string",
+                          "enum": ["text/plain"]
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "type": "string",
+                      "enum": [
+                        "folder"
+                      ]
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": [
+                        "driveId",
+                        "driveType"
+                      ],
+                      "properties": {
+                        "driveId": {
+                          "type": "string",
+                          "pattern": "^%file_id_pattern%$"
+                        },
+                        "driveType": {
+                          "type": "string",
+                          "enum": ["personal"]
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
                         "type": "object",
                         "required": [
+                          "grantedToV2",
                           "id",
-                          "displayName"
+                          "invitation",
+                          "roles"
                         ],
                         "properties": {
                           "id": {
                             "type": "string",
-                            "pattern": "^%user_id_pattern%$"
+                            "pattern": "^%permissions_id_pattern%$"
                           },
-                          "displayName": {
-                            "type": "string",
-                            "enum": [
-                              "Alice Hansen"
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "file": {
-                    "type": "object",
-                    "required": [
-                      "mimeType"
-                    ],
-                    "properties": {
-                      "mimeType": {
-                        "type": "string",
-                        "enum": ["text/plain"]
-                      }
-                    }
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "enum": [
-                      "folder"
-                    ]
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "^%file_id_pattern%$"
-                      },
-                      "driveType": {
-                        "type": "string",
-                        "enum": ["personal"]
-                      }
-                    }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "minItems": 1,
-                    "maxItems": 1,
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
-                        },
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": [
-                            "user"
-                          ],
-                          "properties": {
-                            "user": {
-                              "type": "object",
-                              "properties": {
-                                "displayName": {
-                                  "type": "string",
-                                  "enum": ["Brian Murphy"]
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                }
-                              },
-                              "required": [
-                                "displayName",
-                                "id"
-                              ]
-                            }
-                          }
-                        },
-                        "invitation": {
-                          "type": "object",
-                          "properties": {
-                            "invitedBy": {
-                              "type": "object",
-                              "properties": {
-                                "user": {
-                                  "type": "object",
-                                  "properties": {
-                                    "displayName": {
-                                      "type": "string",
-                                      "enum": ["Alice Hansen"]
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": [
+                              "user"
+                            ],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "properties": {
+                                  "displayName": {
+                                    "type": "string",
+                                    "enum": ["Brian Murphy"]
                                   },
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ]
-                                }
-                              },
-                              "required": [
-                                "user"
-                              ]
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
+                                },
+                                "required": [
+                                  "displayName",
+                                  "id"
+                                ]
+                              }
                             }
                           },
-                          "required": [
-                            "invitedBy"
-                          ]
-                        },
-                        "roles": {
-                          "type": "array",
-                          "minItems": 1,
-                          "maxItems": 1,
-                          "items": {
-                            "type": "string",
-                            "pattern": "^%role_id_pattern%$"
+                          "invitation": {
+                            "type": "object",
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Alice Hansen"]
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    },
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "user"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "invitedBy"
+                            ]
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^%role_id_pattern%$"
+                            }
                           }
                         }
                       }
@@ -600,8 +601,7 @@ Feature: an user gets the resources shared to them
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | Editor           |
@@ -623,282 +623,282 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "createdBy",
-              "eTag",
-              "file",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem",
-              "size"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
-              },
-              "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
-              },
-              "createdBy": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": ["displayName", "id"],
-                    "properties": {
-                      "displayName": {
-                        "type": "string",
-                        "enum": ["Alice Hansen"]
-                      },
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      }
-                    }
-                  }
-                }
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "file": {
-                "type": "object",
-                "required": ["mimeType"],
-                "properties": {
-                  "mimeType": {
-                    "type": "string",
-                    "enum": ["text/plain"]
-                  }
-                }
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "type": "string",
-                "enum": [
-                  "textfile0.txt"
-                ]
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "createdBy",
-                  "eTag",
-                  "file",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions",
-                  "size"
-                ],
-                "properties": {
-                  "createdBy": {
-                    "type": "object",
-                    "required": [
-                      "user"
-                    ],
-                    "properties": {
-                      "user": {
-                        "type": "object",
-                        "required": [
-                          "id",
-                          "displayName"
-                        ],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%user_id_pattern%$"
-                          },
-                          "displayName": {
-                            "type": "string",
-                            "enum": [
-                              "Alice Hansen"
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "file": {
-                    "type": "object",
-                    "required": ["mimeType"],
-                    "properties": {
-                      "mimeType": {
-                        "type": "string",
-                        "enum": ["text/plain"]
-                      }
-                    }
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "enum": [
-                      "textfile0.txt"
-                    ]
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "%space_id_pattern%"
-                      },
-                      "driveType" : {
-                        "type": "string",
-                        "enum": ["personal"]
-                      }
-                    }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "maxItems": 1,
-                    "minItems": 1,
-                    "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "createdBy",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "type": "boolean",
+                  "enum": [false]
+                },
+                "@client.synchronize":{
+                  "type": "boolean",
+                  "enum": [true]
+                },
+                "createdBy": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
                       "type": "object",
-                      "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
-                      ],
+                      "required": ["displayName", "id"],
                       "properties": {
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["group"],
-                          "properties":{
-                            "group": {
-                              "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
-                              "properties": {
-                                "displayName": {
-                                  "const": "grp1"
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                }
-                              }
-                            }
-                          }
+                        "displayName": {
+                          "type": "string",
+                          "enum": ["Alice Hansen"]
                         },
                         "id": {
                           "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
-                        },
-                        "invitation": {
-                          "type": "object",
-                          "required": ["invitedBy"],
-                          "properties": {
-                            "user":{
-                              "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
-                              "properties": {
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "roles": {
-                          "type": "array",
-                          "minItems": 1,
-                          "maxItems": 1,
-                          "items": {
-                            "type": "string",
-                            "pattern": "^%role_id_pattern%$"
-                          }
+                          "pattern": "^%user_id_pattern%$"
                         }
                       }
                     }
-                  },
-                  "size": {
-                    "enum": [
-                      5
-                    ]
                   }
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "file": {
+                  "type": "object",
+                  "required": ["mimeType"],
+                  "properties": {
+                    "mimeType": {
+                      "type": "string",
+                      "enum": ["text/plain"]
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "type": "string",
+                  "enum": [
+                    "textfile0.txt"
+                  ]
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "type": "string",
+                      "enum": ["virtual"]
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "%space_id_pattern%"
+                    }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions",
+                    "size"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": [
+                        "user"
+                      ],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "displayName"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%user_id_pattern%$"
+                            },
+                            "displayName": {
+                              "type": "string",
+                              "enum": [
+                                "Alice Hansen"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "file": {
+                      "type": "object",
+                      "required": ["mimeType"],
+                      "properties": {
+                        "mimeType": {
+                          "type": "string",
+                          "enum": ["text/plain"]
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "type": "string",
+                      "enum": [
+                        "textfile0.txt"
+                      ]
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": [
+                        "driveId",
+                        "driveType"
+                      ],
+                      "properties": {
+                        "driveId": {
+                          "type": "string",
+                          "pattern": "%space_id_pattern%"
+                        },
+                        "driveType" : {
+                          "type": "string",
+                          "enum": ["personal"]
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "grantedToV2",
+                          "id",
+                          "invitation",
+                          "roles"
+                        ],
+                        "properties": {
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["group"],
+                            "properties":{
+                              "group": {
+                                "type": "object",
+                                "required": [
+                                  "displayName",
+                                  "id"
+                                ],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "grp1"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "id": {
+                            "type": "string",
+                            "pattern": "^%permissions_id_pattern%$"
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "required": ["invitedBy"],
+                            "properties": {
+                              "user":{
+                                "type": "object",
+                                "required": [
+                                  "displayName",
+                                  "id"
+                                ],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "Alice Hansen"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^%role_id_pattern%$"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "size": {
+                      "enum": [
+                        5
+                      ]
+                    }
+                  }
+                },
+                "size": {
+                  "enum": [
+                    5
+                  ]
                 }
-              },
-              "size": {
-                "enum": [
-                  5
-                ]
               }
             }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharee lists the folder share received via group invitation (Personal space)
@@ -916,217 +916,218 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "createdBy",
-              "eTag",
-              "folder",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
-              },
-              "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
-              },
-              "createdBy": {
-                "type": "object",
-                "required": ["user"],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": ["displayName", "id"],
-                    "properties": {
-                      "displayName": {
-                        "const": "Alice Hansen"
-                      },
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      }
-                    }
-                  }
-                }
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "const": "folder"
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "createdBy",
-                  "eTag",
-                  "folder",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions"
-                ],
-                "properties": {
-                  "createdBy": {
-                    "type": "object",
-                    "required": ["user"],
-                    "properties": {
-                      "user": {
-                        "type": "object",
-                        "required": ["id", "displayName"],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%user_id_pattern%$"
-                          },
-                          "displayName": {
-                            "const": "Alice Hansen"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "const": "folder"
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "%space_id_pattern%"
-                      },
-                      "driveType" : {
-                        "const": "personal"
-                      }
-                    }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "maxItems": 1,
-                    "minItems": 1,
-                    "items": {
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "createdBy",
+                "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "type": "boolean",
+                  "enum": [false]
+                },
+                "@client.synchronize":{
+                  "type": "boolean",
+                  "enum": [true]
+                },
+                "createdBy": {
+                  "type": "object",
+                  "required": ["user"],
+                  "properties": {
+                    "user": {
                       "type": "object",
-                      "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
-                      ],
+                      "required": ["displayName", "id"],
                       "properties": {
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["group"],
-                          "properties":{
-                            "group": {
-                              "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
-                              "properties": {
-                                "displayName": {
-                                  "const": "grp1"
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                }
-                              }
-                            }
-                          }
+                        "displayName": {
+                          "const": "Alice Hansen"
                         },
                         "id": {
                           "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
-                        },
-                        "invitation": {
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "const": "folder"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "type": "string",
+                      "enum": ["virtual"]
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "%space_id_pattern%"
+                    }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
                           "type": "object",
-                          "required": ["invitedBy"],
+                          "required": ["id", "displayName"],
                           "properties": {
-                            "user":{
-                              "type": "object",
-                              "required": [
-                                "displayName",
-                                "id"
-                              ],
-                              "properties": {
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%user_id_pattern%$"
+                            },
+                            "displayName": {
+                              "const": "Alice Hansen"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "const": "folder"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": [
+                        "driveId",
+                        "driveType"
+                      ],
+                      "properties": {
+                        "driveId": {
+                          "type": "string",
+                          "pattern": "%space_id_pattern%"
+                        },
+                        "driveType" : {
+                          "const": "personal"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "grantedToV2",
+                          "id",
+                          "invitation",
+                          "roles"
+                        ],
+                        "properties": {
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["group"],
+                            "properties":{
+                              "group": {
+                                "type": "object",
+                                "required": [
+                                  "displayName",
+                                  "id"
+                                ],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "grp1"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
                                 }
                               }
                             }
-                          }
-                        },
-                        "roles": {
-                          "type": "array",
-                          "minItems": 1,
-                          "maxItems": 1,
-                          "items": {
+                          },
+                          "id": {
                             "type": "string",
-                            "pattern": "^%role_id_pattern%$"
+                            "pattern": "^%permissions_id_pattern%$"
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "required": ["invitedBy"],
+                            "properties": {
+                              "user":{
+                                "type": "object",
+                                "required": [
+                                  "displayName",
+                                  "id"
+                                ],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "Alice Hansen"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^%role_id_pattern%$"
+                            }
                           }
                         }
                       }
@@ -1138,8 +1139,7 @@ Feature: an user gets the resources shared to them
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharee list the same file shares received via user and group invitation (Personal space)
@@ -1162,355 +1162,355 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "createdBy",
-              "eTag",
-              "file",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem",
-              "size"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
-              },
-              "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
-              },
-              "createdBy": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": ["displayName", "id"],
-                    "properties": {
-                      "displayName": {
-                        "type": "string",
-                        "enum": ["Alice Hansen"]
-                      },
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      }
-                    }
-                  }
-                }
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "file": {
-                "type": "object",
-                "required": ["mimeType"],
-                "properties": {
-                  "mimeType": {
-                    "const": "text/plain"
-                  }
-                }
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "const": "textfile0.txt"
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "createdBy",
-                  "eTag",
-                  "file",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions",
-                  "size"
-                ],
-                "properties": {
-                  "createdBy": {
-                    "type": "object",
-                    "required": [
-                      "user"
-                    ],
-                    "properties": {
-                      "user": {
-                        "type": "object",
-                        "required": [
-                          "id",
-                          "displayName"
-                        ],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%user_id_pattern%$"
-                          },
-                          "displayName": {
-                            "type": "string",
-                            "enum": [
-                              "Alice Hansen"
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "file": {
-                    "type": "object",
-                    "required": ["mimeType"],
-                    "properties": {
-                      "mimeType": {
-                        "const": "text/plain"
-                      }
-                    }
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "const": "textfile0.txt"
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "%space_id_pattern%"
-                      },
-                      "driveType" : {
-                        "type": "string",
-                        "enum": ["personal"]
-                      }
-                    }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "minItems": 2,
-                    "maxItems": 2,
-                    "uniqueItems": true,
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "required": [
-                            "grantedToV2",
-                            "id",
-                            "invitation",
-                            "roles"
-                          ],
-                          "properties": {
-                            "grantedToV2": {
-                              "type": "object",
-                              "required": [
-                                "group"
-                              ],
-                              "properties":{
-                                "group": {
-                                  "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
-                                  "properties": {
-                                    "displayName": {
-                                      "type": "string",
-                                      "enum": ["grp1"]
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "id": {
-                              "type": "string",
-                              "pattern": "^%permissions_id_pattern%$"
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": [
-                                "invitedBy"
-                              ],
-                              "properties": {
-                                "user":{
-                                  "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
-                                  "properties": {
-                                    "displayName": {
-                                      "type": "string",
-                                      "enum": ["Alice Hansen"]
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "roles": {
-                              "type": "array",
-                              "minItems": 1,
-                              "maxItems": 1,
-                              "items": {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            }
-                          }
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "createdBy",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "type": "boolean",
+                  "enum": [false]
+                },
+                "@client.synchronize":{
+                  "type": "boolean",
+                  "enum": [true]
+                },
+                "createdBy": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": ["displayName", "id"],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "enum": ["Alice Hansen"]
                         },
-                        {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "file": {
+                  "type": "object",
+                  "required": ["mimeType"],
+                  "properties": {
+                    "mimeType": {
+                      "const": "text/plain"
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "const": "textfile0.txt"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "type": "string",
+                      "enum": ["virtual"]
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "%space_id_pattern%"
+                    }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions",
+                    "size"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": [
+                        "user"
+                      ],
+                      "properties": {
+                        "user": {
                           "type": "object",
                           "required": [
-                            "grantedToV2",
                             "id",
-                            "invitation",
-                            "roles"
+                            "displayName"
                           ],
                           "properties": {
-                            "grantedToV2": {
-                              "type": "object",
-                              "required": [
-                                "user"
-                              ],
-                              "properties":{
-                                "user": {
-                                  "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
-                                  "properties": {
-                                    "displayName": {
-                                      "type": "string",
-                                      "enum": ["Brian Murphy"]
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
                             "id": {
                               "type": "string",
-                              "pattern": "^%permissions_id_pattern%$"
+                              "pattern": "^%user_id_pattern%$"
                             },
-                            "invitation": {
-                              "type": "object",
-                              "required": [
-                                "invitedBy"
-                              ],
-                              "properties": {
-                                "user":{
-                                  "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
-                                  "properties": {
-                                    "displayName": {
-                                      "type": "string",
-                                      "enum": ["Alice Hansen"]
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "roles": {
-                              "type": "array",
-                              "minItems": 1,
-                              "maxItems": 1,
-                              "items": {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
+                            "displayName": {
+                              "type": "string",
+                              "enum": [
+                                "Alice Hansen"
+                              ]
                             }
                           }
                         }
-                      ]
+                      }
+                    },
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "file": {
+                      "type": "object",
+                      "required": ["mimeType"],
+                      "properties": {
+                        "mimeType": {
+                          "const": "text/plain"
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "const": "textfile0.txt"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": [
+                        "driveId",
+                        "driveType"
+                      ],
+                      "properties": {
+                        "driveId": {
+                          "type": "string",
+                          "pattern": "%space_id_pattern%"
+                        },
+                        "driveType" : {
+                          "type": "string",
+                          "enum": ["personal"]
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "uniqueItems": true,
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": [
+                                  "group"
+                                ],
+                                "properties":{
+                                  "group": {
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["grp1"]
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "id": {
+                                "type": "string",
+                                "pattern": "^%permissions_id_pattern%$"
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": [
+                                  "invitedBy"
+                                ],
+                                "properties": {
+                                  "user":{
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Alice Hansen"]
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": [
+                                  "user"
+                                ],
+                                "properties":{
+                                  "user": {
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Brian Murphy"]
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "id": {
+                                "type": "string",
+                                "pattern": "^%permissions_id_pattern%$"
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": [
+                                  "invitedBy"
+                                ],
+                                "properties": {
+                                  "user":{
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Alice Hansen"]
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "size": {
+                      "const": 5
                     }
-                  },
-                  "size": {
-                    "const": 5
                   }
+                },
+                "size": {
+                  "const": 5
                 }
-              },
-              "size": {
-                "const": 5
               }
             }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharee list the same folder shares received via user and group invitation (Personal space)
@@ -1533,317 +1533,318 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "createdBy",
-              "eTag",
-              "folder",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
-              },
-              "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
-              },
-              "createdBy": {
-                "type": "object",
-                "required": ["user"],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": ["displayName", "id"],
-                    "properties": {
-                      "displayName": {
-                        "const": "Alice Hansen"
-                      },
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      }
-                    }
-                  }
-                }
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "folder": {
-                "const": {}
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "type": "string",
-                "enum": [
-                  "folder"
-                ]
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "createdBy",
-                  "eTag",
-                  "folder",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions"
-                ],
-                "properties": {
-                  "createdBy": {
-                    "type": "object",
-                    "required": ["user"],
-                    "properties": {
-                      "user": {
-                        "type": "object",
-                        "required": ["id", "displayName"],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%user_id_pattern%$"
-                          },
-                          "displayName": {
-                            "const": "Alice Hansen"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "file": {},
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "enum": [
-                      "folder"
-                    ]
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "%space_id_pattern%"
-                      },
-                      "driveType" : {
-                        "const": "personal"
-                      }
-                    }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "minItems": 2,
-                    "maxItems": 2,
-                    "uniqueItems": true,
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "required": [
-                            "grantedToV2",
-                            "id",
-                            "invitation",
-                            "roles"
-                          ],
-                          "properties": {
-                            "grantedToV2": {
-                              "type": "object",
-                              "required": [
-                                "group"
-                              ],
-                              "properties":{
-                                "group": {
-                                  "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
-                                  "properties": {
-                                    "displayName": {
-                                      "type": "string",
-                                      "enum": ["grp1"]
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "id": {
-                              "type": "string",
-                              "pattern": "^%permissions_id_pattern%$"
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": [
-                                "invitedBy"
-                              ],
-                              "properties": {
-                                "user":{
-                                  "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
-                                  "properties": {
-                                    "displayName": {
-                                      "type": "string",
-                                      "enum": ["Alice Hansen"]
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "roles": {
-                              "type": "array",
-                              "minItems": 1,
-                              "maxItems": 1,
-                              "items": {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            }
-                          }
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "createdBy",
+                "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "type": "boolean",
+                  "enum": [false]
+                },
+                "@client.synchronize":{
+                  "type": "boolean",
+                  "enum": [true]
+                },
+                "createdBy": {
+                  "type": "object",
+                  "required": ["user"],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": ["displayName", "id"],
+                      "properties": {
+                        "displayName": {
+                          "const": "Alice Hansen"
                         },
-                        {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "folder": {
+                  "const": {}
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "type": "string",
+                  "enum": [
+                    "folder"
+                  ]
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "type": "string",
+                      "enum": ["virtual"]
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "%space_id_pattern%"
+                    }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
                           "type": "object",
-                          "required": [
-                            "grantedToV2",
-                            "id",
-                            "invitation",
-                            "roles"
-                          ],
+                          "required": ["id", "displayName"],
                           "properties": {
-                            "grantedToV2": {
-                              "type": "object",
-                              "required": [
-                                "user"
-                              ],
-                              "properties":{
-                                "user": {
-                                  "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
-                                  "properties": {
-                                    "displayName": {
-                                      "type": "string",
-                                      "enum": ["Brian Murphy"]
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
                             "id": {
                               "type": "string",
-                              "pattern": "^%permissions_id_pattern%$"
+                              "pattern": "^%user_id_pattern%$"
                             },
-                            "invitation": {
-                              "type": "object",
-                              "required": [
-                                "invitedBy"
-                              ],
-                              "properties": {
-                                "user":{
-                                  "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
-                                  "properties": {
-                                    "displayName": {
-                                      "type": "string",
-                                      "enum": ["Alice Hansen"]
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "roles": {
-                              "type": "array",
-                              "minItems": 1,
-                              "maxItems": 1,
-                              "items": {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
+                            "displayName": {
+                              "const": "Alice Hansen"
                             }
                           }
                         }
+                      }
+                    },
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "file": {},
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "type": "string",
+                      "enum": [
+                        "folder"
                       ]
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": [
+                        "driveId",
+                        "driveType"
+                      ],
+                      "properties": {
+                        "driveId": {
+                          "type": "string",
+                          "pattern": "%space_id_pattern%"
+                        },
+                        "driveType" : {
+                          "const": "personal"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "uniqueItems": true,
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": [
+                                  "group"
+                                ],
+                                "properties":{
+                                  "group": {
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["grp1"]
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "id": {
+                                "type": "string",
+                                "pattern": "^%permissions_id_pattern%$"
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": [
+                                  "invitedBy"
+                                ],
+                                "properties": {
+                                  "user":{
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Alice Hansen"]
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": [
+                                  "user"
+                                ],
+                                "properties":{
+                                  "user": {
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Brian Murphy"]
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "id": {
+                                "type": "string",
+                                "pattern": "^%permissions_id_pattern%$"
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": [
+                                  "invitedBy"
+                                ],
+                                "properties": {
+                                  "user":{
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string",
+                                        "enum": ["Alice Hansen"]
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
                     }
                   }
                 }
@@ -1852,8 +1853,7 @@ Feature: an user gets the resources shared to them
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharee lists the same name file shares received from different users (Personal space)
@@ -2453,60 +2453,60 @@ Feature: an user gets the resources shared to them
     When user "Alice" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "maxItems": 4,
-          "minItems": 4,
-          "uniqueItems": true,
-          "items": {
-            "oneOf": [
-              {
-                "type": "object",
-                "required": ["name"],
-                "properties": {
-                  "name": {
-                    "const": "folder"
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": {
+                    "name": {
+                      "const": "folder"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": {
+                    "name": {
+                      "const": "folder (1)"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": {
+                    "name": {
+                      "const": "textfile.txt"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": {
+                    "name": {
+                      "const": "textfile (1).txt"
+                    }
                   }
                 }
-              },
-              {
-                "type": "object",
-                "required": ["name"],
-                "properties": {
-                  "name": {
-                    "const": "folder (1)"
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "required": ["name"],
-                "properties": {
-                  "name": {
-                    "const": "textfile.txt"
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "required": ["name"],
-                "properties": {
-                  "name": {
-                    "const": "textfile (1).txt"
-                  }
-                }
-              }
-            ]
+              ]
+            }
           }
         }
       }
-    }
-    """
+      """
 
   @issue-8027 @issue-8314
   Scenario Outline: sharee lists the file share (Project space)
@@ -2523,218 +2523,218 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "eTag",
-              "file",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem",
-              "size"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "type": "boolean",
-                "enum": [false]
-              },
-              "@client.synchronize":{
-                "type": "boolean",
-                "enum": [true]
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "file": {
-                "type": "object",
-                "required": ["mimeType"],
-                "properties": {
-                  "mimeType": {
-                    "type": "string",
-                    "pattern": "^text/plain"
-                  }
-                }
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "const": "testfile.txt"
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "type": "string",
-                    "enum": ["virtual"]
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "eTag",
-                  "file",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions",
-                  "size"
-                ],
-                "properties": {
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "file": {
-                    "type": "object",
-                    "required": ["mimeType"],
-                    "properties": {
-                      "mimeType": {
-                        "type": "string",
-                        "pattern": "^text/plain"
-                      }
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "type": "boolean",
+                  "enum": [false]
+                },
+                "@client.synchronize":{
+                  "type": "boolean",
+                  "enum": [true]
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "file": {
+                  "type": "object",
+                  "required": ["mimeType"],
+                  "properties": {
+                    "mimeType": {
+                      "type": "string",
+                      "pattern": "^text/plain"
                     }
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "const": "testfile.txt"
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "^%file_id_pattern%$"
-                      },
-                      "driveType" : {
-                        "const": "project"
-                      }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "const": "testfile.txt"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "type": "string",
+                      "enum": ["virtual"]
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "%space_id_pattern%"
                     }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "minItems": 1,
-                    "maxItems": 1,
-                    "items": {
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions",
+                    "size"
+                  ],
+                  "properties": {
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "file": {
+                      "type": "object",
+                      "required": ["mimeType"],
+                      "properties": {
+                        "mimeType": {
+                          "type": "string",
+                          "pattern": "^text/plain"
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "const": "testfile.txt"
+                    },
+                    "parentReference": {
                       "type": "object",
                       "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
+                        "driveId",
+                        "driveType"
                       ],
                       "properties": {
-                        "id": {
+                        "driveId": {
                           "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
+                          "pattern": "^%file_id_pattern%$"
                         },
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["user"],
-                          "properties": {
-                            "user": {
-                              "type": "object",
-                              "required": ["displayName", "id"],
-                              "properties": {
-                                "displayName": {
-                                  "const": "Brian Murphy"
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern":"^%user_id_pattern%$"
+                        "driveType" : {
+                          "const": "project"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "grantedToV2",
+                          "id",
+                          "invitation",
+                          "roles"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^%permissions_id_pattern%$"
+                          },
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "required": ["displayName", "id"],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "Brian Murphy"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern":"^%user_id_pattern%$"
+                                  }
                                 }
                               }
                             }
-                          }
-                        },
-                        "invitation": {
-                          "type": "object",
-                          "required": ["invitedBy"],
-                          "properties": {
-                            "invitedBy": {
-                              "type": "object",
-                              "required": ["user"],
-                              "properties": {
-                                "user": {
-                                  "type": "object",
-                                  "required": ["displayName", "id"],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": "Alice Hansen"
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "required": ["invitedBy"],
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "Alice Hansen"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
                                     }
                                   }
                                 }
                               }
                             }
-                          }
-                        },
-                        "roles": {
-                          "type": "array",
-                          "maxItems": 1,
-                          "minItems": 1,
-                          "items": {
-                            "type": "string",
-                            "pattern": "^%role_id_pattern%$"
+                          },
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 1,
+                            "minItems": 1,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^%role_id_pattern%$"
+                            }
                           }
                         }
                       }
+                    },
+                    "size": {
+                      "const": 12
                     }
-                  },
-                  "size": {
-                    "const": 12
                   }
+                },
+                "size": {
+                  "const": 12
                 }
-              },
-              "size": {
-                "const": 12
               }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | File Editor      |
@@ -2756,186 +2756,187 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "maxItems": 1,
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "eTag",
-              "folder",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "const": false
-              },
-              "@client.synchronize":{
-                "const": true
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "folder": {
-                "const": {}
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "const": "folder"
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "const": "virtual"
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "eTag",
-                  "folder",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions"
-                ],
-                "properties": {
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "folder": {
-                    "const": {}
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "const": "folder"
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "^%file_id_pattern%$"
-                      },
-                      "driveType" : {
-                        "const": "project"
-                      }
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": false
+                },
+                "@client.synchronize":{
+                  "const": true
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "folder": {
+                  "const": {}
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "const": "folder"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "const": "virtual"
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "%space_id_pattern%"
                     }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "maxItems": 1,
-                    "minItems": 1,
-                    "items": {
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "folder": {
+                      "const": {}
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "const": "folder"
+                    },
+                    "parentReference": {
                       "type": "object",
                       "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
+                        "driveId",
+                        "driveType"
                       ],
                       "properties": {
-                        "id": {
+                        "driveId": {
                           "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
+                          "pattern": "^%file_id_pattern%$"
                         },
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["user"],
-                          "properties": {
-                            "user": {
-                              "type": "object",
-                              "properties": {
-                                "displayName": {
-                                  "const": "Brian Murphy"
+                        "driveType" : {
+                          "const": "project"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "grantedToV2",
+                          "id",
+                          "invitation",
+                          "roles"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^%permissions_id_pattern%$"
+                          },
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "properties": {
+                                  "displayName": {
+                                    "const": "Brian Murphy"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern":"^%user_id_pattern%$"
+                                  }
                                 },
-                                "id": {
-                                  "type": "string",
-                                  "pattern":"^%user_id_pattern%$"
-                                }
-                              },
-                              "required": [
-                                "displayName",
-                                "id"
-                              ]
+                                "required": [
+                                  "displayName",
+                                  "id"
+                                ]
+                              }
                             }
-                          }
-                        },
-                        "invitation": {
-                          "type": "object",
-                          "required": ["invitedBy"],
-                          "properties": {
-                            "invitedBy": {
-                              "type": "object",
-                              "required": ["user"],
-                              "properties": {
-                                "user": {
-                                  "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": "Alice Hansen"
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "required": ["invitedBy"],
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "Alice Hansen"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
                                     }
                                   }
                                 }
                               }
                             }
-                          }
-                        },
-                        "roles": {
-                          "type": "array",
-                          "maxItems": 1,
-                          "minItems": 1,
-                          "items": {
-                            "type": "string",
-                            "pattern": "^%role_id_pattern%$"
+                          },
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 1,
+                            "minItems": 1,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^%role_id_pattern%$"
+                            }
                           }
                         }
                       }
@@ -2947,8 +2948,7 @@ Feature: an user gets the resources shared to them
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | Editor           |
@@ -2972,203 +2972,203 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "eTag",
-              "file",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem",
-              "size"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "const": false
-              },
-              "@client.synchronize":{
-                "const": true
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "file": {
-                "type": "object",
-                "required": ["mimeType"],
-                "properties": {
-                  "mimeType": {
-                    "const": "text/plain"
-                  }
-                }
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "const": "textfile0.txt"
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "const": "virtual"
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "eTag",
-                  "file",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions"
-                ],
-                "properties": {
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "file": {
-                    "type": "object",
-                    "required": ["mimeType"],
-                    "properties": {
-                      "mimeType": {
-                        "const": "text/plain"
-                      }
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": false
+                },
+                "@client.synchronize":{
+                  "const": true
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "file": {
+                  "type": "object",
+                  "required": ["mimeType"],
+                  "properties": {
+                    "mimeType": {
+                      "const": "text/plain"
                     }
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "const": "textfile0.txt"
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": ["driveId", "driveType"],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "%space_id_pattern%"
-                      },
-                      "driveType" : {
-                        "const": "project"
-                      }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "const": "textfile0.txt"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "const": "virtual"
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "%space_id_pattern%"
                     }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "maxItems": 1,
-                    "minItems": 1,
-                    "items": {
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "file": {
                       "type": "object",
-                      "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
-                      ],
+                      "required": ["mimeType"],
                       "properties": {
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["group"],
-                          "properties":{
-                            "group": {
-                              "type": "object",
-                              "required": ["displayName", "id"],
-                              "properties": {
-                                "displayName": {
-                                  "const": "grp1"
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "id": {
+                        "mimeType": {
+                          "const": "text/plain"
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "const": "textfile0.txt"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType"],
+                      "properties": {
+                        "driveId": {
                           "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
+                          "pattern": "%space_id_pattern%"
                         },
-                        "invitation": {
-                          "type": "object",
-                          "required": ["invitedBy"],
-                          "properties": {
-                            "user":{
-                              "type": "object",
-                              "required": ["displayName", "id"],
-                              "properties": {
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
+                        "driveType" : {
+                          "const": "project"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "grantedToV2",
+                          "id",
+                          "invitation",
+                          "roles"
+                        ],
+                        "properties": {
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["group"],
+                            "properties":{
+                              "group": {
+                                "type": "object",
+                                "required": ["displayName", "id"],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "grp1"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
                                 }
                               }
                             }
-                          }
-                        },
-                        "roles": {
-                          "type": "array",
-                          "minItems": 1,
-                          "maxItems": 1,
-                          "items": {
+                          },
+                          "id": {
                             "type": "string",
-                            "pattern": "^%role_id_pattern%$"
+                            "pattern": "^%permissions_id_pattern%$"
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "required": ["invitedBy"],
+                            "properties": {
+                              "user":{
+                                "type": "object",
+                                "required": ["displayName", "id"],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "Alice Hansen"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^%role_id_pattern%$"
+                            }
                           }
                         }
                       }
+                    },
+                    "size": {
+                      "const": 11
                     }
-                  },
-                  "size": {
-                    "const": 11
                   }
+                },
+                "size": {
+                  "const": 11
                 }
-              },
-              "size": {
-                "const": 11
               }
             }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharee lists the folder share received via group invitation (Project space)
@@ -3187,168 +3187,169 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "eTag",
-              "folder",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "const": false
-              },
-              "@client.synchronize":{
-                "const": true
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "const": "folder"
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "const": "virtual"
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "eTag",
-                  "folder",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions"
-                ],
-                "properties": {
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "const": "folder"
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "%space_id_pattern%"
-                      },
-                      "driveType" : {
-                        "const": "project"
-                      }
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": false
+                },
+                "@client.synchronize":{
+                  "const": true
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "const": "folder"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "const": "virtual"
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "%space_id_pattern%"
                     }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "maxItems": 1,
-                    "minItems": 1,
-                    "items": {
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "const": "folder"
+                    },
+                    "parentReference": {
                       "type": "object",
                       "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
+                        "driveId",
+                        "driveType"
                       ],
                       "properties": {
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["group"],
-                          "properties":{
-                            "group": {
-                              "type": "object",
-                              "required": ["displayName", "id"],
-                              "properties": {
-                                "displayName": {
-                                  "const": "grp1"
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "id": {
+                        "driveId": {
                           "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
+                          "pattern": "%space_id_pattern%"
                         },
-                        "invitation": {
-                          "type": "object",
-                          "required": ["invitedBy"],
-                          "properties": {
-                            "user":{
-                              "type": "object",
-                              "required": ["displayName", "id"],
-                              "properties": {
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
+                        "driveType" : {
+                          "const": "project"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "grantedToV2",
+                          "id",
+                          "invitation",
+                          "roles"
+                        ],
+                        "properties": {
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["group"],
+                            "properties":{
+                              "group": {
+                                "type": "object",
+                                "required": ["displayName", "id"],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "grp1"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
                                 }
                               }
                             }
-                          }
-                        },
-                        "roles": {
-                          "type": "array",
-                          "maxItems": 1,
-                          "minItems": 1,
-                          "items": {
+                          },
+                          "id": {
                             "type": "string",
-                            "pattern": "^%role_id_pattern%$"
+                            "pattern": "^%permissions_id_pattern%$"
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "required": ["invitedBy"],
+                            "properties": {
+                              "user":{
+                                "type": "object",
+                                "required": ["displayName", "id"],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "Alice Hansen"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 1,
+                            "minItems": 1,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^%role_id_pattern%$"
+                            }
                           }
                         }
                       }
@@ -3360,8 +3361,7 @@ Feature: an user gets the resources shared to them
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharee list the same file shares received via user and group invitation (Project space)
@@ -3386,274 +3386,274 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "eTag",
-              "file",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem",
-              "size"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "const": false
-              },
-              "@client.synchronize":{
-                "const": true
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "file": {
-                "type": "object",
-                "required": ["mimeType"],
-                "properties": {
-                  "mimeType": {
-                    "const": "text/plain"
-                  }
-                }
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "const": "textfile0.txt"
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "const": "virtual"
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "eTag",
-                  "file",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions",
-                  "size"
-                ],
-                "properties": {
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "file": {
-                    "type": "object",
-                    "required": ["mimeType"],
-                    "properties": {
-                      "mimeType": {
-                        "const": "text/plain"
-                      }
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": false
+                },
+                "@client.synchronize":{
+                  "const": true
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "file": {
+                  "type": "object",
+                  "required": ["mimeType"],
+                  "properties": {
+                    "mimeType": {
+                      "const": "text/plain"
                     }
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "const": "textfile0.txt"
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "%space_id_pattern%"
-                      },
-                      "driveType" : {
-                        "const": "project"
-                      }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "const": "textfile0.txt"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "const": "virtual"
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "%space_id_pattern%"
                     }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "minItems": 2,
-                    "maxItems": 2,
-                    "uniqueItems": true,
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "required": [
-                            "grantedToV2",
-                            "id",
-                            "invitation",
-                            "roles"
-                          ],
-                          "properties": {
-                            "grantedToV2": {
-                              "type": "object",
-                              "required": ["group"],
-                              "properties":{
-                                "group": {
-                                  "type": "object",
-                                  "required": ["displayName", "id"],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": "grp1"
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "id": {
-                              "type": "string",
-                              "pattern": "^%permissions_id_pattern%$"
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "user":{
-                                  "type": "object",
-                                  "required": ["displayName", "id"],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": "Alice Hansen"
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "roles": {
-                              "type": "array",
-                              "minItems": 1,
-                              "maxItems": 1,
-                              "items": {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            }
-                          }
-                        },
-                        {
-                          "type": "object",
-                          "required": [
-                            "grantedToV2",
-                            "id",
-                            "invitation",
-                            "roles"
-                          ],
-                          "properties": {
-                            "grantedToV2": {
-                              "type": "object",
-                              "required": ["user"],
-                              "properties":{
-                                "user": {
-                                  "type": "object",
-                                  "required": ["displayName", "id"],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": "Brian Murphy"
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "id": {
-                              "type": "string",
-                              "pattern": "^%permissions_id_pattern%$"
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "user":{
-                                  "type": "object",
-                                  "required": ["displayName", "id"],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": "Alice Hansen"
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "roles": {
-                              "type": "array",
-                              "minItems": 1,
-                              "maxItems": 1,
-                              "items": {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            }
-                          }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions",
+                    "size"
+                  ],
+                  "properties": {
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "file": {
+                      "type": "object",
+                      "required": ["mimeType"],
+                      "properties": {
+                        "mimeType": {
+                          "const": "text/plain"
                         }
-                      ]
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "const": "textfile0.txt"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": [
+                        "driveId",
+                        "driveType"
+                      ],
+                      "properties": {
+                        "driveId": {
+                          "type": "string",
+                          "pattern": "%space_id_pattern%"
+                        },
+                        "driveType" : {
+                          "const": "project"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "uniqueItems": true,
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["group"],
+                                "properties":{
+                                  "group": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "grp1"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "id": {
+                                "type": "string",
+                                "pattern": "^%permissions_id_pattern%$"
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "user":{
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "Alice Hansen"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties":{
+                                  "user": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "Brian Murphy"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "id": {
+                                "type": "string",
+                                "pattern": "^%permissions_id_pattern%$"
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "user":{
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "Alice Hansen"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "size": {
+                      "const": 11
                     }
-                  },
-                  "size": {
-                    "const": 11
                   }
+                },
+                  "size": {
+                  "const": 11
                 }
-              },
-                "size": {
-                "const": 11
               }
             }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharee list the same folder shares received via user and group invitation (Project space)
@@ -3678,244 +3678,245 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "eTag",
-              "folder",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "const": false
-              },
-              "@client.synchronize":{
-                "const": true
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "folder": {
-                "const": {}
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "const": "folder"
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "const": "virtual"
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "%space_id_pattern%"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "eTag",
-                  "folder",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions"
-                ],
-                "properties": {
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "folder": {
-                    "const": {}
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "const": "folder"
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "%space_id_pattern%"
-                      },
-                      "driveType" : {
-                        "const": "project"
-                      }
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": false
+                },
+                "@client.synchronize":{
+                  "const": true
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "folder": {
+                  "const": {}
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "const": "folder"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "const": "virtual"
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "%space_id_pattern%"
                     }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "minItems": 2,
-                    "maxItems": 2,
-                    "uniqueItems": true,
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "required": [
-                            "grantedToV2",
-                            "id",
-                            "invitation",
-                            "roles"
-                          ],
-                          "properties": {
-                            "grantedToV2": {
-                              "type": "object",
-                              "required": ["group"],
-                              "properties":{
-                                "group": {
-                                  "type": "object",
-                                  "required": ["displayName", "id"],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": "grp1"
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "id": {
-                              "type": "string",
-                              "pattern": "^%permissions_id_pattern%$"
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "user":{
-                                  "type": "object",
-                                  "required": ["displayName", "id"],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": "Alice Hansen"
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "roles": {
-                              "type": "array",
-                              "minItems": 1,
-                              "maxItems": 1,
-                              "items": {
-                                "type": "string",
-                                "pattern": "^%role_id_pattern%$"
-                              }
-                            }
-                          }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "folder": {
+                      "const": {}
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "const": "folder"
+                    },
+                    "parentReference": {
+                      "type": "object",
+                      "required": [
+                        "driveId",
+                        "driveType"
+                      ],
+                      "properties": {
+                        "driveId": {
+                          "type": "string",
+                          "pattern": "%space_id_pattern%"
                         },
-                        {
-                          "type": "object",
-                          "required": [
-                            "grantedToV2",
-                            "id",
-                            "invitation",
-                            "roles"
-                          ],
-                          "properties": {
-                            "grantedToV2": {
-                              "type": "object",
-                              "required": ["user"],
-                              "properties":{
-                                "user": {
-                                  "type": "object",
-                                  "required": ["displayName", "id"],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": "Brian Murphy"
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
+                        "driveType" : {
+                          "const": "project"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "uniqueItems": true,
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["group"],
+                                "properties":{
+                                  "group": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "grp1"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
                                     }
                                   }
                                 }
-                              }
-                            },
-                            "id": {
-                              "type": "string",
-                              "pattern": "^%permissions_id_pattern%$"
-                            },
-                            "invitation": {
-                              "type": "object",
-                              "required": ["invitedBy"],
-                              "properties": {
-                                "user":{
-                                  "type": "object",
-                                  "required": ["displayName", "id"],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": "Alice Hansen"
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            "roles": {
-                              "type": "array",
-                              "minItems": 1,
-                              "maxItems": 1,
-                              "items": {
+                              },
+                              "id": {
                                 "type": "string",
-                                "pattern": "^%role_id_pattern%$"
+                                "pattern": "^%permissions_id_pattern%$"
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "user":{
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "Alice Hansen"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "grantedToV2",
+                              "id",
+                              "invitation",
+                              "roles"
+                            ],
+                            "properties": {
+                              "grantedToV2": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties":{
+                                  "user": {
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "Brian Murphy"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "id": {
+                                "type": "string",
+                                "pattern": "^%permissions_id_pattern%$"
+                              },
+                              "invitation": {
+                                "type": "object",
+                                "required": ["invitedBy"],
+                                "properties": {
+                                  "user":{
+                                    "type": "object",
+                                    "required": ["displayName", "id"],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": "Alice Hansen"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "roles": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^%role_id_pattern%$"
+                                }
                               }
                             }
                           }
-                        }
-                      ]
+                        ]
+                      }
                     }
                   }
                 }
@@ -3924,8 +3925,7 @@ Feature: an user gets the resources shared to them
           }
         }
       }
-    }
-    """
+      """
 
   @issue-8471
   Scenario: sharee lists the same name file and folder shares received from different projects (Project space)
@@ -4032,19 +4032,19 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems":0,
-          "maxItems":0
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems":0,
+            "maxItems":0
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharee lists the folder share after sharer is deleted (Personal space)
@@ -4059,21 +4059,21 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 0,
-          "maxItems": 0
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 0
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharee lists the file share after the sharer is disabled (Personal space)
@@ -4269,186 +4269,187 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him after clearing user cache using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "maxItems": 1,
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "eTag",
-              "folder",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "const": false
-              },
-              "@client.synchronize":{
-                "const": true
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "folder": {
-                "const": {}
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "const": "folder"
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "const": "virtual"
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "eTag",
-                  "folder",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions"
-                ],
-                "properties": {
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "folder": {
-                    "const": {}
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "const": "folder"
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "^%file_id_pattern%$"
-                      },
-                      "driveType" : {
-                        "const": "project"
-                      }
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": false
+                },
+                "@client.synchronize":{
+                  "const": true
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "folder": {
+                  "const": {}
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "const": "folder"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "const": "virtual"
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
                     }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "maxItems": 1,
-                    "minItems": 1,
-                    "items": {
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "folder": {
+                      "const": {}
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "const": "folder"
+                    },
+                    "parentReference": {
                       "type": "object",
                       "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation",
-                        "roles"
+                        "driveId",
+                        "driveType"
                       ],
                       "properties": {
-                        "id": {
+                        "driveId": {
                           "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
+                          "pattern": "^%file_id_pattern%$"
                         },
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["user"],
-                          "properties": {
-                            "user": {
-                              "type": "object",
-                              "properties": {
-                                "displayName": {
-                                  "const": "Brian Murphy"
+                        "driveType" : {
+                          "const": "project"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "grantedToV2",
+                          "id",
+                          "invitation",
+                          "roles"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^%permissions_id_pattern%$"
+                          },
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "properties": {
+                                  "displayName": {
+                                    "const": "Brian Murphy"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern":"^%user_id_pattern%$"
+                                  }
                                 },
-                                "id": {
-                                  "type": "string",
-                                  "pattern":"^%user_id_pattern%$"
-                                }
-                              },
-                              "required": [
-                                "displayName",
-                                "id"
-                              ]
+                                "required": [
+                                  "displayName",
+                                  "id"
+                                ]
+                              }
                             }
-                          }
-                        },
-                        "invitation": {
-                          "type": "object",
-                          "required": ["invitedBy"],
-                          "properties": {
-                            "invitedBy": {
-                              "type": "object",
-                              "required": ["user"],
-                              "properties": {
-                                "user": {
-                                  "type": "object",
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ],
-                                  "properties": {
-                                    "displayName": {
-                                      "const": ""
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "required": ["invitedBy"],
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "displayName": {
+                                        "const": ""
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
                                     }
                                   }
                                 }
                               }
                             }
-                          }
-                        },
-                        "roles": {
-                          "type": "array",
-                          "maxItems": 1,
-                          "minItems": 1,
-                          "items": {
-                            "type": "string",
-                            "pattern": "^%role_id_pattern%$"
+                          },
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 1,
+                            "minItems": 1,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^%role_id_pattern%$"
+                            }
                           }
                         }
                       }
@@ -4460,8 +4461,7 @@ Feature: an user gets the resources shared to them
           }
         }
       }
-    }
-    """
+      """
 
   @env-config @issue-8314
   Scenario: sharee lists the file share with after sharer is deleted (Project space)
@@ -4480,224 +4480,224 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him after clearing user cache using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "maxItems": 1,
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden",
-              "@client.synchronize",
-              "eTag",
-              "file",
-              "id",
-              "lastModifiedDateTime",
-              "name",
-              "parentReference",
-              "remoteItem",
-              "size"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "const": false
-              },
-              "@client.synchronize":{
-                "const": true
-              },
-              "eTag": {
-                "type": "string",
-                "pattern": "%etag_pattern%"
-              },
-              "file": {
-                "type": "object",
-                "required": ["mimeType"],
-                "properties": {
-                  "mimeType": {
-                    "type": "string",
-                    "pattern": "^text/plain"
-                  }
-                }
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%share_id_pattern%$"
-              },
-              "name": {
-                "const": "testfile.txt"
-              },
-              "parentReference": {
-                "type": "object",
-                "required": [
-                  "driveId",
-                  "driveType",
-                  "id"
-                ],
-                "properties": {
-                  "driveId": {
-                    "type": "string",
-                    "pattern": "^%space_id_pattern%$"
-                  },
-                  "driveType" : {
-                    "const": "virtual"
-                  },
-                  "id" : {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  }
-                }
-              },
-              "remoteItem": {
-                "type": "object",
-                "required": [
-                  "eTag",
-                  "file",
-                  "id",
-                  "lastModifiedDateTime",
-                  "name",
-                  "parentReference",
-                  "permissions",
-                  "size"
-                ],
-                "properties": {
-                  "eTag": {
-                    "type": "string",
-                    "pattern": "%etag_pattern%"
-                  },
-                  "file": {
-                    "type": "object",
-                    "required": ["mimeType"],
-                    "properties": {
-                      "mimeType": {
-                        "type": "string",
-                        "pattern": "^text/plain"
-                      }
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": false
+                },
+                "@client.synchronize":{
+                  "const": true
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
+                },
+                "file": {
+                  "type": "object",
+                  "required": ["mimeType"],
+                  "properties": {
+                    "mimeType": {
+                      "type": "string",
+                      "pattern": "^text/plain"
                     }
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%file_id_pattern%$"
-                  },
-                  "name": {
-                    "const": "testfile.txt"
-                  },
-                  "parentReference": {
-                    "type": "object",
-                    "required": [
-                      "driveId",
-                      "driveType"
-                    ],
-                    "properties": {
-                      "driveId": {
-                        "type": "string",
-                        "pattern": "^%file_id_pattern%$"
-                      },
-                      "driveType" : {
-                        "const": "project"
-                      }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%share_id_pattern%$"
+                },
+                "name": {
+                  "const": "testfile.txt"
+                },
+                "parentReference": {
+                  "type": "object",
+                  "required": [
+                    "driveId",
+                    "driveType",
+                    "id"
+                  ],
+                  "properties": {
+                    "driveId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
+                    },
+                    "driveType" : {
+                      "const": "virtual"
+                    },
+                    "id" : {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
                     }
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "maxItems": 1,
-                    "minItems": 1,
-                    "items": {
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions",
+                    "size"
+                  ],
+                  "properties": {
+                    "eTag": {
+                      "type": "string",
+                      "pattern": "%etag_pattern%"
+                    },
+                    "file": {
+                      "type": "object",
+                      "required": ["mimeType"],
+                      "properties": {
+                        "mimeType": {
+                          "type": "string",
+                          "pattern": "^text/plain"
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%file_id_pattern%$"
+                    },
+                    "name": {
+                      "const": "testfile.txt"
+                    },
+                    "parentReference": {
                       "type": "object",
                       "required": [
-                        "grantedToV2",
-                        "id",
-                        "invitation"
+                        "driveId",
+                        "driveType"
                       ],
                       "properties": {
-                        "id": {
+                        "driveId": {
                           "type": "string",
-                          "pattern": "^%permissions_id_pattern%$"
+                          "pattern": "^%file_id_pattern%$"
                         },
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["user"],
-                          "properties": {
-                            "user": {
-                              "type": "object",
-                              "properties": {
-                                "displayName": {
-                                  "const": "Brian Murphy"
-                                },
-                                "id": {
-                                  "type": "string",
-                                  "pattern":"^%user_id_pattern%$"
-                                }
-                              },
-                              "required": [
-                                "displayName",
-                                "id"
-                              ]
-                            }
-                          }
-                        },
-                        "invitation": {
-                          "type": "object",
-                          "properties": {
-                            "invitedBy": {
-                              "type": "object",
-                              "properties": {
-                                "user": {
-                                  "type": "object",
-                                  "properties": {
-                                    "displayName": {
-                                      "const": ""
-                                    },
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^%user_id_pattern%$"
-                                    }
+                        "driveType" : {
+                          "const": "project"
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "grantedToV2",
+                          "id",
+                          "invitation"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^%permissions_id_pattern%$"
+                          },
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "properties": {
+                                  "displayName": {
+                                    "const": "Brian Murphy"
                                   },
-                                  "required": [
-                                    "displayName",
-                                    "id"
-                                  ]
-                                }
-                              },
-                              "required": [
-                                "user"
-                              ]
+                                  "id": {
+                                    "type": "string",
+                                    "pattern":"^%user_id_pattern%$"
+                                  }
+                                },
+                                "required": [
+                                  "displayName",
+                                  "id"
+                                ]
+                              }
                             }
                           },
-                          "required": [
-                            "invitedBy"
-                          ]
-                        },
-                        "roles": {
-                          "type": "array",
-                          "maxItems": 1,
-                          "minItems": 1,
-                          "items": {
-                            "type": "string",
-                            "pattern": "^%role_id_pattern%$"
+                          "invitation": {
+                            "type": "object",
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": {
+                                        "const": ""
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "pattern": "^%user_id_pattern%$"
+                                      }
+                                    },
+                                    "required": [
+                                      "displayName",
+                                      "id"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "user"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "invitedBy"
+                            ]
+                          },
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 1,
+                            "minItems": 1,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^%role_id_pattern%$"
+                            }
                           }
                         }
                       }
+                    },
+                    "size": {
+                      "const": 12
                     }
-                  },
-                  "size": {
-                    "const": 12
                   }
+                },
+                "size": {
+                  "const": 12
                 }
-              },
-              "size": {
-                "const": 12
               }
             }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharee lists the folder share after the sharer is disabled (Project space)
@@ -4874,17 +4874,17 @@ Feature: an user gets the resources shared to them
     When user "Brian" hides the shared resource "<resource>" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["@UI.Hidden"],
-      "properties": {
-        "@UI.Hidden": {
-          "const": true
+      """
+      {
+        "type": "object",
+        "required": ["@UI.Hidden"],
+        "properties": {
+          "@UI.Hidden": {
+            "const": true
+          }
         }
       }
-    }
-    """
+      """
     Examples:
       | resource     |
       | testfile.txt |
@@ -4906,17 +4906,17 @@ Feature: an user gets the resources shared to them
     When user "Brian" hides the shared resource "<resource>" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["@UI.Hidden"],
-      "properties": {
-        "@UI.Hidden": {
-          "const": true
+      """
+      {
+        "type": "object",
+        "required": ["@UI.Hidden"],
+        "properties": {
+          "@UI.Hidden": {
+            "const": true
+          }
         }
       }
-    }
-    """
+      """
     Examples:
       | resource      |
       | testfile.txt  |
@@ -4936,30 +4936,30 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "maxItems": 1,
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "const": true
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": true
+                }
               }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | resource     |
       | testfile.txt |
@@ -4982,30 +4982,30 @@ Feature: an user gets the resources shared to them
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "maxItems": 1,
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "@UI.Hidden"
-            ],
-            "properties": {
-              "@UI.Hidden":{
-                "const": true
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": true
+                }
               }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | resource      |
       | testfile.txt  |

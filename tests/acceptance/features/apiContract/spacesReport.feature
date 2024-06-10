@@ -80,7 +80,7 @@ Feature: REPORT request to project space
       | /folderMain/sub-folder |
     And the following headers should match these regular expressions
       | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    Then the HTTP status code should be "207"
+    And the HTTP status code should be "207"
     And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
       | key              | value                        |
       | oc:fileid        | UUIDof:folderMain/sub-folder |

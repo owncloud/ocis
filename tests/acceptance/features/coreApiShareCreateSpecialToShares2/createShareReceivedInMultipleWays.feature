@@ -307,7 +307,7 @@ Feature: share resources where the sharee receives the share in multiple ways
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Editor        |
-    And user "Brian" should be able to create folder "/Shares/child1/fo1"
+    Then user "Brian" should be able to create folder "/Shares/child1/fo1"
     And user "Brian" should be able to create folder "/Shares/child1/child2/fo2"
     But user "Brian" should not be able to create folder "/Shares/parent/fo3"
     And user "Brian" should not be able to create folder "/Shares/parent/fo3"

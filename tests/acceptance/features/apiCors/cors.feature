@@ -101,7 +101,6 @@ Feature: CORS headers
       | header                      | value               |
       | Access-Control-Allow-Origin | https://aphno.badal |
 
-
   @issue-8380
   Scenario: CORS headers should be returned when uploading file using Tus and when CORS domain sending origin header in the Webdav api
     Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:

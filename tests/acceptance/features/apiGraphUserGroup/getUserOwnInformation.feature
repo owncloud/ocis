@@ -11,30 +11,30 @@ Feature: get user's own information
     When the user "Alice" retrieves her information using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["alice@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Alice"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName"
+        ],
+        "properties": {
+          "id" : {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "enum": ["alice@example.org"]
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "enum": ["Alice"]
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: user gets his/her own information with group involvement
@@ -45,61 +45,61 @@ Feature: get user's own information
     When the user "Alice" retrieves her information using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "id",
-        "mail",
-        "onPremisesSamAccountName"
-      ],
-      "properties": {
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "type": "string",
-          "enum": ["alice@example.org"]
-        },
-        "onPremisesSamAccountName": {
-          "type": "string",
-          "enum": ["Alice"]
-        },
-        "memberOf": {
-          "type": "array",
-          "minItems": 2,
-          "maxItems": 2,
-          "uniqueItems": true,
-          "items": {
-            "oneOf": [
-              {
-                "type": "object",
-                "required": [
-                  "displayName"
-                ],
-                "properties": {
-                  "displayName": {
-                    "type": "string",
-                    "enum": ["tea-lover"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "id",
+          "mail",
+          "onPremisesSamAccountName"
+        ],
+        "properties": {
+          "id" : {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "type": "string",
+            "enum": ["alice@example.org"]
+          },
+          "onPremisesSamAccountName": {
+            "type": "string",
+            "enum": ["Alice"]
+          },
+          "memberOf": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "displayName"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "type": "string",
+                      "enum": ["tea-lover"]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "displayName"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "type": "string",
+                      "enum": ["coffee-lover"]
+                    }
                   }
                 }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "displayName"
-                ],
-                "properties": {
-                  "displayName": {
-                    "type": "string",
-                    "enum": ["coffee-lover"]
-                  }
-                }
-              }
-            ]
+              ]
+            }
           }
         }
       }
-    }
-    """
+      """

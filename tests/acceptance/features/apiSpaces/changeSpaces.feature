@@ -31,25 +31,25 @@ Feature: Change data of space
     When user "Alice" changes the name of the "Project Jupiter" space to "Project Death Star"
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "driveType"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Death Star"]
-        },
-        "driveType": {
-          "type": "string",
-          "enum": ["project"]
+      """
+       {
+        "type": "object",
+        "required": [
+          "name",
+          "driveType"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Project Death Star"]
+          },
+          "driveType": {
+            "type": "string",
+            "enum": ["project"]
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario Outline: user other than space manager role can't change the name of a Space via the Graph API
@@ -65,30 +65,30 @@ Feature: Change data of space
     When user "Alice" changes the description of the "Project Jupiter" space to "The Death Star is a fictional mobile space station"
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "driveType",
-        "description"
-      ],
-      "properties": {
-        "driveType": {
-          "type": "string",
-          "enum": ["project"]
-        },
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "description": {
-          "type": "string",
-          "enum": ["The Death Star is a fictional mobile space station"]
+      """
+       {
+        "type": "object",
+        "required": [
+          "name",
+          "driveType",
+          "description"
+        ],
+        "properties": {
+          "driveType": {
+            "type": "string",
+            "enum": ["project"]
+          },
+          "name": {
+            "type": "string",
+            "enum": ["Project Jupiter"]
+          },
+          "description": {
+            "type": "string",
+            "enum": ["The Death Star is a fictional mobile space station"]
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario Outline: viewer and editor cannot change the description(subtitle) of a space via the Graph API
@@ -113,38 +113,38 @@ Feature: Change data of space
     When user "Alice" changes the quota of the "Project Jupiter" space to "<quota-value>"
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "quota"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "quota": {
-          "type": "object",
-          "required": [
-            "used",
-            "total"
-          ],
-          "properties": {
-            "used" : {
-              "type": "number",
-              "enum": [0]
-            },
-            "total" : {
-              "type": "number",
-              "enum": [0]
+      """
+       {
+        "type": "object",
+        "required": [
+          "name",
+          "quota"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Project Jupiter"]
+          },
+          "quota": {
+            "type": "object",
+            "required": [
+              "used",
+              "total"
+            ],
+            "properties": {
+              "used" : {
+                "type": "number",
+                "enum": [0]
+              },
+              "total" : {
+                "type": "number",
+                "enum": [0]
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | quota-value |
       | 0           |
@@ -157,79 +157,79 @@ Feature: Change data of space
     When user "Alice" sets the file ".space/readme.md" as a description in a special section of the "Project Jupiter" space
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "name",
-        "special"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "special": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "size",
-              "name",
-              "specialFolder",
-              "file",
-              "id",
-              "eTag"
-            ],
-            "properties": {
-              "size": {
-                "type": "number",
-                "enum": [17]
-              },
-              "name": {
-                "type": "string",
-                "enum": ["readme.md"]
-              },
-              "specialFolder": {
-                "type": "object",
-                "required": [
-                  "name"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "enum": ["readme"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "name",
+          "special"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Project Jupiter"]
+          },
+          "special": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "size",
+                "name",
+                "specialFolder",
+                "file",
+                "id",
+                "eTag"
+              ],
+              "properties": {
+                "size": {
+                  "type": "number",
+                  "enum": [17]
+                },
+                "name": {
+                  "type": "string",
+                  "enum": ["readme.md"]
+                },
+                "specialFolder": {
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "enum": ["readme"]
+                    }
                   }
-                }
-              },
-              "file": {
-                "type": "object",
-                "required": [
-                  "mimeType"
-                ],
-                "properties": {
-                  "mimeType": {
-                    "type": "string",
-                    "enum": ["text/markdown"]
+                },
+                "file": {
+                  "type": "object",
+                  "required": [
+                    "mimeType"
+                  ],
+                  "properties": {
+                    "mimeType": {
+                      "type": "string",
+                      "enum": ["text/markdown"]
+                    }
                   }
+                },
+                "id": {
+                  "type": "string",
+                  "enum": ["%file_id%"]
+                },
+                "tag": {
+                  "type": "string",
+                  "enum": ["%eTag%"]
                 }
-              },
-              "id": {
-                "type": "string",
-                "enum": ["%file_id%"]
-              },
-              "tag": {
-                "type": "string",
-                "enum": ["%eTag%"]
               }
             }
           }
         }
       }
-    }
-    """
+      """
     And for user "Alice" the content of the file ".space/readme.md" of the space "Project Jupiter" should be "space description"
 
 
@@ -252,79 +252,79 @@ Feature: Change data of space
     When user "<user>" sets the file ".space/<file-name>" as a space image in a special section of the "Project Jupiter" space
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/<file-name>" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "name",
-        "special"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "special": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "size",
-              "name",
-              "specialFolder",
-              "file",
-              "id",
-              "eTag"
-            ],
-            "properties": {
-              "size": {
-                "type": "number",
-                "enum": [0]
-              },
-              "name": {
-                "type": "string",
-                "enum": ["<file-name>"]
-              },
-              "specialFolder": {
-                "type": "object",
-                "required": [
-                  "name"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "enum": ["image"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "name",
+          "special"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Project Jupiter"]
+          },
+          "special": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "size",
+                "name",
+                "specialFolder",
+                "file",
+                "id",
+                "eTag"
+              ],
+              "properties": {
+                "size": {
+                  "type": "number",
+                  "enum": [0]
+                },
+                "name": {
+                  "type": "string",
+                  "enum": ["<file-name>"]
+                },
+                "specialFolder": {
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "enum": ["image"]
+                    }
                   }
-                }
-              },
-              "file": {
-                "type": "object",
-                "required": [
-                  "mimeType"
-                ],
-                "properties": {
-                  "mimeType": {
-                    "type": "string",
-                    "enum": ["<mime-type>"]
+                },
+                "file": {
+                  "type": "object",
+                  "required": [
+                    "mimeType"
+                  ],
+                  "properties": {
+                    "mimeType": {
+                      "type": "string",
+                      "enum": ["<mime-type>"]
+                    }
                   }
+                },
+                "id": {
+                  "type": "string",
+                  "enum": ["%file_id%"]
+                },
+                "tag": {
+                  "type": "string",
+                  "enum": ["%eTag%"]
                 }
-              },
-              "id": {
-                "type": "string",
-                "enum": ["%file_id%"]
-              },
-              "tag": {
-                "type": "string",
-                "enum": ["%eTag%"]
               }
             }
           }
         }
       }
-    }
-    """
+      """
     And for user "<user>" folder ".space/" of the space "Project Jupiter" should contain these entries:
       | <file-name> |
     Examples:
@@ -332,6 +332,7 @@ Feature: Change data of space
       | Alice | spaceImage.jpeg | image/jpeg |
       | Brian | spaceImage.png  | image/png  |
       | Alice | spaceImage.gif  | image/gif  |
+
 
   Scenario: user viewer cannot set image file as space image of the space via the Graph API
     Given user "Alice" has created a folder ".space" in space "Project Jupiter"
@@ -349,79 +350,79 @@ Feature: Change data of space
     And for user "<user>" the content of the file ".space/readme.md" of the space "Project Jupiter" should be "<expected-content>"
     When user "<user>" lists all available spaces via the Graph API
     And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "name",
-        "special"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "special": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "size",
-              "name",
-              "specialFolder",
-              "file",
-              "id",
-              "eTag"
-            ],
-            "properties": {
-              "size": {
-                "type": "number",
-                "enum": [<expected-size>]
-              },
-              "name": {
-                "type": "string",
-                "enum": ["readme.md"]
-              },
-              "specialFolder": {
-                "type": "object",
-                "required": [
-                  "name"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "enum": ["readme"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "name",
+          "special"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Project Jupiter"]
+          },
+          "special": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "size",
+                "name",
+                "specialFolder",
+                "file",
+                "id",
+                "eTag"
+              ],
+              "properties": {
+                "size": {
+                  "type": "number",
+                  "enum": [<expected-size>]
+                },
+                "name": {
+                  "type": "string",
+                  "enum": ["readme.md"]
+                },
+                "specialFolder": {
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "enum": ["readme"]
+                    }
                   }
-                }
-              },
-              "file": {
-                "type": "object",
-                "required": [
-                  "mimeType"
-                ],
-                "properties": {
-                  "mimeType": {
-                    "type": "string",
-                    "enum": ["text/markdown"]
+                },
+                "file": {
+                  "type": "object",
+                  "required": [
+                    "mimeType"
+                  ],
+                  "properties": {
+                    "mimeType": {
+                      "type": "string",
+                      "enum": ["text/markdown"]
+                    }
                   }
+                },
+                "id": {
+                  "type": "string",
+                  "enum": ["%file_id%"]
+                },
+                "tag": {
+                  "type": "string",
+                  "enum": ["%eTag%"]
                 }
-              },
-              "id": {
-                "type": "string",
-                "enum": ["%file_id%"]
-              },
-              "tag": {
-                "type": "string",
-                "enum": ["%eTag%"]
               }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user  | http-status-code | expected-size | expected-content  |
       | Alice | 204              | 11            | new content       |
@@ -437,79 +438,79 @@ Feature: Change data of space
     And user "<user>" sets the file ".space/newSpaceImage.png" as a space image in a special section of the "Project Jupiter" space
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/newSpaceImage.png" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "name",
-        "special"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "special": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "size",
-              "name",
-              "specialFolder",
-              "file",
-              "id",
-              "eTag"
-            ],
-            "properties": {
-              "size": {
-                "type": "number",
-                "enum": [0]
-              },
-              "name": {
-                "type": "string",
-                "enum": ["newSpaceImage.png"]
-              },
-              "specialFolder": {
-                "type": "object",
-                "required": [
-                  "name"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "enum": ["image"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "name",
+          "special"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Project Jupiter"]
+          },
+          "special": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "size",
+                "name",
+                "specialFolder",
+                "file",
+                "id",
+                "eTag"
+              ],
+              "properties": {
+                "size": {
+                  "type": "number",
+                  "enum": [0]
+                },
+                "name": {
+                  "type": "string",
+                  "enum": ["newSpaceImage.png"]
+                },
+                "specialFolder": {
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "enum": ["image"]
+                    }
                   }
-                }
-              },
-              "file": {
-                "type": "object",
-                "required": [
-                  "mimeType"
-                ],
-                "properties": {
-                  "mimeType": {
-                    "type": "string",
-                    "enum": ["image/png"]
+                },
+                "file": {
+                  "type": "object",
+                  "required": [
+                    "mimeType"
+                  ],
+                  "properties": {
+                    "mimeType": {
+                      "type": "string",
+                      "enum": ["image/png"]
+                    }
                   }
+                },
+                "id": {
+                  "type": "string",
+                  "enum": ["%file_id%"]
+                },
+                "tag": {
+                  "type": "string",
+                  "enum": ["%eTag%"]
                 }
-              },
-              "id": {
-                "type": "string",
-                "enum": ["%file_id%"]
-              },
-              "tag": {
-                "type": "string",
-                "enum": ["%eTag%"]
               }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user  |
       | Alice |

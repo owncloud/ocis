@@ -125,28 +125,28 @@ Feature: add users to group
     When user "Alice" tries to add herself to group "groupA" using the Graph API
     Then the HTTP status code should be "403"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message": {
-              "type": "string",
-              "enum": ["Unauthorized"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "enum": ["Unauthorized"]
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   |
       | Space Admin |
@@ -161,28 +161,28 @@ Feature: add users to group
     When user "Alice" tries to add user "Brian" to group "groupA" using the Graph API
     Then the HTTP status code should be "403"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message" : {
-              "type": "string",
-              "enum": ["Unauthorized"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message" : {
+                "type": "string",
+                "enum": ["Unauthorized"]
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   |
       | Space Admin |

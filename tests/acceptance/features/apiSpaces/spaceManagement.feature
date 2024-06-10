@@ -25,30 +25,30 @@ Feature: Space management
     When user "Brian" lists all spaces via the Graph API with query "$filter=driveType eq 'project'"
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Project" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveType",
-        "name",
-        "id"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project"]
-        },
-        "driveType": {
-          "type": "string",
-          "enum": ["project"]
-        },
-        "id": {
-          "type": "string",
-          "enum": ["%space_id%"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "name",
+          "id"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Project"]
+          },
+          "driveType": {
+            "type": "string",
+            "enum": ["project"]
+          },
+          "id": {
+            "type": "string",
+            "enum": ["%space_id%"]
+          }
         }
       }
-    }
-    """
+      """
     And the json responded should not contain a space with name "Alice Hansen"
 
 
@@ -56,30 +56,30 @@ Feature: Space management
     When user "Brian" lists all spaces via the Graph API with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveType",
-        "name",
-        "id"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Alice Hansen"]
-        },
-        "driveType": {
-          "type": "string",
-          "enum": ["personal"]
-        },
-        "id": {
-          "type": "string",
-          "enum": ["%space_id%"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "name",
+          "id"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Alice Hansen"]
+          },
+          "driveType": {
+            "type": "string",
+            "enum": ["personal"]
+          },
+          "id": {
+            "type": "string",
+            "enum": ["%space_id%"]
+          }
         }
       }
-    }
-    """
+      """
     And the json responded should not contain a space with name "Project"
 
 
@@ -94,20 +94,20 @@ Feature: Space management
     When user "Brian" changes the name of the "Project" space to "New Name" owned by user "Alice"
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "name": {
-           "type": "string",
-           "enum": ["New Name"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+             "type": "string",
+             "enum": ["New Name"]
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: user without space admin permission tries to change the name of the project space
@@ -120,20 +120,20 @@ Feature: Space management
     When user "Brian" changes the description of the "Project" space to "New description" owned by user "Alice"
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "description"
-      ],
-      "properties": {
-        "description": {
-           "type": "string",
-           "enum": ["New description"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "description"
+        ],
+        "properties": {
+          "description": {
+             "type": "string",
+             "enum": ["New description"]
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: user without space admin permission tries to change the description of the project space

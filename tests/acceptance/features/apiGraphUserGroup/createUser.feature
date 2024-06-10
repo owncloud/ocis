@@ -91,7 +91,6 @@ Feature: create user
     Then the HTTP status code should be "201"
     And user "Brian" should exist
 
-
   @env-config
   Scenario Outline: create user with setting OCIS no restriction on the user name
     Given the config "GRAPH_USERNAME_MATCH" has been set to "none"
@@ -109,7 +108,6 @@ Feature: create user
       | 1248Bob           | user names starts with the number           |
       | (*:!;+-&$%)_alice | user names starts with the ASCII characters |
 
-
   @env-config
   Scenario: create user with setting OCIS not to assign the default user role
     Given the config "GRAPH_ASSIGN_DEFAULT_USER_ROLE" has been set to "false"
@@ -124,7 +122,6 @@ Feature: create user
     When the administrator retrieves the assigned role of user "sam" using the Graph API
     Then the HTTP status code should be "200"
     And the Graph API response should have no role
-
 
   @env-config
   Scenario: create user with setting OCIS assign the default user role

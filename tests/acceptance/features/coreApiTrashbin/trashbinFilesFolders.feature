@@ -109,7 +109,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path-version |
       | spaces           |
 
-
   # This scenario deletes many files as close together in time as the test can run.
   # On a very slow system, the file deletes might all happen in different seconds.
   # But on "reasonable" systems, some of the files will be deleted in the same second,

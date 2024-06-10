@@ -24,48 +24,48 @@ Feature: State of the quota
     When user "Alice" uploads a file inside space "<space-name>" with content "<file-content>" to "test.txt" using the WebDAV API
     And user "Alice" lists all available spaces via the Graph API
     Then the JSON response should contain space called "<space-name>" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "quota"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["<space-name>"]
-        },
-        "quota": {
-          "type": "object",
-          "required": [
-            "state",
-            "total",
-            "remaining",
-            "used"
-          ],
-          "properties": {
-            "state" : {
-              "type": "string",
-              "enum": ["<state>"]
-            },
-            "total" : {
-              "type": "number",
-              "enum": [100]
-            },
-            "remaining" : {
-              "type": "number",
-              "enum": [<remaining>]
-            },
-            "used": {
-              "type": "number",
-              "enum": [<used>]
+      """
+       {
+        "type": "object",
+        "required": [
+          "name",
+          "quota"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["<space-name>"]
+          },
+          "quota": {
+            "type": "object",
+            "required": [
+              "state",
+              "total",
+              "remaining",
+              "used"
+            ],
+            "properties": {
+              "state" : {
+                "type": "string",
+                "enum": ["<state>"]
+              },
+              "total" : {
+                "type": "number",
+                "enum": [100]
+              },
+              "remaining" : {
+                "type": "number",
+                "enum": [<remaining>]
+              },
+              "used": {
+                "type": "number",
+                "enum": [<used>]
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | space-name | file-content                                                                                         | state    | remaining | used |
       | Quota1%    | 1                                                                                                    | normal   | 99        | 1    |
@@ -121,7 +121,6 @@ Feature: State of the quota
       | /filesForUpload/lorem-big.txt | /ocs/v1.php/cloud/users/%username% | 100             | 91.17          |
       | /filesForUpload/lorem.txt     | /ocs/v2.php/cloud/users/%username% | 200             | 6.99           |
       | /filesForUpload/lorem-big.txt | /ocs/v2.php/cloud/users/%username% | 200             | 91.17          |
-
 
   @env-config
   Scenario: upload a file by setting OCIS spaces max quota

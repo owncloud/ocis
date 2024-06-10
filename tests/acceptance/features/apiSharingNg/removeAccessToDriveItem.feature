@@ -214,4 +214,4 @@ Feature: Remove access to a drive item
       | permissions-role |
       | Space Viewer     |
       | Space Editor     |
-      | Manager          |  
+      | Manager          |

@@ -6,6 +6,7 @@ Feature: checksums
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
+
   Scenario Outline: uploading a file with checksum should work
     Given using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a" using the WebDAV API

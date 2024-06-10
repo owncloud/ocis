@@ -23,116 +23,116 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name",
-        "size"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "type": "string",
-              "enum": ["personal"]
-            },
-            "path": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "enum": [
-                          "Brian Murphy"
-                        ]
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "type": "string",
+                "enum": ["personal"]
+              },
+              "path": {
+                "type": "string",
+                "enum": ["/"]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["/"]
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "type": "string",
+            "enum": ["textfile.txt"]
+          },
+          "size": {
+            "type": "number",
+            "enum": [
+              11
+            ]
           }
-        },
-        "name": {
-          "type": "string",
-          "enum": ["textfile.txt"]
-        },
-        "size": {
-          "type": "number",
-          "enum": [
-            11
-          ]
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | File Editor      |
@@ -152,116 +152,116 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name",
-        "size"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "type": "string",
-              "enum": ["personal"]
-            },
-            "path": {
-              "type": "string",
-              "enum": ["/FolderToShare"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["FolderToShare"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "enum": [
-                          "Brian Murphy"
-                        ]
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "type": "string",
+                "enum": ["personal"]
+              },
+              "path": {
+                "type": "string",
+                "enum": ["/FolderToShare"]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["FolderToShare"]
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "type": "string",
+            "enum": ["textfile.txt"]
+          },
+          "size": {
+            "type": "number",
+            "enum": [
+              11
+            ]
           }
-        },
-        "name": {
-          "type": "string",
-          "enum": ["textfile.txt"]
-        },
-        "size": {
-          "type": "number",
-          "enum": [
-            11
-          ]
         }
       }
-    }
-    """
+      """
 
 
   Scenario Outline: sharer lists the folder share (Personal space)
@@ -275,109 +275,109 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "FolderToShare" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "type": "string",
-              "enum": ["personal"]
-            },
-            "path": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "enum": [
-                          "Brian Murphy"
-                        ]
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "type": "string",
+                "enum": ["personal"]
+              },
+              "path": {
+                "type": "string",
+                "enum": ["/"]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["/"]
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "type": "string",
+            "enum": ["FolderToShare"]
           }
-        },
-        "name": {
-          "type": "string",
-          "enum": ["FolderToShare"]
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | Editor           |
@@ -403,220 +403,220 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name",
-        "size"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "type": "string",
-              "enum": ["personal"]
-            },
-            "path": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "enum": [
-                          "Brian Murphy"
-                        ]
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "type": "string",
+                "enum": ["personal"]
+              },
+              "path": {
+                "type": "string",
+                "enum": ["/"]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["/"]
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "type": "string",
+            "enum": ["textfile.txt"]
+          },
+          "size": {
+            "type": "number",
+            "enum": [
+              11
+            ]
           }
-        },
-        "name": {
-          "type": "string",
-          "enum": ["textfile.txt"]
-        },
-        "size": {
-          "type": "number",
-          "enum": [
-            11
-          ]
         }
       }
-    }
-    """
+      """
     And the JSON data of the response should contain resource "FolderToShare" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "type": "string",
-              "enum": ["personal"]
-            },
-            "path": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "enum": [
-                          "Brian Murphy"
-                        ]
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "type": "string",
+                "enum": ["personal"]
+              },
+              "path": {
+                "type": "string",
+                "enum": ["/"]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["/"]
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "type": "string",
+            "enum": ["FolderToShare"]
           }
-        },
-        "name": {
-          "type": "string",
-          "enum": ["FolderToShare"]
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharer lists the file and folder shares shared to group (Personal space)
@@ -844,116 +844,116 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name",
-        "size"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "type": "string",
-              "enum": ["project"]
-            },
-            "path": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "enum": [
-                          "Brian Murphy"
-                        ]
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "type": "string",
+                "enum": ["project"]
+              },
+              "path": {
+                "type": "string",
+                "enum": ["/"]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["/"]
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "type": "string",
+            "enum": ["textfile.txt"]
+          },
+          "size": {
+            "type": "number",
+            "enum": [
+              11
+            ]
           }
-        },
-        "name": {
-          "type": "string",
-          "enum": ["textfile.txt"]
-        },
-        "size": {
-          "type": "number",
-          "enum": [
-            11
-          ]
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | File Editor      |
@@ -976,116 +976,116 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name",
-        "size"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "type": "string",
-              "enum": ["project"]
-            },
-            "path": {
-              "type": "string",
-              "enum": ["/FolderToShare"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["FolderToShare"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "enum": [
-                          "Brian Murphy"
-                        ]
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "type": "string",
+                "enum": ["project"]
+              },
+              "path": {
+                "type": "string",
+                "enum": ["/FolderToShare"]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["FolderToShare"]
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "type": "string",
+            "enum": ["textfile.txt"]
+          },
+          "size": {
+            "type": "number",
+            "enum": [
+              11
+            ]
           }
-        },
-        "name": {
-          "type": "string",
-          "enum": ["textfile.txt"]
-        },
-        "size": {
-          "type": "number",
-          "enum": [
-            11
-          ]
         }
       }
-    }
-    """
+      """
 
 
   Scenario Outline: sharer lists the folder share (Project space)
@@ -1102,109 +1102,109 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "FolderToShare" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "type": "string",
-              "enum": ["project"]
-            },
-            "path": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-        "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "enum": [
-                          "Brian Murphy"
-                        ]
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "type": "string",
+                "enum": ["project"]
+              },
+              "path": {
+                "type": "string",
+                "enum": ["/"]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["/"]
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+          "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "type": "string",
+            "enum": ["FolderToShare"]
           }
-        },
-        "name": {
-          "type": "string",
-          "enum": ["FolderToShare"]
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | Editor           |
@@ -1233,220 +1233,220 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name",
-        "size"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "type": "string",
-              "enum": ["project"]
-            },
-            "path": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "enum": [
-                          "Brian Murphy"
-                        ]
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "type": "string",
+                "enum": ["project"]
+              },
+              "path": {
+                "type": "string",
+                "enum": ["/"]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["/"]
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "type": "string",
+            "enum": ["textfile.txt"]
+          },
+          "size": {
+            "type": "number",
+            "enum": [
+              11
+            ]
           }
-        },
-        "name": {
-          "type": "string",
-          "enum": ["textfile.txt"]
-        },
-        "size": {
-          "type": "number",
-          "enum": [
-            11
-          ]
         }
       }
-    }
-    """
+      """
     And the JSON data of the response should contain resource "FolderToShare" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "type": "string",
-              "enum": ["project"]
-            },
-            "path": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["/"]
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": [
-                  "user"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "enum": [
-                          "Brian Murphy"
-                        ]
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "type": "string",
+                "enum": ["project"]
+              },
+              "path": {
+                "type": "string",
+                "enum": ["/"]
+              },
+              "name": {
+                "type": "string",
+                "enum": ["/"]
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "enum": [
+                            "Brian Murphy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "type": "string",
+            "enum": ["FolderToShare"]
           }
-        },
-        "name": {
-          "type": "string",
-          "enum": ["FolderToShare"]
         }
       }
-    }
-    """
+      """
 
 
   Scenario: sharer lists the file and folder shares shared to group (Project space)
@@ -1471,196 +1471,196 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name",
-        "size"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "const": "project"
-            },
-            "path": {
-              "const": "/"
-            },
-            "name": {
-              "const": "/"
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": ["group"],
-                "properties": {
-                  "group": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%group_id_pattern%$"
-                      },
-                      "displayName": {
-                        "const": "grp1"
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "project"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": ["group"],
+                  "properties": {
+                    "group": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%group_id_pattern%$"
+                        },
+                        "displayName": {
+                          "const": "grp1"
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "const": "textfile.txt"
           }
-        },
-        "name": {
-          "const": "textfile.txt"
         }
       }
-    }
-    """
+      """
     And the JSON data of the response should contain resource "FolderToShare" with the following data:
-    """
-    {
-      "type": "object",
-      "required": [
-        "parentReference",
-        "permissions",
-        "name"
-      ],
-      "properties": {
-        "parentReference": {
-          "type": "object",
-          "required": [
-            "driveId",
-            "driveType",
-            "path",
-            "name",
-            "id"
-          ],
-          "properties": {
-            "driveId": {
-              "type": "string",
-              "pattern": "^%space_id_pattern%$"
-            },
-            "driveType": {
-              "const": "project"
-            },
-            "path": {
-              "const": "/"
-            },
-            "name": {
-              "const": "/"
-            },
-            "id": {
-              "type": "string",
-              "pattern": "^%file_id_pattern%$"
-            }
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name"
+        ],
+        "properties": {
+          "parentReference": {
             "type": "object",
             "required": [
-              "grantedToV2",
-              "id",
-              "roles"
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
             ],
             "properties": {
-              "grantedToV2": {
-                "type": "object",
-                "required": ["group"],
-                "properties": {
-                  "group": {
-                    "type": "object",
-                    "required": [
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "^%user_id_pattern%$"
-                      },
-                      "displayName": {
-                        "const": "grp1"
-                      }
-                    }
-                  }
-                }
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "project"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
               },
               "id": {
                 "type": "string",
-                "pattern": "^%permissions_id_pattern%$"
-              },
-              "roles": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 1,
-                "items": {
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": ["group"],
+                  "properties": {
+                    "group": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "const": "grp1"
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
                   "type": "string",
-                  "pattern": "^%role_id_pattern%$"
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
                 }
               }
             }
+          },
+          "name": {
+            "const": "FolderToShare"
           }
-        },
-        "name": {
-          "const": "FolderToShare"
         }
       }
-    }
-    """
+      """
 
   @env-config
   Scenario: sharer lists the file share after sharee (user) is deleted (Personal space)
@@ -1677,21 +1677,21 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her after clearing user cache using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems":0,
-          "maxItems":0
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems":0,
+            "maxItems":0
+          }
         }
       }
-    }
-    """
+      """
 
   @env-config
   Scenario: sharer lists the file share after sharee (group) is deleted (Personal space)
@@ -1709,21 +1709,21 @@ Feature: resources shared by user
     When user "Alice" lists the shares shared by her after clearing group cache using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "value"
-      ],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems":0,
-          "maxItems":0
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems":0,
+            "maxItems":0
+          }
         }
       }
-    }
-    """
+      """
 
   @env-config
   Scenario: sharer lists the file share after sharee is disabled (Personal space)

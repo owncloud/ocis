@@ -1374,6 +1374,7 @@ Feature: get users
       }
       """
 
+
   Scenario: non-admin user tries to search for a user by display name with less than 3 characters
     When user "Brian" tries to search for user "al" using Graph API
     Then the HTTP status code should be "403"

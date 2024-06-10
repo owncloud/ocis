@@ -165,28 +165,28 @@ Feature: remove a user from a group
     When user "Alice" tries to remove user "Brian" from group "grp1" using the Graph API
     Then the HTTP status code should be "403"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "error": {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message": {
-              "type": "string",
-              "enum": ["Unauthorized"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "enum": ["Unauthorized"]
+              }
             }
           }
         }
       }
-    }
-    """
+      """
     And user "Brian" should belong to group "grp1"
     Examples:
       | user-role   |

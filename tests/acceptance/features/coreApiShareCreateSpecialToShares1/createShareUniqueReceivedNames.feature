@@ -24,7 +24,6 @@ Feature: resources shared with the same name are received with unique names
       | Shares/foo/      |
       | /Shares/foo (1)/ |
 
-
   @smokeTest @issue-2131
   Scenario: unique target names for incoming shares when auto-accepting is disabled
     Given user "Brian" has disabled auto-accepting
