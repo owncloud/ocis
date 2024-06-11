@@ -2,6 +2,7 @@ package secure
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -11,22 +12,23 @@ import (
 type secureCtxKey string
 
 const (
-	stsHeader               = "Strict-Transport-Security"
-	stsSubdomainString      = "; includeSubDomains"
-	stsPreloadString        = "; preload"
-	frameOptionsHeader      = "X-Frame-Options"
-	frameOptionsValue       = "DENY"
-	contentTypeHeader       = "X-Content-Type-Options"
-	contentTypeValue        = "nosniff"
-	xssProtectionHeader     = "X-XSS-Protection"
-	xssProtectionValue      = "1; mode=block"
-	cspHeader               = "Content-Security-Policy"
-	cspReportOnlyHeader     = "Content-Security-Policy-Report-Only"
-	hpkpHeader              = "Public-Key-Pins"
-	referrerPolicyHeader    = "Referrer-Policy"
-	featurePolicyHeader     = "Feature-Policy"
-	permissionsPolicyHeader = "Permissions-Policy"
-	coopHeader              = "Cross-Origin-Opener-Policy"
+	stsHeader                          = "Strict-Transport-Security"
+	stsSubdomainString                 = "; includeSubDomains"
+	stsPreloadString                   = "; preload"
+	frameOptionsHeader                 = "X-Frame-Options"
+	frameOptionsValue                  = "DENY"
+	contentTypeHeader                  = "X-Content-Type-Options"
+	contentTypeValue                   = "nosniff"
+	xssProtectionHeader                = "X-XSS-Protection"
+	xssProtectionValue                 = "1; mode=block"
+	cspHeader                          = "Content-Security-Policy"
+	cspReportOnlyHeader                = "Content-Security-Policy-Report-Only"
+	referrerPolicyHeader               = "Referrer-Policy"
+	featurePolicyHeader                = "Feature-Policy"
+	permissionsPolicyHeader            = "Permissions-Policy"
+	coopHeader                         = "Cross-Origin-Opener-Policy"
+	robotTagHeader                     = "X-Robots-Tag"
+	permittedCrossDomainPoliciesHeader = "X-Permitted-Cross-Domain-Policies"
 
 	ctxDefaultSecureHeaderKey = secureCtxKey("SecureResponseHeader")
 	cspNonceSize              = 16
@@ -65,7 +67,7 @@ type Options struct {
 	SSLRedirect bool
 	// If SSLForceHost is true and SSLHost is set, requests will be forced to use SSLHost even the ones that are already using SSL. Default is false.
 	SSLForceHost bool
-	// If SSLTemporaryRedirect is true, the a 302 will be used while redirecting. Default is false (301).
+	// If SSLTemporaryRedirect is true, a 302 will be used while redirecting. Default is false (301).
 	SSLTemporaryRedirect bool
 	// If STSIncludeSubdomains is set to true, the `includeSubdomains` will be appended to the Strict-Transport-Security header. Default is false.
 	STSIncludeSubdomains bool
@@ -110,9 +112,15 @@ type Options struct {
 	STSSeconds int64
 	// SecureContextKey allows a custom key to be specified for context storage.
 	SecureContextKey string
+	// PermittedCrossDomainPolicies allows to set the X-Permitted-Cross-Domain-Policies header
+	// Reference https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
+	PermittedCrossDomainPolicies string
+	// RobotTag allows to set the X-Robot-Tag header
+	// Reference https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag
+	RobotTag string
 }
 
-// Secure is a middleware that helps setup a few basic security features. A single secure.Options struct can be
+// Secure is a middleware that helps set up a few basic security features. A single secure.Options struct can be
 // provided to configure which features should be enabled, and the ability to override a few of the default values.
 type Secure struct {
 	// Customize Secure with an Options struct.
@@ -354,7 +362,7 @@ func (s *Secure) processRequest(w http.ResponseWriter, r *http.Request) (http.He
 
 		http.Redirect(w, r, url.String(), status)
 
-		return nil, nil, fmt.Errorf("redirecting to HTTPS")
+		return nil, nil, errors.New("redirecting to HTTPS")
 	}
 
 	if s.opt.SSLForceHost {
@@ -380,7 +388,7 @@ func (s *Secure) processRequest(w http.ResponseWriter, r *http.Request) (http.He
 
 			http.Redirect(w, r, url.String(), status)
 
-			return nil, nil, fmt.Errorf("redirecting to HTTPS")
+			return nil, nil, errors.New("redirecting to HTTPS")
 		}
 	}
 
@@ -388,7 +396,7 @@ func (s *Secure) processRequest(w http.ResponseWriter, r *http.Request) (http.He
 	if s.opt.AllowRequestFunc != nil && !s.opt.AllowRequestFunc(r) {
 		s.badRequestHandler.ServeHTTP(w, r)
 
-		return nil, nil, fmt.Errorf("request not allowed")
+		return nil, nil, errors.New("request not allowed")
 	}
 
 	// Create our header container.
@@ -466,6 +474,16 @@ func (s *Secure) processRequest(w http.ResponseWriter, r *http.Request) (http.He
 		responseHeader.Set(coopHeader, s.opt.CrossOriginOpenerPolicy)
 	}
 
+	// X-Permitted-Cross-Domain-Policies
+	if len(s.opt.PermittedCrossDomainPolicies) > 0 {
+		responseHeader.Set(permittedCrossDomainPoliciesHeader, s.opt.PermittedCrossDomainPolicies)
+	}
+
+	// X-Robots-Tag
+	if len(s.opt.RobotTag) > 0 {
+		responseHeader.Set(robotTagHeader, s.opt.RobotTag)
+	}
+
 	return responseHeader, r, nil
 }
 
@@ -497,7 +515,7 @@ func (s *Secure) ModifyResponseHeaders(res *http.Response) error {
 		location := res.Header.Get("Location")
 		if s.isSSL(res.Request) &&
 			len(s.opt.SSLHost) > 0 &&
-			(strings.HasPrefix(location, fmt.Sprintf("http://%s/", s.opt.SSLHost)) || location == fmt.Sprintf("http://%s", s.opt.SSLHost)) {
+			(strings.HasPrefix(location, fmt.Sprintf("http://%s/", s.opt.SSLHost)) || location == "http://"+s.opt.SSLHost) {
 			location = strings.Replace(location, "http:", "https:", 1)
 			res.Header.Set("Location", location)
 		}

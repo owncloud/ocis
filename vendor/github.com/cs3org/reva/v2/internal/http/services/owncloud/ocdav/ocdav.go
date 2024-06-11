@@ -165,8 +165,6 @@ func (s *svc) Handler() http.Handler {
 		ctx := r.Context()
 		log := appctx.GetLogger(ctx)
 
-		addAccessHeaders(w, r)
-
 		// TODO(jfd): do we need this?
 		// fake litmus testing for empty namespace: see https://github.com/golang/net/blob/e514e69ffb8bc3c76a71ae40de0118d794855992/webdav/litmus_test_server.go#L58-L89
 		if r.Header.Get(net.HeaderLitmus) == "props: 3 (propfind_invalid2)" {
@@ -282,28 +280,6 @@ func (s *svc) ApplyLayout(ctx context.Context, ns string, useLoggedInUserNS bool
 	}
 
 	return templates.WithUser(u, ns), requestPath, nil
-}
-
-func addAccessHeaders(w http.ResponseWriter, r *http.Request) {
-	headers := w.Header()
-	// all resources served via the DAV endpoint should have the strictest possible as default
-	headers.Set("Content-Security-Policy", "default-src 'none';")
-	// disable sniffing the content type for IE
-	headers.Set("X-Content-Type-Options", "nosniff")
-	// https://msdn.microsoft.com/en-us/library/jj542450(v=vs.85).aspx
-	headers.Set("X-Download-Options", "noopen")
-	// Disallow iFraming from other domains
-	headers.Set("X-Frame-Options", "SAMEORIGIN")
-	// https://www.adobe.com/devnet/adobe-media-server/articles/cross-domain-xml-for-streaming.html
-	headers.Set("X-Permitted-Cross-Domain-Policies", "none")
-	// https://developers.google.com/webmasters/control-crawl-index/docs/robots_meta_tag
-	headers.Set("X-Robots-Tag", "none")
-	// enforce browser based XSS filters
-	headers.Set("X-XSS-Protection", "1; mode=block")
-
-	if r.TLS != nil {
-		headers.Set("Strict-Transport-Security", "max-age=63072000")
-	}
 }
 
 func authContextForUser(client gateway.GatewayAPIClient, userID *userpb.UserId, machineAuthAPIKey string) (context.Context, error) {
