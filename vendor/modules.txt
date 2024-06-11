@@ -954,7 +954,7 @@ github.com/go-micro/plugins/v4/registry/mdns
 # github.com/go-micro/plugins/v4/registry/memory v1.2.0
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/registry/memory
-# github.com/go-micro/plugins/v4/registry/nats v1.2.2-0.20230723205323-1ada01245674
+# github.com/go-micro/plugins/v4/registry/nats v1.2.2
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/registry/nats
 # github.com/go-micro/plugins/v4/server/grpc v1.2.0
