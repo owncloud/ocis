@@ -23,7 +23,7 @@ func BackupCommand(cfg *config.Config) *cli.Command {
 			ConsistencyCommand(cfg),
 		},
 		Before: func(c *cli.Context) error {
-			return configlog.ReturnError(parser.ParseConfig(cfg, false))
+			return configlog.ReturnError(parser.ParseConfig(cfg, true))
 		},
 		Action: func(_ *cli.Context) error {
 			fmt.Println("Read the docs")
@@ -47,7 +47,7 @@ func ConsistencyCommand(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:    "blobstore",
 				Aliases: []string{"b"},
-				Usage:   "the blobstore type. Can be (ocis, s3ng). Default ocis",
+				Usage:   "the blobstore type. Can be (none, ocis, s3ng). Default ocis",
 				Value:   "ocis",
 			},
 		},
@@ -74,6 +74,8 @@ func ConsistencyCommand(cfg *config.Config) *cli.Command {
 				)
 			case "ocis":
 				bs, err = ocisbs.New(basePath)
+			case "none":
+				bs = nil
 			default:
 				err = errors.New("blobstore type not supported")
 			}

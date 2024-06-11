@@ -23,9 +23,10 @@ type ListBlobstore interface {
 type DataProvider struct {
 	Events chan interface{}
 
-	fsys     fs.FS
-	discpath string
-	lbs      ListBlobstore
+	fsys      fs.FS
+	discpath  string
+	lbs       ListBlobstore
+	skipBlobs bool
 }
 
 // NodeData holds data about the nodes
@@ -52,9 +53,10 @@ func NewProvider(fsys fs.FS, discpath string, lbs ListBlobstore) *DataProvider {
 	return &DataProvider{
 		Events: make(chan interface{}),
 
-		fsys:     fsys,
-		discpath: discpath,
-		lbs:      lbs,
+		fsys:      fsys,
+		discpath:  discpath,
+		lbs:       lbs,
+		skipBlobs: lbs == nil,
 	}
 }
 
@@ -89,18 +91,20 @@ func (dp *DataProvider) ProduceData() error {
 	}()
 
 	// crawl blobstore
-	wg.Add(1)
-	go func() {
-		bs, err := dp.lbs.List()
-		if err != nil {
-			fmt.Println("error listing blobs", err)
-		}
+	if !dp.skipBlobs {
+		wg.Add(1)
+		go func() {
+			bs, err := dp.lbs.List()
+			if err != nil {
+				fmt.Println("error listing blobs", err)
+			}
 
-		for _, bn := range bs {
-			dp.Events <- BlobData{BlobPath: dp.lbs.Path(bn)}
-		}
-		wg.Done()
-	}()
+			for _, bn := range bs {
+				dp.Events <- BlobData{BlobPath: dp.lbs.Path(bn)}
+			}
+			wg.Done()
+		}()
+	}
 
 	// wait for all crawlers to finish
 	go func() {
@@ -112,6 +116,10 @@ func (dp *DataProvider) ProduceData() error {
 }
 
 func (dp *DataProvider) getBlobPath(path string) (string, Inconsistency) {
+	if dp.skipBlobs {
+		return "", ""
+	}
+
 	b, err := fs.ReadFile(dp.fsys, path+".mpk")
 	if err != nil {
 		return "", InconsistencyFilesMissing
