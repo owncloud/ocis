@@ -45,7 +45,7 @@ const (
 )
 
 type Builder struct {
-	Directives map[string]([]string)
+	Directives map[string][]string
 }
 
 // MustBuild is like Build but panics if an error occurs.
@@ -61,12 +61,15 @@ func (builder *Builder) MustBuild() string {
 // Build creates a content security policy string from the specified directives.
 // If any directive contains invalid values, an error is returned instead.
 func (builder *Builder) Build() (string, error) {
-	var sb strings.Builder
-	var keys []string
+	keys := make([]string, 0, len(builder.Directives))
+
 	for k := range builder.Directives {
 		keys = append(keys, k)
 	}
+
 	sort.Strings(keys)
+
+	var sb strings.Builder
 	for _, directive := range keys {
 		if sb.Len() > 0 {
 			sb.WriteString("; ")

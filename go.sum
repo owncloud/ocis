@@ -798,8 +798,8 @@ github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym
 github.com/CiscoM31/godata v1.0.10 h1:DZdJ6M8QNh4HquvDDOqNLu6h77Wl86KGK7Qlbmb90sk=
 github.com/CiscoM31/godata v1.0.10/go.mod h1:ZMiT6JuD3Rm83HEtiTx4JEChsd25YCrxchKGag/sdTc=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
-github.com/DeepDiver1975/secure v0.0.0-20240610150357-80471eebce77 h1:UTzaEnOUHXYhF4SFARPcEownvFw8Kgg+oJv3N0pRI2g=
-github.com/DeepDiver1975/secure v0.0.0-20240610150357-80471eebce77/go.mod h1:BmF5hyM6tXczk3MpQkFf1hpKSRqCyhqcbiQtiAF7+40=
+github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c h1:ocsNvQ2tNHme4v/lTs17HROamc7mFzZfzWcg4m+UXN0=
+github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c/go.mod h1:BmF5hyM6tXczk3MpQkFf1hpKSRqCyhqcbiQtiAF7+40=
 github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c/go.mod h1:X0CRv0ky0k6m906ixxpzmDRLvX58TFUKS2eePweuyxk=
 github.com/KimMachineGun/automemlimit v0.6.1 h1:ILa9j1onAAMadBsyyUJv5cack8Y1WT26yLj/V+ulKp8=
 github.com/KimMachineGun/automemlimit v0.6.1/go.mod h1:T7xYht7B8r6AG/AqFcUdc7fzd2bIdBKmepfP2S1svPY=
