@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"reflect"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -13,13 +14,15 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
 	microstore "go-micro.dev/v4/store"
 )
 
-// Activity represents an activity
-type Activity struct {
+// RawActivity represents an activity as it is stored in the activitylog store
+type RawActivity struct {
 	EventID   string    `json:"event_id"`
 	Depth     int       `json:"depth"`
 	Timestamp time.Time `json:"timestamp"`
@@ -27,11 +30,15 @@ type Activity struct {
 
 // ActivitylogService logs events per resource
 type ActivitylogService struct {
-	cfg    *config.Config
-	log    log.Logger
-	events <-chan events.Event
-	store  microstore.Store
-	gws    pool.Selectable[gateway.GatewayAPIClient]
+	cfg       *config.Config
+	log       log.Logger
+	events    <-chan events.Event
+	store     microstore.Store
+	gws       pool.Selectable[gateway.GatewayAPIClient]
+	mux       *chi.Mux
+	evHistory ehsvc.EventHistoryService
+
+	registeredEvents map[string]events.Unmarshaller
 }
 
 // New creates a new ActivitylogService
@@ -55,12 +62,26 @@ func New(opts ...Option) (*ActivitylogService, error) {
 	}
 
 	s := &ActivitylogService{
-		log:    o.Logger,
-		cfg:    o.Config,
-		events: ch,
-		store:  o.Store,
-		gws:    o.GatewaySelector,
+		log:              o.Logger,
+		cfg:              o.Config,
+		events:           ch,
+		store:            o.Store,
+		gws:              o.GatewaySelector,
+		mux:              o.Mux,
+		evHistory:        o.HistoryClient,
+		registeredEvents: make(map[string]events.Unmarshaller),
 	}
+
+	s.mux.Route("/graph/v1.0/drives/{drive-id}", func(r chi.Router) {
+		r.Get("/items/{item-id}/activities", s.HandleGetItemActivities)
+	})
+
+	for _, e := range o.RegisteredEvents {
+		typ := reflect.TypeOf(e)
+		s.registeredEvents[typ.String()] = e
+	}
+
+	go s.Run()
 
 	return s, nil
 }
@@ -155,7 +176,7 @@ func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId,
 }
 
 // Activities returns the activities for the given resource
-func (a *ActivitylogService) Activities(rid *provider.ResourceId) ([]Activity, error) {
+func (a *ActivitylogService) Activities(rid *provider.ResourceId) ([]RawActivity, error) {
 	resourceID := storagespace.FormatResourceID(*rid)
 
 	records, err := a.store.Read(resourceID)
@@ -164,10 +185,10 @@ func (a *ActivitylogService) Activities(rid *provider.ResourceId) ([]Activity, e
 	}
 
 	if len(records) == 0 {
-		return []Activity{}, nil
+		return []RawActivity{}, nil
 	}
 
-	var activities []Activity
+	var activities []RawActivity
 	if err := json.Unmarshal(records[0].Value, &activities); err != nil {
 		return nil, fmt.Errorf("could not unmarshal activities: %w", err)
 	}
@@ -214,7 +235,7 @@ func (a *ActivitylogService) storeActivity(rid *provider.ResourceId, eventID str
 		return err
 	}
 
-	var activities []Activity
+	var activities []RawActivity
 	if len(records) > 0 {
 		if err := json.Unmarshal(records[0].Value, &activities); err != nil {
 			return err
@@ -222,7 +243,7 @@ func (a *ActivitylogService) storeActivity(rid *provider.ResourceId, eventID str
 	}
 
 	// TODO: max len check?
-	activities = append(activities, Activity{
+	activities = append(activities, RawActivity{
 		EventID:   eventID,
 		Depth:     depth,
 		Timestamp: timestamp,

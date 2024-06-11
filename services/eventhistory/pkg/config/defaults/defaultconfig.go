@@ -33,9 +33,10 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		Store: config.Store{
-			Store:    "memory",
+			Store:    "nats-js-kv",
+			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "eventhistory",
-			Table:    "events",
+			Table:    "",
 			TTL:      336 * time.Hour,
 		},
 		GRPC: config.GRPCConfig{

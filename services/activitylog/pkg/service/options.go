@@ -4,7 +4,9 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
@@ -22,6 +24,8 @@ type Options struct {
 	RegisteredEvents []events.Unmarshaller
 	Store            microstore.Store
 	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
+	Mux              *chi.Mux
+	HistoryClient    ehsvc.EventHistoryService
 }
 
 // Logger configures a logger for the activitylog service
@@ -70,5 +74,19 @@ func Store(store microstore.Store) Option {
 func GatewaySelector(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
 		o.GatewaySelector = gatewaySelector
+	}
+}
+
+// Mux defines the muxer for the service
+func Mux(m *chi.Mux) Option {
+	return func(o *Options) {
+		o.Mux = m
+	}
+}
+
+// HistoryClient adds a grpc client for the eventhistory service
+func HistoryClient(hc ehsvc.EventHistoryService) Option {
+	return func(o *Options) {
+		o.HistoryClient = hc
 	}
 }
