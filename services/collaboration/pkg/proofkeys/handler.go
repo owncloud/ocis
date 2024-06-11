@@ -11,31 +11,46 @@ import (
 	"math/big"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/beevik/etree"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/rs/zerolog"
 )
 
 type PubKeys struct {
-	Key    *rsa.PublicKey
-	OldKey *rsa.PublicKey
+	Key        *rsa.PublicKey
+	OldKey     *rsa.PublicKey
+	ExpireTime time.Time
 }
 
 type Verifier interface {
-	Verify(accessToken, url, timestamp, sig64, oldSig64 string) error
+	Verify(accessToken, url, timestamp, sig64, oldSig64 string, opts ...VerifyOption) error
 }
 
 type VerifyHandler struct {
 	discoveryURL string
 	insecure     bool
-	logger       log.Logger
+	cachedKeys   *PubKeys
+	cachedDur    time.Duration
 }
 
-func NewVerifyHandler(discoveryURL string, insecure bool, logger log.Logger) Verifier {
+// NewVerifyHandler will return a new Verifier with the provided parameters
+// The discoveryURL must point to the https://office.wopi/hosting/discovery
+// address, which contains the xml with the proof keys (and more information)
+// The insecure parameter can be used to disable certificate verification when
+// conecting to the provided discoveryURL
+// CachedDur is the duration the keys will be cached in memory. The cached keys
+// will be used for the duration provided, after that new keys will be fetched
+// from the discoveryURL.
+//
+// For WOPI apps whose proof keys rotate after a while, you must ensure that
+// the provided duration is shorter than the rotation time. This should
+// guarantee that we can't fail to verify a request due to obsolete keys.
+func NewVerifyHandler(discoveryURL string, insecure bool, cachedDur time.Duration) Verifier {
 	return &VerifyHandler{
 		discoveryURL: discoveryURL,
 		insecure:     insecure,
-		logger:       logger,
+		cachedDur:    cachedDur,
 	}
 }
 
@@ -47,7 +62,7 @@ func NewVerifyHandler(discoveryURL string, insecure bool, logger log.Logger) Ver
 // "http://wopiserver:8888/wopi/file/abcdef?access_token=zzxxyy"
 // * timestamp: The timestamp provided by the WOPI app in the "X-WOPI-TimeStamp" header, as string
 // * sig64: The base64-encoded signature, which should come directly from the "X-WOPI-Proof" header
-// * olSig64: The base64-encoded previous signature, coming from the "X-WOPI-ProofOld" header
+// * oldSig64: The base64-encoded previous signature, coming from the "X-WOPI-ProofOld" header
 //
 // The public keys will be obtained from the /hosting/discovery path of the target WOPI app.
 // Note that the method will perform the following checks in that order:
@@ -57,7 +72,14 @@ func NewVerifyHandler(discoveryURL string, insecure bool, logger log.Logger) Ver
 // If all of those checks are wrong, the method will fail, and the request should be rejected.
 //
 // The method will return an error if something fails, or nil if everything is ok
-func (vh *VerifyHandler) Verify(accessToken, url, timestamp, sig64, oldSig64 string) error {
+func (vh *VerifyHandler) Verify(accessToken, url, timestamp, sig64, oldSig64 string, opts ...VerifyOption) error {
+	verifyOptions := newOptions(opts...)
+
+	// check timestamp
+	if err := vh.checkTimestamp(timestamp); err != nil {
+		return err
+	}
+
 	// need to decode the signatures
 	signature, err := base64.StdEncoding.DecodeString(sig64)
 	if err != nil {
@@ -73,10 +95,14 @@ func (vh *VerifyHandler) Verify(accessToken, url, timestamp, sig64, oldSig64 str
 		}
 	}
 
-	// fetch the public keys
-	pubkeys, err := vh.fetchPublicKeys()
-	if err != nil {
-		return err
+	pubkeys := vh.cachedKeys
+	if pubkeys == nil || pubkeys.ExpireTime.Before(time.Now()) {
+		// fetch the public keys
+		newpubkeys, err := vh.fetchPublicKeys(verifyOptions.Logger)
+		if err != nil {
+			return err
+		}
+		pubkeys = newpubkeys
 	}
 
 	// build and hash the expected proof
@@ -92,6 +118,46 @@ func (vh *VerifyHandler) Verify(accessToken, url, timestamp, sig64, oldSig64 str
 				return err
 			}
 		}
+	}
+	return nil
+}
+
+// checkTimestamp will check if the provided timestamp is valid.
+// The timestamp is valid if it isn't older than 20 minutes (info from
+// MS WOPI docs).
+//
+// Note: the timestamp is based on C# DateTime.UtcNow.Ticks
+// "One tick equals 100 nanoseconds. The value of this property represents
+// the number of ticks that have elapsed since 12:00:00 midnight, January 1, 0001."
+// It is NOT a unix timestamp (current unix timestamp ~1718123417 secs ;
+// expected timestamp ~638537195321890000 100-nanosecs)
+func (vh *VerifyHandler) checkTimestamp(timestamp string) error {
+	var stamp, unixBaseStamp, unixStamp, unixStampSec, unixStampNanoSec big.Int
+
+	// set the stamp
+	_, ok := stamp.SetString(timestamp, 10)
+	if !ok {
+		return errors.New("Invalid timestamp")
+	}
+
+	// 62135596800 seconds from "January 1, 1 AD" to "January 1, 1970 12:00:00 AM"
+	// need to convert those secs into 100-nanosecs in order to compare the stamp
+	unixBaseStamp.Mul(big.NewInt(62135596800), big.NewInt(1000*1000*10))
+
+	// stamp - unixBaseStamp gives us the unix-based timestamp we can use
+	unixStamp.Sub(&stamp, &unixBaseStamp)
+
+	// divide between 1000*1000*10 to get the seconds and 100-nanoseconds
+	unixStampSec.DivMod(&unixStamp, big.NewInt(1000*1000*10), &unixStampNanoSec)
+
+	// time package requires nanoseconds (var will be overwritten with the result)
+	unixStampNanoSec.Mul(&unixStampNanoSec, big.NewInt(100))
+
+	// both seconds and nanoseconds should be within int64 range
+	convertedUnixTimestamp := time.Unix(unixStampSec.Int64(), unixStampNanoSec.Int64())
+
+	if time.Now().After(convertedUnixTimestamp.Add(20 * time.Minute)) {
+		return errors.New("Timestamp expired")
 	}
 	return nil
 }
@@ -131,7 +197,7 @@ func (vh *VerifyHandler) generateProof(accessToken, url, timestamp string) []byt
 // and exponent found.
 // The PubKeys returned might be either nil (with the non-nil error), or might
 // contain only a PubKeys.Key field (the PubKeys.OldKey might be nil)
-func (vh *VerifyHandler) fetchPublicKeys() (*PubKeys, error) {
+func (vh *VerifyHandler) fetchPublicKeys(logger *zerolog.Logger) (*PubKeys, error) {
 	httpClient := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -142,7 +208,7 @@ func (vh *VerifyHandler) fetchPublicKeys() (*PubKeys, error) {
 
 	httpResp, err := httpClient.Get(vh.discoveryURL)
 	if err != nil {
-		vh.logger.Error().
+		logger.Error().
 			Err(err).
 			Str("WopiAppUrl", vh.discoveryURL).
 			Msg("WopiDiscovery: failed to access wopi app url")
@@ -152,7 +218,7 @@ func (vh *VerifyHandler) fetchPublicKeys() (*PubKeys, error) {
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		vh.logger.Error().
+		logger.Error().
 			Str("WopiAppUrl", vh.discoveryURL).
 			Int("HttpCode", httpResp.StatusCode).
 			Msg("WopiDiscovery: wopi app url failed with unexpected code")
@@ -184,7 +250,8 @@ func (vh *VerifyHandler) fetchPublicKeys() (*PubKeys, error) {
 	}
 
 	keys := &PubKeys{
-		Key: vh.keyFromBase64(mod64, exp64),
+		Key:        vh.keyFromBase64(mod64, exp64),
+		ExpireTime: time.Now().Add(vh.cachedDur),
 	}
 
 	if oldMod64 != "" && oldExp64 != "" {
