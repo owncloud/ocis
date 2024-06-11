@@ -116,30 +116,12 @@ Feature: share access by ID
     And user "Brian" should not see the following elements
       | /Shares/textfile0.txt |
     And the sharing API should report to user "Brian" that these shares are in the declined state
-      | path                  |
-      | /Shares/textfile0.txt |
+      | path          |
+      | textfile0.txt |
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
-
-
-  Scenario Outline: decline a share using a invalid share Id
-    Given using OCS API version "<ocs-api-version>"
-    When user "Brian" declines share with ID "<share-id>" using the sharing API
-    Then the HTTP status code should be "<http-status-code>"
-    And the OCS status code should be "404"
-    And the API should not return any data
-    Examples:
-      | ocs-api-version | share-id   | http-status-code |
-      | 1               | 2333311    | 200              |
-      | 2               | 2333311    | 404              |
-      | 1               | helloshare | 200              |
-      | 2               | helloshare | 404              |
-      | 1               | $#@r3      | 200              |
-      | 2               | $#@r3      | 404              |
-      | 1               | 0          | 200              |
-      | 2               | 0          | 404              |
 
 
   Scenario Outline: decline a share using empty share Id

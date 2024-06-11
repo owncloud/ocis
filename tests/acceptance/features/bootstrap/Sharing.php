@@ -717,7 +717,8 @@ trait Sharing {
 	 */
 	public function getLastCreatedUserGroupShareId(?string $user = null): string {
 		if ($user === null) {
-			return (string) $this->getLastCreatedUserGroupShare()->id;
+			$shareId = $this->isUsingSharingNG() ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShare()->id;
+			return (string) $shareId;
 		}
 		$createdShares = $this->getCreatedUserGroupShares();
 		if (isset($createdShares[$user])) {
@@ -3109,7 +3110,7 @@ trait Sharing {
 			'/apps/files_sharing/api/v' . $this->sharingApiVersion . '/shares/' . $shareId
 		);
 	}
-	
+
 	/**
 	 * @When /^user "([^"]*)" unshares (?:folder|file|entity) "([^"]*)" shared to "([^"]*)"$/
 	 *
