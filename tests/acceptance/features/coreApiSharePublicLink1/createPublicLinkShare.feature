@@ -284,7 +284,8 @@ Feature: create a public link share
       | permissionsRole | view     |
       | password        | %public% |
     When user "Alice" deletes folder "/PARENT" using the WebDAV API
-    Then the public download of file "/parent.txt" from inside the last public link shared folder using the new public WebDAV API with password "%public%" should fail with HTTP status code "404"
+    And the public tries to download file "/parent.txt" from inside the last public link shared folder with password "%public%" using the new public WebDAV API
+    Then the HTTP status code should be "404"
 
   @issue-1269 @issue-1293 @skipOnReva
   Scenario: try to download from a public share that has upload only permissions using the public webdav api
@@ -296,9 +297,8 @@ Feature: create a public link share
       | space           | Personal   |
       | permissionsRole | createOnly |
       | password        | %public%   |
-    When the public downloads file "parent.txt" from inside the last public link shared folder using the new public WebDAV API
-    Then the value of the item "//s:message" in the response should be "File not found: parent.txt"
-    And the HTTP status code should be "404"
+    When the public tries to download file "/parent.txt" from inside the last public link shared folder with password "%public%" using the new public WebDAV API
+    Then the HTTP status code should be "403"
 
   @env-config @skipOnReva
   Scenario: get the size of a file shared by public link

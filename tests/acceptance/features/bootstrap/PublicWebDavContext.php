@@ -65,30 +65,6 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @When /^the public downloads the last public link shared file with range "([^"]*)" and password "([^"]*)" using the (old|new) public WebDAV API$/
-	 *
-	 * @param string $range ignore if empty
-	 * @param string $password
-	 * @param string $publicWebDAVAPIVersion
-	 *
-	 * @return void
-	 */
-	public function downloadPublicFileWithRangeAndPassword(string $range, string $password, string $publicWebDAVAPIVersion):void {
-		if ($publicWebDAVAPIVersion === "new") {
-			$path = (string) $this->featureContext->getLastCreatedPublicShare()->file_target;
-		} else {
-			$path = "";
-		}
-		$response = $this->downloadFileFromPublicFolder(
-			$path,
-			$password,
-			$range,
-			$publicWebDAVAPIVersion
-		);
-		$this->featureContext->setResponse($response);
-	}
-
-	/**
 	 * @When /^the public downloads the last public link shared file using the (old|new) public WebDAV API$/
 	 * @When /^the public tries to download the last public link shared file using the (old|new) public WebDAV API$/
 	 *
@@ -292,6 +268,7 @@ class PublicWebDavContext implements Context {
 
 	/**
 	 * @When /^the public downloads file "([^"]*)" from inside the last public link shared folder with password "([^"]*)" using the (old|new) public WebDAV API$/
+	 * @When /^the public tries to download file "([^"]*)" from inside the last public link shared folder with password "([^"]*)" using the (old|new) public WebDAV API$/
 	 *
 	 * @param string $path
 	 * @param string $password
@@ -1216,37 +1193,6 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @Then /^the public should be able to download the range "([^"]*)" of file "([^"]*)" from inside the last public link shared folder using the (old|new) public WebDAV API and the content should be "([^"]*)"$/
-	 *
-	 * @param string $range
-	 * @param string $path
-	 * @param string $publicWebDAVAPIVersion
-	 * @param string $content
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function shouldBeAbleToDownloadRangeOfFileInsidePublicSharedFolder(
-		string $range,
-		string $path,
-		string $publicWebDAVAPIVersion,
-		string $content
-	):void {
-		if ($publicWebDAVAPIVersion === "old") {
-			return;
-		}
-
-		$response = $this->downloadFileFromPublicFolder(
-			$path,
-			'',
-			$range,
-			$publicWebDAVAPIVersion
-		);
-		$this->featureContext->checkDownloadedContentMatches($content, "", $response);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
-	}
-
-	/**
 	 * @Then /^the public upload to the last publicly shared file using the (old|new) public WebDAV API with password "([^"]*)" should (?:fail|pass) with HTTP status code "([^"]*)"$/
 	 *
 	 * @param string $publicWebDAVAPIVersion
@@ -1279,7 +1225,6 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @Then /^uploading a file should not work using the (old|new) public WebDAV API$/
 	 * @Then /^the public upload to the last publicly shared folder using the (old|new) public WebDAV API should fail with HTTP status code "([^"]*)"$/
 	 *
 	 * @param string $publicWebDAVAPIVersion
@@ -1312,7 +1257,6 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @Then /^uploading a file should not work using the (old|new) public WebDAV API with password "([^"]*)"$/
 	 * @Then /^the public upload to the last publicly shared folder using the (old|new) public WebDAV API with password "([^"]*)" should fail with HTTP status code "([^"]*)"$/
 	 *
 	 * @param string $publicWebDAVAPIVersion

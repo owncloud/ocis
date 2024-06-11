@@ -88,10 +88,6 @@ cannot share a folder with create permission
 - [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:155](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L155)
 - [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L172)
 
-#### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
-
-- [coreApiSharePublicLink1/createPublicLinkShare.feature:290](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L290)
-
 #### [copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file](https://github.com/owncloud/ocis/issues/1232)
 
 - [coreApiSharePublicLink2/copyFromPublicLink.feature:75](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/copyFromPublicLink.feature#L75)
@@ -155,8 +151,6 @@ API, search, favorites, config, capabilities, not existing endpoints, CORS and o
 - [coreApiAuth/ocsGETAuth.feature:123](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuth/ocsGETAuth.feature#L123)
 - [coreApiAuth/ocsPOSTAuth.feature:10](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuth/ocsPOSTAuth.feature#L10)
 - [coreApiAuth/ocsPUTAuth.feature:7](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuth/ocsPUTAuth.feature#L7)
-- [coreApiSharePublicLink1/createPublicLinkShare.feature:277](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L277)
-
 #### [sending MKCOL requests to another or non-existing user's webDav endpoints as normal user should return 404](https://github.com/owncloud/ocis/issues/5049)
 
 _ocdav: api compatibility, return correct status code_
