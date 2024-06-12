@@ -2,14 +2,17 @@ package store
 
 import (
 	"log"
+	"os"
 	"sync"
 	"testing"
 
+	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/gofrs/uuid"
 	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/metadata/assignmentscache"
 	"github.com/stretchr/testify/require"
 )
 
@@ -94,6 +97,10 @@ func initStore() *Store {
 		l:      &sync.Mutex{},
 		cfg:    defaults.DefaultConfig(),
 	}
+	tmpdir, _ := os.MkdirTemp("", "assignmentcache-test")
+	storage, _ := metadata.NewDiskStorage(tmpdir)
+
+	s.assignmentsCache = assignmentscache.New(storage, assignmentCacheFolderLocation, "assignments.json")
 	s.cfg.Commons = &shared.Commons{
 		AdminUserID: uuid.Must(uuid.NewV4()).String(),
 	}
@@ -216,10 +223,12 @@ func TestListRoleAssignmentByRole(t *testing.T) {
 		t.Run(scenario.name, func(t *testing.T) {
 			s := initStore()
 			setupRoles(s)
+			assignmentIDs := make([]string, 0, len(scenario.assignments))
 			for _, a := range scenario.assignments {
 				ass, err := s.WriteRoleAssignment(a.userID, a.roleID)
 				require.NoError(t, err)
 				require.Equal(t, ass.RoleId, a.roleID)
+				assignmentIDs = append(assignmentIDs, ass.GetId())
 			}
 
 			list, err := s.ListRoleAssignmentsByRole(scenario.queryRole)
@@ -228,6 +237,15 @@ func TestListRoleAssignmentByRole(t *testing.T) {
 			for _, ass := range list {
 				require.Equal(t, ass.RoleId, scenario.queryRole)
 			}
+
+			for _, a := range assignmentIDs {
+				err := s.RemoveRoleAssignment(a)
+				require.NoError(t, err)
+			}
+
+			list, err = s.ListRoleAssignmentsByRole(scenario.queryRole)
+			require.NoError(t, err)
+			require.Equal(t, 0, len(list))
 		})
 	}
 }
