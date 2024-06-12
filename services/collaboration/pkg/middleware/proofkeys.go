@@ -40,7 +40,6 @@ func ProofKeysMiddleware(cfg *config.Config, next http.Handler) http.Handler {
 			r.Header.Get("X-WOPI-ProofOld"),
 			proofkeys.VerifyWithLogger(logger),
 		)
-		// Need to check that the timestamp was sent within the last 20 minutes
 
 		if err != nil {
 			logger.Error().Err(err).Msg("ProofKeys verification failed")

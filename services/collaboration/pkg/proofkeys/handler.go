@@ -10,6 +10,7 @@ import (
 	"errors"
 	"math/big"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -132,29 +133,25 @@ func (vh *VerifyHandler) Verify(accessToken, url, timestamp, sig64, oldSig64 str
 // It is NOT a unix timestamp (current unix timestamp ~1718123417 secs ;
 // expected timestamp ~638537195321890000 100-nanosecs)
 func (vh *VerifyHandler) checkTimestamp(timestamp string) error {
-	var stamp, unixBaseStamp, unixStamp, unixStampSec, unixStampNanoSec big.Int
-
 	// set the stamp
-	_, ok := stamp.SetString(timestamp, 10)
-	if !ok {
+	stamp, err := strconv.ParseInt(timestamp, 10, 64)
+	if err != nil {
 		return errors.New("Invalid timestamp")
 	}
 
 	// 62135596800 seconds from "January 1, 1 AD" to "January 1, 1970 12:00:00 AM"
 	// need to convert those secs into 100-nanosecs in order to compare the stamp
-	unixBaseStamp.Mul(big.NewInt(62135596800), big.NewInt(1000*1000*10))
+	unixBaseStamp := int64(62135596800 * 1000 * 1000 * 10)
 
 	// stamp - unixBaseStamp gives us the unix-based timestamp we can use
-	unixStamp.Sub(&stamp, &unixBaseStamp)
+	unixStamp := stamp - unixBaseStamp
 
 	// divide between 1000*1000*10 to get the seconds and 100-nanoseconds
-	unixStampSec.DivMod(&unixStamp, big.NewInt(1000*1000*10), &unixStampNanoSec)
-
-	// time package requires nanoseconds (var will be overwritten with the result)
-	unixStampNanoSec.Mul(&unixStampNanoSec, big.NewInt(100))
+	unixStampSec := unixStamp / (1000 * 1000 * 10)
+	unixStampNanoSec := (unixStamp % (1000 * 1000 * 10)) * 100
 
 	// both seconds and nanoseconds should be within int64 range
-	convertedUnixTimestamp := time.Unix(unixStampSec.Int64(), unixStampNanoSec.Int64())
+	convertedUnixTimestamp := time.Unix(unixStampSec, unixStampNanoSec)
 
 	if time.Now().After(convertedUnixTimestamp.Add(20 * time.Minute)) {
 		return errors.New("Timestamp expired")
