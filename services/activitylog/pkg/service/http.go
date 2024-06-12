@@ -2,13 +2,13 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
@@ -43,8 +43,6 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		ids = append(ids, a.EventID)
 	}
 
-	fmt.Println("IDS:", ids)
-
 	evRes, err := s.evHistory.GetEvents(r.Context(), &ehsvc.GetEventsRequest{Ids: ids})
 	if err != nil {
 		s.log.Error().Err(err).Msg("error getting events")
@@ -52,25 +50,35 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
-	// TODO: compare returned events with initial list and remove missing ones
-
-	fmt.Println("EVENTS:", evRes.GetEvents())
-
 	var acts []Activity
 	for _, e := range evRes.GetEvents() {
+		// TODO: compare returned events with initial list and remove missing ones
+
 		// FIXME: Should all users get all events? If not we can filter here
+
+		var (
+			message string
+			res     Resource
+			act     Actor
+			ts      Times
+		)
 
 		switch ev := s.unwrapEvent(e).(type) {
 		case nil:
 			// error already logged in unwrapEvent
 			continue
 		case events.UploadReady:
-			act := UploadReady(e.Id, ev)
-			acts = append(acts, act)
+			message = "{user} created {resource}"
+			res, act, ts, err = s.ResponseData(ev.FileRef, ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName(), utils.TSToTime(ev.Timestamp))
 		}
-	}
 
-	fmt.Println("ACTIVITIES:", acts)
+		if err != nil {
+			s.log.Error().Err(err).Msg("error getting response data")
+			continue
+		}
+
+		acts = append(acts, NewActivity(message, res, act, ts.RecordedTime, e.GetId()))
+	}
 
 	b, err := json.Marshal(acts)
 	if err != nil {

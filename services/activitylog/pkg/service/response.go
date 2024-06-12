@@ -3,8 +3,10 @@ package service
 import (
 	"time"
 
-	"github.com/cs3org/reva/v2/pkg/events"
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
 // GetActivitiesResponse is the response on GET activities requests
@@ -14,15 +16,14 @@ type GetActivitiesResponse struct {
 
 // Activity represents an activity as it is returned to the client
 type Activity struct {
-	ID string `json:"id"`
+	ID        string   `json:"id"`
+	DriveItem Resource `json:"driveItem"`
+	Actor     Actor    `json:"actor"`
+	Times     Times    `json:"times"`
+	Template  Template `json:"template"`
 
-	// TODO: Implement these
-	Action    interface{} `json:"action"`
-	DriveItem Resource    `json:"driveItem"`
-	Actor     Actor       `json:"actor"`
-	Times     Times       `json:"times"`
-
-	Template Template `json:"template"`
+	// TODO: Implement
+	Action interface{} `json:"action"`
 }
 
 // Resource represents an item such as a file or folder
@@ -48,20 +49,58 @@ type Template struct {
 	Variables map[string]interface{} `json:"variables"`
 }
 
-// UploadReady converts a UploadReady events to an Activity
-func UploadReady(eid string, e events.UploadReady) Activity {
-	rid, _ := storagespace.FormatReference(e.FileRef)
-	res := Resource{
-		ID:   rid,
-		Name: e.Filename,
-	}
+// NewActivity creates a new activity
+func NewActivity(message string, res Resource, user Actor, ts time.Time, eventID string) Activity {
 	return Activity{
-		ID: eid,
+		ID: eventID,
+		Times: Times{
+			RecordedTime: ts,
+		},
+		DriveItem: res,
+		Actor:     user,
 		Template: Template{
-			Message: "file created",
+			Message: message,
 			Variables: map[string]interface{}{
 				"resource": res,
+				"user":     user,
 			},
 		},
 	}
+}
+
+// ResponseData returns the relevant response data for the activity
+func (s *ActivitylogService) ResponseData(ref *provider.Reference, uid *user.UserId, username string, ts time.Time) (Resource, Actor, Times, error) {
+	gwc, err := s.gws.Next()
+	if err != nil {
+		return Resource{}, Actor{}, Times{}, err
+	}
+
+	ctx, err := utils.GetServiceUserContext(s.cfg.ServiceAccount.ServiceAccountID, gwc, s.cfg.ServiceAccount.ServiceAccountSecret)
+	if err != nil {
+		return Resource{}, Actor{}, Times{}, err
+	}
+
+	info, err := utils.GetResource(ctx, ref, gwc)
+	if err != nil {
+		return Resource{}, Actor{}, Times{}, err
+	}
+
+	if username == "" {
+		u, err := utils.GetUser(uid, gwc)
+		if err != nil {
+			return Resource{}, Actor{}, Times{}, err
+		}
+		username = u.GetUsername()
+	}
+
+	return Resource{
+			ID:   storagespace.FormatResourceID(*info.Id),
+			Name: info.Path,
+		}, Actor{
+			ID:          uid.GetOpaqueId(),
+			DisplayName: username,
+		}, Times{
+			RecordedTime: ts,
+		}, nil
+
 }

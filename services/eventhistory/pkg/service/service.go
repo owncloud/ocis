@@ -130,6 +130,10 @@ func (eh *EventHistoryService) getEvent(id string) (*ehmsg.Event, error) {
 		return nil, err
 	}
 
+	if len(evs) == 0 {
+		return nil, store.ErrNotFound
+	}
+
 	var ev StoreEvent
 	if err := json.Unmarshal(evs[0].Value, &ev); err != nil {
 		eh.log.Error().Err(err).Str("eventid", id).Msg("could not unmarshal event")
