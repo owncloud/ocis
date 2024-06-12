@@ -549,7 +549,7 @@ func (s *svc) InitiateFileDownload(ctx context.Context, req *provider.InitiateFi
 func (s *svc) InitiateFileUpload(ctx context.Context, req *provider.InitiateFileUploadRequest) (*gateway.InitiateFileUploadResponse, error) {
 	var c provider.ProviderAPIClient
 	var err error
-	c, _, req.Ref, err = s.findAndUnwrap(ctx, req.Ref)
+	c, _, req.Ref, err = s.findAndUnwrapUnique(ctx, req.Ref)
 	if err != nil {
 		return &gateway.InitiateFileUploadResponse{
 			Status: status.NewStatusFromErrType(ctx, fmt.Sprintf("gateway could not find space for ref=%+v", req.Ref), err),

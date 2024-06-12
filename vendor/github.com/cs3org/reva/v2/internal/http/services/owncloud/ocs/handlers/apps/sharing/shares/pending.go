@@ -23,24 +23,22 @@ import (
 	"fmt"
 	"net/http"
 	"path"
-	"path/filepath"
-	"slices"
 	"strconv"
-	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	ocmv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/go-chi/chi/v5"
+	"github.com/pkg/errors"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
+
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/response"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/conversions"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-chi/chi/v5"
-	"github.com/pkg/errors"
-	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 const (
@@ -76,7 +74,7 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mount, unmountedShares, err := GetMountpointAndUnmountedShares(ctx, client, sharedResource.Info)
+	unmountedShares, err := getUnmountedShares(ctx, client, sharedResource.GetInfo().GetId())
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "could not determine mountpoint", err)
 		return
@@ -84,12 +82,8 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 
 	// first update the requested share
 	receivedShare.State = collaboration.ShareState_SHARE_STATE_ACCEPTED
-	// we need to add a path to the share
-	receivedShare.MountPoint = &provider.Reference{
-		Path: mount,
-	}
 
-	updateMask := &fieldmaskpb.FieldMask{Paths: []string{"state", "mount_point"}}
+	updateMask := &fieldmaskpb.FieldMask{Paths: []string{"state"}}
 	data, meta, err := h.updateReceivedShare(r.Context(), receivedShare, updateMask)
 	if err != nil {
 		// we log an error for affected shares, for the actual share we return an error
@@ -106,10 +100,6 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 		}
 
 		rs.State = collaboration.ShareState_SHARE_STATE_ACCEPTED
-		// set the same mountpoint as for the requested received share
-		rs.MountPoint = &provider.Reference{
-			Path: mount,
-		}
 
 		_, _, err := h.updateReceivedShare(r.Context(), rs, updateMask)
 		if err != nil {
@@ -117,76 +107,6 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 			appctx.GetLogger(ctx).Error().Err(err).Str("received_share", shareID).Str("affected_share", rs.GetShare().GetId().GetOpaqueId()).Msg("could not update affected received share")
 		}
 	}
-}
-
-// GetMountpointAndUnmountedShares returns a new or existing mountpoint for the given info and produces a list of unmounted received shares for the same resource
-func GetMountpointAndUnmountedShares(ctx context.Context, gwc gateway.GatewayAPIClient, info *provider.ResourceInfo) (string, []*collaboration.ReceivedShare, error) {
-	unmountedShares := []*collaboration.ReceivedShare{}
-	receivedShares, err := listReceivedShares(ctx, gwc)
-	if err != nil {
-		return "", unmountedShares, err
-	}
-
-	// we need to sort the received shares by mount point in order to make things easier to evaluate.
-	base := filepath.Clean(info.Name)
-	mount := base
-	existingMountpoint := ""
-	mountedShares := make([]string, 0, len(receivedShares))
-	var pathExists bool
-
-	for _, s := range receivedShares {
-		resourceIDEqual := utils.ResourceIDEqual(s.GetShare().GetResourceId(), info.GetId())
-
-		if resourceIDEqual && s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
-			// a share to the resource already exists and is mounted, remember the mount point
-			_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
-			if err == nil {
-				existingMountpoint = s.GetMountPoint().GetPath()
-			}
-		}
-
-		if resourceIDEqual && s.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
-			// a share to the resource already exists but is not mounted, collect the unmounted share
-			unmountedShares = append(unmountedShares, s)
-		}
-
-		if s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
-			// collect all accepted mount points
-			mountedShares = append(mountedShares, s.GetMountPoint().GetPath())
-			if s.GetMountPoint().GetPath() == mount {
-				// does the shared resource still exist?
-				_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
-				if err == nil {
-					pathExists = true
-				}
-				// TODO we could delete shares here if the stat returns code NOT FOUND ... but listening for file deletes would be better
-			}
-		}
-	}
-
-	if existingMountpoint != "" {
-		// we want to reuse the same mountpoint for all unmounted shares to the same resource
-		return existingMountpoint, unmountedShares, nil
-	}
-
-	// If the mount point really already exists, we need to insert a number into the filename
-	if pathExists {
-		// now we have a list of shares, we want to iterate over all of them and check for name collisions agents a mount points list
-		for i := 1; i <= len(mountedShares)+1; i++ {
-			ext := filepath.Ext(base)
-			name := strings.TrimSuffix(base, ext)
-			// be smart about .tar.(gz|bz) files
-			if strings.HasSuffix(name, ".tar") {
-				name = strings.TrimSuffix(name, ".tar")
-				ext = ".tar" + ext
-			}
-			mount = name + " (" + strconv.Itoa(i) + ")" + ext
-			if !slices.Contains(mountedShares, mount) {
-				return mount, unmountedShares, nil
-			}
-		}
-	}
-	return mount, unmountedShares, nil
 }
 
 // RejectReceivedShare handles DELETE Requests on /apps/files_sharing/api/v1/shares/{shareid}
@@ -392,6 +312,25 @@ func getReceivedShareFromID(ctx context.Context, client gateway.GatewayAPIClient
 	}
 
 	return s.Share, nil
+}
+
+func getUnmountedShares(ctx context.Context, gwc gateway.GatewayAPIClient, id *provider.ResourceId) ([]*collaboration.ReceivedShare, error) {
+	var unmountedShares []*collaboration.ReceivedShare
+	receivedShares, err := listReceivedShares(ctx, gwc)
+	if err != nil {
+		return unmountedShares, err
+	}
+
+	for _, s := range receivedShares {
+		resourceIDEqual := utils.ResourceIDEqual(s.GetShare().GetResourceId(), id)
+
+		if resourceIDEqual && s.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
+			// a share to the resource already exists but is not mounted, collect the unmounted share
+			unmountedShares = append(unmountedShares, s)
+		}
+	}
+
+	return unmountedShares, err
 }
 
 // getSharedResource attempts to get a shared resource from the storage from the resource reference.

@@ -20,8 +20,11 @@ package usershareprovider
 
 import (
 	"context"
+	"path/filepath"
 	"regexp"
 	"slices"
+	"strconv"
+	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -44,6 +47,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/cs3org/reva/v2/pkg/utils"
+)
+
+const (
+	_fieldMaskPathMountPoint  = "mount_point"
+	_fieldMaskPathPermissions = "permissions"
+	_fieldMaskPathState       = "state"
 )
 
 func init() {
@@ -407,7 +416,7 @@ func (s *service) UpdateShare(ctx context.Context, req *collaboration.UpdateShar
 
 	// If this is a permissions update, check if user's permissions on the resource are sufficient to set the desired permissions
 	var newPermissions *provider.ResourcePermissions
-	if slices.Contains(req.GetUpdateMask().GetPaths(), "permissions") {
+	if slices.Contains(req.GetUpdateMask().GetPaths(), _fieldMaskPathPermissions) {
 		newPermissions = req.GetShare().GetPermissions().GetPermissions()
 	} else {
 		newPermissions = req.GetField().GetPermissions().GetPermissions()
@@ -497,40 +506,161 @@ func (s *service) GetReceivedShare(ctx context.Context, req *collaboration.GetRe
 }
 
 func (s *service) UpdateReceivedShare(ctx context.Context, req *collaboration.UpdateReceivedShareRequest) (*collaboration.UpdateReceivedShareResponse, error) {
-
-	if req.Share == nil {
-		return &collaboration.UpdateReceivedShareResponse{
-			Status: status.NewInvalid(ctx, "updating requires a received share object"),
-		}, nil
-	}
-	if req.Share.Share == nil {
-		return &collaboration.UpdateReceivedShareResponse{
-			Status: status.NewInvalid(ctx, "share missing"),
-		}, nil
-	}
-	if req.Share.Share.Id == nil {
-		return &collaboration.UpdateReceivedShareResponse{
-			Status: status.NewInvalid(ctx, "share id missing"),
-		}, nil
-	}
-	if req.Share.Share.Id.OpaqueId == "" {
+	if req.GetShare().GetShare().GetId().GetOpaqueId() == "" {
 		return &collaboration.UpdateReceivedShareResponse{
 			Status: status.NewInvalid(ctx, "share id empty"),
 		}, nil
 	}
 
+	isStateTransitionShareAccepted := slices.Contains(req.GetUpdateMask().GetPaths(), _fieldMaskPathState) && req.GetShare().GetState() == collaboration.ShareState_SHARE_STATE_ACCEPTED
+	isMountPointSet := slices.Contains(req.GetUpdateMask().GetPaths(), _fieldMaskPathMountPoint) && req.GetShare().GetMountPoint().GetPath() != ""
+	// we calculate a valid mountpoint only if the share should be accepted and the mount point is not set explicitly
+	if isStateTransitionShareAccepted && !isMountPointSet {
+		gatewayClient, err := s.gatewaySelector.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		s, err := setReceivedShareMountPoint(ctx, gatewayClient, req)
+		switch {
+		case err != nil:
+			fallthrough
+		case s.GetCode() != rpc.Code_CODE_OK:
+			return &collaboration.UpdateReceivedShareResponse{
+				Status: s,
+			}, err
+		}
+	}
+
 	var uid userpb.UserId
 	_ = utils.ReadJSONFromOpaque(req.Opaque, "userid", &uid)
-	share, err := s.sm.UpdateReceivedShare(ctx, req.Share, req.UpdateMask, &uid)
+	updatedShare, err := s.sm.UpdateReceivedShare(ctx, req.Share, req.UpdateMask, &uid)
 	if err != nil {
 		return &collaboration.UpdateReceivedShareResponse{
 			Status: status.NewInternal(ctx, "error updating received share"),
 		}, nil
 	}
 
-	res := &collaboration.UpdateReceivedShareResponse{
+	return &collaboration.UpdateReceivedShareResponse{
 		Status: status.NewOK(ctx),
-		Share:  share,
+		Share:  updatedShare,
+	}, nil
+}
+
+// GetAvailableMountpoint returns a new or existing mountpoint
+func GetAvailableMountpoint(ctx context.Context, gwc gateway.GatewayAPIClient, id *provider.ResourceId, name string) (string, error) {
+	listReceivedSharesRes, err := gwc.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{})
+	if err != nil {
+		return "", errtypes.InternalError("grpc list received shares request failed")
 	}
-	return res, nil
+
+	if err := errtypes.NewErrtypeFromStatus(listReceivedSharesRes.GetStatus()); err != nil {
+		return "", err
+	}
+
+	base := filepath.Clean(name)
+	mount := base
+	existingMountpoint := ""
+	mountedShares := make([]string, 0, len(listReceivedSharesRes.GetShares()))
+	var pathExists bool
+
+	for _, s := range listReceivedSharesRes.GetShares() {
+		resourceIDEqual := utils.ResourceIDEqual(s.GetShare().GetResourceId(), id)
+
+		if resourceIDEqual && s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
+			// a share to the resource already exists and is mounted, remembers the mount point
+			_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
+			if err == nil {
+				existingMountpoint = s.GetMountPoint().GetPath()
+			}
+		}
+
+		if s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
+			// collect all accepted mount points
+			mountedShares = append(mountedShares, s.GetMountPoint().GetPath())
+			if s.GetMountPoint().GetPath() == mount {
+				// does the shared resource still exist?
+				_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
+				if err == nil {
+					pathExists = true
+				}
+				// TODO we could delete shares here if the stat returns code NOT FOUND ... but listening for file deletes would be better
+			}
+		}
+	}
+
+	if existingMountpoint != "" {
+		// we want to reuse the same mountpoint for all unmounted shares to the same resource
+		return existingMountpoint, nil
+	}
+
+	// If the mount point really already exists, we need to insert a number into the filename
+	if pathExists {
+		// now we have a list of shares, we want to iterate over all of them and check for name collisions agents a mount points list
+		for i := 1; i <= len(mountedShares)+1; i++ {
+			ext := filepath.Ext(base)
+			name := strings.TrimSuffix(base, ext)
+
+			mount = name + " (" + strconv.Itoa(i) + ")" + ext
+			if !slices.Contains(mountedShares, mount) {
+				return mount, nil
+			}
+		}
+	}
+
+	return mount, nil
+}
+
+func setReceivedShareMountPoint(ctx context.Context, gwc gateway.GatewayAPIClient, req *collaboration.UpdateReceivedShareRequest) (*rpc.Status, error) {
+	receivedShare, err := gwc.GetReceivedShare(ctx, &collaboration.GetReceivedShareRequest{
+		Ref: &collaboration.ShareReference{
+			Spec: &collaboration.ShareReference_Id{
+				Id: req.GetShare().GetShare().GetId(),
+			},
+		},
+	})
+	switch {
+	case err != nil:
+		fallthrough
+	case receivedShare.GetStatus().GetCode() != rpc.Code_CODE_OK:
+		return receivedShare.GetStatus(), err
+	}
+
+	if receivedShare.GetShare().GetMountPoint().GetPath() != "" {
+		return status.NewOK(ctx), nil
+	}
+
+	resourceStat, err := gwc.Stat(ctx, &provider.StatRequest{
+		Ref: &provider.Reference{
+			ResourceId: receivedShare.GetShare().GetShare().GetResourceId(),
+		},
+	})
+	switch {
+	case err != nil:
+		fallthrough
+	case resourceStat.GetStatus().GetCode() != rpc.Code_CODE_OK:
+		return resourceStat.GetStatus(), err
+	}
+
+	// handle mount point related updates
+	{
+		// check if the requested mount point is available and if not, find a suitable one
+		availableMountpoint, err := GetAvailableMountpoint(ctx, gwc,
+			resourceStat.GetInfo().GetId(),
+			resourceStat.GetInfo().GetName(),
+		)
+		if err != nil {
+			return status.NewInternal(ctx, err.Error()), nil
+		}
+
+		if !slices.Contains(req.GetUpdateMask().GetPaths(), _fieldMaskPathMountPoint) {
+			req.GetUpdateMask().Paths = append(req.GetUpdateMask().GetPaths(), _fieldMaskPathMountPoint)
+		}
+
+		req.GetShare().MountPoint = &provider.Reference{
+			Path: availableMountpoint,
+		}
+	}
+
+	return status.NewOK(ctx), nil
 }
