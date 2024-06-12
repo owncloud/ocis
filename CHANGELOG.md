@@ -80,8 +80,8 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the error translation from utils: [#9331](https://github.com/owncloud/ocis/pull/9331)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
-* Change - Define maximum input image dimensions and size when generating previews: [#9035](https://github.com/owncloud/ocis/pull/9035)
 * Change - The `filesystem` backend for the settings service has been removed: [#9138](https://github.com/owncloud/ocis/pull/9138)
+* Change - Define maximum input image dimensions and size when generating previews: [#9360](https://github.com/owncloud/ocis/pull/9360)
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
 * Enhancement - Graphs endpoint for mounting and unmounting shares: [#7885](https://github.com/owncloud/ocis/pull/7885)
 * Enhancement - Add epub reader to web default apps: [#8410](https://github.com/owncloud/ocis/pull/8410)
@@ -384,20 +384,21 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/8653
 
-* Change - Define maximum input image dimensions and size when generating previews: [#9035](https://github.com/owncloud/ocis/pull/9035)
-
-   This is a general hardening change to limit processing time and resources of the
-   thumbnailer.
-
-   https://github.com/owncloud/ocis/pull/9035
-   https://github.com/owncloud/ocis/pull/9069
-
 * Change - The `filesystem` backend for the settings service has been removed: [#9138](https://github.com/owncloud/ocis/pull/9138)
 
    The only remaining backend for the settings service is `metadata`, which has
    been the default backend since ocis 2.0
 
    https://github.com/owncloud/ocis/pull/9138
+
+* Change - Define maximum input image dimensions and size when generating previews: [#9360](https://github.com/owncloud/ocis/pull/9360)
+
+   This is a general hardening change to limit processing time and resources of the
+   thumbnailer.
+
+   https://github.com/owncloud/ocis/pull/9360
+   https://github.com/owncloud/ocis/pull/9035
+   https://github.com/owncloud/ocis/pull/9069
 
 * Enhancement - Introduce staticroutes package & remove well-known OIDC middleware: [#6095](https://github.com/owncloud/ocis/issues/6095)
 
