@@ -49,5 +49,5 @@ thumbnail:
   transfer_secret: ""
   data_endpoint: http://127.0.0.1:9186/thumbnails/data
   max_input_width: 7680
-  max_input_height: 4320
+  max_input_height: 7680
   max_input_image_file_size: 50MB

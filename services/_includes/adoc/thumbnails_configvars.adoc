@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-12-09-23-29]
+[#deprecation-note-2024-06-12-09-32-51]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -293,7 +293,7 @@ a|`THUMBNAILS_MAX_INPUT_HEIGHT` +
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++4320 ++
+++7680 ++
 a| [subs=-attributes]
 The maximum height of an input image which is being processed.
 

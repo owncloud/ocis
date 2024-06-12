@@ -30,5 +30,5 @@
 | THUMBNAILS_TRANSFER_TOKEN | string |  | The secret to sign JWT to download the actual thumbnail file.|
 | THUMBNAILS_DATA_ENDPOINT | string | http://127.0.0.1:9186/thumbnails/data | The HTTP endpoint where the actual thumbnail file can be downloaded.|
 | THUMBNAILS_MAX_INPUT_WIDTH | int | 7680 | The maximum width of an input image which is being processed.|
-| THUMBNAILS_MAX_INPUT_HEIGHT | int | 4320 | The maximum height of an input image which is being processed.|
+| THUMBNAILS_MAX_INPUT_HEIGHT | int | 7680 | The maximum height of an input image which is being processed.|
 | THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE | string | 50MB | The maximum file size of an input image which is being processed. Usable common abbreviations: [KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB.|
