@@ -207,7 +207,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+ID of the user who collects all necessary information for deletion. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 a| `OCIS_ASYNC_UPLOADS`
 
 a| [subs=attributes+]
@@ -244,7 +244,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
+The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=attributes+]
@@ -267,7 +267,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
+The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=attributes+]
@@ -284,7 +284,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++cache-userinfo ++
+++storage-users ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
@@ -330,7 +330,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
 a| `OCIS_CACHE_STORE`
 
 a| [subs=attributes+]
@@ -350,10 +350,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++memory ++
+++nats-js-kv ++
 
 a| [subs=-attributes]
-The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
+The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.
 a| `OCIS_CACHE_STORE_NODES`
 
 a| [subs=attributes+]
@@ -376,7 +376,7 @@ a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
 
 a| [subs=-attributes]
-A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 a| `OCIS_CACHE_TTL`
 
 a| [subs=attributes+]
@@ -396,10 +396,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++10s ++
+++12h0m0s ++
 
 a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
+Default time to live for signing keys. See the Environment Variable Types description for more details.
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
 a| [subs=attributes+]
@@ -421,7 +421,7 @@ a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++false ++
+++true ++
 
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
@@ -446,7 +446,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Cache-Control] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -471,7 +471,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[] ++
+++[GET POST PUT PATCH DELETE OPTIONS] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
@@ -496,7 +496,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[https://localhost:9200] ++
+++[*] ++
 
 a| [subs=-attributes]
 A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
@@ -557,7 +557,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
+Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
 a| `OCIS_EDITION`
 
 a| [subs=attributes+]
@@ -733,7 +733,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=attributes+]
@@ -747,7 +747,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the GRPC service.
+The bind address of the gateway GRPC address.
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
 a| [subs=attributes+]
@@ -921,7 +921,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.
+Whether to verify the server TLS certificates.
 a| `OCIS_JWT_SECRET`
 
 a| [subs=attributes+]
@@ -1172,7 +1172,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter like 'groupOfNames'.
+The object class to use for groups in the default group search filter ('groupOfNames').
 a| `OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
 a| [subs=attributes+]
@@ -1219,7 +1219,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
 a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=attributes+]
@@ -1282,7 +1282,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
 a| `OCIS_LDAP_INSECURE`
 
 a| [subs=attributes+]
@@ -1397,7 +1397,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter like 'inetOrgPerson'.
+The object class to use for users in the default user search filter ('inetOrgPerson').
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
 a| [subs=attributes+]
@@ -1429,7 +1429,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=attributes+]
@@ -1510,7 +1510,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 a| `OCIS_LOG_COLOR`
 
 a| [subs=attributes+]
@@ -1744,7 +1744,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary to access resources from other services.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 a| `OCIS_OIDC_ISSUER`
 
 a| [subs=attributes+]
@@ -1764,7 +1764,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
 a| [subs=attributes+]
@@ -1875,7 +1875,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++memory ++
+++nats-js-kv ++
 
 a| [subs=-attributes]
 The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
@@ -1923,7 +1923,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[] ++
+++[127.0.0.1:9233] ++
 
 a| [subs=-attributes]
 A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
@@ -1955,10 +1955,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++336h0m0s ++
+++0s ++
 
 a| [subs=-attributes]
-Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
+Time to live for events in the store. See the Environment Variable Types description for more details.
 a| `OCIS_REVA_GATEWAY`
 
 a| [subs=attributes+]
@@ -1998,7 +1998,7 @@ a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+CS3 gateway used to look up user metadata
 a| `OCIS_SERVICE_ACCOUNT_ID`
 
 a| [subs=attributes+]
@@ -2073,7 +2073,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
+Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false.
 a| `OCIS_SHOW_USER_EMAIL_IN_RESULTS`
 
 a| [subs=attributes+]
@@ -2384,7 +2384,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=attributes+]
@@ -2428,7 +2428,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=attributes+]
