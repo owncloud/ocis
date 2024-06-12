@@ -214,18 +214,22 @@ Feature: lock files
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario: viewer cannot lock a file in the shares using file-id
+  Scenario Outline: viewer cannot lock a file in the shares using file-id
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | textfile.txt |
-      | space           | Personal     |
-      | sharee          | Brian        |
-      | shareType       | user         |
-      | permissionsRole | Viewer       |
+      | resource        | textfile.txt       |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "403"
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | Secure viewer    |
 
 
   Scenario: sharee cannot lock a resource exclusively locked by a sharer
