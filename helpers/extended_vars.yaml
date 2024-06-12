@@ -1,13 +1,5 @@
 variables:
 - rawname: CS3_GATEWAY
-  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:76
-  foundincode: false
-  name: CS3_GATEWAY
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: true
-- rawname: CS3_GATEWAY
   path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
   foundincode: true
   name: CS3_GATEWAY
@@ -15,6 +7,22 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
+- rawname: CS3_GATEWAY
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:76
+  foundincode: false
+  name: CS3_GATEWAY
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: CS3_MACHINE_AUTH_API_KEY
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
+  foundincode: false
+  name: CS3_MACHINE_AUTH_API_KEY
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
 - rawname: CS3_MACHINE_AUTH_API_KEY
   path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:78
   foundincode: true
@@ -23,14 +31,6 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
-- rawname: CS3_MACHINE_AUTH_API_KEY
-  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
-  foundincode: false
-  name: CS3_MACHINE_AUTH_API_KEY
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: true
 - rawname: MICRO_LOG_LEVEL
   path: ocis-pkg/log/log.go:31
   foundincode: true
@@ -60,6 +60,14 @@ variables:
     on supervision of ownCloud Support.'
   do_ignore: false
 - rawname: _registryAddressEnv
+  path: ocis-pkg/registry/registry.go:118
+  foundincode: true
+  name: MICRO_REGISTRY_ADDRESS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _registryAddressEnv
   path: ocis-pkg/natsjsregistry/registry.go:145
   foundincode: false
   name: MICRO_REGISTRY_ADDRESS
@@ -68,14 +76,6 @@ variables:
   description: The bind address of the internal go micro framework. Only change on
     supervision of ownCloud Support.
   do_ignore: false
-- rawname: _registryAddressEnv
-  path: ocis-pkg/registry/registry.go:118
-  foundincode: true
-  name: MICRO_REGISTRY_ADDRESS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: true
 - rawname: _registryPasswordEnv
   path: ocis-pkg/natsjsregistry/registry.go:163
   foundincode: false
