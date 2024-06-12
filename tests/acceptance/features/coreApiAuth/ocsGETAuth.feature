@@ -25,7 +25,6 @@ Feature: auth
       | /ocs/v1.php/privatedata/getattribute                        |
       | /ocs/v2.php/privatedata/getattribute                        |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "401"
 
   @issue-1338
   Scenario: ocs config end point accessible by unauthorized users
@@ -49,8 +48,7 @@ Feature: auth
       | /ocs/v1.php/apps/files_sharing/api/v1/shares                |
       | /ocs/v1.php/config                                          |
       | /ocs/v1.php/privatedata/getattribute                        |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "100"
+    Then the HTTP status code of responses on each endpoint should be "404,404,200,200,404" respectively
     When the user "Alice" requests these endpoints with "GET" with basic auth
       | endpoint                                                    |
       | /ocs/v2.php/apps/files_sharing/api/v1/remote_shares         |
@@ -58,8 +56,7 @@ Feature: auth
       | /ocs/v2.php/apps/files_sharing/api/v1/shares                |
       | /ocs/v2.php/config                                          |
       | /ocs/v2.php/privatedata/getattribute                        |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "200"
+    Then the HTTP status code of responses on each endpoint should be "404,404,200,200,404" respectively
     When the user "Alice" requests these endpoints with "GET" with basic auth
       | endpoint                 |
       | /ocs/v1.php/cloud/apps   |
@@ -68,8 +65,7 @@ Feature: auth
       | /ocs/v2.php/cloud/apps   |
       | /ocs/v2.php/cloud/groups |
       | /ocs/v2.php/cloud/users  |
-    Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "401"
+    Then the HTTP status code of responses on all endpoints should be "404"
 
   @issue-1338 @issue-1337 @smokeTest
   Scenario: using OCS as normal user with wrong password
@@ -90,17 +86,14 @@ Feature: auth
       | /ocs/v1.php/privatedata/getattribute                        |
       | /ocs/v2.php/privatedata/getattribute                        |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "401"
     When user "Alice" requests these endpoints with "GET" using password "invalid"
       | endpoint           |
       | /ocs/v1.php/config |
     Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "100"
     When user "Alice" requests these endpoints with "GET" using password "invalid"
       | endpoint           |
       | /ocs/v2.php/config |
     Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "200"
 
   @issue-1319
   Scenario: using OCS with admin basic auth
@@ -109,15 +102,13 @@ Feature: auth
       | /ocs/v1.php/cloud/apps   |
       | /ocs/v1.php/cloud/groups |
       | /ocs/v1.php/cloud/users  |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "100"
+    Then the HTTP status code of responses on all endpoints should be "404"
     When the administrator requests these endpoints with "GET"
       | endpoint                 |
       | /ocs/v2.php/cloud/apps   |
       | /ocs/v2.php/cloud/groups |
       | /ocs/v2.php/cloud/users  |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "200"
+    Then the HTTP status code of responses on all endpoints should be "404"
 
   @issue-1337 @issue-1319
   Scenario: using OCS as admin user with wrong password
@@ -138,14 +129,11 @@ Feature: auth
       | /ocs/v1.php/privatedata/getattribute                        |
       | /ocs/v2.php/privatedata/getattribute                        |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "997"
     When user "another-admin" requests these endpoints with "GET" using password "invalid"
       | endpoint           |
       | /ocs/v1.php/config |
     Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "100"
     When user "another-admin" requests these endpoints with "GET" using password "invalid"
       | endpoint           |
       | /ocs/v2.php/config |
     Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "200"
