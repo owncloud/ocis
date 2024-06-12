@@ -43,6 +43,7 @@ type Config struct {
 // NameValidation is the validation configuration for file and folder names
 type NameValidation struct {
 	InvalidChars []string `mapstructure:"invalid_chars"`
+	InvalidNames []string `mapstructure:"invalid_names"`
 	MaxLength    int      `mapstructure:"max_length"`
 }
 
@@ -81,6 +82,10 @@ func (c *Config) Init() {
 
 	if c.NameValidation.InvalidChars == nil {
 		c.NameValidation.InvalidChars = []string{"\f", "\r", "\n", "\\"}
+	}
+
+	if c.NameValidation.InvalidNames == nil {
+		c.NameValidation.InvalidNames = []string{".."}
 	}
 
 	if c.NameValidation.MaxLength == 0 {

@@ -253,6 +253,7 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 			w.WriteHeader(http.StatusPreconditionFailed)
 			return
 		}
+		log.Error().Interface("status", uRes.Status).Msg("error initiating file upload")
 		errors.HandleErrorStatus(&log, w, uRes.Status)
 		return
 	}

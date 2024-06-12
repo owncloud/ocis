@@ -22,6 +22,8 @@ func ValidatorsFromConfig(c *config.Config) []Validator {
 	// max length
 	vals = append(vals, isShorterThan(c.NameValidation.MaxLength))
 
+	vals = append(vals, invalidNames(c.NameValidation.InvalidNames))
+
 	return vals
 }
 
@@ -33,6 +35,17 @@ func ValidateName(name string, validators []Validator) error {
 		}
 	}
 	return nil
+}
+
+func invalidNames(bad []string) Validator {
+	return func(s string) error {
+		for _, b := range bad {
+			if s == b {
+				return fmt.Errorf("must not be %s", b)
+			}
+		}
+		return nil
+	}
 }
 
 func notEmpty() Validator {
