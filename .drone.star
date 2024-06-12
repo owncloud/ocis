@@ -1,6 +1,10 @@
 """oCIS CI definition
 """
 
+# Production release tags
+# NOTE: need to be updated if new production releases are determined
+PRODUCTION_RELEASE_TAGS = ["5.0.0", "5.0.1", "5.0.2", "5.0.3", "7.0.0"]
+
 # images
 ALPINE_GIT = "alpine/git:latest"
 APACHE_TIKA = "apache/tika:2.8.0.0"
@@ -1264,20 +1268,29 @@ def logTracingResults():
 
 def dockerReleases(ctx):
     pipelines = []
-    for arch in config["dockerReleases"]["architectures"]:
-        pipelines.append(dockerRelease(ctx, arch))
 
-    manifest = releaseDockerManifest()
+    # dockerhub repo
+    #  - "owncloud/ocis-rolling"
+    repo = ctx.repo.slug + "-rolling"
+
+    # production release repo
+    if ctx.build.event == "tag" and ctx.build.ref.replace("refs/tags/v", "") in PRODUCTION_RELEASE_TAGS:
+        repo = ctx.repo.slug
+
+    for arch in config["dockerReleases"]["architectures"]:
+        pipelines.append(dockerRelease(ctx, arch, repo))
+
+    manifest = releaseDockerManifest(repo)
     manifest["depends_on"] = getPipelineNames(pipelines)
     pipelines.append(manifest)
 
-    readme = releaseDockerReadme(ctx)
+    readme = releaseDockerReadme(ctx, repo)
     readme["depends_on"] = getPipelineNames(pipelines)
     pipelines.append(readme)
 
     return pipelines
 
-def dockerRelease(ctx, arch):
+def dockerRelease(ctx, arch, repo):
     build_args = [
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
@@ -1314,7 +1327,7 @@ def dockerRelease(ctx, arch):
                     "context": "ocis",
                     "tags": "linux-%s" % (arch),
                     "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
-                    "repo": ctx.repo.slug,
+                    "repo": repo,
                     "build_args": build_args,
                 },
                 "when": {
@@ -1339,7 +1352,7 @@ def dockerRelease(ctx, arch):
                     "context": "ocis",
                     "auto_tag_suffix": "linux-%s" % (arch),
                     "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
-                    "repo": ctx.repo.slug,
+                    "repo": repo,
                     "build_args": build_args,
                 },
                 "when": {
@@ -1627,7 +1640,11 @@ def licenseCheck(ctx):
         "volumes": [pipelineVolumeGo],
     }]
 
-def releaseDockerManifest():
+def releaseDockerManifest(repo):
+    spec = "manifest.tmpl"
+    if "rolling" not in repo:
+        spec = "manifest-production.tmpl"
+
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1647,7 +1664,7 @@ def releaseDockerManifest():
                     "password": {
                         "from_secret": "docker_password",
                     },
-                    "spec": "ocis/docker/manifest.tmpl",
+                    "spec": "ocis/docker/%s" % spec,
                     "auto_tag": True,
                     "ignore_missing": True,
                 },
@@ -1730,7 +1747,7 @@ def changelog():
         },
     }]
 
-def releaseDockerReadme(ctx):
+def releaseDockerReadme(ctx, repo):
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1750,7 +1767,7 @@ def releaseDockerReadme(ctx):
                     "DOCKER_PASS": {
                         "from_secret": "docker_password",
                     },
-                    "PUSHRM_TARGET": "owncloud/${DRONE_REPO_NAME}",
+                    "PUSHRM_TARGET": repo,
                     "PUSHRM_SHORT": "Docker images for %s" % (ctx.repo.name),
                     "PUSHRM_FILE": "README.md",
                 },
