@@ -1387,13 +1387,14 @@ def binaryRelease(ctx, name):
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
     depends_on = getPipelineNames(testOcisAndUploadResults(ctx) + testPipelines(ctx))
     if ctx.build.event == "tag":
-        # uploads binary to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
-        folder = "stable"
+        # uploads binary to eg. https://download.owncloud.com/ocis/ocis/testing/1.0.0/
+        folder = "testing"
         buildref = ctx.build.ref.replace("refs/tags/v", "")
-        buildref = buildref.lower()
-        if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
-            folder = "testing"
-        target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
+        if buildref in PRODUCTION_RELEASE_TAGS:
+            # uploads binary to eg. https://download.owncloud.com/ocis/ocis/stable/2.0.0/
+            folder = "stable"
+
+        target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref.lower())
         depends_on = []
 
     settings = {
