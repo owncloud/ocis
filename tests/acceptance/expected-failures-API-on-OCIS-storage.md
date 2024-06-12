@@ -150,7 +150,7 @@ API, search, favorites, config, capabilities, not existing endpoints, CORS and o
 - [coreApiAuth/ocsGETAuth.feature:106](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuth/ocsGETAuth.feature#L106)
 - [coreApiAuth/ocsGETAuth.feature:123](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuth/ocsGETAuth.feature#L123)
 - [coreApiAuth/ocsPOSTAuth.feature:10](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuth/ocsPOSTAuth.feature#L10)
-- [coreApiAuth/ocsPUTAuth.feature:7](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuth/ocsPUTAuth.feature#L7)
+
 #### [sending MKCOL requests to another or non-existing user's webDav endpoints as normal user should return 404](https://github.com/owncloud/ocis/issues/5049)
 
 _ocdav: api compatibility, return correct status code_
@@ -212,10 +212,6 @@ And other missing implementation of favorites
 
 - [coreApiWebdavOperations/refuseAccess.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/refuseAccess.feature#L21)
 - [coreApiWebdavOperations/refuseAccess.feature:22](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/refuseAccess.feature#L22)
-
-#### [Request to edit non-existing user by authorized admin gets unauthorized in http response](https://github.com/owncloud/core/issues/38423)
-
-- [coreApiAuth/ocsPUTAuth.feature:22](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuth/ocsPUTAuth.feature#L22)
 
 #### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
 
