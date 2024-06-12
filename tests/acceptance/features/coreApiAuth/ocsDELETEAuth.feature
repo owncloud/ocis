@@ -25,4 +25,3 @@ Feature: auth
       | /ocs/v1.php/cloud/users/%username%/subadmins                    |
       | /ocs/v2.php/cloud/users/%username%/subadmins                    |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "401"

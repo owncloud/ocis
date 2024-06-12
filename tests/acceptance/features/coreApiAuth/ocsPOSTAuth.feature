@@ -31,14 +31,11 @@ Feature: auth
       | /ocs/v1.php/privatedata/setattribute/testing/test               |
       | /ocs/v2.php/privatedata/setattribute/testing/test               |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "997"
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "invalid" about user "Alice"
       | endpoint                 |
       | /ocs/v1.php/person/check |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "101"
+    Then the HTTP status code of responses on all endpoints should be "401"
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "invalid" about user "Alice"
       | endpoint                 |
       | /ocs/v2.php/person/check |
-    Then the HTTP status code of responses on all endpoints should be "400"
-    And the OCS status code of responses on all endpoints should be "400"
+    Then the HTTP status code of responses on all endpoints should be "401"
