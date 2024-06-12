@@ -270,12 +270,12 @@ Feature: sharing
       | shareType       | user          |
       | permissionsRole | File Editor   |
     When user "Brian" tries to delete the last share of user "Alice" using the sharing API
-    Then the OCS status code should be "404"
-    And the HTTP status code should be "<http-status-code>"
+    Then the HTTP status code should be "<http-status-code>"
+    And the OCS status code should be "996"
     Examples:
       | ocs-api-version | http-status-code |
       | 1               | 200              |
-      | 2               | 404              |
+      | 2               | 500              |
 
 
   Scenario Outline: unshare a shared resources

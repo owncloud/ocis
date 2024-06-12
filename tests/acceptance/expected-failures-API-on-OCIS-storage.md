@@ -132,11 +132,6 @@ cannot share a folder with create permission
 - [coreApiShareUpdateToShares/updateShare.feature:200](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L200)
 - [coreApiShareUpdateToShares/updateShare.feature:201](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L201)
 
-#### [deleting a share with wrong authentication returns OCS status 996 / HTTP 500](https://github.com/owncloud/ocis/issues/1229)
-
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:277](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L277)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:278](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L278)
-
 ### Other
 
 API, search, favorites, config, capabilities, not existing endpoints, CORS and others
