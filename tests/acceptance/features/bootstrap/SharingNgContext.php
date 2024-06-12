@@ -86,11 +86,13 @@ class SharingNgContext implements Context {
 			$itemId = $this->spacesContext->getResourceId($user, $bodyRows['space'], $resource);
 		}
 
+		$bodyRows['quickLink'] = $bodyRows['quickLink'] ?? false;
 		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
 		$bodyRows['expirationDateTime'] = \array_key_exists('expirationDateTime', $bodyRows) ? \date('Y-m-d', \strtotime($bodyRows['expirationDateTime'])) . 'T14:00:00.000Z' : null;
 		$bodyRows['password'] = $bodyRows['password'] ?? null;
 		$body = [
 			'type' => $bodyRows['permissionsRole'],
+			"@libre.graph.quickLink" => filter_var($bodyRows['quickLink'], FILTER_VALIDATE_BOOLEAN),
 			'displayName' => $bodyRows['displayName'],
 			'expirationDateTime' => $bodyRows['expirationDateTime'],
 			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
