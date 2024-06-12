@@ -50,7 +50,7 @@ func DefaultConfig() *config.Config {
 			CS3AllowInsecure:      false,
 			DataEndpoint:          "http://127.0.0.1:9186/thumbnails/data",
 			MaxInputWidth:         7680,
-			MaxInputHeight:        4320,
+			MaxInputHeight:        7680,
 			MaxInputImageFileSize: "50MB",
 		},
 	}
