@@ -15,66 +15,66 @@ Feature: List and create spaces
     When user "Alice" lists all available spaces via the Graph API
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveType",
-        "driveAlias",
-        "name",
-        "id",
-        "quota",
-        "root",
-        "webUrl"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Alice Hansen"]
-        },
-        "driveType": {
-           "type": "string",
-          "enum": ["personal"]
-        },
-        "driveAlias": {
-           "type": "string",
-          "enum": ["personal/alice"]
-        },
-        "id": {
-           "type": "string",
-          "enum": ["%space_id%"]
-        },
-        "quota": {
-           "type": "object",
-           "required": [
-            "state"
-           ],
-           "properties": {
-              "state": {
-                "type": "string",
-                "enum": ["normal"]
-              }
-           }
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "webDavUrl"
-          ],
-          "properties": {
-              "webDavUrl": {
-                "type": "string",
-                "enum": ["%base_url%/dav/spaces/%space_id%"]
-              }
-           }
-        },
-        "webUrl": {
-          "type": "string",
-          "enum": ["%base_url%/f/%space_id%"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "driveAlias",
+          "name",
+          "id",
+          "quota",
+          "root",
+          "webUrl"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Alice Hansen"]
+          },
+          "driveType": {
+             "type": "string",
+            "enum": ["personal"]
+          },
+          "driveAlias": {
+             "type": "string",
+            "enum": ["personal/alice"]
+          },
+          "id": {
+             "type": "string",
+            "enum": ["%space_id%"]
+          },
+          "quota": {
+             "type": "object",
+             "required": [
+              "state"
+             ],
+             "properties": {
+                "state": {
+                  "type": "string",
+                  "enum": ["normal"]
+                }
+             }
+          },
+          "root": {
+            "type": "object",
+            "required": [
+              "webDavUrl"
+            ],
+            "properties": {
+                "webDavUrl": {
+                  "type": "string",
+                  "enum": ["%base_url%/dav/spaces/%space_id%"]
+                }
+             }
+          },
+          "webUrl": {
+            "type": "string",
+            "enum": ["%base_url%/f/%space_id%"]
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: ordinary user can request information about their Space via the Graph API using a filter
@@ -89,65 +89,65 @@ Feature: List and create spaces
     When user "Alice" lists all available spaces via the Graph API with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveType",
-        "driveAlias",
-        "name",
-        "id",
-        "quota",
-        "root"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Alice Hansen"]
-        },
-        "driveType": {
-           "type": "string",
-          "enum": ["personal"]
-        },
-        "driveAlias": {
-           "type": "string",
-          "enum": ["personal/alice"]
-        },
-        "id": {
-           "type": "string",
-          "enum": ["%space_id%"]
-        },
-        "quota": {
-           "type": "object",
-           "required": [
-            "state"
-           ],
-           "properties": {
-              "state": {
-                "type": "string",
-                "enum": ["normal"]
-              }
-           }
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "webDavUrl"
-          ],
-          "properties": {
-              "webDavUrl": {
-                "type": "string",
-                "enum": ["%base_url%/dav/spaces/%space_id%"]
-              }
-           }
-        },
-        "webUrl": {
-          "type": "string",
-          "enum": ["%base_url%/f/%space_id%"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "driveAlias",
+          "name",
+          "id",
+          "quota",
+          "root"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Alice Hansen"]
+          },
+          "driveType": {
+             "type": "string",
+            "enum": ["personal"]
+          },
+          "driveAlias": {
+             "type": "string",
+            "enum": ["personal/alice"]
+          },
+          "id": {
+             "type": "string",
+            "enum": ["%space_id%"]
+          },
+          "quota": {
+             "type": "object",
+             "required": [
+              "state"
+             ],
+             "properties": {
+                "state": {
+                  "type": "string",
+                  "enum": ["normal"]
+                }
+             }
+          },
+          "root": {
+            "type": "object",
+            "required": [
+              "webDavUrl"
+            ],
+            "properties": {
+                "webDavUrl": {
+                  "type": "string",
+                  "enum": ["%base_url%/dav/spaces/%space_id%"]
+                }
+             }
+          },
+          "webUrl": {
+            "type": "string",
+            "enum": ["%base_url%/f/%space_id%"]
+          }
         }
       }
-    }
-    """
+      """
     And the json responded should not contain a space with name "Shares"
     And the json responded should only contain spaces of type "personal"
 
@@ -158,30 +158,30 @@ Feature: List and create spaces
     When user "Alice" lists all available spaces via the Graph API with query "$filter=driveType eq 'project'"
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "my project" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveType",
-        "name",
-        "id"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["my project"]
-        },
-        "driveType": {
-          "type": "string",
-          "enum": ["project"]
-        },
-        "id": {
-          "type": "string",
-          "enum": ["%space_id%"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "name",
+          "id"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["my project"]
+          },
+          "driveType": {
+            "type": "string",
+            "enum": ["project"]
+          },
+          "id": {
+            "type": "string",
+            "enum": ["%space_id%"]
+          }
         }
       }
-    }
-    """
+      """
     And the json responded should not contain a space with name "Alice Hansen"
 
 
@@ -195,104 +195,104 @@ Feature: List and create spaces
     When user "Alice" lists all available spaces via the Graph API with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" owned by "Alice" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveType",
-        "name",
-        "root",
-        "owner",
-        "webUrl"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Alice Hansen"]
-        },
-        "driveType": {
-           "type": "string",
-          "enum": ["personal"]
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "webDavUrl"
-          ],
-          "properties": {
-              "webDavUrl": {
-                "type": "string",
-                "enum": ["%base_url%/dav/spaces/%space_id%"]
-              }
-           }
-        },
-        "owner": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties": {
-            "user": {
-              "type": "object",
-              "required": [
-                "id"
-              ],
-              "properties": {
-                "id": {
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "name",
+          "root",
+          "owner",
+          "webUrl"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Alice Hansen"]
+          },
+          "driveType": {
+             "type": "string",
+            "enum": ["personal"]
+          },
+          "root": {
+            "type": "object",
+            "required": [
+              "webDavUrl"
+            ],
+            "properties": {
+                "webDavUrl": {
                   "type": "string",
-                  "enum": ["%user_id%"]
+                  "enum": ["%base_url%/dav/spaces/%space_id%"]
+                }
+             }
+          },
+          "owner": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties": {
+              "user": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": ["%user_id%"]
+                  }
                 }
               }
             }
+          },
+          "webUrl": {
+            "type": "string",
+            "enum": ["%base_url%/f/%space_id%"]
           }
-        },
-        "webUrl": {
-          "type": "string",
-          "enum": ["%base_url%/f/%space_id%"]
         }
       }
-    }
-    """
+      """
     When user "Alice" looks up the single space "Alice Hansen" via the Graph API by using its id
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveType",
-        "name",
-        "root",
-        "webUrl"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Alice Hansen"]
-        },
-        "driveType": {
-           "type": "string",
-          "enum": ["personal"]
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "webDavUrl"
-          ],
-          "properties": {
-              "webDavUrl": {
-                "type": "string",
-                "enum": ["%base_url%/dav/spaces/%space_id%"]
-              }
-           }
-        },
-        "webUrl": {
-          "type": "string",
-          "enum": ["%base_url%/f/%space_id%"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "name",
+          "root",
+          "webUrl"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Alice Hansen"]
+          },
+          "driveType": {
+             "type": "string",
+            "enum": ["personal"]
+          },
+          "root": {
+            "type": "object",
+            "required": [
+              "webDavUrl"
+            ],
+            "properties": {
+                "webDavUrl": {
+                  "type": "string",
+                  "enum": ["%base_url%/dav/spaces/%space_id%"]
+                }
+             }
+          },
+          "webUrl": {
+            "type": "string",
+            "enum": ["%base_url%/f/%space_id%"]
+          }
         }
       }
-    }
-    """
+      """
 
 
   Scenario Outline: user can list his created spaces via multiple endpoints
@@ -300,129 +300,129 @@ Feature: List and create spaces
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the Graph API
     Then the HTTP status code should be "201"
     And the JSON response should contain space called "Project Venus" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveType",
-        "driveAlias",
-        "name",
-        "id",
-        "quota",
-        "root",
-        "webUrl"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Venus"]
-        },
-        "driveType": {
-           "type": "string",
-          "enum": ["project"]
-        },
-        "driveAlias": {
-          "type": "string",
-          "enum": ["project/project-venus"]
-        },
-        "id": {
-           "type": "string",
-          "enum": ["%space_id%"]
-        },
-        "quota": {
-           "type": "object",
-           "required": [
-            "total"
-           ],
-           "properties": {
-              "total": {
-                "type": "number",
-                "enum": [2000]
-              }
-           }
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "webDavUrl"
-          ],
-          "properties": {
-              "webDavUrl": {
-                "type": "string",
-                "enum": ["%base_url%/dav/spaces/%space_id%"]
-              }
-           }
-        },
-        "webUrl": {
-          "type": "string",
-          "enum": ["%base_url%/f/%space_id%"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "driveAlias",
+          "name",
+          "id",
+          "quota",
+          "root",
+          "webUrl"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Project Venus"]
+          },
+          "driveType": {
+             "type": "string",
+            "enum": ["project"]
+          },
+          "driveAlias": {
+            "type": "string",
+            "enum": ["project/project-venus"]
+          },
+          "id": {
+             "type": "string",
+            "enum": ["%space_id%"]
+          },
+          "quota": {
+             "type": "object",
+             "required": [
+              "total"
+             ],
+             "properties": {
+                "total": {
+                  "type": "number",
+                  "enum": [2000]
+                }
+             }
+          },
+          "root": {
+            "type": "object",
+            "required": [
+              "webDavUrl"
+            ],
+            "properties": {
+                "webDavUrl": {
+                  "type": "string",
+                  "enum": ["%base_url%/dav/spaces/%space_id%"]
+                }
+             }
+          },
+          "webUrl": {
+            "type": "string",
+            "enum": ["%base_url%/f/%space_id%"]
+          }
         }
       }
-    }
-    """
+      """
     When user "Alice" looks up the single space "Project Venus" via the Graph API by using its id
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Project Venus" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveType",
-        "driveAlias",
-        "name",
-        "id",
-        "quota",
-        "root",
-        "webUrl"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Venus"]
-        },
-        "driveType": {
-           "type": "string",
-          "enum": ["project"]
-        },
-        "driveAlias": {
-          "type": "string",
-          "enum": ["project/project-venus"]
-        },
-        "id": {
-           "type": "string",
-          "enum": ["%space_id%"]
-        },
-        "quota": {
-           "type": "object",
-           "required": [
-            "total"
-           ],
-           "properties": {
-              "total": {
-                "type": "number",
-                "enum": [2000]
-              }
-           }
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "webDavUrl"
-          ],
-          "properties": {
-              "webDavUrl": {
-                "type": "string",
-                "enum": ["%base_url%/dav/spaces/%space_id%"]
-              }
-           }
-        },
-        "webUrl": {
-          "type": "string",
-          "enum": ["%base_url%/f/%space_id%"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "driveAlias",
+          "name",
+          "id",
+          "quota",
+          "root",
+          "webUrl"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Project Venus"]
+          },
+          "driveType": {
+             "type": "string",
+            "enum": ["project"]
+          },
+          "driveAlias": {
+            "type": "string",
+            "enum": ["project/project-venus"]
+          },
+          "id": {
+             "type": "string",
+            "enum": ["%space_id%"]
+          },
+          "quota": {
+             "type": "object",
+             "required": [
+              "total"
+             ],
+             "properties": {
+                "total": {
+                  "type": "number",
+                  "enum": [2000]
+                }
+             }
+          },
+          "root": {
+            "type": "object",
+            "required": [
+              "webDavUrl"
+            ],
+            "properties": {
+                "webDavUrl": {
+                  "type": "string",
+                  "enum": ["%base_url%/dav/spaces/%space_id%"]
+                }
+             }
+          },
+          "webUrl": {
+            "type": "string",
+            "enum": ["%base_url%/f/%space_id%"]
+          }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   |
       | Admin       |
@@ -455,70 +455,70 @@ Feature: List and create spaces
     When user "Alice" lists all available spaces via the Graph API
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Shares" owned by "Alice" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "driveType",
-        "driveAlias",
-        "name",
-        "id",
-        "root",
-        "webUrl"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Shares"]
-        },
-        "driveType": {
-          "type": "string",
-          "enum": ["virtual"]
-        },
-        "driveAlias": {
-          "type": "string",
-          "enum": ["virtual/shares"]
-        },
-        "id": {
-          "type": "string",
-          "enum": ["%space_id%"]
-        },
-        "quota": {
-          "type": "object",
-          "required": [
-            "state"
-          ],
-          "properties": {
-            "state": {
-              "type": "string",
-              "enum": ["normal"]
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "driveAlias",
+          "name",
+          "id",
+          "root",
+          "webUrl"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Shares"]
+          },
+          "driveType": {
+            "type": "string",
+            "enum": ["virtual"]
+          },
+          "driveAlias": {
+            "type": "string",
+            "enum": ["virtual/shares"]
+          },
+          "id": {
+            "type": "string",
+            "enum": ["%space_id%"]
+          },
+          "quota": {
+            "type": "object",
+            "required": [
+              "state"
+            ],
+            "properties": {
+              "state": {
+                "type": "string",
+                "enum": ["normal"]
+              }
             }
-          }
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "eTag",
-            "webDavUrl"
-          ],
-          "properties": {
-            "eTag": {
-              "type": "string",
-              "enum": ["%space_etag%"]
-            },
-            "webDavUrl": {
-              "type": "string",
-              "enum": ["%base_url%/dav/spaces/%space_id%"]
+          },
+          "root": {
+            "type": "object",
+            "required": [
+              "eTag",
+              "webDavUrl"
+            ],
+            "properties": {
+              "eTag": {
+                "type": "string",
+                "enum": ["%space_etag%"]
+              },
+              "webDavUrl": {
+                "type": "string",
+                "enum": ["%base_url%/dav/spaces/%space_id%"]
+              }
             }
+          },
+          "webUrl": {
+            "type": "string",
+            "enum": ["%base_url%/f/%space_id%"]
           }
-        },
-        "webUrl": {
-          "type": "string",
-          "enum": ["%base_url%/f/%space_id%"]
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   |
       | Admin       |

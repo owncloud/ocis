@@ -16,17 +16,17 @@ Feature: edit/search user including email
     When the user "Alice" changes the email of user "Brian" to "<new-email>" using the Graph API
     Then the HTTP status code should be "<http-status-code>"
     And the user information of "Brian" should match this JSON schema
-    """
-    {
-      "type": "object",
-      "required": ["mail"],
-      "properties": {
-        "mail": {
-          "const": "<expected-email>"
+      """
+      {
+        "type": "object",
+        "required": ["mail"],
+        "properties": {
+          "mail": {
+            "const": "<expected-email>"
+          }
         }
       }
-    }
-    """
+      """
     Examples:
       | action description        | new-email            | http-status-code | expected-email       |
       | change to a valid email   | newemail@example.com | 200              | newemail@example.com |
@@ -41,17 +41,17 @@ Feature: edit/search user including email
     When the user "Brian" tries to change the email of user "Brian" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Brian" should match this JSON schema
-    """
-    {
-      "type": "object",
-      "required": ["mail"],
-      "properties": {
-        "mail": {
-          "const": "brian@example.com"
+      """
+      {
+        "type": "object",
+        "required": ["mail"],
+        "properties": {
+          "mail": {
+            "const": "brian@example.com"
+          }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   |
       | Space Admin |
@@ -70,17 +70,17 @@ Feature: edit/search user including email
     When the user "Brian" tries to change the email of user "Carol" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Carol" should match this JSON schema
-    """
-    {
-      "type": "object",
-      "required": ["mail"],
-      "properties": {
-        "mail": {
-          "const": "carol@example.com"
+      """
+      {
+        "type": "object",
+        "required": ["mail"],
+        "properties": {
+          "mail": {
+            "const": "carol@example.com"
+          }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   | user-role-2 |
       | Space Admin | Space Admin |
@@ -102,48 +102,7 @@ Feature: edit/search user including email
     When user "Alice" gets information of user "Brian" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "displayName",
-        "id",
-        "mail",
-        "onPremisesSamAccountName",
-        "accountEnabled",
-        "userType"
-      ],
-      "properties": {
-        "displayName": {
-          "const": "Brian Murphy"
-        },
-        "id" : {
-          "type": "string",
-          "pattern": "^%user_id_pattern%$"
-        },
-        "mail": {
-          "const": "brian@example.com"
-        },
-        "onPremisesSamAccountName": {
-          "const": "Brian"
-        },
-        "accountEnabled": {
-          "const": true
-        },
-        "userType": {
-          "const": "Member"
-        }
-      }
-    }
-    """
-
-
-  Scenario Outline: user gets his/her own information along with drive information
-    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
-    When the user "Brian" gets his drive information using Graph API
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-    """
+      """
       {
         "type": "object",
         "required": [
@@ -151,7 +110,6 @@ Feature: edit/search user including email
           "id",
           "mail",
           "onPremisesSamAccountName",
-          "drive",
           "accountEnabled",
           "userType"
         ],
@@ -174,79 +132,121 @@ Feature: edit/search user including email
           },
           "userType": {
             "const": "Member"
-          },
-          "drive": {
-            "type": "object",
-            "required": [
-              "driveAlias",
-              "id",
-              "name",
-              "owner",
-              "quota",
-              "root",
-              "webUrl"
-            ],
-            "properties": {
-              "driveType" : {
-                "const": "personal"
-              },
-              "driveAlias" : {
-                "const": "personal/brian"
-              },
-              "id" : {
-                "type": "string",
-                "pattern": "^%space_id_pattern%$"
-              },
-              "name": {
-                "const": "Brian Murphy"
-              },
-              "owner": {
-                "type": "object",
-                "required": ["user"],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": ["id"],
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "%user_id_pattern%"
+          }
+        }
+      }
+      """
+
+
+  Scenario Outline: user gets his/her own information along with drive information
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    When the user "Brian" gets his drive information using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+        {
+          "type": "object",
+          "required": [
+            "displayName",
+            "id",
+            "mail",
+            "onPremisesSamAccountName",
+            "drive",
+            "accountEnabled",
+            "userType"
+          ],
+          "properties": {
+            "displayName": {
+              "const": "Brian Murphy"
+            },
+            "id" : {
+              "type": "string",
+              "pattern": "^%user_id_pattern%$"
+            },
+            "mail": {
+              "const": "brian@example.com"
+            },
+            "onPremisesSamAccountName": {
+              "const": "Brian"
+            },
+            "accountEnabled": {
+              "const": true
+            },
+            "userType": {
+              "const": "Member"
+            },
+            "drive": {
+              "type": "object",
+              "required": [
+                "driveAlias",
+                "id",
+                "name",
+                "owner",
+                "quota",
+                "root",
+                "webUrl"
+              ],
+              "properties": {
+                "driveType" : {
+                  "const": "personal"
+                },
+                "driveAlias" : {
+                  "const": "personal/brian"
+                },
+                "id" : {
+                  "type": "string",
+                  "pattern": "^%space_id_pattern%$"
+                },
+                "name": {
+                  "const": "Brian Murphy"
+                },
+                "owner": {
+                  "type": "object",
+                  "required": ["user"],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": ["id"],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "%user_id_pattern%"
+                        }
                       }
                     }
                   }
-                }
-              },
-              "quota": {
-                "type": "object",
-                "required": ["state"],
-                "properties": {
-                  "state": {
-                    "const": "normal"
+                },
+                "quota": {
+                  "type": "object",
+                  "required": ["state"],
+                  "properties": {
+                    "state": {
+                      "const": "normal"
+                    }
                   }
-                }
-              },
-              "root": {
-                "type": "object",
-                "required": ["id", "webDavUrl"],
-                "properties": {
-                  "state": {
-                    "const": "normal"
-                  },
-                  "webDavUrl": {
-                    "type": "string",
-                    "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
+                },
+                "root": {
+                  "type": "object",
+                  "required": ["id", "webDavUrl"],
+                  "properties": {
+                    "state": {
+                      "const": "normal"
+                    },
+                    "webDavUrl": {
+                      "type": "string",
+                      "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
+                    }
                   }
+                },
+                "webUrl": {
+                  "type": "string",
+                  "pattern": "^%base_url%/f/%space_id_pattern%$"
                 }
-              },
-              "webUrl": {
-                "type": "string",
-                "pattern": "^%base_url%/f/%space_id_pattern%$"
               }
             }
           }
         }
-      }
-    """
+      """
     Examples:
       | user-role   |
       | Admin       |
@@ -260,43 +260,43 @@ Feature: edit/search user including email
     When user "Brian" searches for user "ali" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "displayName",
-              "id",
-              "mail",
-              "userType"
-            ],
-            "properties": {
-              "displayName": {
-                "const": "Alice Hansen"
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%user_id_pattern%$"
-              },
-              "mail": {
-                "const": "alice@example.org"
-              },
-              "userType": {
-                "const": "Member"
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "userType"
+              ],
+              "properties": {
+                "displayName": {
+                  "const": "Alice Hansen"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "mail": {
+                  "const": "alice@example.org"
+                },
+                "userType": {
+                  "const": "Member"
+                }
               }
             }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | user-role   |
       | Space Admin |
@@ -308,43 +308,43 @@ Feature: edit/search user including email
     When user "Brian" searches for user "%22alice@example.org%22" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "displayName",
-              "id",
-              "mail",
-              "userType"
-            ],
-            "properties": {
-              "displayName": {
-                "const": "Alice Hansen"
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%user_id_pattern%$"
-              },
-              "mail": {
-                "const": "alice@example.org"
-              },
-              "userType": {
-                "const": "Member"
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "userType"
+              ],
+              "properties": {
+                "displayName": {
+                  "const": "Alice Hansen"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "mail": {
+                  "const": "alice@example.org"
+                },
+                "userType": {
+                  "const": "Member"
+                }
               }
             }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: non-admin user searches for a disabled users
@@ -352,43 +352,43 @@ Feature: edit/search user including email
     When user "Brian" searches for user "alice" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "displayName",
-              "id",
-              "mail",
-              "userType"
-            ],
-            "properties": {
-              "displayName": {
-                "const": "Alice Hansen"
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%user_id_pattern%$"
-              },
-              "mail": {
-                "const": "alice@example.org"
-              },
-              "userType": {
-                "const": "Member"
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "userType"
+              ],
+              "properties": {
+                "displayName": {
+                  "const": "Alice Hansen"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "mail": {
+                  "const": "alice@example.org"
+                },
+                "userType": {
+                  "const": "Member"
+                }
               }
             }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario: non-admin user searches for multiple users having same displayname
@@ -400,72 +400,72 @@ Feature: edit/search user including email
     When user "Brian" searches for user "alice" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 2,
-          "maxItems": 2,
-          "uniqueItems": true,
-          "items": {
-            "oneOf": [
-              {
-                "type": "object",
-                "required": [
-                  "displayName",
-                  "id",
-                  "mail",
-                  "userType"
-                ],
-                "properties": {
-                  "displayName": {
-                    "const": "Alice Hansen"
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%user_id_pattern%$"
-                  },
-                  "mail": {
-                    "const": "alice@example.org"
-                  },
-                  "userType": {
-                    "const": "Member"
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "displayName",
+                    "id",
+                    "mail",
+                    "userType"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "const": "Alice Hansen"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "mail": {
+                      "const": "alice@example.org"
+                    },
+                    "userType": {
+                      "const": "Member"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "displayName",
+                    "id",
+                    "mail",
+                    "userType"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "const": "Alice Murphy"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "mail": {
+                      "const": "another-alice@example.org"
+                    },
+                    "userType": {
+                      "const": "Member"
+                    }
                   }
                 }
-              },
-              {
-                "type": "object",
-                "required": [
-                  "displayName",
-                  "id",
-                  "mail",
-                  "userType"
-                ],
-                "properties": {
-                  "displayName": {
-                    "const": "Alice Murphy"
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%user_id_pattern%$"
-                  },
-                  "mail": {
-                    "const": "another-alice@example.org"
-                  },
-                  "userType": {
-                    "const": "Member"
-                  }
-                }
-              }
-            ]
+              ]
+            }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario Outline: search other users when OCIS_SHOW_USER_EMAIL_IN_RESULTS config is disabled

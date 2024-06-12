@@ -183,7 +183,6 @@ Feature: Search
       | new              |
       | spaces           |
 
-
   @skipOnStable3.0
   Scenario Outline: search files inside the folder
     Given using <dav-path-version> DAV path

@@ -8,7 +8,6 @@ Feature: sharing
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-
   @issue-1289 @issue-7555
   Scenario Outline: keep group permissions in sync when the share is renamed by the receiver and then the permissions are updated by sharer
     Given using OCS API version "<ocs-api-version>"

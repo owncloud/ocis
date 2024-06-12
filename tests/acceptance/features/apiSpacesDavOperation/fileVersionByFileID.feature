@@ -33,6 +33,7 @@ Feature: checking file versions using file id
       | File Editor |
       | Viewer      |
 
+
   Scenario Outline: check the versions of a file in a shared space as editor/manager
     Given user "Alice" has sent the following space share invitation:
       | space           | Project1     |

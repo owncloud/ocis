@@ -362,7 +362,7 @@ Feature: create a public link share
   @env-config
   Scenario: overwriting a file changes its mtime (new public webDAV API)
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
-    Given user "Alice" has created folder "testFolder"
+    And user "Alice" has created folder "testFolder"
     When user "Alice" uploads file with content "uploaded content for file name ending with a dot" to "testFolder/file.txt" using the WebDAV API
     And user "Alice" creates a public link share using the sharing API with settings
       | path        | /testFolder               |

@@ -349,7 +349,7 @@ Feature: move (rename) file
 
   Scenario Outline: sharee moves a file within a Shares space (Editor/Uploader permissions)
     Given user "Brian" has created folder "testshare"
-    Given user "Brian" has created folder "testshare/child"
+    And user "Brian" has created folder "testshare/child"
     And user "Brian" has uploaded file with content "test file content" to "/testshare/testfile.txt"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
@@ -370,7 +370,7 @@ Feature: move (rename) file
 
   Scenario: sharee moves a file within a Shares space (viewer permissions)
     Given user "Brian" has created folder "testshare"
-    Given user "Brian" has created folder "testshare/child"
+    And user "Brian" has created folder "testshare/child"
     And user "Brian" has uploaded file with content "test file content" to "/testshare/testfile.txt"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |

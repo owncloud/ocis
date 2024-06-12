@@ -51,8 +51,8 @@ Synchronization features like etag propagation, setting mtime and locking files
 
 #### [Uploading an old method chunked file with checksum should fail using new DAV path](https://github.com/owncloud/ocis/issues/2323)
 
-- [coreApiMain/checksums.feature:268](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiMain/checksums.feature#L268)
-- [coreApiMain/checksums.feature:273](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiMain/checksums.feature#L273)
+- [coreApiMain/checksums.feature:269](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiMain/checksums.feature#L269)
+- [coreApiMain/checksums.feature:274](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiMain/checksums.feature#L274)
 
 ### Share
 
@@ -129,8 +129,8 @@ cannot share a folder with create permission
 
 #### [Edit user share response has a "name" field](https://github.com/owncloud/ocis/issues/1225)
 
+- [coreApiShareUpdateToShares/updateShare.feature:200](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L200)
 - [coreApiShareUpdateToShares/updateShare.feature:201](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L201)
-- [coreApiShareUpdateToShares/updateShare.feature:202](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L202)
 
 #### [deleting a share with wrong authentication returns OCS status 996 / HTTP 500](https://github.com/owncloud/ocis/issues/1229)
 

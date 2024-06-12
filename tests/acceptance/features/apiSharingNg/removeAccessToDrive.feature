@@ -92,7 +92,6 @@ Feature: Remove access to a drive
       | Space Editor     | 403         | should      |
       | Manager          | 204         | should not  |
 
-
   @issue-8819
   Scenario Outline: user removes himself from the project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API

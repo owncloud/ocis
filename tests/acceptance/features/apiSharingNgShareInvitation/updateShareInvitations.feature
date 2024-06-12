@@ -26,60 +26,60 @@ Feature: Update permission of a share
       | expirationDateTime | 2200-07-15T14:00:00Z |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "expirationDateTime",
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "expirationDateTime": {
-          "type": "string",
-          "enum": ["2200-07-15T14:00:00Z"]
-        },
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "Brian Murphy"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "expirationDateTime",
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "expirationDateTime": {
+            "type": "string",
+            "enum": ["2200-07-15T14:00:00Z"]
+          },
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "Brian Murphy"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^%permissions_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^%permissions_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
 
 
   Scenario Outline: user removes expiration date of a share
@@ -98,55 +98,55 @@ Feature: Update permission of a share
       | expirationDateTime |            |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "Brian Murphy"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "Brian Murphy"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^%permissions_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^%permissions_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | resource     |
       | testfile.txt |
@@ -168,55 +168,55 @@ Feature: Update permission of a share
       | resource        | <resource>             |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "Brian Murphy"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "Brian Murphy"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^%permissions_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^%permissions_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role | resource      | new-permissions-role |
       | Viewer           | textfile1.txt | File Editor          |
@@ -243,55 +243,55 @@ Feature: Update permission of a share
       | space           | NewSpace               |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "Brian Murphy"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "Brian Murphy"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^u:%user_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^u:%user_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role | new-permissions-role |
       | Space Viewer     | Space Editor         |
@@ -320,55 +320,55 @@ Feature: Update permission of a share
       | resource        | <resource>             |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "Brian Murphy"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "Brian Murphy"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^%permissions_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^%permissions_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role | new-permissions-role | resource      |
       | Viewer           | File Editor          | textfile1.txt |
@@ -402,55 +402,55 @@ Feature: Update permission of a share
       | sharee             | grp1                   |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "group"
-          ],
-          "properties":{
-            "group": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "grp1"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%group_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "group"
+            ],
+            "properties":{
+              "group": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "grp1"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%group_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^g:%group_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^g:%group_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role | new-permissions-role |
       | Space Viewer     | Space Editor         |
@@ -482,55 +482,55 @@ Feature: Update permission of a share
       | sharee             | grp1     |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "group"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "grp1"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "group"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "grp1"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^g:%group_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^g:%group_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | Space Viewer     |
@@ -562,60 +562,60 @@ Feature: Update permission of a share
       | sharee             | grp1                 |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "expirationDateTime",
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "expirationDateTime": {
-          "type": "string",
-          "enum": ["2200-07-15T14:00:00Z"]
-        },
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "group"
-          ],
-          "properties":{
-            "group": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "grp1"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%group_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "expirationDateTime",
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "expirationDateTime": {
+            "type": "string",
+            "enum": ["2200-07-15T14:00:00Z"]
+          },
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "group"
+            ],
+            "properties":{
+              "group": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "grp1"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%group_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^g:%group_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^g:%group_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | Space Viewer     |
@@ -645,55 +645,55 @@ Feature: Update permission of a share
       | sharee             | grp1                   |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "group"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "grp1"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "group"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "grp1"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^g:%group_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^g:%group_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role | new-permissions-role |
       | Space Viewer     | Space Editor         |
@@ -726,60 +726,60 @@ Feature: Update permission of a share
       | sharee             | grp1                   |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "expirationDateTime",
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "expirationDateTime": {
-          "type": "string",
-          "enum": ["2200-07-15T14:00:00Z"]
-        },
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "group"
-          ],
-          "properties":{
-            "group": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "grp1"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%group_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "expirationDateTime",
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "expirationDateTime": {
+            "type": "string",
+            "enum": ["2200-07-15T14:00:00Z"]
+          },
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "group"
+            ],
+            "properties":{
+              "group": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "grp1"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%group_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^g:%group_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^g:%group_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role | new-permissions-role |
       | Space Viewer     | Space Editor         |
@@ -807,55 +807,55 @@ Feature: Update permission of a share
       | sharee             | Brian                  |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "Brian Murphy"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "Brian Murphy"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^u:%user_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^u:%user_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role | new-permissions-role |
       | Space Viewer     | Space Editor         |
@@ -883,55 +883,55 @@ Feature: Update permission of a share
       | sharee             | Brian                  |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "Brian Murphy"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "Brian Murphy"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^u:%user_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^u:%user_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role |
       | Space Viewer     |
@@ -960,60 +960,60 @@ Feature: Update permission of a share
       | sharee             | Brian                  |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "expirationDateTime",
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "expirationDateTime": {
-          "type": "string",
-          "enum": ["2200-07-15T14:00:00Z"]
-        },
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "Brian Murphy"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "expirationDateTime",
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "expirationDateTime": {
+            "type": "string",
+            "enum": ["2200-07-15T14:00:00Z"]
+          },
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "Brian Murphy"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^u:%user_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^u:%user_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role | new-permissions-role |
       | Space Viewer     | Space Editor         |
@@ -1042,55 +1042,55 @@ Feature: Update permission of a share
       | sharee             | Brian                  |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "Brian Murphy"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "Brian Murphy"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^u:%user_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^u:%user_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role | new-permissions-role |
       | Space Viewer     | Space Editor         |
@@ -1119,60 +1119,60 @@ Feature: Update permission of a share
       | sharee             | Brian                  |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
-    """
-    {
-      "type": "object",
-      "required": [
-        "expirationDateTime",
-        "grantedToV2",
-        "id",
-        "roles"
-      ],
-      "properties": {
-        "expirationDateTime": {
-          "type": "string",
-          "enum": ["2200-07-15T14:00:00Z"]
-        },
-        "grantedToV2": {
-          "type": "object",
-          "required": [
-            "user"
-          ],
-          "properties":{
-            "user": {
-              "type": "object",
-              "required": [
-                "displayName",
-                "id"
-              ],
-              "properties": {
-                "displayName": {
-                  "const": "Brian Murphy"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+      """
+      {
+        "type": "object",
+        "required": [
+          "expirationDateTime",
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "expirationDateTime": {
+            "type": "string",
+            "enum": ["2200-07-15T14:00:00Z"]
+          },
+          "grantedToV2": {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties":{
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayName",
+                  "id"
+                ],
+                "properties": {
+                  "displayName": {
+                    "const": "Brian Murphy"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  }
                 }
               }
             }
-          }
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^u:%user_id_pattern%$"
-        },
-        "roles": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
+          },
+          "id": {
             "type": "string",
-            "pattern": "^%role_id_pattern%$"
+            "pattern": "^u:%user_id_pattern%$"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^%role_id_pattern%$"
+            }
           }
         }
       }
-    }
-    """
+      """
     Examples:
       | permissions-role | new-permissions-role |
       | Space Viewer     | Space Editor         |

@@ -59,7 +59,7 @@ Feature: re-share resources
 
   Scenario Outline: try to re-share file
     Given user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
-    Given using <dav-path-version> DAV path
+    And using <dav-path-version> DAV path
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt      |
       | space           | Personal           |

@@ -176,22 +176,22 @@ Feature: Deprovisioning notification
     And user "Alice" lists all notifications
     Then the HTTP status code of responses on each endpoint should be "200, 200" respectively
     And the JSON response should contain a notification message with the subject "Instance will be shut down and deprovisioned" and the message-details should match
-        """
-        {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message": {
-              "type": "string",
-              "enum": [
-                "Attention! The instance will be shut down and deprovisioned on <deprovision-date>. Download all your data before that date as no access past that date is possible."
-              ]
-            }
+      """
+      {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "Attention! The instance will be shut down and deprovisioned on <deprovision-date>. Download all your data before that date as no access past that date is possible."
+            ]
           }
         }
-        """
+      }
+      """
     Examples:
       | deprovision-date                    | deprovision-date-format             |
       | 2030-04-09T15:04:05.999999999+07:00 | 2006-01-02T15:04:05.999999999Z07:00 |
@@ -210,22 +210,22 @@ Feature: Deprovisioning notification
     And user "Alice" lists all notifications
     Then the HTTP status code of responses on each endpoint should be "200, 200" respectively
     And the JSON response should contain a notification message with the subject "Instance will be shut down and deprovisioned" and the message-details should match
-        """
-        {
-          "type": "object",
-          "required": [
-            "message"
-          ],
-          "properties": {
-            "message": {
-              "type": "string",
-              "enum": [
-                "Attention! The instance will be shut down and deprovisioned on <deprovision-date>. Download all your data before that date as no access past that date is possible."
-              ]
-            }
+      """
+      {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "Attention! The instance will be shut down and deprovisioned on <deprovision-date>. Download all your data before that date as no access past that date is possible."
+            ]
           }
         }
-        """
+      }
+      """
     Examples:
       | deprovision-date                | deprovision-date-format         |
       | 01/02 03:04:05PM '23 -0700      | 01/02 03:04:05PM '06 -0700      |

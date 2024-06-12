@@ -197,7 +197,7 @@ Feature: create files and folder
       | spaces           | '"double".txt'     |
 
 
-  Scenario Outline: try to create file with '.', '..' and 'empty' 
+  Scenario Outline: try to create file with '.', '..' and 'empty'
     Given using <dav-path-version> DAV path
     When user "Alice" uploads file with content "some text" to "<file-name>" using the WebDAV API
     Then the HTTP status code should be "<http-status-code>"
@@ -221,7 +221,7 @@ Feature: create files and folder
       | spaces           |           | 500              |
 
 
-  Scenario Outline: try to create folder with '.', '..' and 'empty' 
+  Scenario Outline: try to create folder with '.', '..' and 'empty'
     Given using <dav-path-version> DAV path
     When user "Alice" creates folder "<folder-name>" using the WebDAV API
     Then the HTTP status code should be "<http-status-code>"
@@ -245,7 +245,7 @@ Feature: create files and folder
       | spaces           |             | 400              |
 
 
-  Scenario Outline: create a file with dots in the name 
+  Scenario Outline: create a file with dots in the name
     Given using <dav-path-version> DAV path
     And user "Alice" uploads file with content "some text" to "<file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -279,7 +279,7 @@ Feature: create files and folder
       | spaces           | /fo.exe   |
 
 
-  Scenario Outline: create a folder with dots in the name 
+  Scenario Outline: create a folder with dots in the name
     Given using <dav-path-version> DAV path
     When user "Alice" creates folder "<folder-name>" using the WebDAV API
     Then the HTTP status code should be "201"

@@ -769,6 +769,7 @@ Feature: Create a share link for a resource
       """
     And the public should be able to download file "textfile1.txt" from the last link share with password "%public%" and the content should be "other data"
 
+
   Scenario: update password of a file's link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:

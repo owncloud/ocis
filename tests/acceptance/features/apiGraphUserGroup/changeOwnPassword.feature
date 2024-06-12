@@ -3,6 +3,7 @@ Feature: an user changes its own password
   I want to change my password
   So that I can use new combination as password
 
+
   Scenario Outline: change own password
     Given user "Alice" has been created with default attributes and without skeleton files
     When the user "Alice" changes its own password "<current-password>" to "<new-password>" using the Graph API

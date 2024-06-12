@@ -390,7 +390,7 @@ Feature: sharing
       | path        | /randomfile.txt        |
       | permissions | read,update            |
       | uid_owner   | %username%             |
-    Then user "brian" should see the following elements
+    And user "brian" should see the following elements
       | /Shares/randomfile.txt |
     And the content of file "Shares/randomfile.txt" for user "brian" should be "Random data"
 
@@ -424,7 +424,7 @@ Feature: sharing
     When user "Alice" shares folder "/PARENT" with group "😀 😁" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
-    Then user "Brian" should see the following elements
+    And user "Brian" should see the following elements
       | /Shares/PARENT/           |
       | /Shares/PARENT/parent.txt |
     And user "Carol" should see the following elements
@@ -488,7 +488,7 @@ Feature: sharing
       | file_target | /Shares/textfile0.txt |
       | path        | /textfile0.txt        |
       | uid_owner   | %username%            |
-    Then as "Brian" file "/Shares/textfile0.txt" should exist
+    And as "Brian" file "/Shares/textfile0.txt" should exist
     And as "Carol" file "/Shares/textfile0.txt" should exist
     When the administrator deletes group "grp1" using the Graph API
     And user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares"

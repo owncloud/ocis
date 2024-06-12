@@ -27,6 +27,7 @@ Feature: Download file in project space
       | shareType       | user          |
       | permissionsRole | Space Viewer  |
 
+
   Scenario Outline: user downloads a file in the project space
     When user "<user>" downloads the file "file.txt" of the space "download file" using the WebDAV API
     Then the HTTP status code should be "200"
