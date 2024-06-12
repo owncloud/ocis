@@ -207,7 +207,7 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 
 	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(driveID), gatewayClient)
 	if err != nil {
-		return libregraph.Permission{}, err
+		return libregraph.Permission{}, errorcode.FromUtilsStatusCodeError(err)
 	}
 
 	if space.SpaceType != _spaceTypeProject {
@@ -298,7 +298,7 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 
 	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(driveID), gatewayClient)
 	if err != nil {
-		return collectionOfPermissions, err
+		return collectionOfPermissions, errorcode.FromUtilsStatusCodeError(err)
 	}
 
 	if space.SpaceType != _spaceTypeProject {
@@ -371,7 +371,7 @@ func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Conte
 
 	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(driveID), gatewayClient)
 	if err != nil {
-		return err
+		return errorcode.FromUtilsStatusCodeError(err)
 	}
 
 	if space.SpaceType != _spaceTypeProject {
@@ -422,7 +422,7 @@ func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Conte
 
 	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(driveID), gatewayClient)
 	if err != nil {
-		return libregraph.Permission{}, err
+		return libregraph.Permission{}, errorcode.FromUtilsStatusCodeError(err)
 	}
 
 	if space.SpaceType != _spaceTypeProject {

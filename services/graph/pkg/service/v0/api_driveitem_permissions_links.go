@@ -102,7 +102,7 @@ func (s DriveItemPermissionsService) CreateSpaceRootLink(ctx context.Context, dr
 	}
 	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(driveID), gatewayClient)
 	if err != nil {
-		return libregraph.Permission{}, err
+		return libregraph.Permission{}, errorcode.FromUtilsStatusCodeError(err)
 	}
 
 	if space.SpaceType != _spaceTypeProject {
@@ -140,7 +140,7 @@ func (s DriveItemPermissionsService) SetPublicLinkPasswordOnSpaceRoot(ctx contex
 	}
 	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(driveID), gatewayClient)
 	if err != nil {
-		return libregraph.Permission{}, err
+		return libregraph.Permission{}, errorcode.FromUtilsStatusCodeError(err)
 	}
 
 	if space.SpaceType != _spaceTypeProject {

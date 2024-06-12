@@ -197,7 +197,7 @@ Feature: Remove access to a drive
       | permissionsRole | <permissions-role> |
       | password        | %public%           |
     When user "Brian" tries to remove the link from space "NewSpace" owned by "Alice" using root endpoint of the Graph API
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "404"
     Examples:
       | permissions-role |
       | view             |
@@ -214,7 +214,7 @@ Feature: Remove access to a drive
       | space           | NewSpace |
       | permissionsRole | internal |
     When user "Brian" tries to remove the link from space "NewSpace" owned by "Alice" using root endpoint of the Graph API
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "404"
 
 
   Scenario: remove link share of a project drive using permissions endpoint

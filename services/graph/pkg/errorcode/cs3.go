@@ -5,6 +5,7 @@ import (
 
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
 // FromCS3Status converts a CS3 status code and an error into a corresponding local Error representation.
@@ -68,4 +69,13 @@ func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) er
 func FromStat(stat *provider.StatResponse, err error, ignore ...cs3rpc.Code) error {
 	// TODO: look into ResourceInfo to get the postprocessing state and map that to 425 status?
 	return FromCS3Status(stat.GetStatus(), err, ignore...)
+}
+
+// FromUtilsStatusCodeError returns original error if `err` does not match to the statusCodeError type
+func FromUtilsStatusCodeError(err error, ignore ...cs3rpc.Code) error {
+	stat := utils.StatusCodeErrorToCS3Status(err)
+	if stat == nil {
+		return FromCS3Status(nil, err, ignore...)
+	}
+	return FromCS3Status(stat, nil, ignore...)
 }

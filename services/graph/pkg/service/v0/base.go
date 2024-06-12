@@ -55,7 +55,7 @@ func (g BaseGraphService) getSpaceRootPermissions(ctx context.Context, spaceID *
 	}
 	space, err := utils.GetSpace(ctx, spaceID.GetOpaqueId(), gatewayClient)
 	if err != nil {
-		return nil, err
+		return nil, errorcode.FromUtilsStatusCodeError(err)
 	}
 
 	return g.cs3SpacePermissionsToLibreGraph(ctx, space, APIVersion_1_Beta_1), nil
