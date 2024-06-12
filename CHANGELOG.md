@@ -77,6 +77,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the status code for multiple mount and unmount share: [#9193](https://github.com/owncloud/ocis/pull/9193)
 * Bugfix - Don't show thumbnails for secureview shares: [#9299](https://github.com/owncloud/ocis/pull/9299)
 * Bugfix - Fix share update: [#9301](https://github.com/owncloud/ocis/pull/9301)
+* Bugfix - Fix the error translation from utils: [#9331](https://github.com/owncloud/ocis/pull/9331)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Change - Define maximum input image dimensions and size when generating previews: [#9035](https://github.com/owncloud/ocis/pull/9035)
@@ -358,6 +359,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8747
    https://github.com/owncloud/ocis/pull/9301
+
+* Bugfix - Fix the error translation from utils: [#9331](https://github.com/owncloud/ocis/pull/9331)
+
+   We've fixed the error translation from the statusCodeError type to CS3 Status
+   because the FromCS3Status function converts a CS3 status code into a
+   corresponding local Error representation.
+
+   https://github.com/owncloud/ocis/issues/9151
+   https://github.com/owncloud/ocis/pull/9331
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
