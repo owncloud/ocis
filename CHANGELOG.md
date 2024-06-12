@@ -123,6 +123,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
 * Enhancement - The storage-users doc updated: [#9228](https://github.com/owncloud/ocis/pull/9228)
 * Enhancement - Docker compose example for ClamAV: [#9229](https://github.com/owncloud/ocis/pull/9229)
+* Enhancement - Add command to check ocis backup consistency: [#9238](https://github.com/owncloud/ocis/pull/9238)
 * Enhancement - Web server compression: [#9287](https://github.com/owncloud/ocis/pull/9287)
 * Enhancement - Add secureview flag when listing apps via http: [#9289](https://github.com/owncloud/ocis/pull/9289)
 * Enhancement - Activitylog Service: [#9327](https://github.com/owncloud/ocis/pull/9327)
@@ -784,6 +785,12 @@ The following sections list the changes for unreleased.
    should not be used in production.
 
    https://github.com/owncloud/ocis/pull/9229
+
+* Enhancement - Add command to check ocis backup consistency: [#9238](https://github.com/owncloud/ocis/pull/9238)
+
+   Adds a command that checks the consistency of an ocis backup.
+
+   https://github.com/owncloud/ocis/pull/9238
 
 * Enhancement - Web server compression: [#9287](https://github.com/owncloud/ocis/pull/9287)
 
