@@ -1377,26 +1377,43 @@ def dockerRelease(ctx, arch, repo):
 
 def binaryReleases(ctx):
     pipelines = []
-    for os in config["binaryReleases"]["os"]:
-        pipelines.append(binaryRelease(ctx, os))
+    targets = []
 
-    return pipelines
-
-def binaryRelease(ctx, name):
     # uploads binary to https://download.owncloud.com/ocis/ocis/daily/
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
     depends_on = getPipelineNames(testOcisAndUploadResults(ctx) + testPipelines(ctx))
-    if ctx.build.event == "tag":
-        # uploads binary to eg. https://download.owncloud.com/ocis/ocis/testing/1.0.0/
-        folder = "testing"
-        buildref = ctx.build.ref.replace("refs/tags/v", "")
-        if buildref in PRODUCTION_RELEASE_TAGS:
-            # uploads binary to eg. https://download.owncloud.com/ocis/ocis/stable/2.0.0/
-            folder = "stable"
 
-        target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref.lower())
+    if ctx.build.event == "tag":
         depends_on = []
 
+        buildref = ctx.build.ref.replace("refs/tags/v", "").lower()
+        target_path = "/ocis/%s" % ctx.repo.name.replace("ocis-", "")
+
+        if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
+            folder = "testing"
+            target = "%s/%s/%s" % (target_path, folder, buildref)
+            targets.append(target)
+        else:
+            # uploads binary to eg. https://download.owncloud.com/ocis/ocis/rolling/1.0.0/
+            folder = "rolling"
+            target = "%s/%s/%s" % (target_path, folder, buildref)
+            targets.append(target)
+
+            if buildref in PRODUCTION_RELEASE_TAGS:
+                # uploads binary to eg. https://download.owncloud.com/ocis/ocis/stable/2.0.0/
+                folder = "stable"
+                target = "%s/%s/%s" % (target_path, folder, buildref)
+                targets.append(target)
+    else:
+        targets.append(target)
+
+    for target in targets:
+        for os in config["binaryReleases"]["os"]:
+            pipelines.append(binaryRelease(ctx, os, target, depends_on))
+
+    return pipelines
+
+def binaryRelease(ctx, name, target, depends_on = []):
     settings = {
         "endpoint": {
             "from_secret": "upload_s3_endpoint",
