@@ -39,9 +39,7 @@ Feature: capabilities
                     "properties": {
                       "profile_picture": {
                         "type": "boolean",
-                        "enum": [
-                          true
-                        ]
+                        "const": false
                       }
                     }
                   }
@@ -158,51 +156,7 @@ Feature: capabilities
                 "properties": {
                   "default_permissions": {
                     "type": "number",
-                    "enum": [
-                      31
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      """
-
-  @issue-1285
-  Scenario: .htaccess is reported as a blacklisted file by default
-    When the administrator retrieves the capabilities using the capabilities API
-    Then the OCS status code should be "100"
-    And the HTTP status code should be "200"
-    And the ocs JSON data of the response should match
-      """
-      {
-        "type": "object",
-        "required": [
-          "capabilities"
-        ],
-        "properties": {
-          "capabilities": {
-            "type": "object",
-            "required": [
-              "files"
-            ],
-            "properties": {
-              "files": {
-                "type": "object",
-                "required": [
-                  "blacklisted_files"
-                ],
-                "properties": {
-                  "blacklisted_files": {
-                    "type": "array",
-                    "minItems": 1,
-                    "maxItems": 1,
-                    "items": {
-                      "type": "string",
-                      "enum": [".htaccess"]
-                    }
+                    "const": 22
                   }
                 }
               }
