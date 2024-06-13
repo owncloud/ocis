@@ -1287,19 +1287,22 @@ def dockerReleases(ctx):
                 break
 
     for repo in docker_repos:
+        repo_pipelines = []
         if ctx.build.event == "tag":
             build_type = "rolling" if "rolling" in repo else "production"
 
         for arch in config["dockerReleases"]["architectures"]:
-            pipelines.append(dockerRelease(ctx, arch, repo, build_type))
+            repo_pipelines.append(dockerRelease(ctx, arch, repo, build_type))
 
         manifest = releaseDockerManifest(repo, build_type)
-        manifest["depends_on"] = getPipelineNames(pipelines)
-        pipelines.append(manifest)
+        manifest["depends_on"] = getPipelineNames(repo_pipelines)
+        repo_pipelines.append(manifest)
 
         readme = releaseDockerReadme(ctx, repo, build_type)
-        readme["depends_on"] = getPipelineNames(pipelines)
-        pipelines.append(readme)
+        readme["depends_on"] = getPipelineNames(repo_pipelines)
+        repo_pipelines.append(readme)
+
+        pipelines.extend(repo_pipelines)
 
     return pipelines
 
