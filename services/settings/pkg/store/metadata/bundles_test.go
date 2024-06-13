@@ -138,6 +138,7 @@ var (
 )
 
 func TestBundles(t *testing.T) {
+	s := initStore()
 	for i := range bundleScenarios {
 		b := bundleScenarios[i]
 		t.Run(b.name, func(t *testing.T) {
@@ -178,17 +179,8 @@ func TestBundles(t *testing.T) {
 }
 
 func TestAppendSetting(t *testing.T) {
-	//mdc := NewMDC()
-	//s := Store{
-	//Logger: olog.NewLogger(
-	//olog.Color(true),
-	//olog.Pretty(true),
-	//olog.Level("info"),
-	//),
-
-	//l:   &sync.Mutex{},
-	//mdc: mdc,
-	//}
+	s := initStore()
+	setupRoles(s)
 
 	// appending to non existing bundle creates new
 	_, err := s.AddSettingToBundle(appendTestBundleID, appendTestSetting1)

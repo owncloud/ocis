@@ -21,11 +21,6 @@ var (
 	role1 = "11111111-1111-1111-1111-111111111111"
 	role2 = "22222222-2222-2222-2222-222222222222"
 
-	s = &Store{
-		Logger: logger,
-		l:      &sync.Mutex{},
-	}
-
 	logger = olog.NewLogger(
 		olog.Color(true),
 		olog.Pretty(true),
@@ -93,17 +88,21 @@ var (
 	}
 )
 
-func init() {
-	s.cfg = defaults.DefaultConfig()
+func initStore() *Store {
+	s := &Store{
+		Logger: logger,
+		l:      &sync.Mutex{},
+		cfg:    defaults.DefaultConfig(),
+	}
 	s.cfg.Commons = &shared.Commons{
 		AdminUserID: uuid.Must(uuid.NewV4()).String(),
 	}
 
 	_ = NewMDC(s)
-	setupRoles()
+	return s
 }
 
-func setupRoles() {
+func setupRoles(s *Store) {
 	for i := range bundles {
 		if _, err := s.WriteBundle(bundles[i]); err != nil {
 			log.Fatal("error initializing ", err)
@@ -127,8 +126,9 @@ func TestAssignmentUniqueness(t *testing.T) {
 	}
 
 	for _, scenario := range scenarios {
-		scenario := scenario
 		t.Run(scenario.name, func(t *testing.T) {
+			s := initStore()
+			setupRoles(s)
 			firstAssignment, err := s.WriteRoleAssignment(scenario.userID, scenario.firstRole)
 			require.NoError(t, err)
 			require.Equal(t, firstAssignment.RoleId, scenario.firstRole)
@@ -159,12 +159,14 @@ func TestListRoleAssignmentByRole(t *testing.T) {
 		roleID string
 	}
 
-	var scenarios = map[string]struct {
+	var scenarios = []struct {
+		name        string
 		assignments []assignment
 		queryRole   string
 		numResults  int
 	}{
-		"just 2 assignments": {
+		{
+			name: "just 2 assignments",
 			assignments: []assignment{
 				{
 					userID: einstein,
@@ -177,7 +179,8 @@ func TestListRoleAssignmentByRole(t *testing.T) {
 			queryRole:  role1,
 			numResults: 2,
 		},
-		"no assignments match": {
+		{
+			name: "no assignments match",
 			assignments: []assignment{
 				{
 					userID: einstein,
@@ -190,7 +193,8 @@ func TestListRoleAssignmentByRole(t *testing.T) {
 			queryRole:  role2,
 			numResults: 0,
 		},
-		"only one assignment matches": {
+		{
+			name: "only one assignment matches",
 			assignments: []assignment{
 				{
 					userID: einstein,
@@ -208,9 +212,10 @@ func TestListRoleAssignmentByRole(t *testing.T) {
 		},
 	}
 
-	for name, scenario := range scenarios {
-		scenario := scenario
-		t.Run(name, func(t *testing.T) {
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			s := initStore()
+			setupRoles(s)
 			for _, a := range scenario.assignments {
 				ass, err := s.WriteRoleAssignment(a.userID, a.roleID)
 				require.NoError(t, err)
@@ -226,6 +231,7 @@ func TestListRoleAssignmentByRole(t *testing.T) {
 		})
 	}
 }
+
 func TestDeleteAssignment(t *testing.T) {
 	var scenarios = []struct {
 		name       string
@@ -242,8 +248,9 @@ func TestDeleteAssignment(t *testing.T) {
 	}
 
 	for _, scenario := range scenarios {
-		scenario := scenario
 		t.Run(scenario.name, func(t *testing.T) {
+			s := initStore()
+			setupRoles(s)
 			assignment, err := s.WriteRoleAssignment(scenario.userID, scenario.firstRole)
 			require.NoError(t, err)
 			require.Equal(t, assignment.RoleId, scenario.firstRole)

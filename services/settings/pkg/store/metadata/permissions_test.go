@@ -8,6 +8,8 @@ import (
 )
 
 func TestPermission(t *testing.T) {
+	s := initStore()
+	setupRoles(s)
 	// bunldes are initialized within init func
 	p, err := s.ReadPermissionByID("readID", []string{"f36db5e6-a03c-40df-8413-711c67e40b47"})
 	require.NoError(t, err)
