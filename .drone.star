@@ -902,8 +902,9 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
 
     ocis_bin = "ocis/bin/ocis"
     validatorTests = []
-
     wopiServer = []
+    extra_server_environment = {}
+
     if wopiServerType == "cs3":
         wopiServer = [
             {
@@ -918,6 +919,10 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
             },
         ]
     else:
+        extra_server_environment = {
+            "OCIS_EXCLUDE_RUN_SERVICES": "app-provider",
+        }
+
         wopiServer = [
             {
                 "name": "wopiserver",
@@ -987,7 +992,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                          ],
                      },
                  ] +
-                 ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator", {"OCIS_EXCLUDE_RUN_SERVICES": "app-provider"}) +
+                 ocisServer(storage, accounts_hash_difficulty, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
                  wopiServer +
                  [
                      {
