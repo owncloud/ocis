@@ -312,28 +312,29 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: user accepts file that was initially accepted from another user and then declined
-    Given user "Carol" has disabled auto-accepting
-    And user "Alice" has uploaded file with content "First file" to "/testfile.txt"
+    Given user "Alice" has uploaded file with content "First file" to "/testfile.txt"
     And user "Brian" has uploaded file with content "Second file" to "/testfile.txt"
-    And user "Carol" has created folder "Shares"
-    And user "Carol" has uploaded file with content "Third file" to "/Shares/testfile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | testfile.txt |
       | space           | Personal     |
       | sharee          | Carol        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    When user "Carol" declines share "/Shares/testfile (2).txt" offered by user "Alice" using the sharing API
-    And user "Brian" shares file "/testfile.txt" with user "Carol" using the sharing API
+    And user "Carol" has declined share "/Shares/testfile.txt" offered by user "Alice"
+    And user "Carol" has disabled auto-accepting
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | sharee          | Carol        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When user "Carol" accepts share "/testfile.txt" offered by user "Brian" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
     And the sharing API should report to user "Carol" that these shares are in the accepted state
-      | path                         |
-      | /Shares/testfile (2).txt     |
-      | /Shares/testfile (2) (2).txt |
-    And the content of file "/Shares/testfile.txt" for user "Carol" should be "Third file"
-    And the content of file "/Shares/testfile (2).txt" for user "Carol" should be "Second file"
-    And the content of file "/Shares/testfile (2) (2).txt" for user "Carol" should be "First file"
+      | path                 |
+      | /Shares/testfile.txt |
+    And the content of file "/Shares/testfile.txt" for user "Carol" should be "Second file"
 
 
   Scenario: user accepts shares received from multiple users with the same name when auto-accept share is disabled
@@ -353,25 +354,21 @@ Feature: accept/decline shares coming from internal users
       | sharee          | Alice    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
-    And user "Alice" has created folder "Shares"
-    And user "Alice" has created folder "Shares/PARENT"
     When user "Alice" accepts share "/PARENT" offered by user "Brian" using the sharing API
-    And user "Alice" declines share "/Shares/PARENT (2)" offered by user "Brian" using the sharing API
     And user "Alice" accepts share "/PARENT" offered by user "Carol" using the sharing API
-    And user "Alice" accepts share "/PARENT (2)" offered by user "Brian" using the sharing API
-    And user "Alice" declines share "/Shares/PARENT (2)" offered by user "Carol" using the sharing API
-    And user "Alice" declines share "/Shares/PARENT (2) (2)" offered by user "Brian" using the sharing API
+    And user "Alice" declines share "/Shares/PARENT (1)" offered by user "Carol" using the sharing API
+    And user "Alice" declines share "/Shares/PARENT" offered by user "Brian" using the sharing API
     And user "David" shares folder "/PARENT" with user "Alice" using the sharing API
     And user "Alice" accepts share "/PARENT" offered by user "David" using the sharing API
-    And user "Alice" accepts share "/PARENT (2)" offered by user "Carol" using the sharing API
-    And user "Alice" accepts share "/PARENT (2) (2)" offered by user "Brian" using the sharing API
+    And user "Alice" accepts share "/PARENT" offered by user "Carol" using the sharing API
+    And user "Alice" accepts share "/PARENT" offered by user "Brian" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And the sharing API should report to user "Alice" that these shares are in the accepted state
-      | path                        | uid_owner |
-      | /Shares/PARENT (2)/         | David     |
-      | /Shares/PARENT (2) (2)/     | Carol     |
-      | /Shares/PARENT (2) (2) (2)/ | Brian     |
+      | path               | uid_owner |
+      | /Shares/PARENT     | David     |
+      | /Shares/PARENT (1) | Carol     |
+      | /Shares/PARENT (2) | Brian     |
 
 
   Scenario: user shares folder with matching folder-name for both user involved in sharing
@@ -623,13 +620,13 @@ Feature: accept/decline shares coming from internal users
     And user "Brian" should see the following elements
       | /PARENT/               |
       | /Shares/PARENT/        |
-      | /Shares/PARENT (2)/    |
+      | /Shares/PARENT (1)/    |
       | /Shares/PaRent/        |
       | /Shares/PARENT.txt     |
-      | /Shares/PARENT (2).txt |
+      | /Shares/PARENT (1).txt |
       | /Shares/parent.txt     |
-    And the content of file "/Shares/PARENT (2)/parent.txt" for user "Brian" should be "subfile, from carol to grp1"
-    And the content of file "/Shares/PARENT (2).txt" for user "Brian" should be "from carol to grp1"
+    And the content of file "/Shares/PARENT (1)/parent.txt" for user "Brian" should be "subfile, from carol to grp1"
+    And the content of file "/Shares/PARENT (1).txt" for user "Brian" should be "from carol to grp1"
     And the content of file "/Shares/parent.txt" for user "Brian" should be "from carol to grp1"
 
   @issue-2131
@@ -686,10 +683,10 @@ Feature: accept/decline shares coming from internal users
     And user "Carol" should see the following elements
       | /PARENT/               |
       | /Shares/PARENT/        |
-      | /Shares/PARENT (2)/    |
+      | /Shares/PARENT (1)/    |
       | /Shares/PaRent/        |
       | /Shares/PARENT.txt     |
-      | /Shares/PARENT (2).txt |
+      | /Shares/PARENT (1).txt |
       | /Shares/parent.txt     |
-    And the content of file "/Shares/PARENT (2)/parent.txt" for user "Carol" should be "subfile, from brian to grp1"
-    And the content of file "/Shares/PARENT (2).txt" for user "Carol" should be "from brian to grp1"
+    And the content of file "/Shares/PARENT (1)/parent.txt" for user "Carol" should be "subfile, from brian to grp1"
+    And the content of file "/Shares/PARENT (1).txt" for user "Carol" should be "from brian to grp1"

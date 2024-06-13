@@ -28,17 +28,17 @@ Feature: share resources where the sharee receives the share in multiple ways
     And the HTTP status code should be "200"
     And user "Brian" should be able to accept pending share "/textfile0.txt" offered by user "Alice"
     And the fields of the last response to user "Alice" sharing with user "Brian" should include
-      | share_with             | %username%                |
-      | share_with_displayname | %displayname%             |
-      | file_target            | /textfile0 (2).txt        |
-      | path                   | /Shares/textfile0 (2).txt |
-      | permissions            | share,read,update         |
-      | uid_owner              | %username%                |
-      | displayname_owner      | %displayname%             |
-      | item_type              | file                      |
-      | mimetype               | text/plain                |
-      | storage_id             | ANY_VALUE                 |
-      | share_type             | user                      |
+      | share_with             | %username%            |
+      | share_with_displayname | %displayname%         |
+      | path                   | /textfile0.txt        |
+      | file_target            | /Shares/textfile0.txt |
+      | permissions            | read,update           |
+      | uid_owner              | %username%            |
+      | displayname_owner      | %displayname%         |
+      | item_type              | file                  |
+      | mimetype               | text/plain            |
+      | storage_id             | ANY_VALUE             |
+      | share_type             | user                  |
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
@@ -120,22 +120,22 @@ Feature: share resources where the sharee receives the share in multiple ways
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs-status-code>"
     And as "Alice" the info about the last share by user "Brian" with user "Alice" should include
-      | uid_owner   | %username%      |
-      | share_with  | %username%      |
-      | file_target | /randomfile.txt |
-      | item_type   | file            |
-      | permissions | read            |
+      | uid_owner   | %username%             |
+      | share_with  | %username%             |
+      | file_target | /Shares/randomfile.txt |
+      | item_type   | file                   |
+      | permissions | read                   |
     When user "Carol" shares file "randomfile.txt" with user "Alice" with permissions "read,update" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs-status-code>"
     And as "Alice" the info about the last share by user "Carol" with user "Alice" should include
-      | uid_owner   | %username%          |
-      | share_with  | %username%          |
-      | file_target | /randomfile (2).txt |
-      | item_type   | file                |
-      | permissions | read,update         |
+      | uid_owner   | %username%             |
+      | share_with  | %username%             |
+      | file_target | /Shares/randomfile.txt |
+      | item_type   | file                   |
+      | permissions | read,update            |
     And the content of file "/Shares/randomfile.txt" for user "Alice" should be "First data"
-    And the content of file "/Shares/randomfile (2).txt" for user "Alice" should be "Second data"
+    And the content of file "/Shares/randomfile (1).txt" for user "Alice" should be "Second data"
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
@@ -151,24 +151,24 @@ Feature: share resources where the sharee receives the share in multiple ways
     And user "Carol" has created folder "zzzfolder/Carol"
     When user "Brian" shares folder "zzzfolder" with user "Alice" with permissions "read,delete" using the sharing API
     Then the HTTP status code should be "200"
-    And the OCS status code should be "100"
+    And the OCS status code should be "<ocs-status-code>"
     And as "Alice" the info about the last share by user "Brian" with user "Alice" should include
-      | uid_owner   | %username%  |
-      | share_with  | %username%  |
-      | file_target | /zzzfolder  |
-      | item_type   | folder      |
-      | permissions | read,delete |
+      | uid_owner   | %username%        |
+      | share_with  | %username%        |
+      | file_target | /Shares/zzzfolder |
+      | item_type   | folder            |
+      | permissions | read,delete       |
     When user "Carol" shares folder "zzzfolder" with user "Alice" with permissions "read" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs-status-code>"
     And as "Alice" the info about the last share by user "Carol" with user "Alice" should include
-      | uid_owner   | %username%     |
-      | share_with  | %username%     |
-      | file_target | /zzzfolder (2) |
-      | item_type   | folder         |
-      | permissions | read,share     |
+      | uid_owner   | %username%        |
+      | share_with  | %username%        |
+      | file_target | /Shares/zzzfolder |
+      | item_type   | folder            |
+      | permissions | read              |
     And as "Alice" folder "/Shares/zzzfolder/Brian" should exist
-    And as "Alice" folder "/Shares/zzzfolder (2)/Carol" should exist
+    And as "Alice" folder "/Shares/zzzfolder (1)/Carol" should exist
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
