@@ -50,7 +50,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
-	var acts []Activity
+	var resp GetActivitiesResponse
 	for _, e := range evRes.GetEvents() {
 		// TODO: compare returned events with initial list and remove missing ones
 
@@ -70,6 +70,48 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		case events.UploadReady:
 			message = "{user} created {resource}"
 			res, act, ts, err = s.ResponseData(ev.FileRef, ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName(), utils.TSToTime(ev.Timestamp))
+		case events.FileTouched:
+			message = "{user} created {resource}"
+			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
+		case events.ContainerCreated:
+			message = "{user} created {resource}"
+			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
+		case events.ItemTrashed:
+			message = "{user} trashed {resource}"
+			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
+		case events.ItemPurged:
+			message = "{user} purged {resource}"
+			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
+		case events.ItemMoved:
+			message = "{user} moved {resource}"
+			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
+		case events.ShareCreated:
+			message = "{user} shared {resource}"
+			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.CTime))
+		case events.ShareUpdated:
+			message = "{user} updated share of {resource}"
+			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.MTime))
+		case events.ShareRemoved:
+			message = "{user} removed share of {resource}"
+			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", ev.Timestamp)
+		case events.LinkCreated:
+			message = "{user} created link to {resource}"
+			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.CTime))
+		case events.LinkUpdated:
+			message = "{user} updated link to {resource}"
+			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.CTime))
+		case events.LinkRemoved:
+			message = "{user} removed link to {resource}"
+			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.Timestamp))
+		case events.SpaceShared:
+			message = "{user} shared space {resource}"
+			res, act, ts, err = s.ResponseData(sToRef(ev.ID), ev.Executant, "", ev.Timestamp)
+		case events.SpaceShareUpdated:
+			message = "{user} updated share of space {resource}"
+			res, act, ts, err = s.ResponseData(sToRef(ev.ID), ev.Executant, "", ev.Timestamp)
+		case events.SpaceUnshared:
+			message = "{user} unshared space {resource}"
+			res, act, ts, err = s.ResponseData(sToRef(ev.ID), ev.Executant, "", ev.Timestamp)
 		}
 
 		if err != nil {
@@ -77,17 +119,21 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			continue
 		}
 
-		acts = append(acts, NewActivity(message, res, act, ts.RecordedTime, e.GetId()))
+		resp.Activities = append(resp.Activities, NewActivity(message, res, act, ts.RecordedTime, e.GetId()))
 	}
 
-	b, err := json.Marshal(acts)
+	b, err := json.Marshal(resp)
 	if err != nil {
 		s.log.Error().Err(err).Msg("error marshalling activities")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	w.Write(b)
+	if _, err := w.Write(b); err != nil {
+		s.log.Error().Err(err).Msg("error writing response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }
 

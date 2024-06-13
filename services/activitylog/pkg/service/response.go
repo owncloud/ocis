@@ -16,14 +16,9 @@ type GetActivitiesResponse struct {
 
 // Activity represents an activity as it is returned to the client
 type Activity struct {
-	ID        string   `json:"id"`
-	DriveItem Resource `json:"driveItem"`
-	Actor     Actor    `json:"actor"`
-	Times     Times    `json:"times"`
-	Template  Template `json:"template"`
-
-	// TODO: Implement
-	Action interface{} `json:"action"`
+	ID       string   `json:"id"`
+	Times    Times    `json:"times"`
+	Template Template `json:"template"`
 }
 
 // Resource represents an item such as a file or folder
@@ -56,8 +51,6 @@ func NewActivity(message string, res Resource, user Actor, ts time.Time, eventID
 		Times: Times{
 			RecordedTime: ts,
 		},
-		DriveItem: res,
-		Actor:     user,
 		Template: Template{
 			Message: message,
 			Variables: map[string]interface{}{
