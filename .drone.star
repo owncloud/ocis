@@ -987,7 +987,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                          ],
                      },
                  ] +
-                 ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
+                 ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator", {"OCIS_EXCLUDE_RUN_SERVICES": "app-provider"}) +
                  wopiServer +
                  [
                      {
