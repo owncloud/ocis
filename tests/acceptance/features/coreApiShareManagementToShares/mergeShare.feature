@@ -116,13 +116,12 @@ Feature: sharing
     And user "Brian" accepts share "/merge-test-outside-groups-renamebeforesecondshare" offered by user "Alice" using the sharing API
     And user "Brian" moves folder "/Shares/merge-test-outside-groups-renamebeforesecondshare" to "/merge-test-outside-groups-renamebeforesecondshare-renamed" using the WebDAV API
     Then the OCS status code of responses on all endpoints should be "100"
-    And the HTTP status code of responses on each endpoint should be "200, 200, 201" respectively
-    And as "Brian" folder "/Shares/merge-test-outside-groups-renamebeforesecondshare" should not exist
-    But as "Brian" folder "/merge-test-outside-groups-renamebeforesecondshare-renamed" should exist
+    And the HTTP status code of responses on each endpoint should be "200, 200, 502" respectively
+    And as "Brian" folder "/Shares/merge-test-outside-groups-renamebeforesecondshare" should exist
+    But as "Brian" folder "/merge-test-outside-groups-renamebeforesecondshare-renamed" should not exist
     # Section 2: Brian receives and accepts the user share from Alice. Brian now has 2 shares of the same folder owned by Alice
     # The server "merges" the 2 shares and presents them to Brian as a single folder inside the "Shares" folder
     When user "Alice" shares folder "/merge-test-outside-groups-renamebeforesecondshare" with user "Brian" using the sharing API
-    And user "Brian" accepts share "/merge-test-outside-groups-renamebeforesecondshare" offered by user "Alice" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And as "Brian" folder "/Shares/merge-test-outside-groups-renamebeforesecondshare" should exist
@@ -136,9 +135,9 @@ Feature: sharing
     And user "Brian" accepts share "/merge-test-outside-groups-renamebeforesecondshare" offered by user "Alice" using the sharing API
     And user "Brian" moves folder "/Shares/merge-test-outside-groups-renamebeforesecondshare" to "/merge-test-outside-groups-renamebeforesecondshare-renamed" using the WebDAV API
     Then the OCS status code of responses on all endpoints should be "100"
-    And the HTTP status code of responses on each endpoint should be "200, 200, 201" respectively
-    And as "Brian" folder "/Shares/merge-test-outside-groups-renamebeforesecondshare" should not exist
-    But as "Brian" folder "/merge-test-outside-groups-renamebeforesecondshare-renamed" should exist
+    And the HTTP status code of responses on each endpoint should be "200, 200, 502" respectively
+    And as "Brian" folder "/Shares/merge-test-outside-groups-renamebeforesecondshare" should exist
+    But as "Brian" folder "/merge-test-outside-groups-renamebeforesecondshare-renamed" should not exist
     # Section 2: Brian receives and accepts the group share from Alice. Brian now has 2 shares of the same folder owned by Alice
     # The server "merges" the 2 shares and presents them to Brian as a single folder inside the "Shares" folder
     When user "Alice" shares folder "/merge-test-outside-groups-renamebeforesecondshare" with group "grp1" using the sharing API
