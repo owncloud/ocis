@@ -3511,6 +3511,32 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" gets the following extracted properties of (?:file|folder|entry|resource) "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string    $user
+	 * @param string    $resourceName
+	 * @param string    $spaceName
+	 * @param TableNode|null $propertiesTable
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function userGetsTheFollowingExtractedPropertiesOfFileInsideSpaceUsingTheWebdavApi(
+		string $user,
+		string $resourceName,
+		string $spaceName,
+		TableNode $propertiesTable
+	):void {
+		// NOTE: extracting properties occurs asynchronously
+		// short wait is necessary before getting those properties
+		sleep(2);
+		$this->setSpaceIDByName($user, $spaceName);
+		$response = $this->webDavPropertiesContext->getPropertiesOfFolder($user, $resourceName, $propertiesTable);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @Then /^as user "([^"]*)" (?:file|folder|entry|resource) "([^"]*)" inside space "([^"]*)" should contain a property "([^"]*)" with value "([^"]*)"$/
 	 *
 	 * @param string $user
