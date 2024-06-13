@@ -64,6 +64,8 @@ func TestValues(t *testing.T) {
 	for i := range valueScenarios {
 		index := i
 		t.Run(valueScenarios[index].name, func(t *testing.T) {
+			s := initStore()
+			setupRoles(s)
 			value := valueScenarios[index].value
 			v, err := s.WriteValue(value)
 			require.NoError(t, err)
@@ -77,6 +79,8 @@ func TestValues(t *testing.T) {
 }
 
 func TestListValues(t *testing.T) {
+	s := initStore()
+	setupRoles(s)
 	for _, v := range valueScenarios {
 		_, err := s.WriteValue(v.value)
 		require.NoError(t, err)
