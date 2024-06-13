@@ -90,7 +90,7 @@ func (vh *VerifyHandler) Verify(accessToken, url, timestamp, sig64, oldSig64 str
 	var oldSignature []byte
 	if oldSig64 != "" {
 		if oldSig, err := base64.StdEncoding.DecodeString(oldSig64); err != nil {
-			return nil
+			return err
 		} else {
 			oldSignature = oldSig
 		}
