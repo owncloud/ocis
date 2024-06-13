@@ -155,6 +155,7 @@ Feature: Share a file or folder that is inside a space
     And the information about the last share for user "Brian" should include
       | expiration |  |
 
+
   Scenario: user cannot delete share role
     Given using OCS API version "<ocs_api_version>"
     And using SharingNG
