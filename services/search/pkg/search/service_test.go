@@ -5,6 +5,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
@@ -100,6 +101,9 @@ var _ = Describe("Searchprovider", func() {
 		})).Return(&sprovider.GetPathResponse{
 			Status: status.NewOK(context.Background()),
 			Path:   ri.Path,
+		}, nil)
+		gatewayClient.On("GetReceivedShare", mock.Anything, mock.Anything).Return(&collaborationv1beta1.GetReceivedShareResponse{
+			Status: status.NewOK(ctx),
 		}, nil)
 		indexClient.On("DocCount").Return(uint64(1), nil)
 	})
