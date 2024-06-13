@@ -78,6 +78,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Don't show thumbnails for secureview shares: [#9299](https://github.com/owncloud/ocis/pull/9299)
 * Bugfix - Fix share update: [#9301](https://github.com/owncloud/ocis/pull/9301)
 * Bugfix - Fix the error translation from utils: [#9331](https://github.com/owncloud/ocis/pull/9331)
+* Bugfix - Fix the settings metedata tests: [#9341](https://github.com/owncloud/ocis/pull/9341)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Change - The `filesystem` backend for the settings service has been removed: [#9138](https://github.com/owncloud/ocis/pull/9138)
@@ -369,6 +370,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9151
    https://github.com/owncloud/ocis/pull/9331
+
+* Bugfix - Fix the settings metedata tests: [#9341](https://github.com/owncloud/ocis/pull/9341)
+
+   We fix the settings metedata tests that had the data race
+
+   https://github.com/owncloud/ocis/issues/9372
+   https://github.com/owncloud/ocis/pull/9341
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
