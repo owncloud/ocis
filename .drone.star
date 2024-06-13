@@ -3,7 +3,9 @@
 
 # Production release tags
 # NOTE: need to be updated if new production releases are determined
-PRODUCTION_RELEASE_TAGS = ["5.0.0", "5.0.1", "5.0.2", "5.0.3", "7.0.0"]
+# - follow semver
+# - omit 'v' prefix
+PRODUCTION_RELEASE_TAGS = ["5.0.0", "5.0.1", "5.0.2", "5.0.3", "7.0.0-rc.1", "7.0.0"]
 
 # images
 ALPINE_GIT = "alpine/git:latest"
@@ -1277,8 +1279,10 @@ def dockerReleases(ctx):
     docker_repos.append(repo)
 
     # production release repo
-    if ctx.build.event == "tag" and ctx.build.ref.replace("refs/tags/v", "") in PRODUCTION_RELEASE_TAGS:
-        docker_repos.append(ctx.repo.slug)
+    if ctx.build.event == "tag":
+        tag = ctx.build.ref.replace("refs/tags/v", "").lower()
+        if tag in PRODUCTION_RELEASE_TAGS:
+            docker_repos.append(ctx.repo.slug)
 
     for repo in docker_repos:
         if ctx.build.event == "tag":
