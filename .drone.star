@@ -1268,25 +1268,28 @@ def logTracingResults():
 
 def dockerReleases(ctx):
     pipelines = []
+    docker_repos = []
 
     # dockerhub repo
     #  - "owncloud/ocis-rolling"
     repo = ctx.repo.slug + "-rolling"
+    docker_repos.append(repo)
 
     # production release repo
     if ctx.build.event == "tag" and ctx.build.ref.replace("refs/tags/v", "") in PRODUCTION_RELEASE_TAGS:
-        repo = ctx.repo.slug
+        docker_repos.append(ctx.repo.slug)
 
-    for arch in config["dockerReleases"]["architectures"]:
-        pipelines.append(dockerRelease(ctx, arch, repo))
+    for repo in docker_repos:
+        for arch in config["dockerReleases"]["architectures"]:
+            pipelines.append(dockerRelease(ctx, arch, repo))
 
-    manifest = releaseDockerManifest(repo)
-    manifest["depends_on"] = getPipelineNames(pipelines)
-    pipelines.append(manifest)
+        manifest = releaseDockerManifest(repo)
+        manifest["depends_on"] = getPipelineNames(pipelines)
+        pipelines.append(manifest)
 
-    readme = releaseDockerReadme(ctx, repo)
-    readme["depends_on"] = getPipelineNames(pipelines)
-    pipelines.append(readme)
+        readme = releaseDockerReadme(ctx, repo)
+        readme["depends_on"] = getPipelineNames(pipelines)
+        pipelines.append(readme)
 
     return pipelines
 
