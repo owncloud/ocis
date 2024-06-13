@@ -1269,6 +1269,7 @@ def logTracingResults():
 def dockerReleases(ctx):
     pipelines = []
     docker_repos = []
+    build_type = "daily"
 
     # dockerhub repo
     #  - "owncloud/ocis-rolling"
@@ -1280,20 +1281,23 @@ def dockerReleases(ctx):
         docker_repos.append(ctx.repo.slug)
 
     for repo in docker_repos:
-        for arch in config["dockerReleases"]["architectures"]:
-            pipelines.append(dockerRelease(ctx, arch, repo))
+        if ctx.build.event == "tag":
+            build_type = "rolling" if "rolling" in repo else "production"
 
-        manifest = releaseDockerManifest(repo)
+        for arch in config["dockerReleases"]["architectures"]:
+            pipelines.append(dockerRelease(ctx, arch, repo, build_type))
+
+        manifest = releaseDockerManifest(repo, build_type)
         manifest["depends_on"] = getPipelineNames(pipelines)
         pipelines.append(manifest)
 
-        readme = releaseDockerReadme(ctx, repo)
+        readme = releaseDockerReadme(ctx, repo, build_type)
         readme["depends_on"] = getPipelineNames(pipelines)
         pipelines.append(readme)
 
     return pipelines
 
-def dockerRelease(ctx, arch, repo):
+def dockerRelease(ctx, arch, repo, build_type):
     build_args = [
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
@@ -1306,7 +1310,7 @@ def dockerRelease(ctx, arch, repo):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "docker-%s" % (arch),
+        "name": "docker-%s-%s" % (arch, build_type),
         "platform": {
             "os": "linux",
             "arch": arch,
@@ -1381,6 +1385,7 @@ def dockerRelease(ctx, arch, repo):
 def binaryReleases(ctx):
     pipelines = []
     targets = []
+    build_type = "daily"
 
     # uploads binary to https://download.owncloud.com/ocis/ocis/daily/
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
@@ -1396,6 +1401,7 @@ def binaryReleases(ctx):
             folder = "testing"
             target = "%s/%s/%s" % (target_path, folder, buildref)
             targets.append(target)
+            build_type = "testing"
         else:
             # uploads binary to eg. https://download.owncloud.com/ocis/ocis/rolling/1.0.0/
             folder = "rolling"
@@ -1411,12 +1417,19 @@ def binaryReleases(ctx):
         targets.append(target)
 
     for target in targets:
+        if "rolling" in target:
+            build_type = "rolling"
+        elif "stable" in target:
+            build_type = "production"
+        elif "testing" in target:
+            build_type = "testing"
+
         for os in config["binaryReleases"]["os"]:
-            pipelines.append(binaryRelease(ctx, os, target, depends_on))
+            pipelines.append(binaryRelease(ctx, os, build_type, target, depends_on))
 
     return pipelines
 
-def binaryRelease(ctx, name, target, depends_on = []):
+def binaryRelease(ctx, arch, build_type, target, depends_on = []):
     settings = {
         "endpoint": {
             "from_secret": "upload_s3_endpoint",
@@ -1439,7 +1452,7 @@ def binaryRelease(ctx, name, target, depends_on = []):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "binaries-%s" % (name),
+        "name": "binaries-%s-%s" % (arch, build_type),
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -1452,7 +1465,7 @@ def binaryRelease(ctx, name, target, depends_on = []):
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
-                    "make -C ocis release-%s" % (name),
+                    "make -C ocis release-%s" % (arch),
                 ],
             },
             {
@@ -1661,7 +1674,7 @@ def licenseCheck(ctx):
         "volumes": [pipelineVolumeGo],
     }]
 
-def releaseDockerManifest(repo):
+def releaseDockerManifest(repo, build_type):
     spec = "manifest.tmpl"
     if "rolling" not in repo:
         spec = "manifest-production.tmpl"
@@ -1669,7 +1682,7 @@ def releaseDockerManifest(repo):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "manifest",
+        "name": "manifest-%s" % build_type,
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -1768,11 +1781,11 @@ def changelog():
         },
     }]
 
-def releaseDockerReadme(ctx, repo):
+def releaseDockerReadme(ctx, repo, build_type):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "readme",
+        "name": "readme-%s" % build_type,
         "platform": {
             "os": "linux",
             "arch": "amd64",
