@@ -47,10 +47,11 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 	}
 	defer file.Close()
 
-	f, err := os.OpenFile(node.InternalPath(), os.O_CREATE|os.O_WRONLY, 0700)
+	f, err := os.OpenFile(node.InternalPath(), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0700)
 	if err != nil {
 		return errors.Wrapf(err, "could not open blob '%s' for writing", node.InternalPath())
 	}
+	defer f.Close()
 
 	w := bufio.NewWriter(f)
 	_, err = w.ReadFrom(file)
