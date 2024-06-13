@@ -11,7 +11,7 @@ geekdocFilePath: Posix FS.md
 
 Posix FS is the working name for the collaborative storage driver for Infinite Scale.
 
-The scope of this document is to give an high level overview to the technical aspects of the Posix FS and guide the setup.
+The scope of this document is to give a high level overview to the technical aspects of the Posix FS and guide the setup.
 
 ## Introduction
 
