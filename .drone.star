@@ -5,7 +5,7 @@
 # NOTE: need to be updated if new production releases are determined
 # - follow semver
 # - omit 'v' prefix
-PRODUCTION_RELEASE_TAGS = ["5.0.0", "5.0.1", "5.0.2", "5.0.3", "7.0.0-rc.1", "7.0.0"]
+PRODUCTION_RELEASE_TAGS = ["5.0", "7.0.0"]
 
 # images
 ALPINE_GIT = "alpine/git:latest"
@@ -1281,8 +1281,10 @@ def dockerReleases(ctx):
     # production release repo
     if ctx.build.event == "tag":
         tag = ctx.build.ref.replace("refs/tags/v", "").lower()
-        if tag in PRODUCTION_RELEASE_TAGS:
-            docker_repos.append(ctx.repo.slug)
+        for prod_tag in PRODUCTION_RELEASE_TAGS:
+            if tag.startswith(prod_tag):
+                docker_repos.append(ctx.repo.slug)
+                break
 
     for repo in docker_repos:
         if ctx.build.event == "tag":
@@ -1412,11 +1414,14 @@ def binaryReleases(ctx):
             target = "%s/%s/%s" % (target_path, folder, buildref)
             targets.append(target)
 
-            if buildref in PRODUCTION_RELEASE_TAGS:
-                # uploads binary to eg. https://download.owncloud.com/ocis/ocis/stable/2.0.0/
-                folder = "stable"
-                target = "%s/%s/%s" % (target_path, folder, buildref)
-                targets.append(target)
+            for prod_tag in PRODUCTION_RELEASE_TAGS:
+                if buildref.startswith(prod_tag):
+                    # uploads binary to eg. https://download.owncloud.com/ocis/ocis/stable/2.0.0/
+                    folder = "stable"
+                    target = "%s/%s/%s" % (target_path, folder, buildref)
+                    targets.append(target)
+                    break
+
     else:
         targets.append(target)
 
