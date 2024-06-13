@@ -60,6 +60,14 @@ variables:
     on supervision of ownCloud Support.'
   do_ignore: false
 - rawname: _registryAddressEnv
+  path: ocis-pkg/registry/registry.go:118
+  foundincode: true
+  name: MICRO_REGISTRY_ADDRESS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _registryAddressEnv
   path: ocis-pkg/natsjsregistry/registry.go:145
   foundincode: false
   name: MICRO_REGISTRY_ADDRESS
@@ -68,14 +76,6 @@ variables:
   description: The bind address of the internal go micro framework. Only change on
     supervision of ownCloud Support.
   do_ignore: false
-- rawname: _registryAddressEnv
-  path: ocis-pkg/registry/registry.go:118
-  foundincode: true
-  name: MICRO_REGISTRY_ADDRESS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: true
 - rawname: _registryPasswordEnv
   path: ocis-pkg/natsjsregistry/registry.go:163
   foundincode: false
