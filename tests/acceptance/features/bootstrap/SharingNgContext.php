@@ -1583,14 +1583,14 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When user :user deletes the last link share of space :space using permissions endpoint of the Graph API
+	 * @When user :user removes the last link share of space :space using permissions endpoint of the Graph API
 	 *
 	 * @param string $user
 	 * @param string $space
 	 *
 	 * @return void
 	 */
-	public function userDeletsTheLastLinkShareOfSpaceUsingPermissionsEndpointOfGraphApi(string $user, string $space):void {
+	public function userRemovesTheLastLinkShareOfSpaceUsingPermissionsEndpointOfGraphApi(string $user, string $space):void {
 		$this->featureContext->setResponse($this->removeAccessToSpaceItem($user, 'link', $space, ''));
 	}
 }
