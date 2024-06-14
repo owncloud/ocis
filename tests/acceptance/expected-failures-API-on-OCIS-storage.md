@@ -56,20 +56,6 @@ Synchronization features like etag propagation, setting mtime and locking files
 
 ### Share
 
-File and sync features in a shared scenario
-
-#### [File deletion using dav gives unique string in filename in the trashbin](https://github.com/owncloud/product/issues/178)
-
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:75](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L75)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L93)
-
-cannot share a folder with create permission
-
-#### [Resource with share permission create is readable for sharee](https://github.com/owncloud/ocis/issues/4524)
-
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:155](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L155)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L172)
-
 #### [copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file](https://github.com/owncloud/ocis/issues/1232)
 
 - [coreApiSharePublicLink2/copyFromPublicLink.feature:75](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/copyFromPublicLink.feature#L75)
@@ -281,14 +267,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiShareManagementToShares/acceptShares.feature:235](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/acceptShares.feature#L235)
 - [coreApiShareManagementToShares/acceptShares.feature:303](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/acceptShares.feature#L303)
 - [coreApiShareManagementToShares/acceptShares.feature:534](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/acceptShares.feature#L534)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:213](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L213)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:214](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L214)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:215](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L215)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:216](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L216)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:237](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L237)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:238](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L238)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:239](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L239)
-- [coreApiShareManagementBasicToShares/deleteShareFromShares.feature:240](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/deleteShareFromShares.feature#L240)
 
 #### [Renaming resource to banned name is allowed in spaces webdav](https://github.com/owncloud/ocis/issues/3099)
 
