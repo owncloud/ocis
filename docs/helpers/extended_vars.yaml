@@ -1,6 +1,6 @@
 variables:
 - rawname: CS3_GATEWAY
-  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:76
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
   foundincode: true
   name: CS3_GATEWAY
   type: ""
@@ -8,7 +8,7 @@ variables:
   description: ""
   do_ignore: true
 - rawname: CS3_MACHINE_AUTH_API_KEY
-  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:78
   foundincode: true
   name: CS3_MACHINE_AUTH_API_KEY
   type: ""
@@ -44,7 +44,7 @@ variables:
     on supervision of ownCloud Support.'
   do_ignore: false
 - rawname: _registryAddressEnv
-  path: ocis-pkg/natsjsregistry/registry.go:145
+  path: ocis-pkg/natsjsregistry/registry.go:165
   foundincode: true
   name: MICRO_REGISTRY_ADDRESS
   type: string
@@ -61,7 +61,7 @@ variables:
   description: ""
   do_ignore: true
 - rawname: _registryPasswordEnv
-  path: ocis-pkg/natsjsregistry/registry.go:163
+  path: ocis-pkg/natsjsregistry/registry.go:193
   foundincode: true
   name: MICRO_REGISTRY_AUTH_PASSWORD
   type: string
@@ -69,7 +69,7 @@ variables:
   description: Optional when using nats to authenticate with the nats cluster.
   do_ignore: false
 - rawname: _registryUsernameEnv
-  path: ocis-pkg/natsjsregistry/registry.go:163
+  path: ocis-pkg/natsjsregistry/registry.go:193
   foundincode: true
   name: MICRO_REGISTRY_AUTH_USERNAME
   type: string
