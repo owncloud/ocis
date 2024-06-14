@@ -79,6 +79,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix share update: [#9301](https://github.com/owncloud/ocis/pull/9301)
 * Bugfix - Fix the error translation from utils: [#9331](https://github.com/owncloud/ocis/pull/9331)
 * Bugfix - Fix the settings metedata tests: [#9341](https://github.com/owncloud/ocis/pull/9341)
+* Bugfix - Encode Registry Keys: [#9385](https://github.com/owncloud/ocis/pull/9385)
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 * Change - Disable resharing by default for deprecation: [#8653](https://github.com/owncloud/ocis/pull/8653)
 * Change - The `filesystem` backend for the settings service has been removed: [#9138](https://github.com/owncloud/ocis/pull/9138)
@@ -377,6 +378,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9372
    https://github.com/owncloud/ocis/pull/9341
+
+* Bugfix - Encode Registry Keys: [#9385](https://github.com/owncloud/ocis/pull/9385)
+
+   Encode the keys of the natsjskv registry as they have always been.
+
+   https://github.com/owncloud/ocis/pull/9385
 
 * Change - Change the default store for presigned keys to nats-js-kv: [#8419](https://github.com/owncloud/ocis/pull/8419)
 
