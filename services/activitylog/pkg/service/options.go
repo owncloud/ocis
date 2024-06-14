@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
@@ -26,6 +27,7 @@ type Options struct {
 	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 	Mux              *chi.Mux
 	HistoryClient    ehsvc.EventHistoryService
+	ValueClient      settingssvc.ValueService
 }
 
 // Logger configures a logger for the activitylog service
@@ -88,5 +90,12 @@ func Mux(m *chi.Mux) Option {
 func HistoryClient(hc ehsvc.EventHistoryService) Option {
 	return func(o *Options) {
 		o.HistoryClient = hc
+	}
+}
+
+// ValueClient adds a grpc client for the value service
+func ValueClient(vs settingssvc.ValueService) Option {
+	return func(o *Options) {
+		o.ValueClient = vs
 	}
 }

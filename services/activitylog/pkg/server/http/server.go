@@ -86,6 +86,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.GatewaySelector(options.GatewaySelector),
 		svc.TraceProvider(options.TraceProvider),
 		svc.HistoryClient(options.HistoryClient),
+		svc.ValueClient(options.ValueClient),
 		svc.RegisteredEvents(options.RegisteredEvents),
 	)
 	if err != nil {

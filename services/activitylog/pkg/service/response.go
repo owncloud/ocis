@@ -7,6 +7,24 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+)
+
+// Translations
+var (
+	MessageResourceCreated   = l10n.Template("{user} created {resource}")
+	MessageResourceTrashed   = l10n.Template("{user} trashed {resource}")
+	MessageResourcePurged    = l10n.Template("{user} purged {resource}")
+	MessageResourceMoved     = l10n.Template("{user} moved {resource}")
+	MessageShareCreated      = l10n.Template("{user} shared {resource}")
+	MessageShareUpdated      = l10n.Template("{user} updated share of {resource}")
+	MessageShareDeleted      = l10n.Template("{user} deleted share of {resource}")
+	MessageLinkCreated       = l10n.Template("{user} created link to {resource}")
+	MessageLinkUpdated       = l10n.Template("{user} updated link to {resource}")
+	MessageLinkDeleted       = l10n.Template("{user} deleted link to {resource}")
+	MessageSpaceShared       = l10n.Template("{user} shared space {resource}")
+	MessageSpaceShareUpdated = l10n.Template("{user} updated share of space {resource}")
+	MessageSpaceUnshared     = l10n.Template("{user} unshared space {resource}")
 )
 
 // GetActivitiesResponse is the response on GET activities requests
@@ -45,12 +63,10 @@ type Template struct {
 }
 
 // NewActivity creates a new activity
-func NewActivity(message string, res Resource, user Actor, ts time.Time, eventID string) Activity {
+func NewActivity(message string, res Resource, user Actor, ts Times, eventID string) Activity {
 	return Activity{
-		ID: eventID,
-		Times: Times{
-			RecordedTime: ts,
-		},
+		ID:    eventID,
+		Times: ts,
 		Template: Template{
 			Message: message,
 			Variables: map[string]interface{}{

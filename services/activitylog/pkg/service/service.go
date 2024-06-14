@@ -17,6 +17,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
 	microstore "go-micro.dev/v4/store"
 )
@@ -30,13 +31,14 @@ type RawActivity struct {
 
 // ActivitylogService logs events per resource
 type ActivitylogService struct {
-	cfg       *config.Config
-	log       log.Logger
-	events    <-chan events.Event
-	store     microstore.Store
-	gws       pool.Selectable[gateway.GatewayAPIClient]
-	mux       *chi.Mux
-	evHistory ehsvc.EventHistoryService
+	cfg        *config.Config
+	log        log.Logger
+	events     <-chan events.Event
+	store      microstore.Store
+	gws        pool.Selectable[gateway.GatewayAPIClient]
+	mux        *chi.Mux
+	evHistory  ehsvc.EventHistoryService
+	valService settingssvc.ValueService
 
 	registeredEvents map[string]events.Unmarshaller
 }
@@ -69,6 +71,7 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		gws:              o.GatewaySelector,
 		mux:              o.Mux,
 		evHistory:        o.HistoryClient,
+		valService:       o.ValueClient,
 		registeredEvents: make(map[string]events.Unmarshaller),
 	}
 

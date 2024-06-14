@@ -1,18 +1,32 @@
 package service
 
 import (
+	"embed"
 	"encoding/json"
 	"net/http"
 	"net/url"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+)
+
+var (
+	//go:embed l10n/locale
+	_localeFS embed.FS
+
+	// subfolder where the translation files are stored
+	_localeSubPath = "l10n/locale"
+
+	// domain of the activitylog service (transifex)
+	_domain = "activitylog"
 )
 
 // ServeHTTP implements the http.Handler interface.
@@ -22,6 +36,12 @@ func (s *ActivitylogService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // HandleGetItemActivities handles the request to get the activities of an item.
 func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *http.Request) {
+	activeUser, ok := revactx.ContextGetUser(r.Context())
+	if !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	// TODO: Compare driveid with itemid to avoid bad requests
 	rid, err := parseIDParam(r, "item-id")
 	if err != nil {
@@ -68,49 +88,49 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			// error already logged in unwrapEvent
 			continue
 		case events.UploadReady:
-			message = "{user} created {resource}"
+			message = MessageResourceCreated
 			res, act, ts, err = s.ResponseData(ev.FileRef, ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName(), utils.TSToTime(ev.Timestamp))
 		case events.FileTouched:
-			message = "{user} created {resource}"
+			message = MessageResourceCreated
 			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
 		case events.ContainerCreated:
-			message = "{user} created {resource}"
+			message = MessageResourceCreated
 			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
 		case events.ItemTrashed:
-			message = "{user} trashed {resource}"
+			message = MessageResourceTrashed
 			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
 		case events.ItemPurged:
-			message = "{user} purged {resource}"
+			message = MessageResourcePurged
 			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
 		case events.ItemMoved:
-			message = "{user} moved {resource}"
+			message = MessageResourceMoved
 			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
 		case events.ShareCreated:
-			message = "{user} shared {resource}"
+			message = MessageShareCreated
 			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.CTime))
 		case events.ShareUpdated:
-			message = "{user} updated share of {resource}"
+			message = MessageShareUpdated
 			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.MTime))
 		case events.ShareRemoved:
-			message = "{user} removed share of {resource}"
+			message = MessageShareDeleted
 			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", ev.Timestamp)
 		case events.LinkCreated:
-			message = "{user} created link to {resource}"
+			message = MessageLinkCreated
 			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.CTime))
 		case events.LinkUpdated:
-			message = "{user} updated link to {resource}"
+			message = MessageLinkUpdated
 			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.CTime))
 		case events.LinkRemoved:
-			message = "{user} removed link to {resource}"
+			message = MessageLinkDeleted
 			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.Timestamp))
 		case events.SpaceShared:
-			message = "{user} shared space {resource}"
+			message = MessageSpaceShared
 			res, act, ts, err = s.ResponseData(sToRef(ev.ID), ev.Executant, "", ev.Timestamp)
 		case events.SpaceShareUpdated:
-			message = "{user} updated share of space {resource}"
+			message = MessageSpaceShareUpdated
 			res, act, ts, err = s.ResponseData(sToRef(ev.ID), ev.Executant, "", ev.Timestamp)
 		case events.SpaceUnshared:
-			message = "{user} unshared space {resource}"
+			message = MessageSpaceUnshared
 			res, act, ts, err = s.ResponseData(sToRef(ev.ID), ev.Executant, "", ev.Timestamp)
 		}
 
@@ -119,7 +139,11 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			continue
 		}
 
-		resp.Activities = append(resp.Activities, NewActivity(message, res, act, ts.RecordedTime, e.GetId()))
+		// todo: configurable default locale?
+		loc := l10n.MustGetUserLocale(r.Context(), activeUser.GetId().GetOpaqueId(), r.Header.Get(l10n.HeaderAcceptLanguage), s.valService)
+		t := l10n.NewTranslatorFromCommonConfig("en", _domain, "", _localeFS, _localeSubPath)
+
+		resp.Activities = append(resp.Activities, NewActivity(t.Translate(message, loc), res, act, ts, e.GetId()))
 	}
 
 	b, err := json.Marshal(resp)

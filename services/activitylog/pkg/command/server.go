@@ -18,6 +18,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/logging"
@@ -119,6 +120,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", grpcClient)
+			vClient := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
 
 			{
 				svc, err := http.Server(
@@ -130,7 +132,8 @@ func Server(cfg *config.Config) *cli.Command {
 					http.RegisteredEvents(_registeredEvents),
 					http.Store(evStore),
 					http.GatewaySelector(gatewaySelector),
-					http.History(hClient),
+					http.HistoryClient(hClient),
+					http.ValueClient(vClient),
 					http.RegisteredEvents(_registeredEvents),
 				)
 
