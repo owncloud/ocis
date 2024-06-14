@@ -33,7 +33,7 @@ The Joint Access Storage Driver uses a few features of the underlying file syste
 
 While the simplest form of Joint Access Storage Driver runs with default file systems of every modern Linux system which are directly mounted and thus support inotify, the full power of this unfolds with more capable file systems such as IBM Storage Scale or Ceph. These are recommended as reliable foundations for big installations of Infinite Scale.
 
-This chapter describes some technical aspects of the storage driver.
+This chapter describes some technical aspects of this storage driver.
 
 ### Path Locations
 
@@ -83,9 +83,9 @@ Other systems store quota data in the metadata storage and implement propagation
 
 ### File ID Resolution
 
-Infinite Scale uses an ID based approach to work with resources, rather than a file path based mechanism. The reason for that is that ID based lookups can be done way more efficiently compared to tree traversals, just to name one reason.
+Infinite Scale uses an ID based approach to work with resources, rather than a file path based mechanism. The reason for that is, that ID based lookups can be done way more efficiently compared to tree traversals, just to name one reason.
 
-The most important component of the ID is a unique file ID that identifies the resource within a space. IDeally the Inode of a file could be used here. However, some file systems re-use inodes which must be avoided. Infinite Scale thus does not use the file Inode, but generates a UUID instead.
+The most important component of the ID is a unique file ID that identifies the resource within a space. Ideally the Inode of a file could be used here. However, some file systems re-use inodes which must be avoided. Infinite Scale thus does not use the file Inode, but generates a UUID instead.
 
 ID based lookups utilize an ID cache which needs to be shared between all storageprovider and dataprovider instances. During startup a scan of the whole file tree is performed to detect and cache new entities.
 
@@ -98,7 +98,7 @@ These two operations are very crucial for the performance of the entire system.
 
 ### User Management
 
-With the requirement that data can be manipulated either through the filesystem or the Infinite Scale system, the question under which uid the manipulation happens is important.
+With the requirement that data can be manipulated either through the filesystem or the Infinite Scale system, the question under which UID the manipulation happens is important.
 
 There are a few possible ways for user management:
 1. Changes can either be only accepted by the same  user that Infinite Scale is running under, for example the user `ocis`. All manipulations in the filesystem have to be done by, and only by this user.
@@ -109,7 +109,7 @@ All possibilities have pros and cons for operations.
 
 One for all, it seems reasonable to use LDAP to manage users which is the base for the Infinite Scale IDP as well as the system login system via PAM.
 
-### GID based space access
+### GID Based Space Access
 
 The Joint Access Storage Driver supports GID based space access to support the problem that project spaces might have to be accessible by multiple users on disk. In order to enable this feature the `ocis` binary needs to have the `setgid` capability and `STORAGE_USERS_POSIX_USE_SPACE_GROUPS` needs to be set to `true`. Inifinite Scale will then use the space GID (the gid of the space root) for all file system access using the `setfsgid` syscall, i.e. all files and directories created by Infinite Scale will belong to the same group as the space root.
 
@@ -153,11 +153,11 @@ It is possible to use different storage drivers in the same Infinite Scale insta
 
 To use the Joint Access Storage Driver, the following prerequisites have to be fulfilled:
 
-1. There must be storage available to store meta data and blobs, available under a root path
+1. There must be storage available to store meta data and blobs, available under a root path.
 1. When using inotify, the storage must be local on the same machine. Network mounts do not work with inotify. `inotifywait` needs to be installed.
-1. The storage root path must be writeable and executable by the same user Infinite Scale is running under
-1. An appropiate version of Infinite Scale is installed, version number 5.0.5 and later
-1. Nats-js-kv as cache service
+1. The storage root path must be writeable and executable by the same user Infinite Scale is running under.
+1. An appropiate version of Infinite Scale is installed, version number 5.0.5 and later.
+1. `nats-js-kv` as cache service
 
 
 ### Setup Configuration
@@ -191,7 +191,7 @@ The Joint Access Storage Driver supports two different watchers for detecting ch
 
 #### GPFS File Audit Logging
 
-The gpfsfileauditlogging watcher tails a GPFS file audit log and parses the JSON events to detect relevant changes.
+The `gpfsfileauditlogging` watcher tails a GPFS file audit log and parses the JSON events to detect relevant changes.
 
 ```
 export STORAGE_USERS_POSIX_WATCH_TYPE="gpfsfileauditlogging"
