@@ -157,6 +157,7 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 		store.Database("service-registry"),
 		store.Table("service-registry"),
 		natsjskv.DefaultMemory(),
+		natsjskv.EncodeKeys(),
 	}
 
 	addr := []string{"127.0.0.1:9233"}
