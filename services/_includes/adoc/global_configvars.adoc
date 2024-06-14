@@ -21,7 +21,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++127.0.0.1:9197 ++
+++127.0.0.1:9260 ++
 
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
@@ -244,7 +244,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+Password for the configured store. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=attributes+]
@@ -267,7 +267,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+Username for the configured store. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=attributes+]
@@ -284,7 +284,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++storage-users ++
+++storage-system ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
@@ -350,10 +350,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++nats-js-kv ++
+++memory ++
 
 a| [subs=-attributes]
-The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.
+The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
 a| `OCIS_CACHE_STORE_NODES`
 
 a| [subs=attributes+]
@@ -376,7 +376,7 @@ a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
 
 a| [subs=-attributes]
-A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 a| `OCIS_CACHE_TTL`
 
 a| [subs=attributes+]
@@ -396,10 +396,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++12h0m0s ++
+++24m0s ++
 
 a| [subs=-attributes]
-Default time to live for signing keys. See the Environment Variable Types description for more details.
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
 a| [subs=attributes+]
@@ -446,7 +446,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Cache-Control] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -471,7 +471,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[GET] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
@@ -733,7 +733,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=attributes+]
@@ -1057,7 +1057,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=idp,ou=sysusers,o=libregraph-idm ++
+++uid=reva,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -1094,7 +1094,7 @@ a| [subs=-attributes]
 ++/var/lib/ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
 a| `OCIS_LDAP_DISABLED_USERS_GROUP_DN`
 
 a| [subs=attributes+]
@@ -1124,7 +1124,7 @@ a| [subs=-attributes]
 ++attribute ++
 
 a| [subs=-attributes]
-An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
+An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
 a| `OCIS_LDAP_GROUP_BASE_DN`
 
 a| [subs=attributes+]
@@ -1330,7 +1330,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-Url of the LDAP service to use as IDP.
+URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
 a| `OCIS_LDAP_USER_BASE_DN`
 
 a| [subs=attributes+]
@@ -1397,7 +1397,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-LDAP User ObjectClass like 'inetOrgPerson'.
+The object class to use for users in the default user search filter ('inetOrgPerson').
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
 a| [subs=attributes+]
@@ -1426,10 +1426,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownCloudUUID ++
+++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP User UUID attribute like 'uid'.
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=attributes+]
@@ -1462,7 +1462,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP User email attribute like 'mail'.
+LDAP Attribute to use for the email address of users.
 a| `OCIS_LDAP_USER_SCHEMA_USERNAME`
 
 a| [subs=attributes+]
@@ -1476,10 +1476,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++displayName ++
+++uid ++
 
 a| [subs=-attributes]
-LDAP User name attribute like 'displayName'.
+LDAP Attribute to use for username of users.
 a| `OCIS_LDAP_USER_SCHEMA_USER_TYPE`
 
 a| [subs=attributes+]
@@ -1764,7 +1764,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The OIDC issuer URL to use.
+The identity provider href for the openid-discovery relation.
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
 a| [subs=attributes+]
@@ -2073,7 +2073,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
 a| `OCIS_SHOW_USER_EMAIL_IN_RESULTS`
 
 a| [subs=attributes+]
@@ -2384,7 +2384,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=attributes+]
@@ -2428,7 +2428,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The OIDC issuer URL to use.
+The identity provider href for the openid-discovery relation.
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=attributes+]
