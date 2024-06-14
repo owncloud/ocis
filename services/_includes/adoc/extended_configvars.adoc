@@ -8,24 +8,8 @@
 | Type
 | Default Value
 | Description
-
-a| `CS3_GATEWAY` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
     
     
-
-a| `CS3_MACHINE_AUTH_API_KEY` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
 
 a| `MICRO_LOG_LEVEL` +
 a| [subs=-attributes]
@@ -84,29 +68,5 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++The default directory location for config files. See the General Info section in the documentation for more details on defaults. ++
-
-a| `_registryAddressEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `_registryPasswordEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `_registryUsernameEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
     
 |===

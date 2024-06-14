@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-14-00-49-46]
+[#deprecation-note-2024-06-14-11-53-17]
 [caption=]
 .Deprecation notes for the settings service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -366,7 +366,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
 
 a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `SETTINGS_CACHE_DISABLE_PERSISTENCE` +

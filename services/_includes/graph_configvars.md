@@ -15,7 +15,7 @@
 | GRAPH_CACHE_STORE_DATABASE | string | cache-roles | The database name the configured store should use.|
 | GRAPH_CACHE_STORE_TABLE | string |  | The database table the store should use.|
 | OCIS_CACHE_TTL<br/>GRAPH_CACHE_TTL | Duration | 336h0m0s | Time to live for cache records in the graph. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.|
-| OCIS_CACHE_SIZE<br/>GRAPH_CACHE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
+| OCIS_CACHE_SIZE<br/>GRAPH_CACHE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.|
 | OCIS_CACHE_DISABLE_PERSISTENCE<br/>GRAPH_CACHE_DISABLE_PERSISTENCE | bool | false | Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.|
 | OCIS_CACHE_AUTH_USERNAME<br/>GRAPH_CACHE_AUTH_USERNAME | string |  | The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_CACHE_AUTH_PASSWORD<br/>GRAPH_CACHE_AUTH_PASSWORD | string |  | The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
