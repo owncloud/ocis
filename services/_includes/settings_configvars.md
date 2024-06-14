@@ -35,7 +35,7 @@
 | SETTINGS_FILE_CACHE_TABLE | string | settings_files | The database table the store should use for the file cache.|
 | SETTINGS_DIRECTORY_CACHE_TABLE | string | settings_dirs | The database table the store should use for the directory cache.|
 | OCIS_CACHE_TTL<br/>SETTINGS_CACHE_TTL | Duration | 10m0s | Default time to live for entries in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.|
-| OCIS_CACHE_SIZE<br/>SETTINGS_CACHE_SIZE | int | 0 | The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
+| OCIS_CACHE_SIZE<br/>SETTINGS_CACHE_SIZE | int | 0 | The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.|
 | OCIS_CACHE_DISABLE_PERSISTENCE<br/>SETTINGS_CACHE_DISABLE_PERSISTENCE | bool | false | Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.|
 | OCIS_CACHE_AUTH_USERNAME<br/>SETTINGS_CACHE_AUTH_USERNAME | string |  | The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_CACHE_AUTH_PASSWORD<br/>SETTINGS_CACHE_AUTH_PASSWORD | string |  | The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|

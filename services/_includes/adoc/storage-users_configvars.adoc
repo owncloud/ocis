@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-14-09-38-55]
+[#deprecation-note-2024-06-14-10-35-32]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -993,7 +993,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
 
 a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `STORAGE_USERS_FILEMETADATA_CACHE_DISABLE_PERSISTENCE` +
@@ -1072,7 +1072,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
 
 a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `STORAGE_USERS_ID_CACHE_DISABLE_PERSISTENCE` +

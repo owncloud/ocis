@@ -26,7 +26,7 @@
 | ACTIVITYLOG_STORE_DATABASE | string | activitylog | The database name the configured store should use.|
 | ACTIVITYLOG_STORE_TABLE | string |  | The database table the store should use.|
 | OCIS_PERSISTENT_STORE_TTL<br/>ACTIVITYLOG_STORE_TTL | Duration | 0s | Time to live for events in the store. See the Environment Variable Types description for more details.|
-| OCIS_PERSISTENT_STORE_SIZE<br/>ACTIVITYLOG_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitely set as default.|
+| OCIS_PERSISTENT_STORE_SIZE<br/>ACTIVITYLOG_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.|
 | OCIS_PERSISTENT_STORE_AUTH_USERNAME<br/>ACTIVITYLOG_STORE_AUTH_USERNAME | string |  | The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_PERSISTENT_STORE_AUTH_PASSWORD<br/>ACTIVITYLOG_STORE_AUTH_PASSWORD | string |  | The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata|
