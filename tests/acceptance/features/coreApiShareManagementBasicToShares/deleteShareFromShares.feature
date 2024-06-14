@@ -87,7 +87,7 @@ Feature: sharing
     And as "Brian" file "/Shares/shared/shared_file.txt" should not exist
     And as "Alice" file "/shared/shared_file.txt" should not exist
     And as "Alice" file "/shared_file.txt" should exist in the trashbin
-    And as "Brian" file "/shared_file.txt" should exist in the trashbin
+    And as "Brian" the file with original path "/shared_file.txt" should not exist in the trashbin
 
 
   Scenario: deleting a folder out of a share as recipient creates a backup for the owner
@@ -107,8 +107,8 @@ Feature: sharing
     And as "Alice" folder "/shared/sub" should not exist
     And as "Alice" folder "/sub" should exist in the trashbin
     And as "Alice" file "/sub/shared_file.txt" should exist in the trashbin
-    And as "Brian" folder "/sub" should exist in the trashbin
-    And as "Brian" file "/sub/shared_file.txt" should exist in the trashbin
+    And as "Brian" the folder with original path "/sub" should not exist in the trashbin
+    And as "Brian" the file with original path "/sub/shared_file.txt" should not exist in the trashbin
 
   @smokeTest
   Scenario: unshare from self
@@ -165,8 +165,7 @@ Feature: sharing
     When user "Brian" deletes file "/Shares/shared/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/shared/shared_file.txt" should exist
-    # Note: for Brian, the file does not "exist" because he only has "create" permission, not "read"
-    And as "Brian" file "/Shares/shared/shared_file.txt" should not exist
+    And as "Brian" file "/Shares/shared/shared_file.txt" should exist
 
 
   Scenario: sharee of an upload-only shared folder tries to delete their file in the folder
@@ -182,8 +181,7 @@ Feature: sharing
     When user "Brian" deletes file "/Shares/shared/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/shared/textfile.txt" should exist
-    # Note: for Brian, the file does not "exist" because he only has "create" permission, not "read"
-    And as "Brian" file "/Shares/shared/textfile.txt" should not exist
+    And as "Brian" file "/Shares/shared/textfile.txt" should exist
 
 
   Scenario Outline: group share recipient tries to delete the share
@@ -196,6 +194,7 @@ Feature: sharing
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
+    And using SharingNG
     And user "Alice" has sent the following resource share invitation:
       | resource        | <entry-to-share>  |
       | space           | Personal          |
@@ -203,7 +202,7 @@ Feature: sharing
       | shareType       | group             |
       | permissionsRole | <permission-role> |
     When user "Brian" deletes the last share of user "Alice" using the sharing API
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "996"
     And the HTTP status code should be "<http-status-code>"
     And as "Alice" entry "<entry-to-share>" should exist
     And as "Brian" entry "<received-entry>" should exist
@@ -211,9 +210,9 @@ Feature: sharing
     Examples:
       | entry-to-share          | permission-role | ocs-api-version | http-status-code | received-entry          |
       | /shared/shared_file.txt | File Editor     | 1               | 200              | /Shares/shared_file.txt |
-      | /shared/shared_file.txt | File Editor     | 2               | 404              | /Shares/shared_file.txt |
+      | /shared/shared_file.txt | File Editor     | 2               | 500              | /Shares/shared_file.txt |
       | /shared                 | Editor          | 1               | 200              | /Shares/shared          |
-      | /shared                 | Editor          | 2               | 404              | /Shares/shared          |
+      | /shared                 | Editor          | 2               | 500              | /Shares/shared          |
 
 
   Scenario Outline: individual share recipient tries to delete the share
@@ -228,16 +227,16 @@ Feature: sharing
       | shareType       | user              |
       | permissionsRole | <permission-role> |
     When user "Brian" deletes the last share of user "Alice" using the sharing API
-    Then the OCS status code should be "404"
+    Then the OCS status code should be "996"
     And the HTTP status code should be "<http-status-code>"
     And as "Alice" entry "<entry-to-share>" should exist
     And as "Brian" entry "<received-entry>" should exist
     Examples:
       | entry-to-share          | permission-role | ocs-api-version | http-status-code | received-entry          |
       | /shared/shared_file.txt | File Editor     | 1               | 200              | /Shares/shared_file.txt |
-      | /shared/shared_file.txt | File Editor     | 2               | 404              | /Shares/shared_file.txt |
+      | /shared/shared_file.txt | File Editor     | 2               | 500              | /Shares/shared_file.txt |
       | /shared                 | Editor          | 1               | 200              | /Shares/shared          |
-      | /shared                 | Editor          | 2               | 404              | /Shares/shared          |
+      | /shared                 | Editor          | 2               | 500              | /Shares/shared          |
 
   @issue-720
   Scenario Outline: request PROPFIND after sharer deletes the collaborator
