@@ -200,7 +200,7 @@ export STORAGE_USERS_POSIX_WATCH_PATH="/path/to/current/audit/log"
 
 #### GPFS Watchfolder
 
-The gpfswatchfolder watcher connects to a kafka cluster which is being filled with filesystem events by the GPFS watchfolder service.
+The `gpfswatchfolder` watcher connects to a kafka cluster which is being filled with filesystem events by the GPFS watchfolder service.
 
 ```
 export STORAGE_USERS_POSIX_WATCH_TYPE="gpfswatchfolder"
