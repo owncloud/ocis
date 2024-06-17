@@ -62,5 +62,5 @@ We updated ownCloud Web to v9.0.0-alpha.7. Please refer to the changelog (linked
 * Enhancement [owncloud/web#11004](https://github.com/owncloud/web/pull/11004): Add enabled only filter to spaces overview
 * Enhancement [owncloud/web#11037](https://github.com/owncloud/web/pull/11037): Multiple sidebar root panels
 
-https://github.com/owncloud/ocis/pull/9379
-https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.7
+https://github.com/owncloud/ocis/pull/9395
+https://github.com/owncloud/web/releases/tag/v9.0.0
