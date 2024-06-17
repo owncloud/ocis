@@ -96,6 +96,8 @@ make -C ocis build
 
 # run with demo users
 IDM_CREATE_DEMO_USERS=true ./ocis/bin/ocis server
+
+# Open your browser on http://localhost:9200 to access the bundled web-ui 
 ```
 
 All batteries included: no external database, no external IDP needed!
