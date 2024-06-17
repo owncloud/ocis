@@ -129,7 +129,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add secureview flag when listing apps via http: [#9289](https://github.com/owncloud/ocis/pull/9289)
 * Enhancement - Activitylog Service: [#9327](https://github.com/owncloud/ocis/pull/9327)
 * Enhancement - Bump Reva: [#9330](https://github.com/owncloud/ocis/pull/9330)
-* Enhancement - Update web to v9.0.0-alpha.7: [#9379](https://github.com/owncloud/ocis/pull/9379)
+* Enhancement - Update web to v9.0.0-alpha.7: [#9395](https://github.com/owncloud/ocis/pull/9395)
 
 ## Details
 
@@ -806,7 +806,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/8606
    https://github.com/owncloud/ocis/pull/8937
 
-* Enhancement - Update web to v9.0.0-alpha.7: [#9379](https://github.com/owncloud/ocis/pull/9379)
+* Enhancement - Update web to v9.0.0-alpha.7: [#9395](https://github.com/owncloud/ocis/pull/9395)
 
    Tags: web
 
@@ -871,8 +871,8 @@ The following sections list the changes for unreleased.
   * Enhancement [owncloud/web#11004](https://github.com/owncloud/web/pull/11004): Add enabled only filter to spaces overview
   * Enhancement [owncloud/web#11037](https://github.com/owncloud/web/pull/11037): Multiple sidebar root panels
 
-   https://github.com/owncloud/ocis/pull/9379
-   https://github.com/owncloud/web/releases/tag/v9.0.0-alpha.7
+   https://github.com/owncloud/ocis/pull/9395
+   https://github.com/owncloud/web/releases/tag/v9.0.0
 
 # Changelog for [5.0.3] (2024-05-02)
 
