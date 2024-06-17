@@ -1,0 +1,11 @@
+web:
+  config:
+    external_apps:
+      - id: preview
+        path: web-app-preview
+        config:
+          mimeTypes:
+            - image/tiff
+            - image/bmp
+            - image/x-ms-bmp
+
