@@ -1,6 +1,12 @@
 """oCIS CI definition
 """
 
+# Production release tags
+# NOTE: need to be updated if new production releases are determined
+# - follow semver
+# - omit 'v' prefix
+PRODUCTION_RELEASE_TAGS = ["5.0", "7.0.0"]
+
 # images
 ALPINE_GIT = "alpine/git:latest"
 APACHE_TIKA = "apache/tika:2.8.0.0"
@@ -1264,20 +1270,43 @@ def logTracingResults():
 
 def dockerReleases(ctx):
     pipelines = []
-    for arch in config["dockerReleases"]["architectures"]:
-        pipelines.append(dockerRelease(ctx, arch))
+    docker_repos = []
+    build_type = "daily"
 
-    manifest = releaseDockerManifest()
-    manifest["depends_on"] = getPipelineNames(pipelines)
-    pipelines.append(manifest)
+    # dockerhub repo
+    #  - "owncloud/ocis-rolling"
+    repo = ctx.repo.slug + "-rolling"
+    docker_repos.append(repo)
 
-    readme = releaseDockerReadme(ctx)
-    readme["depends_on"] = getPipelineNames(pipelines)
-    pipelines.append(readme)
+    # production release repo
+    if ctx.build.event == "tag":
+        tag = ctx.build.ref.replace("refs/tags/v", "").lower()
+        for prod_tag in PRODUCTION_RELEASE_TAGS:
+            if tag.startswith(prod_tag):
+                docker_repos.append(ctx.repo.slug)
+                break
+
+    for repo in docker_repos:
+        repo_pipelines = []
+        if ctx.build.event == "tag":
+            build_type = "rolling" if "rolling" in repo else "production"
+
+        for arch in config["dockerReleases"]["architectures"]:
+            repo_pipelines.append(dockerRelease(ctx, arch, repo, build_type))
+
+        manifest = releaseDockerManifest(repo, build_type)
+        manifest["depends_on"] = getPipelineNames(repo_pipelines)
+        repo_pipelines.append(manifest)
+
+        readme = releaseDockerReadme(ctx, repo, build_type)
+        readme["depends_on"] = getPipelineNames(repo_pipelines)
+        repo_pipelines.append(readme)
+
+        pipelines.extend(repo_pipelines)
 
     return pipelines
 
-def dockerRelease(ctx, arch):
+def dockerRelease(ctx, arch, repo, build_type):
     build_args = [
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
@@ -1290,7 +1319,7 @@ def dockerRelease(ctx, arch):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "docker-%s" % (arch),
+        "name": "docker-%s-%s" % (arch, build_type),
         "platform": {
             "os": "linux",
             "arch": arch,
@@ -1314,7 +1343,7 @@ def dockerRelease(ctx, arch):
                     "context": "ocis",
                     "tags": "linux-%s" % (arch),
                     "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
-                    "repo": ctx.repo.slug,
+                    "repo": repo,
                     "build_args": build_args,
                 },
                 "when": {
@@ -1339,7 +1368,7 @@ def dockerRelease(ctx, arch):
                     "context": "ocis",
                     "auto_tag_suffix": "linux-%s" % (arch),
                     "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
-                    "repo": ctx.repo.slug,
+                    "repo": repo,
                     "build_args": build_args,
                 },
                 "when": {
@@ -1364,25 +1393,55 @@ def dockerRelease(ctx, arch):
 
 def binaryReleases(ctx):
     pipelines = []
-    for os in config["binaryReleases"]["os"]:
-        pipelines.append(binaryRelease(ctx, os))
+    targets = []
+    build_type = "daily"
 
-    return pipelines
-
-def binaryRelease(ctx, name):
     # uploads binary to https://download.owncloud.com/ocis/ocis/daily/
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
     depends_on = getPipelineNames(testOcisAndUploadResults(ctx) + testPipelines(ctx))
+
     if ctx.build.event == "tag":
-        # uploads binary to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
-        folder = "stable"
-        buildref = ctx.build.ref.replace("refs/tags/v", "")
-        buildref = buildref.lower()
-        if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
-            folder = "testing"
-        target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
         depends_on = []
 
+        buildref = ctx.build.ref.replace("refs/tags/v", "").lower()
+        target_path = "/ocis/%s" % ctx.repo.name.replace("ocis-", "")
+
+        if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
+            folder = "testing"
+            target = "%s/%s/%s" % (target_path, folder, buildref)
+            targets.append(target)
+            build_type = "testing"
+        else:
+            # uploads binary to eg. https://download.owncloud.com/ocis/ocis/rolling/1.0.0/
+            folder = "rolling"
+            target = "%s/%s/%s" % (target_path, folder, buildref)
+            targets.append(target)
+
+            for prod_tag in PRODUCTION_RELEASE_TAGS:
+                if buildref.startswith(prod_tag):
+                    # uploads binary to eg. https://download.owncloud.com/ocis/ocis/stable/2.0.0/
+                    folder = "stable"
+                    target = "%s/%s/%s" % (target_path, folder, buildref)
+                    targets.append(target)
+                    break
+
+    else:
+        targets.append(target)
+
+    for target in targets:
+        if "rolling" in target:
+            build_type = "rolling"
+        elif "stable" in target:
+            build_type = "production"
+        elif "testing" in target:
+            build_type = "testing"
+
+        for os in config["binaryReleases"]["os"]:
+            pipelines.append(binaryRelease(ctx, os, build_type, target, depends_on))
+
+    return pipelines
+
+def binaryRelease(ctx, arch, build_type, target, depends_on = []):
     settings = {
         "endpoint": {
             "from_secret": "upload_s3_endpoint",
@@ -1405,7 +1464,7 @@ def binaryRelease(ctx, name):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "binaries-%s" % (name),
+        "name": "binaries-%s-%s" % (arch, build_type),
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -1418,7 +1477,7 @@ def binaryRelease(ctx, name):
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
-                    "make -C ocis release-%s" % (name),
+                    "make -C ocis release-%s" % (arch),
                 ],
             },
             {
@@ -1627,11 +1686,15 @@ def licenseCheck(ctx):
         "volumes": [pipelineVolumeGo],
     }]
 
-def releaseDockerManifest():
+def releaseDockerManifest(repo, build_type):
+    spec = "manifest.tmpl"
+    if "rolling" not in repo:
+        spec = "manifest-production.tmpl"
+
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "manifest",
+        "name": "manifest-%s" % build_type,
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -1647,7 +1710,7 @@ def releaseDockerManifest():
                     "password": {
                         "from_secret": "docker_password",
                     },
-                    "spec": "ocis/docker/manifest.tmpl",
+                    "spec": "ocis/docker/%s" % spec,
                     "auto_tag": True,
                     "ignore_missing": True,
                 },
@@ -1730,11 +1793,11 @@ def changelog():
         },
     }]
 
-def releaseDockerReadme(ctx):
+def releaseDockerReadme(ctx, repo, build_type):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "readme",
+        "name": "readme-%s" % build_type,
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -1750,7 +1813,7 @@ def releaseDockerReadme(ctx):
                     "DOCKER_PASS": {
                         "from_secret": "docker_password",
                     },
-                    "PUSHRM_TARGET": "owncloud/${DRONE_REPO_NAME}",
+                    "PUSHRM_TARGET": repo,
                     "PUSHRM_SHORT": "Docker images for %s" % (ctx.repo.name),
                     "PUSHRM_FILE": "README.md",
                 },
