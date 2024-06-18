@@ -15,11 +15,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
+	microstore "go-micro.dev/v4/store"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
-	microstore "go-micro.dev/v4/store"
 )
 
 // RawActivity represents an activity as it is stored in the activitylog store
@@ -75,9 +76,7 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		registeredEvents: make(map[string]events.Unmarshaller),
 	}
 
-	s.mux.Route("/graph/v1.0/drives/{drive-id}", func(r chi.Router) {
-		r.Get("/items/{item-id}/activities", s.HandleGetItemActivities)
-	})
+	s.mux.Get("/graph/v1beta1/extensions/org.libregraph/activities", s.HandleGetItemActivities)
 
 	for _, e := range o.RegisteredEvents {
 		typ := reflect.TypeOf(e)

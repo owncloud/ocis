@@ -236,15 +236,8 @@ func DefaultPolicies() []config.Policy {
 					Endpoint: "/app/", // /app or /apps? ocdav only handles /apps
 					Service:  "com.owncloud.web.frontend",
 				},
-				// reroute activities endpoint to activitylog service
-				// {
-				// Type:     config.RegexRoute,
-				// Endpoint: "/graph/v1.0/drives/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/items/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/activities",
-				// Service:  "com.owncloud.web.activitylog",
-				// },
 				{
-					Type:     config.RegexRoute,
-					Endpoint: "/graph/v1.0/drives/[^/]+/items/[^/]+/activities",
+					Endpoint: "/graph/v1beta1/extensions/org.libregraph/activities",
 					Service:  "com.owncloud.web.activitylog",
 				},
 				{

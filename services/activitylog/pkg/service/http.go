@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
@@ -12,10 +13,14 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
 
 var (
@@ -42,8 +47,33 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
-	// TODO: Compare driveid with itemid to avoid bad requests
-	rid, err := parseIDParam(r, "item-id")
+	qraw := r.URL.Query().Get("kql")
+	if qraw == "" {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	qBuilder := kql.Builder{}
+	qast, err := qBuilder.Build(qraw)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	var itemID string
+
+	for _, n := range qast.Nodes {
+		v, ok := n.(*ast.StringNode)
+		if !ok {
+			continue
+		}
+
+		if strings.ToLower(v.Key) != "itemid" {
+			continue
+		}
+
+		itemID = v.Value
+	}
+
+	rid, err := storagespace.ParseID(itemID)
 	if err != nil {
 		s.log.Info().Err(err).Msg("invalid resource id")
 		w.WriteHeader(http.StatusBadRequest)
@@ -80,7 +110,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			message string
 			res     Resource
 			act     Actor
-			ts      Times
+			ts      libregraph.ActivityTimes
 		)
 
 		switch ev := s.unwrapEvent(e).(type) {
