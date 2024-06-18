@@ -1,10 +1,4 @@
-image: owncloud/ocis:{{#if build.tag}}{{trimPrefix "v" build.tag}}{{else}}master{{/if}}
-{{#if build.tags}}
-tags:
-{{#each build.tags}}
-  - {{this}}
-{{/each}}
-{{/if}}
+image: owncloud/ocis:latest
 manifests:
   - image: owncloud/ocis:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-amd64
     platform:
