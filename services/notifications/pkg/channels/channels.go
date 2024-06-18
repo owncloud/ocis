@@ -114,7 +114,7 @@ func (m Mail) SendMessage(ctx context.Context, message *Message) error {
 
 	email := mail.NewMSG()
 	if message.Sender != "" {
-		tmpSender := fmt.Sprintf("%s via %s", message.Sender, m.Notifications.SMTP.Sender)
+		tmpSender := fmt.Sprintf("%s via %s", message.Sender, m.conf.Notifications.SMTP.Sender)
 		if strings.Contains(tmpSender, ",") {
 			tmpParts := strings.SplitN(tmpSender, "<", 2)
 			tmpSender = fmt.Sprintf("\"%s\" <%s", tmpParts[0], tmpParts[1])
