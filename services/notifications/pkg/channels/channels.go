@@ -119,7 +119,6 @@ func (m Mail) SendMessage(ctx context.Context, message *Message) error {
 			tmpParts := strings.SplitN(tmpSender, "<", 2)
 			tmpSender = fmt.Sprintf("\"%s\" <%s", tmpParts[0], tmpParts[1])
 		}
-		//Get String and check for coma, if coma do Hochkomma drum
 		email.SetFrom(tmpSender).AddTo(message.Recipient...)
 	} else {
 		email.SetFrom(m.conf.Notifications.SMTP.Sender).AddTo(message.Recipient...)
