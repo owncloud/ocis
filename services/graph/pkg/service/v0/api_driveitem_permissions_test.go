@@ -17,12 +17,6 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	roleconversions "github.com/cs3org/reva/v2/pkg/conversions"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -30,6 +24,13 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
+
+	roleconversions "github.com/cs3org/reva/v2/pkg/conversions"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
@@ -249,7 +250,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			statResponse.Status = status.NewNotFound(context.Background(), "not found")
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, "not found")))
+			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, "not found").WithOrigin(errorcode.ErrorOriginCS3)))
 			Expect(permission).To(BeZero())
 		})
 	})
@@ -999,7 +1000,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 			driveItemPermission.SetExpirationDateTime(expiration)
 			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
-			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "expiration date is in the past")))
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "expiration date is in the past").WithOrigin(errorcode.ErrorOriginCS3)))
 			Expect(res).To(BeZero())
 		})
 	})

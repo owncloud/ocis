@@ -34,11 +34,11 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
+	"github.com/cs3org/reva/v2/internal/grpc/services/usershareprovider"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/response"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/conversions"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
-	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
 const (
@@ -73,8 +73,13 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 		response.WriteOCSResponse(w, r, *ocsResponse, nil)
 		return
 	}
-
-	unmountedShares, err := getUnmountedShares(ctx, client, sharedResource.GetInfo().GetId())
+	mount, unmountedShares, err := usershareprovider.GetMountpointAndUnmountedShares(
+		ctx,
+		client,
+		sharedResource.GetInfo().GetId(),
+		sharedResource.GetInfo().GetName(),
+		nil,
+	)
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "could not determine mountpoint", err)
 		return
@@ -82,8 +87,12 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 
 	// first update the requested share
 	receivedShare.State = collaboration.ShareState_SHARE_STATE_ACCEPTED
+	// we need to add a path to the share
+	receivedShare.MountPoint = &provider.Reference{
+		Path: mount,
+	}
 
-	updateMask := &fieldmaskpb.FieldMask{Paths: []string{"state"}}
+	updateMask := &fieldmaskpb.FieldMask{Paths: []string{"state", "mount_point"}}
 	data, meta, err := h.updateReceivedShare(r.Context(), receivedShare, updateMask)
 	if err != nil {
 		// we log an error for affected shares, for the actual share we return an error
@@ -100,6 +109,10 @@ func (h *Handler) AcceptReceivedShare(w http.ResponseWriter, r *http.Request) {
 		}
 
 		rs.State = collaboration.ShareState_SHARE_STATE_ACCEPTED
+		// set the same mountpoint as for the requested received share
+		rs.MountPoint = &provider.Reference{
+			Path: mount,
+		}
 
 		_, _, err := h.updateReceivedShare(r.Context(), rs, updateMask)
 		if err != nil {
@@ -312,25 +325,6 @@ func getReceivedShareFromID(ctx context.Context, client gateway.GatewayAPIClient
 	}
 
 	return s.Share, nil
-}
-
-func getUnmountedShares(ctx context.Context, gwc gateway.GatewayAPIClient, id *provider.ResourceId) ([]*collaboration.ReceivedShare, error) {
-	var unmountedShares []*collaboration.ReceivedShare
-	receivedShares, err := listReceivedShares(ctx, gwc)
-	if err != nil {
-		return unmountedShares, err
-	}
-
-	for _, s := range receivedShares {
-		resourceIDEqual := utils.ResourceIDEqual(s.GetShare().GetResourceId(), id)
-
-		if resourceIDEqual && s.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
-			// a share to the resource already exists but is not mounted, collect the unmounted share
-			unmountedShares = append(unmountedShares, s)
-		}
-	}
-
-	return unmountedShares, err
 }
 
 // getSharedResource attempts to get a shared resource from the storage from the resource reference.

@@ -547,75 +547,6 @@ func (s *service) UpdateReceivedShare(ctx context.Context, req *collaboration.Up
 	}, nil
 }
 
-// GetAvailableMountpoint returns a new or existing mountpoint
-func GetAvailableMountpoint(ctx context.Context, gwc gateway.GatewayAPIClient, id *provider.ResourceId, name string, userId *userpb.UserId) (string, error) {
-	listReceivedSharesReq := &collaboration.ListReceivedSharesRequest{}
-	if userId != nil {
-		listReceivedSharesReq.Opaque = utils.AppendJSONToOpaque(nil, "userid", userId)
-	}
-
-	listReceivedSharesRes, err := gwc.ListReceivedShares(ctx, listReceivedSharesReq)
-	if err != nil {
-		return "", errtypes.InternalError("grpc list received shares request failed")
-	}
-
-	if err := errtypes.NewErrtypeFromStatus(listReceivedSharesRes.GetStatus()); err != nil {
-		return "", err
-	}
-
-	base := filepath.Clean(name)
-	mount := base
-	existingMountpoint := ""
-	mountedShares := make([]string, 0, len(listReceivedSharesRes.GetShares()))
-	var pathExists bool
-
-	for _, s := range listReceivedSharesRes.GetShares() {
-		resourceIDEqual := utils.ResourceIDEqual(s.GetShare().GetResourceId(), id)
-
-		if resourceIDEqual && s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
-			// a share to the resource already exists and is mounted, remembers the mount point
-			_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
-			if err == nil {
-				existingMountpoint = s.GetMountPoint().GetPath()
-			}
-		}
-
-		if s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
-			// collect all accepted mount points
-			mountedShares = append(mountedShares, s.GetMountPoint().GetPath())
-			if s.GetMountPoint().GetPath() == mount {
-				// does the shared resource still exist?
-				_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
-				if err == nil {
-					pathExists = true
-				}
-				// TODO we could delete shares here if the stat returns code NOT FOUND ... but listening for file deletes would be better
-			}
-		}
-	}
-
-	if existingMountpoint != "" {
-		// we want to reuse the same mountpoint for all unmounted shares to the same resource
-		return existingMountpoint, nil
-	}
-
-	// If the mount point really already exists, we need to insert a number into the filename
-	if pathExists {
-		// now we have a list of shares, we want to iterate over all of them and check for name collisions agents a mount points list
-		for i := 1; i <= len(mountedShares)+1; i++ {
-			ext := filepath.Ext(base)
-			name := strings.TrimSuffix(base, ext)
-
-			mount = name + " (" + strconv.Itoa(i) + ")" + ext
-			if !slices.Contains(mountedShares, mount) {
-				return mount, nil
-			}
-		}
-	}
-
-	return mount, nil
-}
-
 func setReceivedShareMountPoint(ctx context.Context, gwc gateway.GatewayAPIClient, req *collaboration.UpdateReceivedShareRequest) (*rpc.Status, error) {
 	receivedShare, err := gwc.GetReceivedShare(ctx, &collaboration.GetReceivedShareRequest{
 		Ref: &collaboration.ShareReference{
@@ -653,7 +584,7 @@ func setReceivedShareMountPoint(ctx context.Context, gwc gateway.GatewayAPIClien
 		_ = utils.ReadJSONFromOpaque(req.Opaque, "userid", &userID)
 
 		// check if the requested mount point is available and if not, find a suitable one
-		availableMountpoint, err := GetAvailableMountpoint(ctx, gwc,
+		availableMountpoint, _, err := GetMountpointAndUnmountedShares(ctx, gwc,
 			resourceStat.GetInfo().GetId(),
 			resourceStat.GetInfo().GetName(),
 			userID,
@@ -672,4 +603,79 @@ func setReceivedShareMountPoint(ctx context.Context, gwc gateway.GatewayAPIClien
 	}
 
 	return status.NewOK(ctx), nil
+}
+
+// GetMountpointAndUnmountedShares returns a new or existing mountpoint for the given info and produces a list of unmounted received shares for the same resource
+func GetMountpointAndUnmountedShares(ctx context.Context, gwc gateway.GatewayAPIClient, id *provider.ResourceId, name string, userId *userpb.UserId) (string, []*collaboration.ReceivedShare, error) {
+	listReceivedSharesReq := &collaboration.ListReceivedSharesRequest{}
+	if userId != nil {
+		listReceivedSharesReq.Opaque = utils.AppendJSONToOpaque(nil, "userid", userId)
+	}
+
+	listReceivedSharesRes, err := gwc.ListReceivedShares(ctx, listReceivedSharesReq)
+	if err != nil {
+		return "", nil, errtypes.InternalError("grpc list received shares request failed")
+	}
+
+	if err := errtypes.NewErrtypeFromStatus(listReceivedSharesRes.GetStatus()); err != nil {
+		return "", nil, err
+	}
+
+	unmountedShares := []*collaboration.ReceivedShare{}
+	base := filepath.Clean(name)
+	mount := base
+	existingMountpoint := ""
+	mountedShares := make([]string, 0, len(listReceivedSharesRes.GetShares()))
+	var pathExists bool
+
+	for _, s := range listReceivedSharesRes.GetShares() {
+		resourceIDEqual := utils.ResourceIDEqual(s.GetShare().GetResourceId(), id)
+
+		if resourceIDEqual && s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
+			// a share to the resource already exists and is mounted, remembers the mount point
+			_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
+			if err == nil {
+				existingMountpoint = s.GetMountPoint().GetPath()
+			}
+		}
+
+		if resourceIDEqual && s.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
+			// a share to the resource already exists but is not mounted, collect the unmounted share
+			unmountedShares = append(unmountedShares, s)
+		}
+
+		if s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
+			// collect all accepted mount points
+			mountedShares = append(mountedShares, s.GetMountPoint().GetPath())
+			if s.GetMountPoint().GetPath() == mount {
+				// does the shared resource still exist?
+				_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
+				if err == nil {
+					pathExists = true
+				}
+				// TODO we could delete shares here if the stat returns code NOT FOUND ... but listening for file deletes would be better
+			}
+		}
+	}
+
+	if existingMountpoint != "" {
+		// we want to reuse the same mountpoint for all unmounted shares to the same resource
+		return existingMountpoint, unmountedShares, nil
+	}
+
+	// If the mount point really already exists, we need to insert a number into the filename
+	if pathExists {
+		// now we have a list of shares, we want to iterate over all of them and check for name collisions agents a mount points list
+		for i := 1; i <= len(mountedShares)+1; i++ {
+			ext := filepath.Ext(base)
+			name := strings.TrimSuffix(base, ext)
+
+			mount = name + " (" + strconv.Itoa(i) + ")" + ext
+			if !slices.Contains(mountedShares, mount) {
+				return mount, unmountedShares, nil
+			}
+		}
+	}
+
+	return mount, unmountedShares, nil
 }

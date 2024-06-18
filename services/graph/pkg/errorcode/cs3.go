@@ -5,6 +5,7 @@ import (
 
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+
 	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
@@ -19,11 +20,12 @@ import (
 // This function is particularly useful when dealing with CS3 responses,
 // and a unified error handling within the application is necessary.
 func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) error {
-	if inerr != nil {
-		return Error{msg: inerr.Error(), errorCode: GeneralException}
-	}
+	err := Error{errorCode: GeneralException, msg: "unspecified error has occurred", origin: ErrorOriginCS3}
 
-	err := Error{errorCode: GeneralException, msg: "unspecified error has occurred"}
+	if inerr != nil {
+		err.msg = inerr.Error()
+		return err
+	}
 
 	if status != nil {
 		err.msg = status.GetMessage()

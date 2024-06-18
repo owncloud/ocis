@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
@@ -186,26 +185,4 @@ func updateShareRequest(shareID *collaboration.ShareId, uid *user.UserId) *colla
 		},
 		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"state"}},
 	}
-}
-
-// getSharesList gets the list of all shares for the given user.
-func getSharesList(ctx context.Context, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], uid *user.UserId) (*collaboration.ListReceivedSharesResponse, error) {
-	gwc, err := gatewaySelector.Next()
-	if err != nil {
-		return nil, err
-	}
-	shares, err := gwc.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
-		Opaque: utils.AppendJSONToOpaque(nil, "userid", uid),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if shares.Status.Code != rpc.Code_CODE_OK {
-		if shares.Status.Code == rpc.Code_CODE_NOT_FOUND {
-			return nil, fmt.Errorf("not found")
-		}
-		return nil, fmt.Errorf(shares.GetStatus().GetMessage())
-	}
-	return shares, nil
 }
