@@ -1693,30 +1693,25 @@ def releaseDockerManifest(ctx, repo, build_type):
         spec = "manifest.production.tmpl"
         spec_latest = "manifest.production-latest.tmpl"
 
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "manifest-%s" % build_type,
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": [
-            {
-                "name": "execute",
-                "image": PLUGINS_MANIFEST,
-                "settings": {
-                    "username": {
-                        "from_secret": "docker_username",
-                    },
-                    "password": {
-                        "from_secret": "docker_password",
-                    },
-                    "spec": "ocis/docker/%s" % spec,
-                    "auto_tag": True if ctx.build.event == "tag" else False,
-                    "ignore_missing": True,
+    steps = [
+        {
+            "name": "execute",
+            "image": PLUGINS_MANIFEST,
+            "settings": {
+                "username": {
+                    "from_secret": "docker_username",
                 },
+                "password": {
+                    "from_secret": "docker_password",
+                },
+                "spec": "ocis/docker/%s" % spec,
+                "auto_tag": True if ctx.build.event == "tag" else False,
+                "ignore_missing": True,
             },
+        },
+    ]
+    if len(ctx.build.ref.split("-")) == 1:
+        steps.append(
             {
                 "name": "execute-latest",
                 "image": PLUGINS_MANIFEST,
@@ -1737,7 +1732,17 @@ def releaseDockerManifest(ctx, repo, build_type):
                     ],
                 },
             },
-        ],
+        )
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "manifest-%s" % build_type,
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": steps,
         "trigger": {
             "ref": [
                 "refs/heads/master",
