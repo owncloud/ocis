@@ -1294,7 +1294,7 @@ def dockerReleases(ctx):
         for arch in config["dockerReleases"]["architectures"]:
             repo_pipelines.append(dockerRelease(ctx, arch, repo, build_type))
 
-        manifest = releaseDockerManifest(repo, build_type)
+        manifest = releaseDockerManifest(ctx, repo, build_type)
         manifest["depends_on"] = getPipelineNames(repo_pipelines)
         repo_pipelines.append(manifest)
 
@@ -1686,7 +1686,7 @@ def licenseCheck(ctx):
         "volumes": [pipelineVolumeGo],
     }]
 
-def releaseDockerManifest(repo, build_type):
+def releaseDockerManifest(ctx, repo, build_type):
     spec = "manifest.tmpl"
     spec_latest = "manifest-latest.tmpl"
     if "rolling" not in repo:
@@ -1713,7 +1713,7 @@ def releaseDockerManifest(repo, build_type):
                         "from_secret": "docker_password",
                     },
                     "spec": "ocis/docker/%s" % spec,
-                    "auto_tag": True,
+                    "auto_tag": True if ctx.build.event == "tag" else False,
                     "ignore_missing": True,
                 },
             },
