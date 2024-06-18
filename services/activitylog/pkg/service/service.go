@@ -89,7 +89,7 @@ func New(opts ...Option) (*ActivitylogService, error) {
 }
 
 // Run runs the service
-func (a *ActivitylogService) Run() error {
+func (a *ActivitylogService) Run() {
 	for e := range a.events {
 		var err error
 		switch ev := e.Event.(type) {
@@ -129,7 +129,6 @@ func (a *ActivitylogService) Run() error {
 			a.log.Error().Err(err).Interface("event", e).Msg("could not process event")
 		}
 	}
-	return nil
 }
 
 // AddActivity adds the activity to the given resource and all its parents
@@ -196,6 +195,31 @@ func (a *ActivitylogService) Activities(rid *provider.ResourceId) ([]RawActivity
 	}
 
 	return activities, nil
+}
+
+// RemoveActivities removes the activities from the given resource
+func (a *ActivitylogService) RemoveActivities(rid *provider.ResourceId, toDelete map[string]struct{}) error {
+	curActivities, err := a.Activities(rid)
+	if err != nil {
+		return err
+	}
+
+	var acts []RawActivity
+	for _, a := range curActivities {
+		if _, ok := toDelete[a.EventID]; !ok {
+			acts = append(acts, a)
+		}
+	}
+
+	b, err := json.Marshal(acts)
+	if err != nil {
+		return err
+	}
+
+	return a.store.Write(&microstore.Record{
+		Key:   storagespace.FormatResourceID(*rid),
+		Value: b,
+	})
 }
 
 // note: getResource is abstracted to allow unit testing, in general this will just be utils.GetResource

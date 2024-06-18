@@ -3,8 +3,9 @@ package service
 import (
 	"embed"
 	"encoding/json"
+	"errors"
 	"net/http"
-	"net/url"
+	"strconv"
 	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -12,13 +13,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-chi/chi/v5"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
@@ -47,40 +46,15 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
-	qraw := r.URL.Query().Get("kql")
-	if qraw == "" {
-		w.WriteHeader(http.StatusBadRequest)
-	}
-
-	qBuilder := kql.Builder{}
-	qast, err := qBuilder.Build(qraw)
+	rid, limit, rawActivityAccepted, activityAccepted, err := s.getFilters(r.URL.Query().Get("kql"))
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-	}
-
-	var itemID string
-
-	for _, n := range qast.Nodes {
-		v, ok := n.(*ast.StringNode)
-		if !ok {
-			continue
-		}
-
-		if strings.ToLower(v.Key) != "itemid" {
-			continue
-		}
-
-		itemID = v.Value
-	}
-
-	rid, err := storagespace.ParseID(itemID)
-	if err != nil {
-		s.log.Info().Err(err).Msg("invalid resource id")
+		s.log.Info().Str("query", r.URL.Query().Get("kql")).Err(err).Msg("error getting filters")
+		_, _ = w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	raw, err := s.Activities(&rid)
+	raw, err := s.Activities(rid)
 	if err != nil {
 		s.log.Error().Err(err).Msg("error getting activities")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -88,9 +62,13 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 	}
 
 	ids := make([]string, 0, len(raw))
+	toDelete := make(map[string]struct{}, len(raw))
 	for _, a := range raw {
-		// TODO: Filter by depth and timestamp
+		if !rawActivityAccepted(a) {
+			continue
+		}
 		ids = append(ids, a.EventID)
+		toDelete[a.EventID] = struct{}{}
 	}
 
 	evRes, err := s.evHistory.GetEvents(r.Context(), &ehsvc.GetEventsRequest{Ids: ids})
@@ -102,9 +80,15 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 
 	var resp GetActivitiesResponse
 	for _, e := range evRes.GetEvents() {
-		// TODO: compare returned events with initial list and remove missing ones
+		delete(toDelete, e.GetId())
 
-		// FIXME: Should all users get all events? If not we can filter here
+		if limit != 0 && len(resp.Activities) >= limit {
+			continue
+		}
+
+		if !activityAccepted(e) {
+			continue
+		}
 
 		var (
 			message string
@@ -169,11 +153,21 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			continue
 		}
 
-		// todo: configurable default locale?
+		// FIXME: configurable default locale?
 		loc := l10n.MustGetUserLocale(r.Context(), activeUser.GetId().GetOpaqueId(), r.Header.Get(l10n.HeaderAcceptLanguage), s.valService)
 		t := l10n.NewTranslatorFromCommonConfig("en", _domain, "", _localeFS, _localeSubPath)
 
 		resp.Activities = append(resp.Activities, NewActivity(t.Translate(message, loc), res, act, ts, e.GetId()))
+	}
+
+	// delete activities in separate go routine
+	if len(toDelete) > 0 {
+		go func() {
+			err := s.RemoveActivities(rid, toDelete)
+			if err != nil {
+				s.log.Error().Err(err).Msg("error removing activities")
+			}
+		}()
 	}
 
 	b, err := json.Marshal(resp)
@@ -207,16 +201,80 @@ func (s *ActivitylogService) unwrapEvent(e *ehmsg.Event) interface{} {
 	return einterface
 }
 
-// TODO: I found this on graph service. We should move it to `utils` pkg so both services can use it.
-func parseIDParam(r *http.Request, param string) (provider.ResourceId, error) {
-	driveID, err := url.PathUnescape(chi.URLParam(r, param))
+func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int, func(RawActivity) bool, func(*ehmsg.Event) bool, error) {
+	qast, err := kql.Builder{}.Build(query)
 	if err != nil {
-		return provider.ResourceId{}, errorcode.New(errorcode.InvalidRequest, err.Error())
+		return nil, 0, nil, nil, err
 	}
 
-	id, err := storagespace.ParseID(driveID)
-	if err != nil {
-		return provider.ResourceId{}, errorcode.New(errorcode.InvalidRequest, err.Error())
+	prefilters := make([]func(RawActivity) bool, 0)
+	postfilters := make([]func(*ehmsg.Event) bool, 0)
+
+	var (
+		itemID string
+		limit  int
+	)
+
+	for _, n := range qast.Nodes {
+		switch v := n.(type) {
+		case *ast.StringNode:
+			switch strings.ToLower(v.Key) {
+			case "itemid":
+				itemID = v.Value
+			case "depth":
+				depth, err := strconv.Atoi(v.Value)
+				if err != nil {
+					return nil, limit, nil, nil, err
+				}
+
+				prefilters = append(prefilters, func(a RawActivity) bool {
+					return a.Depth <= depth
+				})
+			case "limit":
+				l, err := strconv.Atoi(v.Value)
+				if err != nil {
+					return nil, limit, nil, nil, err
+				}
+
+				limit = l
+			}
+		case *ast.DateTimeNode:
+			switch v.Operator.Value {
+			case "<", "<=":
+				prefilters = append(prefilters, func(a RawActivity) bool {
+					return a.Timestamp.Before(v.Value)
+				})
+			case ">", ">=":
+				prefilters = append(prefilters, func(a RawActivity) bool {
+					return a.Timestamp.After(v.Value)
+				})
+			}
+		case *ast.OperatorNode:
+			if v.Value != "AND" {
+				return nil, limit, nil, nil, errors.New("only AND operator is supported")
+			}
+		}
 	}
-	return id, nil
+
+	rid, err := storagespace.ParseID(itemID)
+	if err != nil {
+		return nil, limit, nil, nil, err
+	}
+	pref := func(a RawActivity) bool {
+		for _, f := range prefilters {
+			if !f(a) {
+				return false
+			}
+		}
+		return true
+	}
+	postf := func(e *ehmsg.Event) bool {
+		for _, f := range postfilters {
+			if !f(e) {
+				return false
+			}
+		}
+		return true
+	}
+	return &rid, limit, pref, postf, nil
 }
