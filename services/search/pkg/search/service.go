@@ -13,6 +13,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -323,6 +324,23 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 			s.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Str("mountpointId", mountpointID).Msg("invalid mountpoint space id")
 			return nil, errSkipSpace
 		}
+		// exclude the hidden shares
+		rs, err := gatewayClient.GetReceivedShare(ctx, &collaborationv1beta1.GetReceivedShareRequest{
+			Ref: &collaborationv1beta1.ShareReference{
+				Spec: &collaborationv1beta1.ShareReference_Id{
+					Id: &collaborationv1beta1.ShareId{
+						OpaqueId: oid,
+					},
+				},
+			},
+		})
+		if err != nil {
+			s.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Str("shareId", oid).Msg("invalid receive share")
+		}
+		if rs.GetStatus().GetCode() == rpcv1beta1.Code_CODE_OK && rs.GetShare().GetHidden() {
+			return nil, errSkipSpace
+		}
+
 		mountpointRootID = &searchmsg.ResourceID{
 			StorageId: sid,
 			SpaceId:   spid,
@@ -361,7 +379,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		s.logger.Debug().Interface("searchRequest", searchRequest).Str("duration", fmt.Sprint(duration)).Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("space search done")
 	}
 
-	var matches []*searchmsg.Match
+	matches := make([]*searchmsg.Match, 0, len(res.Matches))
 
 	for _, match := range res.Matches {
 		if mountpointPrefix != "" {
