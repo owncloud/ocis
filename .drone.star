@@ -1688,8 +1688,10 @@ def licenseCheck(ctx):
 
 def releaseDockerManifest(repo, build_type):
     spec = "manifest.tmpl"
+    spec_latest = "manifest-latest.tmpl"
     if "rolling" not in repo:
-        spec = "manifest-production.tmpl"
+        spec = "manifest.production.tmpl"
+        spec_latest = "manifest.production-latest.tmpl"
 
     return {
         "kind": "pipeline",
@@ -1713,6 +1715,26 @@ def releaseDockerManifest(repo, build_type):
                     "spec": "ocis/docker/%s" % spec,
                     "auto_tag": True,
                     "ignore_missing": True,
+                },
+            },
+            {
+                "name": "execute-latest",
+                "image": PLUGINS_MANIFEST,
+                "settings": {
+                    "username": {
+                        "from_secret": "docker_username",
+                    },
+                    "password": {
+                        "from_secret": "docker_password",
+                    },
+                    "spec": "ocis/docker/%s" % spec_latest,
+                    "auto_tag": True,
+                    "ignore_missing": True,
+                },
+                "when": {
+                    "ref": [
+                        "refs/tags/v*",
+                    ],
                 },
             },
         ],
