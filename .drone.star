@@ -1309,7 +1309,7 @@ def dockerReleases(ctx):
 def dockerRelease(ctx, arch, repo, build_type):
     build_args = [
         "REVISION=%s" % (ctx.build.commit),
-        "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
+        "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "master"),
     ]
     depends_on = getPipelineNames(testOcisAndUploadResults(ctx) + testPipelines(ctx))
 
