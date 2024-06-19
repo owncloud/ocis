@@ -1,6 +1,7 @@
 {
   "clientId": "3keLfua0olYvW1zKXTDB3OjAMPEYWEQNuiscli395GKJOiPnPURNQWGvGCJZf4Hw",
   "name": "Cyberduck",
+  "description": "",
   "surrogateAuthRequired": false,
   "enabled": true,
   "alwaysDisplayInConsole": false,
@@ -26,10 +27,12 @@
     "saml.force.post.binding": "false",
     "saml.multivalued.roles": "false",
     "saml.encrypt": "false",
+    "oauth2.device.authorization.grant.enabled": "false",
     "backchannel.logout.revoke.offline.tokens": "false",
     "saml.server.signature": "false",
     "saml.server.signature.keyinfo.ext": "false",
     "exclude.session.state.from.auth.response": "false",
+    "oidc.ciba.grant.enabled": "false",
     "backchannel.logout.session.required": "true",
     "client_credentials.use_refresh_token": "false",
     "saml_force_name_id_format": "false",
@@ -44,7 +47,6 @@
   "nodeReRegistrationTimeout": -1,
   "defaultClientScopes": [
     "web-origins",
-    "role_list",
     "profile",
     "roles",
     "email"
