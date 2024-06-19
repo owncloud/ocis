@@ -2053,6 +2053,7 @@ trait WebDav {
 			$responseXmlObject = $this->listFolderAndReturnResponseXml(
 				$user,
 				"/",
+				"infinity"
 			);
 			foreach ($elementsSimplified as $expectedElement) {
 				// Allow the table of expected elements to have entries that do
