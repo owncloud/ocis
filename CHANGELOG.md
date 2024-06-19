@@ -129,7 +129,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Web server compression: [#9287](https://github.com/owncloud/ocis/pull/9287)
 * Enhancement - Add secureview flag when listing apps via http: [#9289](https://github.com/owncloud/ocis/pull/9289)
 * Enhancement - Activitylog Service: [#9327](https://github.com/owncloud/ocis/pull/9327)
-* Enhancement - Bump Reva: [#9330](https://github.com/owncloud/ocis/pull/9330)
+* Enhancement - Bump Reva: [#9377](https://github.com/owncloud/ocis/pull/9377)
 * Enhancement - Update web to v9.0.0-alpha.7: [#9395](https://github.com/owncloud/ocis/pull/9395)
 
 ## Details
@@ -796,10 +796,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9327
 
-* Enhancement - Bump Reva: [#9330](https://github.com/owncloud/ocis/pull/9330)
+* Enhancement - Bump Reva: [#9377](https://github.com/owncloud/ocis/pull/9377)
 
    Bumps reva version
 
+   https://github.com/owncloud/ocis/pull/9377
    https://github.com/owncloud/ocis/pull/9330
    https://github.com/owncloud/ocis/pull/9318
    https://github.com/owncloud/ocis/pull/9269
