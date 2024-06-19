@@ -57,7 +57,7 @@ require (
 	github.com/jinzhu/now v1.1.5
 	github.com/justinas/alice v1.2.0
 	github.com/kovidgoyal/imaging v1.6.3
-	github.com/leonelquinteros/gotext v1.6.0
+	github.com/leonelquinteros/gotext v1.6.1
 	github.com/libregraph/idm v0.5.0
 	github.com/libregraph/lico v0.62.0
 	github.com/mitchellh/mapstructure v1.5.0

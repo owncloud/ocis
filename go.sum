@@ -1636,8 +1636,8 @@ github.com/labstack/echo/v4 v4.1.11/go.mod h1:i541M3Fj6f76NZtHSj7TXnyM8n2gaodfvf
 github.com/labstack/gommon v0.3.0/go.mod h1:MULnywXg0yavhxWKc+lOruYdAhDwPK9wf0OL7NoOu+k=
 github.com/leodido/go-urn v1.4.0 h1:WT9HwE9SGECu3lg4d/dIA+jxlljEa1/ffXKmRjqdmIQ=
 github.com/leodido/go-urn v1.4.0/go.mod h1:bvxc+MVxLKB4z00jd1z+Dvzr47oO32F/QSNjSBOlFxI=
-github.com/leonelquinteros/gotext v1.6.0 h1:IYL2+dKsaYYvqGAOafaC7mpAGBhMrD/vKjHUGyp8V64=
-github.com/leonelquinteros/gotext v1.6.0/go.mod h1:qQRISjoonXYFdRGrTG1LARQ38Gpibad0IPeB4hpvyyM=
+github.com/leonelquinteros/gotext v1.6.1 h1:PuTN8YUqHvfPZxW+fPXp7o0Fc2zN9L2wXBZrqT5MO5A=
+github.com/leonelquinteros/gotext v1.6.1/go.mod h1:qQRISjoonXYFdRGrTG1LARQ38Gpibad0IPeB4hpvyyM=
 github.com/libregraph/idm v0.5.0 h1:tDMwKbAOZzdeDYMxVlY5PbSqRKO7dbAW9KT42A51WSk=
 github.com/libregraph/idm v0.5.0/go.mod h1:BGMwIQ/6orJSPVzJ1x6kgG2JyG9GY05YFmbsnaD80k0=
 github.com/libregraph/lico v0.62.0 h1:4aa0hp8kLCj/oy/aGuGKQCzdQRLHY/cvDs25bdkdcXU=
