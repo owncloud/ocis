@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-19-17-33-55]
+[#deprecation-note-2024-06-19-21-02-57]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -16,7 +16,7 @@ ifeval::[{show-deprecation} == true]
 
 | The NOTIFICATIONS_SMTP_ENCRYPTION values 'ssl' and 'tls' are deprecated and will be removed in the future.
 | 5.0.0
-| 6.0.0
+| 7.0.0
 | Use 'starttls' instead of 'tls' and 'ssltls' instead of 'ssl'.
 |===
 
@@ -221,13 +221,13 @@ a| [subs=-attributes]
 Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none' or 'auto'. If set to 'auto' or unset, the authentication method is automatically negotiated with the server.
 
 a|`NOTIFICATIONS_SMTP_ENCRYPTION` +
-xref:deprecation-note-2024-06-19-17-33-55[Deprecation Note]
+xref:deprecation-note-2024-06-19-21-02-57[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++none ++
 a| [subs=-attributes]
-Encryption method for the SMTP communication. Possible values  are 'starttls', 'ssl', 'ssltls', 'tls'  and 'none'.
+Encryption method for the SMTP communication. Possible values are 'starttls', 'ssl', 'ssltls', 'tls' and 'none'.
 
 a|`OCIS_EVENTS_ENDPOINT` +
 `NOTIFICATIONS_EVENTS_ENDPOINT` +
