@@ -37,8 +37,8 @@
     "saml.server.signature.keyinfo.ext": "false",
     "exclude.session.state.from.auth.response": "false",
     "oidc.ciba.grant.enabled": "false",
-    "backchannel.logout.session.required": "true",
     "backchannel.logout.url": "https://ocis.owncloud.test/backchannel_logout",
+    "backchannel.logout.session.required": "true",
     "client_credentials.use_refresh_token": "false",
     "saml_force_name_id_format": "false",
     "saml.client.signature": "false",
@@ -54,6 +54,7 @@
     "web-origins",
     "profile",
     "roles",
+    "groups",
     "basic",
     "email"
   ],

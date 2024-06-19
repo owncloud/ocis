@@ -445,7 +445,80 @@
       ]
     }
   },
-  "groups": [],
+  "groups": [
+    {
+      "id": "99187f82-71b6-4f21-a255-0d87bb286607",
+      "name": "philosophy-haters",
+      "path": "/philosophy-haters",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    },
+    {
+      "id": "2129ab43-0221-40e1-871a-394a8c9b6434",
+      "name": "physics-lovers",
+      "path": "/physics-lovers",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    },
+    {
+      "id": "8246d8bc-8e35-4b11-916e-f8d7729d6a23",
+      "name": "polonium-lovers",
+      "path": "/polonium-lovers",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    },
+    {
+      "id": "fabf9b54-c27e-495e-961d-9c9f2ebfd482",
+      "name": "quantum-lovers",
+      "path": "/quantum-lovers",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    },
+    {
+      "id": "f5613e5a-84b6-4e85-bcb3-0fff9fa6a191",
+      "name": "radium-lovers",
+      "path": "/radium-lovers",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    },
+    {
+      "id": "32031f61-035e-4355-b7bf-17ff314581f3",
+      "name": "sailing-lovers",
+      "path": "/sailing-lovers",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    },
+    {
+      "id": "8520544b-eb76-449d-8498-fbe0e1e62a97",
+      "name": "users",
+      "path": "/users",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    },
+    {
+      "id": "d0a10993-e532-49b7-b2b4-009f9b31d43a",
+      "name": "violin-haters",
+      "path": "/violin-haters",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    }
+  ],
   "defaultRole": {
     "id": "82e13ea7-aac4-4d2c-9fc7-cff8333dbe19",
     "name": "default-roles-ocis",
@@ -530,7 +603,9 @@
         ]
       },
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/users"
+      ]
     },
     {
       "id": "0a9f434c-4864-49cf-ac15-46ed0f49d59b",
@@ -547,8 +622,8 @@
           "id": "19efcb24-c5ec-42ed-97e1-2475ca025f40",
           "type": "password",
           "createdDate": 1611912169712,
-          "secretData": "{\"value\":\"RFmvq2E9BRSkTlzax83HU02nMA83KisDenT6cnb8EspZTrsXvIrFBspIeOZIZfZaJIacFBg1FXslHZMwbUp8qA==\",\"salt\":\"p2wYyBMa41n3A6/5ZAFUww==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+          "secretData": "{\"value\":\"5+ofM8OpvpiPZyi4ZJuB2Pa3jGOIcY2uXui2p8KRWCs=\",\"salt\":\"wfhXLZScHStB14ZxML9d7g==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
         }
       ],
       "disableableCredentialTypes": [],
@@ -565,7 +640,12 @@
         ]
       },
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/physics-lovers",
+        "/sailing-lovers",
+        "/users",
+        "/violin-haters"
+      ]
     },
     {
       "id": "b44a81e2-e3ed-4241-a9ce-44604f7ac9eb",
@@ -629,7 +709,12 @@
         ]
       },
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/physics-lovers",
+        "/polonium-lovers",
+        "/radium-lovers",
+        "/users"
+      ]
     },
     {
       "id": "d18c3689-b816-455a-9728-cd8c9797f315",
@@ -646,8 +731,8 @@
           "id": "273679bf-80ef-4c83-ac23-0ee569c3bece",
           "type": "password",
           "createdDate": 1611912354500,
-          "secretData": "{\"value\":\"u1oYT2/nE7cWKY4MK57zzyOAbnBGjTt1J3MWCJJfnBpSZnO0q1nB9Eymt2P9te702E0ijPDTb8towbxSm60dfQ==\",\"salt\":\"0LnbBHsRET4CLI/bzW4xng==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+          "secretData": "{\"value\":\"f22la+Ghr2xDBOA1tJrMlc2GFy9ZiGcTJuto2U9KaHE=\",\"salt\":\"fjwq6/u6YI+r1xdZL0UtxA==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
         }
       ],
       "disableableCredentialTypes": [],
@@ -664,7 +749,9 @@
         ]
       },
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/users"
+      ]
     },
     {
       "id": "373be4c5-7f65-4e91-ba0e-bfb618c96046",
@@ -699,7 +786,12 @@
         ]
       },
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/philosophy-haters",
+        "/physics-lovers",
+        "/quantum-lovers",
+        "/users"
+      ]
     }
   ],
   "scopeMappings": [
@@ -979,6 +1071,7 @@
         "web-origins",
         "profile",
         "roles",
+        "groups",
         "basic",
         "email"
       ],
@@ -1038,6 +1131,7 @@
         "web-origins",
         "profile",
         "roles",
+        "groups",
         "basic",
         "email"
       ],
@@ -1189,6 +1283,7 @@
         "web-origins",
         "profile",
         "roles",
+        "groups",
         "basic",
         "email"
       ],
@@ -1249,6 +1344,7 @@
         "web-origins",
         "profile",
         "roles",
+        "groups",
         "basic",
         "email"
       ],
@@ -1650,8 +1746,9 @@
           "consentRequired": false,
           "config": {
             "user.session.note": "AUTH_TIME",
-            "id.token.claim": "true",
             "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
             "access.token.claim": "true",
             "claim.name": "auth_time",
             "jsonType.label": "long"
@@ -1716,6 +1813,36 @@
             "jsonType.label": "String",
             "userinfo.token.claim": "true",
             "multivalued": "true"
+          }
+        }
+      ]
+    },
+    {
+      "id": "7438d93e-b07a-4913-9419-3273be364c4b",
+      "name": "groups",
+      "description": "OpenID Connect scope for add user groups to the access token",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "true",
+        "gui.order": "",
+        "consent.screen.text": ""
+      },
+      "protocolMappers": [
+        {
+          "id": "5349faf2-64a6-481f-b207-39ffef2cd597",
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "groups"
           }
         }
       ]
@@ -1816,7 +1943,8 @@
     "roles",
     "web-origins",
     "acr",
-    "basic"
+    "basic",
+    "groups"
   ],
   "defaultOptionalClientScopes": [
     "offline_access",
@@ -1875,13 +2003,13 @@
         "config": {
           "allowed-protocol-mapper-types": [
             "saml-user-property-mapper",
-            "saml-user-attribute-mapper",
-            "oidc-address-mapper",
             "saml-role-list-mapper",
-            "oidc-usermodel-property-mapper",
+            "oidc-address-mapper",
             "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-property-mapper",
             "oidc-usermodel-attribute-mapper",
-            "oidc-full-name-mapper"
+            "oidc-full-name-mapper",
+            "saml-user-attribute-mapper"
           ]
         }
       },
@@ -1905,14 +2033,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-address-mapper",
             "saml-user-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-property-mapper",
-            "oidc-full-name-mapper",
             "oidc-usermodel-attribute-mapper",
+            "oidc-address-mapper",
             "saml-role-list-mapper",
-            "saml-user-property-mapper"
+            "oidc-full-name-mapper",
+            "saml-user-property-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-property-mapper"
           ]
         }
       },
@@ -2640,17 +2768,18 @@
   "firstBrokerLoginFlow": "first broker login",
   "attributes": {
     "cibaBackchannelTokenDeliveryMode": "poll",
-    "cibaExpiresIn": "120",
     "cibaAuthRequestedUserHint": "login_hint",
-    "oauth2DeviceCodeLifespan": "600",
     "clientOfflineSessionMaxLifespan": "0",
     "oauth2DevicePollingInterval": "5",
     "clientSessionIdleTimeout": "0",
-    "parRequestUriLifespan": "60",
-    "clientSessionMaxLifespan": "0",
     "clientOfflineSessionIdleTimeout": "0",
     "cibaInterval": "5",
-    "realmReusableOtpCode": "false"
+    "realmReusableOtpCode": "false",
+    "cibaExpiresIn": "120",
+    "oauth2DeviceCodeLifespan": "600",
+    "parRequestUriLifespan": "60",
+    "clientSessionMaxLifespan": "0",
+    "organizationsEnabled": "false"
   },
   "keycloakVersion": "25.0.0",
   "userManagedAccessAllowed": false,

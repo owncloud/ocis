@@ -49,6 +49,8 @@
     "web-origins",
     "profile",
     "roles",
+    "groups",
+    "basic",
     "email"
   ],
   "optionalClientScopes": [
