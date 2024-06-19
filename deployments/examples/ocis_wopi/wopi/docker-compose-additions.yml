@@ -1,0 +1,38 @@
+---
+services:
+  traefik:
+    networks:
+      ocis-net:
+        aliases:
+          - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+
+  wopiserver:
+    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v10.5.0}
+    networks:
+      - ocis-net
+    entrypoint:
+      - /bin/sh
+      - /entrypoint-override.sh
+    environment:
+      WOPISERVER_INSECURE: "${INSECURE:-false}"
+      WOPISECRET: ${WOPI_JWT_SECRET:-LoremIpsum567}
+      WOPISERVER_DOMAIN: ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+    volumes:
+      # paths are relative to the main compose file
+      - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
+      - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
+      - wopi-recovery:/var/spool/wopirecovery
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wopiserver.entrypoints=https"
+      - "traefik.http.routers.wopiserver.rule=Host(`${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}`)"
+      - "traefik.http.routers.wopiserver.tls.certresolver=http"
+      #- "traefik.http.routers.wopiserver.service=wopiserver"
+      - "traefik.http.services.wopiserver.loadbalancer.server.port=8880"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+volumes:
+  wopi-recovery:
+

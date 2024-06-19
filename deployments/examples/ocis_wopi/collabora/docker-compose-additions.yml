@@ -1,0 +1,67 @@
+---
+services:
+  traefik:
+    networks:
+      ocis-net:
+        aliases:
+          - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
+
+  collabora:
+    # collabora can currently NOT be updated to: 24.x due to a bug in collabora
+    # this is the latest tested and functional collabora version
+    image: collabora/code:23.05.10.1.1
+    networks:
+      - ocis-net
+    environment:
+      aliasgroup1: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}:443
+      DONT_GEN_SSL_CERT: "YES"
+      extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
+      username: ${COLLABORA_ADMIN_USER}
+      password: ${COLLABORA_ADMIN_PASSWORD}
+    cap_add:
+      - MKNOD
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.collabora.entrypoints=https"
+      - "traefik.http.routers.collabora.rule=Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
+      - "traefik.http.routers.collabora.tls.certresolver=http"
+      - "traefik.http.routers.collabora.service=collabora"
+      - "traefik.http.services.collabora.loadbalancer.server.port=9980"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9980/hosting/discovery"]
+
+  ocis-appprovider-collabora:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    networks:
+      ocis-net:
+    command: app-provider server
+    environment:
+      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
+      # use the internal service name of the gateway
+      APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
+      # configure the service name to avoid collision with like with onlyoffice
+      APP_PROVIDER_SERVICE_NAME: app-provider-collabora
+      # use the internal service name
+      APP_PROVIDER_EXTERNAL_ADDR: com.owncloud.api.app-provider-collabora
+      APP_PROVIDER_DRIVER: wopi
+      APP_PROVIDER_WOPI_APP_NAME: Collabora
+      APP_PROVIDER_WOPI_APP_ICON_URI: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}/favicon.ico
+      APP_PROVIDER_WOPI_APP_URL: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}
+      APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
+      APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+      APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      # share the registry with the ocis container
+      MICRO_REGISTRY_ADDRESS: ocis:9233
+    volumes:
+      - ocis-config:/etc/ocis
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+    depends_on:
+      ocis:
+        condition: service_started
+      collabora:
+        condition: service_healthy

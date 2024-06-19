@@ -1,10 +1,4 @@
----
-document this deployment example in: docs/ocis/deployment/ocis_wopi.md
----
+Please refer to our [admin documentation](https://doc.owncloud.com/ocis/latest/depl-examples/ubuntu-compose/ubuntu-compose-prod.html) for instructions on how to deploy this scenario.
 
-# Infinite Scale WOPI Deployment Example
+Note: This deployment setup is highly configurable. At minimum, it starts traefik`, ocis`, tika`, the wopiserver` and collabora`. Additional services can be started by removing the respective comment in the `.env` file. Depending on the service added, related variables need to be configured.
 
-This deployment example is documented in the [developer documentation](https://owncloud.dev/ocis/deployment/ocis_wopi/).
-See the link for more details and instructions on how to deploy this scenario.
-
-Also see the [Admin Documentation](https://doc.owncloud.com/ocis/latest/index.html) for administrative and more configuration details.
