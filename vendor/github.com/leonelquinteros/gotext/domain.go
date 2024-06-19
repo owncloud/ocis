@@ -242,7 +242,7 @@ func (do *Domain) Set(id, str string) {
 		trans = NewTranslation()
 		trans.ID = id
 		trans.Set(str)
-		do.translations[str] = trans
+		do.translations[id] = trans
 	}
 }
 
@@ -278,7 +278,7 @@ func (do *Domain) SetN(id, plural string, n int, str string) {
 		trans.ID = id
 		trans.PluralID = plural
 		trans.SetN(pluralForm, str)
-		do.translations[str] = trans
+		do.translations[id] = trans
 	}
 }
 

@@ -1278,7 +1278,7 @@ github.com/kovidgoyal/imaging
 ## explicit; go 1.18
 github.com/leodido/go-urn
 github.com/leodido/go-urn/scim/schema
-# github.com/leonelquinteros/gotext v1.6.0
+# github.com/leonelquinteros/gotext v1.6.1
 ## explicit; go 1.13
 github.com/leonelquinteros/gotext
 github.com/leonelquinteros/gotext/plurals
