@@ -36,7 +36,6 @@ func NewStoreIDCache(o *options.Options) *StoreIDCache {
 	return &StoreIDCache{
 		cache: store.Create(
 			store.Store(o.IDCache.Store),
-			store.TTL(o.IDCache.TTL),
 			store.Size(o.IDCache.Size),
 			microstore.Nodes(o.IDCache.Nodes...),
 			microstore.Database(o.IDCache.Database),
