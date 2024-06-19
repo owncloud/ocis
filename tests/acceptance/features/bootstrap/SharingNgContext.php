@@ -1276,7 +1276,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Then user :user should be able to send share the following invitation with all allowed permission roles
+	 * @Then user :user should be able to send the following resource share invitation with all allowed permission roles
 	 *
 	 * @param string $user
 	 * @param TableNode $table
