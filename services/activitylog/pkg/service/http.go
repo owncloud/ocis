@@ -15,11 +15,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
+	"github.com/owncloud/ocis/v2/ocis-pkg/kql"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
 
 var (

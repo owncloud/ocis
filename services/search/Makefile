@@ -26,7 +26,7 @@ include ../../.make/generate.mk
 .PHONY: ci-go-generate
 ci-go-generate: $(PIGEON) $(MOCKERY) # CI runs ci-node-generate automatically before this target
 	$(MOCKERY)
-	$(PIGEON) -optimize-grammar -optimize-parser -o pkg/query/kql/dictionary_gen.go pkg/query/kql/dictionary.peg
+	$(PIGEON) -optimize-grammar -optimize-parser -o ../../ocis-pkg/kql/dictionary_gen.go ../../ocis-pkg/kql/dictionary.peg
 
 .PHONY: ci-node-generate
 ci-node-generate:

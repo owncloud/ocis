@@ -4,8 +4,8 @@ package bleve
 import (
 	bQuery "github.com/blevesearch/bleve/v2/search/query"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/kql"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
 
 // Creator is combines a Builder and a Compiler which is used to Create the query.
