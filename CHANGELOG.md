@@ -1,6 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 6.0.0](#changelog-for-600-2024-06-19)
 * [Changelog for 5.0.3](#changelog-for-503-2024-05-02)
 * [Changelog for 5.0.2](#changelog-for-502-2024-04-17)
 * [Changelog for 5.0.1](#changelog-for-501-2024-04-10)
@@ -38,11 +38,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [6.0.0] (2024-06-19)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 6.0.0.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.3...master
+[6.0.0]: https://github.com/owncloud/ocis/compare/v5.0.3...v6.0.0
 
 ## Summary
 
