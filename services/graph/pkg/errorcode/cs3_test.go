@@ -44,6 +44,11 @@ func TestFromCS3Status(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		var e errorcode.Error
+		if errors.As(test.expected, &e) {
+			test.expected = e.WithOrigin(errorcode.ErrorOriginCS3)
+		}
+
 		if got := errorcode.FromCS3Status(test.status, test.err, test.ignore...); !reflect.DeepEqual(got, test.expected) {
 			t.Error("Test Failed: {} expected, received: {}", test.expected, got)
 		}
@@ -56,7 +61,7 @@ func TestFromStat(t *testing.T) {
 		err    error
 		result error
 	}{
-		{nil, errors.New("some error"), errorcode.New(errorcode.GeneralException, "some error")},
+		{nil, errors.New("some error"), errorcode.New(errorcode.GeneralException, "some error").WithOrigin(errorcode.ErrorOriginCS3)},
 		{&provider.StatResponse{Status: &cs3rpc.Status{Code: cs3rpc.Code_CODE_OK}}, nil, nil},
 	}
 

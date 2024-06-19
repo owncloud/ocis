@@ -152,7 +152,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				Once()
 
 			_, err := drivesDriveItemService.GetShare(context.Background(), &collaborationv1beta1.ShareId{})
-			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error()).WithOrigin(errorcode.ErrorOriginCS3)))
 		})
 
 		It("fails if share lookup does not report an error but the status is off", func() {
@@ -161,12 +161,12 @@ var _ = Describe("DrivesDriveItemService", func() {
 				EXPECT().
 				GetReceivedShare(context.Background(), mock.Anything, mock.Anything).
 				Return(&collaborationv1beta1.GetReceivedShareResponse{
-					Status: status.NewNotFound(context.Background(), someErr.Error()),
+					Status: status.NewInvalid(context.Background(), someErr.Error()),
 				}, nil).
 				Once()
 
 			_, err := drivesDriveItemService.GetShare(context.Background(), &collaborationv1beta1.ShareId{})
-			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, someErr.Error())))
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, someErr.Error()).WithOrigin(errorcode.ErrorOriginCS3)))
 		})
 
 		It("successfully returns a share", func() {
@@ -219,7 +219,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				request.Share.State = collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED
 				request.UpdateMask.Paths = append(request.UpdateMask.Paths, "state")
 			})
-			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error()).WithOrigin(errorcode.ErrorOriginCS3)))
 		})
 
 		It("fails if share update does not report an error but the status is off", func() {
@@ -236,7 +236,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				request.Share.State = collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED
 				request.UpdateMask.Paths = append(request.UpdateMask.Paths, "state")
 			})
-			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, someErr.Error())))
+			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, someErr.Error()).WithOrigin(errorcode.ErrorOriginCS3)))
 		})
 	})
 
@@ -265,7 +265,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				request.Share.State = collaborationv1beta1.ShareState_SHARE_STATE_ACCEPTED
 				request.UpdateMask.Paths = append(request.UpdateMask.Paths, "state")
 			})
-			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error()).WithOrigin(errorcode.ErrorOriginCS3)))
 			Expect(err.(interface{ Unwrap() []error }).Unwrap()).To(HaveLen(2))
 			Expect(shares).To(HaveLen(1))
 		})
@@ -281,7 +281,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				Once()
 
 			err := drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{})
-			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error()).WithOrigin(errorcode.ErrorOriginCS3)))
 		})
 
 		It("requests only accepted shares to be unmounted", func() {
@@ -358,7 +358,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				Times(1)
 
 			err := drivesDriveItemService.UnmountShare(context.Background(), &collaborationv1beta1.ShareId{})
-			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error()).WithOrigin(errorcode.ErrorOriginCS3)))
 			Expect(err.(interface{ Unwrap() []error }).Unwrap()).To(HaveLen(1))
 		})
 	})
@@ -436,7 +436,7 @@ var _ = Describe("DrivesDriveItemService", func() {
 				Times(3)
 
 			shares, err := drivesDriveItemService.MountShare(context.Background(), nil, "some")
-			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error())))
+			Expect(err).To(MatchError(errorcode.New(errorcode.GeneralException, someErr.Error()).WithOrigin(errorcode.ErrorOriginCS3)))
 			Expect(err.(interface{ Unwrap() []error }).Unwrap()).To(HaveLen(3))
 			Expect(shares).To(HaveLen(0))
 		})

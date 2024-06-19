@@ -12,14 +12,27 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
-// ErrorCode defines code as used in MS Graph - see https://docs.microsoft.com/en-us/graph/errors?context=graph%2Fapi%2F1.0&view=graph-rest-1.0
-type ErrorCode int
-
 // Error defines a custom error struct, containing and MS Graph error code and a textual error message
 type Error struct {
 	errorCode ErrorCode
 	msg       string
+	origin    ErrorOrigin
 }
+
+// ErrorOrigin gives information about where the error originated
+type ErrorOrigin int
+
+const (
+	// ErrorOriginUnknown is the default error source
+	// and indicates that the error does not have any information about its origin
+	ErrorOriginUnknown ErrorOrigin = iota
+
+	// ErrorOriginCS3 indicates that the error originated from a CS3 service
+	ErrorOriginCS3
+)
+
+// ErrorCode defines code as used in MS Graph - see https://docs.microsoft.com/en-us/graph/errors?context=graph%2Fapi%2F1.0&view=graph-rest-1.0
+type ErrorCode int
 
 // List taken from https://github.com/microsoft/microsoft-graph-docs-1/blob/main/concepts/errors.md#code-property
 const (
@@ -148,7 +161,7 @@ func (e ErrorCode) String() string {
 	return errorCodes[e]
 }
 
-// Error return the concatenation of the error string and optional message
+// Error returns the concatenation of the error string and optional message
 func (e Error) Error() string {
 	errString := errorCodes[e.errorCode]
 	if e.msg != "" {
@@ -161,13 +174,35 @@ func (e Error) GetCode() ErrorCode {
 	return e.errorCode
 }
 
+// GetOrigin returns the source of the error
+func (e Error) GetOrigin() ErrorOrigin {
+	return e.origin
+}
+
+// WithOrigin returns a new Error with the provided origin
+func (e Error) WithOrigin(o ErrorOrigin) Error {
+	e.origin = o
+	return e
+}
+
 // RenderError render the Graph Error based on a code or default one
 func RenderError(w http.ResponseWriter, r *http.Request, err error) {
-	var errcode Error
-	if errors.As(err, &errcode) {
-		errcode.Render(w, r)
+	e, ok := ToError(err)
+	if !ok {
+		GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+	e.Render(w, r)
+}
+
+// ToError checks if the error is of type Error and returns it,
+// the second parameter indicates if the error conversion was successful
+func ToError(err error) (Error, bool) {
+	var e Error
+	if errors.As(err, &e) {
+		return e, true
+	}
+
+	return Error{}, false
 }

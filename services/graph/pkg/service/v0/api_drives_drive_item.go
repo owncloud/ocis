@@ -360,7 +360,7 @@ func (api DrivesDriveItemApi) DeleteDriveItem(w http.ResponseWriter, r *http.Req
 
 	shareID := ExtractShareIdFromResourceId(itemID)
 	if err := api.drivesDriveItemService.UnmountShare(ctx, shareID); err != nil {
-		api.logger.Debug().Err(err).Msg(err.Error())
+		api.logger.Debug().Err(err).Msg(ErrUnmountShare.Error())
 		errorcode.RenderError(w, r, err)
 		return
 	}
@@ -518,8 +518,15 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 
 	mountedShares, err := api.drivesDriveItemService.MountShare(ctx, &resourceId, requestDriveItem.GetName())
 	if err != nil {
-		api.logger.Debug().Err(err).Msg(err.Error())
-		errorcode.RenderError(w, r, err)
+		api.logger.Debug().Err(err).Msg(ErrMountShare.Error())
+
+		switch e, ok := errorcode.ToError(err); {
+		case ok && e.GetOrigin() == errorcode.ErrorOriginCS3 && e.GetCode() == errorcode.ItemNotFound:
+			ErrDriveItemConversion.Render(w, r)
+		default:
+			errorcode.RenderError(w, r, err)
+		}
+
 		return
 	}
 
