@@ -88,13 +88,6 @@ Synchronization features like etag propagation, setting mtime and locking files
 - [coreApiTrashbin/trashbinSharingToShares.feature:241](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L241)
 - [coreApiTrashbin/trashbinSharingToShares.feature:269](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L269)
 
-#### [Sharing folder and sub-folder with same user but different permission,the permission of sub-folder is not obeyed ](https://github.com/owncloud/ocis/issues/2440)
-
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:232](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L232)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:260](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L260)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:317](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L317)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:345](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L345)
-
 #### [Edit user share response has a "name" field](https://github.com/owncloud/ocis/issues/1225)
 
 - [coreApiShareUpdateToShares/updateShare.feature:200](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L200)

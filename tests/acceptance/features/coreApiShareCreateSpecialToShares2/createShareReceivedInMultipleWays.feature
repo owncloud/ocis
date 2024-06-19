@@ -253,21 +253,22 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareType       | group         |
       | permissionsRole | Viewer        |
     And user "Brian" should be able to rename file "/Shares/parent/child1/child2/textfile-2.txt" to "/Shares/parent/child1/child2/rename.txt"
-    And user "Brian" should not be able to rename file "/Shares/child1/child2/rename.txt" to "/Shares/child1/child2/rename2.txt"
-    And user "Alice" should not be able to rename file "/Shares/child1/child2/rename.txt" to "/Shares/child1/child2/rename2.txt"
+    And user "Brian" should be able to rename file "/Shares/child1/child2/rename.txt" to "/Shares/child1/child2/rename2.txt"
+    And user "Alice" should not be able to rename file "/Shares/child1/child2/rename2.txt" to "/Shares/child1/child2/rename3.txt"
 
   @issue-2440
   Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check delete operation
     Given group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Carol" has created the following folders
-      | path                  |
-      | /parent               |
-      | /parent/child1        |
-      | /parent/child1/child2 |
+      | path                         |
+      | /parent                      |
+      | /parent/child1               |
+      | /parent/child1/child2        |
+      | /parent/child1/child2/child3 |
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
-    And user "Carol" has uploaded file with content "some data" to "/parent/child1/child2/textfile-2.txt"
+    And user "Carol" has uploaded file with content "some data" to "/parent/child1/child2/child3/textfile-2.txt"
     And user "Carol" has sent the following resource share invitation:
       | resource        | parent   |
       | space           | Personal |
@@ -280,8 +281,8 @@ Feature: share resources where the sharee receives the share in multiple ways
       | sharee          | grp1          |
       | shareType       | group         |
       | permissionsRole | Viewer        |
-    And user "Brian" should be able to delete file "/Shares/parent/child1/child2/textfile-2.txt"
-    And user "Brian" should not be able to delete folder "/Shares/child1/child2"
+    And user "Brian" should be able to delete file "/Shares/parent/child1/child2/child3/textfile-2.txt"
+    And user "Brian" should be able to delete folder "/Shares/child1/child2/child3"
     And user "Alice" should not be able to delete folder "/Shares/child1/child2"
 
 
@@ -338,8 +339,8 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareType       | user          |
       | permissionsRole | Editor        |
     And user "Brian" should be able to rename file "/Shares/child1/child2/textfile-2.txt" to "/Shares/child1/child2/rename.txt"
-    And user "Brian" should not be able to rename file "/Shares/parent/child1/child2/rename.txt" to "/Shares/parent/child1/child2/rename2.txt"
-    And user "Alice" should not be able to rename file "/Shares/parent/child1/child2/rename.txt" to "/Shares/parent/child1/child2/rename2.txt"
+    And user "Brian" should be able to rename file "/Shares/parent/child1/child2/rename.txt" to "/Shares/parent/child1/child2/rename2.txt"
+    And user "Alice" should not be able to rename file "/Shares/parent/child1/child2/rename2.txt" to "/Shares/parent/child1/child2/rename3.txt"
 
   @issue-2440
   Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check delete operation
@@ -366,7 +367,7 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareType       | user          |
       | permissionsRole | Editor        |
     And user "Brian" should be able to delete file "/Shares/child1/child2/textfile-2.txt"
-    And user "Brian" should not be able to delete folder "/Shares/parent/child1"
+    And user "Brian" should be able to delete folder "/Shares/parent/child1/child2"
     And user "Alice" should not be able to delete folder "/Shares/parent/child1"
 
 
