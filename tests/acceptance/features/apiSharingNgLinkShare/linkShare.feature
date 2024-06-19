@@ -3315,7 +3315,7 @@ Feature: Create a share link for a resource
       }
       """
 
-    
+
   Scenario Outline: create a quick link share of a file using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following resource link share using the Graph API:
@@ -3695,7 +3695,7 @@ Feature: Create a share link for a resource
       """
 
 
- Scenario Outline: create a quick link share of a project-space using permissions endpoint
+  Scenario Outline: create a quick link share of a project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -3761,7 +3761,7 @@ Feature: Create a share link for a resource
       | createOnly       |
       | blocksDownload   |
 
-    
+
   Scenario: create an internal quick link share of a project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -3799,6 +3799,131 @@ Feature: Create a share link for a resource
             "properties": {
               "@libre.graph.displayName": {
                 "const": ""
+              },
+              "@libre.graph.quickLink": {
+                "const": true
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "internal"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario Outline: create quick link share of a project space drive using root endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    When user "Alice" creates the following space link share using root endpoint of the Graph API:
+      | space           | projectSpace       |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+      | displayName     | Link               |
+      | quickLink       | true               |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": true
+          },
+          "id": {
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": "Link"
+              },
+              "@libre.graph.quickLink": {
+                "const": true
+              },
+              "preventsDownload": {
+                "const": false
+              },
+              "type": {
+                "const": "<permissions-role>"
+              },
+              "webUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | view             |
+      | upload           |
+      | edit             |
+      | createOnly       |
+
+
+  Scenario: create an internal quick link share of a project space drive using root endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    When user "Alice" creates the following space link share using root endpoint of the Graph API:
+      | space           | projectSpace |
+      | permissionsRole | internal     |
+      | displayName     | Link         |
+      | quickLink       | true         |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "hasPassword",
+          "id",
+          "link"
+        ],
+        "properties": {
+          "hasPassword": {
+            "const": false
+          },
+          "id": {
+            "pattern": "^[a-zA-Z]{15}$"
+          },
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {
+                "const": "Link"
               },
               "@libre.graph.quickLink": {
                 "const": true
