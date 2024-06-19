@@ -382,6 +382,33 @@ Feature: sharing
       | Uploader         |
 
 
+  Scenario: sharee cannot download file shared with Secure viewer permission by sharee
+    Given using old DAV path
+    And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt  |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Secure viewer |
+    And user "Brian" downloads file "/Shares/textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "403"
+
+
+  Scenario: sharee cannot download file inside folder shared with Secure viewer permission by sharee
+    Given using old DAV path
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has uploaded file with content "hello world" to "FolderToShare/textfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Secure viewer |
+    And user "Brian" downloads file "/Shares/FolderToShare/textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "403"
+
+
   Scenario Outline: space admin tries to remove password of a public link share (change/create permission)
     Given using spaces DAV path
     And using OCS API version "<ocs-api-version>"
