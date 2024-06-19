@@ -112,7 +112,7 @@ services:
     restart: always
 
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0.1
+    image: quay.io/keycloak/keycloak:25.0.0
     networks:
       ocis-net:
     command: ["start", "--proxy=edge", "--spi-connections-http-client-default-disable-trust-manager=${INSECURE:-false}", "--import-realm"]

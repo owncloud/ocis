@@ -1,6 +1,6 @@
 {
   "clientId": "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69",
-  "name": "ownCloud desktop client",
+  "name": "ownCloud Desktop Client",
   "surrogateAuthRequired": false,
   "enabled": true,
   "alwaysDisplayInConsole": false,
@@ -26,6 +26,7 @@
     "saml.force.post.binding": "false",
     "saml.multivalued.roles": "false",
     "saml.encrypt": "false",
+    "post.logout.redirect.uris": "+",
     "backchannel.logout.revoke.offline.tokens": "false",
     "saml.server.signature": "false",
     "saml.server.signature.keyinfo.ext": "false",
@@ -44,9 +45,9 @@
   "nodeReRegistrationTimeout": -1,
   "defaultClientScopes": [
     "web-origins",
-    "role_list",
     "profile",
     "roles",
+    "basic",
     "email"
   ],
   "optionalClientScopes": [
