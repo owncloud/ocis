@@ -72,7 +72,7 @@ require (
 	github.com/onsi/gomega v1.33.1
 	github.com/open-policy-agent/opa v0.65.0
 	github.com/orcaman/concurrent-map v1.0.0
-	github.com/owncloud/libre-graph-api-go v1.0.5-0.20240529101512-a631b9eeddb3
+	github.com/owncloud/libre-graph-api-go v1.0.5-0.20240618162722-2298241331d1
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/client_golang v1.19.1
