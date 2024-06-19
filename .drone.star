@@ -53,6 +53,7 @@ dirs = {
     "ocisRevaDataRoot": "/srv/app/tmp/ocis/owncloud/data",
     "ocisWrapper": "/drone/src/tests/ociswrapper",
     "bannedPasswordList": "tests/config/drone/banned-password-list.txt",
+    "ocmProviders": "tests/config/drone/providers.json",
 }
 
 # configuration
@@ -133,6 +134,21 @@ config = {
             ],
             "skip": False,
             "tikaNeeded": True,
+        },
+        "apiOcm": {
+            "suites": [
+                "apiOcm",
+            ],
+            "skip": False,
+            "federationServer": True,
+            "extraServerEnvironment": {
+                "OCIS_ADD_RUN_SERVICES": "ocm",
+                "GRAPH_INCLUDE_OCM_SHAREES": True,
+                "OCM_OCM_INVITE_MANAGER_INSECURE": True,
+                "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
+                "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
+                "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
+            },
         },
     },
     "apiTests": {
@@ -797,6 +813,7 @@ def localApiTestPipeline(ctx):
         "emailNeeded": False,
         "antivirusNeeded": False,
         "tikaNeeded": False,
+        "federationServer": False,
     }
 
     if "localApiTests" in config:
@@ -821,6 +838,7 @@ def localApiTestPipeline(ctx):
                                      ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
+                                     (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      logRequests(),
                             "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [],
@@ -838,7 +856,8 @@ def localApiTestPipeline(ctx):
 def localApiTests(suite, storage, extra_environment = {}):
     environment = {
         "PATH_TO_OCIS": dirs["base"],
-        "TEST_SERVER_URL": "https://ocis-server:9200",
+        "TEST_SERVER_URL": OCIS_URL,
+        "TEST_SERVER_FED_URL": OCIS_FED_URL,
         "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
         "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
         "SEND_SCENARIO_LINE_REFERENCES": "true",
@@ -1058,7 +1077,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                          "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                          "environment": {
                              "PATH_TO_OCIS": "%s" % dirs["base"],
-                             "TEST_SERVER_URL": "https://ocis-server:9200",
+                             "TEST_SERVER_URL": OCIS_URL,
                              "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
                              "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
@@ -1166,7 +1185,7 @@ def e2eTestPipeline(ctx):
             "name": "e2e-tests",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "environment": {
-                "BASE_URL_OCIS": "ocis-server:9200",
+                "BASE_URL_OCIS": OCIS_DOMAIN,
                 "HEADLESS": "true",
                 "RETRY": "1",
                 "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
@@ -2002,6 +2021,7 @@ def notify(ctx):
 
 def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
     user = "0:0"
+    container_name = "ocis-server"
     environment = {
         "OCIS_URL": OCIS_URL,
         "OCIS_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
@@ -2039,7 +2059,11 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         environment["APP_PROVIDER_WOPI_APP_URL"] = "http://fakeoffice:8080"
         environment["APP_PROVIDER_WOPI_INSECURE"] = "true"
         environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopiserver:9300"
-        environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = "https://ocis-server:9200"
+        environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = OCIS_URL
+
+    if deploy_type == "federation":
+        environment["OCIS_URL"] = OCIS_FED_URL
+        container_name = "federation-ocis-server"
 
     if tika_enabled:
         environment["FRONTEND_FULL_TEXT_SEARCH_ENABLED"] = True
@@ -2061,22 +2085,24 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
 
     wrapper_commands = [
         "make -C %s build" % dirs["ocisWrapper"],
-        "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, OCIS_URL),
+        "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OCIS_URL"]),
     ]
 
     wait_for_ocis = {
-        "name": "wait-for-ocis-server",
+        "name": "wait-for-%s" % (container_name),
         "image": OC_CI_ALPINE,
         "commands": [
             # wait for ocis-server to be ready (5 minutes)
-            "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin https://ocis-server:9200/graph/v1.0/users/admin -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
+            "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin " +
+            "%s/graph/v1.0/users/admin " % environment["OCIS_URL"] +
+            "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
         ],
         "depends_on": depends_on,
     }
 
     return [
         {
-            "name": "ocis-server",
+            "name": container_name,
             "image": OC_CI_GOLANG,
             "detach": True,
             "environment": environment,
@@ -2451,6 +2477,7 @@ def pipelineSanityChecks(ctx, pipelines):
 OCIS_URL = "https://ocis-server:9200"
 OCIS_DOMAIN = "ocis-server:9200"
 OC10_URL = "http://oc10:8080"
+OCIS_FED_URL = "https://federation-ocis-server:9200"
 
 # step volumes
 stepVolumeOC10Templates = \
