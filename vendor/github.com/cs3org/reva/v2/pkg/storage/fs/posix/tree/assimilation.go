@@ -279,3 +279,68 @@ assimilate:
 
 	return fi, nil
 }
+
+// WarmupIDCache warms up the id cache
+func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
+	spaceID := []byte("")
+
+	scopeSpace := func(spaceCandidate string) error {
+		if !t.options.UseSpaceGroups {
+			return nil
+		}
+
+		// set the uid and gid for the space
+		fi, err := os.Stat(spaceCandidate)
+		if err != nil {
+			return err
+		}
+		sys := fi.Sys().(*syscall.Stat_t)
+		gid := int(sys.Gid)
+		_, err = t.userMapper.ScopeUserByIds(-1, gid)
+		return err
+	}
+
+	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		attribs, err := t.lookup.MetadataBackend().All(context.Background(), path)
+		if err == nil {
+			nodeSpaceID := attribs[prefixes.SpaceIDAttr]
+			if len(nodeSpaceID) > 0 {
+				spaceID = nodeSpaceID
+
+				err = scopeSpace(path)
+				if err != nil {
+					return err
+				}
+			} else {
+				// try to find space
+				spaceCandidate := path
+				for strings.HasPrefix(spaceCandidate, t.options.Root) {
+					spaceID, err = t.lookup.MetadataBackend().Get(context.Background(), spaceCandidate, prefixes.SpaceIDAttr)
+					if err == nil {
+						err = scopeSpace(path)
+						if err != nil {
+							return err
+						}
+						break
+					}
+					spaceCandidate = filepath.Dir(spaceCandidate)
+				}
+			}
+			if len(spaceID) == 0 {
+				return nil // no space found
+			}
+
+			id, ok := attribs[prefixes.IDAttr]
+			if ok {
+				_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), string(spaceID), string(id), path)
+			} else if assimilate {
+				_ = t.Scan(path, false)
+			}
+		}
+		return nil
+	})
+}

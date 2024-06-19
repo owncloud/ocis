@@ -30,6 +30,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofrs/flock"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -133,10 +134,25 @@ func New(lu node.PathLookup, bs Blobstore, um usermapper.Mapper, o *options.Opti
 	}
 
 	// Start watching for fs events and put them into the queue
-	go t.watcher.Watch(watchPath)
+	go func() {
+		fileLock := flock.New(filepath.Join(o.Root, ".primary.lock"))
+		locked, err := fileLock.TryLock()
+		if err != nil {
+			log.Err(err).Msg("could not acquire primary lock")
+			return
+		}
+		if !locked {
+			log.Err(err).Msg("watcher is already locked")
+			return
+		}
+		log.Debug().Msg("acquired primary lock")
 
-	// Handle queued fs events
-	go t.workScanQueue()
+		go t.watcher.Watch(watchPath)
+		go t.workScanQueue()
+		go func() {
+			_ = t.WarmupIDCache(o.Root, true)
+		}()
+	}()
 
 	return t, nil
 }
@@ -308,7 +324,7 @@ func (t *Tree) Move(ctx context.Context, oldNode *node.Node, newNode *node.Node)
 	_ = t.lookup.(*lookup.Lookup).CacheID(ctx, newNode.SpaceID, newNode.ID, filepath.Join(newNode.ParentPath(), newNode.Name))
 	// update id cache for the moved subtree
 	if oldNode.IsDir(ctx) {
-		err = t.lookup.(*lookup.Lookup).WarmupIDCache(filepath.Join(newNode.ParentPath(), newNode.Name))
+		err = t.WarmupIDCache(filepath.Join(newNode.ParentPath(), newNode.Name), false)
 		if err != nil {
 			return err
 		}

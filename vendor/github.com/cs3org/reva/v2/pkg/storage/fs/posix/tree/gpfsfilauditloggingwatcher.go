@@ -7,8 +7,6 @@ import (
 	"os"
 	"strconv"
 	"time"
-
-	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/lookup"
 )
 
 type GpfsFileAuditLoggingWatcher struct {
@@ -72,7 +70,7 @@ start:
 			case "RENAME":
 				go func() {
 					_ = w.tree.Scan(ev.Path, true)
-					_ = w.tree.lookup.(*lookup.Lookup).WarmupIDCache(ev.Path)
+					_ = w.tree.WarmupIDCache(ev.Path, false)
 				}()
 			}
 		case io.EOF:

@@ -24,7 +24,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -77,10 +76,6 @@ func New(b metadata.Backend, um usermapper.Mapper, o *options.Options) *Lookup {
 		userMapper:      um,
 	}
 
-	go func() {
-		_ = lu.WarmupIDCache(o.Root)
-	}()
-
 	return lu
 }
 
@@ -92,66 +87,6 @@ func (lu *Lookup) CacheID(ctx context.Context, spaceID, nodeID, val string) erro
 // GetCachedID returns the cached id for the given space and node id
 func (lu *Lookup) GetCachedID(ctx context.Context, spaceID, nodeID string) (string, bool) {
 	return lu.IDCache.Get(ctx, spaceID, nodeID)
-}
-
-// WarmupIDCache warms up the id cache
-func (lu *Lookup) WarmupIDCache(root string) error {
-	spaceID := []byte("")
-
-	scopeSpace := func(spaceCandidate string) error {
-		if !lu.Options.UseSpaceGroups {
-			return nil
-		}
-
-		// set the uid and gid for the space
-		fi, err := os.Stat(spaceCandidate)
-		if err != nil {
-			return err
-		}
-		sys := fi.Sys().(*syscall.Stat_t)
-		gid := int(sys.Gid)
-		_, err = lu.userMapper.ScopeUserByIds(-1, gid)
-		return err
-	}
-
-	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		attribs, err := lu.metadataBackend.All(context.Background(), path)
-		if err == nil {
-			nodeSpaceID := attribs[prefixes.SpaceIDAttr]
-			if len(nodeSpaceID) > 0 {
-				spaceID = nodeSpaceID
-
-				err = scopeSpace(path)
-				if err != nil {
-					return err
-				}
-			} else {
-				// try to find space
-				spaceCandidate := path
-				for strings.HasPrefix(spaceCandidate, lu.Options.Root) {
-					spaceID, err = lu.MetadataBackend().Get(context.Background(), spaceCandidate, prefixes.SpaceIDAttr)
-					if err == nil {
-						err = scopeSpace(path)
-						if err != nil {
-							return err
-						}
-						break
-					}
-					spaceCandidate = filepath.Dir(spaceCandidate)
-				}
-			}
-
-			id, ok := attribs[prefixes.IDAttr]
-			if ok && len(spaceID) > 0 {
-				_ = lu.IDCache.Set(context.Background(), string(spaceID), string(id), path)
-			}
-		}
-		return nil
-	})
 }
 
 // NodeFromPath returns the node for the given path
