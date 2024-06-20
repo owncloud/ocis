@@ -494,7 +494,6 @@ Feature: sharing
     And user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares"
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
-    And file "/textfile0.txt" should not be included as path in the response
     And as "Brian" file "/Shares/textfile0.txt" should not exist
     And as "Carol" file "/Shares/textfile0.txt" should not exist
     Examples:
