@@ -18,9 +18,7 @@ Feature: default capabilities for normal user
       """
       {
         "type": "object",
-        "required": [
-          "capabilities"
-        ],
+        "required": [ "capabilities" ],
         "properties": {
           "capabilities": {
             "type": "object",
@@ -39,16 +37,10 @@ Feature: default capabilities for normal user
                 ],
                 "properties": {
                   "pollinterval": {
-                    "type": "integer",
-                    "enum": [
-                      30000
-                    ]
+                    "const": 60
                   },
                   "webdav-root": {
-                    "type": "string",
-                    "enum": [
-                      "remote.php/webdav"
-                    ]
+                    "const": "remote.php/webdav"
                   },
                   "status": {
                     "type": "object",
@@ -60,28 +52,16 @@ Feature: default capabilities for normal user
                     ],
                     "properties": {
                       "version": {
-                        "type": "string",
-                        "enum": [
-                          "%version%"
-                        ]
+                        "const": "%version%"
                       },
                       "versionstring": {
-                        "type": "string",
-                        "enum": [
-                          "%versionstring%"
-                        ]
+                        "const": "%versionstring%"
                       },
                       "edition": {
-                        "type": "string",
-                        "enum": [
-                          "%edition%"
-                        ]
+                        "const": "%edition%"
                       },
                       "productname": {
-                        "type": "string",
-                        "enum": [
-                          "%productname%"
-                        ]
+                        "const": "%productname%"
                       }
                     }
                   }
@@ -91,27 +71,14 @@ Feature: default capabilities for normal user
                 "type": "object",
                 "required": [
                   "bigfilechunking",
-                  "privateLinks",
-                  "privateLinksDetailsParam"
+                  "privateLinks"
                 ],
                 "properties": {
                   "bigfilechunking": {
-                    "type": "boolean",
-                    "enum": [
-                      true
-                    ]
+                    "const": false
                   },
                   "privateLinks": {
-                    "type": "boolean",
-                    "enum": [
-                      true
-                    ]
-                  },
-                  "privateLinksDetailsParam": {
-                    "type": "boolean",
-                    "enum": [
-                      true
-                    ]
+                    "const": true
                   }
                 }
               },
@@ -120,7 +87,6 @@ Feature: default capabilities for normal user
                 "required": [
                   "api_enabled",
                   "default_permissions",
-                  "search_min_length",
                   "public",
                   "resharing",
                   "federation",
@@ -132,22 +98,10 @@ Feature: default capabilities for normal user
                 ],
                 "properties": {
                   "api_enabled": {
-                    "type": "boolean",
-                    "enum": [
-                      true
-                    ]
+                    "const": true
                   },
                   "default_permissions": {
-                    "type": "integer",
-                    "enum": [
-                      31
-                    ]
-                  },
-                  "search_min_length": {
-                    "type": "integer",
-                    "enum": [
-                      2
-                    ]
+                    "const": 22
                   },
                   "public": {
                     "type": "object",
@@ -157,59 +111,31 @@ Feature: default capabilities for normal user
                       "upload",
                       "supports_upload_only",
                       "send_mail",
-                      "social_share",
-                      "defaultPublicLinkShareName"
+                      "social_share"
                     ],
                     "properties": {
                       "enabled": {
-                        "type": "boolean",
-                        "enum": [
-                          true
-                        ]
+                        "const": true
                       },
                       "multiple": {
-                        "type": "boolean",
-                        "enum": [
-                          true
-                        ]
+                        "const": true
                       },
                       "upload": {
-                        "type": "boolean",
-                        "enum": [
-                          true
-                        ]
+                        "const": true
                       },
                       "supports_upload_only": {
-                        "type": "boolean",
-                        "enum": [
-                          true
-                        ]
+                        "const": true
                       },
                       "send_mail": {
-                        "type": "boolean",
-                        "enum": [
-                          false
-                        ]
+                        "const": true
                       },
                       "social_share": {
-                        "type": "boolean",
-                        "enum": [
-                          true
-                        ]
-                      },
-                      "defaultPublicLinkShareName": {
-                        "type": "string",
-                        "enum": [
-                          "Public link"
-                        ]
+                        "const": true
                       }
                     }
                   },
                   "resharing": {
-                    "type": "boolean",
-                    "enum": [
-                      true
-                    ]
+                    "const": false
                   },
                   "federation": {
                     "type": "object",
@@ -219,42 +145,24 @@ Feature: default capabilities for normal user
                     ],
                     "properties": {
                       "outgoing": {
-                        "type": "boolean",
-                        "enum": [
-                          true
-                        ]
+                        "const": false
                       },
                       "incoming": {
-                        "type": "boolean",
-                        "enum": [
-                          true
-                        ]
+                        "const": false
                       }
                     }
                   },
                   "group_sharing": {
-                    "type": "boolean",
-                    "enum": [
-                      true
-                    ]
+                    "const": true
                   },
                   "share_with_group_members_only": {
-                    "type": "boolean",
-                    "enum": [
-                      false
-                    ]
+                    "const": true
                   },
                   "share_with_membership_groups_only": {
-                    "type": "boolean",
-                    "enum": [
-                      false
-                    ]
+                    "const": true
                   },
                   "auto_accept_share": {
-                    "type": "boolean",
-                    "enum": [
-                      true
-                    ]
+                    "const": true
                   },
                   "user_enumeration": {
                     "type": "object",
@@ -264,16 +172,10 @@ Feature: default capabilities for normal user
                     ],
                     "properties": {
                       "enabled": {
-                        "type": "boolean",
-                        "enum": [
-                          true
-                        ]
+                        "const": true
                       },
                       "group_members_only": {
-                        "type": "boolean",
-                        "enum": [
-                          false
-                        ]
+                        "const": true
                       }
                     }
                   }
