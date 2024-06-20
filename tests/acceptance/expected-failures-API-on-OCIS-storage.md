@@ -191,11 +191,6 @@ And other missing implementation of favorites
 - [coreApiWebdavUploadTUS/optionsRequest.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/optionsRequest.feature#L40)
 - [coreApiWebdavUploadTUS/optionsRequest.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/optionsRequest.feature#L55)
 
-#### [Shares to deleted group listed in the response](https://github.com/owncloud/ocis/issues/2441)
-
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:502](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L502)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:503](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L503)
-
 #### [copying the file inside Shares folder returns 412](https://github.com/owncloud/ocis/issues/3874)
 
 - [coreApiWebdavProperties/copyFile.feature:439](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L439)
