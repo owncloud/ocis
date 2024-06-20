@@ -643,8 +643,8 @@ Feature: sharing
       | permissionsRole | File Editor   |
     When user "Alice" shares file "textfile0.txt" with group "grp1" using the sharing API
     Then the HTTP status code should be "<http-status>"
-    And the OCS status code should be "403"
-    And the OCS status message should be "Path already shared with this group"
+    And the OCS status code should be "104"
+    And the OCS status message should be "A share for the recipient already exists"
     Examples:
       | ocs-api-version | http-status |
       | 1               | 200         |
