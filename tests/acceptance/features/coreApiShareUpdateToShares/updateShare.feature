@@ -148,7 +148,6 @@ Feature: sharing
     Then the HTTP status code should be "502"
 
   @issue-1253 @issue-1224 @issue-1225
-  #after fixing all the issues merge this scenario with the one below
   Scenario Outline: change the permission of the share and check the API response
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -163,7 +162,7 @@ Feature: sharing
     When user "Alice" updates the last share using the sharing API with
       | permissions | all |
     Then the OCS status code should be "<ocs-status-code>"
-    And the OCS status message should be ""
+    And the OCS status message should be "OK"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" sharing with user "Brian" should include
       | id                         | A_STRING             |
@@ -177,8 +176,8 @@ Feature: sharing
       | token                      |                      |
       | uid_file_owner             | %username%           |
       | displayname_file_owner     | %displayname%        |
-      | additional_info_owner      |                      |
-      | additional_info_file_owner |                      |
+      | additional_info_owner      | %emailaddress%       |
+      | additional_info_file_owner | %emailaddress%       |
       | item_type                  | folder               |
       | item_source                | A_STRING             |
       | path                       | /Alice-folder        |
@@ -189,12 +188,9 @@ Feature: sharing
       | file_target                | /Shares/Alice-folder |
       | share_with                 | %username%           |
       | share_with_displayname     | %displayname%        |
-      | share_with_additional_info |                      |
+      | share_with_additional_info | %emailaddress%       |
       | mail_send                  | 0                    |
-      | attributes                 |                      |
-    And the fields of the last response should not include
-      | name |  |
-      # | token |  |
+      | name                       |                      |
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |

@@ -2437,9 +2437,9 @@ trait Sharing {
 		$this->verifyTableNodeColumnsCount($body, 2);
 		$bodyRows = $body->getRowsHash();
 		foreach ($bodyRows as $field => $value) {
-			if (\in_array($field, ["displayname_owner", "displayname_file_owner", "owner", "uid_owner", "uid_file_owner"])) {
+			if (\in_array($field, ["displayname_owner", "displayname_file_owner", "owner", "uid_owner", "uid_file_owner", "additional_info_owner", "additional_info_file_owner"])) {
 				$value = $this->substituteInLineCodes($value, $sharer);
-			} elseif (\in_array($field, ["share_with", "share_with_displayname", "user"])) {
+			} elseif (\in_array($field, ["share_with", "share_with_displayname", "user", "share_with_additional_info"])) {
 				$value = $this->substituteInLineCodes($value, $sharee);
 			}
 			$value = $this->replaceValuesFromTable($field, $value);
