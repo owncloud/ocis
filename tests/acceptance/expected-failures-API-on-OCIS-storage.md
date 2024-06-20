@@ -88,11 +88,6 @@ Synchronization features like etag propagation, setting mtime and locking files
 - [coreApiTrashbin/trashbinSharingToShares.feature:241](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L241)
 - [coreApiTrashbin/trashbinSharingToShares.feature:269](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L269)
 
-#### [Edit user share response has a "name" field](https://github.com/owncloud/ocis/issues/1225)
-
-- [coreApiShareUpdateToShares/updateShare.feature:200](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L200)
-- [coreApiShareUpdateToShares/updateShare.feature:201](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L201)
-
 ### Other
 
 API, search, favorites, config, capabilities, not existing endpoints, CORS and others
