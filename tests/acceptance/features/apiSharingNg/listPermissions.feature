@@ -1696,3 +1696,44 @@ Feature: List a sharing permissions
       | space     | new-space |
       | sharee    | Brian     |
       | shareType | user      |
+
+  @issue-9151
+  Scenario: non-member user tries to list the permissions of a project space using root endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    When user "Brian" tries to list the permissions of space "new-space" owned by "Alice" using root endpoint of the Graph API
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "itemNotFound"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "getting space"
+              }
+            }
+          }
+        }
+      }
+      """
