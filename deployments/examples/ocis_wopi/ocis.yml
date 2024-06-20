@@ -1,0 +1,66 @@
+---
+services:
+  traefik:
+    networks:
+      ocis-net:
+        aliases:
+          - ${OCIS_DOMAIN:-ocis.owncloud.test}
+
+  ocis:
+    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
+    networks:
+      - ocis-net
+    entrypoint:
+      - /bin/sh
+    # run ocis init to initialize a configuration file with random secrets
+    # it will fail on subsequent runs, because the config file already exists
+    # therefore we ignore the error and then start the ocis server
+    command: ["-c", "ocis init || true; ocis server"]
+    environment:
+      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_LOG_LEVEL: ${LOG_LEVEL:-info}
+      # do not use SSL between Traefik and oCIS
+      PROXY_TLS: "false"
+      # make the REVA gateway accessible to the app drivers
+      GATEWAY_GRPC_ADDR: 0.0.0.0:9142
+      # INSECURE: needed if oCIS / Traefik is using self generated certificates
+      OCIS_INSECURE: "${INSECURE:-false}"
+      # admin user password
+      # use the admin password from the configuration file if defined
+      IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}"
+      # demo users
+      IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
+      # email server (if configured)
+      NOTIFICATIONS_SMTP_HOST: "${SMTP_HOST}"
+      NOTIFICATIONS_SMTP_PORT: "${SMTP_PORT}"
+      NOTIFICATIONS_SMTP_SENDER: "${SMTP_SENDER}"
+      NOTIFICATIONS_SMTP_USERNAME: "${SMTP_USERNAME}"
+      NOTIFICATIONS_SMTP_INSECURE: "${SMTP_INSECURE}"
+      # other required configurations
+      MICRO_REGISTRY_ADDRESS: 127.0.0.1:9233
+      NATS_NATS_HOST: 0.0.0.0
+      NATS_NATS_PORT: 9233
+      # enable to allow using the banned passwords
+      #OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: banned-password-list.txt
+    volumes:
+      # paths are relative to the main compose file
+      - ocis-config:/etc/ocis
+      - ocis-data:/var/lib/ocis
+      - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
+      - ./config/ocis/web.yaml:/etc/ocis/web.yaml
+      - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ocis.entrypoints=https"
+      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
+      - "traefik.http.routers.ocis.tls.certresolver=http"
+      - "traefik.http.routers.ocis.service=ocis"
+      - "traefik.http.services.ocis.loadbalancer.server.port=9200"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+volumes:
+  ocis-config:
+  ocis-data:
+
