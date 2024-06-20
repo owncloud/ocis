@@ -33,20 +33,13 @@ var _registeredEvents = []events.Unmarshaller{
 	events.FileTouched{},
 	events.ContainerCreated{},
 	events.ItemTrashed{},
-	events.ItemPurged{},
 	events.ItemMoved{},
 	events.ShareCreated{},
-	events.ShareUpdated{},
 	events.ShareRemoved{},
 	events.LinkCreated{},
-	events.LinkUpdated{},
 	events.LinkRemoved{},
 	events.SpaceShared{},
-	events.SpaceShareUpdated{},
 	events.SpaceUnshared{},
-
-	// TODO: file downloaded only for public links. How to do this?
-	events.FileDownloaded{},
 }
 
 // Server is the entrypoint for the server command.

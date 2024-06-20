@@ -5,15 +5,16 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
 	"github.com/owncloud/ocis/v2/ocis-pkg/kql"
@@ -92,9 +93,8 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 
 		var (
 			message string
-			res     Resource
-			act     Actor
-			ts      libregraph.ActivityTimes
+			ts      time.Time
+			vars    map[string]interface{}
 		)
 
 		switch ev := s.unwrapEvent(e).(type) {
@@ -103,49 +103,54 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			continue
 		case events.UploadReady:
 			message = MessageResourceCreated
-			res, act, ts, err = s.ResponseData(ev.FileRef, ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName(), utils.TSToTime(ev.Timestamp))
+			ts = utils.TSToTime(ev.Timestamp)
+			vars, err = s.GetVars(WithResource(ev.FileRef, true), WithUser(ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName()))
 		case events.FileTouched:
 			message = MessageResourceCreated
-			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
+			ts = utils.TSToTime(ev.Timestamp)
+			vars, err = s.GetVars(WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
 		case events.ContainerCreated:
 			message = MessageResourceCreated
-			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
+			ts = utils.TSToTime(ev.Timestamp)
+			vars, err = s.GetVars(WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
 		case events.ItemTrashed:
 			message = MessageResourceTrashed
-			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
-		case events.ItemPurged:
-			message = MessageResourcePurged
-			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
+			ts = utils.TSToTime(ev.Timestamp)
+			vars, err = s.GetVars(WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
 		case events.ItemMoved:
-			message = MessageResourceMoved
-			res, act, ts, err = s.ResponseData(ev.Ref, ev.Executant, "", utils.TSToTime(ev.Timestamp))
+			switch isRename(ev.OldReference, ev.Ref) {
+			case true:
+				message = MessageResourceRenamed
+				vars, err = s.GetVars(WithResource(ev.Ref, false), WithOldResource(ev.OldReference), WithUser(ev.Executant, ""))
+			case false:
+				message = MessageResourceMoved
+				vars, err = s.GetVars(WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
+			}
+			ts = utils.TSToTime(ev.Timestamp)
 		case events.ShareCreated:
 			message = MessageShareCreated
-			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.CTime))
-		case events.ShareUpdated:
-			message = MessageShareUpdated
-			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.MTime))
+			ts = utils.TSToTime(ev.CTime)
+			vars, err = s.GetVars(WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.ShareRemoved:
 			message = MessageShareDeleted
-			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", ev.Timestamp)
+			ts = ev.Timestamp
+			vars, err = s.GetVars(WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.LinkCreated:
 			message = MessageLinkCreated
-			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.CTime))
-		case events.LinkUpdated:
-			message = MessageLinkUpdated
-			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.CTime))
+			ts = utils.TSToTime(ev.CTime)
+			vars, err = s.GetVars(WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""))
 		case events.LinkRemoved:
 			message = MessageLinkDeleted
-			res, act, ts, err = s.ResponseData(toRef(ev.ItemID), ev.Executant, "", utils.TSToTime(ev.Timestamp))
+			ts = utils.TSToTime(ev.Timestamp)
+			vars, err = s.GetVars(WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""))
 		case events.SpaceShared:
 			message = MessageSpaceShared
-			res, act, ts, err = s.ResponseData(sToRef(ev.ID), ev.Executant, "", ev.Timestamp)
-		case events.SpaceShareUpdated:
-			message = MessageSpaceShareUpdated
-			res, act, ts, err = s.ResponseData(sToRef(ev.ID), ev.Executant, "", ev.Timestamp)
+			ts = ev.Timestamp
+			vars, err = s.GetVars(WithSpace(ev.ID), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.SpaceUnshared:
 			message = MessageSpaceUnshared
-			res, act, ts, err = s.ResponseData(sToRef(ev.ID), ev.Executant, "", ev.Timestamp)
+			ts = ev.Timestamp
+			vars, err = s.GetVars(WithSpace(ev.ID), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		}
 
 		if err != nil {
@@ -157,7 +162,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		loc := l10n.MustGetUserLocale(r.Context(), activeUser.GetId().GetOpaqueId(), r.Header.Get(l10n.HeaderAcceptLanguage), s.valService)
 		t := l10n.NewTranslatorFromCommonConfig("en", _domain, "", _localeFS, _localeSubPath)
 
-		resp.Activities = append(resp.Activities, NewActivity(t.Translate(message, loc), res, act, ts, e.GetId()))
+		resp.Activities = append(resp.Activities, NewActivity(t.Translate(message, loc), ts, e.GetId(), vars))
 	}
 
 	// delete activities in separate go routine
@@ -277,4 +282,13 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 		return true
 	}
 	return &rid, limit, pref, postf, nil
+}
+
+// returns true if this is just a rename
+func isRename(o, n *provider.Reference) bool {
+	// if resourceids are different we assume it is a move
+	if !utils.ResourceIDEqual(o.GetResourceId(), n.GetResourceId()) {
+		return false
+	}
+	return filepath.Base(o.GetPath()) != filepath.Base(n.GetPath())
 }
