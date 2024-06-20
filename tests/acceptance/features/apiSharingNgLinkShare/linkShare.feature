@@ -1,4 +1,4 @@
-Feature: Create a share link for a resource
+Feature: Create a link share for a resource
   https://owncloud.dev/libre-graph-api/#/drives.permissions/CreateLink
 
   Background:
@@ -891,7 +891,7 @@ Feature: Create a share link for a resource
       | ownCloud        |
 
   @issue-7879
-  Scenario Outline: create a share link of a folder inside project-space using permissions endpoint
+  Scenario Outline: create a link share of a folder inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1018,7 +1018,7 @@ Feature: Create a share link for a resource
       """
 
   @issue-8619
-  Scenario: try to create an internal share link of a folder inside project-space with password using permissions endpoint
+  Scenario: try to create an internal link share of a folder inside project-space with password using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1031,7 +1031,7 @@ Feature: Create a share link for a resource
     Then the HTTP status code should be "400"
 
   @issue-7879
-  Scenario Outline: create a share link of a folder inside project-space with display name and expiry date using permissions endpoint
+  Scenario Outline: create a link share of a folder inside project-space with display name and expiry date using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1105,7 +1105,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
 
-  Scenario Outline: create a share link of a folder inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
+  Scenario Outline: create a link share of a folder inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -1163,7 +1163,7 @@ Feature: Create a share link for a resource
       | ownCloud        | blocksDownload   |
 
   @env-config
-  Scenario: set password on a existing share link of a folder inside project-space using permissions endpoint
+  Scenario: set password on a existing link share of a folder inside project-space using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -1198,7 +1198,7 @@ Feature: Create a share link for a resource
     And the public should be able to download file "/textfile.txt" from the last link share with password "%public%" and the content should be "to share"
 
   @env-config @issue-7879
-  Scenario Outline: create a share link of a file inside project-space without password using permissions endpoint
+  Scenario Outline: create a link share of a file inside project-space without password using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -1268,7 +1268,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @issue-7879
-  Scenario Outline: create a share link of a file inside project-space using permissions endpoint
+  Scenario Outline: create a link share of a file inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1334,7 +1334,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @issue-8619
-  Scenario: create an internal share link of a file inside project-space using permissions endpoint
+  Scenario: create an internal link share of a file inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1394,7 +1394,7 @@ Feature: Create a share link for a resource
       """
 
   @issue-8619
-  Scenario: try to create an internal share link of a file inside project-space with password from project-space using permissions endpoint
+  Scenario: try to create an internal link share of a file inside project-space with password from project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1407,7 +1407,7 @@ Feature: Create a share link for a resource
     Then the HTTP status code should be "400"
 
   @issue-7879
-  Scenario Outline: create a share link of a file inside project-space with display name and expiry date using permissions endpoint
+  Scenario Outline: create a link share of a file inside project-space with display name and expiry date using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1478,7 +1478,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @env-config @issue-7879
-  Scenario Outline: create a share link of a file inside project-space without password using permissions endpoint
+  Scenario Outline: create a link share of a file inside project-space without password using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -1547,7 +1547,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
 
-  Scenario Outline: create a share link of a file inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
+  Scenario Outline: create a link share of a file inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -1599,7 +1599,7 @@ Feature: Create a share link for a resource
       | ownCloud        | blocksDownload   |
 
   @env-config
-  Scenario: set password on a existing share link of a file inside project-space using permissions endpoint
+  Scenario: set password on a existing link share of a file inside project-space using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
@@ -3438,7 +3438,7 @@ Feature: Create a share link for a resource
       """
 
 
-  Scenario Outline: create a share quick link of a folder inside project-space using permissions endpoint
+  Scenario Outline: create a quick link share of a folder inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -3567,7 +3567,7 @@ Feature: Create a share link for a resource
       """
 
 
-  Scenario Outline: create a quick share link of a file inside project-space using permissions endpoint
+  Scenario Outline: create a quick link share of a file inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -3634,7 +3634,7 @@ Feature: Create a share link for a resource
       | blocksDownload   |
 
   @issue-8619
-  Scenario: create an internal quick share link of a file inside project-space using permissions endpoint
+  Scenario: create an internal quick link share of a file inside project-space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
