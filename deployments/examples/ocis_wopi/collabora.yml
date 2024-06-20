@@ -42,7 +42,7 @@ services:
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
       # use the internal service name of the gateway
       APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
-      # configure the service name to avoid collision with like with onlyoffice
+      # configure the service name to avoid collision with other apps like onlyoffice
       APP_PROVIDER_SERVICE_NAME: app-provider-collabora
       # use the internal service name
       APP_PROVIDER_EXTERNAL_ADDR: com.owncloud.api.app-provider-collabora
