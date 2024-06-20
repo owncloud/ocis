@@ -40,7 +40,7 @@ services:
       MICRO_REGISTRY_ADDRESS: 127.0.0.1:9233
       NATS_NATS_HOST: 0.0.0.0
       NATS_NATS_PORT: 9233
-      # enable to allow using the banned passwords
+      # enable to allow using the banned passwords list
       #OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: banned-password-list.txt
     volumes:
       # paths are relative to the main compose file

@@ -17,7 +17,7 @@ services:
       - /entrypoint-override.sh
     environment:
       WOPI_ENABLED: "true"
-      # self signed certificates
+      # self-signed certificates
       USE_UNAUTHORIZED_STORAGE: "${INSECURE:-false}"
     volumes:
       # paths are relative to the main compose file
@@ -30,7 +30,7 @@ services:
       - "traefik.http.routers.onlyoffice.tls.certresolver=http"
       - "traefik.http.routers.onlyoffice.service=onlyoffice"
       - "traefik.http.services.onlyoffice.loadbalancer.server.port=80"
-      # websockets can't be opened when this is ommitted
+      # websockets can't be opened when this is omitted
       - "traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.onlyoffice.middlewares=onlyoffice"
     logging:
@@ -48,7 +48,7 @@ services:
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
       # use the internal service name of the gateway
       APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
-      # configure the service name to avoid collision like with with collabora
+      # configure the service name to avoid collision with other apps like collabora
       APP_PROVIDER_SERVICE_NAME: app-provider-onlyoffice
       # use the internal service name
       APP_PROVIDER_EXTERNAL_ADDR: com.owncloud.api.app-provider-onlyoffice
