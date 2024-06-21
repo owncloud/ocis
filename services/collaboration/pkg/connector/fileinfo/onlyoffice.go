@@ -131,85 +131,85 @@ type OnlyOffice struct {
 func (oinfo *OnlyOffice) SetProperties(props map[string]interface{}) {
 	for key, value := range props {
 		switch key {
-		case "BaseFileName":
+		case KeyBaseFileName:
 			oinfo.BaseFileName = value.(string)
-		case "Version":
+		case KeyVersion:
 			oinfo.Version = value.(string)
 
-		case "BreadcrumbBrandName":
+		case KeyBreadcrumbBrandName:
 			oinfo.BreadcrumbBrandName = value.(string)
-		case "BreadcrumbBrandURL":
+		case KeyBreadcrumbBrandURL:
 			oinfo.BreadcrumbBrandURL = value.(string)
-		case "BreadcrumbDocName":
+		case KeyBreadcrumbDocName:
 			oinfo.BreadcrumbDocName = value.(string)
-		case "BreadcrumbFolderName":
+		case KeyBreadcrumbFolderName:
 			oinfo.BreadcrumbFolderName = value.(string)
-		case "BreadcrumbFolderURL":
+		case KeyBreadcrumbFolderURL:
 			oinfo.BreadcrumbFolderURL = value.(string)
 
-		case "ClosePostMessage":
+		case KeyClosePostMessage:
 			oinfo.ClosePostMessage = value.(bool)
-		case "EditModePostMessage":
+		case KeyEditModePostMessage:
 			oinfo.EditModePostMessage = value.(bool)
-		case "EditNotificationPostMessage":
+		case KeyEditNotificationPostMessage:
 			oinfo.EditNotificationPostMessage = value.(bool)
-		case "FileSharingPostMessage":
+		case KeyFileSharingPostMessage:
 			oinfo.FileSharingPostMessage = value.(bool)
-		case "FileVersionPostMessage":
+		case KeyFileVersionPostMessage:
 			oinfo.FileVersionPostMessage = value.(bool)
-		case "PostMessageOrigin":
+		case KeyPostMessageOrigin:
 			oinfo.PostMessageOrigin = value.(string)
 
-		case "CloseURL":
+		case KeyCloseURL:
 			oinfo.CloseURL = value.(string)
-		case "FileSharingURL":
+		case KeyFileSharingURL:
 			oinfo.FileSharingURL = value.(string)
-		case "FileVersionURL":
+		case KeyFileVersionURL:
 			oinfo.FileVersionURL = value.(string)
-		case "HostEditURL":
+		case KeyHostEditURL:
 			oinfo.HostEditURL = value.(string)
 
-		case "CopyPasteRestrictions":
+		case KeyCopyPasteRestrictions:
 			oinfo.CopyPasteRestrictions = value.(string)
-		case "DisablePrint":
+		case KeyDisablePrint:
 			oinfo.DisablePrint = value.(bool)
-		case "FileExtension":
+		case KeyFileExtension:
 			oinfo.FileExtension = value.(string)
-		case "FileNameMaxLength":
+		case KeyFileNameMaxLength:
 			oinfo.FileNameMaxLength = value.(int)
-		case "LastModifiedTime":
+		case KeyLastModifiedTime:
 			oinfo.LastModifiedTime = value.(string)
 
-		case "IsAnonymousUser":
+		case KeyIsAnonymousUser:
 			oinfo.IsAnonymousUser = value.(bool)
-		case "UserFriendlyName":
+		case KeyUserFriendlyName:
 			oinfo.UserFriendlyName = value.(string)
-		case "UserID":
+		case KeyUserID:
 			oinfo.UserID = value.(string)
 
-		case "ReadOnly":
+		case KeyReadOnly:
 			oinfo.ReadOnly = value.(bool)
-		case "UserCanNotWriteRelative":
+		case KeyUserCanNotWriteRelative:
 			oinfo.UserCanNotWriteRelative = value.(bool)
-		case "UserCanRename":
+		case KeyUserCanRename:
 			oinfo.UserCanRename = value.(bool)
-		case "UserCanReview":
+		case KeyUserCanReview:
 			oinfo.UserCanReview = value.(bool)
-		case "UserCanWrite":
+		case KeyUserCanWrite:
 			oinfo.UserCanWrite = value.(bool)
 
-		case "SupportsLocks":
+		case KeySupportsLocks:
 			oinfo.SupportsLocks = value.(bool)
-		case "SupportsRename":
+		case KeySupportsRename:
 			oinfo.SupportsRename = value.(bool)
-		case "SupportsReviewing":
+		case KeySupportsReviewing:
 			oinfo.SupportsReviewing = value.(bool)
-		case "SupportsUpdate":
+		case KeySupportsUpdate:
 			oinfo.SupportsUpdate = value.(bool)
 
-		case "EnableInsertRemoteImage":
+		case KeyEnableInsertRemoteImage:
 			oinfo.EnableInsertRemoteImage = value.(bool)
-		case "HidePrintOption":
+		case KeyHidePrintOption:
 			oinfo.HidePrintOption = value.(bool)
 		}
 	}

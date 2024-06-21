@@ -24,3 +24,109 @@ type FileInfo interface {
 	// Note that the returned value must be unique among all the implementations
 	GetTarget() string
 }
+
+// constants that can be used to refer the fileinfo properties for the
+// SetProperties method of the FileInfo interface
+const (
+	KeyBaseFileName = "BaseFileName"
+	KeyOwnerID      = "OwnerId"
+	KeySize         = "Size"
+	KeyUserID       = "UserID"
+	KeyVersion      = "Version"
+
+	KeySupportedShareURLTypes     = "SupportedShareURLTypes"
+	KeySupportsCobalt             = "SupportsCobalt"
+	KeySupportsContainers         = "SupportsContainers"
+	KeySupportsDeleteFile         = "SupportsDeleteFile"
+	KeySupportsEcosystem          = "SupportsEcosystem"
+	KeySupportsExtendedLockLength = "SupportsExtendedLockLength"
+	KeySupportsFolders            = "SupportsFolders"
+	//KeySupportsGetFileWopiSrc = "SupportsGetFileWopiSrc"  // wopivalidator is complaining and the property isn't used for now -> commented
+	KeySupportsGetLock  = "SupportsGetLock"
+	KeySupportsLocks    = "SupportsLocks"
+	KeySupportsRename   = "SupportsRename"
+	KeySupportsUpdate   = "SupportsUpdate"
+	KeySupportsUserInfo = "SupportsUserInfo"
+
+	KeyIsAnonymousUser              = "IsAnonymousUser"
+	KeyIsEduUser                    = "IsEduUser"
+	KeyLicenseCheckForEditIsEnabled = "LicenseCheckForEditIsEnabled"
+	KeyUserFriendlyName             = "UserFriendlyName"
+	KeyUserInfo                     = "UserInfo"
+
+	KeyReadOnly                = "ReadOnly"
+	KeyRestrictedWebViewOnly   = "RestrictedWebViewOnly"
+	KeyUserCanAttend           = "UserCanAttend"
+	KeyUserCanNotWriteRelative = "UserCanNotWriteRelative"
+	KeyUserCanPresent          = "UserCanPresent"
+	KeyUserCanRename           = "UserCanRename"
+	KeyUserCanWrite            = "UserCanWrite"
+
+	KeyCloseURL            = "CloseURL"
+	KeyDownloadURL         = "DownloadURL"
+	KeyFileEmbedCommandURL = "FileEmbedCommandURL"
+	KeyFileSharingURL      = "FileSharingURL"
+	KeyFileURL             = "FileURL"
+	KeyFileVersionURL      = "FileVersionURL"
+	KeyHostEditURL         = "HostEditURL"
+	KeyHostEmbeddedViewURL = "HostEmbeddedViewURL"
+	KeyHostViewURL         = "HostViewURL"
+	KeySignoutURL          = "SignoutURL"
+
+	KeyAllowAdditionalMicrosoftServices = "AllowAdditionalMicrosoftServices"
+	KeyAllowErrorReportPrompt           = "AllowErrorReportPrompt"
+	KeyAllowExternalMarketplace         = "AllowExternalMarketplace"
+	KeyClientThrottlingProtection       = "ClientThrottlingProtection"
+	KeyCloseButtonClosesWindow          = "CloseButtonClosesWindow"
+	KeyCopyPasteRestrictions            = "CopyPasteRestrictions"
+	KeyDisablePrint                     = "DisablePrint"
+	KeyDisableTranslation               = "DisableTranslation"
+	KeyFileExtension                    = "FileExtension"
+	KeyFileNameMaxLength                = "FileNameMaxLength"
+	KeyLastModifiedTime                 = "LastModifiedTime"
+	KeyRequestedCallThrottling          = "RequestedCallThrottling"
+	KeySHA256                           = "SHA256"
+	KeySharingStatus                    = "SharingStatus"
+	KeyTemporarilyNotWritable           = "TemporarilyNotWritable"
+	//KeyUniqueContentId = "UniqueContentId"  // From microsoft docs: Not supported in CSPP -> commented
+
+	KeyBreadcrumbBrandName  = "BreadcrumbBrandName"
+	KeyBreadcrumbBrandURL   = "BreadcrumbBrandURL"
+	KeyBreadcrumbDocName    = "BreadcrumbDocName"
+	KeyBreadcrumbFolderName = "BreadcrumbFolderName"
+	KeyBreadcrumbFolderURL  = "BreadcrumbFolderUrl"
+
+	// Collabora (non-dupped) properties below
+
+	KeyPostMessageOrigin = "PostMessageOrigin"
+	KeyTemplateSource    = "TemplateSource"
+
+	KeyEnableInsertRemoteImage = "EnableInsertRemoteImage"
+	KeyDisableInsertLocalImage = "DisableInsertLocalImage"
+	KeyHidePrintOption         = "HidePrintOption"
+	KeyHideSaveOption          = "HideSaveOption"
+	KeyHideExportOption        = "HideExportOption"
+	KeyDisableExport           = "DisableExport"
+	KeyDisableCopy             = "DisableCopy"
+	KeyDisableInactiveMessages = "DisableInactiveMessages"
+	KeyDownloadAsPostMessage   = "DownloadAsPostMessage"
+	KeySaveAsPostmessage       = "SaveAsPostmessage"
+	KeyEnableOwnerTermination  = "EnableOwnerTermination"
+	//KeyUserExtraInfo -> requires definition, currently not used
+	//KeyUserPrivateInfo -> requires definition, currently not used
+	KeyWatermarkText = "WatermarkText"
+
+	KeyEnableShare  = "EnableShare"
+	KeyHideUserList = "HideUserList"
+
+	// OnlyOffice (non-dupped) properties below
+
+	KeyClosePostMessage            = "ClosePostMessage"
+	KeyEditModePostMessage         = "EditModePostMessage"
+	KeyEditNotificationPostMessage = "EditNotificationPostMessage"
+	KeyFileSharingPostMessage      = "FileSharingPostMessage"
+	KeyFileVersionPostMessage      = "FileVersionPostMessage"
+
+	KeyUserCanReview     = "UserCanReview"
+	KeySupportsReviewing = "SupportsReviewing"
+)

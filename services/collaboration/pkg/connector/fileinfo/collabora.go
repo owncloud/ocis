@@ -84,65 +84,65 @@ type Collabora struct {
 func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 	for key, value := range props {
 		switch key {
-		case "BaseFileName":
+		case KeyBaseFileName:
 			cinfo.BaseFileName = value.(string)
-		case "DisablePrint":
+		case KeyDisablePrint:
 			cinfo.DisablePrint = value.(bool)
-		case "OwnerID":
+		case KeyOwnerID:
 			cinfo.OwnerID = value.(string)
-		case "PostMessageOrigin":
+		case KeyPostMessageOrigin:
 			cinfo.PostMessageOrigin = value.(string)
-		case "Size":
+		case KeySize:
 			cinfo.Size = value.(int64)
-		case "TemplateSource":
+		case KeyTemplateSource:
 			cinfo.TemplateSource = value.(string)
-		case "UserCanWrite":
+		case KeyUserCanWrite:
 			cinfo.UserCanWrite = value.(bool)
-		case "UserCanNotWriteRelative":
+		case KeyUserCanNotWriteRelative:
 			cinfo.UserCanNotWriteRelative = value.(bool)
-		case "UserID":
+		case KeyUserID:
 			cinfo.UserID = value.(string)
-		case "UserFriendlyName":
+		case KeyUserFriendlyName:
 			cinfo.UserFriendlyName = value.(string)
 
-		case "EnableInsertRemoteImage":
+		case KeyEnableInsertRemoteImage:
 			cinfo.EnableInsertRemoteImage = value.(bool)
-		case "DisableInsertLocalImage":
+		case KeyDisableInsertLocalImage:
 			cinfo.DisableInsertLocalImage = value.(bool)
-		case "HidePrintOption":
+		case KeyHidePrintOption:
 			cinfo.HidePrintOption = value.(bool)
-		case "HideSaveOption":
+		case KeyHideSaveOption:
 			cinfo.HideSaveOption = value.(bool)
-		case "HideExportOption":
+		case KeyHideExportOption:
 			cinfo.HideExportOption = value.(bool)
-		case "DisableExport":
+		case KeyDisableExport:
 			cinfo.DisableExport = value.(bool)
-		case "DisableCopy":
+		case KeyDisableCopy:
 			cinfo.DisableCopy = value.(bool)
-		case "DisableInactiveMessages":
+		case KeyDisableInactiveMessages:
 			cinfo.DisableInactiveMessages = value.(bool)
-		case "DownloadAsPostMessage":
+		case KeyDownloadAsPostMessage:
 			cinfo.DownloadAsPostMessage = value.(bool)
-		case "SaveAsPostmessage":
+		case KeySaveAsPostmessage:
 			cinfo.SaveAsPostmessage = value.(bool)
-		case "EnableOwnerTermination":
+		case KeyEnableOwnerTermination:
 			cinfo.EnableOwnerTermination = value.(bool)
 		//UserExtraInfo -> requires definition, currently not used
 		//UserPrivateInfo -> requires definition, currently not used
-		case "WatermarkText":
+		case KeyWatermarkText:
 			cinfo.WatermarkText = value.(string)
 
-		case "EnableShare":
+		case KeyEnableShare:
 			cinfo.EnableShare = value.(bool)
-		case "HideUserList":
+		case KeyHideUserList:
 			cinfo.HideUserList = value.(string)
-		case "SupportsLocks":
+		case KeySupportsLocks:
 			cinfo.SupportsLocks = value.(bool)
-		case "SupportsRename":
+		case KeySupportsRename:
 			cinfo.SupportsRename = value.(bool)
-		case "UserCanRename":
+		case KeyUserCanRename:
 			cinfo.UserCanRename = value.(bool)
-		case "BreadcrumbDocName":
+		case KeyBreadcrumbDocName:
 			cinfo.BreadcrumbDocName = value.(string)
 		}
 	}

@@ -538,42 +538,42 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 
 	// fileinfo map
 	infoMap := map[string]interface{}{
-		"OwnerID":           hexEncodedOwnerId,
-		"Size":              int64(statRes.GetInfo().GetSize()),
-		"Version":           version,
-		"BaseFileName":      path.Base(statRes.GetInfo().GetPath()),
-		"BreadcrumbDocName": path.Base(statRes.GetInfo().GetPath()),
+		fileinfo.KeyOwnerID:           hexEncodedOwnerId,
+		fileinfo.KeySize:              int64(statRes.GetInfo().GetSize()),
+		fileinfo.KeyVersion:           version,
+		fileinfo.KeyBaseFileName:      path.Base(statRes.GetInfo().GetPath()),
+		fileinfo.KeyBreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request
 		//BreadcrumbFolderName: path.Dir(statRes.Info.Path),
 
-		"HostViewURL": wopiContext.ViewAppUrl,
-		"HostEditURL": wopiContext.EditAppUrl,
+		fileinfo.KeyHostViewURL: wopiContext.ViewAppUrl,
+		fileinfo.KeyHostEditURL: wopiContext.EditAppUrl,
 
-		"EnableOwnerTermination":     true, // only for collabora
-		"SupportsExtendedLockLength": true,
-		"SupportsGetLock":            true,
-		"SupportsLocks":              true,
-		"SupportsUpdate":             true,
+		fileinfo.KeyEnableOwnerTermination:     true, // only for collabora
+		fileinfo.KeySupportsExtendedLockLength: true,
+		fileinfo.KeySupportsGetLock:            true,
+		fileinfo.KeySupportsLocks:              true,
+		fileinfo.KeySupportsUpdate:             true,
 
-		"UserCanNotWriteRelative": true,
-		"IsAnonymousUser":         isAnonymousUser,
-		"UserFriendlyName":        userFriendlyName,
-		"UserID":                  userId,
+		fileinfo.KeyUserCanNotWriteRelative: true,
+		fileinfo.KeyIsAnonymousUser:         isAnonymousUser,
+		fileinfo.KeyUserFriendlyName:        userFriendlyName,
+		fileinfo.KeyUserID:                  userId,
 	}
 
 	switch wopiContext.ViewMode {
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE:
-		infoMap["UserCanWrite"] = true
+		infoMap[fileinfo.KeyUserCanWrite] = true
 
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_ONLY:
 		// nothing special to do here for now
 
 	case appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY:
-		infoMap["DisableExport"] = true // only for collabora
-		infoMap["DisableCopy"] = true   // only for collabora
-		infoMap["DisablePrint"] = true
+		infoMap[fileinfo.KeyDisableExport] = true // only for collabora
+		infoMap[fileinfo.KeyDisableCopy] = true   // only for collabora
+		infoMap[fileinfo.KeyDisablePrint] = true
 		if !isPublicShare {
-			infoMap["WatermarkText"] = f.watermarkText(wopiContext.User) // only for collabora
+			infoMap[fileinfo.KeyWatermarkText] = f.watermarkText(wopiContext.User) // only for collabora
 		}
 	}
 
