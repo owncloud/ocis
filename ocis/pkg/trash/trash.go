@@ -1,6 +1,7 @@
 package trash
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
@@ -13,14 +14,13 @@ type ListBlobstore interface {
 }
 
 type TrashDirs struct {
-	Dirs []string
+	LinkPath string
+	NodePath string
 }
 
 // NewTrashDirs creates a new trash dirs object
 func NewTrashDirs() *TrashDirs {
-	return &TrashDirs{
-		Dirs: make([]string, 0),
-	}
+	return &TrashDirs{}
 }
 
 // PurgeTrashOrphanedPaths purges orphaned paths in the trash
@@ -40,7 +40,7 @@ func PurgeTrashOrphanedPaths(storagepath string, lbs ListBlobstore) error {
 
 // GatherData gathers data from the data provider
 func (t *TrashDirs) GatherData(events <-chan interface{}) {
-	/*for ev := range events {
+	for ev := range events {
 		fmt.Println(ev)
-	}*/
+	}
 }
