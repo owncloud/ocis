@@ -32,7 +32,7 @@ func NewDataProvider(fsys fs.FS, discpath string, lbs ListBlobstore) *DataProvid
 func (dp *DataProvider) ProduceData() error {
 	// we have all trash nodes in all spaces now
 	// TODO: this globbing does not work as expected, probably wrong number of stars
-	dirs, err := fs.Glob(dp.fsys, "storage/users/spaces/*/*/trash/*/*/*/*")
+	dirs, err := fs.Glob(dp.fsys, "storage/users/spaces/*/*/trash/*/*/*/*/*")
 
 	if err != nil {
 		return err
