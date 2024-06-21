@@ -37,9 +37,11 @@ import (
 )
 
 const (
-	_spaceTypePersonal = "personal"
-	_spaceTypeProject  = "project"
-	_spaceStateTrashed = "trashed"
+	_spaceTypePersonal   = "personal"
+	_spaceTypeProject    = "project"
+	_spaceTypeVirtual    = "virtual"
+	_spaceTypeMountpoint = "mountpoint"
+	_spaceStateTrashed   = "trashed"
 
 	_sortDescending = "desc"
 )
@@ -650,9 +652,9 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 				}
 
 				// can't access disabled space
-				if utils.ReadPlainFromOpaque(storageSpace.Opaque, "trashed") != _spaceStateTrashed {
+				if utils.ReadPlainFromOpaque(storageSpace.Opaque, _spaceStateTrashed) != _spaceStateTrashed {
 					res.Special = g.getSpecialDriveItems(ctx, baseURL, storageSpace)
-					if storageSpace.SpaceType != "mountpoint" && storageSpace.SpaceType != "virtual" {
+					if storageSpace.SpaceType != _spaceTypeMountpoint && storageSpace.SpaceType != _spaceTypeVirtual {
 						quota, err := g.getDriveQuota(ctx, storageSpace)
 						res.Quota = &quota
 						if err != nil {
@@ -759,7 +761,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 			Permissions: permissions,
 		},
 	}
-	if space.SpaceType == "mountpoint" {
+	if space.SpaceType == _spaceTypeMountpoint {
 		var remoteItem *libregraph.RemoteItem
 		grantID := storageprovider.ResourceId{
 			StorageId: utils.ReadPlainFromOpaque(space.Opaque, "grantStorageID"),
@@ -787,7 +789,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 			drive.DriveAlias = libregraph.PtrString(string(alias.Value))
 		}
 
-		if v, ok := space.Opaque.Map["trashed"]; ok {
+		if v, ok := space.Opaque.Map[_spaceStateTrashed]; ok {
 			deleted := &libregraph.Deleted{}
 			deleted.SetState(string(v.Value))
 			drive.Root.Deleted = deleted

@@ -20,13 +20,14 @@ import (
 	"github.com/CiscoM31/godata"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -640,7 +641,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, sp := range lspr.GetStorageSpaces() {
-			if !(sp.SpaceType == "personal" && sp.Owner.Id.OpaqueId == user.GetId()) {
+			if !(sp.SpaceType == _spaceTypePersonal && sp.Owner.Id.OpaqueId == user.GetId()) {
 				continue
 			}
 			// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
@@ -649,7 +650,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 			// Deleting a space a two step process (1. disabling/trashing, 2. purging)
 			// Do the "disable/trash" step only if the space is not marked as trashed yet:
-			if _, ok := sp.Opaque.Map["trashed"]; !ok {
+			if _, ok := sp.Opaque.Map[_spaceStateTrashed]; !ok {
 				_, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 					Id: &storageprovider.StorageSpaceId{
 						OpaqueId: sp.Id.OpaqueId,

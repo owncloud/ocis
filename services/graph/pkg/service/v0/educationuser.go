@@ -9,12 +9,13 @@ import (
 
 	"github.com/CiscoM31/godata"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 )
 
@@ -249,7 +250,7 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 
 			// Deleting a space a two step process (1. disabling/trashing, 2. purging)
 			// Do the "disable/trash" step only if the space is not marked as trashed yet:
-			if _, ok := sp.Opaque.Map["trashed"]; !ok {
+			if _, ok := sp.Opaque.Map[_spaceStateTrashed]; !ok {
 				_, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 					Id: &storageprovider.StorageSpaceId{
 						OpaqueId: sp.Id.OpaqueId,
