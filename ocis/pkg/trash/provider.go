@@ -30,7 +30,8 @@ func NewDataProvider(fsys fs.FS, discpath string, lbs ListBlobstore) *DataProvid
 
 // ProduceData produces data for the trash folders
 func (dp *DataProvider) ProduceData() error {
-	// we have all nodes in all spaces now
+	// we have all trash nodes in all spaces now
+	// TODO: this globbing does not work as expected, probably wrong number of stars
 	dirs, err := fs.Glob(dp.fsys, "storage/users/spaces/*/*/trash/*/*/*/*")
 
 	if err != nil {
@@ -49,7 +50,9 @@ func (dp *DataProvider) ProduceData() error {
 			linkpath := filepath.Join(dp.discpath, l)
 			r, _ := os.Readlink(linkpath)
 			p := filepath.Join(dp.discpath, l, "..", r)
-			dp.Events <- TrashDirs{LinkPath: linkpath, NodePath: p}
+			if !hasChildren(dp.fsys, p) {
+				dp.Events <- TrashDirs{LinkPath: linkpath, NodePath: p}
+			}
 			wg.Done()
 		}()
 	}
@@ -64,4 +67,9 @@ func (dp *DataProvider) ProduceData() error {
 
 func (dp *DataProvider) quit() {
 	close(dp.Events)
+}
+
+func hasChildren(fsys fs.FS, path string) bool {
+	entries, _ := fs.ReadDir(fsys, path)
+	return len(entries) > 0
 }

@@ -41,6 +41,20 @@ func PurgeTrashOrphanedPaths(storagepath string, lbs ListBlobstore) error {
 // GatherData gathers data from the data provider
 func (t *TrashDirs) GatherData(events <-chan interface{}) {
 	for ev := range events {
-		fmt.Println(ev)
+		switch d := ev.(type) {
+		case TrashDirs:
+			// we have to remove the directory
+			if err := removeDir(d.LinkPath); err != nil {
+				fmt.Printf("TrashDirs: %v could not be removed: %v\n", d, err)
+			}
+			fmt.Printf("TrashDirs: %v is empty and needs to be removed\n", d)
+		default:
+			// we do not have to handle this here
+			continue
+		}
 	}
+}
+
+func removeDir(path string) error {
+	return os.RemoveAll(path)
 }
