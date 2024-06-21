@@ -14,17 +14,15 @@ type DataProvider struct {
 
 	fsys     fs.FS
 	discpath string
-	lbs      ListBlobstore
 }
 
 // NewDataProvider creates a new provider
-func NewDataProvider(fsys fs.FS, discpath string, lbs ListBlobstore) *DataProvider {
+func NewDataProvider(fsys fs.FS, discpath string) *DataProvider {
 	return &DataProvider{
 		Events: make(chan interface{}),
 
 		fsys:     fsys,
 		discpath: discpath,
-		lbs:      lbs,
 	}
 }
 

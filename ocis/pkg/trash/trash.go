@@ -24,10 +24,10 @@ func NewTrashDirs() *TrashDirs {
 }
 
 // PurgeTrashOrphanedPaths purges orphaned paths in the trash
-func PurgeTrashOrphanedPaths(storagepath string, lbs ListBlobstore) error {
+func PurgeTrashOrphanedPaths(storagepath string) error {
 	fsys := os.DirFS(storagepath)
 
-	dp := NewDataProvider(fsys, storagepath, lbs)
+	dp := NewDataProvider(fsys, storagepath)
 	if err := dp.ProduceData(); err != nil {
 		return err
 	}
