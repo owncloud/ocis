@@ -101,28 +101,20 @@ func (a *ActivitylogService) Run() {
 			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ItemTrashed:
 			err = a.AddActivityTrashed(ev.ID, ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
-		case events.ItemPurged:
-			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ItemMoved:
 			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ShareCreated:
 			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
-		case events.ShareUpdated:
-			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.MTime))
 		case events.ShareRemoved:
 			err = a.AddActivity(toRef(ev.ItemID), e.ID, ev.Timestamp)
 		case events.LinkCreated:
 			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
-		case events.LinkUpdated:
-			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
 		case events.LinkRemoved:
 			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.Timestamp))
 		case events.SpaceShared:
-			err = a.AddActivity(sToRef(ev.ID), e.ID, ev.Timestamp)
-		case events.SpaceShareUpdated:
-			err = a.AddActivity(sToRef(ev.ID), e.ID, ev.Timestamp)
+			err = a.AddSpaceActivity(ev.ID, e.ID, ev.Timestamp)
 		case events.SpaceUnshared:
-			err = a.AddActivity(sToRef(ev.ID), e.ID, ev.Timestamp)
+			err = a.AddSpaceActivity(ev.ID, e.ID, ev.Timestamp)
 		}
 
 		if err != nil {
@@ -161,7 +153,7 @@ func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId,
 	}
 
 	// store activity on trashed item
-	if err := a.storeActivity(resourceID, eventID, 0, timestamp); err != nil {
+	if err := a.storeActivity(storagespace.FormatResourceID(*resourceID), eventID, 0, timestamp); err != nil {
 		return fmt.Errorf("could not store activity: %w", err)
 	}
 
@@ -174,6 +166,20 @@ func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId,
 	return a.addActivity(ref, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
 		return utils.GetResource(ctx, ref, gwc)
 	})
+}
+
+// AddSpaceActivity adds the activity to the given spaceroot
+func (a *ActivitylogService) AddSpaceActivity(spaceID *provider.StorageSpaceId, eventID string, timestamp time.Time) error {
+	// spaceID is in format <providerid>$<spaceid>
+	// activitylog service uses format <providerid>$<spaceid>!<resourceid>
+	// lets do some converting, shall we?
+	rid, err := storagespace.ParseID(spaceID.GetOpaqueId())
+	if err != nil {
+		return fmt.Errorf("could not parse space id: %w", err)
+	}
+	rid.OpaqueId = rid.GetSpaceId()
+	return a.storeActivity(storagespace.FormatResourceID(rid), eventID, 0, timestamp)
+
 }
 
 // Activities returns the activities for the given resource
@@ -236,7 +242,7 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 			return fmt.Errorf("could not get resource info: %w", err)
 		}
 
-		if err := a.storeActivity(info.GetId(), eventID, depth, timestamp); err != nil {
+		if err := a.storeActivity(storagespace.FormatResourceID(*info.GetId()), eventID, depth, timestamp); err != nil {
 			return fmt.Errorf("could not store activity: %w", err)
 		}
 
@@ -249,13 +255,7 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 	}
 }
 
-func (a *ActivitylogService) storeActivity(rid *provider.ResourceId, eventID string, depth int, timestamp time.Time) error {
-	if rid == nil {
-		return errors.New("resource id is required")
-	}
-
-	resourceID := storagespace.FormatResourceID(*rid)
-
+func (a *ActivitylogService) storeActivity(resourceID string, eventID string, depth int, timestamp time.Time) error {
 	records, err := a.store.Read(resourceID)
 	if err != nil && err != microstore.ErrNotFound {
 		return err
@@ -289,14 +289,5 @@ func (a *ActivitylogService) storeActivity(rid *provider.ResourceId, eventID str
 func toRef(r *provider.ResourceId) *provider.Reference {
 	return &provider.Reference{
 		ResourceId: r,
-	}
-}
-
-func sToRef(s *provider.StorageSpaceId) *provider.Reference {
-	return &provider.Reference{
-		ResourceId: &provider.ResourceId{
-			OpaqueId: s.GetOpaqueId(),
-			SpaceId:  s.GetOpaqueId(),
-		},
 	}
 }
