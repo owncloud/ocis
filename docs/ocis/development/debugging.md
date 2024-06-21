@@ -147,8 +147,8 @@ make debug-docker
 ```bash
 export OCIS_DOCKER_TAG=debug
 ```
-3. Change the docker-compose `ocis` or `ocis-appprovider-collabora` or `ocis-appprovider-onlyoffice` depends on what do you want to debug:
-For example `deployments/examples/ocis_wopi/docker-compose.yml`
+3. Change the docker-compose `ocis` or `ocis-appprovider-collabora` or `ocis-appprovider-onlyoffice` or `collaboration` depends on what do you want to debug:
+Example for `ocis` `deployments/examples/ocis_wopi/docker-compose.yml`
 ```yaml
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
@@ -156,13 +156,34 @@ For example `deployments/examples/ocis_wopi/docker-compose.yml`
       ocis-net:
     entrypoint:
       - /bin/sh
-# Comment out command
+# Comment out the command
 #    command: ["-c", "ocis init || true; ocis server"]
 # Replace the command and expose the port
-    command: [ "-c", "ocis init || true; dlv --listen=:40000 --headless=true --api-version=2 --accept-multiclient exec /usr/bin/ocis server" ]
+    command: [ "-c", "ocis init || true; dlv --listen=:40000 --headless=true --check-go-version=false --api-version=2 --accept-multiclient exec /usr/bin/ocis server" ]
     ports:
       - 40000:40000
 ```
+
+Example for `Collaboration server`  `deployments/examples/ocis_collaboration/docker-compose.collabora.yml`
+Please note: Against the stack that uses [cs3org/wopiserver](https://github.com/cs3org/wopiserver), we don't need the app_provider anymore. The new collaboration server now includes the wopiserver and app_provider.
+```yaml
+  collaboration:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    networks:
+      ocis-net:
+    depends_on:
+      collabora:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+# Comment out the command
+#   command: [ "-c", "ocis collaboration server" ]
+# Replace the command and expose the port
+    command: [ "-c", " dlv --listen=:40000 --headless=true --check-go-version=false --api-version=2 --accept-multiclient exec /usr/bin/ocis collaboration server" ]
+    ports:
+      - 40000:40000
+```
+
 4. Run the docker-compose
 5. Connect to remote `delve`
 * For the VS Code add the configuration to the `.vscode/launch.json` [https://github.com/golang/vscode-go/wiki/debugging#remote-debugging](https://github.com/golang/vscode-go/wiki/debugging#remote-debugging)
@@ -179,8 +200,7 @@ For example `deployments/examples/ocis_wopi/docker-compose.yml`
 },
 ```
 
-
-### Gather error messages
+### Gather Error Messages
 
 We recommend you collect all related information in a single file or in a GitHub issue. Let us start with an error that pops up in the Web UI:
 
