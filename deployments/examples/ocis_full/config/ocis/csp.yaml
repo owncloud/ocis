@@ -3,6 +3,8 @@ directives:
     - '''self'''
   connect-src:
     - '''self'''
+    - 'https://${COMPANION_DOMAIN|companion.owncloud.test}/'
+    - 'wss://${COMPANION_DOMAIN|companion.owncloud.test}/'
   default-src:
     - '''none'''
   font-src:

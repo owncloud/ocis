@@ -1,22 +1,22 @@
 ---
-title: "oCIS with WOPI server"
+title: "Full oCIS with WebOffice"
 date: 2020-10-12T14:04:00+01:00
 weight: 24
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
-geekdocFilePath: ocis_wopi.md
+geekdocFilePath: ocis_full.md
 ---
 
 {{< toc >}}
 
 ## Overview
 
-* oCIS, Wopi server, Collabora and OnlyOffice running behind Traefik as reverse proxy
-* Collabora and OnlyOffice enable you to edit documents in your browser
+* oCIS, Wopi server, Collabora or OnlyOffice running behind Traefik as reverse proxy
+* Collabora or OnlyOffice enable you to edit documents in your browser
 * Wopi server acts as a bridge to make the oCIS storage accessible to Collabora and OnlyOffice
 * Traefik generating self-signed certificates for local setup or obtaining valid SSL certificates for a server setup
 
-[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_wopi)
+[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_full)
 
 The docker stack consists of 10 containers. One of them is Traefik, a proxy which is terminating SSL and forwards the requests to oCIS in the internal docker network.
 
@@ -25,10 +25,6 @@ The next container is oCIS itself in a configuration like the [oCIS with Traefik
 There are three oCIS app driver containers that register Collabora and OnlyOffice at the app registry.
 
 The last four containers are the WOPI server, Collabora and OnlyOffice.
-
-## Overview Image
-
-{{< figure src="/ocis/deployment/ocis_and_wopi_drawio.svg" >}}
 
 ## Server Deployment
 
