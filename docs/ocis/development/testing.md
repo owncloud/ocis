@@ -539,6 +539,67 @@ BEHAT_FEATURE="tests/acceptance/features/apiAntivirus/antivirus.feature" \
 make test-acceptance-api
 ```
 
+## Running Test Suite With Federated Sharing (@ocm)
+Test suites that are tagged with `@ocm` require running two different ocis instances. More detailed information and configuration related to it can be found [here](https://doc.owncloud.com/ocis/5.0/deployment/services/s-list/ocm.html).
+
+Put
+```bash
+127.0.0.1 ocis-server
+127.0.0.1 federation-ocis-server
+```
+in the `/etc/hosts` file
+
+### Setup first ocis instance
+
+```bash
+# run oCIS
+OCIS_URL="https://ocis-server:9200" \
+PROXY_ENABLE_BASIC_AUTH=true \
+GRAPH_INCLUDE_OCM_SHAREES=true \
+OCM_OCM_INVITE_MANAGER_INSECURE=true \
+OCM_OCM_SHARE_PROVIDER_INSECURE=true \
+OCM_OCM_STORAGE_PROVIDER_INSECURE=true \
+OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE="${workspaceFolder}/tests/config/drone/providers.json" \
+OCIS_ADD_RUN_SERVICES="ocm"
+ocis/bin/ocis server
+```
+
+The first oCIS instance should be available at: https://ocis-server:9200/
+
+### Setup second ocis instance
+#### Using .vscode/launch.json
+
+#### Using .env file
+
+```bash
+# init oCIS
+source tests/config/drone/.env-federation && ocis/bin/ocis init
+
+# run oCIS
+ocis/bin/ocis server
+```
+
+The second oCIS instance should be available at: https://federation-ocis-server:10200/
+
+{{< hint info >}}
+To enable ocm in the web interface, you need to set the following envs:
+`FRONTEND_OCS_INCLUDE_OCM_SHAREES=true` \
+`FRONTEND_OCS_LIST_OCM_SHARES=true` \
+`FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING=true` \
+`FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING=true`
+{{< /hint>}}
+
+#### Run the Acceptance Test
+
+Run the acceptance test with the following command:
+
+```bash
+TEST_SERVER_URL="https://ocis-server:9200" \
+TEST_SERVER_FED_URL="https://federation-ocis-server:10200" \
+BEHAT_FEATURE="tests/acceptance/features/apiOcm/ocm.feature" \
+make test-acceptance-api
+```
+
 ## Running Text Preview Tests Containing Unicode Characters
 
 There are some tests that check the text preview of files containing Unicode characters. The oCIS server by default cannot generate the thumbnail of such files correctly but it provides an environment variable to allow the use of custom fonts that support Unicode characters. So to run such tests successfully, we have to run the oCIS server with this environment variable.
