@@ -711,7 +711,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getStepLineRef()
 		);
 		$this->featureContext->setResponse($response);
-		if ($response->getStatusCode() === '201') {
+		if ($response->getStatusCode() === 201) {
 			$this->addCreatedSpace($user, $response);
 		}
 	}
