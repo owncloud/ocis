@@ -82,45 +82,68 @@ type Collabora struct {
 
 // SetProperties will set the file properties for the Collabora implementation.
 func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
-	setters := map[string]func(value interface{}){
-		"BaseFileName":            assignStringTo(&cinfo.BaseFileName),
-		"DisablePrint":            assignBoolTo(&cinfo.DisablePrint),
-		"OwnerID":                 assignStringTo(&cinfo.OwnerID),
-		"PostMessageOrigin":       assignStringTo(&cinfo.PostMessageOrigin),
-		"Size":                    assignInt64To(&cinfo.Size),
-		"TemplateSource":          assignStringTo(&cinfo.TemplateSource),
-		"UserCanWrite":            assignBoolTo(&cinfo.UserCanWrite),
-		"UserCanNotWriteRelative": assignBoolTo(&cinfo.UserCanNotWriteRelative),
-		"UserID":                  assignStringTo(&cinfo.UserID),
-		"UserFriendlyName":        assignStringTo(&cinfo.UserFriendlyName),
+	for key, value := range props {
+		switch key {
+		case "BaseFileName":
+			cinfo.BaseFileName = value.(string)
+		case "DisablePrint":
+			cinfo.DisablePrint = value.(bool)
+		case "OwnerID":
+			cinfo.OwnerID = value.(string)
+		case "PostMessageOrigin":
+			cinfo.PostMessageOrigin = value.(string)
+		case "Size":
+			cinfo.Size = value.(int64)
+		case "TemplateSource":
+			cinfo.TemplateSource = value.(string)
+		case "UserCanWrite":
+			cinfo.UserCanWrite = value.(bool)
+		case "UserCanNotWriteRelative":
+			cinfo.UserCanNotWriteRelative = value.(bool)
+		case "UserID":
+			cinfo.UserID = value.(string)
+		case "UserFriendlyName":
+			cinfo.UserFriendlyName = value.(string)
 
-		"EnableInsertRemoteImage": assignBoolTo(&cinfo.EnableInsertRemoteImage),
-		"DisableInsertLocalImage": assignBoolTo(&cinfo.DisableInsertLocalImage),
-		"HidePrintOption":         assignBoolTo(&cinfo.HidePrintOption),
-		"HideSaveOption":          assignBoolTo(&cinfo.HideSaveOption),
-		"HideExportOption":        assignBoolTo(&cinfo.HideExportOption),
-		"DisableExport":           assignBoolTo(&cinfo.DisableExport),
-		"DisableCopy":             assignBoolTo(&cinfo.DisableCopy),
-		"DisableInactiveMessages": assignBoolTo(&cinfo.DisableInactiveMessages),
-		"DownloadAsPostMessage":   assignBoolTo(&cinfo.DownloadAsPostMessage),
-		"SaveAsPostmessage":       assignBoolTo(&cinfo.SaveAsPostmessage),
-		"EnableOwnerTermination":  assignBoolTo(&cinfo.EnableOwnerTermination),
+		case "EnableInsertRemoteImage":
+			cinfo.EnableInsertRemoteImage = value.(bool)
+		case "DisableInsertLocalImage":
+			cinfo.DisableInsertLocalImage = value.(bool)
+		case "HidePrintOption":
+			cinfo.HidePrintOption = value.(bool)
+		case "HideSaveOption":
+			cinfo.HideSaveOption = value.(bool)
+		case "HideExportOption":
+			cinfo.HideExportOption = value.(bool)
+		case "DisableExport":
+			cinfo.DisableExport = value.(bool)
+		case "DisableCopy":
+			cinfo.DisableCopy = value.(bool)
+		case "DisableInactiveMessages":
+			cinfo.DisableInactiveMessages = value.(bool)
+		case "DownloadAsPostMessage":
+			cinfo.DownloadAsPostMessage = value.(bool)
+		case "SaveAsPostmessage":
+			cinfo.SaveAsPostmessage = value.(bool)
+		case "EnableOwnerTermination":
+			cinfo.EnableOwnerTermination = value.(bool)
 		//UserExtraInfo -> requires definition, currently not used
 		//UserPrivateInfo -> requires definition, currently not used
-		"WatermarkText": assignStringTo(&cinfo.WatermarkText),
+		case "WatermarkText":
+			cinfo.WatermarkText = value.(string)
 
-		"EnableShare":       assignBoolTo(&cinfo.EnableShare),
-		"HideUserList":      assignStringTo(&cinfo.HideUserList),
-		"SupportsLocks":     assignBoolTo(&cinfo.SupportsLocks),
-		"SupportsRename":    assignBoolTo(&cinfo.SupportsRename),
-		"UserCanRename":     assignBoolTo(&cinfo.UserCanRename),
-		"BreadcrumbDocName": assignStringTo(&cinfo.BreadcrumbDocName),
-	}
-
-	for key, value := range props {
-		setterFn := setters[key]
-		if setterFn != nil {
-			setterFn(value)
+		case "EnableShare":
+			cinfo.EnableShare = value.(bool)
+		case "HideUserList":
+			cinfo.HideUserList = value.(string)
+		case "SupportsLocks":
+			cinfo.SupportsLocks = value.(bool)
+		case "SupportsRename":
+			cinfo.SupportsRename = value.(bool)
+		case "UserCanRename":
+			cinfo.UserCanRename = value.(bool)
+		case "BreadcrumbDocName":
+			cinfo.BreadcrumbDocName = value.(string)
 		}
 	}
 }

@@ -129,57 +129,88 @@ type OnlyOffice struct {
 
 // SetProperties will set the file properties for the OnlyOffice implementation.
 func (oinfo *OnlyOffice) SetProperties(props map[string]interface{}) {
-	setters := map[string]func(value interface{}){
-		"BaseFileName": assignStringTo(&oinfo.BaseFileName),
-		"Version":      assignStringTo(&oinfo.Version),
-
-		"BreadcrumbBrandName":  assignStringTo(&oinfo.BreadcrumbBrandName),
-		"BreadcrumbBrandURL":   assignStringTo(&oinfo.BreadcrumbBrandURL),
-		"BreadcrumbDocName":    assignStringTo(&oinfo.BreadcrumbDocName),
-		"BreadcrumbFolderName": assignStringTo(&oinfo.BreadcrumbFolderName),
-		"BreadcrumbFolderURL":  assignStringTo(&oinfo.BreadcrumbFolderURL),
-
-		"ClosePostMessage":            assignBoolTo(&oinfo.ClosePostMessage),
-		"EditModePostMessage":         assignBoolTo(&oinfo.EditModePostMessage),
-		"EditNotificationPostMessage": assignBoolTo(&oinfo.EditNotificationPostMessage),
-		"FileSharingPostMessage":      assignBoolTo(&oinfo.FileSharingPostMessage),
-		"FileVersionPostMessage":      assignBoolTo(&oinfo.FileVersionPostMessage),
-		"PostMessageOrigin":           assignStringTo(&oinfo.PostMessageOrigin),
-
-		"CloseURL":       assignStringTo(&oinfo.CloseURL),
-		"FileSharingURL": assignStringTo(&oinfo.FileSharingURL),
-		"FileVersionURL": assignStringTo(&oinfo.FileVersionURL),
-		"HostEditURL":    assignStringTo(&oinfo.HostEditURL),
-
-		"CopyPasteRestrictions": assignStringTo(&oinfo.CopyPasteRestrictions),
-		"DisablePrint":          assignBoolTo(&oinfo.DisablePrint),
-		"FileExtension":         assignStringTo(&oinfo.FileExtension),
-		"FileNameMaxLength":     assignIntTo(&oinfo.FileNameMaxLength),
-		"LastModifiedTime":      assignStringTo(&oinfo.LastModifiedTime),
-
-		"IsAnonymousUser":  assignBoolTo(&oinfo.IsAnonymousUser),
-		"UserFriendlyName": assignStringTo(&oinfo.UserFriendlyName),
-		"UserID":           assignStringTo(&oinfo.UserID),
-
-		"ReadOnly":                assignBoolTo(&oinfo.ReadOnly),
-		"UserCanNotWriteRelative": assignBoolTo(&oinfo.UserCanNotWriteRelative),
-		"UserCanRename":           assignBoolTo(&oinfo.UserCanRename),
-		"UserCanReview":           assignBoolTo(&oinfo.UserCanReview),
-		"UserCanWrite":            assignBoolTo(&oinfo.UserCanWrite),
-
-		"SupportsLocks":     assignBoolTo(&oinfo.SupportsLocks),
-		"SupportsRename":    assignBoolTo(&oinfo.SupportsRename),
-		"SupportsReviewing": assignBoolTo(&oinfo.SupportsReviewing),
-		"SupportsUpdate":    assignBoolTo(&oinfo.SupportsUpdate),
-
-		"EnableInsertRemoteImage": assignBoolTo(&oinfo.EnableInsertRemoteImage),
-		"HidePrintOption":         assignBoolTo(&oinfo.HidePrintOption),
-	}
-
 	for key, value := range props {
-		setterFn := setters[key]
-		if setterFn != nil {
-			setterFn(value)
+		switch key {
+		case "BaseFileName":
+			oinfo.BaseFileName = value.(string)
+		case "Version":
+			oinfo.Version = value.(string)
+
+		case "BreadcrumbBrandName":
+			oinfo.BreadcrumbBrandName = value.(string)
+		case "BreadcrumbBrandURL":
+			oinfo.BreadcrumbBrandURL = value.(string)
+		case "BreadcrumbDocName":
+			oinfo.BreadcrumbDocName = value.(string)
+		case "BreadcrumbFolderName":
+			oinfo.BreadcrumbFolderName = value.(string)
+		case "BreadcrumbFolderURL":
+			oinfo.BreadcrumbFolderURL = value.(string)
+
+		case "ClosePostMessage":
+			oinfo.ClosePostMessage = value.(bool)
+		case "EditModePostMessage":
+			oinfo.EditModePostMessage = value.(bool)
+		case "EditNotificationPostMessage":
+			oinfo.EditNotificationPostMessage = value.(bool)
+		case "FileSharingPostMessage":
+			oinfo.FileSharingPostMessage = value.(bool)
+		case "FileVersionPostMessage":
+			oinfo.FileVersionPostMessage = value.(bool)
+		case "PostMessageOrigin":
+			oinfo.PostMessageOrigin = value.(string)
+
+		case "CloseURL":
+			oinfo.CloseURL = value.(string)
+		case "FileSharingURL":
+			oinfo.FileSharingURL = value.(string)
+		case "FileVersionURL":
+			oinfo.FileVersionURL = value.(string)
+		case "HostEditURL":
+			oinfo.HostEditURL = value.(string)
+
+		case "CopyPasteRestrictions":
+			oinfo.CopyPasteRestrictions = value.(string)
+		case "DisablePrint":
+			oinfo.DisablePrint = value.(bool)
+		case "FileExtension":
+			oinfo.FileExtension = value.(string)
+		case "FileNameMaxLength":
+			oinfo.FileNameMaxLength = value.(int)
+		case "LastModifiedTime":
+			oinfo.LastModifiedTime = value.(string)
+
+		case "IsAnonymousUser":
+			oinfo.IsAnonymousUser = value.(bool)
+		case "UserFriendlyName":
+			oinfo.UserFriendlyName = value.(string)
+		case "UserID":
+			oinfo.UserID = value.(string)
+
+		case "ReadOnly":
+			oinfo.ReadOnly = value.(bool)
+		case "UserCanNotWriteRelative":
+			oinfo.UserCanNotWriteRelative = value.(bool)
+		case "UserCanRename":
+			oinfo.UserCanRename = value.(bool)
+		case "UserCanReview":
+			oinfo.UserCanReview = value.(bool)
+		case "UserCanWrite":
+			oinfo.UserCanWrite = value.(bool)
+
+		case "SupportsLocks":
+			oinfo.SupportsLocks = value.(bool)
+		case "SupportsRename":
+			oinfo.SupportsRename = value.(bool)
+		case "SupportsReviewing":
+			oinfo.SupportsReviewing = value.(bool)
+		case "SupportsUpdate":
+			oinfo.SupportsUpdate = value.(bool)
+
+		case "EnableInsertRemoteImage":
+			oinfo.EnableInsertRemoteImage = value.(bool)
+		case "HidePrintOption":
+			oinfo.HidePrintOption = value.(bool)
 		}
 	}
 }

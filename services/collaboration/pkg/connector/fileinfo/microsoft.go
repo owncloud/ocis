@@ -165,79 +165,133 @@ type Microsoft struct {
 
 // SetProperties will set the file properties for the Microsoft implementation.
 func (minfo *Microsoft) SetProperties(props map[string]interface{}) {
-	setters := map[string]func(value interface{}){
-		"BaseFileName": assignStringTo(&minfo.BaseFileName),
-		"OwnerID":      assignStringTo(&minfo.OwnerID),
-		"Size":         assignInt64To(&minfo.Size),
-		"UserID":       assignStringTo(&minfo.UserID),
-		"Version":      assignStringTo(&minfo.Version),
-
-		"SupportedShareURLTypes":     assignStringListTo(&minfo.SupportedShareURLTypes),
-		"SupportsCobalt":             assignBoolTo(&minfo.SupportsCobalt),
-		"SupportsContainers":         assignBoolTo(&minfo.SupportsContainers),
-		"SupportsDeleteFile":         assignBoolTo(&minfo.SupportsDeleteFile),
-		"SupportsEcosystem":          assignBoolTo(&minfo.SupportsEcosystem),
-		"SupportsExtendedLockLength": assignBoolTo(&minfo.SupportsExtendedLockLength),
-		"SupportsFolders":            assignBoolTo(&minfo.SupportsFolders),
-		//SupportsGetFileWopiSrc bool `json:"SupportsGetFileWopiSrc"`  // wopivalidator is complaining and the property isn't used for now -> commented
-		"SupportsGetLock":  assignBoolTo(&minfo.SupportsGetLock),
-		"SupportsLocks":    assignBoolTo(&minfo.SupportsLocks),
-		"SupportsRename":   assignBoolTo(&minfo.SupportsRename),
-		"SupportsUpdate":   assignBoolTo(&minfo.SupportsUpdate),
-		"SupportsUserInfo": assignBoolTo(&minfo.SupportsUserInfo),
-
-		"IsAnonymousUser":              assignBoolTo(&minfo.IsAnonymousUser),
-		"IsEduUser":                    assignBoolTo(&minfo.IsEduUser),
-		"LicenseCheckForEditIsEnabled": assignBoolTo(&minfo.LicenseCheckForEditIsEnabled),
-		"UserFriendlyName":             assignStringTo(&minfo.UserFriendlyName),
-		"UserInfo":                     assignStringTo(&minfo.UserInfo),
-
-		"ReadOnly":                assignBoolTo(&minfo.ReadOnly),
-		"RestrictedWebViewOnly":   assignBoolTo(&minfo.RestrictedWebViewOnly),
-		"UserCanAttend":           assignBoolTo(&minfo.UserCanAttend),
-		"UserCanNotWriteRelative": assignBoolTo(&minfo.UserCanNotWriteRelative),
-		"UserCanPresent":          assignBoolTo(&minfo.UserCanPresent),
-		"UserCanRename":           assignBoolTo(&minfo.UserCanRename),
-		"UserCanWrite":            assignBoolTo(&minfo.UserCanWrite),
-
-		"CloseURL":            assignStringTo(&minfo.CloseURL),
-		"DownloadURL":         assignStringTo(&minfo.DownloadURL),
-		"FileEmbedCommandURL": assignStringTo(&minfo.FileEmbedCommandURL),
-		"FileSharingURL":      assignStringTo(&minfo.FileSharingURL),
-		"FileURL":             assignStringTo(&minfo.FileURL),
-		"FileVersionURL":      assignStringTo(&minfo.FileVersionURL),
-		"HostEditURL":         assignStringTo(&minfo.HostEditURL),
-		"HostEmbeddedViewURL": assignStringTo(&minfo.HostEmbeddedViewURL),
-		"HostViewURL":         assignStringTo(&minfo.HostViewURL),
-		"SignoutURL":          assignStringTo(&minfo.SignoutURL),
-
-		"AllowAdditionalMicrosoftServices": assignBoolTo(&minfo.AllowAdditionalMicrosoftServices),
-		"AllowErrorReportPrompt":           assignBoolTo(&minfo.AllowErrorReportPrompt),
-		"AllowExternalMarketplace":         assignBoolTo(&minfo.AllowExternalMarketplace),
-		"ClientThrottlingProtection":       assignStringTo(&minfo.ClientThrottlingProtection),
-		"CloseButtonClosesWindow":          assignBoolTo(&minfo.CloseButtonClosesWindow),
-		"CopyPasteRestrictions":            assignStringTo(&minfo.CopyPasteRestrictions),
-		"DisablePrint":                     assignBoolTo(&minfo.DisablePrint),
-		"DisableTranslation":               assignBoolTo(&minfo.DisableTranslation),
-		"FileExtension":                    assignStringTo(&minfo.FileExtension),
-		"FileNameMaxLength":                assignIntTo(&minfo.FileNameMaxLength),
-		"LastModifiedTime":                 assignStringTo(&minfo.LastModifiedTime),
-		"RequestedCallThrottling":          assignStringTo(&minfo.RequestedCallThrottling),
-		"SHA256":                           assignStringTo(&minfo.SHA256),
-		"SharingStatus":                    assignStringTo(&minfo.SharingStatus),
-		"TemporarilyNotWritable":           assignBoolTo(&minfo.TemporarilyNotWritable),
-
-		"BreadcrumbBrandName":  assignStringTo(&minfo.BreadcrumbBrandName),
-		"BreadcrumbBrandURL":   assignStringTo(&minfo.BreadcrumbBrandURL),
-		"BreadcrumbDocName":    assignStringTo(&minfo.BreadcrumbDocName),
-		"BreadcrumbFolderName": assignStringTo(&minfo.BreadcrumbFolderName),
-		"BreadcrumbFolderURL":  assignStringTo(&minfo.BreadcrumbFolderURL),
-	}
-
 	for key, value := range props {
-		setterFn := setters[key]
-		if setterFn != nil {
-			setterFn(value)
+		switch key {
+		case "BaseFileName":
+			minfo.BaseFileName = value.(string)
+		case "OwnerID":
+			minfo.OwnerID = value.(string)
+		case "Size":
+			minfo.Size = value.(int64)
+		case "UserID":
+			minfo.UserID = value.(string)
+		case "Version":
+			minfo.Version = value.(string)
+
+		case "SupportedShareURLTypes":
+			minfo.SupportedShareURLTypes = value.([]string)
+		case "SupportsCobalt":
+			minfo.SupportsCobalt = value.(bool)
+		case "SupportsContainers":
+			minfo.SupportsContainers = value.(bool)
+		case "SupportsDeleteFile":
+			minfo.SupportsDeleteFile = value.(bool)
+		case "SupportsEcosystem":
+			minfo.SupportsEcosystem = value.(bool)
+		case "SupportsExtendedLockLength":
+			minfo.SupportsExtendedLockLength = value.(bool)
+		case "SupportsFolders":
+			minfo.SupportsFolders = value.(bool)
+		//SupportsGetFileWopiSrc bool `json:"SupportsGetFileWopiSrc"`  // wopivalidator is complaining and the property isn't used for now -> commented
+		case "SupportsGetLock":
+			minfo.SupportsGetLock = value.(bool)
+		case "SupportsLocks":
+			minfo.SupportsLocks = value.(bool)
+		case "SupportsRename":
+			minfo.SupportsRename = value.(bool)
+		case "SupportsUpdate":
+			minfo.SupportsUpdate = value.(bool)
+		case "SupportsUserInfo":
+			minfo.SupportsUserInfo = value.(bool)
+
+		case "IsAnonymousUser":
+			minfo.IsAnonymousUser = value.(bool)
+		case "IsEduUser":
+			minfo.IsEduUser = value.(bool)
+		case "LicenseCheckForEditIsEnabled":
+			minfo.LicenseCheckForEditIsEnabled = value.(bool)
+		case "UserFriendlyName":
+			minfo.UserFriendlyName = value.(string)
+		case "UserInfo":
+			minfo.UserInfo = value.(string)
+
+		case "ReadOnly":
+			minfo.ReadOnly = value.(bool)
+		case "RestrictedWebViewOnly":
+			minfo.RestrictedWebViewOnly = value.(bool)
+		case "UserCanAttend":
+			minfo.UserCanAttend = value.(bool)
+		case "UserCanNotWriteRelative":
+			minfo.UserCanNotWriteRelative = value.(bool)
+		case "UserCanPresent":
+			minfo.UserCanPresent = value.(bool)
+		case "UserCanRename":
+			minfo.UserCanRename = value.(bool)
+		case "UserCanWrite":
+			minfo.UserCanWrite = value.(bool)
+
+		case "CloseURL":
+			minfo.CloseURL = value.(string)
+		case "DownloadURL":
+			minfo.DownloadURL = value.(string)
+		case "FileEmbedCommandURL":
+			minfo.FileEmbedCommandURL = value.(string)
+		case "FileSharingURL":
+			minfo.FileSharingURL = value.(string)
+		case "FileURL":
+			minfo.FileURL = value.(string)
+		case "FileVersionURL":
+			minfo.FileVersionURL = value.(string)
+		case "HostEditURL":
+			minfo.HostEditURL = value.(string)
+		case "HostEmbeddedViewURL":
+			minfo.HostEmbeddedViewURL = value.(string)
+		case "HostViewURL":
+			minfo.HostViewURL = value.(string)
+		case "SignoutURL":
+			minfo.SignoutURL = value.(string)
+
+		case "AllowAdditionalMicrosoftServices":
+			minfo.AllowAdditionalMicrosoftServices = value.(bool)
+		case "AllowErrorReportPrompt":
+			minfo.AllowErrorReportPrompt = value.(bool)
+		case "AllowExternalMarketplace":
+			minfo.AllowExternalMarketplace = value.(bool)
+		case "ClientThrottlingProtection":
+			minfo.ClientThrottlingProtection = value.(string)
+		case "CloseButtonClosesWindow":
+			minfo.CloseButtonClosesWindow = value.(bool)
+		case "CopyPasteRestrictions":
+			minfo.CopyPasteRestrictions = value.(string)
+		case "DisablePrint":
+			minfo.DisablePrint = value.(bool)
+		case "DisableTranslation":
+			minfo.DisableTranslation = value.(bool)
+		case "FileExtension":
+			minfo.FileExtension = value.(string)
+		case "FileNameMaxLength":
+			minfo.FileNameMaxLength = value.(int)
+		case "LastModifiedTime":
+			minfo.LastModifiedTime = value.(string)
+		case "RequestedCallThrottling":
+			minfo.RequestedCallThrottling = value.(string)
+		case "SHA256":
+			minfo.SHA256 = value.(string)
+		case "SharingStatus":
+			minfo.SharingStatus = value.(string)
+		case "TemporarilyNotWritable":
+			minfo.TemporarilyNotWritable = value.(bool)
+
+		case "BreadcrumbBrandName":
+			minfo.BreadcrumbBrandName = value.(string)
+		case "BreadcrumbBrandURL":
+			minfo.BreadcrumbBrandURL = value.(string)
+		case "BreadcrumbDocName":
+			minfo.BreadcrumbDocName = value.(string)
+		case "BreadcrumbFolderName":
+			minfo.BreadcrumbFolderName = value.(string)
+		case "BreadcrumbFolderURL":
+			minfo.BreadcrumbFolderURL = value.(string)
 		}
 	}
 }
