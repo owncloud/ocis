@@ -357,6 +357,14 @@ default:
         - PublicWebDavContext:
         - OcisConfigContext:
 
+    apiOcm:
+      paths:
+        - "%paths.base%/../features/apiOcm"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - OcmContext:
+
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
 
