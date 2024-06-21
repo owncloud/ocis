@@ -291,3 +291,9 @@ func toRef(r *provider.ResourceId) *provider.Reference {
 		ResourceId: r,
 	}
 }
+
+func toSpace(r *provider.Reference) *provider.StorageSpaceId {
+	return &provider.StorageSpaceId{
+		OpaqueId: storagespace.FormatStorageID(r.GetResourceId().GetStorageId(), r.GetResourceId().GetSpaceId()),
+	}
+}

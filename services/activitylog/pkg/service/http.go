@@ -116,7 +116,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		case events.ItemTrashed:
 			message = MessageResourceTrashed
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
+			vars, err = s.GetVars(WithTrashedResource(ev.Ref, ev.ID), WithUser(ev.Executant, ""), WithSpace(toSpace(ev.Ref)))
 		case events.ItemMoved:
 			switch isRename(ev.OldReference, ev.Ref) {
 			case true:

@@ -87,6 +87,35 @@ func WithOldResource(ref *provider.Reference) ActivityOption {
 	}
 }
 
+// WithTrashedResource sets the resource variable if the resource is trashed
+func WithTrashedResource(ref *provider.Reference, rid *provider.ResourceId) ActivityOption {
+	return func(ctx context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
+		resp, err := gwc.ListRecycle(ctx, &provider.ListRecycleRequest{
+			Ref: ref,
+		})
+		if err != nil {
+			return err
+		}
+		if resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+			return fmt.Errorf("error listing recycle: %s", resp.GetStatus().GetMessage())
+		}
+
+		for _, item := range resp.GetRecycleItems() {
+			if item.GetKey() == rid.GetOpaqueId() {
+
+				vars["resource"] = Resource{
+					ID:   storagespace.FormatResourceID(*rid),
+					Name: filepath.Base(item.GetRef().GetPath()),
+				}
+
+				return nil
+			}
+		}
+
+		return nil
+	}
+}
+
 // WithUser sets the user variable for an Activity
 func WithUser(uid *user.UserId, username string) ActivityOption {
 	return func(_ context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
