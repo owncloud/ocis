@@ -91,17 +91,17 @@ Feature: sharing
     Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
     And using <dav-path-version> DAV path
     And user "Alice" has sent the following resource share invitation:
-      | resource        | sharefile.txt |
-      | space           | Personal      |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+      | resource        | sharefile.txt      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     And user "Alice" has sent the following resource share invitation:
-      | resource        | sharefile.txt |
-      | space           | Personal      |
-      | sharee          | Carol         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+      | resource        | sharefile.txt      |
+      | space           | Personal           |
+      | sharee          | Carol              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Carol" moves file "Shares/sharefile.txt" to "Shares/renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "Shares/renamedsharefile.txt" should exist
@@ -120,26 +120,29 @@ Feature: sharing
     And as user "Brian" the value of the item "//oc:name" of path "<dav-path>/Shares/sharefile.txt" in the response should be "sharefile.txt"
     And as user "Brian" the value of the item "//d:displayname" of path "<dav-path>/Shares/sharefile.txt" in the response should be "sharefile.txt"
     Examples:
-      | dav-path-version | dav-path                         |
-      | old              | /remote.php/webdav               |
-      | new              | /remote.php/dav/files/%username% |
-      | new              | /dav/files/%username%            |
+      | dav-path-version | dav-path                         | permissions-role |
+      | old              | /remote.php/webdav               | Viewer           |
+      | new              | /remote.php/dav/files/%username% | Viewer           |
+      | new              | /dav/files/%username%            | Viewer           |
+      | old              | /remote.php/webdav               | Secure viewer    |
+      | new              | /remote.php/dav/files/%username% | Secure viewer    |
+      | new              | /dav/files/%username%            | Secure viewer    |
 
   @issue-8242
   Scenario Outline: share receiver renames the shared item (spaces webdav)
     Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | sharefile.txt |
-      | space           | Personal      |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+      | resource        | sharefile.txt      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     And user "Alice" has sent the following resource share invitation:
-      | resource        | sharefile.txt |
-      | space           | Personal      |
-      | sharee          | Carol         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+      | resource        | sharefile.txt      |
+      | space           | Personal           |
+      | sharee          | Carol              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Carol" moves file "Shares/sharefile.txt" to "Shares/renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "Shares/renamedsharefile.txt" should exist
@@ -159,9 +162,11 @@ Feature: sharing
     And as user "Brian" the value of the item "//oc:name" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
     And as user "Brian" the value of the item "//d:displayname" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
     Examples:
-      | dav-path                                 | dav-path-personal                |
-      | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% |
-      | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% |
+      | dav-path                                 | dav-path-personal                | permissions-role |
+      | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% | Viewer           |
+      | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% | Viewer           |
+      | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% | Secure viewer    |
+      | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% | Secure viewer    |
 
 
   Scenario: keep group share when the one user renames the share and the user is deleted
