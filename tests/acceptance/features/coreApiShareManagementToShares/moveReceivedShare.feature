@@ -201,15 +201,16 @@ Feature: sharing
     But as "Alice" file "/folderToShare/fileInside" should not exist
 
 
-  Scenario: receiver tries to rename a received share with read permissions inside the Shares folder
+  Scenario Outline: receiver tries to rename a received share with read permissions inside the Shares folder
     Given user "Alice" has created folder "folderToShare"
+    And user "Alice" has created folder "folderToShare/folderInside"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/folderToShare/fileInside"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | folderToShare |
-      | space           | Personal      |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+      | resource        | folderToShare      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Brian" moves folder "/Shares/folderToShare" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -218,6 +219,14 @@ Feature: sharing
     Then the HTTP status code should be "403"
     And as "Brian" file "/Shares/myFolder/renamedFile" should not exist
     But as "Brian" file "Shares/myFolder/fileInside" should exist
+    When user "Brian" moves folder "/Shares/myFolder/folderInside" to "/Shares/myFolder/renamedFolder" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And as "Brian" folder "/Shares/myFolder/renamedFolder" should not exist
+    But as "Brian" folder "Shares/myFolder/folderInside" should exist
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | Secure viewer    |
 
 
   Scenario: receiver renames a received folder share to a different name on the same folder
