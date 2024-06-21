@@ -15,6 +15,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
 	"github.com/owncloud/ocis/v2/ocis-pkg/kql"
@@ -41,7 +42,10 @@ func (s *ActivitylogService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // HandleGetItemActivities handles the request to get the activities of an item.
 func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *http.Request) {
-	activeUser, ok := revactx.ContextGetUser(r.Context())
+	ctx := r.Context()
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, r.Header.Get("X-Access-Token"))
+
+	activeUser, ok := revactx.ContextGetUser(ctx)
 	if !ok {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -104,53 +108,53 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		case events.UploadReady:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(WithResource(ev.FileRef, true), WithUser(ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName()))
+			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, true), WithUser(ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName()))
 		case events.FileTouched:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
 		case events.ContainerCreated:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
 		case events.ItemTrashed:
 			message = MessageResourceTrashed
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(WithTrashedResource(ev.Ref, ev.ID), WithUser(ev.Executant, ""), WithSpace(toSpace(ev.Ref)))
+			vars, err = s.GetVars(ctx, WithTrashedResource(ev.Ref, ev.ID), WithUser(ev.Executant, ""), WithSpace(toSpace(ev.Ref)))
 		case events.ItemMoved:
 			switch isRename(ev.OldReference, ev.Ref) {
 			case true:
 				message = MessageResourceRenamed
-				vars, err = s.GetVars(WithResource(ev.Ref, false), WithOldResource(ev.OldReference), WithUser(ev.Executant, ""))
+				vars, err = s.GetVars(ctx, WithResource(ev.Ref, false), WithOldResource(ev.OldReference), WithUser(ev.Executant, ""))
 			case false:
 				message = MessageResourceMoved
-				vars, err = s.GetVars(WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
+				vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
 			}
 			ts = utils.TSToTime(ev.Timestamp)
 		case events.ShareCreated:
 			message = MessageShareCreated
 			ts = utils.TSToTime(ev.CTime)
-			vars, err = s.GetVars(WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
+			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.ShareRemoved:
 			message = MessageShareDeleted
 			ts = ev.Timestamp
-			vars, err = s.GetVars(WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
+			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.LinkCreated:
 			message = MessageLinkCreated
 			ts = utils.TSToTime(ev.CTime)
-			vars, err = s.GetVars(WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""))
+			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""))
 		case events.LinkRemoved:
 			message = MessageLinkDeleted
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""))
+			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""))
 		case events.SpaceShared:
 			message = MessageSpaceShared
 			ts = ev.Timestamp
-			vars, err = s.GetVars(WithSpace(ev.ID), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
+			vars, err = s.GetVars(ctx, WithSpace(ev.ID), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.SpaceUnshared:
 			message = MessageSpaceUnshared
 			ts = ev.Timestamp
-			vars, err = s.GetVars(WithSpace(ev.ID), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
+			vars, err = s.GetVars(ctx, WithSpace(ev.ID), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		}
 
 		if err != nil {

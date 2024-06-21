@@ -200,13 +200,8 @@ func NewActivity(message string, ts time.Time, eventID string, vars map[string]i
 }
 
 // GetVars calls other service to gather the required data for the activity variables
-func (s *ActivitylogService) GetVars(opts ...ActivityOption) (map[string]interface{}, error) {
+func (s *ActivitylogService) GetVars(ctx context.Context, opts ...ActivityOption) (map[string]interface{}, error) {
 	gwc, err := s.gws.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	ctx, err := utils.GetServiceUserContext(s.cfg.ServiceAccount.ServiceAccountID, gwc, s.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		return nil, err
 	}
