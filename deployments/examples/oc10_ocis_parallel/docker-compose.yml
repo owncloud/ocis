@@ -15,7 +15,7 @@ services:
       - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
       - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
-      # enable dasbhoard
+      # enable dashboard
       - "--api.dashboard=true"
       # define entrypoints
       - "--entryPoints.http.address=:80"
@@ -77,7 +77,7 @@ services:
       PROXY_OIDC_REWRITE_WELLKNOWN: "true"
       WEB_OIDC_CLIENT_ID: ocis-web
       WEB_OIDC_SCOPE: openid profile email owncloud
-      # external ldap is supposed to be read only
+      # external ldap is supposed to be read-only
       GRAPH_IDENTITY_BACKEND: ldap
       GRAPH_LDAP_SERVER_WRITE_ENABLED: "false"
       # LDAP bind
@@ -122,7 +122,7 @@ services:
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
-      # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
+      # basic auth (not recommended, but needed for e.g., WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
       # password policies
       OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"

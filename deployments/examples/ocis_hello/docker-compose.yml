@@ -65,7 +65,7 @@ services:
       SETTINGS_GRPC_ADDR: 0.0.0.0:9191
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
-      # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
+      # basic auth (not recommended, but needed for e.g., WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
       # admin user password
       IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}" # this overrides the admin password from the configuration file

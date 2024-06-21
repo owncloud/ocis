@@ -59,7 +59,7 @@ services:
     # therefore we ignore the error and then start the ocis server
     command: [ "-c", "ocis init || true; ocis server" ]
     environment:
-      # users/gropups from ldap
+      # users/groups from ldap
       OCIS_LDAP_URI: ldaps://ldap-server:1636
       OCIS_LDAP_INSECURE: "true"
       OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
@@ -86,7 +86,7 @@ services:
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
-      # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
+      # basic auth (not recommended, but needed for e.g., WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
       # password policies
       OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
