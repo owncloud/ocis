@@ -54,19 +54,21 @@ Feature: copy file
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
-      | resource        | testshare |
-      | space           | Personal  |
-      | sharee          | Alice     |
-      | shareType       | user      |
-      | permissionsRole | Viewer    |
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     And user "Alice" has a share "testshare" synced
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And user "Alice" should not be able to download file "/Shares/testshare/textfile0.txt"
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
+      | dav-path-version | permissions-role |
+      | old              | Viewer           |
+      | new              | Viewer           |
+      | old              | Secure viewer    |
+      | new              | Secure viewer    |
 
   @skipOnReva
   Scenario Outline: copying a file to overwrite a file into a folder with no permissions
@@ -690,6 +692,26 @@ Feature: copy file
       | old              |
       | new              |
 
+
+  Scenario Outline: copying a file into a shared folder shared via viewer and secure viewer permissions as the sharee
+    Given using <dav-path-version> DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/textfile0.txt" using the WebDAV API
+    Then the HTTP status code should be "403"
+    Examples:
+      | dav-path-version | permissions-role |
+      | old              | Viewer           |
+      | new              | Viewer           |
+      | old              | Secure viewer    |
+      | new              | Secure viewer    |
+
   @skipOnReva
   Scenario Outline: copying a file into a shared folder as the sharer
     Given using <dav-path-version> DAV path
@@ -730,6 +752,26 @@ Feature: copy file
     And as "Alice" file "/fileInsideShare.txt" should exist
     And the content of file "/fileInsideShare.txt" for user "Alice" should be "ownCloud test text file inside share"
     And the content of file "/testshare/fileInsideShare.txt" for user "Brian" should be "ownCloud test text file inside share"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+
+  Scenario Outline: copying a file out of a shared folder shared via secure viewer permissions as the sharee
+    Given using <dav-path-version> DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has uploaded file with content "hello world" to "testshare/fileInsideShare.txt"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare     |
+      | space           | Personal      |
+      | sharee          | Alice         |
+      | shareType       | user          |
+      | permissionsRole | Secure viewer |
+    When user "Alice" copies file "/Shares/testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
+    Then the HTTP status code should be "500"
+    And as "Alice" file "/fileInsideShare.txt" should not exist
     Examples:
       | dav-path-version |
       | old              |
@@ -814,6 +856,36 @@ Feature: copy file
       | old              |
       | new              |
 
+
+  Scenario Outline: copying a file between shares received from different users when one share is shared via Secure viewer
+    Given using <dav-path-version> DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has created folder "/testshare0"
+    And user "Brian" has uploaded file with content "content inside testshare0" to "/testshare0/testshare0.txt"
+    And user "Carol" has created folder "/testshare1"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare0           |
+      | space           | Personal             |
+      | sharee          | Alice                |
+      | shareType       | user                 |
+      | permissionsRole | <permissions-role-1> |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | testshare1           |
+      | space           | Personal             |
+      | sharee          | Alice                |
+      | shareType       | user                 |
+      | permissionsRole | <permissions-role-2> |
+    When user "Alice" copies file "/Shares/testshare0/testshare0.txt" to "/Shares/testshare1/testshare0.txt" using the WebDAV API
+    Then the HTTP status code should be "<status-code>"
+    Examples:
+      | dav-path-version | permissions-role-1 | permissions-role-2 | status-code |
+      | old              | Secure viewer      | Editor             | 500         |
+      | new              | Secure viewer      | Secure viewer      | 403         |
+      | old              | Secure viewer      | Viewer             | 403         |
+      | old              | Editor             | Secure viewer      | 403         |
+      | new              | Viewer             | Secure viewer      | 403         |
+
   @skipOnReva
   Scenario Outline: copying a folder between shares received from different users
     Given using <dav-path-version> DAV path
@@ -847,6 +919,36 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+
+
+  Scenario Outline: copying a folder between shares received from different users when one share is shared via Secure viewer
+    Given using <dav-path-version> DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has created folder "/testshare0"
+    And user "Brian" has created folder "/testshare0/folder_to_copy/"
+    And user "Carol" has created folder "/testshare1"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare0           |
+      | space           | Personal             |
+      | sharee          | Alice                |
+      | shareType       | user                 |
+      | permissionsRole | <permissions-role-1> |
+    And user "Carol" has sent the following resource share invitation:
+      | resource        | testshare1           |
+      | space           | Personal             |
+      | sharee          | Alice                |
+      | shareType       | user                 |
+      | permissionsRole | <permissions-role-2> |
+    When user "Alice" copies file "/Shares/testshare0/folder_to_copy/" to "/Shares/testshare1/folder_to_copy/" using the WebDAV API
+    Then the HTTP status code should be "<status-code>"
+    Examples:
+      | dav-path-version | permissions-role-1 | permissions-role-2 | status-code |
+      | old              | Secure viewer      | Editor             | 500         |
+      | new              | Secure viewer      | Secure viewer      | 403         |
+      | old              | Secure viewer      | Viewer             | 403         |
+      | old              | Editor             | Secure viewer      | 403         |
+      | new              | Viewer             | Secure viewer      | 403         |
 
   @skipOnReva
   Scenario Outline: copying a file to a folder that is shared with multiple users
