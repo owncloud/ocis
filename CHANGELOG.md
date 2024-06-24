@@ -49,6 +49,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix sharing-ng permission listings for personal and virtual drive items: [#9438](https://github.com/owncloud/ocis/pull/9438)
 * Enhancement - Add fail flag to consistency check: [#9447](https://github.com/owncloud/ocis/pull/9447)
+* Enhancement - Deprecate gateway environment variables: [#9451](https://github.com/owncloud/ocis/pull/9451)
 
 ## Details
 
@@ -68,6 +69,13 @@ The following sections list the changes for unreleased.
    ensure that backups are consistent.
 
    https://github.com/owncloud/ocis/pull/9447
+
+* Enhancement - Deprecate gateway environment variables: [#9451](https://github.com/owncloud/ocis/pull/9451)
+
+   Deprecate service specific `_GATEWAY_NAME` env vars. It makes no sense to point
+   one specific service to a different gateway.
+
+   https://github.com/owncloud/ocis/pull/9451
 
 # Changelog for [6.0.0] (2024-06-19)
 
