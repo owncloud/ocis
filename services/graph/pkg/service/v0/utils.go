@@ -241,7 +241,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 			// the parentReference of the outer driveItem should be the drive
 			// containing the mountpoint i.e. the share jail
 			driveItem.ParentReference = libregraph.NewItemReference()
-			driveItem.ParentReference.SetDriveType("virtual")
+			driveItem.ParentReference.SetDriveType(_spaceTypeVirtual)
 			driveItem.ParentReference.SetDriveId(storagespace.FormatStorageID(utils.ShareStorageProviderID, utils.ShareStorageSpaceID))
 			driveItem.ParentReference.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
 				StorageId: utils.ShareStorageProviderID,

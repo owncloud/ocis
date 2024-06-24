@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"slices"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -11,14 +12,15 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/cs3org/reva/v2/pkg/publicshare"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -301,7 +303,8 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 		return collectionOfPermissions, errorcode.FromUtilsStatusCodeError(err)
 	}
 
-	if space.SpaceType != _spaceTypeProject {
+	isSupportedSpaceType := slices.Contains([]string{_spaceTypeProject, _spaceTypePersonal, _spaceTypeVirtual}, space.GetSpaceType())
+	if !isSupportedSpaceType {
 		return collectionOfPermissions, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
