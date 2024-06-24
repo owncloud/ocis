@@ -1,6 +1,8 @@
 package revaconfig
 
 import (
+	"math"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/ocm/pkg/config"
 )
@@ -98,8 +100,10 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 							"file": cfg.OCMInviteManager.Drivers.JSON.File,
 						},
 					},
-					"provider_domain": cfg.Commons.OcisURL,
-					"ocm_insecure":    cfg.OCMInviteManager.Insecure,
+					"provider_domain":  cfg.Commons.OcisURL,
+					"token_expiration": cfg.OCMInviteManager.TokenExpiration.String(),
+					"ocm_timeout":      int(math.Round(cfg.OCMInviteManager.Timeout.Seconds())),
+					"ocm_insecure":     cfg.OCMInviteManager.Insecure,
 				},
 				"ocmproviderauthorizer": map[string]interface{}{
 					"driver": cfg.OCMProviderAuthorizerDriver,
