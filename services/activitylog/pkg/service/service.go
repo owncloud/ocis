@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"reflect"
+	"sync"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -40,6 +41,7 @@ type ActivitylogService struct {
 	mux        *chi.Mux
 	evHistory  ehsvc.EventHistoryService
 	valService settingssvc.ValueService
+	lock       sync.RWMutex
 
 	registeredEvents map[string]events.Unmarshaller
 }
@@ -73,6 +75,7 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		mux:              o.Mux,
 		evHistory:        o.HistoryClient,
 		valService:       o.ValueClient,
+		lock:             sync.RWMutex{},
 		registeredEvents: make(map[string]events.Unmarshaller),
 	}
 
@@ -184,28 +187,18 @@ func (a *ActivitylogService) AddSpaceActivity(spaceID *provider.StorageSpaceId, 
 
 // Activities returns the activities for the given resource
 func (a *ActivitylogService) Activities(rid *provider.ResourceId) ([]RawActivity, error) {
-	resourceID := storagespace.FormatResourceID(*rid)
+	a.lock.RLock()
+	defer a.lock.RUnlock()
 
-	records, err := a.store.Read(resourceID)
-	if err != nil && err != microstore.ErrNotFound {
-		return nil, fmt.Errorf("could not read activities: %w", err)
-	}
-
-	if len(records) == 0 {
-		return []RawActivity{}, nil
-	}
-
-	var activities []RawActivity
-	if err := json.Unmarshal(records[0].Value, &activities); err != nil {
-		return nil, fmt.Errorf("could not unmarshal activities: %w", err)
-	}
-
-	return activities, nil
+	return a.activities(rid)
 }
 
 // RemoveActivities removes the activities from the given resource
 func (a *ActivitylogService) RemoveActivities(rid *provider.ResourceId, toDelete map[string]struct{}) error {
-	curActivities, err := a.Activities(rid)
+	a.lock.Lock()
+	defer a.lock.Unlock()
+
+	curActivities, err := a.activities(rid)
 	if err != nil {
 		return err
 	}
@@ -226,6 +219,26 @@ func (a *ActivitylogService) RemoveActivities(rid *provider.ResourceId, toDelete
 		Key:   storagespace.FormatResourceID(*rid),
 		Value: b,
 	})
+}
+
+func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity, error) {
+	resourceID := storagespace.FormatResourceID(*rid)
+
+	records, err := a.store.Read(resourceID)
+	if err != nil && err != microstore.ErrNotFound {
+		return nil, fmt.Errorf("could not read activities: %w", err)
+	}
+
+	if len(records) == 0 {
+		return []RawActivity{}, nil
+	}
+
+	var activities []RawActivity
+	if err := json.Unmarshal(records[0].Value, &activities); err != nil {
+		return nil, fmt.Errorf("could not unmarshal activities: %w", err)
+	}
+
+	return activities, nil
 }
 
 // note: getResource is abstracted to allow unit testing, in general this will just be utils.GetResource
@@ -256,6 +269,9 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 }
 
 func (a *ActivitylogService) storeActivity(resourceID string, eventID string, depth int, timestamp time.Time) error {
+	a.lock.Lock()
+	defer a.lock.Unlock()
+
 	records, err := a.store.Read(resourceID)
 	if err != nil && err != microstore.ErrNotFound {
 		return err
