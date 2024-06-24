@@ -181,9 +181,10 @@ Feature: sharing
       | shareType       | group    |
       | permissionsRole | Viewer   |
     When user "Carol" moves folder "/Shares/TMP" to "/Shares/new" using the WebDAV API
-    And the administrator deletes user "Carol" using the provisioning API
-    Then the HTTP status code of responses on each endpoint should be "201, 204" respectively
-    And as "Alice" file "Shares/TMP" should not exist
+    Then the HTTP status code should be "201"
+    When the administrator deletes user "Carol" using the provisioning API
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "Shares/TMP" should not exist
 
 
   Scenario: receiver renames a received share with read, change permissions inside the Shares folder
