@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/services/collaboration/mocks"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -337,7 +338,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("CheckFileInfo", mock.Anything).Times(1).Return(connector.FileInfo{}, errors.New("Something happened"))
+			fc.On("CheckFileInfo", mock.Anything).Times(1).Return(&fileinfo.Microsoft{}, errors.New("Something happened"))
 
 			httpAdapter.CheckFileInfo(w, req)
 			resp := w.Result()
@@ -351,7 +352,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("CheckFileInfo", mock.Anything).Times(1).Return(connector.FileInfo{}, connector.NewConnectorError(404, "Not found"))
+			fc.On("CheckFileInfo", mock.Anything).Times(1).Return(&fileinfo.Microsoft{}, connector.NewConnectorError(404, "Not found"))
 
 			httpAdapter.CheckFileInfo(w, req)
 			resp := w.Result()
@@ -364,11 +365,11 @@ var _ = Describe("HttpAdapter", func() {
 			w := httptest.NewRecorder()
 
 			// might need more info, but should be enough for the test
-			fileinfo := connector.FileInfo{
+			finfo := &fileinfo.Microsoft{
 				Size:              123456789,
 				BreadcrumbDocName: "testy.docx",
 			}
-			fc.On("CheckFileInfo", mock.Anything).Times(1).Return(fileinfo, nil)
+			fc.On("CheckFileInfo", mock.Anything).Times(1).Return(finfo, nil)
 
 			httpAdapter.CheckFileInfo(w, req)
 			resp := w.Result()
@@ -376,9 +377,9 @@ var _ = Describe("HttpAdapter", func() {
 
 			jsonInfo, _ := io.ReadAll(resp.Body)
 
-			var responseInfo connector.FileInfo
+			var responseInfo *fileinfo.Microsoft
 			json.Unmarshal(jsonInfo, &responseInfo)
-			Expect(responseInfo).To(Equal(fileinfo))
+			Expect(responseInfo).To(Equal(finfo))
 		})
 	})
 

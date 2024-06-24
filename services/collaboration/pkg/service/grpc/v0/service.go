@@ -38,7 +38,7 @@ func NewHandler(opts ...Option) (*Service, func(), error) {
 	}
 
 	return &Service{
-		id:      options.Config.GRPC.Namespace + "." + options.Config.Service.Name,
+		id:      options.Config.GRPC.Namespace + "." + options.Config.Service.Name + "." + options.Config.App.Name,
 		appURLs: options.AppURLs,
 		logger:  options.Logger,
 		config:  options.Config,

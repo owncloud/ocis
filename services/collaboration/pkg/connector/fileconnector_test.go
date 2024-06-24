@@ -15,6 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/stretchr/testify/mock"
 )
@@ -732,7 +733,7 @@ var _ = Describe("FileConnector", func() {
 			ctx := context.Background()
 			newFileInfo, err := fc.CheckFileInfo(ctx)
 			Expect(err).To(HaveOccurred())
-			Expect(newFileInfo).To(Equal(connector.FileInfo{}))
+			Expect(newFileInfo).To(BeNil())
 		})
 
 		It("Stat fails", func() {
@@ -746,7 +747,7 @@ var _ = Describe("FileConnector", func() {
 			newFileInfo, err := fc.CheckFileInfo(ctx)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
-			Expect(newFileInfo).To(Equal(connector.FileInfo{}))
+			Expect(newFileInfo).To(BeNil())
 		})
 
 		It("Stat fails status not ok", func() {
@@ -760,7 +761,7 @@ var _ = Describe("FileConnector", func() {
 			Expect(err).To(HaveOccurred())
 			conErr := err.(*connector.ConnectorError)
 			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(newFileInfo).To(Equal(connector.FileInfo{}))
+			Expect(newFileInfo).To(BeNil())
 		})
 
 		It("Stat success", func() {
@@ -783,28 +784,27 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			expectedFileInfo := connector.FileInfo{
-				OwnerId:                    "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
+			expectedFileInfo := &fileinfo.Microsoft{
+				OwnerID:                    "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                       int64(998877),
 				Version:                    "16273849.0",
 				BaseFileName:               "test.txt",
 				BreadcrumbDocName:          "test.txt",
 				UserCanNotWriteRelative:    true,
-				HostViewUrl:                "http://test.ex.prv/view",
-				HostEditUrl:                "http://test.ex.prv/edit",
-				EnableOwnerTermination:     false,
+				HostViewURL:                "http://test.ex.prv/view",
+				HostEditURL:                "http://test.ex.prv/edit",
 				SupportsExtendedLockLength: true,
 				SupportsGetLock:            true,
 				SupportsLocks:              true,
 				SupportsUpdate:             true,
 				UserCanWrite:               true,
-				UserId:                     "6f7061717565496440696e6d656d6f7279", // hex of opaqueId@inmemory
+				UserID:                     "6f7061717565496440696e6d656d6f7279", // hex of opaqueId@inmemory
 				UserFriendlyName:           "Pet Shaft",
 			}
 
 			newFileInfo, err := fc.CheckFileInfo(ctx)
 			Expect(err).To(Succeed())
-			Expect(newFileInfo).To(Equal(expectedFileInfo))
+			Expect(newFileInfo.(*fileinfo.Microsoft)).To(Equal(expectedFileInfo))
 		})
 
 		It("Stat success guests", func() {
@@ -839,39 +839,36 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			expectedFileInfo := connector.FileInfo{
-				OwnerId:                    "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
-				Size:                       int64(998877),
-				Version:                    "16273849.0",
-				BaseFileName:               "test.txt",
-				BreadcrumbDocName:          "test.txt",
-				UserCanNotWriteRelative:    true,
-				HostViewUrl:                "http://test.ex.prv/view",
-				HostEditUrl:                "http://test.ex.prv/edit",
-				EnableOwnerTermination:     false,
-				SupportsExtendedLockLength: true,
-				SupportsGetLock:            true,
-				SupportsLocks:              true,
-				DisableExport:              true,
-				DisableCopy:                true,
-				DisablePrint:               true,
-				IsAnonymousUser:            true,
-				UserId:                     "guest-zzz000",
-				UserFriendlyName:           "guest zzz000",
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+
+			expectedFileInfo := &fileinfo.Collabora{
+				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
+				Size:                    int64(998877),
+				BaseFileName:            "test.txt",
+				UserCanNotWriteRelative: true,
+				DisableExport:           true,
+				DisableCopy:             true,
+				DisablePrint:            true,
+				UserID:                  "guest-zzz000",
+				UserFriendlyName:        "guest zzz000",
+				EnableOwnerTermination:  true,
+				SupportsLocks:           true,
+				BreadcrumbDocName:       "test.txt",
 			}
 
 			newFileInfo, err := fc.CheckFileInfo(ctx)
 
-			// UserId and UserFriendlyName have random Ids generated which are impossible to guess
+			// UserID and UserFriendlyName have random Ids generated which are impossible to guess
 			// Check both separately
-			Expect(newFileInfo.UserId).To(HavePrefix(hex.EncodeToString([]byte("guest-"))))
-			Expect(newFileInfo.UserFriendlyName).To(HavePrefix("Guest "))
-			// overwrite UserId and UserFriendlyName here for easier matching
-			newFileInfo.UserId = "guest-zzz000"
-			newFileInfo.UserFriendlyName = "guest zzz000"
+			Expect(newFileInfo.(*fileinfo.Collabora).UserID).To(HavePrefix(hex.EncodeToString([]byte("guest-"))))
+			Expect(newFileInfo.(*fileinfo.Collabora).UserFriendlyName).To(HavePrefix("Guest "))
+			// overwrite UserID and UserFriendlyName here for easier matching
+			newFileInfo.(*fileinfo.Collabora).UserID = "guest-zzz000"
+			newFileInfo.(*fileinfo.Collabora).UserFriendlyName = "guest zzz000"
 
 			Expect(err).To(Succeed())
-			Expect(newFileInfo).To(Equal(expectedFileInfo))
+			Expect(newFileInfo.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
 		})
 
 		It("Stat success authenticated user", func() {
@@ -897,32 +894,29 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			expectedFileInfo := connector.FileInfo{
-				OwnerId:                    "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
-				Size:                       int64(998877),
-				Version:                    "16273849.0",
-				BaseFileName:               "test.txt",
-				BreadcrumbDocName:          "test.txt",
-				UserCanNotWriteRelative:    true,
-				HostViewUrl:                "http://test.ex.prv/view",
-				HostEditUrl:                "http://test.ex.prv/edit",
-				EnableOwnerTermination:     false,
-				SupportsExtendedLockLength: true,
-				SupportsGetLock:            true,
-				SupportsLocks:              true,
-				DisableExport:              true,
-				DisableCopy:                true,
-				DisablePrint:               true,
-				IsAnonymousUser:            false,
-				UserId:                     hex.EncodeToString([]byte("opaqueId@inmemory")),
-				UserFriendlyName:           "Pet Shaft",
-				WatermarkText:              "Pet Shaft shaft@example.com",
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+
+			expectedFileInfo := &fileinfo.Collabora{
+				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
+				Size:                    int64(998877),
+				BaseFileName:            "test.txt",
+				UserCanNotWriteRelative: true,
+				DisableExport:           true,
+				DisableCopy:             true,
+				DisablePrint:            true,
+				UserID:                  hex.EncodeToString([]byte("opaqueId@inmemory")),
+				UserFriendlyName:        "Pet Shaft",
+				EnableOwnerTermination:  true,
+				WatermarkText:           "Pet Shaft shaft@example.com",
+				SupportsLocks:           true,
+				BreadcrumbDocName:       "test.txt",
 			}
 
 			newFileInfo, err := fc.CheckFileInfo(ctx)
 
 			Expect(err).To(Succeed())
-			Expect(newFileInfo).To(Equal(expectedFileInfo))
+			Expect(newFileInfo.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
 		})
 	})
 })
