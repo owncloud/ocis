@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-24-13-31-03]
+[#deprecation-note-2024-06-24-14-51-56]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,6 +13,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
+
+| COLLABORATION_CS3API_GATEWAY_NAME removed from simplicity.
+| 6.0
+| %%NEXT%%
+| 
 |===
 
 endif::[]
@@ -155,7 +160,7 @@ Used to mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT tok
 
 a|`OCIS_REVA_GATEWAY` +
 `COLLABORATION_CS3API_GATEWAY_NAME` +
-
+xref:deprecation-note-2024-06-24-14-51-56[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
