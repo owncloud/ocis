@@ -60,7 +60,7 @@ Feature: create folder using MKCOL
       | /remote.php/dav/files/non-existent-user/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "404"
 
-  @skipOnRevaMaster @issue-1347 @issue-1292
+  @issue-1347 @issue-1292
   Scenario: send MKCOL requests to another user's webDav endpoints as normal user using the spaces WebDAV API
     Given user "Brian" has been created with default attributes and without skeleton files
     When user "Brian" requests these endpoints with "MKCOL" including body "" about user "Alice"
@@ -71,7 +71,7 @@ Feature: create folder using MKCOL
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "404"
 
-  @issue-5049 @skipOnRevaMaster @issue-1347 @issue-1292
+  @issue-5049  @issue-1347 @issue-1292
   Scenario: send MKCOL requests to non-existent user's webDav endpoints as normal user using the spaces WebDAV API
     Given user "Brian" has been created with default attributes and without skeleton files
     When user "Brian" requests these endpoints with "MKCOL" including body "" about user "non-existent-user"

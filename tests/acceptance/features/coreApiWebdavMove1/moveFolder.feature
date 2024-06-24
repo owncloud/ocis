@@ -19,10 +19,6 @@ Feature: move (rename) folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -37,10 +33,6 @@ Feature: move (rename) folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -55,10 +47,6 @@ Feature: move (rename) folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -73,10 +61,6 @@ Feature: move (rename) folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -94,10 +78,6 @@ Feature: move (rename) folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -112,10 +92,6 @@ Feature: move (rename) folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -138,17 +114,13 @@ Feature: move (rename) folder
       | new              | /upload...1.. |
       | new              | /...          |
       | new              | /..upload     |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | folder-name   |
       | spaces           | /upload.      |
       | spaces           | /upload.1     |
       | spaces           | /upload...1.. |
       | spaces           | /...          |
       | spaces           | /..upload     |
 
-  @skipOnRevaMaster @issue-3023
+  @issue-3023
   Scenario Outline: moving a folder into a sub-folder of itself
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
@@ -203,10 +175,6 @@ Feature: move (rename) folder
       | new              | "Sample,Folder,With,Comma" | "testFolder"               |
       | new              | " start with space"        | "testFolder"               |
       | new              | "renamed.part"             | "testFolder"               |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | from-folder-name           | to-folder-name             |
       | spaces           | "testFolder"               | "'single'quotes"           |
       | spaces           | "testFolder"               | '"double"quotes'           |
       | spaces           | "testFolder"               | "strängé नेपाली folder"    |
@@ -235,10 +203,6 @@ Feature: move (rename) folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1976
@@ -252,10 +216,6 @@ Feature: move (rename) folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -274,10 +234,6 @@ Feature: move (rename) folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -292,10 +248,6 @@ Feature: move (rename) folder
       | old              | /..         | 404              |
       | new              | /.          | 409              |
       | new              | /..         | 404              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | folder-name | http-status-code |
       | spaces           | /.          | 409              |
       | spaces           | /..         | 400              |
 

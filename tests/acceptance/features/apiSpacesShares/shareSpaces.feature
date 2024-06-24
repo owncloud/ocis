@@ -136,7 +136,7 @@ Feature: Share spaces
       | editor     |
       | viewer     |
 
-  @skipOnRevaMaster
+
   Scenario Outline: user with editor or viewer role cannot share a space to another user
     Given user "Alice" has sent the following space share invitation:
       | space           | share space  |
@@ -181,7 +181,7 @@ Feature: Share spaces
       | Manager      | editor           |
       | Manager      | viewer           |
 
-  @skipOnRevaMaster
+
   Scenario Outline: user without manager role cannot change the role of space members
     Given user "Alice" has sent the following space share invitation:
       | space           | share space  |

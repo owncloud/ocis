@@ -24,10 +24,6 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -105,10 +101,6 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva

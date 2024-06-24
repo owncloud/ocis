@@ -27,10 +27,6 @@ Feature: upload to a public link share
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1269

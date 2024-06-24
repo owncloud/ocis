@@ -15,10 +15,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest @issue-1291
@@ -31,10 +27,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest @issue-1316
@@ -48,10 +40,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1291
@@ -65,10 +53,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1316
@@ -83,10 +67,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1291
@@ -101,10 +81,6 @@ Feature: checksums
     Examples:
       | dav-path-version |
       | old              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1343
@@ -119,10 +95,6 @@ Feature: checksums
     Examples:
       | dav-path-version |
       | old              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -137,10 +109,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1291
@@ -153,10 +121,6 @@ Feature: checksums
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1316
@@ -169,10 +133,6 @@ Feature: checksums
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1291 @skipOnReva
@@ -216,10 +176,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -231,10 +187,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1315
@@ -250,10 +202,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   ## Validation Plugin or Old Endpoint Specific
@@ -267,10 +215,6 @@ Feature: checksums
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   ## upload overwriting
@@ -291,10 +235,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1291
@@ -314,10 +254,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnStorage:ceph @skipOnStorage:scality @issue-1291
@@ -332,10 +268,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1296
@@ -355,9 +287,5 @@ Feature: checksums
       | old              | "# %ab ab?=ed"    |
       | new              | " oc?test=ab&cd " |
       | new              | "# %ab ab?=ed"    |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | renamed-file      |
       | spaces           | " oc?test=ab&cd " |
       | spaces           | "# %ab ab?=ed"    |

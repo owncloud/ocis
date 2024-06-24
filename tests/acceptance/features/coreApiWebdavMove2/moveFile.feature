@@ -21,10 +21,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest
@@ -44,10 +40,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -62,10 +54,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest
@@ -81,10 +69,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -101,10 +85,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1976
@@ -119,10 +99,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -140,10 +116,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -156,10 +128,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1295
@@ -172,10 +140,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -193,10 +157,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1295
@@ -216,10 +176,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @sqliteDB
@@ -244,10 +200,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1259
@@ -262,10 +214,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -290,10 +238,6 @@ Feature: move (rename) file
       | new              | /upload...1.. | abc...txt.. |
       | new              | /...          | ...         |
       | new              | /..upload     | ..abc       |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | folder-name   | file-name   |
       | spaces           | /upload.      | abc.        |
       | spaces           | /upload.      | abc .       |
       | spaces           | /upload.1     | abc         |
@@ -312,10 +256,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest
@@ -328,10 +268,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -359,10 +295,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -389,10 +321,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -424,10 +352,6 @@ Feature: move (rename) file
       | new              | texta         | 1           | textb              | file.txt         |
       | new              | texta         | file.txt    | textb              | 0                |
       | new              | texta         | file.txt    | textb              | 1                |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | source-folder | source-file | destination-folder | destination-file |
       | spaces           | text          | file.txt    | 0                  | file.txt         |
       | spaces           | text          | file.txt    | 1                  | file.txt         |
       | spaces           | 0             | file.txt    | text               | file.txt         |
@@ -461,10 +385,6 @@ Feature: move (rename) file
       | new              | texta         | 1           | file.txt         |
       | new              | texta         | file.txt    | 0                |
       | new              | texta         | file.txt    | 1                |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | source-folder | source-file | destination-file |
       | spaces           | 0             | file.txt    | file.txt         |
       | spaces           | 1             | file.txt    | file.txt         |
       | spaces           | texta         | 0           | file.txt         |
@@ -485,10 +405,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -503,10 +419,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -539,10 +451,6 @@ Feature: move (rename) file
       | new              | "strängé नेपाली.txt"    | "testfile.txt"          |
       | new              | "file,comma.txt"        | "testfile.txt"          |
       | new              | " start with space.txt" | "testfile.txt"          |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | from-file-name          | to-file-name            |
       | spaces           | "testfile.txt"          | "'single'quotes.txt"    |
       | spaces           | "testfile.txt"          | '"double"quotes.txt'    |
       | spaces           | "testfile.txt"          | "strängé नेपाली.txt"    |
@@ -567,10 +475,6 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -585,10 +489,6 @@ Feature: move (rename) file
       | old              | /..       | 404              |
       | new              | /.        | 409              |
       | new              | /..       | 404              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name | http-status-code |
       | spaces           | /.        | 409              |
       | spaces           | /..       | 400              |
 

@@ -24,10 +24,6 @@ Feature: upload file using old chunking
     Examples:
       | dav-path-version |
       | old              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -44,10 +40,6 @@ Feature: upload file using old chunking
     Examples:
       | dav-path-version |
       | old              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -64,10 +56,6 @@ Feature: upload file using old chunking
     Examples:
       | dav-path-version |
       | old              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -88,10 +76,6 @@ Feature: upload file using old chunking
     Examples:
       | dav-path-version |
       | old              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest
@@ -113,10 +97,6 @@ Feature: upload file using old chunking
       | dav-path-version | file-name                       |
       | old              | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
       | old              | 0                               |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name                       |
       | spaces           | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
       | spaces           | 0                               |
 
@@ -136,8 +116,4 @@ Feature: upload file using old chunking
     Examples:
       | dav-path-version |
       | old              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |

@@ -64,7 +64,7 @@ Feature: Share a file or folder that is inside a space
       | file.txt | file          | viewer     | 2042-03-25T23:59:59+0100 | 2042-03-25 |
       | file.txt | file          | editor     |                          |            |
 
-  @skipOnRevaMaster
+
   Scenario Outline: user participant of the project space without space manager role cannot share an entity to another user
     Given user "Alice" has sent the following space share invitation:
       | space           | share sub-item |

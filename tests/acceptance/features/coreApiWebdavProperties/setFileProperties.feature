@@ -18,10 +18,6 @@ Feature: set file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1297
@@ -35,10 +31,6 @@ Feature: set file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1263
@@ -53,10 +45,6 @@ Feature: set file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1297
@@ -77,10 +65,6 @@ Feature: set file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1263
@@ -95,10 +79,6 @@ Feature: set file properties
       | dav-path-version | dav-path-version-2 |
       | old              | new                |
       | new              | old                |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | dav-path-version-2 |
       | spaces           | new                |
       | spaces           | old                |
       | new              | spaces             |
