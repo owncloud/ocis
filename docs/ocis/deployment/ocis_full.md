@@ -1,5 +1,5 @@
 ---
-title: "Full oCIS with WebOffice"
+title: "Full modular oCIS with WebOffice"
 date: 2020-10-12T14:04:00+01:00
 weight: 24
 geekdocRepo: https://github.com/owncloud/ocis
@@ -11,18 +11,36 @@ geekdocFilePath: ocis_full.md
 
 ## Overview
 
-* oCIS, Wopi server, Collabora or OnlyOffice running behind Traefik as reverse proxy
+* oCIS, the collaboration service, Collabora or OnlyOffice running behind Traefik as reverse proxy
 * Collabora or OnlyOffice enable you to edit documents in your browser
-* Wopi server acts as a bridge to make the oCIS storage accessible to Collabora and OnlyOffice
+* The collaboration server acts as a bridge to make the oCIS storage accessible to Collabora and OnlyOffice
 * Traefik generating self-signed certificates for local setup or obtaining valid SSL certificates for a server setup
+* The whole deployment acts as a modular toolkit to use different flavors of office suites and ocis features
 
 [Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_full)
 
-The docker stack consists of 10 containers. One of them is Traefik, a proxy which is terminating SSL and forwards the requests to oCIS in the internal docker network.
+## Easy Default
 
-There are three oCIS app driver containers that register Collabora and OnlyOffice at the app registry.
+The Infinite Scale Team and product management are providing a default setup for oCIS.
 
-The last four containers are the WOPI server, Collabora and OnlyOffice.
+### Goal:
+  - provide a good starting point for a production deployment
+  - minimal effort to get started with an opinionated setup
+  - keep it adjustable it to your needs.
+
+### Default components
+
+- Infinite Scale
+- Full Text Search
+- Collabora Online Web Office
+- LetsEncrypt for SSL certificates via Traefik Reverse Proxy
+
+### Optional components
+
+- Cloud Importer (Experimental)
+- OnlyOffice as an alternative to Collabora
+- S3 Storage config to connect to an S3 storage backend
+- S3 Minio Server as a local S3 storage backend for debugging and development
 
 ## Server Deployment
 
@@ -43,7 +61,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 * Clone oCIS repository
 
-  `git clone https://github.com/owncloud/ocis.git`
+  `git clone https://github.com/owncloud/ocis.git --depth 1`
 
 * Go to the deployment example
 
@@ -53,103 +71,170 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   The file by default looks like this:
 
-  ```bash
-  # If you're on a internet facing server please comment out following line.
-  # It skips certificate validation for various parts of oCIS and is needed if you use self signed certificates.
+  ```shell {linenos=table,hl_lines=[7,21,42,44,120,123]}
+  # Define the docker compose log driver used.
+  # Defaults to local
+  LOG_DRIVER=
+  # If you're on an internet facing server. comment out following line.
+  # It skips certificate validation for various parts of Infinite Scale and is
+  # needed when self signed certificates are used.
   INSECURE=true
 
-  ### Traefik settings ###
-  # Serve Traefik dashboard. Defaults to "false".
+  ### Traefik Settings ###
+  # Serve Traefik dashboard.
+  # Defaults to "false".
   TRAEFIK_DASHBOARD=
-  # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
+  # Domain of Traefik, where you can find the dashboard.
+  # Defaults to "traefik.owncloud.test"
   TRAEFIK_DOMAIN=
-  # Basic authentication for the dashboard. Defaults to user "admin" and password "admin" (written as: "admin:admin").
+  # Basic authentication for the traefik dashboard.
+  # Defaults to user "admin" and password "admin" (written as: "admin:admin").
   TRAEFIK_BASIC_AUTH_USERS=
-  # Email address for obtaining LetsEncrypt certificates, needs only be changed if this is a public facing server
+  # Email address for obtaining LetsEncrypt certificates.
+  # Needs only be changed if this is a public facing server.
   TRAEFIK_ACME_MAIL=
+  # Set to the following for testing to check the certificate process:
+  # "https://acme-staging-v02.api.letsencrypt.org/directory"
+  # With staging configured, there will be an SSL error in the browser.
+  # When certificates are displayed and are emitted by # "Fake LE Intermediate X1",
+  # the process went well and the envvar can be reset to empty to get valid certificates.
+  TRAEFIK_ACME_CASERVER=
 
-  ### oCIS settings ###
-  # oCIS version. Defaults to "latest"
+
+  ### Infinite Scale Settings ###
+  # Beside Traefik, this service must stay enabled.
+  # Disable only for testing purposes.
+  OCIS=:ocis.yml
+  # The oCIS container image.
+  # Defaults to "owncloud/ocis" which contains the production releases.
+  OCIS_DOCKER_IMAGE=
+  # The oCIS container version.
+  # Defaults to "latest". This will point to the latest stable tag.
   OCIS_DOCKER_TAG=
-  # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
+  # Domain of oCIS, where you can find the frontend.
+  # Defaults to "ocis.owncloud.test"
   OCIS_DOMAIN=
   # oCIS admin user password. Defaults to "admin".
   ADMIN_PASSWORD=
-  # The demo users should not be created on a production instance
+  # Demo users should not be created on a production instance,
   # because their passwords are public. Defaults to "false".
+  # Also see: https://doc.owncloud.com/ocis/latest/deployment/general/general-info.html#demo-users-and-groups
   DEMO_USERS=
-  # Log level for oCIS. Defaults to "info".
-  OCIS_LOG_LEVEL=
+  # Define the loglevel used.
+  # For more details see:
+  # https://doc.owncloud.com/ocis/latest/deployment/services/env-vars-special-scope.html
+  LOG_LEVEL=
+  # Define the kind of logging.
+  # The default log can be read by machines.
+  # Set this to true to make the log human readable
+  # LOG_PRETTY=true
 
-  ### Wopi server settings ###
-  # cs3org wopi server version. Defaults to "v8.3.3"
-  WOPISERVER_DOCKER_TAG=
-  # cs3org wopi server domain. Defaults to "wopiserver.owncloud.test"
-  WOPISERVER_DOMAIN=
-  # JWT secret which is used for the documents to be request by the Wopi client from the cs3org Wopi server. Must be change in order to have a secure Wopi server. Defaults to "LoremIpsum567"
-  WOPI_JWT_SECRET=
+  # S3 Storage configuration
+  #
+  # - optional
+  #
+  # Infinite Scale supports S3 storage as primary storage.
+  # Per default, S3 storage is disabled and we use the local filesystem.
+  # To enable S3 storage, uncomment the following lines and configure the S3 storage.
+  # The leading colon is required to enable the service.
+  # S3NG=:s3ng.yml
+  # Configure the S3 storage endpoint. Defaults to "http://minio:9000" for testing purposes.
+  S3NG_ENDPOINT=
+  # S3 region. Defaults to "default".
+  S3NG_REGION=
+  # S3 access key. Defaults to "ocis"
+  S3NG_ACCESS_KEY=
+  # S3 secret. Defaults to "ocis-secret-key"
+  S3NG_SECRET_KEY=
+  # S3 bucket. Defaults to "ocis"
+  S3NG_BUCKET=
+  # Add local minio S3 storage to the docker-compose file.
+  # This is needed for testing purposes.
+  # The leading colon is required to enable the service.
+  # S3NG_MINIO=:minio.yml
+  # Minio domain. Defaults to "minio.owncloud.test".
+  MINIO_DOMAIN=
 
-  ### Collabora settings ###
-  # Domain of Collabora, where you can find the frontend. Defaults to "collabora.owncloud.test"
-  COLLABORA_DOMAIN=
-  # Admin user for Collabora. Defaults to blank, provide one to enable access. Collabora Admin Panel URL: https://{COLLABORA_DOMAIN}/browser/dist/admin/admin.html
-  COLLABORA_ADMIN_USER=
-  # Admin password for Collabora. Defaults to blank, provide one to enable access
-  COLLABORA_ADMIN_PASSWORD=
+  # Define SMPT settings if you would like to send Infinite Scale email notifications.
+  # For more details see:
+  # https://doc.owncloud.com/ocis/latest/deployment/services/s-list/notifications.html
+  # NOTE: this doesn't work if you are using inbucket.
+  # SMTP host to connect to.
+  SMTP_HOST=
+  # Port of the SMTP host to connect to.
+  SMTP_PORT=
+  # An eMail address that is used for sending Infinite Scale notification eMails
+  # like "ocis notifications <noreply@yourdomain.com>".
+  SMTP_SENDER=
+  # Username for the SMTP host to connect to.
+  SMTP_USERNAME=
+  # Password for the SMTP host to connect to.
+  SMTP_PASSWORD=
+  # Authentication method for the SMTP communication.
+  SMTP_AUTHENTICATION=
+  # Allow insecure connections to the SMTP server. Defaults to false.
+  SMTP_INSECURE=
 
-  ### OnlyOffice settings ###
-  # Domain of OnlyOffice, where you can find the frontend. Defaults to "onlyoffice.owncloud.test"
-  ONLYOFFICE_DOMAIN=
+  ## Default Enabled Services ##
 
-  ### Email / Inbucket settings ###
-  # Inbucket / Mail domain. Defaults to "mail.owncloud.test"
-  INBUCKET_DOMAIN=
-
-  ### Apache Tika Content analysis toolkit ###
-  # Set the desired docker image tag or digest, defaults to "latest"
+  ### Apache Tika Content Analysis Toolkit ###
+  # Tika (search) is enabled by default, comment if not required.
+  # The leading colon is required to enable the service.
+  TIKA=:tika.yml
+  # Set the desired docker image tag or digest.
+  # Defaults to "latest"
   TIKA_IMAGE=
 
-  # If you want to use debugging and tracing with this stack,
-  # you need uncomment following line. Please see documentation at
-  # https://owncloud.dev/ocis/deployment/monitoring-tracing/
-  #COMPOSE_FILE=docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
-
-  ### Uppy Companion settings ###
-  # Domain of Uppy Companion. Defaults to "companion.owncloud.test"
-  COMPANION_IMAGE=
-  COMPANION_DOMAIN=
-  # Provider settings, see https://uppy.io/docs/companion/#provideroptions for reference. Empty by default, which disables providers.
-  COMPANION_ONEDRIVE_KEY=
-  COMPANION_ONEDRIVE_SECRET=
+  ### Collabora Settings ###
+  # Collabora web office is default enabled, comment if not required.
+  # The leading colon is required to enable the service.
+  COLLABORA=:collabora.yml
+  # Domain of Collabora, where you can find the frontend.
+  # Defaults to "collabora.owncloud.test"
+  COLLABORA_DOMAIN=
+  # Domain of the wopiserver which handles OnlyOffice.
+  #Defaults to "wopiserver.owncloud.test"
+  WOPISERVER_DOMAIN=
+  # Admin user for Collabora.
+  # Defaults to "admin".
+  # Collabora Admin Panel URL:
+  # https://{COLLABORA_DOMAIN}/browser/dist/admin/admin.html
+  COLLABORA_ADMIN_USER=
+  # Admin password for Collabora.
+  # Defaults to "admin".
+  COLLABORA_ADMIN_PASSWORD=
+  ...
   ```
+  #### Reverse Proxy and SSL
+
+  {{< hint type=important >}}
+  **Domains and SSL**\
+  Though it may sound strange, most of the setups are failing due to a misconfiguration regarding domains and SSL. Please make sure that you have set up the domains correctly and that they are pointing to your server. Also, make sure that you have set up the email address for the LetsEncrypt certificates in `TRAEFIK_ACME_MAIL=`.
+  {{< /hint >}}
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
 
-  If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` e.g. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
-
-  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (e.g. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
-
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
-  By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
+  #### Infinite Scale Release and Version
+  By default oCIS will be started in the `latest` production version.
+  You can change it to use the oCIS rolling releases by setting `OCIS_DOCKER_IMAGE=owncloud/ocis-rolling`. This will always use the latest rolling release.
+
+  If you want to use a specific version of oCIS, set the version to a dedicated tag like `OCIS_DOCKER_TAG=5.0.1`. Available  production versions can be found on [Docker Hub Production](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated) and available rolling releases can be found on [Docker Hub Rolling](https://hub.docker.com/r/owncloud/ocis-rolling/tags?page=1&ordering=last_updated)
+
+  {{< hint type=info title="oCIS Releases" >}}
+  You can read more about the different oCIS releases in the [oCIS Release Lifecycle](../release_roadmap.md).
+  {{< /hint >}}
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=ocis.owncloud.test`.
 
   Set the initial admin user password in `ADMIN_PASSWORD=`, it defaults to `admin`.
 
-  By default the CS3Org WOPI server will also be started in the `latest` version. If you want to start a specific version of it, you can set the version to `WOPISERVER_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/cs3org/wopiserver/tags?page=1&ordering=last_updated).
-
-  Set your domain for the CS3Org WOPI server in `WOPISERVER_DOMAIN=`, where all office suites can download the files via the WOPI protocol.
-
-  You also must override the default WOPI JWT secret in order to have a secure setup. Do this by setting `WOPI_JWT_SECRET` to a long and random string.
+  Web Office needs a public domain for the WOPI server to be set in `WOPISERVER_DOMAIN=`, where the office suite can work on the files via the WOPI protocol.
 
   Now it's time to set up Collabora and you need to configure the domain of Collabora in `COLLABORA_DOMAIN=`.
 
   If you want to use the Collabora admin panel you need to set the username and password for the administrator in `COLLABORA_ADMIN_USER=` and `COLLABORA_ADMIN_PASSWORD=`.
-
-  Next up is OnlyOffice, which also needs a domain in `ONLYOFFICE_DOMAIN=`.
-
-  Now you have configured everything and can save the file.
 
 * Start the docker stack
 
@@ -158,7 +243,6 @@ See also [example server setup]({{< ref "preparing_server" >}})
 * You now can visit oCIS and are able to open an office document in your browser. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
 ## Local setup
-For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
 
 This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self-signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
@@ -179,9 +263,62 @@ After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
-Open https://collabora.owncloud.test, https://onlyoffice.owncloud.test and https://wopiserver.owncloud.test  in your browser and accept the invalid certificate warning.
+Open https://collabora.owncloud.test in your browser and accept the invalid certificate warning.
 
 Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to open an office document in your browser. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
+
+## Additional services
+
+### Traefik dashboard
+
+If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` e.g. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
+
+The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (e.g. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
+
+```shell {linenos=table,hl_lines=[4,7,10]}
+### Traefik Settings ###
+# Serve Traefik dashboard.
+# Defaults to "false".
+TRAEFIK_DASHBOARD=true
+# Domain of Traefik, where you can find the dashboard.
+# Defaults to "traefik.owncloud.test"
+TRAEFIK_DOMAIN=
+# Basic authentication for the traefik dashboard.
+# Defaults to user "admin" and password "admin" (written as: "admin:admin").
+TRAEFIK_BASIC_AUTH_USERS=
+```
+### Cloud Importer
+
+Cloud importer can provide an Upload Interface to your oCIS instance. It is a separate service that can be enabled in the `.env` file.
+
+```shell {linenos=table,hl_lines=[3]}
+## Uppy Companion Settings ##
+# The leading colon is required to enable the service.
+CLOUD_IMPORTER=:cloudimporter.yml
+## The docker image to be used for uppy companion.
+# owncloud has built a container with public link import support.
+COMPANION_IMAGE=
+# Domain of Uppy Companion. Defaults to "companion.owncloud.test".
+COMPANION_DOMAIN=
+# Provider settings, see https://uppy.io/docs/companion/#provideroptions for reference.
+# Empty by default, which disables providers.
+COMPANION_ONEDRIVE_KEY=
+COMPANION_ONEDRIVE_SECRET=
+```
+
+After Enabling that servive by uncommenting the `CLOUD_IMPORTER` line, you can add the service to the stack with `docker-compose up -d` again.
+
+### Clamav Virusscanner
+
+You can add a Clamav Virusscanner to the stack. The service is disabled by default. To enable it, uncomment the `CLAMAV` line in the `docker-compose.yml` file.
+
+```shell {linenos=table,hl_lines=[3]}
+## Clamav Settings ##
+# The leading colon is required to enable the service.
+CLAMAV=:clamav.yml
+```
+
+After enabling that service, you can add the service to the stack with `docker-compose up -d` again.
 
 ## Local setup for web development
 
