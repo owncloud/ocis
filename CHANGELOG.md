@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix sharing-ng permission listings for personal and virtual drive items: [#9438](https://github.com/owncloud/ocis/pull/9438)
+* Enhancement - Add fail flag to consistency check: [#9447](https://github.com/owncloud/ocis/pull/9447)
 
 ## Details
 
@@ -58,6 +59,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8922
    https://github.com/owncloud/ocis/pull/9438
+
+* Enhancement - Add fail flag to consistency check: [#9447](https://github.com/owncloud/ocis/pull/9447)
+
+   We added a `--fail` flag to the `ocis backup consistency` command. If set to
+   true, the command will return a non-zero exit code if any inconsistencies are
+   found. This allows you to use the command in scripts and CI/CD pipelines to
+   ensure that backups are consistent.
+
+   https://github.com/owncloud/ocis/pull/9447
 
 # Changelog for [6.0.0] (2024-06-19)
 
