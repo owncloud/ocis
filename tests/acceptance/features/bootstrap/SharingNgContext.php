@@ -1265,7 +1265,7 @@ class SharingNgContext implements Context {
 				break;
 			}
 		}
-		return $syncStatus === true;
+		return $syncStatus;
 	}
 
 	/**
