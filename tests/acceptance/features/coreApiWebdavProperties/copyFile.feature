@@ -857,7 +857,7 @@ Feature: copy file
       | new              |
 
 
-  Scenario Outline: copying a file between shares received from different users when one share is shared via Secure viewer
+  Scenario Outline: copying a file between shares received from different users when one share is shared via Viewer and Secure viewer permission
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -881,9 +881,14 @@ Feature: copy file
     Examples:
       | dav-path-version | permissions-role-1 | permissions-role-2 | status-code |
       | old              | Secure viewer      | Editor             | 500         |
+      | new              | Secure viewer      | Editor             | 500         |
+      | old              | Secure viewer      | Secure viewer      | 403         |
       | new              | Secure viewer      | Secure viewer      | 403         |
       | old              | Secure viewer      | Viewer             | 403         |
+      | new              | Secure viewer      | Viewer             | 403         |
       | old              | Editor             | Secure viewer      | 403         |
+      | new              | Editor             | Secure viewer      | 403         |
+      | old              | Viewer             | Secure viewer      | 403         |
       | new              | Viewer             | Secure viewer      | 403         |
 
   @skipOnReva
@@ -944,11 +949,17 @@ Feature: copy file
     Then the HTTP status code should be "<status-code>"
     Examples:
       | dav-path-version | permissions-role-1 | permissions-role-2 | status-code |
-      | old              | Secure viewer      | Editor             | 500         |
+      | old              | Secure viewer      | Editor             | 201         |
+      | new              | Secure viewer      | Editor             | 201         |
+      | old              | Secure viewer      | Secure viewer      | 403         |
       | new              | Secure viewer      | Secure viewer      | 403         |
       | old              | Secure viewer      | Viewer             | 403         |
+      | new              | Secure viewer      | Viewer             | 403         |
       | old              | Editor             | Secure viewer      | 403         |
+      | new              | Editor             | Secure viewer      | 403         |
+      | old              | Viewer             | Secure viewer      | 403         |
       | new              | Viewer             | Secure viewer      | 403         |
+
 
   @skipOnReva
   Scenario Outline: copying a file to a folder that is shared with multiple users
