@@ -20,8 +20,6 @@ geekdocFilePath: ocis_full.md
 
 The docker stack consists of 10 containers. One of them is Traefik, a proxy which is terminating SSL and forwards the requests to oCIS in the internal docker network.
 
-The next container is oCIS itself in a configuration like the [oCIS with Traefik example]({{< ref "ocis_traefik" >}}), except that for this example a custom mimetype configuration is used.
-
 There are three oCIS app driver containers that register Collabora and OnlyOffice at the app registry.
 
 The last four containers are the WOPI server, Collabora and OnlyOffice.
@@ -49,7 +47,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 * Go to the deployment example
 
-  `cd ocis/deployments/examples/ocis_wopi`
+  `cd ocis/deployments/examples/ocis_full`
 
 * Open the `.env` file in a text editor.
 
@@ -174,6 +172,7 @@ On Linux and macOS you can add them to your `/etc/hosts` file and on Windows to 
 127.0.0.1 wopiserver.owncloud.test
 127.0.0.1 mail.owncloud.test
 127.0.0.1 companion.owncloud.test
+127.0.0.1 minio.owncloud.test
 ```
 
 After that you're ready to start the application stack:

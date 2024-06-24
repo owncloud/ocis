@@ -136,7 +136,7 @@ bin/ocis --log-level=$LOG_LEVEL proxy &
 
 ### Debugging the ocis in a docker container
 
-Remote debugging is the debug mode commonly used to work with a debugger and target running on a remote machine or a container for example a wopi stack `deployments/examples/ocis_wopi/docker-compose.yml`.
+Remote debugging is the debug mode commonly used to work with a debugger and target running on a remote machine or a container for example a wopi stack `deployments/examples/ocis_full/docker-compose.yml`.
 Below we describe the steps how to build the image, run the docker-compose and connect via remote debugger.
 1. Build the image:
 ```bash
@@ -147,8 +147,8 @@ make debug-docker
 ```bash
 export OCIS_DOCKER_TAG=debug
 ```
-3. Change the docker-compose `ocis` or `ocis-appprovider-collabora` or `ocis-appprovider-onlyoffice` depends on what do you want to debug:
-For example `deployments/examples/ocis_wopi/docker-compose.yml`
+3. Change the docker-compose `ocis` or `collaboration` depends on what do you want to debug:
+For example `deployments/examples/ocis_full/docker-compose.yml`
 ```yaml
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
