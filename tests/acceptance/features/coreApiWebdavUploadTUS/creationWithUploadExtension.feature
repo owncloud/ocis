@@ -26,10 +26,6 @@ Feature: tests of the creation extension see https://tus.io/protocols/resumable-
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -41,8 +37,4 @@ Feature: tests of the creation extension see https://tus.io/protocols/resumable-
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |

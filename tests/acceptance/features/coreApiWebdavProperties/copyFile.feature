@@ -20,10 +20,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest
@@ -36,10 +32,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -54,10 +46,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -116,10 +104,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1239
@@ -135,10 +119,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1239
@@ -153,10 +133,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1239
@@ -175,10 +151,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1239
@@ -199,10 +171,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1239
@@ -222,10 +190,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1239
@@ -246,10 +210,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1239 @skipOnReva
@@ -438,10 +398,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1239 @skipOnReva
@@ -468,10 +424,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1239 @skipOnReva
@@ -615,10 +567,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -632,10 +580,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -648,10 +592,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -666,10 +606,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -778,10 +714,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -891,13 +823,9 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
-  @skipOnRevaMaster @issue-3023
+  @issue-3023
   Scenario Outline: copying a folder into a sub-folder of itself
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/PARENT"
@@ -929,10 +857,6 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -953,10 +877,6 @@ Feature: copy file
       | new              | "'single'"  | "folder-'single'"  | "folder-'single'/'single'"   |
       | new              | "question?" | "folder-question?" | "folder-question?/question?" |
       | new              | "&and#hash" | "folder-&and#hash" | "folder-&and#hash/&and#hash" |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name   | folder-name        | destination                  |
       | spaces           | "'single'"  | "folder-'single'"  | "folder-'single'/'single'"   |
       | spaces           | "question?" | "folder-question?" | "folder-question?/question?" |
       | spaces           | "&and#hash" | "folder-&and#hash" | "folder-&and#hash/&and#hash" |

@@ -22,7 +22,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on each endpoint should be "200,200,204,204,200" on oCIS or "204,204,204,204,204" on reva
 
-  @skipOnRevaMaster
+
   Scenario: send DELETE requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "DELETE" using password "%regular%" about user "Alice"
       | endpoint                                             |
@@ -43,7 +43,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on all endpoints should be "200"
 
-  @skipOnRevaMaster
+
   Scenario: send GET requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "GET" using password "%regular%" about user "Alice"
       | endpoint                                             |
@@ -86,7 +86,7 @@ Feature: make webdav request with special urls
       | /remote.php/dav//files/%username%/PARENT6  |
     Then the HTTP status code of responses on each endpoint should be "200,201,200,200,201,201" on oCIS or "201,201,201,201,201,201" on reva
 
-  @skipOnRevaMaster
+
   Scenario: send MKCOL requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "MKCOL" using password "%regular%" about user "Alice"
       | endpoint                                   |
@@ -109,7 +109,7 @@ Feature: make webdav request with special urls
       | /remote.php/dav//files/%username%/PARENT2/parent.txt | /remote.php/dav/files/%username%/PARENT2/parent1.txt |
     Then the HTTP status code of responses on each endpoint should be "200,201,201,200,404" on oCIS or "201,201,201,201,201" on reva
 
-  @skipOnRevaMaster
+
   Scenario: send MOVE requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "MOVE" using password "%regular%" about user "Alice"
       | endpoint                                             | destination                                          |
@@ -130,7 +130,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on each endpoint should be "200,200,412,412,200" respectively
 
-  @skipOnRevaMaster
+
   Scenario: send POST requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "%regular%" about user "Alice"
       | endpoint                                            |
@@ -151,7 +151,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on each endpoint should be "200,200,207,207,200" on oCIS or "207,207,207,207,207" on reva
 
-  @skipOnRevaMaster
+
   Scenario: send PROPFIND requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "PROPFIND" to get property "d:href" about user "Alice"
       | endpoint                                            |
@@ -172,7 +172,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on each endpoint should be "200,200,400,400,200" respectively
 
-  @skipOnRevaMaster
+
   Scenario: send PROPPATCH requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "PROPPATCH" to set property "d:getlastmodified" about user "Alice"
       | endpoint                                            |
@@ -193,7 +193,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav/files/%username%/PARENT//parent.txt |
     Then the HTTP status code of responses on each endpoint should be "200,204,200,201,200" on oCIS or "204,204,204,201,204" on reva
 
-  @skipOnRevaMaster
+
   Scenario: send PUT requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "PUT" including body "doesnotmatter" using password "%regular%" about user "Alice"
       | endpoint                                             |

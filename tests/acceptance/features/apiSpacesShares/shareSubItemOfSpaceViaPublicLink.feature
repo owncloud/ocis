@@ -97,7 +97,7 @@ Feature: Share a file or folder that is inside a space via public link
       | folder          | /folder     | folder        | httpd/unix-directory |
       | folder/file.txt | /file.txt   | file          | text/plain           |
 
-  @skipOnRevaMaster
+
   Scenario Outline: user participant of the project space without space manager role cannot share an entity inside project space via public link
     Given user "Alice" has sent the following space share invitation:
       | space           | share sub-item |

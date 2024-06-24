@@ -20,10 +20,6 @@ Feature: auth
     When user "Alice" requests "<dav-path>" with "PROPFIND" using basic auth
     Then the HTTP status code should be "207"
     Examples:
-      | dav-path           |
-      | /remote.php/webdav |
-
-    @skipOnRevaMaster
-    Examples:
       | dav-path              |
+      | /remote.php/webdav    |
       | /dav/spaces/%spaceid% |

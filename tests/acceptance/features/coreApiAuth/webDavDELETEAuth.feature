@@ -53,7 +53,7 @@ Feature: delete file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "404"
 
-  @skipOnRevaMaster
+
   Scenario: send DELETE requests to another user's webDav endpoints as normal user using the spaces WebDAV API
     When user "Brian" requests these endpoints with "DELETE" about user "Alice"
       | endpoint                                           |
@@ -115,7 +115,7 @@ Feature: delete file/folder
       | /remote.php/dav/files/%username%/FOLDER            |
     Then the HTTP status code of responses on all endpoints should be "415"
 
-  @skipOnRevaMaster @issue-4332
+  @issue-4332
   Scenario: send DELETE requests to webDav endpoints with body as normal user using the spaces WebDAV API
     When user "Alice" requests these endpoints with "DELETE" including body "doesnotmatter" about user "Alice"
       | endpoint                                           |

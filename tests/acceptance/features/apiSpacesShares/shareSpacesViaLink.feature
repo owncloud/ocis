@@ -81,7 +81,7 @@ Feature: Share spaces via link
     And for user "Alice" the space "share space" should contain these entries:
       | lorem.txt |
 
-  @skipOnRevaMaster
+
   Scenario Outline: user without manager role cannot share a space to public via link
     Given user "Alice" has sent the following space share invitation:
       | space           | share space  |
