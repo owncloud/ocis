@@ -10,7 +10,6 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -46,11 +45,11 @@ const (
 // Searcher is the interface to the SearchService
 type Searcher interface {
 	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
-	IndexSpace(rID *provider.StorageSpaceId, uID *user.UserId) error
+	IndexSpace(rID *provider.StorageSpaceId) error
 	TrashItem(rID *provider.ResourceId)
-	UpsertItem(ref *provider.Reference, uID *user.UserId)
-	RestoreItem(ref *provider.Reference, uID *user.UserId)
-	MoveItem(ref *provider.Reference, uID *user.UserId)
+	UpsertItem(ref *provider.Reference)
+	RestoreItem(ref *provider.Reference)
+	MoveItem(ref *provider.Reference)
 }
 
 // Service is responsible for indexing spaces and pass on a search
@@ -409,7 +408,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 }
 
 // IndexSpace (re)indexes all resources of a given space.
-func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uID *user.UserId) error {
+func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return err
@@ -456,7 +455,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uID *user.UserId)
 			return nil
 		}
 
-		s.UpsertItem(ref, uID)
+		s.UpsertItem(ref)
 
 		return nil
 	})
@@ -479,8 +478,8 @@ func (s *Service) TrashItem(rID *provider.ResourceId) {
 }
 
 // UpsertItem indexes or stores Resource data fields.
-func (s *Service) UpsertItem(ref *provider.Reference, uID *user.UserId) {
-	ctx, stat, path := s.resInfo(uID, ref)
+func (s *Service) UpsertItem(ref *provider.Reference) {
+	ctx, stat, path := s.resInfo(ref)
 	if ctx == nil || stat == nil || path == "" {
 		return
 	}
@@ -610,8 +609,8 @@ func valueToString(value interface{}) string {
 }
 
 // RestoreItem makes the item available again.
-func (s *Service) RestoreItem(ref *provider.Reference, uID *user.UserId) {
-	ctx, stat, path := s.resInfo(uID, ref)
+func (s *Service) RestoreItem(ref *provider.Reference) {
+	ctx, stat, path := s.resInfo(ref)
 	if ctx == nil || stat == nil || path == "" {
 		return
 	}
@@ -622,8 +621,8 @@ func (s *Service) RestoreItem(ref *provider.Reference, uID *user.UserId) {
 }
 
 // MoveItem updates the resource location and all of its necessary fields.
-func (s *Service) MoveItem(ref *provider.Reference, uID *user.UserId) {
-	ctx, stat, path := s.resInfo(uID, ref)
+func (s *Service) MoveItem(ref *provider.Reference) {
+	ctx, stat, path := s.resInfo(ref)
 	if ctx == nil || stat == nil || path == "" {
 		return
 	}
@@ -633,7 +632,7 @@ func (s *Service) MoveItem(ref *provider.Reference, uID *user.UserId) {
 	}
 }
 
-func (s *Service) resInfo(uID *user.UserId, ref *provider.Reference) (context.Context, *provider.StatResponse, string) {
+func (s *Service) resInfo(ref *provider.Reference) (context.Context, *provider.StatResponse, string) {
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return nil, nil, ""

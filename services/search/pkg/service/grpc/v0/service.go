@@ -172,7 +172,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 
 // IndexSpace (re)indexes all resources of a given space.
 func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
-	return s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.SpaceId}, &user.UserId{OpaqueId: in.UserId})
+	return s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.SpaceId})
 }
 
 // FromCache pulls a search result from cache
