@@ -2,7 +2,7 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| COLLABORATION_APP_NAME | string | Collabora | The name of the app|
+| COLLABORATION_APP_NAME | string | Collabora | The name of the app, either Collabora, OnlyOffice or Microsoft365|
 | COLLABORATION_APP_DESCRIPTION | string | Open office documents with Collabora | App description|
 | COLLABORATION_APP_ICON | string | image-edit | Icon for the app|
 | COLLABORATION_APP_LOCKNAME | string | com.github.owncloud.collaboration | Name for the app lock|
