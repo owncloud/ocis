@@ -178,7 +178,11 @@ class FilesVersionsContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
-		$responseXml = $this->listVersionFolder($user, $fileId, 1);
+		$response = $this->listVersionFolder($user, $fileId, 1);
+		$responseXml = HttpRequestHelper::getResponseXml(
+			$response,
+			__METHOD__
+		);
 		$xmlPart = $responseXml->xpath("//d:response/d:href");
 		//restoring the version only works with DAV path v2
 		$destinationUrl = $this->featureContext->getBaseUrl() . "/" .
@@ -236,7 +240,11 @@ class FilesVersionsContext implements Context {
 	 * @throws Exception
 	 */
 	public function assertFileVersionsCount(string $user, string $fileId, int $expectedCount):void {
-		$responseXml = $this->listVersionFolder($user, $fileId, 1);
+		$response = $this->listVersionFolder($user, $fileId, 1);
+		$responseXml = HttpRequestHelper::getResponseXml(
+			$response,
+			__METHOD__
+		);
 		$actualCount = \count($responseXml->xpath("//d:prop/d:getetag")) - 1;
 		if ($actualCount === -1) {
 			$actualCount = 0;
@@ -307,11 +315,10 @@ class FilesVersionsContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
-		$responseXml = $this->listVersionFolder(
-			$user,
-			$fileId,
-			1,
-			['getcontentlength']
+		$response = $this->listVersionFolder($user, $fileId, 1, ['getcontentlength']);
+		$responseXml = HttpRequestHelper::getResponseXml(
+			$response,
+			__METHOD__
 		);
 		$xmlPart = $responseXml->xpath("//d:prop/d:getcontentlength");
 		Assert::assertEquals(
@@ -370,7 +377,11 @@ class FilesVersionsContext implements Context {
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
 		$index = (int)$index;
-		$responseXml = $this->listVersionFolder($user, $fileId, 1);
+		$response = $this->listVersionFolder($user, $fileId, 1);
+		if ($response->getStatusCode() === 403) {
+			return $response;
+		}
+		$responseXml = new SimpleXMLElement($response->getBody()->getContents());
 		$xmlPart = $responseXml->xpath("//d:response/d:href");
 		if (!isset($xmlPart[$index])) {
 			Assert::fail(
@@ -482,7 +493,7 @@ class FilesVersionsContext implements Context {
 	 * @param int $folderDepth
 	 * @param string[]|null $properties
 	 *
-	 * @return SimpleXMLElement
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
 	public function listVersionFolder(
@@ -490,7 +501,7 @@ class FilesVersionsContext implements Context {
 		string $fileId,
 		int $folderDepth,
 		?array $properties = null
-	):SimpleXMLElement {
+	):ResponseInterface {
 		if (!$properties) {
 			$properties = [
 				'getetag'
@@ -508,10 +519,7 @@ class FilesVersionsContext implements Context {
 			(string) $folderDepth,
 			"versions"
 		);
-		return HttpRequestHelper::getResponseXml(
-			$response,
-			__METHOD__
-		);
+		return $response;
 	}
 
 	/**
