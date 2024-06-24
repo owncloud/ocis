@@ -1269,35 +1269,47 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $status
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function waitAndCheckShareSyncStatus(string $user, string $resource, string $status): void {
+		$expected = $status === "enabled";
+
+		// NOTE: Sharing is async so it might take some time for the share to be available.
+		$retried = 0;
+		do {
+			$shareSynced = $this->isShareSynced($user, $resource);
+
+			if ($shareSynced === $expected) {
+				return;
+			}
+
+			$tryAgain = !$shareSynced && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+			if ($tryAgain) {
+				$retried += 1;
+				echo "[INFO] Wait for share sync status...";
+				// wait 500ms and try again
+				\usleep(500 * 1000);
+			}
+		} while ($tryAgain);
+		Assert::fail("[Timeout] Sync for share '$resource' was expected to be '$status' but was not");
+	}
+
+	/**
 	 * @Then /^user "([^"]*)" has a share "([^"]*)" synced$/
 	 *
 	 * @param string $user
 	 * @param string $resource
 	 *
 	 * @return void
-	 * @throws GuzzleException
+	 * @throws Exception|GuzzleException
 	 */
 	public function userHasShareSynced(string $user, string $resource): void {
-		$shareSynced = false;
-
-		// Sharing is async so it might take some time for the share to be available
-		$retried = 0;
-		do {
-			$shareSynced = $this->isShareSynced($user, $resource);
-
-			$tryAgain = !$shareSynced && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
-			if ($tryAgain) {
-				$retried += 1;
-				echo "[INFO] Wait for shares to be available...";
-				// wait 500ms and try again
-				\usleep(500 * 1000);
-			}
-		} while ($tryAgain);
-
-		Assert::assertTrue(
-			$shareSynced,
-			"Share '$resource' is expected to be synced but not"
-		);
+		$this->waitAndCheckShareSyncStatus($user, $resource, "enabled");
 	}
 
 	/**
@@ -1311,28 +1323,7 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userShouldHaveSyncEnabledOrDisabledForShare(string $user, string $status, string $resource):void {
-		$response = GraphHelper::getSharesSharedWithMe(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$user,
-			$this->featureContext->getPasswordForUser($user)
-		);
-		$responseBody = $this->featureContext->getJsonDecodedResponse($response);
-		$expectedValue = $status === "enabled" ? "true" : "false";
-		$actualValue = "";
-		foreach ($responseBody["value"] as $value) {
-			if ($value["remoteItem"]["name"] === $resource) {
-				// var_export converts values to their string representations
-				// e.g.: true -> 'true'
-				$actualValue = var_export($value["@client.synchronize"], true);
-				break;
-			}
-		}
-		Assert::assertSame(
-			$actualValue,
-			$expectedValue,
-			"Expected property '@client.synchronize' to be '$expectedValue' but found '$actualValue'"
-		);
+		$this->waitAndCheckShareSyncStatus($user, $resource, $status);
 	}
 
 	/**
