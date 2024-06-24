@@ -22,4 +22,5 @@ type UserBackend interface {
 	Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error)
 	CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error)
 	UpdateUserIfNeeded(ctx context.Context, user *cs3.User, claims map[string]interface{}) error
+	SyncGroupMemberships(ctx context.Context, user *cs3.User, claims map[string]interface{}) error
 }
