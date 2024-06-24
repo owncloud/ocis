@@ -180,6 +180,7 @@ Feature: sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Viewer   |
+    And user "Carol" has a share "/TMP" synced
     When user "Carol" moves folder "/Shares/TMP" to "/Shares/new" using the WebDAV API
     And the administrator deletes user "Carol" using the provisioning API
     Then the HTTP status code of responses on each endpoint should be "201, 204" respectively
