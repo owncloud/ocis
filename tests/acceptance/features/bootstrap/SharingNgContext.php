@@ -1265,6 +1265,7 @@ class SharingNgContext implements Context {
 				break;
 			}
 		}
+		Assert::assertIsBool($syncStatus, "'@client.synchronize' must be a boolean value");
 		return $syncStatus;
 	}
 
