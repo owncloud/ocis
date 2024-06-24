@@ -150,7 +150,7 @@ Feature: copy file
       | Space Viewer |
 
 
-  Scenario Outline: user copies a file from project space with different role to Shares with viewer role
+  Scenario Outline: user copies a file from project space with different role to Shares with viewer and secure viewer role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has created folder "/testshare"
@@ -161,20 +161,23 @@ Feature: copy file
       | shareType       | user         |
       | permissionsRole | <space-role> |
     And user "Brian" has sent the following resource share invitation:
-      | resource        | testshare |
-      | space           | Personal  |
-      | sharee          | Alice     |
-      | shareType       | user      |
-      | permissionsRole | Viewer    |
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" folder "testshare" of the space "Shares" should not contain these files:
       | project.txt |
     Examples:
-      | space-role   |
-      | Manager      |
-      | Space Editor |
-      | Space Viewer |
+      | space-role   | permissions-role |
+      | Manager      | Viewer           |
+      | Space Editor | Viewer           |
+      | Space Viewer | Viewer           |
+      | Manager      | Secure viewer    |
+      | Space Editor | Secure viewer    |
+      | Space Viewer | Secure viewer    |
 
 
   Scenario Outline: user copies a file from personal space to project space with different role
@@ -228,19 +231,23 @@ Feature: copy file
     And for user "Alice" the content of the file "/testshare/personal.txt" of the space "Shares" should be "personal content"
 
 
-  Scenario: user copies a file from personal space to share space with role viewer
+  Scenario Outline: user copies a file from personal space to share space with role viewer and secure viewer
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
-      | resource        | testshare |
-      | space           | Personal  |
-      | sharee          | Alice     |
-      | shareType       | user      |
-      | permissionsRole | Viewer    |
+      | resource        | testshare          |
+      | space           | Personal           |
+      | sharee          | Alice              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     And user "Alice" has uploaded file with content "personal content" to "/personal.txt"
     When user "Alice" copies file "/personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" folder "testshare" of the space "Shares" should not contain these files:
       | personal.txt |
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | Secure viewer    |
 
 
   Scenario Outline: user copies a file from share space with different role to personal space
@@ -262,6 +269,20 @@ Feature: copy file
       | permissions-role |
       | Editor           |
       | Viewer           |
+
+
+  Scenario: user copies a file from share space with secure viewer role to personal space
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare     |
+      | space           | Personal      |
+      | sharee          | Alice         |
+      | shareType       | user          |
+      | permissionsRole | Secure viewer |
+    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "500"
 
 
   Scenario Outline: user copies a file from share space with different role to project space with different role
@@ -291,6 +312,33 @@ Feature: copy file
       | Manager      | Viewer           |
       | Space Editor | Editor           |
       | Space Editor | Viewer           |
+
+
+  Scenario Outline: user copies a file from share space with secure viewer role to project space with different role
+    Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has created a space "Project" with the default quota using the Graph API
+    And user "Brian" has sent the following space share invitation:
+      | space           | Project      |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | <space-role> |
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare     |
+      | space           | Personal      |
+      | sharee          | Alice         |
+      | shareType       | user          |
+      | permissionsRole | Secure viewer |
+    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Project" using the WebDAV API
+    Then the HTTP status code should be "500"
+    And for user "Alice" the space "Project" should not contain these entries:
+      | /testshare.txt |
+    Examples:
+      | space-role   |
+      | Manager      |
+      | Manager      |
+      | Space Editor |
 
 
   Scenario Outline: user copies a file from share space with different role to project space with role viewer
@@ -349,22 +397,22 @@ Feature: copy file
       | Viewer           |
 
 
-  Scenario Outline: user copies a file from share space with different role to share space with role viewer
+  Scenario Outline: user copies a file from share space with different role to share space with role viewer and space viewer
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
     And user "Brian" has sent the following resource share invitation:
-      | resource        | testshare1         |
-      | space           | Personal           |
-      | sharee          | Alice              |
-      | shareType       | user               |
-      | permissionsRole | <permissions-role> |
+      | resource        | testshare1           |
+      | space           | Personal             |
+      | sharee          | Alice                |
+      | shareType       | user                 |
+      | permissionsRole | <permissions-role-1> |
     And user "Brian" has sent the following resource share invitation:
-      | resource        | testshare2 |
-      | space           | Personal   |
-      | sharee          | Alice      |
-      | shareType       | user       |
-      | permissionsRole | Viewer     |
+      | resource        | testshare2           |
+      | space           | Personal             |
+      | sharee          | Alice                |
+      | shareType       | user                 |
+      | permissionsRole | <permissions-role-2> |
     When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" folder "testshare2" of the space "Shares" should not contain these files:
@@ -372,9 +420,11 @@ Feature: copy file
     And for user "Brian" folder "testshare2" of the space "Personal" should not contain these files:
       | testshare1.txt |
     Examples:
-      | permissions-role |
-      | Editor           |
-      | Viewer           |
+      | permissions-role-1 | permissions-role-2 |
+      | Editor             | Viewer             |
+      | Editor             | Secure viewer      |
+      | Viewer             | Viewer             |
+      | Secure viewer      | Secure viewer      |
 
 
   Scenario Outline: copying a folder within the same project space with different role
