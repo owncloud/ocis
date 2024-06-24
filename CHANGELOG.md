@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 6.0.0](#changelog-for-600-2024-06-19)
 * [Changelog for 5.0.3](#changelog-for-503-2024-05-02)
 * [Changelog for 5.0.2](#changelog-for-502-2024-04-17)
@@ -37,6 +38,26 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v6.0.0...master
+
+## Summary
+
+* Bugfix - Fix sharing-ng permission listings for personal and virtual drive items: [#9438](https://github.com/owncloud/ocis/pull/9438)
+
+## Details
+
+* Bugfix - Fix sharing-ng permission listings for personal and virtual drive items: [#9438](https://github.com/owncloud/ocis/pull/9438)
+
+   Fixes an issue where the sharing-ng service was not able to list permissions for
+   personal and virtual drive items.
+
+   https://github.com/owncloud/ocis/issues/8922
+   https://github.com/owncloud/ocis/pull/9438
 
 # Changelog for [6.0.0] (2024-06-19)
 
