@@ -26,6 +26,7 @@ use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use TestHelpers\OcisHelper;
 use TestHelpers\WebDavHelper;
+use TestHelpers\HttpRequestHelper;
 use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
 
@@ -1238,6 +1239,65 @@ class SharingNgContext implements Context {
 			$shareSpaceId
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function isShareSynced(string $user, string $resource): bool {
+		$resource = \trim($resource, '/');
+		$response = GraphHelper::getSharesSharedWithMe(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user)
+		);
+
+		$shares = $this->featureContext->getJsonDecodedResponse($response)["value"];
+		$syncStatus = false;
+		foreach ($shares as $share) {
+			if ($share["name"] === $resource) {
+				$syncStatus = $share["@client.synchronize"];
+				break;
+			}
+		}
+		return $syncStatus === true;
+	}
+
+	/**
+	 * @Then /^user "([^"]*)" has a share "([^"]*)" synced$/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasShareSynced(string $user, string $resource): void {
+		$shareSynced = false;
+
+		// Sharing is async so it might take some time for the share to be available
+		$retried = 0;
+		do {
+			$shareSynced = $this->isShareSynced($user, $resource);
+
+			$tryAgain = !$shareSynced && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+			if ($tryAgain) {
+				$retried += 1;
+				echo "[INFO] Wait for shares to be available...";
+				// wait 500ms and try again
+				\usleep(500 * 1000);
+			}
+		} while ($tryAgain);
+
+		Assert::assertTrue(
+			$shareSynced,
+			"Share '$resource' is expected to be synced but not"
+		);
 	}
 
 	/**
