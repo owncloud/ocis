@@ -245,7 +245,8 @@ Feature: sharing
     And user "Brian" has been added to group "grp2"
     And user "Alice" has created folder "/PARENT"
     When user "Alice" shares folder "/PARENT" with group "grp1" using the sharing API
-    Then user "Brian" should see the following elements
+    Then user "Brian" should have sync enabled for share "PARENT"
+    And user "Brian" should see the following elements
       | /Shares/PARENT/ |
 
 
