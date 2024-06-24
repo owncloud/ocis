@@ -50,6 +50,10 @@ func ConsistencyCommand(cfg *config.Config) *cli.Command {
 				Usage:   "the blobstore type. Can be (none, ocis, s3ng). Default ocis",
 				Value:   "ocis",
 			},
+			&cli.BoolFlag{
+				Name:  "fail",
+				Usage: "exit with non-zero status if consistency check fails",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			basePath := c.String("basepath")
@@ -83,7 +87,7 @@ func ConsistencyCommand(cfg *config.Config) *cli.Command {
 				fmt.Println(err)
 				return err
 			}
-			if err := backup.CheckProviderConsistency(basePath, bs); err != nil {
+			if err := backup.CheckProviderConsistency(basePath, bs, c.Bool("fail")); err != nil {
 				fmt.Println(err)
 				return err
 			}

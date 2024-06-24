@@ -60,7 +60,7 @@ func NewConsistency() *Consistency {
 }
 
 // CheckProviderConsistency checks the consistency of a space
-func CheckProviderConsistency(storagepath string, lbs ListBlobstore) error {
+func CheckProviderConsistency(storagepath string, lbs ListBlobstore, fail bool) error {
 	fsys := os.DirFS(storagepath)
 
 	p := NewProvider(fsys, storagepath, lbs)
@@ -71,7 +71,7 @@ func CheckProviderConsistency(storagepath string, lbs ListBlobstore) error {
 	c := NewConsistency()
 	c.GatherData(p.Events)
 
-	return c.PrintResults(storagepath)
+	return c.PrintResults(storagepath, fail)
 }
 
 // GatherData gathers and evaluates data produced by the DataProvider
@@ -134,7 +134,7 @@ func (c *Consistency) GatherData(events <-chan interface{}) {
 }
 
 // PrintResults prints the results of the evaluation
-func (c *Consistency) PrintResults(discpath string) error {
+func (c *Consistency) PrintResults(discpath string, fail bool) error {
 	if len(c.Nodes) != 0 {
 		fmt.Println("\n🚨 Inconsistent Nodes:")
 	}
@@ -161,6 +161,8 @@ func (c *Consistency) PrintResults(discpath string) error {
 	}
 	if len(c.Nodes) == 0 && len(c.LinkedNodes) == 0 && len(c.Blobs) == 0 && len(c.BlobReferences) == 0 {
 		fmt.Printf("💚 No inconsistency found. The backup in '%s' seems to be valid.\n", discpath)
+	} else if fail {
+		os.Exit(1)
 	}
 	return nil
 
