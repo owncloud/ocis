@@ -18,6 +18,6 @@ Feature: shares are received in the default folder for received shares
     Then the OCS status code of responses on each endpoint should be "<ocs-status-code>" respectively
     And the HTTP status code of responses on each endpoint should be "<http-status-code>" respectively
     Examples:
-      | ocs-api-version | ocs-status-code    | http-status-code   |
-      | 1               | 100, 100, 100, 400 | 200, 200, 200, 200 |
-      | 2               | 200, 200, 200, 400 | 200, 200, 200, 400 |
+      | ocs-api-version | ocs-status-code | http-status-code |
+      | 1               | 100, 100, 403   | 200, 200, 200    |
+      | 2               | 200, 200, 403   | 200, 200, 403    |
