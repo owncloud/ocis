@@ -177,28 +177,28 @@ Feature: move (rename) folder
       | dav-path-version | from-folder-name           | to-folder-name             |
       | old              | "testFolder"               | "'single'quotes"           |
       | old              | "testFolder"               | '"double"quotes'           |
-      | old              | "testFolder"               | "strängé नेपाली folder"      |
+      | old              | "testFolder"               | "strängé नेपाली folder"    |
       | old              | "testFolder"               | "$%#?&@"                   |
       | old              | "testFolder"               | "Sample,Folder,With,Comma" |
       | old              | "testFolder"               | " start with space"        |
       | old              | "testFolder"               | "renamed.part"             |
       | old              | "'single'quotes"           | "testFolder"               |
       | old              | '"double"quotes'           | "testFolder"               |
-      | old              | "strängé नेपाली folder"      | "testFolder"               |
+      | old              | "strängé नेपाली folder"    | "testFolder"               |
       | old              | "$%#?&@"                   | "testFolder"               |
       | old              | "Sample,Folder,With,Comma" | "testFolder"               |
       | old              | " start with space"        | "testFolder"               |
       | old              | "renamed.part"             | "testFolder"               |
       | new              | "testFolder"               | "'single'quotes"           |
       | new              | "testFolder"               | '"double"quotes'           |
-      | new              | "testFolder"               | "strängé नेपाली folder"      |
+      | new              | "testFolder"               | "strängé नेपाली folder"    |
       | new              | "testFolder"               | "$%#?&@"                   |
       | new              | "testFolder"               | "Sample,Folder,With,Comma" |
       | new              | "testFolder"               | " start with space"        |
       | new              | "testFolder"               | "renamed.part"             |
       | new              | "'single'quotes"           | "testFolder"               |
       | new              | '"double"quotes'           | "testFolder"               |
-      | new              | "strängé नेपाली folder"      | "testFolder"               |
+      | new              | "strängé नेपाली folder"    | "testFolder"               |
       | new              | "$%#?&@"                   | "testFolder"               |
       | new              | "Sample,Folder,With,Comma" | "testFolder"               |
       | new              | " start with space"        | "testFolder"               |
@@ -209,14 +209,14 @@ Feature: move (rename) folder
       | dav-path-version | from-folder-name           | to-folder-name             |
       | spaces           | "testFolder"               | "'single'quotes"           |
       | spaces           | "testFolder"               | '"double"quotes'           |
-      | spaces           | "testFolder"               | "strängé नेपाली folder"      |
+      | spaces           | "testFolder"               | "strängé नेपाली folder"    |
       | spaces           | "testFolder"               | "$%#?&@"                   |
       | spaces           | "testFolder"               | "Sample,Folder,With,Comma" |
       | spaces           | "testFolder"               | " start with space"        |
       | spaces           | "testFolder"               | "renamed.part"             |
       | spaces           | "'single'quotes"           | "testFolder"               |
       | spaces           | '"double"quotes'           | "testFolder"               |
-      | spaces           | "strängé नेपाली folder"      | "testFolder"               |
+      | spaces           | "strängé नेपाली folder"    | "testFolder"               |
       | spaces           | "$%#?&@"                   | "testFolder"               |
       | spaces           | "Sample,Folder,With,Comma" | "testFolder"               |
       | spaces           | " start with space"        | "testFolder"               |
@@ -287,14 +287,28 @@ Feature: move (rename) folder
     When user "Alice" moves folder "testFolder" to "<folder-name>" using the WebDAV API
     Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | dav-path-version | folder-name   | http-status-code |
-      | old              | /.            | 409              |
-      | old              | /..           | 404              |
-      | new              | /.            | 409              |
-      | new              | /..           | 404              |
+      | dav-path-version | folder-name | http-status-code |
+      | old              | /.          | 409              |
+      | old              | /..         | 404              |
+      | new              | /.          | 409              |
+      | new              | /..         | 404              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | folder-name   | http-status-code |
-      | spaces           | /.            | 409              |
-      | spaces           | /..           | 400              |
+      | dav-path-version | folder-name | http-status-code |
+      | spaces           | /.          | 409              |
+      | spaces           | /..         | 400              |
+
+
+  Scenario Outline: rename a folder to .htaccess
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "/testshare"
+    When user "Alice" moves folder "/testshare" to "/.htaccess" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Alice" should see the following elements
+      | /.htaccess/ |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |

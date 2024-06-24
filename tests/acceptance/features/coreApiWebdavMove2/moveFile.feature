@@ -521,22 +521,22 @@ Feature: move (rename) file
       | dav-path-version | from-file-name          | to-file-name            |
       | old              | "testfile.txt"          | "'single'quotes.txt"    |
       | old              | "testfile.txt"          | '"double"quotes.txt'    |
-      | old              | "testfile.txt"          | "strängé नेपाली.txt"      |
+      | old              | "testfile.txt"          | "strängé नेपाली.txt"    |
       | old              | "testfile.txt"          | "file,comma.txt"        |
       | old              | "testfile.txt"          | " start with space.txt" |
       | old              | "'single'quotes.txt"    | "testfile.txt"          |
       | old              | '"double"quotes.txt'    | "testfile.txt"          |
-      | old              | "strängé नेपाली.txt"      | "testfile.txt"          |
+      | old              | "strängé नेपाली.txt"    | "testfile.txt"          |
       | old              | "file,comma.txt"        | "testfile.txt"          |
       | old              | " start with space.txt" | "testfile.txt"          |
       | new              | "testfile.txt"          | "'single'quotes.txt"    |
       | new              | "testfile.txt"          | '"double"quotes.txt'    |
-      | new              | "testfile.txt"          | "strängé नेपाली.txt"      |
+      | new              | "testfile.txt"          | "strängé नेपाली.txt"    |
       | new              | "testfile.txt"          | "file,comma.txt"        |
       | new              | "testfile.txt"          | " start with space.txt" |
       | new              | "'single'quotes.txt"    | "testfile.txt"          |
       | new              | '"double"quotes.txt'    | "testfile.txt"          |
-      | new              | "strängé नेपाली.txt"      | "testfile.txt"          |
+      | new              | "strängé नेपाली.txt"    | "testfile.txt"          |
       | new              | "file,comma.txt"        | "testfile.txt"          |
       | new              | " start with space.txt" | "testfile.txt"          |
 
@@ -545,12 +545,12 @@ Feature: move (rename) file
       | dav-path-version | from-file-name          | to-file-name            |
       | spaces           | "testfile.txt"          | "'single'quotes.txt"    |
       | spaces           | "testfile.txt"          | '"double"quotes.txt'    |
-      | spaces           | "testfile.txt"          | "strängé नेपाली.txt"      |
+      | spaces           | "testfile.txt"          | "strängé नेपाली.txt"    |
       | spaces           | "testfile.txt"          | "file,comma.txt"        |
       | spaces           | "testfile.txt"          | " start with space.txt" |
       | spaces           | "'single'quotes.txt"    | "testfile.txt"          |
       | spaces           | '"double"quotes.txt'    | "testfile.txt"          |
-      | spaces           | "strängé नेपाली.txt"      | "testfile.txt"          |
+      | spaces           | "strängé नेपाली.txt"    | "testfile.txt"          |
       | spaces           | "file,comma.txt"        | "testfile.txt"          |
       | spaces           | " start with space.txt" | "testfile.txt"          |
 
@@ -580,14 +580,28 @@ Feature: move (rename) file
     When user "Alice" moves file "testfile.txt" to "<file-name>" using the WebDAV API
     Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | dav-path-version | file-name   | http-status-code |
-      | old              | /.            | 409              |
-      | old              | /..           | 404              |
-      | new              | /.            | 409              |
-      | new              | /..           | 404              |
+      | dav-path-version | file-name | http-status-code |
+      | old              | /.        | 409              |
+      | old              | /..       | 404              |
+      | new              | /.        | 409              |
+      | new              | /..       | 404              |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file-name   | http-status-code |
-      | spaces           | /.            | 409              |
-      | spaces           | /..           | 400              |
+      | dav-path-version | file-name | http-status-code |
+      | spaces           | /.        | 409              |
+      | spaces           | /..       | 400              |
+
+
+  Scenario Outline: rename a file to .htaccess
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
+    When user "Alice" moves file "/textfile0.txt" to "/.htaccess" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Alice" should see the following elements
+      | .htaccess |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
