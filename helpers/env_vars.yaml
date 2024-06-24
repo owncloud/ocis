@@ -5451,10 +5451,10 @@ IDM_ADMIN_USER_ID:
   removalVersion: ""
   deprecationInfo: ""
 IDM_CREATE_DEMO_USERS:
-  name: SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;IDM_CREATE_DEMO_USERS
+  name: IDM_CREATE_DEMO_USERS
   defaultValue: "false"
   type: bool
-  description: The default role assignments the demo users should be setup.
+  description: Flag to enable or disable the creation of the demo users.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -7226,12 +7226,12 @@ OCDAV_WEBDAV_NAMESPACE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_ADMIN_USER_ID:
-  name: OCIS_ADMIN_USER_ID;STORAGE_USERS_PURGE_TRASH_BIN_USER_ID
+  name: OCIS_ADMIN_USER_ID;IDM_ADMIN_USER_ID
   defaultValue: ""
   type: string
-  description: ID of the user who collects all necessary information for deletion.
-    Consider that the UUID can be encoded in some LDAP deployment configurations like
-    in .ldif files. These need to be decoded beforehand.
+  description: ID of the user that should receive admin privileges. Consider that
+    the UUID can be encoded in some LDAP deployment configurations like in .ldif files.
+    These need to be decoded beforehand.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -7247,7 +7247,7 @@ OCIS_ASSET_THEMES_PATH:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_ASYNC_UPLOADS:
-  name: OCIS_ASYNC_UPLOADS
+  name: OCIS_ASYNC_UPLOADS;SEARCH_EVENTS_ASYNC_UPLOADS
   defaultValue: "true"
   type: bool
   description: Enable asynchronous file uploads.
@@ -7256,28 +7256,28 @@ OCIS_ASYNC_UPLOADS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_AUTH_PASSWORD:
-  name: OCIS_CACHE_AUTH_PASSWORD;STORAGE_USERS_ID_CACHE_AUTH_PASSWORD
+  name: OCIS_CACHE_AUTH_PASSWORD;SETTINGS_CACHE_AUTH_PASSWORD
   defaultValue: ""
   type: string
-  description: The password to authenticate with the cache store. Only applies when
-    store type 'nats-js-kv' is configured.
+  description: The password to authenticate with the cache. Only applies when store
+    type 'nats-js-kv' is configured.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_AUTH_USERNAME:
-  name: OCIS_CACHE_AUTH_USERNAME;STORAGE_USERS_ID_CACHE_AUTH_USERNAME
+  name: OCIS_CACHE_AUTH_USERNAME;SETTINGS_CACHE_AUTH_USERNAME
   defaultValue: ""
   type: string
-  description: The username to authenticate with the cache store. Only applies when
-    store type 'nats-js-kv' is configured.
+  description: The username to authenticate with the cache. Only applies when store
+    type 'nats-js-kv' is configured.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_DATABASE:
   name: OCIS_CACHE_DATABASE
-  defaultValue: ids-storage-users
+  defaultValue: settings-cache
   type: string
   description: The database name the configured store should use.
   introductionVersion: pre5.0
@@ -7285,7 +7285,7 @@ OCIS_CACHE_DATABASE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_DISABLE_PERSISTENCE:
-  name: OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_USERS_ID_CACHE_DISABLE_PERSISTENCE
+  name: OCIS_CACHE_DISABLE_PERSISTENCE;SETTINGS_CACHE_DISABLE_PERSISTENCE
   defaultValue: "false"
   type: bool
   description: Disables persistence of the cache. Only applies when store type 'nats-js-kv'
@@ -7295,18 +7295,18 @@ OCIS_CACHE_DISABLE_PERSISTENCE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_SIZE:
-  name: OCIS_CACHE_SIZE;STORAGE_USERS_ID_CACHE_SIZE
+  name: OCIS_CACHE_SIZE;SETTINGS_CACHE_SIZE
   defaultValue: "0"
   type: int
-  description: The maximum quantity of items in the user info cache. Only applies
-    when store type 'ocmem' is configured. Defaults to 512 which is derived from the
-    ocmem package though not exclicitly set as default.
+  description: The maximum quantity of items in the cache. Only applies when store
+    type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package
+    though not exclicitly set as default.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_STORE:
-  name: OCIS_CACHE_STORE;STORAGE_USERS_ID_CACHE_STORE
+  name: OCIS_CACHE_STORE;SETTINGS_CACHE_STORE
   defaultValue: memory
   type: string
   description: 'The type of the cache store. Supported values are: ''memory'', ''redis-sentinel'',
@@ -7316,7 +7316,7 @@ OCIS_CACHE_STORE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_STORE_NODES:
-  name: OCIS_CACHE_STORE_NODES;STORAGE_USERS_ID_CACHE_STORE_NODES
+  name: OCIS_CACHE_STORE_NODES;SETTINGS_CACHE_STORE_NODES
   defaultValue: '[127.0.0.1:9233]'
   type: '[]string'
   description: A list of nodes to access the configured store. This has no effect
@@ -7328,19 +7328,18 @@ OCIS_CACHE_STORE_NODES:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_TTL:
-  name: OCIS_CACHE_TTL;STORAGE_USERS_ID_CACHE_TTL
-  defaultValue: 24m0s
+  name: OCIS_CACHE_TTL;SETTINGS_CACHE_TTL
+  defaultValue: 10m0s
   type: Duration
-  description: Default time to live for user info in the user info cache. Only applied
-    when access tokens have no expiration. Defaults to 300s which is derived from
-    the underlaying package though not explicitly set as default. See the Environment
-    Variable Types description for more details.
+  description: Default time to live for entries in the cache. Only applied when access
+    tokens has no expiration. See the Environment Variable Types description for more
+    details.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_CREDENTIALS:
-  name: OCIS_CORS_ALLOW_CREDENTIALS;USERLOG_CORS_ALLOW_CREDENTIALS
+  name: OCIS_CORS_ALLOW_CREDENTIALS;WEBDAV_CORS_ALLOW_CREDENTIALS
   defaultValue: "true"
   type: bool
   description: 'Allow credentials for CORS.See following chapter for more details:
@@ -7350,9 +7349,9 @@ OCIS_CORS_ALLOW_CREDENTIALS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_HEADERS:
-  name: OCIS_CORS_ALLOW_HEADERS;USERLOG_CORS_ALLOW_HEADERS
+  name: OCIS_CORS_ALLOW_HEADERS;WEBDAV_CORS_ALLOW_HEADERS
   defaultValue: '[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id
-    Ocs-Apirequest]'
+    Cache-Control]'
   type: '[]string'
   description: 'A list of allowed CORS headers. See following chapter for more details:
     *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -7362,8 +7361,8 @@ OCIS_CORS_ALLOW_HEADERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_METHODS:
-  name: OCIS_CORS_ALLOW_METHODS;USERLOG_CORS_ALLOW_METHODS
-  defaultValue: '[GET]'
+  name: OCIS_CORS_ALLOW_METHODS;WEBDAV_CORS_ALLOW_METHODS
+  defaultValue: '[GET POST PUT PATCH DELETE OPTIONS]'
   type: '[]string'
   description: 'A list of allowed CORS methods. See following chapter for more details:
     *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method.
@@ -7373,7 +7372,7 @@ OCIS_CORS_ALLOW_METHODS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_ORIGINS:
-  name: OCIS_CORS_ALLOW_ORIGINS;USERLOG_CORS_ALLOW_ORIGINS
+  name: OCIS_CORS_ALLOW_ORIGINS;WEBDAV_CORS_ALLOW_ORIGINS
   defaultValue: '[*]'
   type: '[]string'
   description: 'A list of allowed CORS origins. See following chapter for more details:
@@ -7640,7 +7639,7 @@ OCIS_JWT_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_BASE_PATH:
-  name: OCIS_KEYCLOAK_BASE_PATH;INVITATIONS_KEYCLOAK_BASE_PATH
+  name: OCIS_KEYCLOAK_BASE_PATH;GRAPH_KEYCLOAK_BASE_PATH
   defaultValue: ""
   type: string
   description: The URL to access keycloak.
@@ -7649,16 +7648,16 @@ OCIS_KEYCLOAK_BASE_PATH:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_CLIENT_ID:
-  name: OCIS_KEYCLOAK_CLIENT_ID;INVITATIONS_KEYCLOAK_CLIENT_ID
+  name: OCIS_KEYCLOAK_CLIENT_ID;GRAPH_KEYCLOAK_CLIENT_ID
   defaultValue: ""
   type: string
-  description: The client ID to authenticate with keycloak.
+  description: The client id to authenticate with keycloak.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_CLIENT_REALM:
-  name: OCIS_KEYCLOAK_CLIENT_REALM;INVITATIONS_KEYCLOAK_CLIENT_REALM
+  name: OCIS_KEYCLOAK_CLIENT_REALM;GRAPH_KEYCLOAK_CLIENT_REALM
   defaultValue: ""
   type: string
   description: The realm the client is defined in.
@@ -7667,7 +7666,7 @@ OCIS_KEYCLOAK_CLIENT_REALM:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_CLIENT_SECRET:
-  name: OCIS_KEYCLOAK_CLIENT_SECRET;INVITATIONS_KEYCLOAK_CLIENT_SECRET
+  name: OCIS_KEYCLOAK_CLIENT_SECRET;GRAPH_KEYCLOAK_CLIENT_SECRET
   defaultValue: ""
   type: string
   description: The client secret to use in authentication.
@@ -7676,7 +7675,7 @@ OCIS_KEYCLOAK_CLIENT_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY:
-  name: OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY;INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY
+  name: OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY;GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY
   defaultValue: "false"
   type: bool
   description: Disable TLS certificate validation for Keycloak connections. Do not
@@ -7686,7 +7685,7 @@ OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_USER_REALM:
-  name: OCIS_KEYCLOAK_USER_REALM;INVITATIONS_KEYCLOAK_USER_REALM
+  name: OCIS_KEYCLOAK_USER_REALM;GRAPH_KEYCLOAK_USER_REALM
   defaultValue: ""
   type: string
   description: The realm users are defined.
@@ -7978,7 +7977,7 @@ OCIS_LDAP_USER_SCOPE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_COLOR:
-  name: OCIS_LOG_COLOR;USERLOG_LOG_COLOR
+  name: OCIS_LOG_COLOR;WEBDAV_LOG_COLOR
   defaultValue: "false"
   type: bool
   description: Activates colorized log output.
@@ -7987,7 +7986,7 @@ OCIS_LOG_COLOR:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_FILE:
-  name: OCIS_LOG_FILE;USERLOG_LOG_FILE
+  name: OCIS_LOG_FILE;WEBDAV_LOG_FILE
   defaultValue: ""
   type: string
   description: The path to the log file. Activates logging to this file if set.
@@ -7996,7 +7995,7 @@ OCIS_LOG_FILE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_LEVEL:
-  name: OCIS_LOG_LEVEL;USERLOG_LOG_LEVEL
+  name: OCIS_LOG_LEVEL;WEBDAV_LOG_LEVEL
   defaultValue: ""
   type: string
   description: 'The log level. Valid values are: ''panic'', ''fatal'', ''error'',
@@ -8006,7 +8005,7 @@ OCIS_LOG_LEVEL:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_PRETTY:
-  name: OCIS_LOG_PRETTY;USERLOG_LOG_PRETTY
+  name: OCIS_LOG_PRETTY;WEBDAV_LOG_PRETTY
   defaultValue: "false"
   type: bool
   description: Activates pretty log output.
@@ -8015,7 +8014,7 @@ OCIS_LOG_PRETTY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_MACHINE_AUTH_API_KEY:
-  name: OCIS_MACHINE_AUTH_API_KEY;AUTH_MACHINE_API_KEY
+  name: OCIS_MACHINE_AUTH_API_KEY;IDP_MACHINE_AUTH_API_KEY
   defaultValue: ""
   type: string
   description: Machine auth API key used to validate internal requests necessary for
@@ -8036,10 +8035,10 @@ OCIS_OIDC_CLIENT_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_OIDC_ISSUER:
-  name: OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BEARER_OIDC_ISSUER
+  name: OCIS_URL;OCIS_OIDC_ISSUER;IDP_ISS
   defaultValue: https://localhost:9200
   type: string
-  description: URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+  description: The OIDC issuer URL to use.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8265,12 +8264,11 @@ OCIS_SHOW_USER_EMAIL_IN_RESULTS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SPACES_MAX_QUOTA:
-  name: OCIS_SPACES_MAX_QUOTA;STORAGE_USERS_OCIS_MAX_QUOTA
+  name: OCIS_SPACES_MAX_QUOTA;FRONTEND_MAX_QUOTA
   defaultValue: "0"
   type: uint64
-  description: Set a global max quota for spaces in bytes. A value of 0 equals unlimited.
-    If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA
-    in the frontend service.
+  description: Set the global max quota value in bytes. A value of 0 equals unlimited.
+    The value is provided via capabilities.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8306,7 +8304,7 @@ OCIS_SYSTEM_USER_IDP:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_COLLECTOR:
-  name: OCIS_TRACING_COLLECTOR;USERLOG_TRACING_COLLECTOR
+  name: OCIS_TRACING_COLLECTOR;WEBDAV_TRACING_COLLECTOR
   defaultValue: ""
   type: string
   description: The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces.
@@ -8316,7 +8314,7 @@ OCIS_TRACING_COLLECTOR:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENABLED:
-  name: OCIS_TRACING_ENABLED;USERLOG_TRACING_ENABLED
+  name: OCIS_TRACING_ENABLED;WEBDAV_TRACING_ENABLED
   defaultValue: "false"
   type: bool
   description: Activates tracing.
@@ -8325,7 +8323,7 @@ OCIS_TRACING_ENABLED:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENDPOINT:
-  name: OCIS_TRACING_ENDPOINT;USERLOG_TRACING_ENDPOINT
+  name: OCIS_TRACING_ENDPOINT;WEBDAV_TRACING_ENDPOINT
   defaultValue: ""
   type: string
   description: The endpoint of the tracing agent.
@@ -8334,7 +8332,7 @@ OCIS_TRACING_ENDPOINT:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_TYPE:
-  name: OCIS_TRACING_TYPE;USERLOG_TRACING_TYPE
+  name: OCIS_TRACING_TYPE;WEBDAV_TRACING_TYPE
   defaultValue: ""
   type: string
   description: The type of tracing. Defaults to '', which is the same as 'jaeger'.
@@ -8364,10 +8362,10 @@ OCIS_TRANSLATION_PATH:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_URL:
-  name: OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BEARER_OIDC_ISSUER
-  defaultValue: https://localhost:9200
+  name: OCIS_URL;OCIS_PUBLIC_URL
+  defaultValue: https://127.0.0.1:9200
   type: string
-  description: URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+  description: URL, where oCIS is reachable for users.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
