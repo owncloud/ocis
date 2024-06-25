@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io/fs"
 	"os"
+	"reflect"
 
 	"github.com/leonelquinteros/gotext"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -51,6 +52,127 @@ func NewTranslatorFromCommonConfig(defaultLocale string, domain string, path str
 func (t Translator) Translate(str, locale string) string {
 	return t.Locale(locale).Get(str)
 }
+
+type field func() (string, []any)
+
+func TranslateField(fieldName string, fn ...any) field {
+	return func() (string, []any) {
+		return fieldName, fn
+	}
+}
+
+func TranslateLocation(t Translator, locale string) func(string, ...any) string {
+	return t.Locale(locale).Get
+}
+
+// TranslateEntity function tranlate all described fields in the struct in the given locale including nested structs
+//
+//		type InnreStruct struct {
+//			Description string
+//			DisplayName *string
+//		}
+//
+//		type TopLevelStruct struct {
+//			Description string
+//			DisplayName *string
+//			SubStruct   *InnreStruct
+//		}
+//
+//	 TranslateEntity(tt.args.structPtr, translateFunc(),
+//	                 TranslateField("Description"),
+//						TranslateField("DisplayName"),
+//						TranslateField("SubStruct",
+//							TranslateField("Description"),
+//							TranslateField("DisplayName")))
+func TranslateEntity(entity any, tr func(string, ...any) string, fields ...any) error {
+	value := reflect.ValueOf(entity)
+	if value.Kind() != reflect.Ptr || !value.IsNil() && value.Elem().Kind() != reflect.Struct {
+		// must be a pointer to a struct
+		return ErrStructPointer
+	}
+	if value.IsNil() {
+		// treat a nil struct pointer as valid
+		return nil
+	}
+	translateInner(value, tr, fields...)
+	return nil
+}
+
+func translateInner(value reflect.Value, tr func(string, ...any) string, fields ...any) {
+	for _, fl := range fields {
+		if _, ok := fl.(field); ok {
+			translateField(value, tr, fl.(field))
+		}
+	}
+}
+
+func translateField(value reflect.Value, tr func(string, ...any) string, fl field) {
+	if !value.IsValid() {
+		return
+	}
+	fieldName, fields := fl()
+	// exported field
+	if value.Kind() == reflect.Ptr {
+		if value.IsNil() {
+			return
+		}
+		value = value.Elem()
+	}
+	innerValue := value.FieldByName(fieldName)
+	if !innerValue.IsValid() {
+		return
+	}
+	if isStruct(innerValue) {
+		translateInner(innerValue, tr, fields...)
+		return
+	}
+	translateStringField(value, tr, fieldName)
+}
+
+func translateStringField(value reflect.Value, tr func(string, ...any) string, fieldName string) {
+	if value.Kind() == reflect.Ptr {
+		if value.IsNil() {
+			return
+		}
+		value = value.Elem()
+	}
+	// exported field
+	f := value.FieldByName(fieldName)
+	if f.IsValid() {
+		if f.Kind() == reflect.Ptr {
+			if f.IsNil() {
+				return
+			}
+			f = f.Elem()
+		}
+		// A Value can be changed only if it is
+		// addressable and was not obtained by
+		// the use of unexported struct fields.
+		if f.CanSet() {
+			// change value
+			if f.Kind() == reflect.String {
+				val := tr(f.String())
+				if val == "" {
+					return
+				}
+				f.SetString(val)
+			}
+		}
+	}
+}
+
+func isStruct(r reflect.Value) bool {
+	if r.Kind() == reflect.Ptr {
+		r = r.Elem()
+	}
+	return r.Kind() == reflect.Struct
+}
+
+var (
+	// ErrStructPointer is the error that a struct being validated is not specified as a pointer.
+	ErrStructPointer   = errors.New("only a pointer to a struct can be validated")
+	ErrUnsupportedType = errors.New("unsupported type")
+)
 
 // Locale returns the gotext.Locale, use `.Get` method to translate strings
 func (t Translator) Locale(locale string) *gotext.Locale {
