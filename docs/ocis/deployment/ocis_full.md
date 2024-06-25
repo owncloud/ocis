@@ -1,6 +1,6 @@
 ---
 title: "Full modular oCIS with WebOffice"
-date: 2020-10-12T14:04:00+01:00
+date: 2024-06-25T00:00:00+01:00
 weight: 24
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
@@ -12,7 +12,7 @@ geekdocFilePath: ocis_full.md
 ## Overview
 
 * oCIS, the collaboration service, Collabora or OnlyOffice running behind Traefik as reverse proxy
-* Collabora or OnlyOffice enable you to edit documents in your browser
+* Collabora or OnlyOffice enable you to edit office documents in your browser
 * The collaboration server acts as a bridge to make the oCIS storage accessible to Collabora and OnlyOffice
 * Traefik generating self-signed certificates for local setup or obtaining valid SSL certificates for a server setup
 * The whole deployment acts as a modular toolkit to use different flavors of office suites and ocis features
@@ -193,7 +193,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # Defaults to "collabora.owncloud.test"
   COLLABORA_DOMAIN=
   # Domain of the wopiserver which handles OnlyOffice.
-  #Defaults to "wopiserver.owncloud.test"
+  # Defaults to "wopiserver.owncloud.test"
   WOPISERVER_DOMAIN=
   # Admin user for Collabora.
   # Defaults to "admin".
@@ -259,9 +259,9 @@ On Linux and macOS you can add them to your `/etc/hosts` file and on Windows to 
 127.0.0.1 minio.owncloud.test
 ```
 
-After that you're ready to start the application stack:
+After that, you're ready to start the application stack:
 
-`docker-compose up -d`
+`docker-compose pull && docker-compose up -d`
 
 Open https://collabora.owncloud.test in your browser and accept the invalid certificate warning.
 
