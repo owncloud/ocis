@@ -20,7 +20,7 @@ type Config struct {
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 
-	RevaGateway string `yaml:"reva_gateway" env:"OCIS_REVA_GATEWAY;CLIENTLOG_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata" introductionVersion:"5.0" deprecationVersion:"6.0" removalVersion:"%%NEXT%%" deprecationInfo:"CLIENTLOG_REVA_GATEWAY removed from simplicity."`
+	RevaGateway string `yaml:"reva_gateway" env:"OCIS_REVA_GATEWAY;CLIENTLOG_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata" introductionVersion:"5.0" deprecationVersion:"6.0" removalVersion:"%%NEXT%%" deprecationInfo:"CLIENTLOG_REVA_GATEWAY removed for simplicity."`
 	Events      Events `yaml:"events"`
 
 	ServiceAccount ServiceAccount `yaml:"service_account"`
