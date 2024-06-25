@@ -2,6 +2,7 @@ package trash
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -47,7 +48,7 @@ func (dp *DataProvider) ProduceData() error {
 		go func() {
 			linkpath := filepath.Join(dp.discpath, l)
 			r, _ := os.Readlink(linkpath)
-			p := filepath.Join(dp.discpath, l, "..", r)
+			p := filepath.Join(l, "..", r)
 			if !hasChildren(dp.fsys, p) {
 				dp.Events <- TrashDirs{LinkPath: linkpath, NodePath: p}
 			}
@@ -68,6 +69,10 @@ func (dp *DataProvider) quit() {
 }
 
 func hasChildren(fsys fs.FS, path string) bool {
-	entries, _ := fs.ReadDir(fsys, path)
+	entries, err := fs.ReadDir(fsys, path)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
 	return len(entries) > 0
 }

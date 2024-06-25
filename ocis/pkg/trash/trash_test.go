@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// TODO: this concept is wrong, needs to be mocked and tested differently
 func TestGatherData(t *testing.T) {
 	testcases := []struct {
 		Name     string
@@ -44,7 +45,7 @@ func TestGatherData(t *testing.T) {
 		td := trash.NewTrashDirs()
 		td.GatherData(events)
 
-		require.Equal(t, tc.Expected, td)
+		require.Equal(t, tc.Expected, td, tc.Name)
 	}
 }
 
