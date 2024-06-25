@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix sharing-ng permission listings for personal and virtual drive items: [#9438](https://github.com/owncloud/ocis/pull/9438)
+* Bugfix - Allow all uploads to restart: [#9465](https://github.com/owncloud/ocis/pull/9465)
 * Enhancement - Activitylog API: [#9361](https://github.com/owncloud/ocis/pull/9361)
 * Enhancement - Add fail flag to consistency check: [#9447](https://github.com/owncloud/ocis/pull/9447)
 * Enhancement - Deprecate gateway environment variables: [#9451](https://github.com/owncloud/ocis/pull/9451)
@@ -62,6 +63,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8922
    https://github.com/owncloud/ocis/pull/9438
+
+* Bugfix - Allow all uploads to restart: [#9465](https://github.com/owncloud/ocis/pull/9465)
+
+   On postprocessing-restart, allow all uploads to restart even if one fails.
+
+   https://github.com/owncloud/ocis/pull/9465
 
 * Enhancement - Activitylog API: [#9361](https://github.com/owncloud/ocis/pull/9361)
 
