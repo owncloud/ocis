@@ -8,6 +8,9 @@ import (
 	"os"
 	"time"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -132,22 +135,65 @@ func Server(cfg *config.Config) *cli.Command {
 				proxy.Logger(logger),
 				proxy.Config(cfg),
 			)
+			if err != nil {
+				return fmt.Errorf("failed to initialize reverse proxy: %w", err)
+			}
+
+			gatewaySelector, err := pool.GatewaySelector(
+				cfg.Reva.Address,
+				append(
+					cfg.Reva.GetRevaOptions(),
+					pool.WithRegistry(registry.GetRegistry()),
+					pool.WithTracerProvider(traceProvider),
+				)...)
+			if err != nil {
+				logger.Fatal().Err(err).Msg("Failed to get gateway selector")
+			}
+
+			var userProvider backend.UserBackend
+			switch cfg.AccountBackend {
+			case "cs3":
+				userProvider = backend.NewCS3UserBackend(
+					backend.WithLogger(logger),
+					backend.WithRevaGatewaySelector(gatewaySelector),
+					backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
+					backend.WithOIDCissuer(cfg.OIDC.Issuer),
+					backend.WithServiceAccount(cfg.ServiceAccount),
+					backend.WithAutoProvisionClaims(cfg.AutoProvisionClaims),
+				)
+			default:
+				logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
+			}
+
+			var publisher events.Stream
+			if cfg.Events.Endpoint != "" {
+				var err error
+				publisher, err = stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Events))
+				if err != nil {
+					logger.Error().
+						Err(err).
+						Msg("Error initializing events publisher")
+					return fmt.Errorf("could not initialize events publisher %w", err)
+				}
+			}
 
 			lh := staticroutes.StaticRouteHandler{
-				Prefix:         cfg.HTTP.Root,
-				UserInfoCache:  userInfoCache,
-				Logger:         logger,
-				Config:         *cfg,
-				OidcClient:     oidcClient,
-				OidcHttpClient: oidcHTTPClient,
-				Proxy:          rp,
+				Prefix:          cfg.HTTP.Root,
+				UserInfoCache:   userInfoCache,
+				Logger:          logger,
+				Config:          *cfg,
+				OidcClient:      oidcClient,
+				OidcHttpClient:  oidcHTTPClient,
+				Proxy:           rp,
+				EventsPublisher: publisher,
+				UserProvider:    userProvider,
 			}
 			if err != nil {
 				return fmt.Errorf("failed to initialize reverse proxy: %w", err)
 			}
 
 			{
-				middlewares := loadMiddlewares(ctx, logger, cfg, userInfoCache, signingKeyStore, traceProvider, *m)
+				middlewares := loadMiddlewares(logger, cfg, userInfoCache, signingKeyStore, traceProvider, *m, userProvider, gatewaySelector)
 				server, err := proxyHTTP.Server(
 					proxyHTTP.Handler(lh.Handler()),
 					proxyHTTP.Logger(logger),
@@ -200,37 +246,12 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache, signingKeyStore microstore.Store, traceProvider trace.TracerProvider, metrics metrics.Metrics) alice.Chain {
+func loadMiddlewares(logger log.Logger, cfg *config.Config,
+	userInfoCache, signingKeyStore microstore.Store, traceProvider trace.TracerProvider, metrics metrics.Metrics,
+	userProvider backend.UserBackend, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) alice.Chain {
+
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
 	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
-	gatewaySelector, err := pool.GatewaySelector(
-		cfg.Reva.Address,
-		append(
-			cfg.Reva.GetRevaOptions(),
-			pool.WithRegistry(registry.GetRegistry()),
-			pool.WithTracerProvider(traceProvider),
-		)...)
-	if err != nil {
-		logger.Fatal().Err(err).Msg("Failed to get gateway selector")
-	}
-	if err != nil {
-		logger.Fatal().Err(err).
-			Msg("Failed to create token manager")
-	}
-	var userProvider backend.UserBackend
-	switch cfg.AccountBackend {
-	case "cs3":
-		userProvider = backend.NewCS3UserBackend(
-			backend.WithLogger(logger),
-			backend.WithRevaGatewaySelector(gatewaySelector),
-			backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
-			backend.WithOIDCissuer(cfg.OIDC.Issuer),
-			backend.WithServiceAccount(cfg.ServiceAccount),
-			backend.WithAutoProvisionClaims(cfg.AutoProvisionClaims),
-		)
-	default:
-		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
-	}
 
 	var roleAssigner userroles.UserRoleAssigner
 	switch cfg.RoleAssignment.Driver {

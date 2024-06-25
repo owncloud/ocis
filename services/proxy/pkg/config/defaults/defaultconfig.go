@@ -92,6 +92,11 @@ func DefaultConfig() *config.Config {
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,
 		CSPConfigFileLocation: "",
+		Events: config.Events{
+			Endpoint:  "127.0.0.1:9233",
+			Cluster:   "ocis-cluster",
+			EnableTLS: false,
+		},
 	}
 }
 
