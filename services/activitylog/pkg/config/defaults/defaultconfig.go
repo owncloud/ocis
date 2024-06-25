@@ -38,6 +38,17 @@ func DefaultConfig() *config.Config {
 			Table:    "",
 		},
 		RevaGateway: shared.DefaultRevaConfig().Address,
+		HTTP: config.HTTP{
+			Addr:      "127.0.0.1:0",
+			Root:      "/",
+			Namespace: "com.owncloud.web",
+			CORS: config.CORS{
+				AllowedOrigins:   []string{"*"},
+				AllowedMethods:   []string{"GET"},
+				AllowedHeaders:   []string{"Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With", "X-Request-Id", "Ocs-Apirequest"},
+				AllowCredentials: true,
+			},
+		},
 	}
 }
 
@@ -55,6 +66,22 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Log = &config.Log{}
 	}
 
+	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
+		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.Commons != nil {
+		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
+	}
+
 	// provide with defaults for shared tracing, since we need a valid destination address for "envdecode".
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {
 		cfg.Tracing = &config.Tracing{
@@ -67,9 +94,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
-		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
-	}
 }
 
 // Sanitize sanitizes the config

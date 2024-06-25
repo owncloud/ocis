@@ -5,9 +5,8 @@ import (
 	"time"
 
 	"github.com/blevesearch/bleve/v2/search/query"
+	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
 	tAssert "github.com/stretchr/testify/assert"
-
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
 
 var timeMustParse = func(t *testing.T, ts string) time.Time {

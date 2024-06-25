@@ -6,12 +6,11 @@ import (
 	"time"
 
 	"github.com/jinzhu/now"
+	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
+	"github.com/owncloud/ocis/v2/ocis-pkg/ast/test"
+	"github.com/owncloud/ocis/v2/ocis-pkg/kql"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query"
 	tAssert "github.com/stretchr/testify/assert"
-
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast/test"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/kql"
 )
 
 func TestParse_Spec(t *testing.T) {

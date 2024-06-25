@@ -2039,6 +2039,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "NATS_NATS_HOST": "0.0.0.0",
         "NATS_NATS_PORT": 9233,
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+        "EVENTHISTORY_STORE": "memory",
     }
 
     if deploy_type == "":

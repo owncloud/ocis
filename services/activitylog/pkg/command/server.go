@@ -14,13 +14,16 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
+	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/metrics"
-	"github.com/owncloud/ocis/v2/services/activitylog/pkg/service"
+	"github.com/owncloud/ocis/v2/services/activitylog/pkg/server/http"
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
 )
@@ -30,20 +33,13 @@ var _registeredEvents = []events.Unmarshaller{
 	events.FileTouched{},
 	events.ContainerCreated{},
 	events.ItemTrashed{},
-	events.ItemPurged{},
 	events.ItemMoved{},
 	events.ShareCreated{},
-	events.ShareUpdated{},
 	events.ShareRemoved{},
 	events.LinkCreated{},
-	events.LinkUpdated{},
 	events.LinkRemoved{},
 	events.SpaceShared{},
-	events.SpaceShareUpdated{},
 	events.SpaceUnshared{},
-
-	// TODO: file downloaded only for public links. How to do this?
-	events.FileDownloaded{},
 }
 
 // Server is the entrypoint for the server command.
@@ -109,15 +105,29 @@ func Server(cfg *config.Config) *cli.Command {
 				return fmt.Errorf("could not get reva client selector: %s", err)
 			}
 
+			grpcClient, err := ogrpc.NewClient(
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(tracerProvider))...,
+			)
+			if err != nil {
+				return err
+			}
+
+			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", grpcClient)
+			vClient := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
+
 			{
-				svc, err := service.New(
-					service.Logger(logger),
-					service.Config(cfg),
-					service.TraceProvider(tracerProvider),
-					service.Stream(evStream),
-					service.RegisteredEvents(_registeredEvents),
-					service.Store(evStore),
-					service.GatewaySelector(gatewaySelector),
+				svc, err := http.Server(
+					http.Logger(logger),
+					http.Config(cfg),
+					http.Context(ctx), // NOTE: not passing this "option" leads to a panic in go-micro
+					http.TraceProvider(tracerProvider),
+					http.Stream(evStream),
+					http.RegisteredEvents(_registeredEvents),
+					http.Store(evStore),
+					http.GatewaySelector(gatewaySelector),
+					http.HistoryClient(hClient),
+					http.ValueClient(vClient),
+					http.RegisteredEvents(_registeredEvents),
 				)
 
 				if err != nil {

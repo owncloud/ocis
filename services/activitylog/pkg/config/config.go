@@ -23,6 +23,9 @@ type Config struct {
 	RevaGateway   string                `yaml:"reva_gateway" env:"OCIS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata" introductionVersion:"5.0"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
+	HTTP         HTTP          `yaml:"http"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 
 	Context context.Context `yaml:"-"`
@@ -46,7 +49,7 @@ type Store struct {
 	Database     string        `yaml:"database" env:"ACTIVITYLOG_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
 	Table        string        `yaml:"table" env:"ACTIVITYLOG_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
 	TTL          time.Duration `yaml:"ttl" env:"OCIS_PERSISTENT_STORE_TTL;ACTIVITYLOG_STORE_TTL" desc:"Time to live for events in the store. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	Size         int           `yaml:"size" env:"OCIS_PERSISTENT_STORE_SIZE;ACTIVITYLOG_STORE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default." introductionVersion:"pre5.0"`
+	Size         int           `yaml:"size" env:"OCIS_PERSISTENT_STORE_SIZE;ACTIVITYLOG_STORE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default." introductionVersion:"pre5.0"`
 	AuthUsername string        `yaml:"username" env:"OCIS_PERSISTENT_STORE_AUTH_USERNAME;ACTIVITYLOG_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 	AuthPassword string        `yaml:"password" env:"OCIS_PERSISTENT_STORE_AUTH_PASSWORD;ACTIVITYLOG_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 }
@@ -55,4 +58,26 @@ type Store struct {
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;ACTIVITYLOG_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
 	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;ACTIVITYOG_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+}
+
+// CORS defines the available cors configuration.
+type CORS struct {
+	AllowedOrigins   []string `yaml:"allow_origins" env:"OCIS_CORS_ALLOW_ORIGINS;ACTIVITYLOG_CORS_ALLOW_ORIGINS" desc:"A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	AllowedMethods   []string `yaml:"allow_methods" env:"OCIS_CORS_ALLOW_METHODS;ACTIVITYLOG_CORS_ALLOW_METHODS" desc:"A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	AllowedHeaders   []string `yaml:"allow_headers" env:"OCIS_CORS_ALLOW_HEADERS;ACTIVITYLOG_CORS_ALLOW_HEADERS" desc:"A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	AllowCredentials bool     `yaml:"allow_credentials" env:"OCIS_CORS_ALLOW_CREDENTIALS;ACTIVITYLOG_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials." introductionVersion:"pre5.0"`
+}
+
+// HTTP defines the available http configuration.
+type HTTP struct {
+	Addr      string                `yaml:"addr" env:"ACTIVITYLOG_HTTP_ADDR" desc:"The bind address of the HTTP service." introductionVersion:"pre5.0"`
+	Namespace string                `yaml:"-"`
+	Root      string                `yaml:"root" env:"ACTIVITYLOG_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service." introductionVersion:"pre5.0"`
+	CORS      CORS                  `yaml:"cors"`
+	TLS       shared.HTTPServiceTLS `yaml:"tls"`
+}
+
+// TokenManager is the config for using the reva token manager
+type TokenManager struct {
+	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;ACTIVITYLOG_JWT_SECRET" desc:"The secret to mint and validate jwt tokens." introductionVersion:"pre5.0"`
 }

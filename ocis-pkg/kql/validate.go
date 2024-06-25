@@ -1,8 +1,8 @@
 package kql
 
 import (
+	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
 )
 
 func validateAst(a *ast.Ast) error {

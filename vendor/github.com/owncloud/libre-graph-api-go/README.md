@@ -78,6 +78,7 @@ All URIs are relative to *https://ocis.ocis-traefik.latest.owncloud.works/graph*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*ActivitiesApi* | [**GetActivities**](docs/ActivitiesApi.md#getactivities) | **Get** /v1beta1/extensions/org.libregraph/activities | Get activities
 *ApplicationsApi* | [**GetApplication**](docs/ApplicationsApi.md#getapplication) | **Get** /v1.0/applications/{application-id} | Get application by id
 *ApplicationsApi* | [**ListApplications**](docs/ApplicationsApi.md#listapplications) | **Get** /v1.0/applications | Get all applications
 *DriveItemApi* | [**DeleteDriveItem**](docs/DriveItemApi.md#deletedriveitem) | **Delete** /v1beta1/drives/{drive-id}/items/{item-id} | Delete a DriveItem.
@@ -168,6 +169,9 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [Activity](docs/Activity.md)
+ - [ActivityTemplate](docs/ActivityTemplate.md)
+ - [ActivityTimes](docs/ActivityTimes.md)
  - [AppRole](docs/AppRole.md)
  - [AppRoleAssignment](docs/AppRoleAssignment.md)
  - [Application](docs/Application.md)
@@ -175,6 +179,7 @@ Class | Method | HTTP request | Description
  - [ClassMemberReference](docs/ClassMemberReference.md)
  - [ClassReference](docs/ClassReference.md)
  - [ClassTeacherReference](docs/ClassTeacherReference.md)
+ - [CollectionOfActivities](docs/CollectionOfActivities.md)
  - [CollectionOfAppRoleAssignments](docs/CollectionOfAppRoleAssignments.md)
  - [CollectionOfApplications](docs/CollectionOfApplications.md)
  - [CollectionOfClass](docs/CollectionOfClass.md)

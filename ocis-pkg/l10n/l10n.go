@@ -14,6 +14,9 @@ import (
 	micrometadata "go-micro.dev/v4/metadata"
 )
 
+// HeaderAcceptLanguage is the header key for the accept-language header
+var HeaderAcceptLanguage = "Accept-Language"
+
 // Template marks a string as translatable
 func Template(s string) string { return s }
 

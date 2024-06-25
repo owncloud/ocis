@@ -3,7 +3,7 @@ package kql
 import (
 	"strings"
 
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/ast"
+	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
 )
 
 // connectNodes connects given nodes

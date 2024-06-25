@@ -14,7 +14,7 @@ func TestAddActivity(t *testing.T) {
 		Name       string
 		Tree       map[string]*provider.ResourceInfo
 		Activities map[string]string
-		Expected   map[string][]Activity
+		Expected   map[string][]RawActivity
 	}{
 		{
 			Name: "simple",
@@ -26,7 +26,7 @@ func TestAddActivity(t *testing.T) {
 			Activities: map[string]string{
 				"activity": "base",
 			},
-			Expected: map[string][]Activity{
+			Expected: map[string][]RawActivity{
 				"base":    activitites("activity", 0),
 				"parent":  activitites("activity", 1),
 				"spaceid": activitites("activity", 2),
@@ -43,7 +43,7 @@ func TestAddActivity(t *testing.T) {
 				"activity1": "base",
 				"activity2": "base",
 			},
-			Expected: map[string][]Activity{
+			Expected: map[string][]RawActivity{
 				"base":    activitites("activity1", 0, "activity2", 0),
 				"parent":  activitites("activity1", 1, "activity2", 1),
 				"spaceid": activitites("activity1", 2, "activity2", 2),
@@ -61,7 +61,7 @@ func TestAddActivity(t *testing.T) {
 				"activity1": "base1",
 				"activity2": "base2",
 			},
-			Expected: map[string][]Activity{
+			Expected: map[string][]RawActivity{
 				"base1":   activitites("activity1", 0),
 				"base2":   activitites("activity2", 0),
 				"parent":  activitites("activity1", 1, "activity2", 1),
@@ -83,7 +83,7 @@ func TestAddActivity(t *testing.T) {
 				"activity2": "base2",
 				"activity3": "base3",
 			},
-			Expected: map[string][]Activity{
+			Expected: map[string][]RawActivity{
 				"base1":   activitites("activity1", 0),
 				"base2":   activitites("activity2", 0),
 				"base3":   activitites("activity3", 0),
@@ -109,7 +109,7 @@ func TestAddActivity(t *testing.T) {
 				"activity3": "base3",
 				"activity4": "parent2",
 			},
-			Expected: map[string][]Activity{
+			Expected: map[string][]RawActivity{
 				"base1":   activitites("activity1", 0),
 				"base2":   activitites("activity2", 0),
 				"base3":   activitites("activity3", 0),
@@ -143,9 +143,9 @@ func TestAddActivity(t *testing.T) {
 	}
 }
 
-func activitites(acts ...interface{}) []Activity {
-	var activities []Activity
-	act := Activity{}
+func activitites(acts ...interface{}) []RawActivity {
+	var activities []RawActivity
+	act := RawActivity{}
 	for _, a := range acts {
 		switch v := a.(type) {
 		case string:
