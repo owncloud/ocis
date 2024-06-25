@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -14,6 +16,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/token"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/jellydator/ttlcache/v2"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
@@ -23,6 +26,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
@@ -114,6 +118,8 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		searcher:     ss,
 		cache:        cache,
 		tokenManager: tokenManager,
+		gws:          selector,
+		cfg:          cfg,
 	}, teardown, nil
 }
 
@@ -124,6 +130,8 @@ type Service struct {
 	searcher     search.Searcher
 	cache        *ttlcache.Cache
 	tokenManager token.Manager
+	gws          *pool.Selector[gateway.GatewayAPIClient]
+	cfg          *config.Config
 }
 
 // Search handles the search
@@ -171,8 +179,38 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 }
 
 // IndexSpace (re)indexes all resources of a given space.
-func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
-	return s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.SpaceId}, &user.UserId{OpaqueId: in.UserId})
+func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
+	if in.GetSpaceId() != "" {
+		return s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()})
+	}
+
+	// index all spaces instead
+	gwc, err := s.gws.Next()
+	if err != nil {
+		return err
+	}
+
+	ctx, err := utils.GetServiceUserContext(s.cfg.ServiceAccount.ServiceAccountID, gwc, s.cfg.ServiceAccount.ServiceAccountSecret)
+	if err != nil {
+		return err
+	}
+
+	resp, err := gwc.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{})
+	if err != nil {
+		return err
+	}
+
+	if resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return errors.New(resp.GetStatus().GetMessage())
+	}
+
+	for _, space := range resp.GetStorageSpaces() {
+		if err := s.searcher.IndexSpace(space.GetId()); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // FromCache pulls a search result from cache

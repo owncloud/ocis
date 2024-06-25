@@ -8,8 +8,6 @@ import (
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	mock "github.com/stretchr/testify/mock"
 
-	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
@@ -26,17 +24,17 @@ func (_m *Searcher) EXPECT() *Searcher_Expecter {
 	return &Searcher_Expecter{mock: &_m.Mock}
 }
 
-// IndexSpace provides a mock function with given fields: rID, uID
-func (_m *Searcher) IndexSpace(rID *providerv1beta1.StorageSpaceId, uID *userv1beta1.UserId) error {
-	ret := _m.Called(rID, uID)
+// IndexSpace provides a mock function with given fields: rID
+func (_m *Searcher) IndexSpace(rID *providerv1beta1.StorageSpaceId) error {
+	ret := _m.Called(rID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for IndexSpace")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*providerv1beta1.StorageSpaceId, *userv1beta1.UserId) error); ok {
-		r0 = rf(rID, uID)
+	if rf, ok := ret.Get(0).(func(*providerv1beta1.StorageSpaceId) error); ok {
+		r0 = rf(rID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -51,14 +49,13 @@ type Searcher_IndexSpace_Call struct {
 
 // IndexSpace is a helper method to define mock.On call
 //   - rID *providerv1beta1.StorageSpaceId
-//   - uID *userv1beta1.UserId
-func (_e *Searcher_Expecter) IndexSpace(rID interface{}, uID interface{}) *Searcher_IndexSpace_Call {
-	return &Searcher_IndexSpace_Call{Call: _e.mock.On("IndexSpace", rID, uID)}
+func (_e *Searcher_Expecter) IndexSpace(rID interface{}) *Searcher_IndexSpace_Call {
+	return &Searcher_IndexSpace_Call{Call: _e.mock.On("IndexSpace", rID)}
 }
 
-func (_c *Searcher_IndexSpace_Call) Run(run func(rID *providerv1beta1.StorageSpaceId, uID *userv1beta1.UserId)) *Searcher_IndexSpace_Call {
+func (_c *Searcher_IndexSpace_Call) Run(run func(rID *providerv1beta1.StorageSpaceId)) *Searcher_IndexSpace_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*providerv1beta1.StorageSpaceId), args[1].(*userv1beta1.UserId))
+		run(args[0].(*providerv1beta1.StorageSpaceId))
 	})
 	return _c
 }
@@ -68,14 +65,14 @@ func (_c *Searcher_IndexSpace_Call) Return(_a0 error) *Searcher_IndexSpace_Call 
 	return _c
 }
 
-func (_c *Searcher_IndexSpace_Call) RunAndReturn(run func(*providerv1beta1.StorageSpaceId, *userv1beta1.UserId) error) *Searcher_IndexSpace_Call {
+func (_c *Searcher_IndexSpace_Call) RunAndReturn(run func(*providerv1beta1.StorageSpaceId) error) *Searcher_IndexSpace_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// MoveItem provides a mock function with given fields: ref, uID
-func (_m *Searcher) MoveItem(ref *providerv1beta1.Reference, uID *userv1beta1.UserId) {
-	_m.Called(ref, uID)
+// MoveItem provides a mock function with given fields: ref
+func (_m *Searcher) MoveItem(ref *providerv1beta1.Reference) {
+	_m.Called(ref)
 }
 
 // Searcher_MoveItem_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MoveItem'
@@ -85,14 +82,13 @@ type Searcher_MoveItem_Call struct {
 
 // MoveItem is a helper method to define mock.On call
 //   - ref *providerv1beta1.Reference
-//   - uID *userv1beta1.UserId
-func (_e *Searcher_Expecter) MoveItem(ref interface{}, uID interface{}) *Searcher_MoveItem_Call {
-	return &Searcher_MoveItem_Call{Call: _e.mock.On("MoveItem", ref, uID)}
+func (_e *Searcher_Expecter) MoveItem(ref interface{}) *Searcher_MoveItem_Call {
+	return &Searcher_MoveItem_Call{Call: _e.mock.On("MoveItem", ref)}
 }
 
-func (_c *Searcher_MoveItem_Call) Run(run func(ref *providerv1beta1.Reference, uID *userv1beta1.UserId)) *Searcher_MoveItem_Call {
+func (_c *Searcher_MoveItem_Call) Run(run func(ref *providerv1beta1.Reference)) *Searcher_MoveItem_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*providerv1beta1.Reference), args[1].(*userv1beta1.UserId))
+		run(args[0].(*providerv1beta1.Reference))
 	})
 	return _c
 }
@@ -102,14 +98,14 @@ func (_c *Searcher_MoveItem_Call) Return() *Searcher_MoveItem_Call {
 	return _c
 }
 
-func (_c *Searcher_MoveItem_Call) RunAndReturn(run func(*providerv1beta1.Reference, *userv1beta1.UserId)) *Searcher_MoveItem_Call {
+func (_c *Searcher_MoveItem_Call) RunAndReturn(run func(*providerv1beta1.Reference)) *Searcher_MoveItem_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// RestoreItem provides a mock function with given fields: ref, uID
-func (_m *Searcher) RestoreItem(ref *providerv1beta1.Reference, uID *userv1beta1.UserId) {
-	_m.Called(ref, uID)
+// RestoreItem provides a mock function with given fields: ref
+func (_m *Searcher) RestoreItem(ref *providerv1beta1.Reference) {
+	_m.Called(ref)
 }
 
 // Searcher_RestoreItem_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RestoreItem'
@@ -119,14 +115,13 @@ type Searcher_RestoreItem_Call struct {
 
 // RestoreItem is a helper method to define mock.On call
 //   - ref *providerv1beta1.Reference
-//   - uID *userv1beta1.UserId
-func (_e *Searcher_Expecter) RestoreItem(ref interface{}, uID interface{}) *Searcher_RestoreItem_Call {
-	return &Searcher_RestoreItem_Call{Call: _e.mock.On("RestoreItem", ref, uID)}
+func (_e *Searcher_Expecter) RestoreItem(ref interface{}) *Searcher_RestoreItem_Call {
+	return &Searcher_RestoreItem_Call{Call: _e.mock.On("RestoreItem", ref)}
 }
 
-func (_c *Searcher_RestoreItem_Call) Run(run func(ref *providerv1beta1.Reference, uID *userv1beta1.UserId)) *Searcher_RestoreItem_Call {
+func (_c *Searcher_RestoreItem_Call) Run(run func(ref *providerv1beta1.Reference)) *Searcher_RestoreItem_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*providerv1beta1.Reference), args[1].(*userv1beta1.UserId))
+		run(args[0].(*providerv1beta1.Reference))
 	})
 	return _c
 }
@@ -136,7 +131,7 @@ func (_c *Searcher_RestoreItem_Call) Return() *Searcher_RestoreItem_Call {
 	return _c
 }
 
-func (_c *Searcher_RestoreItem_Call) RunAndReturn(run func(*providerv1beta1.Reference, *userv1beta1.UserId)) *Searcher_RestoreItem_Call {
+func (_c *Searcher_RestoreItem_Call) RunAndReturn(run func(*providerv1beta1.Reference)) *Searcher_RestoreItem_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -233,9 +228,9 @@ func (_c *Searcher_TrashItem_Call) RunAndReturn(run func(*providerv1beta1.Resour
 	return _c
 }
 
-// UpsertItem provides a mock function with given fields: ref, uID
-func (_m *Searcher) UpsertItem(ref *providerv1beta1.Reference, uID *userv1beta1.UserId) {
-	_m.Called(ref, uID)
+// UpsertItem provides a mock function with given fields: ref
+func (_m *Searcher) UpsertItem(ref *providerv1beta1.Reference) {
+	_m.Called(ref)
 }
 
 // Searcher_UpsertItem_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpsertItem'
@@ -245,14 +240,13 @@ type Searcher_UpsertItem_Call struct {
 
 // UpsertItem is a helper method to define mock.On call
 //   - ref *providerv1beta1.Reference
-//   - uID *userv1beta1.UserId
-func (_e *Searcher_Expecter) UpsertItem(ref interface{}, uID interface{}) *Searcher_UpsertItem_Call {
-	return &Searcher_UpsertItem_Call{Call: _e.mock.On("UpsertItem", ref, uID)}
+func (_e *Searcher_Expecter) UpsertItem(ref interface{}) *Searcher_UpsertItem_Call {
+	return &Searcher_UpsertItem_Call{Call: _e.mock.On("UpsertItem", ref)}
 }
 
-func (_c *Searcher_UpsertItem_Call) Run(run func(ref *providerv1beta1.Reference, uID *userv1beta1.UserId)) *Searcher_UpsertItem_Call {
+func (_c *Searcher_UpsertItem_Call) Run(run func(ref *providerv1beta1.Reference)) *Searcher_UpsertItem_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*providerv1beta1.Reference), args[1].(*userv1beta1.UserId))
+		run(args[0].(*providerv1beta1.Reference))
 	})
 	return _c
 }
@@ -262,7 +256,7 @@ func (_c *Searcher_UpsertItem_Call) Return() *Searcher_UpsertItem_Call {
 	return _c
 }
 
-func (_c *Searcher_UpsertItem_Call) RunAndReturn(run func(*providerv1beta1.Reference, *userv1beta1.UserId)) *Searcher_UpsertItem_Call {
+func (_c *Searcher_UpsertItem_Call) RunAndReturn(run func(*providerv1beta1.Reference)) *Searcher_UpsertItem_Call {
 	_c.Call.Return(run)
 	return _c
 }

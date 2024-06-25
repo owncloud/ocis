@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -25,22 +26,23 @@ func Index(cfg *config.Config) *cli.Command {
 		Aliases:  []string{"i"},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "space",
-				Aliases:  []string{"s"},
-				Required: true,
-				Usage:    "the id of the space to travers and index the files of",
+				Name:    "space",
+				Aliases: []string{"s"},
+				Usage:   "the id of the space to travers and index the files of. This or --all-spaces is required.",
 			},
-			&cli.StringFlag{
-				Name:     "user",
-				Aliases:  []string{"u"},
-				Required: true,
-				Usage:    "the username of the user that shall be used to access the files",
+			&cli.BoolFlag{
+				Name:  "all-spaces",
+				Usage: "index all spaces instead. This or --space is required.",
 			},
 		},
-		Before: func(c *cli.Context) error {
+		Before: func(_ *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(ctx *cli.Context) error {
+			if ctx.String("space") == "" && !ctx.Bool("all-spaces") {
+				return errors.New("either --space or --all-spaces is required")
+			}
+
 			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
@@ -57,7 +59,6 @@ func Index(cfg *config.Config) *cli.Command {
 			c := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)
 			_, err = c.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
 				SpaceId: ctx.String("space"),
-				UserId:  ctx.String("user"),
 			}, func(opts *client.CallOptions) { opts.RequestTimeout = 10 * time.Minute })
 			if err != nil {
 				fmt.Println("failed to index space: " + err.Error())

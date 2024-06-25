@@ -4,14 +4,13 @@ import (
 	"sync"
 	"time"
 
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 )
 
 // SpaceDebouncer debounces operations on spaces for a configurable amount of time
 type SpaceDebouncer struct {
 	after      time.Duration
-	f          func(id *provider.StorageSpaceId, userID *user.UserId)
+	f          func(id *provider.StorageSpaceId)
 	pending    map[string]*time.Timer
 	inProgress sync.Map
 
@@ -19,7 +18,7 @@ type SpaceDebouncer struct {
 }
 
 // NewSpaceDebouncer returns a new SpaceDebouncer instance
-func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId, userID *user.UserId)) *SpaceDebouncer {
+func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId)) *SpaceDebouncer {
 	return &SpaceDebouncer{
 		after:      d,
 		f:          f,
@@ -29,7 +28,7 @@ func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId, user
 }
 
 // Debounce restars the debounce timer for the given space
-func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId, userID *user.UserId) {
+func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -48,6 +47,6 @@ func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId, userID *user.User
 
 		d.inProgress.Store(id.OpaqueId, true)
 		defer d.inProgress.Delete(id.OpaqueId)
-		d.f(id, userID)
+		d.f(id)
 	})
 }

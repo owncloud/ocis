@@ -3,7 +3,6 @@ package search
 import (
 	"time"
 
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -52,21 +51,9 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 		}
 	}
 
-	getUser := func(users ...*user.UserId) *user.UserId {
-		for _, u := range users {
-			if u == nil {
-				continue
-			}
-
-			return u
-		}
-
-		return nil
-	}
-
-	indexSpaceDebouncer := NewSpaceDebouncer(time.Duration(cfg.Events.DebounceDuration)*time.Millisecond, func(id *provider.StorageSpaceId, userID *user.UserId) {
-		if err := s.IndexSpace(id, userID); err != nil {
-			logger.Error().Err(err).Interface("spaceID", id).Interface("userID", userID).Msg("error while indexing a space")
+	indexSpaceDebouncer := NewSpaceDebouncer(time.Duration(cfg.Events.DebounceDuration)*time.Millisecond, func(id *provider.StorageSpaceId) {
+		if err := s.IndexSpace(id); err != nil {
+			logger.Error().Err(err).Interface("spaceID", id).Msg("error while indexing a space")
 		}
 	})
 
@@ -77,41 +64,32 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 				go func() {
 					logger.Debug().Interface("event", e).Msg("updating index")
 
-					var err error
-
 					switch ev := e.Event.(type) {
 					case events.ItemTrashed:
-						u := getUser(ev.SpaceOwner, ev.Executant)
 						s.TrashItem(ev.ID)
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), u)
+						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
 					case events.ItemMoved:
-						u := getUser(ev.SpaceOwner, ev.Executant)
-						s.MoveItem(ev.Ref, u)
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
+						s.MoveItem(ev.Ref)
+						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
 					case events.ItemRestored:
-						u := getUser(ev.SpaceOwner, ev.Executant)
-						s.RestoreItem(ev.Ref, u)
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), u)
+						s.RestoreItem(ev.Ref)
+						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
 					case events.ContainerCreated:
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
+						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
 					case events.FileTouched:
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
+						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
 					case events.FileVersionRestored:
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
+						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
 					case events.TagsAdded:
-						s.UpsertItem(ev.Ref, ev.Executant)
+						s.UpsertItem(ev.Ref)
 					case events.TagsRemoved:
-						s.UpsertItem(ev.Ref, ev.Executant)
+						s.UpsertItem(ev.Ref)
 					case events.FileUploaded:
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
+						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
 					case events.UploadReady:
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.FileRef), getUser(ev.SpaceOwner, ev.ExecutingUser.GetId()))
+						indexSpaceDebouncer.Debounce(getSpaceID(ev.FileRef))
 					case events.SpaceRenamed:
-						indexSpaceDebouncer.Debounce(ev.ID, getUser(ev.Executant))
-					}
-
-					if err != nil {
-						logger.Error().Err(err).Interface("event", e)
+						indexSpaceDebouncer.Debounce(ev.ID)
 					}
 				}()
 			}

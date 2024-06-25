@@ -128,7 +128,7 @@ var _ = Describe("Searchprovider", func() {
 				Status: status.NewOK(context.Background()),
 				Info:   ri,
 			}, nil)
-			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}, user.Id)
+			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 	})
