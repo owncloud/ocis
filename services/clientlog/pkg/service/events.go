@@ -11,3 +11,9 @@ type FileEvent struct {
 	// Only in case of sharing (refactor this into separate struct when more fields are needed)
 	AffectedUserIDs []string `json:"affecteduserids"`
 }
+
+// BackchannelLogout is emitted when the callback revived from the identity provider
+type BackchannelLogout struct {
+	UserID    string `json:"userid"`
+	Timestamp string `json:"timestamp"`
+}

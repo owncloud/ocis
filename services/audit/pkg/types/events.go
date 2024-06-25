@@ -39,5 +39,6 @@ func RegisteredEvents() []events.Unmarshaller {
 		events.GroupDeleted{},
 		events.GroupMemberAdded{},
 		events.GroupMemberRemoved{},
+		events.BackchannelLogout{},
 	}
 }

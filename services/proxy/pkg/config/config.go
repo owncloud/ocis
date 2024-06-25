@@ -10,13 +10,13 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	Commons *shared.Commons `mask:"struct" yaml:"-"` // don't use this directly as configuration for a service
+	Commons *shared.Commons `yaml:"-" mask:"struct"` // don't use this directly as configuration for a service
 
 	Service Service `yaml:"-"`
 
 	Tracing *Tracing `yaml:"tracing"`
 	Log     *Log     `yaml:"log"`
-	Debug   Debug    `mask:"struct" yaml:"debug"`
+	Debug   Debug    `yaml:"debug" mask:"struct"`
 
 	HTTP HTTP `yaml:"http"`
 
@@ -35,7 +35,7 @@ type Config struct {
 	AccountBackend        string              `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here." introductionVersion:"pre5.0"`
 	UserOIDCClaim         string              `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_username' but you can also add your own claim." introductionVersion:"pre5.0"`
 	UserCS3Claim          string              `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'." introductionVersion:"pre5.0"`
-	MachineAuthAPIKey     string              `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services." introductionVersion:"pre5.0"`
+	MachineAuthAPIKey     string              `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services." introductionVersion:"pre5.0" mask:"password"`
 	AutoprovisionAccounts bool                `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running." introductionVersion:"pre5.0"`
 	AutoProvisionClaims   AutoProvisionClaims `yaml:"auto_provision_claims"`
 	EnableBasicAuth       bool                `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic authentication' (username/password)." introductionVersion:"pre5.0"`
@@ -44,8 +44,9 @@ type Config struct {
 	AuthMiddleware        AuthMiddleware      `yaml:"auth_middleware"`
 	PoliciesMiddleware    PoliciesMiddleware  `yaml:"policies_middleware"`
 	CSPConfigFileLocation string              `yaml:"csp_config_file_location" env:"PROXY_CSP_CONFIG_FILE_LOCATION" desc:"The location of the CSP configuration file." introductionVersion:"6.0.0"`
+	Events                Events              `yaml:"events"`
 
-	Context context.Context `yaml:"-" json:"-"`
+	Context context.Context `json:"-" yaml:"-"`
 }
 
 // Policy enables us to use multiple directors.
@@ -216,4 +217,15 @@ type RegexRuleConf struct {
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;PROXY_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
 	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;PROXY_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+}
+
+// Events combines the configuration options for the event bus.
+type Events struct {
+	Endpoint             string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;PROXY_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events." introductionVersion:"%%NEXT%%"`
+	Cluster              string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;PROXY_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"%%NEXT%%"`
+	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;PROXY_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"%%NEXT%%"`
+	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;PROXY_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided PROXY_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"%%NEXT%%"`
+	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;PROXY_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"%%NEXT%%"`
+	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;PROXY_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"%%NEXT%%"`
+	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;PROXY_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"%%NEXT%%"`
 }

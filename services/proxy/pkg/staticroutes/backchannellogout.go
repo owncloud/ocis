@@ -1,10 +1,16 @@
 package staticroutes
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/pkg/errors"
+	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"
 )
 
@@ -33,7 +39,6 @@ func (s *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 		render.JSON(w, r, nil)
 		return
 	}
-
 	if err != nil {
 		logger.Error().Err(err).Msg("Error reading userinfo cache")
 		render.Status(r, http.StatusBadRequest)
@@ -42,6 +47,10 @@ func (s *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 	}
 
 	for _, record := range records {
+		err := s.publishBackchannelLogoutEvent(r.Context(), record, logoutToken)
+		if err != nil {
+			s.Logger.Warn().Err(err).Msg("could not publish backchannel logout event")
+		}
 		err = s.UserInfoCache.Delete(string(record.Value))
 		if err != nil && !errors.Is(err, microstore.ErrNotFound) {
 			// Spec requires us to return a 400 BadRequest when the session could not be destroyed
@@ -61,4 +70,44 @@ func (s *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, nil)
+}
+
+// publishBackchannelLogoutEvent publishes a backchannel logout event when the callback revived from the identity provider
+func (s StaticRouteHandler) publishBackchannelLogoutEvent(ctx context.Context, record *microstore.Record, logoutToken *oidc.LogoutToken) error {
+	if s.EventsPublisher == nil {
+		return fmt.Errorf("the events publisher is not set")
+	}
+	urecords, err := s.UserInfoCache.Read(string(record.Value))
+	if err != nil {
+		return fmt.Errorf("reading userinfo cache: %w", err)
+	}
+	if len(urecords) == 0 {
+		return fmt.Errorf("userinfo not found")
+	}
+
+	var claims map[string]interface{}
+	if err = msgpack.UnmarshalAsMap(urecords[0].Value, &claims); err != nil {
+		return fmt.Errorf("could not unmarshal userinfo: %w", err)
+	}
+
+	oidcClaim, ok := claims[s.Config.UserOIDCClaim].(string)
+	if !ok {
+		return fmt.Errorf("could not get claim %w", err)
+	}
+
+	user, _, err := s.UserProvider.GetUserByClaims(ctx, s.Config.UserCS3Claim, oidcClaim)
+	if err != nil || user.GetId() == nil {
+		return fmt.Errorf("could not get user by claims: %w", err)
+	}
+
+	e := events.BackchannelLogout{
+		Executant: user.GetId(),
+		SessionId: logoutToken.SessionId,
+		Timestamp: utils.TSNow(),
+	}
+
+	if err := events.Publish(ctx, s.EventsPublisher, e); err != nil {
+		return fmt.Errorf("could not publish user created event %w", err)
+	}
+	return nil
 }

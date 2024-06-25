@@ -159,6 +159,8 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		fileEv("link-updated", &provider.Reference{ResourceId: e.ItemID})
 	case events.LinkRemoved:
 		fileEv("link-removed", &provider.Reference{ResourceId: e.ItemID})
+	case events.BackchannelLogout:
+		evType, users, data = backchannelLogoutEvent(e)
 	}
 
 	if err != nil {
@@ -286,4 +288,11 @@ func isRename(o, n *provider.Reference) bool {
 		return false
 	}
 	return filepath.Base(o.GetPath()) != filepath.Base(n.GetPath())
+}
+
+func backchannelLogoutEvent(e events.BackchannelLogout) (string, []string, BackchannelLogout) {
+	return "backchannel-logout", []string{e.Executant.GetOpaqueId()}, BackchannelLogout{
+		UserID:    e.Executant.GetOpaqueId(),
+		Timestamp: e.Timestamp.String(),
+	}
 }
