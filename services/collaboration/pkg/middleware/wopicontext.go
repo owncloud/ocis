@@ -11,6 +11,7 @@ import (
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/metadata"
 )
@@ -43,7 +44,7 @@ type WopiContext struct {
 // * The created WopiContext for the request
 // * A contextual zerologger containing information about the request
 // and the WopiContext
-func WopiContextAuthMiddleware(jwtSecret string, next http.Handler) http.Handler {
+func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessToken := r.URL.Query().Get("access_token")
 		if accessToken == "" {
@@ -58,7 +59,7 @@ func WopiContextAuthMiddleware(jwtSecret string, next http.Handler) http.Handler
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 
-			return []byte(jwtSecret), nil
+			return []byte(cfg.Wopi.Secret), nil
 		})
 
 		if err != nil {
@@ -73,7 +74,7 @@ func WopiContextAuthMiddleware(jwtSecret string, next http.Handler) http.Handler
 
 		ctx := r.Context()
 
-		wopiContextAccessToken, err := DecryptAES([]byte(jwtSecret), claims.WopiContext.AccessToken)
+		wopiContextAccessToken, err := DecryptAES([]byte(cfg.Wopi.Secret), claims.WopiContext.AccessToken)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
@@ -118,4 +119,34 @@ func WopiContextFromCtx(ctx context.Context) (WopiContext, error) {
 // used instead in order to provide a valid WopiContext
 func WopiContextToCtx(ctx context.Context, wopiContext WopiContext) context.Context {
 	return context.WithValue(ctx, wopiContextKey, wopiContext)
+}
+
+// The access token inside the wopiContext is expected to be decrypted.
+// In order to generate the access token for WOPI, the reva token inside the
+// wopiContext will be encrypted
+func GenerateWopiToken(wopiContext WopiContext, cfg *config.Config) (string, int64, error) {
+	cryptedReqAccessToken, err := EncryptAES([]byte(cfg.Wopi.Secret), wopiContext.AccessToken)
+	if err != nil {
+		return "", 0, err
+	}
+
+	cs3Claims := &jwt.RegisteredClaims{}
+	cs3JWTparser := jwt.Parser{}
+	_, _, err = cs3JWTparser.ParseUnverified(wopiContext.AccessToken, cs3Claims)
+	if err != nil {
+		return "", 0, err
+	}
+
+	wopiContext.AccessToken = cryptedReqAccessToken
+	claims := &Claims{
+		WopiContext: wopiContext,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: cs3Claims.ExpiresAt,
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	accessToken, err := token.SignedString([]byte(cfg.Wopi.Secret))
+
+	return accessToken, claims.ExpiresAt.UnixMilli(), err
 }

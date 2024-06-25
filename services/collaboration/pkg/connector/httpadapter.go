@@ -9,13 +9,19 @@ import (
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/utf7"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/locks"
 	"github.com/rs/zerolog"
 )
 
 const (
-	HeaderWopiLock    string = "X-WOPI-Lock"
-	HeaderWopiOldLock string = "X-WOPI-OldLock"
+	HeaderWopiLock        string = "X-WOPI-Lock"
+	HeaderWopiOldLock     string = "X-WOPI-OldLock"
+	HeaderWopiST          string = "X-WOPI-SuggestedTarget"
+	HeaderWopiRT          string = "X-WOPI-RelativeTarget"
+	HeaderWopiOverwriteRT string = "X-WOPI-OverwriteRelativeTarget"
+	HeaderWopiSize        string = "X-WOPI-Size"
+	HeaderWopiValidRT     string = "X-WOPI-ValidRelativeTarget"
 )
 
 // HttpAdapter will adapt the responses from the connector to HTTP.
@@ -238,4 +244,109 @@ func (h *HttpAdapter) PutFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+// PutRelativeFile will upload the file with a specific name. The name might be
+// automatically adjusted depending on the request headers.
+// Note that this method will also send a json body in the response.
+// It has 2 mutually exclusive operation methods that are used based on the
+// provided headers in the request.
+// Note that this method won't used locks (not documented).
+func (h *HttpAdapter) PutRelativeFile(w http.ResponseWriter, r *http.Request) {
+	relativeTarget := r.Header.Get(HeaderWopiRT)
+	suggestedTarget := r.Header.Get(HeaderWopiST)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Length", "0")
+
+	if relativeTarget != "" && suggestedTarget != "" {
+		// headers are mutually exclusive
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var response *PutRelativeResponse
+	var headers *PutRelativeHeaders
+	var putErr error
+	fileCon := h.con.GetFileConnector()
+
+	if suggestedTarget != "" {
+		utf8Target, decErr := utf7.DecodeString(suggestedTarget)
+		if decErr != nil || len(utf8Target) > 512 {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		response, putErr = fileCon.PutRelativeFileSuggested(r.Context(), h.con.GetContentConnector(), r.Body, r.ContentLength, utf8Target)
+	}
+
+	if relativeTarget != "" {
+		utf8Target, decErr := utf7.DecodeString(relativeTarget)
+		if decErr != nil || len(utf8Target) > 512 {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		response, headers, putErr = fileCon.PutRelativeFileRelative(r.Context(), h.con.GetContentConnector(), r.Body, r.ContentLength, utf8Target)
+	}
+
+	var conError *ConnectorError
+	if putErr != nil {
+		if errors.As(putErr, &conError) {
+			if headers != nil {
+				w.Header().Set(HeaderWopiValidRT, utf7.EncodeString(headers.ValidTarget))
+				w.Header().Set(HeaderWopiLock, headers.LockID)
+			}
+			// we might still need to send a body, so we'll hold the write for now
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	logger := zerolog.Ctx(r.Context())
+
+	jsonFileInfo, err := json.Marshal(response)
+	if err != nil {
+		logger.Error().Err(err).Msg("PutRelativeFile: failed to marshal response")
+		return
+	}
+
+	w.Header().Set("Content-Length", strconv.Itoa(len(jsonFileInfo)))
+	if conError != nil {
+		w.WriteHeader(conError.HttpCodeOut)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+	bytes, err := w.Write(jsonFileInfo)
+
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Int("TotalBytes", len(jsonFileInfo)).
+			Int("WrittenBytes", bytes).
+			Msg("PutRelativeFile: failed to write contents in the HTTP response")
+	}
+}
+
+// DeleteFile will delete the provided file. If the file is locked and can't
+// be deleted, a 409 conflict error will be returned with its corresponding
+// lock.
+func (h *HttpAdapter) DeleteFile(w http.ResponseWriter, r *http.Request) {
+	lockID := r.Header.Get(HeaderWopiLock)
+
+	fileCon := h.con.GetFileConnector()
+	newLockID, err := fileCon.DeleteFile(r.Context(), lockID)
+	if err != nil {
+		var conError *ConnectorError
+		if errors.As(err, &conError) {
+			if conError.HttpCodeOut == 409 {
+				w.Header().Set(HeaderWopiLock, newLockID)
+			}
+			http.Error(w, http.StatusText(conError.HttpCodeOut), conError.HttpCodeOut)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
+	// If no error, a HTTP 200 should be sent automatically.
+	// X-WOPI-Lock header isn't needed on HTTP 200
 }

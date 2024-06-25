@@ -16,7 +16,6 @@ import (
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -198,21 +197,8 @@ func (s *Service) OpenInApp(
 		appURL = editAppURL
 	}
 
-	cryptedReqAccessToken, err := middleware.EncryptAES([]byte(s.config.Wopi.Secret), req.GetAccessToken())
-	if err != nil {
-		s.logger.Error().
-			Err(err).
-			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.GetViewMode().String()).
-			Str("Requester", user.GetId().String()).
-			Msg("OpenInApp: error encrypting access token")
-		return &appproviderv1beta1.OpenInAppResponse{
-			Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_INTERNAL},
-		}, err
-	}
-
 	wopiContext := middleware.WopiContext{
-		AccessToken:   cryptedReqAccessToken,
+		AccessToken:   req.GetAccessToken(), // it will be encrypted
 		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
 		FileReference: &providerFileRef,
 		User:          user,
@@ -221,36 +207,14 @@ func (s *Service) OpenInApp(
 		ViewAppUrl:    viewAppURL,
 	}
 
-	cs3Claims := &jwt.RegisteredClaims{}
-	cs3JWTparser := jwt.Parser{}
-	_, _, err = cs3JWTparser.ParseUnverified(req.GetAccessToken(), cs3Claims)
+	accessToken, accessExpiration, err := middleware.GenerateWopiToken(wopiContext, s.config)
 	if err != nil {
 		s.logger.Error().
 			Err(err).
 			Str("FileReference", providerFileRef.String()).
 			Str("ViewMode", req.GetViewMode().String()).
 			Str("Requester", user.GetId().String()).
-			Msg("OpenInApp: error parsing JWT token")
-		return nil, err
-	}
-
-	claims := &middleware.Claims{
-		WopiContext: wopiContext,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: cs3Claims.ExpiresAt,
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	accessToken, err := token.SignedString([]byte(s.config.Wopi.Secret))
-
-	if err != nil {
-		s.logger.Error().
-			Err(err).
-			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.GetViewMode().String()).
-			Str("Requester", user.GetId().String()).
-			Msg("OpenInApp: error signing access token")
+			Msg("OpenInApp: error generating the token")
 		return &appproviderv1beta1.OpenInAppResponse{
 			Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_INTERNAL},
 		}, err
@@ -271,7 +235,8 @@ func (s *Service) OpenInApp(
 				// these parameters will be passed to the web server by the app provider application
 				"access_token": accessToken,
 				// milliseconds since Jan 1, 1970 UTC as required in https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/concepts#access_token_ttl
-				"access_token_ttl": strconv.FormatInt(claims.ExpiresAt.UnixMilli(), 10),
+				//"access_token_ttl": strconv.FormatInt(claims.ExpiresAt.UnixMilli(), 10),
+				"access_token_ttl": strconv.FormatInt(accessExpiration, 10),
 			},
 		},
 	}, nil
