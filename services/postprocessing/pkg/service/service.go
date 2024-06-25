@@ -241,7 +241,6 @@ func (pps *PostprocessingService) handleResumePPEvent(ctx context.Context, ev ev
 	for _, id := range ids {
 		if err := pps.resumePP(ctx, id); err != nil {
 			pps.log.Error().Str("uploadID", id).Err(err).Msg("cannot resume upload")
-			return fmt.Errorf("cannot resume upload: %w", err)
 		}
 	}
 	return nil
