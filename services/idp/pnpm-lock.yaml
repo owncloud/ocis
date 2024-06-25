@@ -9,8 +9,8 @@ overrides:
 
 dependencies:
   '@fontsource/roboto':
-    specifier: ^5.0.8
-    version: 5.0.8
+    specifier: ^5.0.13
+    version: 5.0.13
   '@material-ui/core':
     specifier: ^4.12.4
     version: 4.12.4(@types/react@17.0.65)(react-dom@17.0.2)(react@17.0.2)
@@ -2379,8 +2379,8 @@ packages:
       - supports-color
     dev: true
 
-  /@fontsource/roboto@5.0.8:
-    resolution: {integrity: sha512-XxPltXs5R31D6UZeLIV1td3wTXU3jzd3f2DLsXI8tytMGBkIsGcc9sIyiupRtA8y73HAhuSCeweOoBqf6DbWCA==}
+  /@fontsource/roboto@5.0.13:
+    resolution: {integrity: sha512-j61DHjsdUCKMXSdNLTOxcG701FWnF0jcqNNQi2iPCDxU8seN/sMxeh62dC++UiagCWq9ghTypX+Pcy7kX+QOeQ==}
     dev: false
 
   /@gluejs/glue@0.3.0:
