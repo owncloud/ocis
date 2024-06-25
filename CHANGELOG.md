@@ -51,6 +51,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Activitylog API: [#9361](https://github.com/owncloud/ocis/pull/9361)
 * Enhancement - Add fail flag to consistency check: [#9447](https://github.com/owncloud/ocis/pull/9447)
 * Enhancement - Deprecate gateway environment variables: [#9451](https://github.com/owncloud/ocis/pull/9451)
+* Enhancement - Allow reindexing all spaces: [#9456](https://github.com/owncloud/ocis/pull/9456)
 
 ## Details
 
@@ -84,6 +85,13 @@ The following sections list the changes for unreleased.
    one specific service to a different gateway.
 
    https://github.com/owncloud/ocis/pull/9451
+
+* Enhancement - Allow reindexing all spaces: [#9456](https://github.com/owncloud/ocis/pull/9456)
+
+   Adds a `--all-spaces` flag to the `ocis search index` command to allow
+   reindexing all spaces at once.
+
+   https://github.com/owncloud/ocis/pull/9456
 
 # Changelog for [6.0.0] (2024-06-19)
 
