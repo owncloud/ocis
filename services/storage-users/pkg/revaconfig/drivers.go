@@ -94,6 +94,7 @@ func Posix(cfg *config.Config, enableFSWatch bool) map[string]interface{} {
 		"permissionssvc_tls_mode":    cfg.Commons.GRPCClientTLS.Mode,
 		"treetime_accounting":        true,
 		"treesize_accounting":        true,
+		"asyncfileuploads":           cfg.Drivers.Posix.AsyncUploads,
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
 			"cache_nodes":               cfg.IDCache.Nodes,
