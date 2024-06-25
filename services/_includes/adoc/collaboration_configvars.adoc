@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-25-03-34-42]
+[#deprecation-note-2024-06-25-07-03-57]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -14,7 +14,7 @@ ifeval::[{show-deprecation} == true]
 | Removal Version
 | Deprecation Replacement
 
-| COLLABORATION_CS3API_GATEWAY_NAME removed from simplicity.
+| COLLABORATION_CS3API_GATEWAY_NAME removed for simplicity.
 | 6.0
 | %%NEXT%%
 | 
@@ -160,13 +160,13 @@ Used to mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT tok
 
 a|`OCIS_REVA_GATEWAY` +
 `COLLABORATION_CS3API_GATEWAY_NAME` +
-xref:deprecation-note-2024-06-25-03-34-42[Deprecation Note]
+xref:deprecation-note-2024-06-25-07-03-57[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 a| [subs=-attributes]
-The service name of the CS3API gateway.
+CS3 gateway used to look up user metadata.
 
 a|`COLLABORATION_CS3API_DATAGATEWAY_INSECURE` +
 
