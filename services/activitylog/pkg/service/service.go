@@ -104,6 +104,8 @@ func (a *ActivitylogService) Run() {
 			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ItemTrashed:
 			err = a.AddActivityTrashed(ev.ID, ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+		case events.ItemPurged:
+			err = a.RemoveResource(ev.ID)
 		case events.ItemMoved:
 			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ShareCreated:
@@ -219,6 +221,14 @@ func (a *ActivitylogService) RemoveActivities(rid *provider.ResourceId, toDelete
 		Key:   storagespace.FormatResourceID(*rid),
 		Value: b,
 	})
+}
+
+// RemoveResource removes the resource from the store
+func (a *ActivitylogService) RemoveResource(rid *provider.ResourceId) error {
+	a.lock.Lock()
+	defer a.lock.Unlock()
+
+	return a.store.Delete(storagespace.FormatResourceID(*rid))
 }
 
 func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity, error) {

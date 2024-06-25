@@ -17,6 +17,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/grpc/metadata"
 
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
 	"github.com/owncloud/ocis/v2/ocis-pkg/kql"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
@@ -83,7 +84,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
-	var resp GetActivitiesResponse
+	resp := GetActivitiesResponse{Activities: make([]libregraph.Activity, 0, len(evRes.GetEvents()))}
 	for _, e := range evRes.GetEvents() {
 		delete(toDelete, e.GetId())
 
@@ -268,6 +269,10 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 	rid, err := storagespace.ParseID(itemID)
 	if err != nil {
 		return nil, limit, nil, nil, err
+	}
+	if rid.GetOpaqueId() == "" {
+		// space root requested - fix format
+		rid.OpaqueId = rid.GetSpaceId()
 	}
 	pref := func(a RawActivity) bool {
 		for _, f := range prefilters {

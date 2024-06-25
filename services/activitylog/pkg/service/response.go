@@ -57,6 +57,9 @@ func WithResource(ref *provider.Reference, addSpace bool) ActivityOption {
 	return func(ctx context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
 		info, err := utils.GetResource(ctx, ref, gwc)
 		if err != nil {
+			vars["resource"] = Resource{
+				Name: filepath.Base(ref.GetPath()),
+			}
 			return err
 		}
 
@@ -90,6 +93,10 @@ func WithOldResource(ref *provider.Reference) ActivityOption {
 // WithTrashedResource sets the resource variable if the resource is trashed
 func WithTrashedResource(ref *provider.Reference, rid *provider.ResourceId) ActivityOption {
 	return func(ctx context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
+		vars["resource"] = Resource{
+			Name: filepath.Base(ref.GetPath()),
+		}
+
 		resp, err := gwc.ListRecycle(ctx, &provider.ListRecycleRequest{
 			Ref: ref,
 		})
@@ -122,6 +129,10 @@ func WithUser(uid *user.UserId, username string) ActivityOption {
 		if username == "" {
 			u, err := utils.GetUser(uid, gwc)
 			if err != nil {
+				vars["user"] = Actor{
+					ID:          uid.GetOpaqueId(),
+					DisplayName: "DeletedUser",
+				}
 				return err
 			}
 			username = u.GetUsername()
@@ -143,6 +154,9 @@ func WithSharee(uid *user.UserId, gid *group.GroupId) ActivityOption {
 		case uid != nil:
 			u, err := utils.GetUser(uid, gwc)
 			if err != nil {
+				vars["sharee"] = Actor{
+					DisplayName: "DeletedUser",
+				}
 				return err
 			}
 
@@ -151,6 +165,10 @@ func WithSharee(uid *user.UserId, gid *group.GroupId) ActivityOption {
 				DisplayName: u.GetUsername(),
 			}
 		case gid != nil:
+			vars["sharee"] = Actor{
+				ID:          gid.GetOpaqueId(),
+				DisplayName: "DeletedGroup",
+			}
 			r, err := gwc.GetGroup(ctx, &group.GetGroupRequest{GroupId: gid})
 			if err != nil {
 				return fmt.Errorf("error getting group: %w", err)
@@ -176,6 +194,10 @@ func WithSpace(spaceid *provider.StorageSpaceId) ActivityOption {
 	return func(ctx context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
 		s, err := utils.GetSpace(ctx, spaceid.GetOpaqueId(), gwc)
 		if err != nil {
+			vars["space"] = Resource{
+				ID:   spaceid.GetOpaqueId(),
+				Name: "DeletedSpace",
+			}
 			return err
 		}
 		vars["space"] = Resource{
@@ -209,7 +231,7 @@ func (s *ActivitylogService) GetVars(ctx context.Context, opts ...ActivityOption
 	vars := make(map[string]interface{})
 	for _, opt := range opts {
 		if err := opt(ctx, gwc, vars); err != nil {
-			return nil, err
+			s.log.Info().Err(err).Msg("error getting activity vars")
 		}
 	}
 
