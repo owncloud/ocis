@@ -36,6 +36,29 @@ store:
   password: ""
 reva_gateway: com.owncloud.api.gateway
 grpc_client_tls: null
+http:
+  addr: 127.0.0.1:0
+  root: /
+  cors:
+    allow_origins:
+    - '*'
+    allow_methods:
+    - GET
+    allow_headers:
+    - Authorization
+    - Origin
+    - Content-Type
+    - Accept
+    - X-Requested-With
+    - X-Request-Id
+    - Ocs-Apirequest
+    allow_credentials: true
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
+token_manager:
+  jwt_secret: ""
 service_account:
   service_account_id: ""
   service_account_secret: ""

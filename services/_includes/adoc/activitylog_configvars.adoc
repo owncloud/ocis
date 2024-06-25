@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-25-07-12-50]
+[#deprecation-note-2024-06-25-07-20-51]
 [caption=]
 .Deprecation notes for the activitylog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -27,7 +27,7 @@ endif::[]
 | Description
 
 a|`OCIS_TRACING_ENABLED` +
-`CLIENTLOG_TRACING_ENABLED` +
+`ACTIVITYLOG_TRACING_ENABLED` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -37,7 +37,7 @@ a| [subs=-attributes]
 Activates tracing.
 
 a|`OCIS_TRACING_TYPE` +
-`CLIENTLOG_TRACING_TYPE` +
+`ACTIVITYLOG_TRACING_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -47,7 +47,7 @@ a| [subs=-attributes]
 The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a|`OCIS_TRACING_ENDPOINT` +
-`CLIENTLOG_TRACING_ENDPOINT` +
+`ACTIVITYLOG_TRACING_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -57,7 +57,7 @@ a| [subs=-attributes]
 The endpoint of the tracing agent.
 
 a|`OCIS_TRACING_COLLECTOR` +
-`CLIENTLOG_TRACING_COLLECTOR` +
+`ACTIVITYLOG_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
 ++string ++
@@ -67,7 +67,7 @@ a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 a|`OCIS_LOG_LEVEL` +
-`CLIENTLOG_USERLOG_LOG_LEVEL` +
+`ACTIVITYLOG_LOG_LEVEL` +
 
 a| [subs=-attributes]
 ++string ++
@@ -77,7 +77,7 @@ a| [subs=-attributes]
 The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
-`CLIENTLOG_USERLOG_LOG_PRETTY` +
+`ACTIVITYLOG_LOG_PRETTY` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -87,7 +87,7 @@ a| [subs=-attributes]
 Activates pretty log output.
 
 a|`OCIS_LOG_COLOR` +
-`CLIENTLOG_USERLOG_LOG_COLOR` +
+`ACTIVITYLOG_LOG_COLOR` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -97,7 +97,7 @@ a| [subs=-attributes]
 Activates colorized log output.
 
 a|`OCIS_LOG_FILE` +
-`CLIENTLOG_USERLOG_LOG_FILE` +
+`ACTIVITYLOG_LOG_FILE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -106,7 +106,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 
-a|`CLIENTLOG_DEBUG_ADDR` +
+a|`ACTIVITYLOG_DEBUG_ADDR` +
 
 a| [subs=-attributes]
 ++string ++
@@ -115,7 +115,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
-a|`CLIENTLOG_DEBUG_TOKEN` +
+a|`ACTIVITYLOG_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
 ++string ++
@@ -124,7 +124,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
 
-a|`CLIENTLOG_DEBUG_PPROF` +
+a|`ACTIVITYLOG_DEBUG_PPROF` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -133,7 +133,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
 
-a|`CLIENTLOG_DEBUG_ZPAGES` +
+a|`ACTIVITYLOG_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -261,7 +261,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
 
 a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
 `ACTIVITYLOG_STORE_AUTH_USERNAME` +
@@ -291,6 +291,101 @@ a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 a| [subs=-attributes]
 CS3 gateway used to look up user metadata
+
+a|`ACTIVITYLOG_HTTP_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:0 ++
+a| [subs=-attributes]
+The bind address of the HTTP service.
+
+a|`ACTIVITYLOG_HTTP_ROOT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/ ++
+a| [subs=-attributes]
+Subdirectory that serves as the root for this HTTP service.
+
+a|`OCIS_CORS_ALLOW_ORIGINS` +
+`ACTIVITYLOG_CORS_ALLOW_ORIGINS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[*] ++
+a| [subs=-attributes]
+A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_METHODS` +
+`ACTIVITYLOG_CORS_ALLOW_METHODS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[GET] ++
+a| [subs=-attributes]
+A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_HEADERS` +
+`ACTIVITYLOG_CORS_ALLOW_HEADERS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
+a| [subs=-attributes]
+A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_CREDENTIALS` +
+`ACTIVITYLOG_CORS_ALLOW_CREDENTIALS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
+
+a|`OCIS_HTTP_TLS_ENABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.
+
+a|`OCIS_HTTP_TLS_CERTIFICATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the http services.
+
+a|`OCIS_HTTP_TLS_KEY` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
+
+a|`OCIS_JWT_SECRET` +
+`ACTIVITYLOG_JWT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
 
 a|`OCIS_SERVICE_ACCOUNT_ID` +
 `ACTIVITYLOG_SERVICE_ACCOUNT_ID` +

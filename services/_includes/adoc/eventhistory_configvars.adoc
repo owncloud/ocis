@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-25-07-12-50]
+[#deprecation-note-2024-06-25-07-20-51]
 [caption=]
 .Deprecation notes for the eventhistory service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -227,7 +227,7 @@ a|`OCIS_PERSISTENT_STORE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++memory ++
+++nats-js-kv ++
 a| [subs=-attributes]
 The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
@@ -237,7 +237,7 @@ a|`OCIS_PERSISTENT_STORE_NODES` +
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
-++[] ++
+++[127.0.0.1:9233] ++
 a| [subs=-attributes]
 A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
@@ -255,7 +255,7 @@ a|`EVENTHISTORY_STORE_TABLE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++events ++
+++ ++
 a| [subs=-attributes]
 The database table the store should use.
 

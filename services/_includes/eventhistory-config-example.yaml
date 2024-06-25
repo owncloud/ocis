@@ -29,10 +29,11 @@ events:
   username: ""
   password: ""
 store:
-  store: memory
-  nodes: []
+  store: nats-js-kv
+  nodes:
+  - 127.0.0.1:9233
   database: eventhistory
-  table: events
+  table: ""
   ttl: 336h0m0s
   size: 0
   username: ""

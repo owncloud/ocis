@@ -105,6 +105,8 @@ policies:
     unprotected: true
   - endpoint: /app/
     service: com.owncloud.web.frontend
+  - endpoint: /graph/v1beta1/extensions/org.libregraph/activities
+    service: com.owncloud.web.activitylog
   - endpoint: /graph/v1.0/invitations
     service: com.owncloud.web.invitations
   - endpoint: /graph/
