@@ -9,6 +9,11 @@ import (
 	"sync"
 )
 
+const (
+	// _trashGlobPattern is the glob pattern to find all trash items
+	_trashGlobPattern = "storage/users/spaces/*/*/trash/*/*/*/*/*"
+)
+
 // DataProvider provides data for the trash folders
 type DataProvider struct {
 	Events chan interface{}

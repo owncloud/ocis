@@ -1,7 +1,11 @@
 package trash_test
 
 import (
+	"os"
+	"path"
+
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+
 	testhelper "github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/testhelpers"
 	"github.com/owncloud/ocis/v2/ocis/pkg/trash"
 
@@ -12,20 +16,21 @@ import (
 
 var _ = Describe("Trash", func() {
 	var (
-		env *testhelper.TestEnv
+		env      *testhelper.TestEnv
+		testRoot string
 	)
 
 	BeforeEach(func() {
-		var err error
-		env, err = testhelper.NewTestEnv(map[string]interface{}{
-			"root":
-		})
+		tr, err := os.MkdirTemp("", "ocis-test")
 		Expect(err).ToNot(HaveOccurred())
+
+		testRoot = tr
+		env = setupTestEnv(path.Join(testRoot, "storage", "users"))
 	})
 
 	Context("No empty trash directories", func() {
 		When("a directory is removed", func() {
-			JustBeforeEach(func() {
+			BeforeEach(func() {
 				env.Permissions.On("AssemblePermissions", mock.Anything, mock.Anything, mock.Anything).Return(provider.ResourcePermissions{
 					Stat:            true,
 					CreateContainer: true,
@@ -38,8 +43,9 @@ var _ = Describe("Trash", func() {
 				})
 				Expect(err).ToNot(HaveOccurred())
 			})
+
 			It("does not find any trash dirs to remove", func() {
-				err := trash.PurgeTrashOrphanedPaths(env.Root)
+				err := trash.PurgeTrashOrphanedPaths(testRoot)
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
