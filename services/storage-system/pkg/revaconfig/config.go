@@ -155,6 +155,7 @@ func metadataDrivers(cfg *config.Config) map[string]interface{} {
 			"permissionssvc":             "com.owncloud.api.storage-system",
 			"max_acquire_lock_cycles":    cfg.Drivers.OCIS.MaxAcquireLockCycles,
 			"lock_cycle_duration_factor": cfg.Drivers.OCIS.LockCycleDurationFactor,
+			"disable_versioning":         true,
 			"statcache": map[string]interface{}{
 				"cache_store":    "noop",
 				"cache_database": "system",
