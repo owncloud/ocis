@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"encoding/base64"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -181,10 +182,15 @@ func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 
 	claims, err := m.getClaims(token, r)
 	if err != nil {
+		host, port, _ := net.SplitHostPort(r.RemoteAddr)
 		m.Logger.Error().
 			Err(err).
 			Str("authenticator", "oidc").
 			Str("path", r.URL.Path).
+			Str("user_agent", r.UserAgent()).
+			Str("client.address", r.Header.Get("X-Forwarded-For")).
+			Str("network.peer.address", host).
+			Str("network.peer.port", port).
 			Msg("failed to authenticate the request")
 		return nil, false
 	}
