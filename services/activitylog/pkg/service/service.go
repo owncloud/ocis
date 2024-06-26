@@ -225,6 +225,10 @@ func (a *ActivitylogService) RemoveActivities(rid *provider.ResourceId, toDelete
 
 // RemoveResource removes the resource from the store
 func (a *ActivitylogService) RemoveResource(rid *provider.ResourceId) error {
+	if rid == nil {
+		return fmt.Errorf("resource id is required")
+	}
+
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
