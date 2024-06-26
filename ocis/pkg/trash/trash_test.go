@@ -1,63 +1,47 @@
 package trash_test
 
 import (
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	testhelper "github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/testhelpers"
 	"github.com/owncloud/ocis/v2/ocis/pkg/trash"
-	"github.com/stretchr/testify/require"
-	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
 )
 
-// TODO: this concept is wrong, needs to be mocked and tested differently
-func TestGatherData(t *testing.T) {
-	testcases := []struct {
-		Name     string
-		Events   []interface{}
-		Expected *trash.TrashDirs
-	}{
-		{
-			Name: "no empty dirs",
-			Events: []interface{}{
-				trashDirs("linkpath", "nodepath"),
-			},
-			Expected: trashFunc(func(c *trash.TrashDirs) {
-				c.LinkPath = "linkpath"
-				c.NodePath = "nodepath"
-			}),
-		},
-		{
-			Name: "empty dirs",
-			Events: []interface{}{
-				trashDirs("linkpath", "nodepath"),
-			},
-			Expected: trashFunc(func(c *trash.TrashDirs) {
-			}),
-		},
-	}
+var _ = Describe("Trash", func() {
+	var (
+		env *testhelper.TestEnv
+	)
 
-	for _, tc := range testcases {
-		events := make(chan interface{})
-		go func() {
-			for _, e := range tc.Events {
-				events <- e
-			}
-			close(events)
-		}()
+	BeforeEach(func() {
+		var err error
+		env, err = testhelper.NewTestEnv(map[string]interface{}{
+			"root":
+		})
+		Expect(err).ToNot(HaveOccurred())
+	})
 
-		td := trash.NewTrashDirs()
-		td.GatherData(events)
+	Context("No empty trash directories", func() {
+		When("a directory is removed", func() {
+			JustBeforeEach(func() {
+				env.Permissions.On("AssemblePermissions", mock.Anything, mock.Anything, mock.Anything).Return(provider.ResourcePermissions{
+					Stat:            true,
+					CreateContainer: true,
+					Delete:          true,
+				}, nil)
 
-		require.Equal(t, tc.Expected, td, tc.Name)
-	}
-}
-
-func trashDirs(linkPath, nodePath string) interface{} {
-	return trash.TrashDirs{
-		LinkPath: linkPath,
-		NodePath: nodePath,
-	}
-}
-
-func trashFunc(f func(c *trash.TrashDirs)) *trash.TrashDirs {
-	c := &trash.TrashDirs{}
-	f(c)
-	return c
-}
+				err := env.Fs.Delete(env.Ctx, &provider.Reference{
+					ResourceId: env.SpaceRootRes,
+					Path:       "/dir1/subdir1",
+				})
+				Expect(err).ToNot(HaveOccurred())
+			})
+			It("does not find any trash dirs to remove", func() {
+				err := trash.PurgeTrashOrphanedPaths(env.Root)
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
+	})
+})
