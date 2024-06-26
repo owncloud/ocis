@@ -50,6 +50,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix sharing-ng permission listings for personal and virtual drive items: [#9438](https://github.com/owncloud/ocis/pull/9438)
 * Bugfix - Allow all uploads to restart: [#9465](https://github.com/owncloud/ocis/pull/9465)
 * Enhancement - Activitylog API: [#9361](https://github.com/owncloud/ocis/pull/9361)
+* Enhancement - Add the backchannel logout event: [#9447](https://github.com/owncloud/ocis/pull/9447)
 * Enhancement - Add fail flag to consistency check: [#9447](https://github.com/owncloud/ocis/pull/9447)
 * Enhancement - Deprecate gateway environment variables: [#9451](https://github.com/owncloud/ocis/pull/9451)
 * Enhancement - Allow reindexing all spaces: [#9456](https://github.com/owncloud/ocis/pull/9456)
@@ -76,6 +77,13 @@ The following sections list the changes for unreleased.
    to show item activities
 
    https://github.com/owncloud/ocis/pull/9361
+
+* Enhancement - Add the backchannel logout event: [#9447](https://github.com/owncloud/ocis/pull/9447)
+
+   We've added the backchannel logout event
+
+   https://github.com/owncloud/ocis/issues/9355
+   https://github.com/owncloud/ocis/pull/9447
 
 * Enhancement - Add fail flag to consistency check: [#9447](https://github.com/owncloud/ocis/pull/9447)
 
