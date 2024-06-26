@@ -64,3 +64,10 @@
 | PROXY_HTTPS_CACERT | string |  | Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services.|
 | PROXY_POLICIES_QUERY | string |  | Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Rules default to deny if the variable was not found.|
 | PROXY_CSP_CONFIG_FILE_LOCATION | string |  | The location of the CSP configuration file.|
+| OCIS_EVENTS_ENDPOINT<br/>PROXY_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.|
+| OCIS_EVENTS_CLUSTER<br/>PROXY_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
+| OCIS_INSECURE<br/>PROXY_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
+| OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>PROXY_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided PROXY_EVENTS_TLS_INSECURE will be seen as false.|
+| OCIS_EVENTS_ENABLE_TLS<br/>PROXY_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_USERNAME<br/>PROXY_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_EVENTS_AUTH_PASSWORD<br/>PROXY_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|

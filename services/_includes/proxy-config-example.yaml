@@ -186,3 +186,11 @@ auth_middleware:
 policies_middleware:
   query: ""
 csp_config_file_location: ""
+events:
+  endpoint: 127.0.0.1:9233
+  cluster: ocis-cluster
+  tls_insecure: false
+  tls_root_ca_certificate: ""
+  enable_tls: false
+  username: ""
+  password: ""
