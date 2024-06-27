@@ -25,9 +25,17 @@ import (
 func ResetPassword(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "resetpassword",
-		Usage:    "Reset admin password",
+		Usage:    "Reset user password",
 		Category: "password reset",
-		Before: func(c *cli.Context) error {
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "user-name",
+				Aliases: []string{"u"},
+				Usage:   "User name",
+				Value:   "admin",
+			},
+		},
+		Before: func(_ *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
@@ -40,12 +48,12 @@ func ResetPassword(cfg *config.Config) *cli.Command {
 			}()
 
 			defer cancel()
-			return resetPassword(ctx, logger, cfg)
+			return resetPassword(ctx, logger, cfg, c.String("user-name"))
 		},
 	}
 }
 
-func resetPassword(ctx context.Context, logger log.Logger, cfg *config.Config) error {
+func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, userName string) error {
 	servercfg := server.Config{
 		Logger:      log.LogrusWrap(logger.Logger),
 		LDAPHandler: "boltdb",
@@ -54,8 +62,8 @@ func resetPassword(ctx context.Context, logger log.Logger, cfg *config.Config) e
 		BoltDBFile: cfg.IDM.DatabasePath,
 	}
 
-	adminUserDN := "uid=admin,ou=users," + servercfg.LDAPBaseDN
-	fmt.Printf("Resetting password for user '%s'.\n", adminUserDN)
+	userDN := fmt.Sprintf("uid=%s,ou=users,%s", userName, servercfg.LDAPBaseDN)
+	fmt.Printf("Resetting password for user '%s'.\n", userDN)
 	if _, err := os.Stat(servercfg.BoltDBFile); errors.Is(err, os.ErrNotExist) {
 		fmt.Fprintf(os.Stderr, "IDM database does not exist.\n")
 		return err
@@ -82,23 +90,23 @@ func resetPassword(ctx context.Context, logger log.Logger, cfg *config.Config) e
 		return err
 	}
 
-	pwRequest := ldap.NewPasswordModifyRequest(adminUserDN, "", newPw)
+	pwRequest := ldap.NewPasswordModifyRequest(userDN, "", newPw)
 	if err := bdb.UpdatePassword(pwRequest); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to update admin password: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to update user password: %v\n", err)
 	}
-	fmt.Printf("Password for user '%s' updated.\n", adminUserDN)
+	fmt.Printf("Password for user '%s' updated.\n", userDN)
 	return nil
 }
 
 func getPassword() (string, error) {
 	fmt.Print("Enter new password: ")
-	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+	bytePassword, err := term.ReadPassword(syscall.Stdin)
 	if err != nil {
 		return "", err
 	}
 	fmt.Println("")
 	fmt.Print("Re-enter new password: ")
-	bytePasswordVerify, err := term.ReadPassword(int(syscall.Stdin))
+	bytePasswordVerify, err := term.ReadPassword(syscall.Stdin)
 	if err != nil {
 		return "", err
 	}
