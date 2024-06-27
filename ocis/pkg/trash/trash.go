@@ -44,6 +44,9 @@ func removeEmptyFolder(path string, dryRun bool) error {
 		return nil
 	}
 	if err := os.Remove(path); err != nil {
+		// we do not really care about the error here
+		// if the folder is not empty we will get an error,
+		// this is our signal to break out of the recursion
 		return nil
 	}
 	nd := filepath.Dir(path)
