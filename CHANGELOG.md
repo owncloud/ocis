@@ -56,6 +56,8 @@ The following sections list the changes for unreleased.
 * Enhancement - Add fail flag to consistency check: [#9447](https://github.com/owncloud/ocis/pull/9447)
 * Enhancement - Deprecate gateway environment variables: [#9451](https://github.com/owncloud/ocis/pull/9451)
 * Enhancement - Allow reindexing all spaces: [#9456](https://github.com/owncloud/ocis/pull/9456)
+* Enhancement - Allow disable versioning: [#9473](https://github.com/owncloud/ocis/pull/9473)
+* Enhancement - Bump reva: [#9473](https://github.com/owncloud/ocis/pull/9473)
 * Enhancement - Various fixes for the activitylog service: [#9485](https://github.com/owncloud/ocis/pull/9485)
 
 ## Details
@@ -124,6 +126,18 @@ The following sections list the changes for unreleased.
    reindexing all spaces at once.
 
    https://github.com/owncloud/ocis/pull/9456
+
+* Enhancement - Allow disable versioning: [#9473](https://github.com/owncloud/ocis/pull/9473)
+
+   Adds new configuration options to disable versioning for the storage providers
+
+   https://github.com/owncloud/ocis/pull/9473
+
+* Enhancement - Bump reva: [#9473](https://github.com/owncloud/ocis/pull/9473)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/9473
 
 * Enhancement - Various fixes for the activitylog service: [#9485](https://github.com/owncloud/ocis/pull/9485)
 
