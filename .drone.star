@@ -2021,6 +2021,7 @@ def notify(ctx):
 
 def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
     user = "0:0"
+    container_name = "ocis-server"
     environment = {
         "OCIS_URL": OCIS_URL,
         "OCIS_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
@@ -2061,6 +2062,11 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopiserver:9300"
         environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = OCIS_URL
 
+    if deploy_type == "federation":
+        environment["OCIS_URL"] = OCIS_FED_URL
+        environment["PROXY_HTTP_ADDR"] = OCIS_FED_DOMAIN
+        container_name = "federation-ocis-server"
+
     if tika_enabled:
         environment["FRONTEND_FULL_TEXT_SEARCH_ENABLED"] = True
         environment["SEARCH_EXTRACTOR_TYPE"] = "tika"
@@ -2085,7 +2091,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     ]
 
     ocis = {
-        "name": "ocis-server",
+        "name": container_name,
         "image": OC_CI_GOLANG,
         "detach": True,
         "environment": environment,
@@ -2097,11 +2103,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "volumes": volumes,
         "depends_on": depends_on,
     }
-
-    if deploy_type == "federation":
-        environment["OCIS_URL"] = OCIS_FED_URL
-        environment["PROXY_HTTP_ADDR"] = OCIS_FED_DOMAIN
-        ocis["name"] = "federation-ocis-server"
 
     wait_for_ocis = {
         "name": "wait-for-%s" % (ocis["name"]),
