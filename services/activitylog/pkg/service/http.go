@@ -110,15 +110,15 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		case events.UploadReady:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, true), WithUser(ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName()))
+			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, true), WithUser(ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName()), WithSpace(toSpace(ev.FileRef)))
 		case events.FileTouched:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""), WithSpace(toSpace(ev.Ref)))
 		case events.ContainerCreated:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""), WithSpace(toSpace(ev.Ref)))
 		case events.ItemTrashed:
 			message = MessageResourceTrashed
 			ts = utils.TSToTime(ev.Timestamp)
@@ -130,7 +130,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 				vars, err = s.GetVars(ctx, WithResource(ev.Ref, false), WithOldResource(ev.OldReference), WithUser(ev.Executant, ""))
 			case false:
 				message = MessageResourceMoved
-				vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""))
+				vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""), WithSpace(toSpace(ev.Ref)))
 			}
 			ts = utils.TSToTime(ev.Timestamp)
 		case events.ShareCreated:

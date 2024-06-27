@@ -192,6 +192,11 @@ func WithSharee(uid *user.UserId, gid *group.GroupId) ActivityOption {
 // WithSpace sets the space variable for an activity
 func WithSpace(spaceid *provider.StorageSpaceId) ActivityOption {
 	return func(ctx context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
+		if _, ok := vars["space"]; ok {
+			// do not override space if already set
+			return nil
+		}
+
 		s, err := utils.GetSpace(ctx, spaceid.GetOpaqueId(), gwc)
 		if err != nil {
 			vars["space"] = Resource{
