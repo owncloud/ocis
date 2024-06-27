@@ -56,7 +56,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add fail flag to consistency check: [#9447](https://github.com/owncloud/ocis/pull/9447)
 * Enhancement - Deprecate gateway environment variables: [#9451](https://github.com/owncloud/ocis/pull/9451)
 * Enhancement - Allow reindexing all spaces: [#9456](https://github.com/owncloud/ocis/pull/9456)
-* Enhancement - Various fixes for the activitylog service: [#9467](https://github.com/owncloud/ocis/pull/9467)
+* Enhancement - Various fixes for the activitylog service: [#9485](https://github.com/owncloud/ocis/pull/9485)
 
 ## Details
 
@@ -125,10 +125,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9456
 
-* Enhancement - Various fixes for the activitylog service: [#9467](https://github.com/owncloud/ocis/pull/9467)
+* Enhancement - Various fixes for the activitylog service: [#9485](https://github.com/owncloud/ocis/pull/9485)
 
    First round of fixes to make the activitylog service more robust and reliable.
 
+   https://github.com/owncloud/ocis/pull/9485
    https://github.com/owncloud/ocis/pull/9467
 
 # Changelog for [6.0.0] (2024-06-19)
