@@ -59,7 +59,7 @@ Feature: change shared resource
     When user "Alice" downloads version of the file "/textfile1.txt" with the index "1" of the space "Personal" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "old content version 2"
-    When user "Brian" tries to get version of the file "/textfile1.txt" with the index "1" of the space "Shares" using the WebDAV API
+    When user "Brian" tries to get versions of the file "/textfile1.txt" from the space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     Examples:
       | user-role   |
