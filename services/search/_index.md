@@ -1,6 +1,6 @@
 ---
 title: Search
-date: 2024-06-27T11:58:26.997961786Z
+date: 2024-06-27T12:42:22.151842632Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/search
@@ -186,10 +186,16 @@ This is exactly the same as [File uploaded - synchronous](#file-uploaded---synch
 The service includes a command-line interface to trigger re-indexing a space:
 
 ```shell
-ocis search index --space $SPACE_ID --user $USER_ID
+ocis search index --space $SPACE_ID
 ```
 
-Note that not names but IDs are necessary and that the specified user ID needs access to the space to be indexed.
+It can also be used to re-index all spaces:
+
+```shell
+ocis search index --all-spaces
+```
+
+Note that either `--space $SPACE_ID` or `--all-spaces` must be set.
 
 ## Notes
 
