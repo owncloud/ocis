@@ -93,6 +93,7 @@ drivers:
     max_concurrency: 5
     async_uploads: true
     max_quota: 0
+    disable_versioning: false
   s3ng:
     metadata_backend: messagepack
     propagator: sync
@@ -120,6 +121,7 @@ drivers:
     max_acquire_lock_cycles: 20
     lock_cycle_duration_factor: 30
     max_concurrency: 5
+    disable_versioning: false
   owncloudsql:
     root: /var/lib/ocis/storage/owncloud
     share_folder: /Shares

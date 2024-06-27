@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-27-14-55-56]
+[#deprecation-note-2024-06-27-15-27-29]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -450,6 +450,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
 
+a|`OCIS_DISABLE_VERSIONING` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.
+
 a|`STORAGE_USERS_S3NG_METADATA_BACKEND` +
 
 a| [subs=-attributes]
@@ -676,6 +685,15 @@ a| [subs=-attributes]
 ++5 ++
 a| [subs=-attributes]
 Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.
+
+a|`OCIS_DISABLE_VERSIONING` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.
 
 a|`STORAGE_USERS_OWNCLOUDSQL_DATADIR` +
 
