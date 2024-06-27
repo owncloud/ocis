@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	mRegistry "go-micro.dev/v4/registry"
-	"go-micro.dev/v4/util/addr"
+	mAddr "go-micro.dev/v4/util/addr"
 )
 
-func BuildGRPCService(serviceID, uuid, address string, version string) *mRegistry.Service {
+func BuildGRPCService(serviceID, uuid, transport, address string, version string) *mRegistry.Service {
 	var host string
 	var port int
 
@@ -22,20 +22,25 @@ func BuildGRPCService(serviceID, uuid, address string, version string) *mRegistr
 		host = parts[0]
 	}
 
-	addr, err := addr.Extract(host)
-	if err != nil {
-		addr = host
+	addr := host
+	if transport != "unix" {
+		var err error
+		addr, err = mAddr.Extract(host)
+		if err != nil {
+			addr = host
+		}
+		addr = net.JoinHostPort(addr, strconv.Itoa(port))
 	}
 
 	node := &mRegistry.Node{
 		Id:       serviceID + "-" + uuid,
-		Address:  net.JoinHostPort(addr, fmt.Sprint(port)),
+		Address:  addr,
 		Metadata: make(map[string]string),
 	}
 
 	node.Metadata["registry"] = GetRegistry().String()
 	node.Metadata["server"] = "grpc"
-	node.Metadata["transport"] = "grpc"
+	node.Metadata["transport"] = transport
 	node.Metadata["protocol"] = "grpc"
 
 	return &mRegistry.Service{
@@ -58,7 +63,7 @@ func BuildHTTPService(serviceID, uuid, address string, version string) *mRegistr
 		host = parts[0]
 	}
 
-	addr, err := addr.Extract(host)
+	addr, err := mAddr.Extract(host)
 	if err != nil {
 		addr = host
 	}
