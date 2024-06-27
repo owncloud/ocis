@@ -41,7 +41,7 @@ services:
       - "traefik.http.routers.collaboration-oo.service=collaboration-oo"
       - "traefik.http.services.collaboration-oo.loadbalancer.server.port=9300"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   onlyoffice:

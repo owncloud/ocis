@@ -5,6 +5,8 @@ services:
     networks:
       ocis-net:
     restart: always
+    logging:
+      driver: ${LOG_DRIVER:-local}
 
   ocis:
     environment:

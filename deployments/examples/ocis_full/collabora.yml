@@ -45,7 +45,7 @@ services:
       - "traefik.http.routers.collaboration.service=collaboration"
       - "traefik.http.services.collaboration.loadbalancer.server.port=9300"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   collabora:
