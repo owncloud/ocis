@@ -33,6 +33,7 @@ var _registeredEvents = []events.Unmarshaller{
 	events.FileTouched{},
 	events.ContainerCreated{},
 	events.ItemTrashed{},
+	events.ItemPurged{},
 	events.ItemMoved{},
 	events.ShareCreated{},
 	events.ShareRemoved{},

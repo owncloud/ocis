@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -17,6 +18,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/grpc/metadata"
 
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
 	"github.com/owncloud/ocis/v2/ocis-pkg/kql"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
@@ -51,7 +53,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
-	rid, limit, rawActivityAccepted, activityAccepted, err := s.getFilters(r.URL.Query().Get("kql"))
+	rid, limit, rawActivityAccepted, activityAccepted, sort, err := s.getFilters(r.URL.Query().Get("kql"))
 	if err != nil {
 		s.log.Info().Str("query", r.URL.Query().Get("kql")).Err(err).Msg("error getting filters")
 		_, _ = w.Write([]byte(err.Error()))
@@ -83,7 +85,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
-	var resp GetActivitiesResponse
+	resp := GetActivitiesResponse{Activities: make([]libregraph.Activity, 0, len(evRes.GetEvents()))}
 	for _, e := range evRes.GetEvents() {
 		delete(toDelete, e.GetId())
 
@@ -179,6 +181,8 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		}()
 	}
 
+	sort(resp.Activities)
+
 	b, err := json.Marshal(resp)
 	if err != nil {
 		s.log.Error().Err(err).Msg("error marshalling activities")
@@ -210,14 +214,16 @@ func (s *ActivitylogService) unwrapEvent(e *ehmsg.Event) interface{} {
 	return einterface
 }
 
-func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int, func(RawActivity) bool, func(*ehmsg.Event) bool, error) {
+func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int, func(RawActivity) bool, func(*ehmsg.Event) bool, func([]libregraph.Activity), error) {
 	qast, err := kql.Builder{}.Build(query)
 	if err != nil {
-		return nil, 0, nil, nil, err
+		return nil, 0, nil, nil, nil, err
 	}
 
 	prefilters := make([]func(RawActivity) bool, 0)
 	postfilters := make([]func(*ehmsg.Event) bool, 0)
+
+	sortby := func(_ []libregraph.Activity) {}
 
 	var (
 		itemID string
@@ -233,7 +239,7 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 			case "depth":
 				depth, err := strconv.Atoi(v.Value)
 				if err != nil {
-					return nil, limit, nil, nil, err
+					return nil, limit, nil, nil, sortby, err
 				}
 
 				prefilters = append(prefilters, func(a RawActivity) bool {
@@ -242,10 +248,19 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 			case "limit":
 				l, err := strconv.Atoi(v.Value)
 				if err != nil {
-					return nil, limit, nil, nil, err
+					return nil, limit, nil, nil, sortby, err
 				}
 
 				limit = l
+			case "sort":
+				switch v.Value {
+				case "asc":
+					// nothing to do - already ascending
+				case "desc":
+					sortby = func(activities []libregraph.Activity) {
+						slices.Reverse(activities)
+					}
+				}
 			}
 		case *ast.DateTimeNode:
 			switch v.Operator.Value {
@@ -260,14 +275,18 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 			}
 		case *ast.OperatorNode:
 			if v.Value != "AND" {
-				return nil, limit, nil, nil, errors.New("only AND operator is supported")
+				return nil, limit, nil, nil, sortby, errors.New("only AND operator is supported")
 			}
 		}
 	}
 
 	rid, err := storagespace.ParseID(itemID)
 	if err != nil {
-		return nil, limit, nil, nil, err
+		return nil, limit, nil, nil, sortby, err
+	}
+	if rid.GetOpaqueId() == "" {
+		// space root requested - fix format
+		rid.OpaqueId = rid.GetSpaceId()
 	}
 	pref := func(a RawActivity) bool {
 		for _, f := range prefilters {
@@ -285,7 +304,7 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 		}
 		return true
 	}
-	return &rid, limit, pref, postf, nil
+	return &rid, limit, pref, postf, sortby, nil
 }
 
 // returns true if this is just a rename
