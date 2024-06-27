@@ -37,6 +37,7 @@ The Infinite Scale Team and product management are providing a default setup for
 
 ### Optional components
 
+- ClamAV Virusscanner
 - Cloud Importer (Experimental)
 - OnlyOffice as an alternative to Collabora
 - S3 Storage config to connect to an S3 storage backend
@@ -269,6 +270,18 @@ Open https://ocis.owncloud.test in your browser and accept the invalid certifica
 
 ## Additional services
 
+### Clamav Virusscanner
+
+You can add a Clamav Virusscanner to the stack. The service is disabled by default. To enable it, uncomment the `CLAMAV` line in the `docker-compose.yml` file.
+
+```shell {linenos=table,hl_lines=[3]}
+## Clamav Settings ##
+# The leading colon is required to enable the service.
+CLAMAV=:clamav.yml
+```
+
+After enabling that service, you can add the service to the stack with `docker-compose up -d` again.
+
 ### Traefik dashboard
 
 If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` e.g. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
@@ -308,17 +321,41 @@ COMPANION_ONEDRIVE_SECRET=
 
 After Enabling that servive by uncommenting the `CLOUD_IMPORTER` line, you can add the service to the stack with `docker-compose up -d` again.
 
-### Clamav Virusscanner
+### S3 Storage
 
-You can add a Clamav Virusscanner to the stack. The service is disabled by default. To enable it, uncomment the `CLAMAV` line in the `docker-compose.yml` file.
+You can use an S3 compatible Storage as the primary data store. The metadatata of the files will still be stored on the local filesystem.
 
-```shell {linenos=table,hl_lines=[3]}
-## Clamav Settings ##
+{{<hint type="info">}}
+The endpoint, region and keys for your S3 Server need to be provided by the service or company who operates it. Normally you can get these via web portal.
+{{</hint>}}
+
+```shell {linenos=table,hl_lines=[9,11,13,15,17,19]}
+# S3 Storage configuration
+#
+# - optional
+#
+# Infinite Scale supports S3 storage as primary storage.
+# Per default, S3 storage is disabled and we use the local filesystem.
+# To enable S3 storage, uncomment the following lines and configure the S3 storage.
 # The leading colon is required to enable the service.
-CLAMAV=:clamav.yml
+S3NG=:s3ng.yml
+# Configure the S3 storage endpoint. Defaults to "http://minio:9000" for testing purposes.
+S3NG_ENDPOINT=
+# S3 region. Defaults to "default".
+S3NG_REGION=
+# S3 access key. Defaults to "ocis"
+S3NG_ACCESS_KEY=
+# S3 secret. Defaults to "ocis-secret-key"
+S3NG_SECRET_KEY=
+# S3 bucket. Defaults to "ocis"
+S3NG_BUCKET=
 ```
 
-After enabling that service, you can add the service to the stack with `docker-compose up -d` again.
+#### Use a local minio S3 storage backend
+
+For testing purposes, you can use a local minio S3 storage backend. To enable it, uncomment the `S3NG_MINIO` line in the `docker-compose.yml` file.
+
+The frontend for the minio server is available at `http://minio.owncloud.test` and the access key is `ocis` and the secret key is `ocis-secret`.
 
 ## Local setup for web development
 
