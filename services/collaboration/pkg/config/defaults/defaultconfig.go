@@ -33,6 +33,7 @@ func DefaultConfig() *config.Config {
 		},
 		GRPC: config.GRPC{
 			Addr:      "127.0.0.1:9301",
+			Protocol:  "tcp",
 			Namespace: "com.owncloud.api",
 		},
 		HTTP: config.HTTP{
