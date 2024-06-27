@@ -287,10 +287,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiSpacesDavOperation/moveByFileId.feature:466](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L466)
 - [apiSpacesDavOperation/moveByFileId.feature:467](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L467)
-- [apiSpacesDavOperation/moveByFileId.feature:488](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L488)
 - [apiSpacesDavOperation/moveByFileId.feature:489](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L489)
-- [apiSpacesDavOperation/moveByFileId.feature:724](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L724)
+- [apiSpacesDavOperation/moveByFileId.feature:490](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L490)
 - [apiSpacesDavOperation/moveByFileId.feature:725](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L725)
+- [apiSpacesDavOperation/moveByFileId.feature:726](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L726)
 
 ### [MOVE a file into same folder with same name returns 404 instead of 403](https://github.com/owncloud/ocis/issues/1976)
 

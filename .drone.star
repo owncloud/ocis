@@ -2064,6 +2064,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
 
     if deploy_type == "federation":
         environment["OCIS_URL"] = OCIS_FED_URL
+        environment["PROXY_HTTP_ADDR"] = OCIS_FED_DOMAIN
         container_name = "federation-ocis-server"
 
     if tika_enabled:
@@ -2478,7 +2479,8 @@ def pipelineSanityChecks(ctx, pipelines):
 OCIS_URL = "https://ocis-server:9200"
 OCIS_DOMAIN = "ocis-server:9200"
 OC10_URL = "http://oc10:8080"
-OCIS_FED_URL = "https://federation-ocis-server:9200"
+OCIS_FED_URL = "https://federation-ocis-server:10200"
+OCIS_FED_DOMAIN = "federation-ocis-server:10200"
 
 # step volumes
 stepVolumeOC10Templates = \

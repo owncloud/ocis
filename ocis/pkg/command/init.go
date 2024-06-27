@@ -37,7 +37,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 				Name:    "config-path",
 				Value:   defaults.BaseConfigPath(),
 				Usage:   "Config path for the ocis runtime",
-				EnvVars: []string{"OCIS_CONFIG_DIR"},
+				EnvVars: []string{"OCIS_CONFIG_DIR", "OCIS_BASE_DATA_PATH"},
 			},
 			&cli.StringFlag{
 				Name:    "admin-password",
