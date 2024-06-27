@@ -478,6 +478,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | <permissions> |
+    And user "Brian" has a share "/folder" synced
     When user "Brian" moves a file "Shares/folder/test.txt" into "folder" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "403"
     And as "Alice" file "test.txt" should not exist in the trashbin of the space "Personal"
