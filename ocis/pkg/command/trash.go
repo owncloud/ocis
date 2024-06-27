@@ -30,7 +30,7 @@ func TrashCommand(cfg *config.Config) *cli.Command {
 
 func TrashPurgeOrphanedDirsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "purge-orphaned-dirs",
+		Name:  "purge-empty-dirs",
 		Usage: "purge orphaned directories",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
