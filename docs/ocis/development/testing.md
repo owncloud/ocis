@@ -587,6 +587,8 @@ To enable ocm in the web interface, you need to set the following envs:
 `FRONTEND_OCS_LIST_OCM_SHARES=true` \
 `FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING=true` \
 `FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING=true`
+
+and put `ocm` to apps https://github.com/owncloud/ocis/blob/master/services/web/pkg/config/defaults/defaultconfig.go#L101
 {{< /hint>}}
 
 #### Run the Acceptance Test

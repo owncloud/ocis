@@ -95,7 +95,6 @@
             "OCIS_LDAP_URI": "ldaps://localhost:10235",
             "OCIS_RUNTIME_PORT": "10250",
             "OCIS_URL": "https://federation-ocis-server:10200",
-            // "OCIS_OIDC_ISSUER": "federation-ocis-server",
             "FRONTEND_OCS_LIST_OCM_SHARES": "true",
             "FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING": "true",
             "FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING": "true",
@@ -187,9 +186,9 @@
             "OCIS_LOG_COLOR": "true",
             "PROXY_ENABLE_BASIC_AUTH": "true",
             "IDM_CREATE_DEMO_USERS": "true",
-            "OCIS_ADMIN_USER_ID": "some-admin-user-id-0000-000000000000", // FIXME currently must have the length of a UUID, see reva/pkg/storage/utils/decomposedfs/spaces.go:228
+            "OCIS_ADMIN_USER_ID": "some-admin-user-id-0000-000000000000",
             "IDM_ADMIN_PASSWORD": "admin",
-            "OCIS_SYSTEM_USER_ID": "some-system-user-id-000-000000000000", // FIXME currently must have the length of a UUID, see reva/pkg/storage/utils/decomposedfs/spaces.go:228
+            "OCIS_SYSTEM_USER_ID": "some-system-user-id-000-000000000000",
             "OCIS_SYSTEM_USER_API_KEY": "some-system-user-machine-auth-api-key",
             "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
             "OCIS_MACHINE_AUTH_API_KEY": "some-ocis-machine-auth-api-key",

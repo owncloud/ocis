@@ -2090,22 +2090,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OCIS_URL"]),
     ]
 
-    ocis = {
-        "name": container_name,
-        "image": OC_CI_GOLANG,
-        "detach": True,
-        "environment": environment,
-        "user": user,
-        "commands": [
-            "%s init --insecure true" % ocis_bin,
-            "cat $OCIS_CONFIG_DIR/ocis.yaml",
-        ] + wrapper_commands,
-        "volumes": volumes,
-        "depends_on": depends_on,
-    }
-
     wait_for_ocis = {
-        "name": "wait-for-%s" % (ocis["name"]),
+        "name": "wait-for-%s" % (container_name),
         "image": OC_CI_ALPINE,
         "commands": [
             # wait for ocis-server to be ready (5 minutes)
@@ -2117,7 +2103,19 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     }
 
     return [
-        ocis,
+        {
+            "name": container_name,
+            "image": OC_CI_GOLANG,
+            "detach": True,
+            "environment": environment,
+            "user": user,
+            "commands": [
+                "%s init --insecure true" % ocis_bin,
+                "cat $OCIS_CONFIG_DIR/ocis.yaml",
+            ] + (wrapper_commands),
+            "volumes": volumes,
+            "depends_on": depends_on,
+        },
         wait_for_ocis,
     ]
 

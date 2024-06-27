@@ -1,4 +1,4 @@
-@ocm @skipOnReva
+@ocm
 Feature: an user shares resources usin ScienceMesh application
   As a user
   I want to share resources between different ocis instances
