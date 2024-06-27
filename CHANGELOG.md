@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix sharing-ng permission listings for personal and virtual drive items: [#9438](https://github.com/owncloud/ocis/pull/9438)
+* Bugfix - Add inotify-tools and bash packages to docker files: [#9440](https://github.com/owncloud/ocis/pull/9440)
 * Bugfix - Allow all uploads to restart: [#9465](https://github.com/owncloud/ocis/pull/9465)
 * Enhancement - Activitylog API: [#9361](https://github.com/owncloud/ocis/pull/9361)
 * Enhancement - Add the backchannel logout event: [#9447](https://github.com/owncloud/ocis/pull/9447)
@@ -65,6 +66,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8922
    https://github.com/owncloud/ocis/pull/9438
+
+* Bugfix - Add inotify-tools and bash packages to docker files: [#9440](https://github.com/owncloud/ocis/pull/9440)
+
+   We need both packages to make posixfs work. Later, once the golang package is
+   fixed to not depend on bash any more, bash can be removed again.
+
+   https://github.com/owncloud/ocis/pull/9440
 
 * Bugfix - Allow all uploads to restart: [#9465](https://github.com/owncloud/ocis/pull/9465)
 
