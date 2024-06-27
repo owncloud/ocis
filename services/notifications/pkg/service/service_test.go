@@ -315,7 +315,7 @@ https://owncloud.com
                         <br><br>
                         Dr. O&#39;reilly has shared "&lt;script&gt;alert(&#39;secrets of the board&#39;);&lt;/script&gt;" with you.
                         <br><br>
-                        <a href="files/shares/with-me">Click here to view it: files/shares/with-me</a>
+                        Click here to view it: <a href="files/shares/with-me">files/shares/with-me</a>
                     </td>
                 </tr>
                 <tr>
@@ -384,7 +384,7 @@ https://owncloud.com
                         <br><br>
                         Dr. O&#39;reilly has invited you to join "&lt;script&gt;alert(&#39;secret space&#39;);&lt;/script&gt;".
                         <br><br>
-                        <a href="f/spaceid">Click here to view it: f/spaceid</a>
+                        Click here to view it: <a href="f/spaceid">f/spaceid</a>
                     </td>
                 </tr>
                 <tr>

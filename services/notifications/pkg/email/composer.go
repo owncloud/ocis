@@ -89,6 +89,6 @@ func callToActionToHTML(s string) string {
 	if strings.TrimSpace(s) == "" {
 		return ""
 	}
-	s = strings.TrimSuffix(s, "{{ .ShareLink }}")
-	return `<a href="{{ .ShareLink }}">` + s + `</a>`
+	s = strings.TrimSuffix(s, "{ShareLink}")
+	return s + `<a href="{ShareLink}">{ShareLink}</a>`
 }
