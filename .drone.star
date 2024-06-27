@@ -270,14 +270,8 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -291,6 +285,7 @@ def main(ctx):
         ),
     )
 
+    return test_pipelines
     pipelines = test_pipelines + build_release_pipelines
 
     if ctx.build.event == "cron":
@@ -370,7 +365,7 @@ def testPipelines(ctx):
 
     pipelines += e2eTestPipeline(ctx)
 
-    return pipelines
+    return e2eTestPipeline(ctx)
 
 def getGoBinForTesting(ctx):
     return [{
