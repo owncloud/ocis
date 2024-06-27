@@ -16,7 +16,7 @@ func TrashCommand(cfg *config.Config) *cli.Command {
 		Name:  "trash",
 		Usage: "ocis trash functionality",
 		Subcommands: []*cli.Command{
-			TrashPurgeOrphanedDirsCommand(cfg),
+			TrashPurgeEmptyDirsCommand(cfg),
 		},
 		Before: func(c *cli.Context) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg, true))
@@ -28,10 +28,10 @@ func TrashCommand(cfg *config.Config) *cli.Command {
 	}
 }
 
-func TrashPurgeOrphanedDirsCommand(cfg *config.Config) *cli.Command {
+func TrashPurgeEmptyDirsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "purge-empty-dirs",
-		Usage: "purge orphaned directories",
+		Usage: "purge empty directories",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "basepath",
@@ -52,7 +52,7 @@ func TrashPurgeOrphanedDirsCommand(cfg *config.Config) *cli.Command {
 				return cli.ShowCommandHelp(c, "trash")
 			}
 
-			if err := trash.PurgeTrashOrphanedPaths(basePath, c.Bool("dry-run")); err != nil {
+			if err := trash.PurgeTrashEmptyPaths(basePath, c.Bool("dry-run")); err != nil {
 				fmt.Println(err)
 				return err
 			}

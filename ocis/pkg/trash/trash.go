@@ -12,8 +12,8 @@ const (
 	_trashGlobPattern = "storage/users/spaces/*/*/trash/*/*/*/*"
 )
 
-// PurgeTrashOrphanedPaths purges orphaned paths in the trash
-func PurgeTrashOrphanedPaths(p string, dryRun bool) error {
+// PurgeTrashEmptyPaths purges empty paths in the trash
+func PurgeTrashEmptyPaths(p string, dryRun bool) error {
 	// we have all trash nodes in all spaces now
 	dirs, err := filepath.Glob(filepath.Join(p, _trashGlobPattern))
 	if err != nil {
