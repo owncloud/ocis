@@ -553,7 +553,7 @@ class TrashbinContext implements Context {
 	public function userTriesToRestoreFromTrashbinOfUser(?string $asUser, ?string $path, ?string $user):void {
 		$user = $this->featureContext->getActualUsername($user);
 		$asUser = $this->featureContext->getActualUsername($asUser);
-		$response = $this->restoreElement($user, $path, null, true, $asUser);
+		$response = $this->restoreElement($user, $path, null, $asUser);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -572,7 +572,7 @@ class TrashbinContext implements Context {
 	public function userTriesToRestoreFromTrashbinOfUserUsingPassword(?string $asUser, ?string $path, ?string $user, ?string $password):void {
 		$asUser = $this->featureContext->getActualUsername($asUser);
 		$user = $this->featureContext->getActualUsername($user);
-		$response = $this->restoreElement($user, $path, null, true, $asUser, $password);
+		$response = $this->restoreElement($user, $path, null, $asUser, $password);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -812,7 +812,6 @@ class TrashbinContext implements Context {
 	 * @param string $user
 	 * @param string $originalPath
 	 * @param string|null $destinationPath
-	 * @param bool $throwExceptionIfNotFound
 	 * @param string|null $asUser - To send request as another user
 	 * @param string|null $password
 	 *
@@ -820,7 +819,7 @@ class TrashbinContext implements Context {
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	private function restoreElement(string $user, string $originalPath, ?string $destinationPath = null, bool $throwExceptionIfNotFound = true, ?string $asUser = null, ?string $password = null):ResponseInterface {
+	private function restoreElement(string $user, string $originalPath, ?string $destinationPath = null, ?string $asUser = null, ?string $password = null):ResponseInterface {
 		$asUser = $asUser ?? $user;
 		$listing = $this->listTrashbinFolder($user);
 		$originalPath = \trim($originalPath, '/');
@@ -841,12 +840,10 @@ class TrashbinContext implements Context {
 		// The requested element to restore was not even in the trashbin.
 		// Throw an exception, because there was not any API call, and so there
 		// is also no up-to-date response to examine in later test steps.
-		if ($throwExceptionIfNotFound) {
-			throw new \Exception(
-				__METHOD__
-				. " cannot restore from trashbin because no element was found for user $user at original path $originalPath"
-			);
-		}
+		throw new \Exception(
+			__METHOD__
+			. " cannot restore from trashbin because no element was found for user $user at original path $originalPath"
+		);
 	}
 
 	/**
@@ -923,20 +920,6 @@ class TrashbinContext implements Context {
 		} else {
 			$this->featureContext->checkDownloadedContentMatches($alternativeContent, '', $response);
 		}
-	}
-
-	/**
-	 * @When /^user "([^"]*)" tries to restore the (?:file|folder|entry) with original path "([^"]*)" using the trashbin API$/
-	 *
-	 * @param string $user
-	 * @param string $originalPath
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userTriesToRestoreElementInTrash(string $user, string $originalPath):void {
-		$response = $this->restoreElement($user, $originalPath, null, false);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
