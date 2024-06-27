@@ -49,7 +49,7 @@ func TrashPurgeOrphanedDirsCommand(cfg *config.Config) *cli.Command {
 			basePath := c.String("basepath")
 			if basePath == "" {
 				fmt.Println("basepath is required")
-				return cli.ShowCommandHelp(c, "consistency")
+				return cli.ShowCommandHelp(c, "trash")
 			}
 
 			if err := trash.PurgeTrashOrphanedPaths(basePath, c.Bool("dry-run")); err != nil {
