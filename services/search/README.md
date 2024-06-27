@@ -144,10 +144,16 @@ This is exactly the same as [File uploaded - synchronous](#file-uploaded---synch
 The service includes a command-line interface to trigger re-indexing a space:
 
 ```shell
-ocis search index --space $SPACE_ID --user $USER_ID
+ocis search index --space $SPACE_ID
 ```
 
-Note that not names but IDs are necessary and that the specified user ID needs access to the space to be indexed.
+It can also be used to re-index all spaces:
+
+```shell
+ocis search index --all-spaces
+```
+
+Note that either `--space $SPACE_ID` or `--all-spaces` must be set.
 
 ## Notes
 
