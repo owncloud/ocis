@@ -90,6 +90,8 @@ type Options struct {
 	MaxConcurrency          int `mapstructure:"max_concurrency"`
 
 	MaxQuota uint64 `mapstructure:"max_quota"`
+
+	DisableVersioning bool `mapstructure:"disable_versioning"`
 }
 
 // AsyncPropagatorOptions holds the configuration for the async propagator

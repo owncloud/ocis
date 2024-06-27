@@ -161,6 +161,7 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 		"max_concurrency":             cfg.Drivers.OCIS.MaxConcurrency,
 		"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
 		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
+		"disable_versioning":          cfg.Drivers.OCIS.DisableVersioning,
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
 			"cache_nodes":               cfg.FilemetadataCache.Nodes,
@@ -216,6 +217,7 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 		"lock_cycle_duration_factor":  cfg.Drivers.OCIS.LockCycleDurationFactor,
 		"max_concurrency":             cfg.Drivers.OCIS.MaxConcurrency,
 		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
+		"disable_versioning":          cfg.Drivers.OCIS.DisableVersioning,
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
 			"cache_nodes":               cfg.FilemetadataCache.Nodes,
@@ -285,6 +287,7 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 		"max_acquire_lock_cycles":     cfg.Drivers.S3NG.MaxAcquireLockCycles,
 		"lock_cycle_duration_factor":  cfg.Drivers.S3NG.LockCycleDurationFactor,
 		"max_concurrency":             cfg.Drivers.S3NG.MaxConcurrency,
+		"disable_versioning":          cfg.Drivers.S3NG.DisableVersioning,
 		"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
@@ -344,6 +347,7 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 		"s3.bucket":                   cfg.Drivers.S3NG.Bucket,
 		"max_acquire_lock_cycles":     cfg.Drivers.S3NG.MaxAcquireLockCycles,
 		"max_concurrency":             cfg.Drivers.S3NG.MaxConcurrency,
+		"disable_versioning":          cfg.Drivers.S3NG.DisableVersioning,
 		"lock_cycle_duration_factor":  cfg.Drivers.S3NG.LockCycleDurationFactor,
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,

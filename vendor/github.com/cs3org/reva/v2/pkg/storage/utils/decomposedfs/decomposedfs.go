@@ -157,10 +157,11 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 	}
 
 	aspects := aspects.Aspects{
-		Lookup:      lu,
-		Tree:        tp,
-		Permissions: permissions.NewPermissions(node.NewPermissions(lu), permissionsSelector),
-		EventStream: es,
+		Lookup:            lu,
+		Tree:              tp,
+		Permissions:       permissions.NewPermissions(node.NewPermissions(lu), permissionsSelector),
+		EventStream:       es,
+		DisableVersioning: o.DisableVersioning,
 	}
 
 	return New(o, aspects)
