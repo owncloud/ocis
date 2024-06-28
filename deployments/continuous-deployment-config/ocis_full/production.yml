@@ -1,5 +1,5 @@
 ---
-- name: continuous-deployment-ocis-traefik-daily
+- name: continuous-deployment-ocis-production
   server:
     server_type: cx21
     image: ubuntu-22.04
@@ -14,7 +14,7 @@
       - /var/lib/docker/volumes/ocis_certs
 
   domains:
-    - "*.ocis-traefik.daily.owncloud.works"
+    - "*.ocis.production.owncloud.works"
 
   vars:
     ssh_authorized_keys:
@@ -27,23 +27,27 @@
     docker_compose_projects:
       - name: ocis
         git_url: https://github.com/owncloud/ocis.git
-        ref: master
-        docker_compose_path: deployments/examples/ocis_traefik
+        ref: stable-5.0
+        docker_compose_path: deployments/examples/ocis_wopi
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: mbarz@owncloud.com
-          OCIS_DOCKER_TAG: latest
-          OCIS_DOMAIN: ocis.ocis-traefik.daily.owncloud.works
+          OCIS_DOCKER_TAG: 5.0.5
+          OCIS_DOMAIN: ocis.ocis.production.owncloud.works
+          COMPANION_DOMAIN: companion.ocis.production.owncloud.works
+          COMPANION_IMAGE: owncloud/uppy-companion:3.12.13-owncloud
+          WOPISERVER_DOMAIN: wopiserver.ocis.production.owncloud.works
+          COLLABORA_DOMAIN: collabora.ocis.production.owncloud.works
+          ONLYOFFICE_DOMAIN: onlyoffice.ocis.production.owncloud.works
           DEMO_USERS: "true"
-          INBUCKET_DOMAIN: mail.ocis-traefik.daily.owncloud.works
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
         ref: master
         env:
           NETWORK_NAME: ocis-net
-          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-traefik.daily.owncloud.works
+          TELEMETRY_SERVE_DOMAIN: telemetry.ocis.production.owncloud.works
           JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
-          TELEGRAF_SPECIFIC_CONFIG: ocis_single_container
-          OCIS_URL: ocis.ocis-traefik.daily.owncloud.works
-          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-traefik-daily
+          TELEGRAF_SPECIFIC_CONFIG: ocis_wopi
+          OCIS_URL: ocis.ocis.production.owncloud.works
+          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-production
