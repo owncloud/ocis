@@ -68,9 +68,7 @@ func GetRegistry(opts ...Option) mRegistry.Registry {
 			cfg.DisableCache = true // no cache needed for in-memory registry
 		case "kubernetes":
 			fmt.Println("Attention: kubernetes registry is deprecated, use nats-js-kv instead")
-			_reg = kubernetesr.NewRegistry(
-				mRegistry.Addrs(cfg.Addresses...),
-			)
+			_reg = kubernetesr.NewRegistry()
 		case "nats":
 			fmt.Println("Attention: nats registry is deprecated, use nats-js-kv instead")
 			_reg = natsr.NewRegistry(
