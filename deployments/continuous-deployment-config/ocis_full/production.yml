@@ -39,8 +39,9 @@
           WOPISERVER_DOMAIN: wopiserver.ocis.production.owncloud.works
           COLLABORA_DOMAIN: collabora.ocis.production.owncloud.works
           ONLYOFFICE_DOMAIN: onlyoffice.ocis.production.owncloud.works
+          INBUCKET_DOMAIN: mail.ocis.production.owncloud.works
           DEMO_USERS: "true"
-          COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
+          COMPOSE_FILE: docker-compose.yml:ocis.yml:tika.yml:collabora.yml:cloudimporter.yml:inbucket.yml:monitoring.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
         ref: master

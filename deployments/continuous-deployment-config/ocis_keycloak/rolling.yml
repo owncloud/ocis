@@ -1,5 +1,5 @@
 ---
-- name: continuous-deployment-ocis-keycloak-latest
+- name: continuous-deployment-ocis-keycloak-rolling
   server:
     server_type: cx21
     image: ubuntu-22.04
@@ -14,7 +14,7 @@
       - /var/lib/docker/volumes/ocis_certs
 
   domains:
-    - "*.ocis-keycloak.latest.owncloud.works"
+    - "*.ocis-keycloak.rolling.owncloud.works"
 
   vars:
     ssh_authorized_keys:
@@ -33,16 +33,17 @@
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: mbarz@owncloud.com
           OCIS_DOCKER_TAG: latest
-          OCIS_DOMAIN: ocis.ocis-keycloak.latest.owncloud.works
-          KEYCLOAK_DOMAIN: keycloak.ocis-keycloak.latest.owncloud.works
+          OCIS_DOCKER_IMAGE: owncloud/ocis-rolling
+          OCIS_DOMAIN: ocis.ocis-keycloak.rolling.owncloud.works
+          KEYCLOAK_DOMAIN: keycloak.ocis-keycloak.rolling.owncloud.works
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
         ref: master
         env:
           NETWORK_NAME: ocis-net
-          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-keycloak.latest.owncloud.works
+          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-keycloak.rolling.owncloud.works
           JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
           TELEGRAF_SPECIFIC_CONFIG: ocis_single_container
-          OCIS_URL: ocis.ocis-keycloak.latest.owncloud.works
-          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-keycloak-latest
+          OCIS_URL: ocis.ocis-keycloak.rolling.owncloud.works
+          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-keycloak-rolling
