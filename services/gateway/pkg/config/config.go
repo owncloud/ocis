@@ -31,20 +31,20 @@ type Config struct {
 
 	FrontendPublicURL string `yaml:"frontend_public_url" env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL" desc:"The public facing URL of the oCIS frontend." introductionVersion:"pre5.0"`
 
-	UsersEndpoint             string `yaml:"-"`
-	GroupsEndpoint            string `yaml:"-"`
-	PermissionsEndpoint       string `yaml:"-"`
-	SharingEndpoint           string `yaml:"-"`
-	AuthAppEndpoint           string `yaml:"-"`
-	AuthBasicEndpoint         string `yaml:"-"`
-	AuthBearerEndpoint        string `yaml:"-"`
-	AuthMachineEndpoint       string `yaml:"-"`
-	AuthServiceEndpoint       string `yaml:"-"`
-	StoragePublicLinkEndpoint string `yaml:"-"`
-	StorageUsersEndpoint      string `yaml:"-"`
-	StorageSharesEndpoint     string `yaml:"-"`
-	AppRegistryEndpoint       string `yaml:"-"`
-	OCMEndpoint               string `yaml:"-"`
+	UsersEndpoint             string `yaml:"users_endpoint" env:"GATEWAY_USERS_ENDPOINT" desc:"The USERS API endpoint." introductionVersion:"%%NEXT%%"`
+	GroupsEndpoint            string `yaml:"groups_endpoint" env:"GATEWAY_GROUPS_ENDPOINT" desc:"The GROUPS API endpoint." introductionVersion:"%%NEXT%%"`
+	PermissionsEndpoint       string `yaml:"permissions_endpoint" env:"GATEWAY_PERMISSIONS_ENDPOINT" desc:"The SETTINGS API endpoint." introductionVersion:"%%NEXT%%"`
+	SharingEndpoint           string `yaml:"sharing_endpoint" env:"GATEWAY_SHARING_ENDPOINT" desc:"The SHARE API endpoint." introductionVersion:"%%NEXT%%"`
+	AuthAppEndpoint           string `yaml:"auth_app_endpoint" env:"GATEWAY_AUTH_APP_ENDPOINT" desc:"The AUTH APP API endpoint." introductionVersion:"%%NEXT%%"`
+	AuthBasicEndpoint         string `yaml:"auth_basic_endpoint" env:"GATEWAY_AUTH_BASIC_ENDPOINT" desc:"The AUTH BASIC API endpoint." introductionVersion:"%%NEXT%%"`
+	AuthBearerEndpoint        string `yaml:"auth_bearer_endpoint" env:"GATEWAY_AUTH_BEARER_ENDPOINT" desc:"The AUTH BEARER API endpoint." introductionVersion:"%%NEXT%%"`
+	AuthMachineEndpoint       string `yaml:"auth_machine_endpoint" env:"GATEWAY_AUTH_MACHINE_ENDPOINT" desc:"The AUTH MACHINE API endpoint." introductionVersion:"%%NEXT%%"`
+	AuthServiceEndpoint       string `yaml:"auth_service_endpoint" env:"GATEWAY_AUTH_SERVICE_ENDPOINT" desc:"The AUTH SERVICE API endpoint." introductionVersion:"%%NEXT%%"`
+	StoragePublicLinkEndpoint string `yaml:"storage_public_link_endpoint" env:"GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT" desc:"The STORAGE PUBLICLINK API endpoint." introductionVersion:"%%NEXT%%"`
+	StorageUsersEndpoint      string `yaml:"storage_users_endpoint" env:"GATEWAY_STORAGE_USERS_ENDPOINT" desc:"The STORAGE USERS API endpoint." introductionVersion:"%%NEXT%%"`
+	StorageSharesEndpoint     string `yaml:"storage_shares_endpoint" env:"GATEWAY_STORAGE_SHARES_ENDPOINT" desc:"The STORAGE SHARES API endpoint." introductionVersion:"%%NEXT%%"`
+	AppRegistryEndpoint       string `yaml:"app_registry_endpoint" env:"GATEWAY_APP_REGISTRY_ENDPOINT" desc:"The APP REGISTRY API endpoint." introductionVersion:"%%NEXT%%"`
+	OCMEndpoint               string `yaml:"ocm_endpoint" env:"GATEWAY_OCM_ENDPOINT" desc:"The OCM API endpoint." introductionVersion:"%%NEXT%%"`
 
 	StorageRegistry StorageRegistry `yaml:"storage_registry"` // TODO: should we even support switching this?
 
