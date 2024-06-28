@@ -2,6 +2,8 @@
 services:
   ocis:
     environment:
+      # enable the notifications service
+      OCIS_ADD_RUN_SERVICES": "notifications"
       NOTIFICATIONS_SMTP_HOST: inbucket
       NOTIFICATIONS_SMTP_PORT: 2500
       NOTIFICATIONS_SMTP_SENDER: oCIS notifications <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>

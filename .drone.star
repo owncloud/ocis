@@ -108,6 +108,7 @@ config = {
                 "EMAIL_PORT": "9000",
             },
             "extraServerEnvironment": {
+                "OCIS_ADD_RUN_SERVICES": "notifications",
                 "NOTIFICATIONS_SMTP_HOST": "email",
                 "NOTIFICATIONS_SMTP_PORT": "2500",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",

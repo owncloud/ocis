@@ -19,6 +19,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
+	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/command"
 	"github.com/thejerf/suture/v4"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
@@ -43,7 +44,6 @@ import (
 	idp "github.com/owncloud/ocis/v2/services/idp/pkg/command"
 	invitations "github.com/owncloud/ocis/v2/services/invitations/pkg/command"
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/command"
-	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/command"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/command"
 	ocm "github.com/owncloud/ocis/v2/services/ocm/pkg/command"
 	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/command"
@@ -200,11 +200,6 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.IDM.Commons = cfg.Commons
 		return idm.Execute(cfg.IDM)
 	})
-	reg(3, opts.Config.Notifications.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
-		cfg.Notifications.Context = ctx
-		cfg.Notifications.Commons = cfg.Commons
-		return notifications.Execute(cfg.Notifications)
-	})
 	reg(3, opts.Config.OCDav.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.OCDav.Context = ctx
 		cfg.OCDav.Commons = cfg.Commons
@@ -338,6 +333,11 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.Invitations.Context = ctx
 		cfg.Invitations.Commons = cfg.Commons
 		return invitations.Execute(cfg.Invitations)
+	})
+	areg(opts.Config.Notifications.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.Notifications.Context = ctx
+		cfg.Notifications.Commons = cfg.Commons
+		return notifications.Execute(cfg.Notifications)
 	})
 
 	return s, nil
