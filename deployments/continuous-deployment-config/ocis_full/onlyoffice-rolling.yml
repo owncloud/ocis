@@ -37,7 +37,7 @@
           OCIS_DOMAIN: ocis.ocis-onlyoffice.rolling.owncloud.works
           COMPANION_DOMAIN: companion.ocis-onlyoffice.rolling.owncloud.works
           COMPANION_IMAGE: owncloud/uppy-companion:3.12.13-owncloud
-          WOPISERVER_DOMAIN: wopiserver.ocis-onlyoffice.rolling.owncloud.works
+          WOPISERVER_ONLYOFFICE_DOMAIN: wopiserver-oo.ocis-onlyoffice.rolling.owncloud.works
           ONLYOFFICE_DOMAIN: onlyoffice.ocis-onlyoffice.rolling.owncloud.works
           INBUCKET_DOMAIN: mail.ocis-onlyoffice.rolling.owncloud.works
           DEMO_USERS: "true"

@@ -20,3 +20,7 @@ services:
       OCIS_TRACING_ENDPOINT: jaeger-agent:6831
       # metrics
       COLLABORATION_DEBUG_ADDR: 0.0.0.0:9304
+
+networks:
+  ocis-net:
+    external: true
