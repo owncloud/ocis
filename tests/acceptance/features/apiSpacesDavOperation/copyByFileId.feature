@@ -192,6 +192,7 @@ Feature: copying file using file id
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "folder" synced
     When user "Brian" copies a file "Shares/folder/sub-folder/test.txt" into "Shares/folder" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:
@@ -219,6 +220,7 @@ Feature: copying file using file id
       | permissionsRole | Editor   |
     And user "Brian" has uploaded file with content "some data" to "/test.txt"
     And we save it into "FILEID"
+    And user "Brian" has a share "folder" synced
     When user "Brian" copies a file "/test.txt" into "Shares/folder" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:
@@ -244,6 +246,7 @@ Feature: copying file using file id
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "folder" synced
     When user "Brian" copies a file "/test.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:

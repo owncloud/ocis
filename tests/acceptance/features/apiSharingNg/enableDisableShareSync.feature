@@ -20,6 +20,7 @@ Feature:  enable or disable sync of incoming shares
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource>" synced
     When user "Brian" disables sync of share "<resource>" using the Graph API
     Then the HTTP status code should be "204"
     When user "Brian" lists the shares shared with him using the Graph API
@@ -141,6 +142,7 @@ Feature:  enable or disable sync of incoming shares
       | sharee          | grp1       |
       | shareType       | group      |
       | permissionsRole | Viewer     |
+    And user "Alice" has a share "<resource>" synced
     When user "Alice" disables sync of share "<resource>" using the Graph API
     Then the HTTP status code should be "204"
     And user "Alice" should have sync disabled for share "<resource>"
@@ -196,6 +198,7 @@ Feature:  enable or disable sync of incoming shares
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource>" synced
     When user "Brian" disables sync of share "<resource>" using the Graph API
     Then the HTTP status code should be "204"
     When user "Brian" lists the shares shared with him using the Graph API
@@ -289,6 +292,7 @@ Feature:  enable or disable sync of incoming shares
       | sharee          | grp1       |
       | shareType       | group      |
       | permissionsRole | Viewer     |
+    And user "Alice" has a share "<resource>" synced
     When user "Alice" disables sync of share "<resource>" using the Graph API
     Then the HTTP status code should be "204"
     And user "Alice" should have sync disabled for share "<resource>"
@@ -766,6 +770,7 @@ Feature:  enable or disable sync of incoming shares
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource>" synced
     When user "Brian" enables sync of share "<resource>" offered by "Alice" from "Personal" space using the Graph API
     Then the HTTP status code should be "409"
     And the JSON data of the response should match
@@ -867,6 +872,7 @@ Feature:  enable or disable sync of incoming shares
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource>" synced
     When user "Brian" enables sync of share "<resource>" offered by "Alice" from "NewSpace" space using the Graph API
     Then the HTTP status code should be "409"
     And the JSON data of the response should match
