@@ -157,12 +157,16 @@ type Clientlog struct {
 }
 
 type WopiApp struct {
-	Insecure bool   `yaml:"insecure"`
-	Secret   string `yaml:"secret"`
+	Secret string `yaml:"secret"`
+}
+
+type App struct {
+	Insecure bool `yaml:"insecure"`
 }
 
 type Collaboration struct {
 	WopiApp WopiApp `yaml:"wopi"`
+	App     App     `yaml:"app"`
 }
 
 type Nats struct {
@@ -445,7 +449,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		cfg.AuthBearer = AuthbearerService{
 			AuthProviders: AuthProviderSettings{Oidc: _insecureService},
 		}
-		cfg.Collaboration.WopiApp.Insecure = true
+		cfg.Collaboration.App.Insecure = true
 		cfg.Frontend.AppHandler = _insecureService
 		cfg.Frontend.Archiver = _insecureService
 		cfg.Graph.Spaces = _insecureService

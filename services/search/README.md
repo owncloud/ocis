@@ -74,7 +74,7 @@ When extracting content, you can specify whether [stop words](https://en.wikiped
 
 When using the Tika container and docker-compose, consider the following:
 
-*   See the [ocis_wopi](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_wopi) example.
+*   See the [ocis_full](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_full) example.
 *   Containers for the linked service are reachable at a hostname identical to the alias or the service name if no alias was specified.
 
 If using the `tika` extractor, make sure to also set `FRONTEND_FULL_TEXT_SEARCH_ENABLED` in the frontend service to `true`. This will tell the webclient that full-text search has been enabled.
