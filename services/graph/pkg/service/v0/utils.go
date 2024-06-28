@@ -11,18 +11,16 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3User "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"golang.org/x/sync/errgroup"
-
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-
 	libregraph "github.com/owncloud/libre-graph-api-go"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
+	"golang.org/x/sync/errgroup"
 )
 
 // StrictJSONUnmarshal is a wrapper around json.Unmarshal that returns an error if the json contains unknown fields.
@@ -471,4 +469,318 @@ func ExtractShareIdFromResourceId(rid storageprovider.ResourceId) *collaboration
 	return &collaboration.ShareId{
 		OpaqueId: rid.GetOpaqueId(),
 	}
+}
+
+func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
+	logger *log.Logger,
+	gatewayClient gateway.GatewayAPIClient,
+	identityCache identity.IdentityCache,
+	receivedShares []*ocm.ReceivedShare) ([]libregraph.DriveItem, error) {
+
+	ch := make(chan libregraph.DriveItem)
+	group := new(errgroup.Group)
+	// Set max concurrency
+	group.SetLimit(10)
+
+	receivedSharesByResourceID := make(map[string][]*ocm.ReceivedShare, len(receivedShares))
+	for _, receivedShare := range receivedShares {
+		rIDStr := receivedShare.GetRemoteShareId()
+		receivedSharesByResourceID[rIDStr] = append(receivedSharesByResourceID[rIDStr], receivedShare)
+	}
+
+	for _, receivedSharesForResource := range receivedSharesByResourceID {
+		receivedShares := receivedSharesForResource
+
+		group.Go(func() error {
+			var err error // redeclare
+			shareStat, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{
+				Ref: &storageprovider.Reference{
+					ResourceId: &storageprovider.ResourceId{
+						// TODO maybe the reference is wrong
+						StorageId: utils.OCMStorageProviderID,
+						SpaceId:   receivedShares[0].GetId().GetOpaqueId(),
+						OpaqueId:  "", // in OCM resources the opaque id is the base64 encoded path
+						//OpaqueId: maybe ? receivedShares[0].GetId().GetOpaqueId(),
+					},
+				},
+			})
+
+			var errCode errorcode.Error
+			errors.As(errorcode.FromCS3Status(shareStat.GetStatus(), err), &errCode)
+
+			switch {
+			// skip ItemNotFound shares, they might have been deleted in the meantime or orphans.
+			case errCode.GetCode() == errorcode.ItemNotFound:
+				return nil
+			case err == nil:
+				break
+			default:
+				logger.Error().Err(errCode).Msg("could not stat")
+				return errCode
+			}
+
+			driveItem, err := fillDriveItemPropertiesFromReceivedOCMShare(ctx, logger, identityCache, receivedShares, shareStat.GetInfo())
+			if err != nil {
+				return err
+			}
+
+			if !driveItem.HasUIHidden() {
+				driveItem.SetUIHidden(false)
+			}
+			if !driveItem.HasClientSynchronize() {
+				driveItem.SetClientSynchronize(false)
+				if name := shareStat.GetInfo().GetName(); name != "" {
+					driveItem.SetName(name) // FIXME name is not set???
+				}
+			}
+
+			remoteItem := driveItem.RemoteItem
+			{
+				if id := shareStat.GetInfo().GetId(); id != nil {
+					remoteItem.SetId(storagespace.FormatResourceID(*id))
+				}
+
+				if name := shareStat.GetInfo().GetName(); name != "" {
+					remoteItem.SetName(name)
+				}
+
+				if etag := shareStat.GetInfo().GetEtag(); etag != "" {
+					remoteItem.SetETag(etag)
+				}
+
+				if mTime := shareStat.GetInfo().GetMtime(); mTime != nil {
+					remoteItem.SetLastModifiedDateTime(cs3TimestampToTime(mTime))
+				}
+
+				if size := shareStat.GetInfo().GetSize(); size != 0 {
+					remoteItem.SetSize(int64(size))
+				}
+
+				parentReference := libregraph.NewItemReference()
+				if spaceType := shareStat.GetInfo().GetSpace().GetSpaceType(); spaceType != "" {
+					parentReference.SetDriveType(spaceType)
+				}
+
+				if root := shareStat.GetInfo().GetSpace().GetRoot(); root != nil {
+					parentReference.SetDriveId(storagespace.FormatResourceID(*root))
+				}
+				if !reflect.ValueOf(*parentReference).IsZero() {
+					remoteItem.ParentReference = parentReference
+				}
+
+			}
+
+			// the parentReference of the outer driveItem should be the drive
+			// containing the mountpoint i.e. the share jail
+			driveItem.ParentReference = libregraph.NewItemReference()
+			driveItem.ParentReference.SetDriveType("virtual")
+			driveItem.ParentReference.SetDriveId(storagespace.FormatStorageID(utils.ShareStorageProviderID, utils.ShareStorageSpaceID))
+			driveItem.ParentReference.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+				StorageId: utils.ShareStorageProviderID,
+				OpaqueId:  utils.ShareStorageSpaceID,
+				SpaceId:   utils.ShareStorageSpaceID,
+			}))
+			if etag := shareStat.GetInfo().GetEtag(); etag != "" {
+				driveItem.SetETag(etag)
+			}
+
+			// connect the dots
+			{
+				if mTime := shareStat.GetInfo().GetMtime(); mTime != nil {
+					t := cs3TimestampToTime(mTime)
+
+					driveItem.SetLastModifiedDateTime(t)
+					remoteItem.SetLastModifiedDateTime(t)
+				}
+
+				if size := shareStat.GetInfo().GetSize(); size != 0 {
+					s := int64(size)
+
+					driveItem.SetSize(s)
+					remoteItem.SetSize(s)
+				}
+
+				if userID := shareStat.GetInfo().GetOwner(); userID != nil && userID.Type != cs3User.UserType_USER_TYPE_SPACE_OWNER {
+					identity, err := cs3UserIdToIdentity(ctx, identityCache, userID)
+					if err != nil {
+						// TODO: define a proper error behavior here. We don't
+						// want the whole request to fail just because a single
+						// resource owner couldn't be resolved. But, should we
+						// really return the affected share in the response?
+						// For now we just log a warning. The returned
+						// identitySet will just contain the userid.
+						logger.Warn().Err(err).Str("userid", userID.String()).Msg("could not get owner of shared resource")
+					}
+
+					remoteItem.SetCreatedBy(libregraph.IdentitySet{User: &identity})
+					driveItem.SetCreatedBy(libregraph.IdentitySet{User: &identity})
+				}
+				switch info := shareStat.GetInfo(); {
+				case info.GetType() == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER:
+					folder := libregraph.NewFolder()
+
+					remoteItem.Folder = folder
+					driveItem.Folder = folder
+				case info.GetType() == storageprovider.ResourceType_RESOURCE_TYPE_FILE:
+					file := libregraph.NewOpenGraphFile()
+
+					if mimeType := info.GetMimeType(); mimeType != "" {
+						file.MimeType = &mimeType
+					}
+
+					remoteItem.File = file
+					driveItem.File = file
+				}
+			}
+
+			ch <- *driveItem
+
+			return nil
+		})
+	}
+
+	var err error
+	// wait for concurrent requests to finish
+	go func() {
+		err = group.Wait()
+		close(ch)
+	}()
+
+	driveItems := make([]libregraph.DriveItem, 0, len(receivedSharesByResourceID))
+	for di := range ch {
+		driveItems = append(driveItems, di)
+	}
+
+	return driveItems, err
+}
+
+func fillDriveItemPropertiesFromReceivedOCMShare(ctx context.Context, logger *log.Logger,
+	identityCache identity.IdentityCache, receivedShares []*ocm.ReceivedShare,
+	resourceInfo *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
+
+	driveItem := libregraph.NewDriveItem()
+	permissions := make([]libregraph.Permission, 0, len(receivedShares))
+
+	var oldestReceivedShare *ocm.ReceivedShare
+	for _, receivedShare := range receivedShares {
+		switch {
+		case oldestReceivedShare == nil:
+			fallthrough
+		case utils.TSToTime(receivedShare.GetCtime()).Before(utils.TSToTime(oldestReceivedShare.GetCtime())):
+			oldestReceivedShare = receivedShare
+		}
+
+		permission, err := cs3ReceivedOCMShareToLibreGraphPermissions(ctx, logger, identityCache, receivedShare, resourceInfo)
+		if err != nil {
+			return driveItem, err
+		}
+
+		driveItem.SetName(resourceInfo.GetName())
+
+		// If at least one of the shares was accepted, we consider the driveItem's synchronized
+		// flag enabled.
+		// Also we use the Mountpoint name of the first accepted mountpoint as the name for
+		// the driveItem
+		if receivedShare.GetState() == ocm.ShareState_SHARE_STATE_ACCEPTED {
+			driveItem.SetClientSynchronize(true)
+			if name := receivedShare.GetName(); name != "" && driveItem.GetName() == "" {
+				driveItem.SetName(receivedShare.GetName())
+			}
+		}
+
+		// if at least one share is marked as hidden, consider the whole driveItem to be hidden
+		/*
+			if receivedShare.GetHidden() {
+				driveItem.SetUIHidden(true)
+			}
+		*/
+
+		if userID := receivedShare.GetCreator(); userID != nil {
+			identity, err := cs3UserIdToIdentity(ctx, identityCache, userID)
+			if err != nil {
+				logger.Warn().Err(err).Str("userid", userID.String()).Msg("could not get creator of the ocm share")
+			}
+
+			permission.SetInvitation(
+				libregraph.SharingInvitation{
+					InvitedBy: &libregraph.IdentitySet{
+						User: &identity,
+					},
+				},
+			)
+		}
+		permissions = append(permissions, *permission)
+		// To stay compatible with the usershareprovider and the webdav
+		// service the id of the driveItem is composed of the StorageID and
+		// SpaceID of the sharestorage appended with the opaque ID of
+		// the oldest share for the resource:
+		// '<sharestorageid>$<sharespaceid>!<share-opaque-id>
+		// Note: This means that the driveitem ID will change when the oldest
+		//   share is removed. It would be good to have are more stable ID here (e.g.
+		//   derived from the shared resource's ID. But as we need to use the same
+		//   ID across all services this means we needed to make similar adjustments
+		//   to the sharejail (usershareprovider, webdav). Which we can't currently do
+		//   as some clients rely on the IDs used there having a special format.
+		driveItem.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+			StorageId: utils.OCMStorageProviderID,
+			SpaceId:   utils.OCMStorageSpaceID,
+			OpaqueId:  oldestReceivedShare.GetRemoteShareId(),
+		}))
+
+	}
+	driveItem.RemoteItem = libregraph.NewRemoteItem()
+	driveItem.RemoteItem.Permissions = permissions
+	return driveItem, nil
+}
+
+func cs3ReceivedOCMShareToLibreGraphPermissions(ctx context.Context, logger *log.Logger,
+	identityCache identity.IdentityCache, receivedShare *ocm.ReceivedShare,
+	_ *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
+	permission := libregraph.NewPermission()
+	if id := receivedShare.GetId().GetOpaqueId(); id != "" {
+		permission.SetId(id)
+	}
+
+	if expiration := receivedShare.GetExpiration(); expiration != nil {
+		permission.SetExpirationDateTime(cs3TimestampToTime(expiration))
+	}
+
+	/*
+		if permissionSet := receivedShare.GetShare().GetPermissions().GetPermissions(); permissionSet != nil {
+			condition, err := roleConditionForResourceType(resourceInfo)
+			if err != nil {
+				return nil, err
+			}
+			role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*permissionSet, condition)
+
+			if role != nil {
+				permission.SetRoles([]string{role.GetId()})
+			}
+
+			actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissionSet)
+
+			// actions only make sense if no role is set
+			if role == nil && len(actions) > 0 {
+				permission.SetLibreGraphPermissionsActions(actions)
+			}
+		}
+	*/
+	switch grantee := receivedShare.GetGrantee(); {
+	case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_USER:
+		user, err := cs3UserIdToIdentity(ctx, identityCache, grantee.GetUserId())
+		if err != nil {
+			logger.Error().Err(err).Msg("could not get user")
+			return nil, err
+		}
+		permission.SetGrantedToV2(libregraph.SharePointIdentitySet{User: &user})
+	case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
+		group, err := groupIdToIdentity(ctx, identityCache, grantee.GetGroupId().GetOpaqueId())
+		if err != nil {
+			logger.Error().Err(err).Msg("could not get group")
+			return nil, err
+		}
+		permission.SetGrantedToV2(libregraph.SharePointIdentitySet{Group: &group})
+	}
+
+	return permission, nil
 }

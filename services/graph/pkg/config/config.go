@@ -25,10 +25,11 @@ type Config struct {
 	TokenManager  *TokenManager         `yaml:"token_manager"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
-	Application Application `yaml:"application"`
-	Spaces      Spaces      `yaml:"spaces"`
-	Identity    Identity    `yaml:"identity"`
-	Events      Events      `yaml:"events"`
+	Application       Application `yaml:"application"`
+	Spaces            Spaces      `yaml:"spaces"`
+	Identity          Identity    `yaml:"identity"`
+	IncludeOCMSharees bool        `yaml:"include_ocm_sharees" env:"GRAPH_INCLUDE_OCM_SHAREES" desc:"Include OCM sharees when listing users." introductionVersion:"5.0"`
+	Events            Events      `yaml:"events"`
 
 	Keycloak       Keycloak       `yaml:"keycloak"`
 	ServiceAccount ServiceAccount `yaml:"service_account"`

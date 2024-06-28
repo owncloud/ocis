@@ -9,6 +9,8 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
+	ocmv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
+
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
@@ -142,6 +144,65 @@ func (_c *DrivesDriveItemProvider_GetSharesForResource_Call) Return(_a0 []*colla
 }
 
 func (_c *DrivesDriveItemProvider_GetSharesForResource_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, []*collaborationv1beta1.Filter) ([]*collaborationv1beta1.ReceivedShare, error)) *DrivesDriveItemProvider_GetSharesForResource_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MountOCMShare provides a mock function with given fields: ctx, resourceID
+func (_m *DrivesDriveItemProvider) MountOCMShare(ctx context.Context, resourceID *providerv1beta1.ResourceId) ([]*ocmv1beta1.ReceivedShare, error) {
+	ret := _m.Called(ctx, resourceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MountOCMShare")
+	}
+
+	var r0 []*ocmv1beta1.ReceivedShare
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId) ([]*ocmv1beta1.ReceivedShare, error)); ok {
+		return rf(ctx, resourceID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId) []*ocmv1beta1.ReceivedShare); ok {
+		r0 = rf(ctx, resourceID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ocmv1beta1.ReceivedShare)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId) error); ok {
+		r1 = rf(ctx, resourceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DrivesDriveItemProvider_MountOCMShare_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MountOCMShare'
+type DrivesDriveItemProvider_MountOCMShare_Call struct {
+	*mock.Call
+}
+
+// MountOCMShare is a helper method to define mock.On call
+//   - ctx context.Context
+//   - resourceID *providerv1beta1.ResourceId
+func (_e *DrivesDriveItemProvider_Expecter) MountOCMShare(ctx interface{}, resourceID interface{}) *DrivesDriveItemProvider_MountOCMShare_Call {
+	return &DrivesDriveItemProvider_MountOCMShare_Call{Call: _e.mock.On("MountOCMShare", ctx, resourceID)}
+}
+
+func (_c *DrivesDriveItemProvider_MountOCMShare_Call) Run(run func(ctx context.Context, resourceID *providerv1beta1.ResourceId)) *DrivesDriveItemProvider_MountOCMShare_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId))
+	})
+	return _c
+}
+
+func (_c *DrivesDriveItemProvider_MountOCMShare_Call) Return(_a0 []*ocmv1beta1.ReceivedShare, _a1 error) *DrivesDriveItemProvider_MountOCMShare_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *DrivesDriveItemProvider_MountOCMShare_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId) ([]*ocmv1beta1.ReceivedShare, error)) *DrivesDriveItemProvider_MountOCMShare_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
@@ -38,6 +39,25 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 		g.logger.Error().Err(err).Msg("listing shares failed")
 		return nil, err
 	}
+	driveItems, err := cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedSharesResponse.GetShares())
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not convert received shares to drive items")
+		return nil, err
+	}
 
-	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedSharesResponse.GetShares())
+	if g.config.IncludeOCMSharees {
+		listReceivedOCMSharesResponse, err := gatewayClient.ListReceivedOCMShares(ctx, &ocm.ListReceivedOCMSharesRequest{})
+		if err := errorcode.FromCS3Status(listReceivedSharesResponse.GetStatus(), err); err != nil {
+			g.logger.Error().Err(err).Msg("listing shares failed")
+			return nil, err
+		}
+		ocmDriveItems, err := cs3ReceivedOCMSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedOCMSharesResponse.GetShares())
+		if err != nil {
+			g.logger.Error().Err(err).Msg("could not convert received shares to drive items")
+			return nil, err
+		}
+		driveItems = append(driveItems, ocmDriveItems...)
+	}
+
+	return driveItems, err
 }
