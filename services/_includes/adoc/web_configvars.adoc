@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-06-28-06-38-58]
+[#deprecation-note-2024-06-28-10-11-48]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -242,7 +242,7 @@ a| [subs=-attributes]
 Allow credentials for CORS. See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 
 a|`WEB_ASSET_PATH` +
-xref:deprecation-note-2024-06-28-06-38-58[Deprecation Note]
+xref:deprecation-note-2024-06-28-10-11-48[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

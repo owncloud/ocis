@@ -125,6 +125,7 @@ identity:
       school_number_attribute: ""
       school_id_attribute: ""
       school_termination_min_grace_days: 0
+include_ocm_sharees: false
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
