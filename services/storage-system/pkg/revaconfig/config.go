@@ -25,12 +25,12 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 			"services": map[string]interface{}{
 				"gateway": map[string]interface{}{
 					// registries are located on the gateway
-					"authregistrysvc":    "com.owncloud.api.storage-system",
-					"storageregistrysvc": "com.owncloud.api.storage-system",
+					"authregistrysvc":    cfg.StorageSystemEndpoint,
+					"storageregistrysvc": cfg.StorageSystemEndpoint,
 					// user metadata is located on the users services
-					"userprovidersvc":  "com.owncloud.api.storage-system",
-					"groupprovidersvc": "com.owncloud.api.storage-system",
-					"permissionssvc":   "com.owncloud.api.storage-system",
+					"userprovidersvc":  cfg.StorageSystemEndpoint,
+					"groupprovidersvc": cfg.StorageSystemEndpoint,
+					"permissionssvc":   cfg.StorageSystemEndpoint,
 					// other
 					"disable_home_creation_on_login": true, // metadata manually creates a space
 					// metadata always uses the simple upload, so no transfer secret or datagateway needed
@@ -60,7 +60,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"drivers": map[string]interface{}{
 						"static": map[string]interface{}{
 							"rules": map[string]interface{}{
-								"machine": "com.owncloud.api.storage-system",
+								"machine": cfg.StorageSystemEndpoint,
 							},
 						},
 					},
@@ -70,7 +70,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
 							"api_key":      cfg.SystemUserAPIKey,
-							"gateway_addr": "com.owncloud.api.storage-system",
+							"gateway_addr": cfg.StorageSystemEndpoint,
 						},
 					},
 				},
@@ -86,7 +86,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 						"static": map[string]interface{}{
 							"rules": map[string]interface{}{
 								"/": map[string]interface{}{
-									"address": "com.owncloud.api.storage-system",
+									"address": cfg.StorageSystemEndpoint,
 								},
 							},
 						},
@@ -152,7 +152,7 @@ func metadataDrivers(cfg *config.Config) map[string]interface{} {
 			"user_layout":                "{{.Id.OpaqueId}}",
 			"treetime_accounting":        false,
 			"treesize_accounting":        false,
-			"permissionssvc":             "com.owncloud.api.storage-system",
+			"permissionssvc":             cfg.StorageSystemEndpoint,
 			"max_acquire_lock_cycles":    cfg.Drivers.OCIS.MaxAcquireLockCycles,
 			"lock_cycle_duration_factor": cfg.Drivers.OCIS.LockCycleDurationFactor,
 			"statcache": map[string]interface{}{
