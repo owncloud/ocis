@@ -272,7 +272,7 @@ Open https://ocis.owncloud.test in your browser and accept the invalid certifica
 
 ### Clamav Virusscanner
 
-You can add a Clamav Virusscanner to the stack. The service is disabled by default. To enable it, uncomment the `CLAMAV` line in the `docker-compose.yml` file.
+You can add a Clamav Virusscanner to the stack. The service is disabled by default. To enable it, uncomment the `CLAMAV` line in the `.env` file.
 
 ```shell {linenos=table,hl_lines=[3]}
 ## Clamav Settings ##
@@ -353,7 +353,7 @@ S3NG_BUCKET=
 
 #### Use a local minio S3 storage backend
 
-For testing purposes, you can use a local minio S3 storage backend. To enable it, uncomment the `S3NG_MINIO` line in the `docker-compose.yml` file.
+For testing purposes, you can use a local minio S3 storage backend. To enable it, uncomment the `S3NG_MINIO` line in the `.env` file.
 
 The frontend for the minio server is available at `http://minio.owncloud.test` and the access key is `ocis` and the secret key is `ocis-secret`.
 

@@ -6,7 +6,7 @@ services:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
   ocis:
-    image: owncloud/ocis-rolling:${OCIS_DOCKER_TAG:-latest}
+    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     entrypoint:

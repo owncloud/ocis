@@ -12,7 +12,7 @@ services:
       FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR: com.owncloud.api.collaboration
 
   collaboration:
-    image: owncloud/ocis-rolling:${OCIS_DOCKER_TAG:-latest}
+    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     depends_on:

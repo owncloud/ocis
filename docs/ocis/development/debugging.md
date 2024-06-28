@@ -148,10 +148,10 @@ make debug-docker
 export OCIS_DOCKER_TAG=debug
 ```
 3. Change the docker-compose `ocis` or `collaboration` depends on what do you want to debug:
-For example `deployments/examples/ocis_full/docker-compose.yml`
+For example `deployments/examples/ocis_full/ocis.yml`
 ```yaml
   ocis:
-    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     entrypoint:
