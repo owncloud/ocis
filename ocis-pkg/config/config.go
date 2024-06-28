@@ -67,6 +67,7 @@ type Config struct {
 	GRPCClientTLS  *shared.GRPCClientTLS  `yaml:"grpc_client_tls"`
 	GRPCServiceTLS *shared.GRPCServiceTLS `yaml:"grpc_service_tls"`
 	HTTPServiceTLS shared.HTTPServiceTLS  `yaml:"http_service_tls"`
+	Reva           *shared.Reva           `yaml:"reva"`
 
 	Mode    Mode // DEPRECATED
 	File    string
