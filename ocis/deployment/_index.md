@@ -17,11 +17,9 @@ This section handles deployments and operations for admins and people who are in
 oCIS deployments are super simple, yet there are many configurations possible for advanced setups.
 
 - [Basic oCIS setup]({{< ref "basic-remote-setup" >}}) - configure domain, certificates and port
-- [oCIS setup with Traefik for SSL termination]({{< ref "ocis_traefik" >}})
 - [oCIS setup with Keycloak as identity provider]({{< ref "ocis_keycloak" >}})
-- [oCIS setup with WOPI server to open office documents in your browser]({{< ref "ocis_wopi" >}})
+- [Flexible oCIS setup with WebOffice and Search capabilities]({{< ref "ocis_full" >}})
 - [Parallel deployment of oC10 and oCIS]({{< ref "oc10_ocis_parallel" >}})
-- [oCIS with S3 storage backend (MinIO)]({{< ref "ocis_s3" >}})
 - [oCIS with the Hello extension example]({{< ref "ocis_hello" >}})
 
 

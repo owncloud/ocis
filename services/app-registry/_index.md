@@ -1,6 +1,6 @@
 ---
 title: App Registry
-date: 2024-06-28T10:23:30.272753188Z
+date: 2024-06-28T10:52:20.005573432Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/app-registry
@@ -40,7 +40,7 @@ Administrators can set default applications for each MIME type and also allow th
 
 ### MIME Type Configuration
 
-Modifing the MIME type config can only be achieved via a yaml configuration. Using environment variables is not possible. For an example, see the `ocis_wopi/config/ocis/app-registry.yaml` at [docker-compose example](https://github.com/owncloud/ocis/tree/master/deployments/examples). The following is a brief structure and a field description:
+Modifing the MIME type config can only be achieved via a yaml configuration. Using environment variables is not possible. For an example, see the `ocis_full/config/ocis/app-registry.yaml` at [docker-compose example](https://github.com/owncloud/ocis/tree/master/deployments/examples). The following is a brief structure and a field description:
 
 **Structure**
 

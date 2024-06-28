@@ -19,8 +19,6 @@ geekdocFilePath: ocis_hello.md
 
 The docker stack consists of 3 containers. One of them is Traefik, a proxy which is terminating SSL and forwards the requests to oCIS in the internal docker network.
 
-The next container is oCIS itself in a configuration like the [oCIS with Traefik example]({{< ref "ocis_traefik" >}}), except that for this example a custom proxy and web UI configuration is used to enable the oCIS Hello extension.
-
 The oCIS Hello extension is running in another container and enables you to use its functionality from within ownCloud Web.
 
 ## Server Deployment
