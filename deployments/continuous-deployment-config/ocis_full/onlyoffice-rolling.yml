@@ -41,7 +41,7 @@
           ONLYOFFICE_DOMAIN: onlyoffice.ocis-onlyoffice.rolling.owncloud.works
           INBUCKET_DOMAIN: mail.ocis-onlyoffice.rolling.owncloud.works
           DEMO_USERS: "true"
-          COMPOSE_FILE: docker-compose.yml:ocis.yml:tika.yml:onlyoffice.yml:cloudimporter.yml:inbucket.yml:monitoring_tracing/monitoring.yml
+          COMPOSE_FILE: docker-compose.yml:ocis.yml:tika.yml:onlyoffice.yml:cloudimporter.yml:inbucket.yml:monitoring_tracing/monitoring-oo.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
         ref: master
