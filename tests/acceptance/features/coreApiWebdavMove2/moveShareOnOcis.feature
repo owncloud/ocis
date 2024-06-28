@@ -45,6 +45,7 @@ Feature: move (rename) file
       | sharee          | Alice              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Alice" has a share "testshare" synced
     And user "Alice" has uploaded file with content "test data" to "/testfile.txt"
     When user "Alice" moves file "/testfile.txt" to "Shares/testshare/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "502"
@@ -98,6 +99,7 @@ Feature: move (rename) file
       | sharee          | Alice              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Alice" has a share "testshare" synced
     When user "Alice" moves file "/Shares/testshare/testfile.txt" to "/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "502"
     And as "Alice" file "/Shares/testshare/testfile.txt" should exist
@@ -149,6 +151,7 @@ Feature: move (rename) file
       | sharee          | Alice              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Alice" has a share "testshare" synced
     And user "Alice" has created folder "/testsubfolder"
     And user "Alice" has uploaded file with content "test data" to "/testsubfolder/testfile.txt"
     When user "Alice" moves folder "/testsubfolder" to "Shares/testshare/testsubfolder" using the WebDAV API
@@ -209,6 +212,7 @@ Feature: move (rename) file
       | sharee          | Alice              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Alice" has a share "testshare" synced
     When user "Alice" moves folder "/Shares/testshare/testsubfolder" to "/testsubfolder" using the WebDAV API
     Then the HTTP status code should be "502"
     And as "Alice" folder "/Shares/testshare/testsubfolder" should exist
@@ -235,6 +239,7 @@ Feature: move (rename) file
       | sharee          | Alice              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Alice" has a share "testshare" synced
     When user "Alice" moves folder "Shares/testshare/testfile.txt" to "Shares/testshare/child/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/Shares/testshare/child/testfile.txt" should exist
@@ -261,6 +266,7 @@ Feature: move (rename) file
       | sharee          | Alice     |
       | shareType       | user      |
       | permissionsRole | Viewer    |
+    And user "Alice" has a share "testshare" synced
     When user "Alice" moves folder "Shares/testshare/testfile.txt" to "Shares/testshare/child/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/Shares/testshare/child/testfile.txt" should not exist
@@ -284,6 +290,7 @@ Feature: move (rename) file
       | sharee          | Alice              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Alice" has a share "testshare" synced
     When user "Alice" moves folder "Shares/testshare/testfile.txt" to "Shares/testshare/testfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Brian" the file with original path "testshare/testfile.txt" should not exist in the trashbin
