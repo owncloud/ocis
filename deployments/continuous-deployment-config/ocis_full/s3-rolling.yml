@@ -1,5 +1,5 @@
 ---
-- name: continuous-deployment-ocis-wopi-released
+- name: continuous-deployment-ocis-s3-rolling
   server:
     server_type: cx21
     image: ubuntu-22.04
@@ -14,7 +14,7 @@
       - /var/lib/docker/volumes/ocis_certs
 
   domains:
-    - "*.ocis-wopi.released.owncloud.works"
+    - "*.ocis-s3.rolling.owncloud.works"
 
   vars:
     ssh_authorized_keys:
@@ -28,27 +28,28 @@
       - name: ocis
         git_url: https://github.com/owncloud/ocis.git
         ref: master
-        docker_compose_path: deployments/examples/ocis_wopi
+        docker_compose_path: deployments/examples/ocis_full
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: mbarz@owncloud.com
-          OCIS_DOCKER_TAG: 5.0.3
-          OCIS_DOMAIN: ocis.ocis-wopi.released.owncloud.works
-          COMPANION_DOMAIN: companion.ocis-wopi.released.owncloud.works
+          OCIS_DOCKER_TAG: 6.1.0-alpha.1
+          OCIS_DOCKER_IMAGE: owncloud/ocis-rolling
+          OCIS_DOMAIN: ocis.ocis-s3.rolling.owncloud.works
+          COMPANION_DOMAIN: companion.ocis-s3.rolling.owncloud.works
           COMPANION_IMAGE: owncloud/uppy-companion:3.12.13-owncloud
-          COMPANION_WEB_CONFIG_FILE_NAME: web-released.yaml
-          WOPISERVER_DOMAIN: wopiserver.ocis-wopi.released.owncloud.works
-          COLLABORA_DOMAIN: collabora.ocis-wopi.released.owncloud.works
-          ONLYOFFICE_DOMAIN: onlyoffice.ocis-wopi.released.owncloud.works
+          WOPISERVER_DOMAIN: wopiserver.ocis-s3.rolling.owncloud.works
+          COLLABORA_DOMAIN: collabora.ocis-s3.rolling.owncloud.works
+          INBUCKET_DOMAIN: mail.ocis-s3.rolling.owncloud.works
+          MINIO_DOMAIN: minio.ocis-s3.rolling.owncloud.works
           DEMO_USERS: "true"
-          COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
+          COMPOSE_FILE: docker-compose.yml:ocis.yml:s3ng.yml:minio.yml:tika.yml:collabora.yml:cloudimporter.yml:inbucket.yml:monitoring_tracing/monitoring.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
         ref: master
         env:
           NETWORK_NAME: ocis-net
-          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-wopi.released.owncloud.works
+          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-s3.rolling.owncloud.works
           JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
-          TELEGRAF_SPECIFIC_CONFIG: ocis_wopi
-          OCIS_URL: ocis.ocis-wopi.released.owncloud.works
-          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-wopi-released
+          TELEGRAF_SPECIFIC_CONFIG: ocis_full
+          OCIS_URL: ocis.ocis-s3.rolling.owncloud.works
+          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-s3-rolling

@@ -47,7 +47,7 @@ services:
     restart: always
 
   ocis:
-    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     depends_on:

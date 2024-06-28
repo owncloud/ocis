@@ -32,15 +32,16 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: mbarz@owncloud.com
-          OCIS_DOCKER_TAG: latest
+          OCIS_DOCKER_TAG: 6.1.0-alpha.1
           OCIS_DOCKER_IMAGE: owncloud/ocis-rolling
           OCIS_DOMAIN: ocis.ocis.rolling.owncloud.works
           COMPANION_DOMAIN: companion.ocis.rolling.owncloud.works
           COMPANION_IMAGE: owncloud/uppy-companion:3.12.13-owncloud
           WOPISERVER_DOMAIN: wopiserver.ocis.rolling.owncloud.works
           COLLABORA_DOMAIN: collabora.ocis.rolling.owncloud.works
+          INBUCKET_DOMAIN: mail.ocis.rolling.owncloud.works
           DEMO_USERS: "true"
-          COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
+          COMPOSE_FILE: docker-compose.yml:ocis.yml:tika.yml:collabora.yml:cloudimporter.yml:inbucket.yml:monitoring_tracing/monitoring.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
         ref: master
