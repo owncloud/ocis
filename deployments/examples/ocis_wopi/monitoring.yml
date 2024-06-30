@@ -20,15 +20,6 @@ services:
       # metrics
       APP_PROVIDER_DEBUG_ADDR: 0.0.0.0:9165
 
-  ocis-appprovider-onlyoffice:
-    environment:
-      # tracing
-      OCIS_TRACING_ENABLED: "true"
-      OCIS_TRACING_TYPE: "jaeger"
-      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
-      # metrics
-      APP_PROVIDER_DEBUG_ADDR: 0.0.0.0:9165
-
 networks:
   ocis-net:
     external: true
