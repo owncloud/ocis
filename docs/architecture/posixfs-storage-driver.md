@@ -1,27 +1,27 @@
 ---
-title: "Joint Access Storage Driver"
+title: "PosixFS Storage Driver"
 date: 2024-05-27T14:31:00+01:00
 weight: 30
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/architecture
-geekdocFilePath: joint-access-storage-driver.md
+geekdocFilePath: posixfs-storage-driver.md
 ---
 
 {{< toc >}}
 
-The Joint Access Storage Driver is a new storage driver for Infinite Scale.
+The Posix FS Storage Driver is a new storage driver for Infinite Scale.
 
-The scope of this document is to give a high level overview to the technical aspects of the Joint Access Storage Driver and guide the setup.
+The scope of this document is to give a high level overview to the technical aspects of the Posix FS Storage Driver and guide the setup.
 
 ## Introduction
 
-The Joint Access Storage Driver is a backend component that manages files on the server utilizing a "real" file tree that represents the data with folders and files in the file system as users are used to it. That is the big difference compared to Decomposed FS which is the default storage driver in Infinite Scale.
+The Posix FS Storage Driver is a backend component that manages files on the server utilizing a "real" file tree that represents the data with folders and files in the file system as users are used to it. That is the big difference compared to Decomposed FS which is the default storage driver in Infinite Scale.
 
 This does not mean that Infinite Scale is trading any of its benefits to this new feature: It still implements simplicity by running without a database, it continues to store metadata in the file system and adds them transparently to caches and search indexes, and it also features the full spaces concept as before, just to name a few examples.
 
-The architecture of Infinite Scale allows configuring different storage drivers for specific storage types and purposes on a space granularity. The Joint Access Storage Driver is an alternative to the default driver called Decomposed FS.
+The architecture of Infinite Scale allows configuring different storage drivers for specific storage types and purposes on a space granularity. The Posix FS Storage Driver is an alternative to the default driver called Decomposed FS.
 
-However, the clarity of the file structure in the underlying file system is not the only benefit of the Joint Access Storage Driver. This new technology allows users to manipulate the data directly in the file system, and any changes made to files outside of Infinite Scale are monitored and directly reflected in Infinite Scale. For example, a scanner could store its output directly to the Infinite Scale file system, which immediately gets picked up in Infinite Scale.
+However, the clarity of the file structure in the underlying file system is not the only benefit of the Posix FS Storage Driver. This new technology allows users to manipulate the data directly in the file system, and any changes made to files outside of Infinite Scale are monitored and directly reflected in Infinite Scale. For example, a scanner could store its output directly to the Infinite Scale file system, which immediately gets picked up in Infinite Scale.
 
 For the first time ever with feature rich open source file sync & share systems, users can either choose to work with their data through the clients of the system, its APIs or even directly in the underlying file system on the server.
 
@@ -29,9 +29,9 @@ That is another powerful vector for integration and enables a new spectrum of us
 
 ## Technical Aspects
 
-The Joint Access Storage Driver uses a few features of the underlying file system, which are mandatory and directly contributing to the performance of the system.
+The Posix FS Storage Driver uses a few features of the underlying file system, which are mandatory and directly contributing to the performance of the system.
 
-While the simplest form of Joint Access Storage Driver runs with default file systems of every modern Linux system which are directly mounted and thus support inotify, the full power of this unfolds with more capable file systems such as IBM Storage Scale or Ceph. These are recommended as reliable foundations for big installations of Infinite Scale.
+While the simplest form of Posix FS Storage Driver runs with default file systems of every modern Linux system which are directly mounted and thus support inotify, the full power of this unfolds with more capable file systems such as IBM Storage Scale or Ceph. These are recommended as reliable foundations for big installations of Infinite Scale.
 
 This chapter describes some technical aspects of this storage driver.
 
@@ -111,17 +111,17 @@ One for all, it seems reasonable to use LDAP to manage users which is the base f
 
 ### GID Based Space Access
 
-The Joint Access Storage Driver supports GID based space access to support the problem that project spaces might have to be accessible by multiple users on disk. In order to enable this feature the `ocis` binary needs to have the `setgid` capability and `STORAGE_USERS_POSIX_USE_SPACE_GROUPS` needs to be set to `true`. Inifinite Scale will then use the space GID (the gid of the space root) for all file system access using the `setfsgid` syscall, i.e. all files and directories created by Infinite Scale will belong to the same group as the space root.
+The Posix FS Storage Driver supports GID based space access to support the problem that project spaces might have to be accessible by multiple users on disk. In order to enable this feature the `ocis` binary needs to have the `setgid` capability and `STORAGE_USERS_POSIX_USE_SPACE_GROUPS` needs to be set to `true`. Inifinite Scale will then use the space GID (the gid of the space root) for all file system access using the `setfsgid` syscall, i.e. all files and directories created by Infinite Scale will belong to the same group as the space root.
 
 ## Advanced Features
 
-Depending on the capabilities of the underlying file system, the Joint Access Storage Driver can benefit from more advanced functionality described here.
+Depending on the capabilities of the underlying file system, the Posix FS Storage Driver can benefit from more advanced functionality described here.
 
 ### Versioning
 
 If the underlying file system is able to create versions of single resources (imagine a git based file system) this functionality could directly be used by Infinite Scale.
 
-In the current state of the Joint Access Storage Driver, versioning is not supported.
+In the current state of the Posix FS Storage Driver, versioning is not supported.
 
 ### Trashbin
 
@@ -129,11 +129,11 @@ If the underlying file system handles deleted files in a trash bin that allows r
 
 If not available it will follow the [the Free Desktop Trash specificaton](https://specifications.freedesktop.org/trash-spec/trashspec-latest.html).
 
-In the current state of the Joint Access Storage Driver, trash bin is not supported.
+In the current state of the Posix FS Storage Driver, trash bin is not supported.
 
 ## Limitations
 
-As of Q2/2024 the Joint Access Storage Driver is not officially supported and in technical preview state.
+As of Q2/2024 the Posix FS Storage Driver is not officially supported and in technical preview state.
 
 The tech preview comes with the following limitations:
 
@@ -145,13 +145,13 @@ The tech preview comes with the following limitations:
 
 ## Setup
 
-This describes the steps to use the Joint Access Storage Driver storage driver with Infinite Scale.
+This describes the steps to use the Posix FS Storage Driver storage driver with Infinite Scale.
 
-It is possible to use different storage drivers in the same Infinite Scale installation. For example it is possible to set up one space running on Joint Access Storage Driver while others run Decomposed FS.
+It is possible to use different storage drivers in the same Infinite Scale installation. For example it is possible to set up one space running on Posix FS Storage Driver while others run Decomposed FS.
 
 ### Prerequisites
 
-To use the Joint Access Storage Driver, the following prerequisites have to be fulfilled:
+To use the Posix FS Storage Driver, the following prerequisites have to be fulfilled:
 
 1. There must be storage available to store meta data and blobs, available under a root path.
 1. When using inotify, the storage must be local on the same machine. Network mounts do not work with inotify. `inotifywait` needs to be installed.
@@ -162,7 +162,7 @@ To use the Joint Access Storage Driver, the following prerequisites have to be f
 
 ### Setup Configuration
 
-This is an example configuration with environment variables that configures Infinite Scale to use Joint Access Storage Driver for all spaces it works with, ie. Personal and Project Spaces:
+This is an example configuration with environment variables that configures Infinite Scale to use Posix FS Storage Driver for all spaces it works with, ie. Personal and Project Spaces:
 
 ```
 export STORAGE_USERS_DRIVER="posix"
@@ -187,7 +187,7 @@ As described above metadata is stored as extended attributes of the according en
 
 ### FS Watcher
 
-The Joint Access Storage Driver supports two different watchers for detecting changes to the filesystem. The watchfolder watcher is better tested and supported at that point.
+The Posix FS Storage Driver supports two different watchers for detecting changes to the filesystem. The watchfolder watcher is better tested and supported at that point.
 
 #### GPFS File Audit Logging
 
