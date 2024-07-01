@@ -964,6 +964,9 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         "FileVersion",
         "Features",
     ]
+    builtinOnlyTestGroups = [
+        "PutRelativeFile",
+    ]
 
     ocis_bin = "ocis/bin/ocis"
     validatorTests = []
@@ -1015,6 +1018,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
             },
         ]
 
+    wopiTestCases = dirs["base"] + "/tests/config/drone/wopiValidatorCustomTestCases.xml"
     for testgroup in testgroups:
         validatorTests.append({
             "name": "wopiValidatorTests-%s" % testgroup,
@@ -1027,9 +1031,25 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                 "export WOPI_SRC=$(cat wopisrc)",
                 "echo $WOPI_SRC",
                 "cd /app",
-                "/app/Microsoft.Office.WopiValidator -t $WOPI_TOKEN -w $WOPI_SRC -l $WOPI_TTL --testgroup %s" % testgroup,
+                "/app/Microsoft.Office.WopiValidator -t $WOPI_TOKEN -w $WOPI_SRC -l $WOPI_TTL --testgroup %s -c %s" % (testgroup, wopiTestCases),
             ],
         })
+    if wopiServerType == "builtin":
+        for builtinOnlyGroup in builtinOnlyTestGroups:
+            validatorTests.append({
+                "name": "wopiValidatorTests-%s-%s" % (storage, builtinOnlyGroup),
+                "image": "owncloudci/wopi-validator",
+                "commands": [
+                    "export WOPI_TOKEN=$(cat accesstoken)",
+                    "echo $WOPI_TOKEN",
+                    "export WOPI_TTL=$(cat accesstokenttl)",
+                    "echo $WOPI_TTL",
+                    "export WOPI_SRC=$(cat wopisrc)",
+                    "echo $WOPI_SRC",
+                    "cd /app",
+                    "/app/Microsoft.Office.WopiValidator -s -t $WOPI_TOKEN -w $WOPI_SRC -l $WOPI_TTL --testgroup %s -c %s" % (builtinOnlyGroup, wopiTestCases),
+                ],
+            })
 
     return {
         "kind": "pipeline",
