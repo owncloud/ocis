@@ -8,13 +8,13 @@ Basic file management like up and download, move, copy, properties, trash, versi
 
 #### [COPY a folder to received share file/folder seems to work but no change in shares](https://github.com/owncloud/ocis/issues/6999)
 
-- [coreApiWebdavProperties/copyFile.feature:284](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L284)
-- [coreApiWebdavProperties/copyFile.feature:285](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L285)
-- [coreApiWebdavProperties/copyFile.feature:308](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L308)
-- [coreApiWebdavProperties/copyFile.feature:309](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L309)
-- [coreApiWebdavProperties/copyFile.feature:482](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L482)
-- [coreApiWebdavProperties/copyFile.feature:483](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L483)
+- [coreApiWebdavProperties/copyFile.feature:286](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L286)
+- [coreApiWebdavProperties/copyFile.feature:287](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L287)
+- [coreApiWebdavProperties/copyFile.feature:310](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L310)
+- [coreApiWebdavProperties/copyFile.feature:311](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L311)
 - [coreApiWebdavProperties/copyFile.feature:484](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L484)
+- [coreApiWebdavProperties/copyFile.feature:485](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L485)
+- [coreApiWebdavProperties/copyFile.feature:486](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L486)
 
 #### [Custom dav properties with namespaces are rendered incorrectly](https://github.com/owncloud/ocis/issues/2140)
 
@@ -174,11 +174,11 @@ And other missing implementation of favorites
 
 #### [copying the file inside Shares folder returns 412](https://github.com/owncloud/ocis/issues/3874)
 
-- [coreApiWebdavProperties/copyFile.feature:238](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L238)
-- [coreApiWebdavProperties/copyFile.feature:239](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L239)
-- [coreApiWebdavProperties/copyFile.feature:455](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L455)
-- [coreApiWebdavProperties/copyFile.feature:456](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L456)
+- [coreApiWebdavProperties/copyFile.feature:240](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L240)
+- [coreApiWebdavProperties/copyFile.feature:241](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L241)
 - [coreApiWebdavProperties/copyFile.feature:457](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L457)
+- [coreApiWebdavProperties/copyFile.feature:458](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L458)
+- [coreApiWebdavProperties/copyFile.feature:459](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L459)
 
 ### Won't fix
 
@@ -189,9 +189,9 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [Blacklist files extensions](https://github.com/owncloud/ocis/issues/2177)
 
-- [coreApiWebdavProperties/copyFile.feature:107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L107)
-- [coreApiWebdavProperties/copyFile.feature:108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L108)
 - [coreApiWebdavProperties/copyFile.feature:109](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L109)
+- [coreApiWebdavProperties/copyFile.feature:110](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L110)
+- [coreApiWebdavProperties/copyFile.feature:111](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L111)
 - [coreApiWebdavProperties/createFileFolder.feature:95](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/createFileFolder.feature#L95)
 - [coreApiWebdavProperties/createFileFolder.feature:96](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/createFileFolder.feature#L96)
 - [coreApiWebdavProperties/createFileFolder.feature:97](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/createFileFolder.feature#L97)
@@ -233,9 +233,9 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 ### [COPY file/folder to same name is possible (but 500 code error for folder with spaces path)](https://github.com/owncloud/ocis/issues/8711)
 
 - [coreApiSharePublicLink2/copyFromPublicLink.feature:198](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/copyFromPublicLink.feature#L198)
-- [coreApiWebdavProperties/copyFile.feature:979](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L979)
-- [coreApiWebdavProperties/copyFile.feature:980](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L980)
-- [coreApiWebdavProperties/copyFile.feature:981](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L981)
+- [coreApiWebdavProperties/copyFile.feature:1064](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L1064)
+- [coreApiWebdavProperties/copyFile.feature:1065](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L1065)
+- [coreApiWebdavProperties/copyFile.feature:1066](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L1066)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
