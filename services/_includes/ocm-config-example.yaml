@@ -89,6 +89,8 @@ ocm_invite_manager:
   drivers:
     json:
       file: /var/lib/ocis/storage/ocm/ocminvites.json
+  token_expiration: 24h0m0s
+  timeout: 30s
   insecure: false
 ocm_provider_authorizer_driver: json
 ocm_provider_authorizer_drivers:

@@ -34,6 +34,8 @@
 | OCM_MESH_DIRECTORY_URL | string |  | URL of the mesh directory service.|
 | OCM_OCM_INVITE_MANAGER_DRIVER | string | json | Driver to be used to persist OCM invites. Supported value is only 'json'.|
 | OCM_OCM_INVITE_MANAGER_JSON_FILE | string | /var/lib/ocis/storage/ocm/ocminvites.json | Path to the JSON file where OCM invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| OCM_OCM_INVITE_MANAGER_TOKEN_EXPIRATION | Duration | 24h0m0s | Expiry duration for invite tokens.|
+| OCM_OCM_INVITE_MANAGER_TIMEOUT | Duration | 30s | Timeout specifies a time limit for requests made to OCM endpoints.|
 | OCM_OCM_INVITE_MANAGER_INSECURE | bool | false | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
 | SHARING_OCM_PROVIDER_AUTHORIZER_DRIVER | string | json | Driver to be used to persist ocm invites. Supported value is only 'json'.|
 | OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE | string | /var/lib/ocis/storage/ocm/ocmproviders.json | Path to the JSON file where ocm invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|

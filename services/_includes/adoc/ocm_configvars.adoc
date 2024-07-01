@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-01-00-41-16]
+[#deprecation-note-2024-07-01-09-26-36]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -327,6 +327,24 @@ a| [subs=-attributes]
 ++/var/lib/ocis/storage/ocm/ocminvites.json ++
 a| [subs=-attributes]
 Path to the JSON file where OCM invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
+
+a|`OCM_OCM_INVITE_MANAGER_TOKEN_EXPIRATION` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++24h0m0s ++
+a| [subs=-attributes]
+Expiry duration for invite tokens.
+
+a|`OCM_OCM_INVITE_MANAGER_TIMEOUT` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++30s ++
+a| [subs=-attributes]
+Timeout specifies a time limit for requests made to OCM endpoints.
 
 a|`OCM_OCM_INVITE_MANAGER_INSECURE` +
 
