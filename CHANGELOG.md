@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Activitylog API: [#9361](https://github.com/owncloud/ocis/pull/9361)
 * Enhancement - Add the backchannel logout event: [#9447](https://github.com/owncloud/ocis/pull/9447)
 * Enhancement - Add fail flag to consistency check: [#9447](https://github.com/owncloud/ocis/pull/9447)
+* Enhancement - Configurable OCM timeouts: [#9450](https://github.com/owncloud/ocis/pull/9450)
 * Enhancement - Deprecate gateway environment variables: [#9451](https://github.com/owncloud/ocis/pull/9451)
 * Enhancement - Allow reindexing all spaces: [#9456](https://github.com/owncloud/ocis/pull/9456)
 * Enhancement - Allow disable versioning: [#9473](https://github.com/owncloud/ocis/pull/9473)
@@ -129,6 +130,14 @@ The following sections list the changes for unreleased.
    ensure that backups are consistent.
 
    https://github.com/owncloud/ocis/pull/9447
+
+* Enhancement - Configurable OCM timeouts: [#9450](https://github.com/owncloud/ocis/pull/9450)
+
+   We added `OCM_OCM_INVITE_MANAGER_TOKEN_EXPIRATION` and
+   `OCM_OCM_INVITE_MANAGER_TIMEOUT` to allow changing the default invite token
+   duration as well as the request timeout for requests made to other instances.
+
+   https://github.com/owncloud/ocis/pull/9450
 
 * Enhancement - Deprecate gateway environment variables: [#9451](https://github.com/owncloud/ocis/pull/9451)
 
