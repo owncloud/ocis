@@ -235,6 +235,14 @@ golangci-lint-fix:
         $(MAKE) --no-print-directory -C $$mod golangci-lint-fix; \
     done
 
+.PHONY: test-gherkin-lint
+test-gherkin-lint:
+	gherlint tests/acceptance/features -c tests/acceptance/config/.gherlintrc.json
+
+.PHONY: test-gherkin-lint-fix
+test-gherkin-lint-fix:
+	gherlint --fix tests/acceptance/features -c tests/acceptance/config/.gherlintrc.json
+
 .PHONY: bingo-update
 bingo-update: $(BINGO)
 	$(BINGO) get -l -v
