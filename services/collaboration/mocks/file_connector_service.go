@@ -5,7 +5,12 @@ package mocks
 import (
 	context "context"
 
+	connector "github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
+
 	fileinfo "github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
+
+	io "io"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -76,6 +81,63 @@ func (_c *FileConnectorService_CheckFileInfo_Call) Return(_a0 fileinfo.FileInfo,
 }
 
 func (_c *FileConnectorService_CheckFileInfo_Call) RunAndReturn(run func(context.Context) (fileinfo.FileInfo, error)) *FileConnectorService_CheckFileInfo_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteFile provides a mock function with given fields: ctx, lockID
+func (_m *FileConnectorService) DeleteFile(ctx context.Context, lockID string) (string, error) {
+	ret := _m.Called(ctx, lockID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteFile")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
+		return rf(ctx, lockID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
+		r0 = rf(ctx, lockID)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, lockID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FileConnectorService_DeleteFile_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteFile'
+type FileConnectorService_DeleteFile_Call struct {
+	*mock.Call
+}
+
+// DeleteFile is a helper method to define mock.On call
+//   - ctx context.Context
+//   - lockID string
+func (_e *FileConnectorService_Expecter) DeleteFile(ctx interface{}, lockID interface{}) *FileConnectorService_DeleteFile_Call {
+	return &FileConnectorService_DeleteFile_Call{Call: _e.mock.On("DeleteFile", ctx, lockID)}
+}
+
+func (_c *FileConnectorService_DeleteFile_Call) Run(run func(ctx context.Context, lockID string)) *FileConnectorService_DeleteFile_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *FileConnectorService_DeleteFile_Call) Return(_a0 string, _a1 error) *FileConnectorService_DeleteFile_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FileConnectorService_DeleteFile_Call) RunAndReturn(run func(context.Context, string) (string, error)) *FileConnectorService_DeleteFile_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -190,6 +252,139 @@ func (_c *FileConnectorService_Lock_Call) Return(_a0 string, _a1 error) *FileCon
 }
 
 func (_c *FileConnectorService_Lock_Call) RunAndReturn(run func(context.Context, string, string) (string, error)) *FileConnectorService_Lock_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PutRelativeFileRelative provides a mock function with given fields: ctx, ccs, stream, streamLength, target
+func (_m *FileConnectorService) PutRelativeFileRelative(ctx context.Context, ccs connector.ContentConnectorService, stream io.Reader, streamLength int64, target string) (*connector.PutRelativeResponse, *connector.PutRelativeHeaders, error) {
+	ret := _m.Called(ctx, ccs, stream, streamLength, target)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PutRelativeFileRelative")
+	}
+
+	var r0 *connector.PutRelativeResponse
+	var r1 *connector.PutRelativeHeaders
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.PutRelativeResponse, *connector.PutRelativeHeaders, error)); ok {
+		return rf(ctx, ccs, stream, streamLength, target)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) *connector.PutRelativeResponse); ok {
+		r0 = rf(ctx, ccs, stream, streamLength, target)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connector.PutRelativeResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) *connector.PutRelativeHeaders); ok {
+		r1 = rf(ctx, ccs, stream, streamLength, target)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*connector.PutRelativeHeaders)
+		}
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) error); ok {
+		r2 = rf(ctx, ccs, stream, streamLength, target)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// FileConnectorService_PutRelativeFileRelative_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PutRelativeFileRelative'
+type FileConnectorService_PutRelativeFileRelative_Call struct {
+	*mock.Call
+}
+
+// PutRelativeFileRelative is a helper method to define mock.On call
+//   - ctx context.Context
+//   - ccs connector.ContentConnectorService
+//   - stream io.Reader
+//   - streamLength int64
+//   - target string
+func (_e *FileConnectorService_Expecter) PutRelativeFileRelative(ctx interface{}, ccs interface{}, stream interface{}, streamLength interface{}, target interface{}) *FileConnectorService_PutRelativeFileRelative_Call {
+	return &FileConnectorService_PutRelativeFileRelative_Call{Call: _e.mock.On("PutRelativeFileRelative", ctx, ccs, stream, streamLength, target)}
+}
+
+func (_c *FileConnectorService_PutRelativeFileRelative_Call) Run(run func(ctx context.Context, ccs connector.ContentConnectorService, stream io.Reader, streamLength int64, target string)) *FileConnectorService_PutRelativeFileRelative_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(connector.ContentConnectorService), args[2].(io.Reader), args[3].(int64), args[4].(string))
+	})
+	return _c
+}
+
+func (_c *FileConnectorService_PutRelativeFileRelative_Call) Return(_a0 *connector.PutRelativeResponse, _a1 *connector.PutRelativeHeaders, _a2 error) *FileConnectorService_PutRelativeFileRelative_Call {
+	_c.Call.Return(_a0, _a1, _a2)
+	return _c
+}
+
+func (_c *FileConnectorService_PutRelativeFileRelative_Call) RunAndReturn(run func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.PutRelativeResponse, *connector.PutRelativeHeaders, error)) *FileConnectorService_PutRelativeFileRelative_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PutRelativeFileSuggested provides a mock function with given fields: ctx, ccs, stream, streamLength, target
+func (_m *FileConnectorService) PutRelativeFileSuggested(ctx context.Context, ccs connector.ContentConnectorService, stream io.Reader, streamLength int64, target string) (*connector.PutRelativeResponse, error) {
+	ret := _m.Called(ctx, ccs, stream, streamLength, target)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PutRelativeFileSuggested")
+	}
+
+	var r0 *connector.PutRelativeResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.PutRelativeResponse, error)); ok {
+		return rf(ctx, ccs, stream, streamLength, target)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) *connector.PutRelativeResponse); ok {
+		r0 = rf(ctx, ccs, stream, streamLength, target)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connector.PutRelativeResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) error); ok {
+		r1 = rf(ctx, ccs, stream, streamLength, target)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FileConnectorService_PutRelativeFileSuggested_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PutRelativeFileSuggested'
+type FileConnectorService_PutRelativeFileSuggested_Call struct {
+	*mock.Call
+}
+
+// PutRelativeFileSuggested is a helper method to define mock.On call
+//   - ctx context.Context
+//   - ccs connector.ContentConnectorService
+//   - stream io.Reader
+//   - streamLength int64
+//   - target string
+func (_e *FileConnectorService_Expecter) PutRelativeFileSuggested(ctx interface{}, ccs interface{}, stream interface{}, streamLength interface{}, target interface{}) *FileConnectorService_PutRelativeFileSuggested_Call {
+	return &FileConnectorService_PutRelativeFileSuggested_Call{Call: _e.mock.On("PutRelativeFileSuggested", ctx, ccs, stream, streamLength, target)}
+}
+
+func (_c *FileConnectorService_PutRelativeFileSuggested_Call) Run(run func(ctx context.Context, ccs connector.ContentConnectorService, stream io.Reader, streamLength int64, target string)) *FileConnectorService_PutRelativeFileSuggested_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(connector.ContentConnectorService), args[2].(io.Reader), args[3].(int64), args[4].(string))
+	})
+	return _c
+}
+
+func (_c *FileConnectorService_PutRelativeFileSuggested_Call) Return(_a0 *connector.PutRelativeResponse, _a1 error) *FileConnectorService_PutRelativeFileSuggested_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FileConnectorService_PutRelativeFileSuggested_Call) RunAndReturn(run func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.PutRelativeResponse, error)) *FileConnectorService_PutRelativeFileSuggested_Call {
 	_c.Call.Return(run)
 	return _c
 }
