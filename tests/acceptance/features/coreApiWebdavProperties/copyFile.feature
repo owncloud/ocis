@@ -695,7 +695,7 @@ Feature: copy file
       | new              |
 
 
-  Scenario Outline: copying a file into a shared folder shared via viewer and secure viewer permissions as the sharee
+  Scenario Outline: sharee copy a file into a shared folder, shared with viewer and secure viewer permissions
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -758,7 +758,7 @@ Feature: copy file
       | new              |
 
 
-  Scenario Outline: copying a file out of a shared folder shared via secure viewer permissions as the sharee
+  Scenario Outline: sharee copy a file from a shared folder, shared with secure viewer permission
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -770,7 +770,7 @@ Feature: copy file
       | shareType       | user          |
       | permissionsRole | Secure viewer |
     When user "Alice" copies file "/Shares/testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "403"
     And as "Alice" file "/fileInsideShare.txt" should not exist
     Examples:
       | dav-path-version |
@@ -881,8 +881,8 @@ Feature: copy file
     Then the HTTP status code should be "<status-code>"
     Examples:
       | dav-path-version | permissions-role-1 | permissions-role-2 | status-code |
-      | old              | Secure viewer      | Editor             | 500         |
-      | new              | Secure viewer      | Editor             | 500         |
+      | old              | Secure viewer      | Editor             | 403         |
+      | new              | Secure viewer      | Editor             | 403         |
       | old              | Secure viewer      | Secure viewer      | 403         |
       | new              | Secure viewer      | Secure viewer      | 403         |
       | old              | Secure viewer      | Viewer             | 403         |
