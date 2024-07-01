@@ -234,7 +234,7 @@ require (
 	github.com/gookit/color v1.5.4 // indirect
 	github.com/gookit/goutil v0.6.15 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
-	github.com/gorilla/schema v1.2.0 // indirect
+	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/hashicorp/consul/api v1.25.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
