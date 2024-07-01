@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"go-micro.dev/v4/client"
@@ -90,9 +91,11 @@ type OCMD struct {
 }
 
 type OCMInviteManager struct {
-	Driver   string                  `yaml:"driver" env:"OCM_OCM_INVITE_MANAGER_DRIVER" desc:"Driver to be used to persist OCM invites. Supported value is only 'json'." introductionVersion:"5.0"`
-	Drivers  OCMInviteManagerDrivers `yaml:"drivers"`
-	Insecure bool                    `yaml:"insecure" env:"OCM_OCM_INVITE_MANAGER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments." introductionVersion:"5.0"`
+	Driver          string                  `yaml:"driver" env:"OCM_OCM_INVITE_MANAGER_DRIVER" desc:"Driver to be used to persist OCM invites. Supported value is only 'json'." introductionVersion:"5.0"`
+	Drivers         OCMInviteManagerDrivers `yaml:"drivers"`
+	TokenExpiration time.Duration           `yaml:"token_expiration" env:"OCM_OCM_INVITE_MANAGER_TOKEN_EXPIRATION" desc:"Expiry duration for invite tokens." introductionVersion:"6.0.1"`
+	Timeout         time.Duration           `yaml:"timeout" env:"OCM_OCM_INVITE_MANAGER_TIMEOUT" desc:"Timeout specifies a time limit for requests made to OCM endpoints." introductionVersion:"6.0.1"`
+	Insecure        bool                    `yaml:"insecure" env:"OCM_OCM_INVITE_MANAGER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments." introductionVersion:"5.0"`
 }
 
 type OCMInviteManagerDrivers struct {

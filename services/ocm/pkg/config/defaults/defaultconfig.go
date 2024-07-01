@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"path/filepath"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -97,7 +98,9 @@ func DefaultConfig() *config.Config {
 					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocm", "ocminvites.json"),
 				},
 			},
-			Insecure: false,
+			TokenExpiration: 24 * time.Hour,
+			Timeout:         30 * time.Second,
+			Insecure:        false,
 		},
 		OCMProviderAuthorizerDriver: "json",
 		OCMProviderAuthorizerDrivers: config.OCMProviderAuthorizerDrivers{
