@@ -7,14 +7,13 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/shamaton/msgpack/v2"
 )
 
 var (
-	// _nodesGlobPattern is the glob pattern to find all nodes
-	_nodesGlobPattern = "spaces/*/*/*/*/*/*/*/*"
 	// regex to determine if a node versioned. Examples:
 	// 9113a718-8285-4b32-9042-f930f1a58ac2.REV.2024-05-22T07:32:53.89969726Z
 	// 9113a718-8285-4b32-9042-f930f1a58ac2.REV.2024-05-22T07:32:53.89969726Z.mpk
@@ -28,8 +27,7 @@ type DelBlobstore interface {
 }
 
 // PurgeRevisions removes all revisions from a storage provider.
-func PurgeRevisions(p string, bs DelBlobstore, dryRun bool, verbose bool) error {
-	pattern := filepath.Join(p, _nodesGlobPattern)
+func PurgeRevisions(pattern string, bs DelBlobstore, dryRun bool, verbose bool) error {
 	if verbose {
 		fmt.Println("Looking for nodes in", pattern)
 	}
@@ -87,15 +85,22 @@ func PurgeRevisions(p string, bs DelBlobstore, dryRun bool, verbose bool) error 
 		countFiles++
 
 		if verbose {
+			spaceID, nodeID := getIDsFromPath(d)
 			if dryRun {
-				fmt.Println("Would delete", d)
+				fmt.Println("Would delete")
+				fmt.Println("\tResourceID:", spaceID+"!"+nodeID)
+				fmt.Println("\tSpaceID:", spaceID)
+				fmt.Println("\tPath:", d)
 				if blobID != "" {
-					fmt.Println("Would delete blob", blobID)
+					fmt.Println("\tBlob:", blobID)
 				}
 			} else {
-				fmt.Println("Deleted", d)
+				fmt.Println("Deleted")
+				fmt.Println("\tResourceID:", spaceID+"!"+nodeID)
+				fmt.Println("\tSpaceID:", spaceID)
+				fmt.Println("\tPath:", d)
 				if blobID != "" {
-					fmt.Println("Deleted blob", blobID)
+					fmt.Println("\tBlob:", blobID)
 				}
 			}
 		}
@@ -128,4 +133,25 @@ func getBlobID(path string) (string, error) {
 	}
 
 	return "", nil
+}
+
+func getIDsFromPath(path string) (string, string) {
+	rawIDs := strings.Split(path, "/nodes/")
+	if len(rawIDs) != 2 {
+		return "", ""
+	}
+
+	s := strings.Split(rawIDs[0], "/spaces/")
+	if len(s) != 2 {
+		return "", ""
+	}
+
+	n := strings.Split(rawIDs[1], ".REV.")
+	if len(n) != 2 {
+		return "", ""
+	}
+
+	spaceID := strings.Replace(s[1], "/", "", -1)
+	nodeID := strings.Replace(n[0], "/", "", -1)
+	return spaceID, filepath.Base(nodeID)
 }
