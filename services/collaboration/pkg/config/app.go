@@ -9,4 +9,11 @@ type App struct {
 
 	Addr     string `yaml:"addr" env:"COLLABORATION_APP_ADDR" desc:"The URL where the WOPI app is located, such as https://127.0.0.1:8080." introductionVersion:"6.0.0"`
 	Insecure bool   `yaml:"insecure" env:"COLLABORATION_APP_INSECURE" desc:"Skip TLS certificate verification when connecting to the WOPI app" introductionVersion:"6.0.0"`
+
+	ProofKeys ProofKeys `yaml:"proofkeys"`
+}
+
+type ProofKeys struct {
+	Disable  bool   `yaml:"disable" env:"COLLABORATION_APP_PROOF_DISABLE" desc:"Disable the proof keys verification" introductionVersion:"6.0.0"`
+	Duration string `yaml:"duration" env:"COLLABORATION_APP_PROOF_DURATION" desc:"Duration for the proof keys to be cached in memory, using time.ParseDuration format. If the duration can't be parsed, we'll use the default 12h as duration" introductionVersion:"6.0.0"`
 }
