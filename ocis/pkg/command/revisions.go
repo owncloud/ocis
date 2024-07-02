@@ -3,15 +3,23 @@ package command
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 
 	ocisbs "github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
+	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/lookup"
 	s3bs "github.com/cs3org/reva/v2/pkg/storage/fs/s3ng/blobstore"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	"github.com/owncloud/ocis/v2/ocis/pkg/revisions"
 	"github.com/urfave/cli/v2"
+)
+
+var (
+	// _nodesGlobPattern is the glob pattern to find all nodes
+	_nodesGlobPattern = "spaces/*/*/*/*/*/*/*/*"
 )
 
 // RevisionsCommand is the entrypoint for the revisions command.
@@ -36,7 +44,7 @@ func RevisionsCommand(cfg *config.Config) *cli.Command {
 func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "purge",
-		Usage: "purge all revisions",
+		Usage: "purge revisions",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "basepath",
@@ -47,7 +55,7 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:    "blobstore",
 				Aliases: []string{"b"},
-				Usage:   "the blobstore type. Can be (none, ocis, s3ng). Default ocis",
+				Usage:   "the blobstore type. Can be (none, ocis, s3ng). Default ocis. Note: When using s3ng this needs same configuration as the storage-users service",
 				Value:   "ocis",
 			},
 			&cli.BoolFlag{
@@ -60,6 +68,11 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 				Aliases: []string{"v"},
 				Usage:   "print verbose output",
 				Value:   false,
+			},
+			&cli.StringFlag{
+				Name:    "resource-id",
+				Aliases: []string{"r"},
+				Usage:   "purge all revisions of this file/space. If not set, all revisions will be purged",
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -94,7 +107,14 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 				fmt.Println(err)
 				return err
 			}
-			if err := revisions.PurgeRevisions(basePath, bs, c.Bool("dry-run"), c.Bool("verbose")); err != nil {
+
+			p, err := generatePath(basePath, c.String("resource-id"))
+			if err != nil {
+				fmt.Printf("❌ Error parsing resourceID: %s", err)
+				return err
+			}
+
+			if err := revisions.PurgeRevisions(p, bs, c.Bool("dry-run"), c.Bool("verbose")); err != nil {
 				fmt.Printf("❌ Error purging revisions: %s", err)
 				return err
 			}
@@ -102,6 +122,29 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+}
+
+func generatePath(basePath string, resourceID string) (string, error) {
+	if resourceID == "" {
+		return filepath.Join(basePath, _nodesGlobPattern), nil
+	}
+
+	rid, err := storagespace.ParseID(resourceID)
+	if err != nil {
+		return "", err
+	}
+
+	sid := lookup.Pathify(rid.GetSpaceId(), 1, 2)
+	if sid == "" {
+		sid = "*/*"
+	}
+
+	nid := lookup.Pathify(rid.GetOpaqueId(), 4, 2)
+	if nid == "" {
+		nid = "*/*/*/*/"
+	}
+
+	return filepath.Join(basePath, "spaces", sid, "nodes", nid+"*"), nil
 }
 
 func init() {
