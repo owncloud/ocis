@@ -52,22 +52,21 @@ unprotected: false # with false (default), calling the endpoint requires authori
 
 ## Automatic User and Group Provisioning
 
-When using and external OpenID Connect IDP the proxy can be configured to automatically provision
+When using an external OpenID Connect IDP, the proxy can be configured to automatically provision
 users upon their first login.
 
 ### Prequisites
 
 A number of prerequisites must be met for automatic user provisioning to work:
 
-* ownCloud Infinite Scale must be configured to use an external OpenID Connect
-  IDP
+* ownCloud Infinite Scale must be configured to use an external OpenID Connect IDP
 * The `graph` service must be configured to allow updating users and groups
-  (`GRAPH_LDAP_SERVER_WRITE_ENABLED`)
+  (`GRAPH_LDAP_SERVER_WRITE_ENABLED`).
 * The IDP must return a unique value in the user's claims (as part of the
   userinfo response and/or the access tokens) that can be used to identify
   the user. This claim needs to be stable and cannot be changed for the whole
-  lifetime of the user. That means if a claim like `email` or
-  `preferred_username` is used, you must asure that the user's email address or
+  lifetime of the user. That means, if a claim like `email` or
+  `preferred_username` is used, you must ensure that the user's email address or
   username never changes.
 
 ### Configuration
@@ -75,35 +74,37 @@ A number of prerequisites must be met for automatic user provisioning to work:
 To enable automatic user provisioning, the following environment variables must
 be set for the proxy service:
 
-* `PROXY_AUTOPROVISION_ACCOUNTS`: Set to `true` to enable automatic user provisioning.
-* `PROXY_AUTOPROVISION_CLAIM_USERNAME`: The name of an OIDC claim whose value
-  should be used as the username for the autoprovsioned user in ownCloud
-  Infinite Scale. Defaults to `preferred_username`. Can also be set to e.g.
-  `sub` to guarantee a unique and stable username.
-* `PROXY_AUTOPROVISION_CLAIM_EMAIL`: The name of an OIDC claim whose value
-  should be used for the `mail` attribute of the autoprovisioned user in
-  ownCloud Infinite Scale. Defaults to `email`.
-* `PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME`: The name of an OIDC claim whose
-  value should be used for the `displayname` attribute of the autoprovisioned
-  user in ownCloud Infinite Scale. Defaults to `name`.
-* `PROXY_AUTOPROVISION_CLAIM_GROUPS`: The name of an OIDC claim whose value
-  should be used to maintain a user's group membership. The claim value should
-  contain a list of group names the user should be a member of. Defaults to
-  `groups`.
-* `PROXY_USER_OIDC_CLAIM`: When resolving and authenticated OIDC user, the
-  value of this claims is used to lookup the user in the users service. For
-  auto provisioning setups this usually is the same claims as set via
-  `PROXY_AUTOPROVISION_CLAIM_USERNAME`.
-* `PROXY_USER_CS3_CLAIM`: This is the name of the user attribute in ocis that
-  is used to lookup the user by the value of the `PROXY_USER_OIDC_CLAIM`. For
-  auto provisioning setups this usually needs to be set to `username`.
+* `PROXY_AUTOPROVISION_ACCOUNTS`\
+Set to `true` to enable automatic user provisioning.
+* `PROXY_AUTOPROVISION_CLAIM_USERNAME`\
+The name of an OIDC claim whose value should be used as the username for the
+autoprovsioned user in ownCloud Infinite Scale. Defaults to `preferred_username`.
+Can also be set to e.g. `sub` to guarantee a unique and stable username.
+* `PROXY_AUTOPROVISION_CLAIM_EMAIL`\
+The name of an OIDC claim whose value should be used for the `mail` attribute
+of the autoprovisioned user in ownCloud Infinite Scale. Defaults to `email`.
+* `PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME`\
+The name of an OIDC claim whose value should be used for the `displayname`
+attribute of the autoprovisioned user in ownCloud Infinite Scale. Defaults to `name`.
+* `PROXY_AUTOPROVISION_CLAIM_GROUPS`\
+The name of an OIDC claim whose value should be used to maintain a user's group
+membership. The claim value should contain a list of group names the user should
+be a member of. Defaults to `groups`.
+* `PROXY_USER_OIDC_CLAIM`\
+When resolving and authenticated OIDC user, the value of this claims is used to
+lookup the user in the users service. For auto provisioning setups this usually is the
+same claims as set via `PROXY_AUTOPROVISION_CLAIM_USERNAME`.
+* `PROXY_USER_CS3_CLAIM`\
+This is the name of the user attribute in ocis that is used to lookup the user by the
+value of the `PROXY_USER_OIDC_CLAIM`. For auto provisioning setups this usually
+needs to be set to `username`.
 
-### How it works
+### How it Works
 
 When a user logs into ownCloud Infinite Scale for the first time, the proxy
-checks if that user already exists by querying the `users` service for users
+checks if that user already exists. This is done by querying the `users` service for users,
 where the attribute set in `PROXY_USER_CS3_CLAIM` matches the value of the OIDC
-claim configure in `PROXY_USER_OIDC_CLAIM`.
+claim configured in `PROXY_USER_OIDC_CLAIM`.
 
 If the users does not exist, the proxy will create a new user via the `graph`
 service using the claim values configured in
@@ -111,16 +112,16 @@ service using the claim values configured in
 `PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME`.
 
 If the user does already exist, the proxy will check if the user's email or
-displayname has changed and update those accordingly via `graph` service.
+displayname has changed and updates those accordingly via `graph` service.
 
 Next, the proxy will check if the user is a member of the groups configured in
 `PROXY_AUTOPROVISION_CLAIM_GROUPS`. It will add the user to the groups listed
-in there and remove it from all other groups that it is currently a member of.
-Groups that do not exist yet will be created. Note: This can be a somewhat
-costly operation, especially if the user is a member of a large number of
+via the OIDC claim that holds the groups defined in the envvar and removes it from
+all other groups that he is currently a member of.
+Groups that do not exist in the external IDP yet will be created. Note: This can be a
+somewhat costly operation, especially if the user is a member of a large number of
 groups. If the group memberships of a user are changed in the IDP after the
-first login it can take up to 5 minutes until the changes are reflected in
-ownCloud Infinite Scale.
+first login, it can take up to 5 minutes until the changes are reflected in Infinite Scale.
 
 ## Automatic Quota Assignments
 
@@ -149,9 +150,8 @@ is unset.
 When `PROXY_ROLE_ASSIGNMENT_DRIVER` is set to `oidc` the role assignment for a user will happen
 based on the values of an OpenID Connect Claim of that user. The name of the OpenID Connect Claim to
 be used for the role assignment can be configured via the `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`
-environment variable. It is also possible to defe ine a mapping of claim values to role names defined
-in ownCloud Infinite Scale via a `yaml` configuration. See the following `proxy.yaml` snippet for an
-example.
+environment variable. It is also possible to define a mapping of claim values to role names defined
+in Infinite Scale via a `yaml` configuration. See the following `proxy.yaml` snippet for an example.
 
 ```yaml
 role_assignment:
