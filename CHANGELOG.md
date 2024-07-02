@@ -49,7 +49,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Allow all uploads to restart: [#9506](https://github.com/owncloud/ocis/pull/9506)
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
-* Enhancement - Update web to v8.0.3: [#9429](https://github.com/owncloud/ocis/pull/9429)
+* Enhancement - Update web to v8.0.4: [#9429](https://github.com/owncloud/ocis/pull/9429)
 
 ## Details
 
@@ -66,11 +66,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9199
 
-* Enhancement - Update web to v8.0.3: [#9429](https://github.com/owncloud/ocis/pull/9429)
+* Enhancement - Update web to v8.0.4: [#9429](https://github.com/owncloud/ocis/pull/9429)
 
    Tags: web
 
-   We updated ownCloud Web to v8.0.3. Please refer to the changelog (linked) for
+   We updated ownCloud Web to v8.0.4. Please refer to the changelog (linked) for
    details on the web release.
 
    - Bugfix [owncloud/web#10814](https://github.com/owncloud/web/issues/10814):
@@ -82,10 +82,20 @@ The following sections list the changes for unreleased.
    [owncloud/web#10941](https://github.com/owncloud/web/issues/10941): Space not
    updating on navigation - Bugfix
    [owncloud/web#11063](https://github.com/owncloud/web/issues/11063): Enforce
-   shortcut URL protocol
+   shortcut URL protocol - Bugfix
+   [owncloud/web#11092](https://github.com/owncloud/web/issues/11092): Browser
+   confirmation dialog after closing editor - Bugfix
+   [owncloud/web#11091](https://github.com/owncloud/web/issues/11091): Button focus
+   when closing editor - Bugfix
+   [owncloud/web#10942](https://github.com/owncloud/web/issues/10942): Keyboard
+   navigation breaking - Bugfix
+   [owncloud/web#11086](https://github.com/owncloud/web/pull/11086): Opening public
+   links with an expired token
 
    https://github.com/owncloud/ocis/pull/9429
+   https://github.com/owncloud/ocis/pull/9510
    https://github.com/owncloud/web/releases/tag/v8.0.3
+   https://github.com/owncloud/web/releases/tag/v8.0.4
 
 # Changelog for [5.0.5] (2024-05-22)
 
