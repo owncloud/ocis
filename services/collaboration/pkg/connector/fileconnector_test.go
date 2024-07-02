@@ -13,6 +13,7 @@ import (
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
@@ -30,6 +31,9 @@ var _ = Describe("FileConnector", func() {
 
 	BeforeEach(func() {
 		cfg = &config.Config{
+			Commons: &shared.Commons{
+				OcisURL: "https://ocis.example.prv",
+			},
 			App: config.App{
 				LockName: "testName_for_unittests", // Only the LockName is used
 			},
@@ -790,13 +794,14 @@ var _ = Describe("FileConnector", func() {
 				Version:                    "16273849.0",
 				BaseFileName:               "test.txt",
 				BreadcrumbDocName:          "test.txt",
-				UserCanNotWriteRelative:    true,
+				UserCanNotWriteRelative:    false,
 				HostViewURL:                "http://test.ex.prv/view",
 				HostEditURL:                "http://test.ex.prv/edit",
 				SupportsExtendedLockLength: true,
 				SupportsGetLock:            true,
 				SupportsLocks:              true,
 				SupportsUpdate:             true,
+				SupportsDeleteFile:         true,
 				UserCanWrite:               true,
 				UserID:                     "6f7061717565496440696e6d656d6f7279", // hex of opaqueId@inmemory
 				UserFriendlyName:           "Pet Shaft",
@@ -846,7 +851,7 @@ var _ = Describe("FileConnector", func() {
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                    int64(998877),
 				BaseFileName:            "test.txt",
-				UserCanNotWriteRelative: true,
+				UserCanNotWriteRelative: false,
 				DisableExport:           true,
 				DisableCopy:             true,
 				DisablePrint:            true,
@@ -855,6 +860,7 @@ var _ = Describe("FileConnector", func() {
 				EnableOwnerTermination:  true,
 				SupportsLocks:           true,
 				BreadcrumbDocName:       "test.txt",
+				PostMessageOrigin:       "https://ocis.example.prv",
 			}
 
 			newFileInfo, err := fc.CheckFileInfo(ctx)
@@ -901,7 +907,7 @@ var _ = Describe("FileConnector", func() {
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                    int64(998877),
 				BaseFileName:            "test.txt",
-				UserCanNotWriteRelative: true,
+				UserCanNotWriteRelative: false,
 				DisableExport:           true,
 				DisableCopy:             true,
 				DisablePrint:            true,
@@ -911,6 +917,7 @@ var _ = Describe("FileConnector", func() {
 				WatermarkText:           "Pet Shaft shaft@example.com",
 				SupportsLocks:           true,
 				BreadcrumbDocName:       "test.txt",
+				PostMessageOrigin:       "https://ocis.example.prv",
 			}
 
 			newFileInfo, err := fc.CheckFileInfo(ctx)
