@@ -47,10 +47,17 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Allow all uploads to restart: [#9506](https://github.com/owncloud/ocis/pull/9506)
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
 * Enhancement - Update web to v8.0.3: [#9429](https://github.com/owncloud/ocis/pull/9429)
 
 ## Details
+
+* Bugfix - Allow all uploads to restart: [#9506](https://github.com/owncloud/ocis/pull/9506)
+
+   On postprocessing-restart, allow all uploads to restart even if one fails.
+
+   https://github.com/owncloud/ocis/pull/9506
 
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
 
