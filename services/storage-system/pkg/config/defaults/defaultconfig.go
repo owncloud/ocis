@@ -40,9 +40,10 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "storage-system",
 		},
-		Reva:          shared.DefaultRevaConfig(),
-		DataServerURL: "http://localhost:9216/data",
-		Driver:        "ocis",
+		Reva:                  shared.DefaultRevaConfig(),
+		StorageSystemEndpoint: "com.owncloud.api.storage-system",
+		DataServerURL:         "http://localhost:9216/data",
+		Driver:                "ocis",
 		Drivers: config.Drivers{
 			OCIS: config.OCISDriver{
 				MetadataBackend:         "messagepack",
