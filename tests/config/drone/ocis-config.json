@@ -22,8 +22,8 @@
   "apps": [
     "files",
     "draw-io",
-    "markdown-editor",
-    "media-viewer",
+    "text-editor",
+    "preview",
     "pdf-viewer",
     "search",
     "admin-settings"
