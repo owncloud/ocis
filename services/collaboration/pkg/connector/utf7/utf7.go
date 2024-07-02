@@ -10,6 +10,13 @@ import (
 	"unicode/utf16"
 )
 
+const (
+	rangeASCII = "ascii"
+	rangeUTF7  = "utf7"
+)
+
+// Range represents a range with a lower and upper bounds. The range has a
+// name for easier identification
 type Range struct {
 	Name string
 	Low  int
@@ -40,7 +47,7 @@ var utf7AsciiRT = &unicode.RangeTable{
 // be "+ACs-", not "+-"
 // * Sequences of chars will be encoded as a single group. For example,
 // "こんにちは" will be encoded as "+MFMwkzBrMGEwbw-"
-// * All encoded sequences will be enclosed betwen "+" and "-"
+// * All encoded sequences will be enclosed between "+" and "-"
 func EncodeString(s string) string {
 	runes := []rune(s)
 
@@ -51,7 +58,7 @@ func EncodeString(s string) string {
 	sb.Grow(len(s) * 2)
 
 	for _, v := range ranges {
-		if v.Name == "ascii" {
+		if v.Name == rangeASCII {
 			for _, v := range runes[v.Low:v.High] {
 				sb.WriteRune(v)
 			}
@@ -87,7 +94,7 @@ func DecodeString(s string) (string, error) {
 	sb.Grow(len(byteArray))
 
 	for _, v := range ranges {
-		if v.Name == "ascii" {
+		if v.Name == rangeASCII {
 			// if it's an ascii range, just copy it
 			sb.Write(byteArray[v.Low:v.High])
 		} else {
@@ -141,28 +148,28 @@ func analyzeRunes(runes []rune) []Range {
 		if unicode.Is(utf7AsciiRT, v) {
 			if currentRange.Name == "" {
 				// take control of the current range
-				currentRange.Name = "ascii"
+				currentRange.Name = rangeASCII
 				currentRange.Low = k
-			} else if currentRange.Name != "ascii" {
+			} else if currentRange.Name != rangeASCII {
 				// close current range and open a new one
 				currentRange.High = k
 				ranges = append(ranges, currentRange)
 				currentRange = Range{
-					Name: "ascii",
+					Name: rangeASCII,
 					Low:  k,
 				}
 			}
 		} else {
 			if currentRange.Name == "" {
 				// take control of the current range
-				currentRange.Name = "utf7"
+				currentRange.Name = rangeUTF7
 				currentRange.Low = k
-			} else if currentRange.Name != "utf7" {
+			} else if currentRange.Name != rangeUTF7 {
 				// close current range and open a new one
 				currentRange.High = k
 				ranges = append(ranges, currentRange)
 				currentRange = Range{
-					Name: "utf7",
+					Name: rangeUTF7,
 					Low:  k,
 				}
 			}
@@ -193,7 +200,7 @@ func analyzeUtf7(byteArray []byte) ([]Range, error) {
 	ranges := make([]Range, 0)
 
 	currentRange := Range{
-		Name: "ascii",
+		Name: rangeASCII,
 		Low:  0,
 	}
 
@@ -202,12 +209,12 @@ func analyzeUtf7(byteArray []byte) ([]Range, error) {
 			return nil, errors.New("Byte sequence contains a non-ASCII char")
 		}
 
-		if v == '+' && currentRange.Name != "utf7" {
+		if v == '+' && currentRange.Name != rangeUTF7 {
 			// start utf7-encoded range
 			currentRange.High = k
 			ranges = append(ranges, currentRange)
 			currentRange = Range{
-				Name: "utf7",
+				Name: rangeUTF7,
 				Low:  k,
 			}
 		} else if v == '-' {
@@ -215,15 +222,15 @@ func analyzeUtf7(byteArray []byte) ([]Range, error) {
 			currentRange.High = k + 1 // the '-' char is part of the range
 			ranges = append(ranges, currentRange)
 			currentRange = Range{
-				Name: "ascii",
+				Name: rangeASCII,
 				Low:  k + 1,
 			}
-		} else if bytes.IndexByte(base64ByteArray, v) == -1 && currentRange.Name == "utf7" {
+		} else if bytes.IndexByte(base64ByteArray, v) == -1 && currentRange.Name == rangeUTF7 {
 			// found invalid base64 char, so need to close the utf7 range
 			currentRange.High = k
 			ranges = append(ranges, currentRange)
 			currentRange = Range{
-				Name: "ascii",
+				Name: rangeASCII,
 				Low:  k,
 			}
 		}
