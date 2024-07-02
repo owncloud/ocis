@@ -160,6 +160,7 @@ type AutoProvisionClaims struct {
 	Username    string `yaml:"username" env:"PROXY_AUTOPROVISION_CLAIM_USERNAME" desc:"The name of the OIDC claim that holds the username." introductionVersion:"6.0.0"`
 	Email       string `yaml:"email" env:"PROXY_AUTOPROVISION_CLAIM_EMAIL" desc:"The name of the OIDC claim that holds the email." introductionVersion:"6.0.0"`
 	DisplayName string `yaml:"display_name" env:"PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME" desc:"The name of the OIDC claim that holds the display name." introductionVersion:"6.0.0"`
+	Groups      string `yaml:"groups" env:"PROXY_AUTOPROVISION_CLAIM_GROUPS" desc:"The name of the OIDC claim that holds the groups." introductionVersion:"6.1.0"`
 }
 
 // PolicySelector is the toplevel-configuration for different selectors

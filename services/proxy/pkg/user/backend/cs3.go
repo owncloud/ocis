@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	utils "github.com/cs3org/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"go-micro.dev/v4/selector"
 
@@ -39,6 +41,10 @@ type Options struct {
 	serviceAccount      config.ServiceAccount
 	autoProvisionClaims config.AutoProvisionClaims
 }
+
+var (
+	errGroupNotFound = errors.New("group not found")
+)
 
 // WithLogger sets the logger option
 func WithLogger(l log.Logger) Option {
@@ -243,6 +249,143 @@ func (c cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, clai
 	return nil
 }
 
+// SyncGroupMemberships maintains a users group memberships based on an OIDC claim
+func (c cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
+	gatewayClient, err := c.gatewaySelector.Next()
+	if err != nil {
+		c.logger.Error().Err(err).Msg("could not select next gateway client")
+		return err
+	}
+	newctx := context.Background()
+	token, err := utils.GetServiceUserToken(newctx, gatewayClient, c.serviceAccount.ServiceAccountID, c.serviceAccount.ServiceAccountSecret)
+	if err != nil {
+		c.logger.Error().Err(err).Msg("Error getting token for service user")
+		return err
+	}
+
+	lgClient, err := c.setupLibregraphClient(newctx, token)
+	if err != nil {
+		c.logger.Error().Err(err).Msg("Error setting up libregraph client")
+		return err
+	}
+
+	lgUser, resp, err := lgClient.UserApi.GetUser(newctx, user.GetId().GetOpaqueId()).Expand([]string{"memberOf"}).Execute()
+	if resp != nil {
+		defer resp.Body.Close()
+	}
+	if err != nil {
+		c.logger.Error().Err(err).Msg("Failed to lookup user via libregraph")
+		return err
+	}
+
+	currentGroups := lgUser.GetMemberOf()
+	currentGroupSet := make(map[string]struct{})
+	for _, group := range currentGroups {
+		currentGroupSet[group.GetDisplayName()] = struct{}{}
+	}
+
+	newGroupSet := make(map[string]struct{})
+	if groups, ok := claims[c.autoProvisionClaims.Groups].([]interface{}); ok {
+		for _, g := range groups {
+			if group, ok := g.(string); ok {
+				newGroupSet[group] = struct{}{}
+			}
+		}
+	}
+
+	for group := range newGroupSet {
+		if _, exists := currentGroupSet[group]; !exists {
+			c.logger.Debug().Str("group", group).Msg("adding user to group")
+			// Check if group exists
+			lgGroup, err := c.getLibregraphGroup(newctx, lgClient, group)
+			switch {
+			case errors.Is(err, errGroupNotFound):
+				newGroup := libregraph.Group{}
+				newGroup.SetDisplayName(group)
+				req := lgClient.GroupsApi.CreateGroup(newctx).Group(newGroup)
+				var resp *http.Response
+				lgGroup, resp, err = req.Execute()
+				if resp != nil {
+					defer resp.Body.Close()
+				}
+				switch {
+				case err == nil:
+				// all good
+				case resp == nil:
+					return err
+				default:
+					// Ignore error if group already exists
+					exists, lerr := c.isAlreadyExists(resp)
+					switch {
+					case lerr != nil:
+						c.logger.Error().Err(lerr).Msg("extracting error from ibregraph response body failed.")
+						return err
+					case !exists:
+						c.logger.Error().Err(err).Msg("Failed to create group via libregraph")
+						return err
+					default:
+						// group has been created meanwhile, re-read it to get the group id
+						lgGroup, err = c.getLibregraphGroup(newctx, lgClient, group)
+						if err != nil {
+							return err
+						}
+					}
+				}
+			case err != nil:
+				return err
+			}
+
+			memberref := "https://localhost/graph/v1.0/users/" + user.GetId().GetOpaqueId()
+			resp, err := lgClient.GroupApi.AddMember(newctx, lgGroup.GetId()).MemberReference(
+				libregraph.MemberReference{
+					OdataId: &memberref,
+				},
+			).Execute()
+			if resp != nil {
+				defer resp.Body.Close()
+			}
+			if err != nil {
+				c.logger.Error().Err(err).Msg("Failed to add user to group via libregraph")
+			}
+		}
+	}
+	for current := range currentGroupSet {
+		if _, exists := newGroupSet[current]; !exists {
+			c.logger.Debug().Str("group", current).Msg("deleting user from group")
+			lgGroup, err := c.getLibregraphGroup(newctx, lgClient, current)
+			if err != nil {
+				return err
+			}
+			resp, err := lgClient.GroupApi.DeleteMember(newctx, lgGroup.GetId(), user.GetId().GetOpaqueId()).Execute()
+			if resp != nil {
+				defer resp.Body.Close()
+			}
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (c cs3backend) getLibregraphGroup(ctx context.Context, client *libregraph.APIClient, group string) (*libregraph.Group, error) {
+	lgGroup, resp, err := client.GroupApi.GetGroup(ctx, group).Execute()
+	if resp != nil {
+		defer resp.Body.Close()
+	}
+	if err != nil {
+		switch {
+		case resp == nil:
+			return nil, err
+		case resp.StatusCode == http.StatusNotFound:
+			return nil, errGroupNotFound
+		case resp.StatusCode != http.StatusOK:
+			return nil, err
+		}
+	}
+	return lgGroup, nil
+}
+
 func (c cs3backend) updateLibregraphUser(userid string, user libregraph.User) error {
 	gatewayClient, err := c.gatewaySelector.Next()
 	if err != nil {
@@ -250,19 +393,13 @@ func (c cs3backend) updateLibregraphUser(userid string, user libregraph.User) er
 		return err
 	}
 	newctx := context.Background()
-	authRes, err := gatewayClient.Authenticate(newctx, &gateway.AuthenticateRequest{
-		Type:         "serviceaccounts",
-		ClientId:     c.serviceAccount.ServiceAccountID,
-		ClientSecret: c.serviceAccount.ServiceAccountSecret,
-	})
+	token, err := utils.GetServiceUserToken(newctx, gatewayClient, c.serviceAccount.ServiceAccountID, c.serviceAccount.ServiceAccountSecret)
 	if err != nil {
+		c.logger.Error().Err(err).Msg("Error getting token for service user")
 		return err
 	}
-	if authRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
-		return fmt.Errorf("error authenticating service user: %s", authRes.GetStatus().GetMessage())
-	}
 
-	lgClient, err := c.setupLibregraphClient(newctx, authRes.GetToken())
+	lgClient, err := c.setupLibregraphClient(newctx, token)
 	if err != nil {
 		c.logger.Error().Err(err).Msg("Error setting up libregraph client")
 		return err

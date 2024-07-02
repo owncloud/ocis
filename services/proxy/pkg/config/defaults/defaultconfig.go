@@ -88,6 +88,7 @@ func DefaultConfig() *config.Config {
 			Username:    "preferred_username",
 			Email:       "email",
 			DisplayName: "name",
+			Groups:      "groups",
 		},
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,
