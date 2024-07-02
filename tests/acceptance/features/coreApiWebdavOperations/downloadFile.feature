@@ -18,10 +18,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1346
@@ -34,10 +30,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -52,10 +44,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -70,10 +58,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1316
@@ -89,10 +73,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1316
@@ -108,10 +88,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -129,10 +105,6 @@ Feature: download file
       | new              | "sample,1.txt" |
       | new              | ",,,.txt"      |
       | new              | ",,,.,"        |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name      |
       | spaces           | "sample,1.txt" |
       | spaces           | ",,,.txt"      |
       | spaces           | ",,,.,"        |
@@ -151,10 +123,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -182,10 +150,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -198,10 +162,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -214,10 +174,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -229,10 +185,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -256,10 +208,6 @@ Feature: download file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest @issue-8361 @skipOnReva

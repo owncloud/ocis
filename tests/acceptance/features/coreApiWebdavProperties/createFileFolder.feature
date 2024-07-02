@@ -14,11 +14,11 @@ Feature: create files and folder
     Then the HTTP status code should be "201"
     And as "Alice" folder <folder-name> should exist
     Examples:
-      | dav-path-version | folder-name     |
+      | dav-path-version | folder-name      |
       | old              | "upload"         |
       | old              | "strängé folder" |
       | old              | "C++ folder.cpp" |
-      | old              | "नेपाली"           |
+      | old              | "नेपाली"         |
       | old              | "folder #2"      |
       | old              | "folder ?2"      |
       | old              | "😀 🤖"          |
@@ -29,7 +29,7 @@ Feature: create files and folder
       | new              | "upload"         |
       | new              | "strängé folder" |
       | new              | "C++ folder.cpp" |
-      | new              | "नेपाली"           |
+      | new              | "नेपाली"         |
       | new              | "folder #2"      |
       | new              | "folder ?2"      |
       | new              | "😀 🤖"          |
@@ -37,14 +37,10 @@ Feature: create files and folder
       | new              | "Sample,comma"   |
       | new              | "'single'"       |
       | new              | '"double"'       |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | folder-name      |
       | spaces           | "upload"         |
       | spaces           | "strängé folder" |
       | spaces           | "C++ folder.cpp" |
-      | spaces           | "नेपाली"           |
+      | spaces           | "नेपाली"         |
       | spaces           | "folder #2"      |
       | spaces           | "folder ?2"      |
       | spaces           | "😀 🤖"          |
@@ -66,10 +62,6 @@ Feature: create files and folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -85,10 +77,6 @@ Feature: create files and folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1345
@@ -105,10 +93,6 @@ Feature: create files and folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1283
@@ -124,10 +108,6 @@ Feature: create files and folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1283
@@ -143,10 +123,6 @@ Feature: create files and folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -161,7 +137,7 @@ Feature: create files and folder
       | old              | "upload.txt"       |
       | old              | "strängéfile.txt"  |
       | old              | "C++ file.cpp"     |
-      | old              | "नेपाली"             |
+      | old              | "नेपाली"           |
       | old              | "file #2.txt"      |
       | old              | "file ?2.pdf"      |
       | old              | "😀 🤖.txt"        |
@@ -172,7 +148,7 @@ Feature: create files and folder
       | new              | "upload.txt"       |
       | new              | "strängéfile.txt"  |
       | new              | "C++ file.cpp"     |
-      | new              | "नेपाली"             |
+      | new              | "नेपाली"           |
       | new              | "file #2.txt"      |
       | new              | "file ?2.pdf"      |
       | new              | "😀 🤖.txt"        |
@@ -180,14 +156,10 @@ Feature: create files and folder
       | new              | "Sample,comma.txt" |
       | new              | "'single'.txt"     |
       | new              | '"double".txt'     |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name          |
       | spaces           | "upload.txt"       |
       | spaces           | "strängéfile.txt"  |
       | spaces           | "C++ file.cpp"     |
-      | spaces           | "नेपाली"             |
+      | spaces           | "नेपाली"           |
       | spaces           | "file #2.txt"      |
       | spaces           | "file ?2.pdf"      |
       | spaces           | "😀 🤖.txt"        |
@@ -211,10 +183,6 @@ Feature: create files and folder
       | new              | /..       | 405              |
       | new              | /../lorem | 404              |
       | new              |           | 500              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name | http-status-code |
       | spaces           | /.        | 500              |
       | spaces           | /..       | 405              |
       | spaces           | /../lorem | 404              |
@@ -235,10 +203,6 @@ Feature: create files and folder
       | new              | /..         | 405              |
       | new              | /../lorem   | 409              |
       | new              |             | 405              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | folder-name | http-status-code |
       | spaces           | /.          | 400              |
       | spaces           | /..         | 405              |
       | spaces           | /../lorem   | 404              |
@@ -266,10 +230,6 @@ Feature: create files and folder
       | new              | /..fo     |
       | new              | /fo.xyz   |
       | new              | /fo.exe   |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name |
       | spaces           | /fo.      |
       | spaces           | /fo.1     |
       | spaces           | /fo...1.. |
@@ -285,29 +245,25 @@ Feature: create files and folder
     Then the HTTP status code should be "201"
     And as "Alice" folder "<folder-name>" should exist
     Examples:
-      | dav-path-version | file-name |
-      | old              | /fo.      |
-      | old              | /fo.1     |
-      | old              | /fo...1.. |
-      | old              | /...      |
-      | old              | /..fo     |
-      | old              | /fo.xyz   |
-      | old              | /fo.exe   |
-      | new              | /fo.      |
-      | new              | /fo.1     |
-      | new              | /fo...1.. |
-      | new              | /...      |
-      | new              | /..fo     |
-      | new              | /fo.xyz   |
-      | new              | /fo.exe   |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name |
-      | spaces           | /fo.      |
-      | spaces           | /fo.1     |
-      | spaces           | /fo...1.. |
-      | spaces           | /...      |
-      | spaces           | /..fo     |
-      | spaces           | /fo.xyz   |
-      | spaces           | /fo.exe   |
+      | dav-path-version | folder-name |
+      | old              | /fo.        |
+      | old              | /fo.1       |
+      | old              | /fo...1..   |
+      | old              | /...        |
+      | old              | /..fo       |
+      | old              | /fo.xyz     |
+      | old              | /fo.exe     |
+      | new              | /fo.        |
+      | new              | /fo.1       |
+      | new              | /fo...1..   |
+      | new              | /...        |
+      | new              | /..fo       |
+      | new              | /fo.xyz     |
+      | new              | /fo.exe     |
+      | spaces           | /fo.        |
+      | spaces           | /fo.1       |
+      | spaces           | /fo...1..   |
+      | spaces           | /...        |
+      | spaces           | /..fo       |
+      | spaces           | /fo.xyz     |
+      | spaces           | /fo.exe     |

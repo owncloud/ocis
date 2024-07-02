@@ -28,10 +28,6 @@ Feature: files and folders can be deleted from the trashbin
       | dav-path-version | file-name     | file-name-2   |
       | new              | textfile0.txt | textfile1.txt |
       | new              | sample,0.txt  | sample,1.txt  |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name     | file-name-2   |
       | spaces           | textfile0.txt | textfile1.txt |
       | spaces           | sample,0.txt  | sample,1.txt  |
 
@@ -51,10 +47,6 @@ Feature: files and folders can be deleted from the trashbin
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest
@@ -78,10 +70,6 @@ Feature: files and folders can be deleted from the trashbin
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -98,7 +86,6 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/textfile0.txt" should exist in the trashbin
     And as "Alice" the file with original path "/PARENT/parent.txt" should exist in the trashbin
     And as "Alice" the file with original path "/PARENT/CHILD/child.txt" should exist in the trashbin
-    @skipOnRevaMaster
     Examples:
       | dav-path-version |
       | new              |
@@ -121,10 +108,6 @@ Feature: files and folders can be deleted from the trashbin
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -144,10 +127,6 @@ Feature: files and folders can be deleted from the trashbin
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -169,10 +148,6 @@ Feature: files and folders can be deleted from the trashbin
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -194,10 +169,6 @@ Feature: files and folders can be deleted from the trashbin
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -231,10 +202,6 @@ Feature: files and folders can be deleted from the trashbin
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -268,10 +235,6 @@ Feature: files and folders can be deleted from the trashbin
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -317,8 +280,4 @@ Feature: files and folders can be deleted from the trashbin
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |

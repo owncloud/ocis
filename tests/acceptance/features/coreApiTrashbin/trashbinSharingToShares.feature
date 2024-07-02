@@ -27,10 +27,6 @@ Feature: using trashbin together with sharing
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-7555
@@ -53,10 +49,6 @@ Feature: using trashbin together with sharing
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -83,10 +75,6 @@ Feature: using trashbin together with sharing
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -113,10 +101,6 @@ Feature: using trashbin together with sharing
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -144,10 +128,6 @@ Feature: using trashbin together with sharing
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -175,10 +155,6 @@ Feature: using trashbin together with sharing
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-7555
@@ -207,10 +183,6 @@ Feature: using trashbin together with sharing
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -234,10 +206,6 @@ Feature: using trashbin together with sharing
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -262,8 +230,4 @@ Feature: using trashbin together with sharing
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |

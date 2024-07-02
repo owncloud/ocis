@@ -22,10 +22,6 @@ Feature: propagation of etags when creating folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -47,10 +43,6 @@ Feature: propagation of etags when creating folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-4251 @skipOnReva
@@ -135,8 +127,4 @@ Feature: propagation of etags when creating folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |

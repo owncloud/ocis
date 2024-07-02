@@ -27,10 +27,6 @@ Feature: upload file
       | new              | /C++ file.cpp     |
       | new              | /?fi=le&%#2 . txt |
       | new              | /# %ab ab?=ed     |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name         |
       | spaces           | /upload.txt       |
       | spaces           | /strängé file.txt |
       | spaces           | /नेपाली.txt       |
@@ -61,10 +57,6 @@ Feature: upload file
       | new              | /folder #2.txt                   | file #2.txt                   |
       | new              | /folder ?2.txt                   | file ?2.txt                   |
       | new              | /?fi=le&%#2 . txt                | # %ab ab?=ed                  |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | folder-name                      | file-name                     |
       | spaces           | /upload                          | abc.txt                       |
       | spaces           | /strängé folder (duplicate #2 &) | strängé file (duplicate #2 &) |
       | spaces           | /C++ folder                      | C++ file.cpp                  |
@@ -82,10 +74,6 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -97,10 +85,6 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -113,10 +97,6 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -128,10 +108,6 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -145,10 +121,6 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -172,10 +144,6 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -200,10 +168,6 @@ Feature: upload file
       | new              | "filewithLF-and-CR\r\n" | ZmlsZXdpdGhMRi1hbmQtQ1INCgo= |
       | new              | "folder/file"           | Zm9sZGVyL2ZpbGU=             |
       | new              | "my\\file"              | bXkMaWxl                     |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name               | metadata                     |
       | spaces           | " "                     | IA==                         |
       | spaces           | "filewithLF-and-CR\r\n" | ZmlsZXdpdGhMRi1hbmQtQ1INCgo= |
       | spaces           | "folder/file"           | Zm9sZGVyL2ZpbGU=             |
