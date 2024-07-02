@@ -1007,7 +1007,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                     "COLLABORATION_APP_NAME": "FakeOffice",
                     "COLLABORATION_APP_ADDR": "http://fakeoffice:8080",
                     "COLLABORATION_APP_INSECURE": "true",
-                    "COLLABORATION_WOPI_SRC": "http://wopiserver",
+                    "COLLABORATION_WOPI_SRC": "http://wopiserver:9300",
                     "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
                     "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
                     "OCIS_JWT_SECRET": "some-ocis-jwt-secret",

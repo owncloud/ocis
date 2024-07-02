@@ -730,7 +730,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 		Url:  wopiSrcURL.String(),
 	}
 
-	logger.Debug().Msg("PutRelativeFileRelative: success")
+	newLogger.Debug().Msg("PutRelativeFileRelative: success")
 	return result, nil, nil
 }
 
