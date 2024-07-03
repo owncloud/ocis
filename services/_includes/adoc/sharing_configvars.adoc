@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-02-10-58-47]
+[#deprecation-note-2024-07-03-00-07-04]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -283,7 +283,7 @@ Disables the loading of user's group memberships from the reva access token.
 
 a|`OCIS_ENABLE_RESHARING` +
 `SHARING_ENABLE_RESHARING` +
-xref:deprecation-note-2024-07-02-10-58-47[Deprecation Note]
+xref:deprecation-note-2024-07-03-00-07-04[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
