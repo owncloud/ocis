@@ -60,6 +60,7 @@ require (
 	github.com/leonelquinteros/gotext v1.6.1
 	github.com/libregraph/idm v0.5.0
 	github.com/libregraph/lico v0.62.0
+	github.com/libregraph/oidc-go v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mna/pigeon v1.2.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -115,7 +116,6 @@ require (
 	google.golang.org/protobuf v1.34.1
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/v3 v3.5.1
-	stash.kopano.io/kgol/oidc-go v0.3.4
 	stash.kopano.io/kgol/rndm v1.1.2
 )
 
@@ -259,7 +259,6 @@ require (
 	github.com/klauspost/compress v1.17.8 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/libregraph/oidc-go v1.1.0 // indirect
 	github.com/longsleep/go-metrics v1.0.0 // indirect
 	github.com/longsleep/rndm v1.2.0 // indirect
 	github.com/mattermost/xml-roundtrip-validator v0.1.0 // indirect
@@ -352,7 +351,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240515191416-fc5f0ca64291 // indirect
 	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
