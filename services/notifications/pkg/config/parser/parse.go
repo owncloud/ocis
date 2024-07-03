@@ -3,6 +3,8 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"net/mail"
+	"strings"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -51,6 +53,14 @@ func Validate(cfg *config.Config) error {
 				"unknown value '%s' for 'smtp_encryption' in service %s. Allowed values are 'starttls', 'ssltls' or 'none'",
 				cfg.Notifications.SMTP.Encryption, cfg.Service.Name,
 			)
+		}
+	}
+
+	if strings.TrimSpace(cfg.Notifications.SMTP.Sender) != "" {
+		if s, err := mail.ParseAddress(cfg.Notifications.SMTP.Sender); err == nil {
+			cfg.Notifications.SMTP.Sender = s.String()
+		} else {
+			return fmt.Errorf("the 'smtp_sender' must be a valid single RFC 5322 address. parsing error %w", err)
 		}
 	}
 

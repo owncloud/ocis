@@ -4,7 +4,7 @@ package channels
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
+	stdmail "net/mail"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -31,16 +31,24 @@ type Message struct {
 
 // NewMailChannel instantiates a new mail communication channel.
 func NewMailChannel(cfg config.Config, logger log.Logger) (Channel, error) {
+	var err error
+	var a *stdmail.Address
+	a, err = stdmail.ParseAddress(cfg.Notifications.SMTP.Sender)
+	if err != nil {
+		logger.Err(err).Msg("parsing error, the 'smtp_sender' must be a valid single RFC 5322 address.")
+	}
 	return Mail{
-		conf:   cfg,
-		logger: logger,
+		conf:        cfg,
+		smtpAddress: a,
+		logger:      logger,
 	}, nil
 }
 
 // Mail is the communication channel for email.
 type Mail struct {
-	conf   config.Config
-	logger log.Logger
+	conf        config.Config
+	smtpAddress *stdmail.Address
+	logger      log.Logger
 }
 
 func (m Mail) getMailClient() (*mail.SMTPClient, error) {
@@ -102,8 +110,12 @@ func (m Mail) getMailClient() (*mail.SMTPClient, error) {
 
 // SendMessage sends a message to all given users.
 func (m Mail) SendMessage(ctx context.Context, message *Message) error {
+	if m.smtpAddress == nil {
+		m.logger.Error().Str("mail", "SendMessage").Msg("failed to send a message. SMTP address is not set")
+		return nil
+	}
 	if m.conf.Notifications.SMTP.Host == "" {
-		m.logger.Info().Str("mail", "SendMessage").Msg("failed to send a message. SMTP host is  not set")
+		m.logger.Info().Str("mail", "SendMessage").Msg("failed to send a message. SMTP host is not set")
 		return nil
 	}
 
@@ -113,11 +125,7 @@ func (m Mail) SendMessage(ctx context.Context, message *Message) error {
 	}
 
 	email := mail.NewMSG()
-	if message.Sender != "" {
-		email.SetFrom(fmt.Sprintf("%s via %s", message.Sender, m.conf.Notifications.SMTP.Sender)).AddTo(message.Recipient...)
-	} else {
-		email.SetFrom(m.conf.Notifications.SMTP.Sender).AddTo(message.Recipient...)
-	}
+	email.SetFrom(appendSender(message.Sender, *m.smtpAddress)).AddTo(message.Recipient...)
 	email.SetSubject(message.Subject)
 	email.SetBody(mail.TextPlain, message.TextBody)
 	if message.HTMLBody != "" {
@@ -128,4 +136,11 @@ func (m Mail) SendMessage(ctx context.Context, message *Message) error {
 	}
 
 	return email.Send(smtpClient)
+}
+
+func appendSender(sender string, a stdmail.Address) string {
+	if strings.TrimSpace(sender) != "" {
+		a.Name = strings.TrimSpace(sender + " via " + a.Name)
+	}
+	return a.String()
 }
