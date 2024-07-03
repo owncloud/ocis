@@ -45,7 +45,7 @@ services:
     restart: always
 
   onlyoffice:
-    image: onlyoffice/documentserver:8.0.1
+    image: onlyoffice/documentserver:8.1.0
     networks:
       ocis-net:
     entrypoint:
