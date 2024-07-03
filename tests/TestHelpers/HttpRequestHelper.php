@@ -685,4 +685,15 @@ class HttpRequestHelper {
 		$timeout = \getenv("REQUEST_TIMEOUT");
 		return (int)$timeout ?: 60;
 	}
+
+	/**
+	 * returns json decoded body content of a json response as an object
+	 *
+	 * @param ResponseInterface $response
+	 *
+	 * @return mixed
+	 */
+	public static function getJsonDecodedResponseBodyContent(ResponseInterface $response): mixed {
+		return json_decode($response->getBody()->getContents(), null, 512, JSON_THROW_ON_ERROR);
+	}
 }

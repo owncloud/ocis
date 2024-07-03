@@ -13,6 +13,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use TestHelpers\EmailHelper;
 use PHPUnit\Framework\Assert;
 use TestHelpers\GraphHelper;
+use TestHelpers\SettingsHelper;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
@@ -109,7 +110,13 @@ class NotificationContext implements Context {
 	 */
 	public function listAllNotifications(string $user):ResponseInterface {
 		$this->setUserRecipient($user);
-		$headers = ["accept-language" => $this->settingsContext->getSettingLanguageValue($user)];
+		$language = SettingsHelper::getLanguageSettingValue(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$this->featureContext->getStepLineRef()
+		);
+		$headers = ["accept-language" => $language];
 		return OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),

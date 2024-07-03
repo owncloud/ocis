@@ -15,6 +15,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
+use TestHelpers\SettingsHelper;
 use Behat\Gherkin\Node\TableNode;
 
 require_once 'bootstrap.php';
@@ -54,14 +55,11 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function getRoles(string $user): ResponseInterface {
-		$fullUrl = $this->baseUrl . $this->settingsUrl . "roles-list";
-		return HttpRequestHelper::post(
-			$fullUrl,
-			$this->featureContext->getStepLineRef(),
+		return SettingsHelper::getRolesList(
+			$this->baseUrl,
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			null,
-			"{}"
+			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -91,15 +89,13 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function assignRoleToUser(string $user, string $userId, string $roleId): ResponseInterface {
-		$fullUrl = $this->baseUrl . $this->settingsUrl . "assignments-add";
-		$body = json_encode(["account_uuid" => $userId, "role_id" => $roleId], JSON_THROW_ON_ERROR);
-		return HttpRequestHelper::post(
-			$fullUrl,
-			$this->featureContext->getStepLineRef(),
+		return SettingsHelper::assignRoleToUser(
+			$this->baseUrl,
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			null,
-			$body
+			$userId,
+			$roleId,
+			$this->featureContext->getStepLineRef(),
 		);
 	}
 
@@ -107,21 +103,18 @@ class SettingsContext implements Context {
 	 * @param string $user
 	 * @param string $userId
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
 	public function getAssignmentsList(string $user, string $userId): ResponseInterface {
-		$fullUrl = $this->baseUrl . $this->settingsUrl . "assignments-list";
-		$body = json_encode(["account_uuid" => $userId], JSON_THROW_ON_ERROR);
-		return HttpRequestHelper::post(
-			$fullUrl,
-			$this->featureContext->getStepLineRef(),
+		return SettingsHelper::getAssignmentsList(
+			$this->baseUrl,
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			null,
-			$body
+			$userId,
+			$this->featureContext->getStepLineRef(),
 		);
 	}
 
@@ -300,14 +293,11 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function sendRequestGetBundlesList(string $user): ResponseInterface {
-		$fullUrl = $this->baseUrl . $this->settingsUrl . "bundles-list";
-		return HttpRequestHelper::post(
-			$fullUrl,
-			$this->featureContext->getStepLineRef(),
+		return SettingsHelper::getBundlesList(
+			$this->baseUrl,
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			null,
-			"{}"
+			$this->featureContext->getStepLineRef(),
 		);
 	}
 
@@ -320,21 +310,14 @@ class SettingsContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function getBundlesList(string $user, string $bundleName): array {
-		$response = $this->sendRequestGetBundlesList($user);
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			201,
-			"Expected response status code should be 201",
-			$response
+	public function getBundleByName(string $user, string $bundleName): array {
+		return SettingsHelper::getBundleByName(
+			$this->baseUrl,
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$bundleName,
+			$this->featureContext->getStepLineRef()
 		);
-
-		$body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-		foreach ($body["bundles"] as $value) {
-			if ($value["displayName"] === $bundleName) {
-				return $value;
-			}
-		}
-		return [];
 	}
 
 	/**
@@ -347,47 +330,13 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function sendRequestGetSettingsValuesList(string $user, array $headers = null): ResponseInterface {
-		$fullUrl = $this->baseUrl . $this->settingsUrl . "values-list";
-		$body = json_encode(["account_uuid" => "me"], JSON_THROW_ON_ERROR);
-		return HttpRequestHelper::post(
-			$fullUrl,
-			$this->featureContext->getStepLineRef(),
+		return SettingsHelper::getValuesList(
+			$this->baseUrl,
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$headers,
-			$body
+			$this->featureContext->getStepLineRef(),
+			$headers
 		);
-	}
-
-	/**
-	 * @param string $user
-	 *
-	 * @return bool
-	 *
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public function getAutoAcceptSharesSettingValue(string $user): bool {
-		$response = $this->sendRequestGetSettingsValuesList($user);
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			201,
-			"Expected response status code should be 201",
-			$response
-		);
-
-		$body = $this->featureContext->getJsonDecodedResponseBodyContent($response);
-
-		if (empty($body)) {
-			return true;
-		}
-
-		foreach ($body->values as $value) {
-			if ($value->identifier->setting === "auto-accept-shares") {
-				return $value->value->boolValue;
-			}
-		}
-
-		return true;
 	}
 
 	/**
@@ -415,37 +364,6 @@ class SettingsContext implements Context {
 
 	/**
 	 * @param string $user
-	 *
-	 * @return string
-	 *
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public function getSettingLanguageValue(string $user): string {
-		$response = $this->sendRequestGetSettingsValuesList($user);
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			201,
-			"Expected response status code should be 201",
-			$response
-		);
-
-		$body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-
-		// if no language is set, the request body is empty return English as the default language
-		if (empty($body)) {
-			return "en";
-		}
-		foreach ($body["values"] as $value) {
-			if ($value["identifier"]["setting"] === "language") {
-				return $value["value"]["listValue"]["values"][0]["stringValue"];
-			}
-		}
-		// if a language setting was still not found, return English
-		return "en";
-	}
-
-	/**
-	 * @param string $user
 	 * @param string $language
 	 *
 	 * @return ResponseInterface
@@ -454,7 +372,7 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function sendRequestToSwitchSystemLanguage(string $user, string $language): ResponseInterface {
-		$profileBundlesList = $this->getBundlesList($user, "Profile");
+		$profileBundlesList = $this->getBundleByName($user, "Profile");
 		Assert::assertNotEmpty($profileBundlesList, "bundles list is empty");
 
 		$settingId = '';
@@ -466,7 +384,6 @@ class SettingsContext implements Context {
 		}
 		Assert::assertNotEmpty($settingId, "settingId is empty");
 
-		$fullUrl = $this->baseUrl . $this->settingsUrl . "values-save";
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
 		$body = json_encode(
 			[
@@ -489,13 +406,12 @@ class SettingsContext implements Context {
 			],
 			JSON_THROW_ON_ERROR
 		);
-		return HttpRequestHelper::post(
-			$fullUrl,
-			$this->featureContext->getStepLineRef(),
+		return SettingsHelper::updateSettings(
+			$this->baseUrl,
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			null,
-			$body
+			$body,
+			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -528,7 +444,6 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function sendRequestToDisableAutoAccepting(string $user): ResponseInterface {
-		$fullUrl = $this->baseUrl . $this->settingsUrl . "values-save";
 		$body = json_encode(
 			[
 				"value" => [
@@ -544,13 +459,12 @@ class SettingsContext implements Context {
 			JSON_THROW_ON_ERROR
 		);
 
-		return HttpRequestHelper::post(
-			$fullUrl,
-			$this->featureContext->getStepLineRef(),
+		return SettingsHelper::updateSettings(
+			$this->baseUrl,
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			[],
-			$body
+			$body,
+			$this->featureContext->getStepLineRef()
 		);
 	}
 

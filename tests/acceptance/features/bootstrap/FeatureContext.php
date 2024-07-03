@@ -42,6 +42,7 @@ use TestHelpers\HttpLogger;
 use TestHelpers\OcisHelper;
 use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
+use TestHelpers\SettingsHelper;
 
 require_once 'bootstrap.php';
 
@@ -181,7 +182,12 @@ class FeatureContext extends BehatVariablesContext {
 		if (\array_key_exists($user, $this->autoSyncSettings)) {
 			return $this->autoSyncSettings[$user];
 		}
-		$autoSyncSetting = $this->settingsContext->getAutoAcceptSharesSettingValue($user);
+		$autoSyncSetting = SettingsHelper::getAutoAcceptSharesSettingValue(
+			$this->baseUrl,
+			$user,
+			$this->getPasswordForUser($user),
+			$this->getStepLineRef()
+		);
 		$this->autoSyncSettings[$user] = $autoSyncSetting;
 
 		return $autoSyncSetting;
@@ -196,11 +202,6 @@ class FeatureContext extends BehatVariablesContext {
 	public function rememberUserAutoSyncSetting(string $user, bool $value): void {
 		$this->autoSyncSettings[$user] = $value;
 	}
-
-	/**
-	 * this is set true for db conversion tests
-	 */
-	private bool $dbConversion = false;
 
 	public const SHARES_SPACE_ID = 'a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668';
 	private bool $useSharingNG = false;
@@ -1472,7 +1473,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function getJsonDecodedResponseBodyContent(ResponseInterface $response = null): mixed {
 		$response = $response ?? $this->response;
 		$response->getBody()->rewind();
-		return json_decode($response->getBody()->getContents(), null, 512, JSON_THROW_ON_ERROR);
+		return HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
 	}
 
 	/**
@@ -2439,14 +2440,12 @@ class FeatureContext extends BehatVariablesContext {
 		$this->ocsContext = new OCSContext();
 		$this->authContext = new AuthContext();
 		$this->tusContext = new TUSContext();
-		$this->settingsContext = new SettingsContext();
 		$this->ocsContext->before($scope);
 		$this->authContext->setUpScenario($scope);
 		$this->tusContext->setUpScenario($scope);
 		$environment->registerContext($this->ocsContext);
 		$environment->registerContext($this->authContext);
 		$environment->registerContext($this->tusContext);
-		$environment->registerContext($this->settingsContext);
 		$scenarioLine = $scope->getScenario()->getLine();
 		$featureFile = $scope->getFeature()->getFile();
 		$suiteName = $scope->getSuite()->getName();

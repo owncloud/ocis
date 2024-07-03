@@ -2517,9 +2517,9 @@ class GraphContext implements Context {
 				$credentials['password']
 			);
 
-			$jsonObj = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+			$jsonBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 
-			foreach ($jsonObj->value as $share) {
+			foreach ($jsonBody->value as $share) {
 				$autoSync = $this->featureContext->getUserAutoSyncSetting($credentials['username']);
 				$tryAgain = !$share->{'@client.synchronize'} && $autoSync && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
 
