@@ -22,11 +22,12 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
 use TestHelpers\OcisHelper;
 use TestHelpers\OcmHelper;
 
 /**
- * Acceptance test steps related to testing sharing ng features
+ * Acceptance test steps related to testing federation share(ocm) features
  */
 class OcmContext implements Context {
 	private FeatureContext $featureContext;
@@ -53,17 +54,40 @@ class OcmContext implements Context {
 	}
 
 	/**
-	 * @When :user generates invitation
-	 * @When :user generates invitation with email :email and description :description
+	 * @return string
+	 */
+	public function getOcisDomain(): string {
+		return $this->extractDomain(\getenv('TEST_SERVER_URL'));
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getFedOcisDomain(): string {
+		return $this->extractDomain(\getenv('TEST_SERVER_FED_URL'));
+	}
+
+	/**
+	 * @param string $url
 	 *
+	 * @return string
+	 */
+	public function extractDomain($url): string {
+		if (!$url) {
+			return "localhost";
+		}
+		return parse_url($url)["host"];
+	}
+
+	/**
 	 * @param string $user
 	 * @param string $email
 	 * @param string $description
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function userGeneratesInvitation(string $user, $email = null, $description = null): void {
+	public function createInvitation(string $user, $email = null, $description = null): ResponseInterface {
 		$response = OcmHelper::createInvitation(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -72,26 +96,84 @@ class OcmContext implements Context {
 			$email,
 			$description
 		);
-		$this->featureContext->setResponse($response);
-		$this->invitationToken = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['token'];
+		$responseData = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+		if (isset($responseData["token"])) {
+			$this->invitationToken = $responseData["token"];
+		} else {
+			throw new Exception(__METHOD__ . " response doesn't contain token");
+		}
+		return $response;
 	}
 
 	/**
-	 * @When :user accepts invitation
+	 * @When :user creates the federation share invitation
+	 * @When :user creates the federation share invitation with email :email and description :description
+	 *
+	 * @param string $user
+	 * @param string $email
+	 * @param string $description
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userCreatesTheFederationShareInvitation(string $user, $email = null, $description = null): void {
+		$this->featureContext->setResponse($this->createInvitation($user, $email, $description));
+	}
+
+	/**
+	 * @Given :user has created the federation share invitation
 	 *
 	 * @param string $user
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userAcceptsInvitation(string $user): void {
-		$response = OcmHelper::acceptInvitation(
+	public function userHasCreatedTheFederationShareInvitation(string $user): void {
+		$response = $this->createInvitation($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function acceptInvitation(string $user): ResponseInterface {
+		$providerDomain = ($this->featureContext->getCurrentServer() === "LOCAL") ? $this->getFedOcisDomain() : $this->getOcisDomain();
+		return OcmHelper::acceptInvitation(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$this->invitationToken
+			$this->invitationToken,
+			$providerDomain
 		);
-		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When :user accepts the last federation share invitation
+	 * @When :user tries to accept the last federation share invitation
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userAcceptsTheLastFederationShareInvitation(string $user): void {
+		$this->featureContext->setResponse($this->acceptInvitation($user));
+	}
+
+	/**
+	 * @Given :user has accepted invitation
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasAcceptedTheLastFederationShareInvitation(string $user): void {
+		$response = $this->acceptInvitation($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 }

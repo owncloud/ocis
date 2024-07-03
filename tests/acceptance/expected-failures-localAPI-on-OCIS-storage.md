@@ -307,5 +307,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:209](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L209)
 
 
+### [OCM. sharing issues](https://github.com/owncloud/ocis/issues/9534)
+
+- [apiOcm/share.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L12)
+- [apiOcm/share.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L90)
+
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.
