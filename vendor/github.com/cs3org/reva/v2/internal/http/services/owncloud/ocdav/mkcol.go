@@ -39,10 +39,10 @@ func (s *svc) handlePathMkcol(w http.ResponseWriter, r *http.Request, ns string)
 	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "mkcol")
 	defer span.End()
 
-	fn := path.Join(ns, r.URL.Path)
-	if err := ValidateName(path.Base(fn), s.nameValidators); err != nil {
+	if err := ValidateName(filename(r.URL.Path), s.nameValidators); err != nil {
 		return http.StatusBadRequest, err
 	}
+	fn := path.Join(ns, r.URL.Path)
 	sublog := appctx.GetLogger(ctx).With().Str("path", fn).Logger()
 
 	client, err := s.gatewaySelector.Next()

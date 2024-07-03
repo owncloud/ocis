@@ -27,12 +27,26 @@ func ValidatorsFromConfig(c *config.Config) []Validator {
 
 // ValidateName will validate a file or folder name, returning an error when it is not accepted
 func ValidateName(name string, validators []Validator) error {
+	return ValidateDestination(name, append(validators, notReserved()))
+}
+
+// ValidateDestination will validate a file or folder destination name (which can be . or ..), returning an error when it is not accepted
+func ValidateDestination(name string, validators []Validator) error {
 	for _, v := range validators {
 		if err := v(name); err != nil {
 			return fmt.Errorf("name validation failed: %w", err)
 		}
 	}
 	return nil
+}
+
+func notReserved() Validator {
+	return func(s string) error {
+		if s == ".." || s == "." {
+			return errors.New(". and .. are reserved names")
+		}
+		return nil
+	}
 }
 
 func notEmpty() Validator {
