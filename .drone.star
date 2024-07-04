@@ -356,9 +356,8 @@ def testOcisAndUploadResults(ctx):
     scan_result_upload = uploadScanResults(ctx)
     scan_result_upload["depends_on"] = getPipelineNames([pipeline])
 
-    #security_scan = scanOcis(ctx)
-    #return [security_scan, pipeline, scan_result_upload]
-    return [pipeline, scan_result_upload]
+    security_scan = scanOcis(ctx)
+    return [security_scan, pipeline, scan_result_upload]
 
 def testPipelines(ctx):
     pipelines = []
