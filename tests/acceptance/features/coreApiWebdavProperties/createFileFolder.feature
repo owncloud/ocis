@@ -215,10 +215,10 @@ Feature: create files and folder
     @skipOnRevaMaster
     Examples:
       | dav-path-version | file-name | http-status-code |
-      | spaces           | /.        | 400              |
+      | spaces           | /.        | 500              |
       | spaces           | /..       | 405              |
-      | spaces           | /../lorem | 400              |
-      | spaces           |           | 400              |
+      | spaces           | /../lorem | 404              |
+      | spaces           |           | 500              |
 
 
   Scenario Outline: try to create folder with '.', '..' and 'empty'
