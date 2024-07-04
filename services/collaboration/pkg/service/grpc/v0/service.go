@@ -89,8 +89,14 @@ func (s *Service) OpenInApp(
 	// get the file extension to use the right wopi app url
 	fileExt := path.Ext(req.GetResourceInfo().GetPath())
 
+	var viewCommentAppURL string
 	var viewAppURL string
 	var editAppURL string
+	if viewCommentAppURLs, ok := s.appURLs["view_comment"]; ok {
+		if url := viewCommentAppURLs[fileExt]; ok {
+			viewCommentAppURL = url
+		}
+	}
 	if viewAppURLs, ok := s.appURLs["view"]; ok {
 		if url := viewAppURLs[fileExt]; ok {
 			viewAppURL = url
@@ -101,7 +107,7 @@ func (s *Service) OpenInApp(
 			editAppURL = url
 		}
 	}
-	if editAppURL == "" && viewAppURL == "" {
+	if editAppURL == "" && viewAppURL == "" && viewCommentAppURL == "" {
 		err := fmt.Errorf("OpenInApp: neither edit nor view app url found")
 		s.logger.Error().
 			Err(err).
@@ -122,7 +128,15 @@ func (s *Service) OpenInApp(
 		// the URL of the end-user application in view mode when different (defaults to edit mod URL)
 		viewAppURL = editAppURL
 	}
-
+	// TODO: check if collabora will support an "edit" url in the future
+	if viewAppURL == "" && editAppURL == "" && viewCommentAppURL != "" {
+		// there are rare cases where neither view nor edit is supported but view_comment is
+		viewAppURL = viewCommentAppURL
+		// that can be the case for editable and viewable files
+		if req.GetViewMode() == appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE {
+			editAppURL = viewCommentAppURL
+		}
+	}
 	wopiSrcURL, err := url.Parse(s.config.Wopi.WopiSrc)
 	if err != nil {
 		return nil, err
