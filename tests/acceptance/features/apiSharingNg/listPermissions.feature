@@ -257,29 +257,6 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
                       "const": 2
                     },
                     "description": {
@@ -403,29 +380,6 @@ Feature: List a sharing permissions
             "uniqueItems": true,
             "items": {
               "oneOf":  [
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
                 {
                   "type": "object",
                   "required": [
@@ -645,7 +599,6 @@ Feature: List a sharing permissions
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
-      | Secure viewer    |
 
   @issues-8331
   Scenario: user lists permissions of a file in personal space
@@ -1125,29 +1078,6 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
                       "const": 2
                     },
                     "description": {
@@ -1260,29 +1190,6 @@ Feature: List a sharing permissions
             "uniqueItems": true,
             "items": {
               "oneOf":  [
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
                 {
                   "type": "object",
                   "required": [
@@ -1575,29 +1482,6 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
                       "const": 2
                     },
                     "description": {
@@ -1807,7 +1691,6 @@ Feature: List a sharing permissions
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
-      | Secure viewer    |
 
 
   Scenario: user sends share invitation with all allowed roles for a project space using root endpoint
