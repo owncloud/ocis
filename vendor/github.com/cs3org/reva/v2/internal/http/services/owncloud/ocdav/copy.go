@@ -58,7 +58,7 @@ func (s *svc) handlePathCopy(w http.ResponseWriter, r *http.Request, ns string) 
 
 	if r.Body != http.NoBody {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
-		b, err := errors.Marshal(http.StatusUnsupportedMediaType, "body must be empty", "")
+		b, err := errors.Marshal(http.StatusUnsupportedMediaType, "body must be empty", "", "")
 		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
@@ -83,21 +83,21 @@ func (s *svc) handlePathCopy(w http.ResponseWriter, r *http.Request, ns string) 
 	dst, err := net.ParseDestination(baseURI, dh)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		b, err := errors.Marshal(http.StatusBadRequest, "failed to extract destination", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "failed to extract destination", "", "")
 		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
 
 	if err := ValidateName(filename(src), s.nameValidators); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		b, err := errors.Marshal(http.StatusBadRequest, "source failed naming rules", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "source failed naming rules", "", "")
 		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
 
 	if err := ValidateDestination(filename(dst), s.nameValidators); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		b, err := errors.Marshal(http.StatusBadRequest, "destination failed naming rules", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "destination failed naming rules", "", "")
 		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
@@ -163,7 +163,7 @@ func (s *svc) executePathCopy(ctx context.Context, selector pool.Selectable[gate
 			if createRes.Status.Code == rpc.Code_CODE_PERMISSION_DENIED {
 				w.WriteHeader(http.StatusForbidden)
 				m := fmt.Sprintf("Permission denied to create %v", createReq.Ref.Path)
-				b, err := errors.Marshal(http.StatusForbidden, m, "")
+				b, err := errors.Marshal(http.StatusForbidden, m, "", "")
 				errors.HandleWebdavError(log, w, b, err)
 			}
 			return nil
@@ -264,7 +264,7 @@ func (s *svc) executePathCopy(ctx context.Context, selector pool.Selectable[gate
 			if uRes.Status.Code == rpc.Code_CODE_PERMISSION_DENIED {
 				w.WriteHeader(http.StatusForbidden)
 				m := fmt.Sprintf("Permissions denied to create %v", uReq.Ref.Path)
-				b, err := errors.Marshal(http.StatusForbidden, m, "")
+				b, err := errors.Marshal(http.StatusForbidden, m, "", "")
 				errors.HandleWebdavError(log, w, b, err)
 				return nil
 			}
@@ -327,7 +327,7 @@ func (s *svc) handleSpacesCopy(w http.ResponseWriter, r *http.Request, spaceID s
 
 	if r.Body != http.NoBody {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
-		b, err := errors.Marshal(http.StatusUnsupportedMediaType, "body must be empty", "")
+		b, err := errors.Marshal(http.StatusUnsupportedMediaType, "body must be empty", "", "")
 		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
@@ -394,7 +394,7 @@ func (s *svc) executeSpacesCopy(ctx context.Context, w http.ResponseWriter, sele
 				w.WriteHeader(http.StatusForbidden)
 				// TODO path could be empty or relative...
 				m := fmt.Sprintf("Permission denied to create %v", createReq.Ref.Path)
-				b, err := errors.Marshal(http.StatusForbidden, m, "")
+				b, err := errors.Marshal(http.StatusForbidden, m, "", "")
 				errors.HandleWebdavError(log, w, b, err)
 			}
 			return nil
@@ -482,7 +482,7 @@ func (s *svc) executeSpacesCopy(ctx context.Context, w http.ResponseWriter, sele
 				w.WriteHeader(http.StatusForbidden)
 				// TODO path can be empty or relative
 				m := fmt.Sprintf("Permissions denied to create %v", uReq.Ref.Path)
-				b, err := errors.Marshal(http.StatusForbidden, m, "")
+				b, err := errors.Marshal(http.StatusForbidden, m, "", "")
 				errors.HandleWebdavError(log, w, b, err)
 				return nil
 			}
@@ -554,7 +554,7 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 	}
 	if isChild {
 		w.WriteHeader(http.StatusConflict)
-		b, err := errors.Marshal(http.StatusBadRequest, "can not copy a folder into one of its children", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "can not copy a folder into one of its children", "", "")
 		errors.HandleWebdavError(log, w, b, err)
 		return nil
 	}
@@ -577,7 +577,7 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 
 	if isParent {
 		w.WriteHeader(http.StatusConflict)
-		b, err := errors.Marshal(http.StatusBadRequest, "can not copy a folder into its parent", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "can not copy a folder into its parent", "", "")
 		errors.HandleWebdavError(log, w, b, err)
 		return nil
 
@@ -585,7 +585,7 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 
 	if srcRef.Path == dstRef.Path && srcRef.ResourceId == dstRef.ResourceId {
 		w.WriteHeader(http.StatusConflict)
-		b, err := errors.Marshal(http.StatusBadRequest, "source and destination are the same", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "source and destination are the same", "", "")
 		errors.HandleWebdavError(log, w, b, err)
 		return nil
 	}
@@ -595,7 +595,7 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Overwrite header is set to incorrect value %v", overwrite)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(log, w, b, err)
 		return nil
 	}
@@ -605,7 +605,7 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Depth header is set to incorrect value %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(log, w, b, err)
 		return nil
 	}
@@ -634,7 +634,7 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 	case srcStatRes.Status.Code == rpc.Code_CODE_NOT_FOUND:
 		errors.HandleErrorStatus(log, w, srcStatRes.Status)
 		m := fmt.Sprintf("Resource %v not found", srcStatReq.Ref.Path)
-		b, err := errors.Marshal(http.StatusNotFound, m, "")
+		b, err := errors.Marshal(http.StatusNotFound, m, "", "")
 		errors.HandleWebdavError(log, w, b, err)
 		return nil
 	case srcStatRes.Status.Code != rpc.Code_CODE_OK:
@@ -672,7 +672,7 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 			log.Warn().Bool("overwrite", overwrite).Msg("dst already exists")
 			w.WriteHeader(http.StatusPreconditionFailed)
 			m := fmt.Sprintf("Could not overwrite Resource %v", dstRef.Path)
-			b, err := errors.Marshal(http.StatusPreconditionFailed, m, "")
+			b, err := errors.Marshal(http.StatusPreconditionFailed, m, "", "")
 			errors.HandleWebdavError(log, w, b, err) // 412, see https://tools.ietf.org/html/rfc4918#section-9.8.5
 			return nil
 		}

@@ -270,7 +270,7 @@ Feature: download file
     Then the HTTP status code should be "200"
     And the following headers should be set
       | header                            | value                                                                                                                                                                                                                                                                                                                  |
-      | Content-Disposition               | attachment; filename*=UTF-8''"<file-name>"; filename="<file-name>"                                                                                                                                                                                                                                                     |
+      | Content-Disposition               | attachment; filename*=UTF-8''<file-name>; filename="<file-name>"                                                                                                                                                                                                                                                     |
       | Content-Security-Policy           | child-src 'self'; connect-src 'self'; default-src 'none'; font-src 'self'; frame-ancestors 'self'; frame-src 'self' blob: https://embed.diagrams.net/; img-src 'self' data: blob:; manifest-src 'self'; media-src 'self'; object-src 'self' blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' |
       | X-Content-Type-Options            | nosniff                                                                                                                                                                                                                                                                                                                |
       | X-Frame-Options                   | SAMEORIGIN                                                                                                                                                                                                                                                                                                             |
@@ -279,16 +279,16 @@ Feature: download file
       | X-XSS-Protection                  | 1; mode=block                                                                                                                                                                                                                                                                                                          |
     And the downloaded content should be "test file"
     Examples:
-      | dav-path-version | file-name          |
-      | old              | textfile.txt       |
-      | old              | comma,.txt         |
-      | old              | 'quote'single'.txt |
-      | new              | textfile.txt       |
-      | new              | comma,.txt         |
-      | new              | 'quote'single'.txt |
-      | spaces           | textfile.txt       |
-      | spaces           | comma,.txt         |
-      | spaces           | 'quote'single'.txt |
+      | dav-path-version | file-name                |
+      | old              | textfile.txt             |
+      | old              | comma%2C.txt             |
+      | old              | %27quote%27single%27.txt |
+      | new              | textfile.txt             |
+      | new              | comma%2C.txt             |
+      | new              | %27quote%27single%27.txt |
+      | spaces           | textfile.txt             |
+      | spaces           | comma%2C.txt             |
+      | spaces           | %27quote%27single%27.txt |
 
   @smokeTest @issue-8361 @skipOnReva
   Scenario Outline: downloading a file should serve security headers (file with doubel quotes)
@@ -298,7 +298,7 @@ Feature: download file
     Then the HTTP status code should be "200"
     And the following headers should be set
       | header                            | value                                                                                                                                                                                                                                                                                                                  |
-      | Content-Disposition               | attachment; filename*=UTF-8''""quote"double".txt"; filename=""quote"double".txt"                                                                                                                                                                                                                                       |
+      | Content-Disposition               | attachment; filename*=UTF-8''%22quote%22double%22.txt; filename=""quote"double".txt"                                                                                                                                                                                                                                       |
       | Content-Security-Policy           | child-src 'self'; connect-src 'self'; default-src 'none'; font-src 'self'; frame-ancestors 'self'; frame-src 'self' blob: https://embed.diagrams.net/; img-src 'self' data: blob:; manifest-src 'self'; media-src 'self'; object-src 'self' blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' |
       | X-Content-Type-Options            | nosniff                                                                                                                                                                                                                                                                                                                |
       | X-Frame-Options                   | SAMEORIGIN                                                                                                                                                                                                                                                                                                             |

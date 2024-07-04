@@ -117,7 +117,7 @@ func (s *svc) handlePathPut(w http.ResponseWriter, r *http.Request, ns string) {
 
 	if err := ValidateName(filename(r.URL.Path), s.nameValidators); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "")
+		b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -318,7 +318,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 				m = "Resource not found" // mimic the oc10 error message
 			}
 			w.WriteHeader(status)
-			b, err := errors.Marshal(status, m, "")
+			b, err := errors.Marshal(status, m, "", "")
 			errors.HandleWebdavError(&log, w, b, err)
 		case rpc.Code_CODE_ABORTED:
 			w.WriteHeader(http.StatusPreconditionFailed)
@@ -364,7 +364,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 			}
 			if httpRes.StatusCode == errtypes.StatusChecksumMismatch {
 				w.WriteHeader(http.StatusBadRequest)
-				b, err := errors.Marshal(http.StatusBadRequest, "The computed checksum does not match the one received from the client.", "")
+				b, err := errors.Marshal(http.StatusBadRequest, "The computed checksum does not match the one received from the client.", "", "")
 				errors.HandleWebdavError(&log, w, b, err)
 				return
 			}
@@ -411,11 +411,13 @@ func (s *svc) handleSpacesPut(w http.ResponseWriter, r *http.Request, spaceID st
 		return
 	}
 
-	if err := ValidateName(filename(ref.Path), s.nameValidators); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "")
-		errors.HandleWebdavError(&sublog, w, b, err)
-		return
+	if r.URL.Path != "/" {
+		if err := ValidateName(filepath.Base(ref.Path), s.nameValidators); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "", "")
+			errors.HandleWebdavError(&sublog, w, b, err)
+			return
+		}
 	}
 
 	s.handlePut(ctx, w, r, &ref, sublog)

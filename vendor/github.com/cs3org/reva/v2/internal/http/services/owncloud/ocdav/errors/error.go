@@ -101,13 +101,14 @@ type Exception struct {
 }
 
 // Marshal just calls the xml marshaller for a given exception.
-func Marshal(code int, message string, header string) ([]byte, error) {
+func Marshal(code int, message string, header string, errorCode string) ([]byte, error) {
 	xmlstring, err := xml.Marshal(&ErrorXML{
 		Xmlnsd:    "DAV",
 		Xmlnss:    "http://sabredav.org/ns",
 		Exception: sabreException[code],
 		Message:   message,
 		Header:    header,
+		ErrorCode: errorCode,
 	})
 	if err != nil {
 		return nil, err
@@ -126,6 +127,7 @@ type ErrorXML struct {
 	Xmlnss    string   `xml:"xmlns:s,attr"`
 	Exception string   `xml:"s:exception"`
 	Message   string   `xml:"s:message"`
+	ErrorCode string   `xml:"s:errorcode"`
 	InnerXML  []byte   `xml:",innerxml"`
 	// Header is used to indicate the conflicting request header
 	Header string `xml:"s:header,omitempty"`

@@ -115,7 +115,7 @@ func (h *SpacesHandler) Handler(s *svc, trashbinHandler *TrashbinHandler) http.H
 			w.WriteHeader(status)
 			if status != http.StatusNoContent {
 				var b []byte
-				if b, err = errors.Marshal(status, err.Error(), ""); err == nil {
+				if b, err = errors.Marshal(status, err.Error(), "", ""); err == nil {
 					_, err = w.Write(b)
 				}
 			}

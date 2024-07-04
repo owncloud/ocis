@@ -102,7 +102,7 @@ func (s *svc) handlePropfindOnToken(w http.ResponseWriter, r *http.Request, ns s
 		span.SetStatus(codes.Error, ocdaverrors.ErrTokenStatInfoMissing.Error())
 		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusInternalServerError))
 		w.WriteHeader(http.StatusInternalServerError)
-		b, err := ocdaverrors.Marshal(http.StatusInternalServerError, ocdaverrors.ErrTokenStatInfoMissing.Error(), "")
+		b, err := ocdaverrors.Marshal(http.StatusInternalServerError, ocdaverrors.ErrTokenStatInfoMissing.Error(), "", "")
 		ocdaverrors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
@@ -118,7 +118,7 @@ func (s *svc) handlePropfindOnToken(w http.ResponseWriter, r *http.Request, ns s
 		sublog.Debug().Str("depth", dh).Msg(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := ocdaverrors.Marshal(http.StatusBadRequest, m, "")
+		b, err := ocdaverrors.Marshal(http.StatusBadRequest, m, "", "")
 		ocdaverrors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -130,7 +130,7 @@ func (s *svc) handlePropfindOnToken(w http.ResponseWriter, r *http.Request, ns s
 		sublog.Debug().Str("depth", dh).Msg(ocdaverrors.ErrInvalidDepth.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := ocdaverrors.Marshal(http.StatusBadRequest, m, "")
+		b, err := ocdaverrors.Marshal(http.StatusBadRequest, m, "", "")
 		ocdaverrors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}

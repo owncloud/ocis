@@ -208,7 +208,7 @@ func (s *svc) handleProppatch(ctx context.Context, w http.ResponseWriter, r *htt
 						m = "Resource not found" // mimic the oc10 error message
 					}
 					w.WriteHeader(status)
-					b, err := errors.Marshal(status, m, "")
+					b, err := errors.Marshal(status, m, "", "")
 					errors.HandleWebdavError(&log, w, b, err)
 					return nil, nil, false
 				}
@@ -273,7 +273,7 @@ func (s *svc) handleProppatch(ctx context.Context, w http.ResponseWriter, r *htt
 						m = "Resource not found" // mimic the oc10 error message
 					}
 					w.WriteHeader(status)
-					b, err := errors.Marshal(status, m, "")
+					b, err := errors.Marshal(status, m, "", "")
 					errors.HandleWebdavError(&log, w, b, err)
 					return nil, nil, false
 				}

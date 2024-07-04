@@ -61,7 +61,7 @@ func (h *WebDavHandler) Handler(s *svc) http.Handler {
 		ns, newPath, err := s.ApplyLayout(r.Context(), h.namespace, h.useLoggedInUserNS, r.URL.Path)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
-			b, err := errors.Marshal(http.StatusNotFound, fmt.Sprintf("could not get storage for %s", r.URL.Path), "")
+			b, err := errors.Marshal(http.StatusNotFound, fmt.Sprintf("could not get storage for %s", r.URL.Path), "", "")
 			errors.HandleWebdavError(appctx.GetLogger(r.Context()), w, b, err)
 			return
 		}
@@ -108,7 +108,7 @@ func (h *WebDavHandler) Handler(s *svc) http.Handler {
 			w.WriteHeader(status)
 			if status != http.StatusNoContent {
 				var b []byte
-				if b, err = errors.Marshal(status, err.Error(), ""); err == nil {
+				if b, err = errors.Marshal(status, err.Error(), "", ""); err == nil {
 					_, err = w.Write(b)
 				}
 			}

@@ -44,7 +44,7 @@ func (s *svc) handlePathMove(w http.ResponseWriter, r *http.Request, ns string) 
 
 	if r.Body != http.NoBody {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
-		b, err := errors.Marshal(http.StatusUnsupportedMediaType, "body must be empty", "")
+		b, err := errors.Marshal(http.StatusUnsupportedMediaType, "body must be empty", "", "")
 		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
@@ -55,21 +55,21 @@ func (s *svc) handlePathMove(w http.ResponseWriter, r *http.Request, ns string) 
 	dstPath, err := net.ParseDestination(baseURI, dh)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		b, err := errors.Marshal(http.StatusBadRequest, "failed to extract destination", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "failed to extract destination", "", "")
 		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
 
 	if err := ValidateName(filename(srcPath), s.nameValidators); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		b, err := errors.Marshal(http.StatusBadRequest, "source failed naming rules", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "source failed naming rules", "", "")
 		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
 
 	if err := ValidateDestination(filename(dstPath), s.nameValidators); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		b, err := errors.Marshal(http.StatusBadRequest, "destination naming rules", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "destination naming rules", "", "")
 		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
@@ -108,7 +108,7 @@ func (s *svc) handleSpacesMove(w http.ResponseWriter, r *http.Request, srcSpaceI
 
 	if r.Body != http.NoBody {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
-		b, err := errors.Marshal(http.StatusUnsupportedMediaType, "body must be empty", "")
+		b, err := errors.Marshal(http.StatusUnsupportedMediaType, "body must be empty", "", "")
 		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
 		return
 	}
@@ -157,7 +157,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 	if isChild {
 		w.WriteHeader(http.StatusConflict)
-		b, err := errors.Marshal(http.StatusBadRequest, "can not move a folder into one of its children", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "can not move a folder into one of its children", "", "")
 		errors.HandleWebdavError(&log, w, b, err)
 		return
 	}
@@ -179,7 +179,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 	if isParent {
 		w.WriteHeader(http.StatusConflict)
-		b, err := errors.Marshal(http.StatusBadRequest, "can not move a folder into its parent", "")
+		b, err := errors.Marshal(http.StatusBadRequest, "can not move a folder into its parent", "", "")
 		errors.HandleWebdavError(&log, w, b, err)
 		return
 
@@ -213,7 +213,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 		if srcStatRes.Status.Code == rpc.Code_CODE_NOT_FOUND {
 			w.WriteHeader(http.StatusNotFound)
 			m := fmt.Sprintf("Resource %v not found", srcStatReq.Ref.Path)
-			b, err := errors.Marshal(http.StatusNotFound, m, "")
+			b, err := errors.Marshal(http.StatusNotFound, m, "", "")
 			errors.HandleWebdavError(&log, w, b, err)
 		}
 		errors.HandleErrorStatus(&log, w, srcStatRes.Status)
@@ -321,7 +321,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 		w.WriteHeader(status)
 
-		b, err := errors.Marshal(status, m, "")
+		b, err := errors.Marshal(status, m, "", "")
 		errors.HandleWebdavError(&log, w, b, err)
 		return
 	}
