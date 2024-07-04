@@ -411,11 +411,13 @@ func (s *svc) handleSpacesPut(w http.ResponseWriter, r *http.Request, spaceID st
 		return
 	}
 
-	if err := ValidateName(filename(ref.Path), s.nameValidators); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "")
-		errors.HandleWebdavError(&sublog, w, b, err)
-		return
+	if r.URL.Path != "/" {
+		if err := ValidateName(filepath.Base(ref.Path), s.nameValidators); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "")
+			errors.HandleWebdavError(&sublog, w, b, err)
+			return
+		}
 	}
 
 	s.handlePut(ctx, w, r, &ref, sublog)
