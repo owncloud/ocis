@@ -17,8 +17,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -65,7 +65,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#9473](https://github.com/owncloud/ocis/pull/9473)
 * Enhancement - Empty trash directories: [#9483](https://github.com/owncloud/ocis/pull/9483)
 * Enhancement - Various fixes for the activitylog service: [#9485](https://github.com/owncloud/ocis/pull/9485)
-* Enhancement - Update web to v9.1.0-alpha.1: [#9496](https://github.com/owncloud/ocis/pull/9496)
+* Enhancement - Update web to v9.1.0: [#9547](https://github.com/owncloud/ocis/pull/9547)
 
 ## Details
 
@@ -198,26 +198,31 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9485
    https://github.com/owncloud/ocis/pull/9467
 
-* Enhancement - Update web to v9.1.0-alpha.1: [#9496](https://github.com/owncloud/ocis/pull/9496)
+* Enhancement - Update web to v9.1.0: [#9547](https://github.com/owncloud/ocis/pull/9547)
 
    Tags: web
 
-   We updated ownCloud Web to v9.1.0-alpha.1. Please refer to the changelog
-   (linked) for details on the web release.
+   We updated ownCloud Web to v9.1.0. Please refer to the changelog (linked) for
+   details on the web release.
 
   * Bugfix [owncloud/web#11058](https://github.com/owncloud/web/pull/11058): Resetting user after logout
   * Bugfix [owncloud/web#11059](https://github.com/owncloud/web/pull/11059): Admin settings UI update after save
   * Bugfix [owncloud/web#11068](https://github.com/owncloud/web/pull/11068): Editor save after token renewal
+  * Bugfix [owncloud/web#11132](https://github.com/owncloud/web/pull/11132): Trash bin breaking on navigation
+  * Bugfix [owncloud/web#11135](https://github.com/owncloud/web/issues/11135): Tooltips in trashbin covered
+  * Bugfix [owncloud/web#11137](https://github.com/owncloud/web/pull/11137): Duplicated elements on public link page
+  * Bugfix [owncloud/web#11139](https://github.com/owncloud/web/pull/11139): Secure view default action
   * Enhancement [owncloud/web#5387](https://github.com/owncloud/web/issues/5387): Accessibility improvements
   * Enhancement [owncloud/web#10996](https://github.com/owncloud/web/pull/10996): Activities sidebar app panel
   * Enhancement [owncloud/web#11054](https://github.com/owncloud/web/pull/11054): Consistent initial loading spinner
   * Enhancement [owncloud/web#11057](https://github.com/owncloud/web/pull/11057): Add action drop down to app top bar
   * Enhancement [owncloud/web#11060](https://github.com/owncloud/web/pull/11060): Decrease text editor loading times
   * Enhancement [owncloud/web#11077](https://github.com/owncloud/web/pull/11077): Reduce network load on token renewal
+  * Enhancement [owncloud/web#11085](https://github.com/owncloud/web/pull/11085): Open file directly from app
   * Enhancement [owncloud/web#11093](https://github.com/owncloud/web/pull/11093): Enable default autosave in editors
 
-   https://github.com/owncloud/ocis/pull/9496
-   https://github.com/owncloud/web/releases/tag/v9.1.0-alpha.1
+   https://github.com/owncloud/ocis/pull/9547
+   https://github.com/owncloud/web/releases/tag/v9.1.0
 
 # Changelog for [6.0.0] (2024-06-19)
 
@@ -8509,7 +8514,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -8683,11 +8688,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -8860,24 +8883,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
