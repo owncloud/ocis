@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"ociswrapper/common"
 	"ociswrapper/ocis"
 )
 
@@ -115,12 +116,30 @@ func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 func StopOcisHandler(res http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodDelete {
+	if req.Method != http.MethodPost {
 		http.Error(res, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	success, message := ocis.Stop()
+	sendResponse(res, success, message)
+}
+
+func StartOcisHandler(res http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPost {
+		http.Error(res, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if ocis.IsOcisRunning() {
+		sendResponse(res, false, "oCIS server is already running")
+		return
+	}
+
+	common.Wg.Add(1)
+	go ocis.Start(nil)
+
+	success, message := ocis.WaitForConnection()
 	sendResponse(res, success, message)
 }
 

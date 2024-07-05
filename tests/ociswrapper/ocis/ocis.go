@@ -138,6 +138,13 @@ func Restart(envMap map[string]any) (bool, string) {
 	return WaitForConnection()
 }
 
+func IsOcisRunning() bool {
+	if cmd != nil {
+		return cmd.Process.Pid > 0
+	}
+	return false
+}
+
 func waitAllServices(startTime time.Time, timeout time.Duration) {
 	timeoutS := timeout * time.Second
 
