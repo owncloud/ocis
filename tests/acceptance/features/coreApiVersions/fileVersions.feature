@@ -73,7 +73,7 @@ Feature: dav-versions
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
     When user "Alice" uploads file "filesForUpload/davtest.txt" to "/textfile0.txt" in 2 chunks using the WebDAV API
     And user "Alice" uploads file "filesForUpload/lorem.txt" to "/textfile0.txt" in 3 chunks using the WebDAV API
-#    HTTP status code is different for old (201) and new (204) WebDav API when uploading in chunks
+    #    HTTP status code is different for old (201) and new (204) WebDav API when uploading in chunks
     Then the HTTP status code of responses on all endpoints should be "201"
     And the version folder of file "/textfile0.txt" for user "Alice" should contain "2" elements
     When user "Alice" restores version index "1" of file "/textfile0.txt" using the WebDAV API
@@ -162,14 +162,14 @@ Feature: dav-versions
     When user "Alice" downloads the version of file "textfile0.txt" with the index "1"
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header              | value                                                                  |
-      | Content-Disposition | attachment; filename*=UTF-8''"textfile0.txt"; filename="textfile0.txt" |
+      | header              | value                                                                |
+      | Content-Disposition | attachment; filename*=UTF-8''textfile0.txt; filename="textfile0.txt" |
     And the downloaded content should be "version 1"
     When user "Alice" downloads the version of file "textfile0.txt" with the index "2"
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header              | value                                                                  |
-      | Content-Disposition | attachment; filename*=UTF-8''"textfile0.txt"; filename="textfile0.txt" |
+      | header              | value                                                                |
+      | Content-Disposition | attachment; filename*=UTF-8''textfile0.txt; filename="textfile0.txt" |
     And the downloaded content should be "uploaded content"
 
   @skipOnStorage:ceph @skipOnStorage:scality
@@ -181,14 +181,14 @@ Feature: dav-versions
     When user "Alice" downloads the version of file "textfile0.txt" with the index "1"
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header              | value                                                                  |
-      | Content-Disposition | attachment; filename*=UTF-8''"textfile0.txt"; filename="textfile0.txt" |
+      | header              | value                                                                |
+      | Content-Disposition | attachment; filename*=UTF-8''textfile0.txt; filename="textfile0.txt" |
     And the downloaded content should be "version 2"
     When user "Alice" downloads the version of file "textfile0.txt" with the index "2"
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header              | value                                                                  |
-      | Content-Disposition | attachment; filename*=UTF-8''"textfile0.txt"; filename="textfile0.txt" |
+      | header              | value                                                                |
+      | Content-Disposition | attachment; filename*=UTF-8''textfile0.txt; filename="textfile0.txt" |
     And the downloaded content should be "uploaded content"
 
 
