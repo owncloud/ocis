@@ -111,7 +111,7 @@ func Start(envMap map[string]any) {
 	close(outChan)
 }
 
-func Stop() {
+func Stop() (bool, string) {
 	log.Println("Stopping oCIS server...")
 	stopSignal = true
 
@@ -119,13 +119,25 @@ func Stop() {
 	if err != nil {
 		if !strings.HasSuffix(err.Error(), "process already finished") {
 			log.Fatalln(err)
+		} else {
+			return true, "oCIS server is already stopped"
 		}
 	}
 	cmd.Process.Wait()
-	waitUntilCompleteShutdown()
+	return waitUntilCompleteShutdown()
 }
 
-func listAllServices(startTime time.Time, timeout time.Duration) {
+func Restart(envMap map[string]any) (bool, string) {
+	Stop()
+
+	log.Println("Restarting oCIS server...")
+	common.Wg.Add(1)
+	go Start(envMap)
+
+	return WaitForConnection()
+}
+
+func waitAllServices(startTime time.Time, timeout time.Duration) {
 	timeoutS := timeout * time.Second
 
 	c := exec.Command(config.Get("bin"), "list")
@@ -133,15 +145,15 @@ func listAllServices(startTime time.Time, timeout time.Duration) {
 	if err != nil {
 		if time.Since(startTime) <= timeoutS {
 			time.Sleep(500 * time.Millisecond)
-			listAllServices(startTime, timeout)
+			waitAllServices(startTime, timeout)
 		}
 		return
 	}
 	log.Println("All services are up")
 }
 
-func WaitForConnection() bool {
-	listAllServices(time.Now(), 30)
+func WaitForConnection() (bool, string) {
+	waitAllServices(time.Now(), 30)
 
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -168,7 +180,7 @@ func WaitForConnection() bool {
 		select {
 		case <-timeout:
 			log.Println(fmt.Sprintf("%v seconds timeout waiting for oCIS server", int64(timeoutValue.Seconds())))
-			return false
+			return false, "Timeout waiting for oCIS server to start"
 		default:
 			req.Header.Set("X-Request-ID", "ociswrapper-"+strconv.Itoa(int(time.Now().UnixMilli())))
 
@@ -180,12 +192,12 @@ func WaitForConnection() bool {
 			}
 
 			log.Println("oCIS server is ready to accept requests")
-			return true
+			return true, "oCIS server is up and running"
 		}
 	}
 }
 
-func waitUntilCompleteShutdown() {
+func waitUntilCompleteShutdown() (bool, string) {
 	timeout := 30 * time.Second
 	startTime := time.Now()
 
@@ -200,17 +212,14 @@ func waitUntilCompleteShutdown() {
 
 		if time.Since(startTime) >= timeout {
 			log.Println(fmt.Sprintf("Unable to kill oCIS server after %v seconds", int64(timeout.Seconds())))
-			break
+			return false, "Timeout waiting for oCIS server to stop"
 		}
 	}
+	return true, "oCIS server stopped successfully"
 }
 
-func Restart(envMap map[string]any) bool {
-	Stop()
-
-	log.Println("Restarting oCIS server...")
-	common.Wg.Add(1)
-	go Start(envMap)
-
-	return WaitForConnection()
+func RunCommand(command string) (int, string) {
+	c := exec.Command(config.Get("bin"), command)
+	out, _ := c.CombinedOutput()
+	return c.ProcessState.ExitCode(), string(out)
 }
