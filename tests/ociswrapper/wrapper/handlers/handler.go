@@ -52,18 +52,20 @@ func sendResponse(res http.ResponseWriter, success bool, message string) {
 }
 
 func sendCmdResponse(res http.ResponseWriter, exitCode int, message string) {
-	var resBody CommandResponse
+	resBody := CommandResponse{
+		BasicResponse: &BasicResponse{
+			Message: message,
+		},
+		ExitCode: exitCode,
+	}
+
+	if exitCode == 0 {
+		resBody.BasicResponse.Status = "OK"
+	} else {
+		resBody.BasicResponse.Status = "ERROR"
+	}
 
 	res.WriteHeader(http.StatusOK)
-	if exitCode == 0 {
-		resBody.Status = "OK"
-		resBody.ExitCode = exitCode
-		resBody.Message = message
-	} else {
-		resBody.Status = "ERROR"
-		resBody.ExitCode = exitCode
-		resBody.Message = message
-	}
 	res.Header().Set("Content-Type", "application/json")
 
 	jsonResponse, _ := json.Marshal(resBody)
@@ -128,23 +130,18 @@ func CommandHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	body, err := parseJsonBody(req.Body)
+	if req.Body == nil {
+		http.Error(res, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		http.Error(res, "Bad request", http.StatusBadRequest)
 		return
 	}
-	if body["command"] == nil {
-		http.Error(res, "Bad request", http.StatusBadRequest)
-		return
-	}
 
-	command, ok := body["command"].(string)
-	if !ok || command == "" {
-		http.Error(res, "Bad request", http.StatusBadRequest)
-		return
-	}
+	exitCode, output := ocis.RunCommand(string(body))
 
-	exitCode, out := ocis.RunCommand(command)
-
-	sendCmdResponse(res, exitCode, out)
+	sendCmdResponse(res, exitCode, output)
 }

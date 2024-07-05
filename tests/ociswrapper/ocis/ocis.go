@@ -2,6 +2,7 @@ package ocis
 
 import (
 	"bufio"
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
@@ -219,7 +220,17 @@ func waitUntilCompleteShutdown() (bool, string) {
 }
 
 func RunCommand(command string) (int, string) {
-	c := exec.Command(config.Get("bin"), command)
-	out, _ := c.CombinedOutput()
-	return c.ProcessState.ExitCode(), string(out)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	c := exec.CommandContext(ctx, config.Get("bin"), command)
+	output, err := c.CombinedOutput()
+	if err != nil {
+		if ctx.Err() == context.DeadlineExceeded {
+			message := "Command timed out:\n" + string(output)
+			return c.ProcessState.ExitCode(), message
+		}
+	}
+
+	return c.ProcessState.ExitCode(), string(output)
 }
