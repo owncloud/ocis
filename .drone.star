@@ -346,11 +346,19 @@ def buildWebCache(ctx):
 def testOcisAndUploadResults(ctx):
     pipeline = testOcis(ctx)
 
+    ######################################################################
+    # The triggers have been disabled for now, since the govulncheck can #
+    # not silence single, acceptable vulnerabilities.                    #
+    # See https://github.com/owncloud/ocis/issues/9527 for more details. #
+    # FIXME: RE-ENABLE THIS ASAP!!!                                      #
+    ######################################################################
+
     scan_result_upload = uploadScanResults(ctx)
     scan_result_upload["depends_on"] = getPipelineNames([pipeline])
 
-    security_scan = scanOcis(ctx)
-    return [security_scan, pipeline, scan_result_upload]
+    #security_scan = scanOcis(ctx)
+    #return [security_scan, pipeline, scan_result_upload]
+    return [pipeline, scan_result_upload]
 
 def testPipelines(ctx):
     pipelines = []

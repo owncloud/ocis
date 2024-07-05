@@ -77,7 +77,7 @@ func parseWopiDiscovery(body io.Reader) (map[string]map[string]string, error) {
 			for _, app := range netzone.SelectElements("app") {
 				for _, action := range app.SelectElements("action") {
 					access := action.SelectAttrValue("name", "")
-					if access == "view" || access == "edit" {
+					if access == "view" || access == "edit" || access == "view_comment" {
 						ext := action.SelectAttrValue("ext", "")
 						urlString := action.SelectAttrValue("urlsrc", "")
 

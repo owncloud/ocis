@@ -210,10 +210,6 @@ func NewSecureViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 				AllowedResourceActions: convert(r),
 				Condition:              proto.String(UnifiedRoleConditionFolder),
 			},
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionDrive),
-			},
 		},
 		LibreGraphWeight: proto.Int32(0),
 	}

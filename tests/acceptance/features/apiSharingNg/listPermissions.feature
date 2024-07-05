@@ -242,8 +242,8 @@ Feature: List a sharing permissions
           },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
-            "minItems": 4,
-            "maxItems": 4,
+            "minItems": 3,
+            "maxItems": 3,
             "uniqueItems": true,
             "items": {
               "oneOf":  [
@@ -258,29 +258,6 @@ Feature: List a sharing permissions
                   "properties": {
                     "@libre.graph.weight": {
                       "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "const": 2
                     },
                     "description": {
                       "const": "View and download."
@@ -303,7 +280,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 3
+                      "const": 2
                     },
                     "description": {
                       "const": "View, download, upload, edit, add and delete."
@@ -326,7 +303,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 4
+                      "const": 3
                     },
                     "description": {
                       "const": "View, download, upload, edit, add, delete and manage members."
@@ -398,8 +375,8 @@ Feature: List a sharing permissions
           },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
-            "minItems": 4,
-            "maxItems": 4,
+            "minItems": 3,
+            "maxItems": 3,
             "uniqueItems": true,
             "items": {
               "oneOf":  [
@@ -414,29 +391,6 @@ Feature: List a sharing permissions
                   "properties": {
                     "@libre.graph.weight": {
                       "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "const": 2
                     },
                     "description": {
                       "const": "View and download."
@@ -459,7 +413,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 3
+                      "const": 2
                     },
                     "description": {
                       "const": "View, download, upload, edit, add and delete."
@@ -482,7 +436,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 4
+                      "const": 3
                     },
                     "description": {
                       "const": "View, download, upload, edit, add, delete and manage members."
@@ -645,7 +599,6 @@ Feature: List a sharing permissions
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
-      | Secure viewer    |
 
   @issues-8331
   Scenario: user lists permissions of a file in personal space
@@ -1110,8 +1063,8 @@ Feature: List a sharing permissions
           },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
-            "minItems": 4,
-            "maxItems": 4,
+            "minItems": 3,
+            "maxItems": 3,
             "uniqueItems": true,
             "items": {
               "oneOf":  [
@@ -1126,29 +1079,6 @@ Feature: List a sharing permissions
                   "properties": {
                     "@libre.graph.weight": {
                       "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "const": 2
                     },
                     "description": {
                       "const": "View and download."
@@ -1171,7 +1101,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 3
+                      "const": 2
                     },
                     "description": {
                       "const": "View, download, upload, edit, add and delete."
@@ -1194,7 +1124,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 4
+                      "const": 3
                     },
                     "description": {
                       "const": "View, download, upload, edit, add, delete and manage members."
@@ -1255,8 +1185,8 @@ Feature: List a sharing permissions
           },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
-            "minItems": 4,
-            "maxItems": 4,
+            "minItems": 3,
+            "maxItems": 3,
             "uniqueItems": true,
             "items": {
               "oneOf":  [
@@ -1271,29 +1201,6 @@ Feature: List a sharing permissions
                   "properties": {
                     "@libre.graph.weight": {
                       "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "const": 2
                     },
                     "description": {
                       "const": "View and download."
@@ -1316,7 +1223,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 3
+                      "const": 2
                     },
                     "description": {
                       "const": "View, download, upload, edit, add and delete."
@@ -1339,7 +1246,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 4
+                      "const": 3
                     },
                     "description": {
                       "const": "View, download, upload, edit, add, delete and manage members."
@@ -1560,8 +1467,8 @@ Feature: List a sharing permissions
           },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
-            "minItems": 4,
-            "maxItems": 4,
+            "minItems": 3,
+            "maxItems": 3,
             "uniqueItems": true,
             "items": {
               "oneOf":  [
@@ -1576,29 +1483,6 @@ Feature: List a sharing permissions
                   "properties": {
                     "@libre.graph.weight": {
                       "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "const": 2
                     },
                     "description": {
                       "const": "View and download."
@@ -1621,7 +1505,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 3
+                      "const": 2
                     },
                     "description": {
                       "const": "View, download, upload, edit, add and delete."
@@ -1644,7 +1528,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 4
+                      "const": 3
                     },
                     "description": {
                       "const": "View, download, upload, edit, add, delete and manage members."
@@ -1807,7 +1691,6 @@ Feature: List a sharing permissions
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
-      | Secure viewer    |
 
 
   Scenario: user sends share invitation with all allowed roles for a project space using root endpoint

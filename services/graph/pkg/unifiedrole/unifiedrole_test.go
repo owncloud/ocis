@@ -33,7 +33,6 @@ var _ = Describe("unifiedroles", func() {
 		Entry(rConversions.RoleSpaceEditor, rConversions.NewSpaceEditorRole(), unifiedrole.NewSpaceEditorUnifiedRole(), unifiedrole.UnifiedRoleConditionDrive),
 		Entry(rConversions.RoleSecureViewer, rConversions.NewSecureViewerRole(), unifiedrole.NewSecureViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionFile),
 		Entry(rConversions.RoleSecureViewer, rConversions.NewSecureViewerRole(), unifiedrole.NewSecureViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionFolder),
-		Entry(rConversions.RoleSecureViewer, rConversions.NewSecureViewerRole(), unifiedrole.NewSecureViewerUnifiedRole(), unifiedrole.UnifiedRoleConditionDrive),
 	)
 
 	DescribeTable("UnifiedRolePermissionsToCS3ResourcePermissions",
@@ -205,7 +204,6 @@ var _ = Describe("unifiedroles", func() {
 				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList()...),
 				unifiedrole.UnifiedRoleConditionDrive,
 				[]*libregraph.UnifiedRoleDefinition{
-					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewSpaceViewerUnifiedRole(),
 					unifiedrole.NewSpaceEditorUnifiedRole(),
 					unifiedrole.NewManagerUnifiedRole(),
