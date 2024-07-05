@@ -17,8 +17,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -53,6 +53,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the email notification service: [#9467](https://github.com/owncloud/ocis/pull/9467)
 * Bugfix - Fix Password Reset: [#9479](https://github.com/owncloud/ocis/pull/9479)
 * Bugfix - Fixed the email template: [#9484](https://github.com/owncloud/ocis/pull/9484)
+* Bugfix - Polish secure view: [#9532](https://github.com/owncloud/ocis/pull/9532)
 * Enhancement - Rudimentary OCM support in graph: [#8909](https://github.com/owncloud/ocis/pull/8909)
 * Enhancement - Activitylog API: [#9361](https://github.com/owncloud/ocis/pull/9361)
 * Enhancement - Add the backchannel logout event: [#9447](https://github.com/owncloud/ocis/pull/9447)
@@ -110,6 +111,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8424
    https://github.com/owncloud/ocis/pull/9484
+
+* Bugfix - Polish secure view: [#9532](https://github.com/owncloud/ocis/pull/9532)
+
+   We fixed a bug where viewing pdf files in secure view mode was not possible.
+   Secure view access on space roots was dropped because of unwanted side effects.
+
+   https://github.com/owncloud/ocis/pull/9532
 
 * Enhancement - Rudimentary OCM support in graph: [#8909](https://github.com/owncloud/ocis/pull/8909)
 
@@ -8501,7 +8509,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -8675,29 +8683,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -8870,6 +8860,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
