@@ -22,8 +22,9 @@ import (
 var cmd *exec.Cmd
 var retryCount = 0
 var stopSignal = false
+var EnvConfigs = []string{}
 
-func Start(envMap map[string]any) {
+func Start(envMap []string) {
 	// wait for the log scanner to finish
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -34,14 +35,11 @@ func Start(envMap map[string]any) {
 	}
 
 	cmd = exec.Command(config.Get("bin"), "server")
-	cmd.Env = os.Environ()
-	var environments []string
-	if envMap != nil {
-		for key, value := range envMap {
-			environments = append(environments, fmt.Sprintf("%s=%v", key, value))
-		}
+	if envMap == nil {
+		cmd.Env = append(os.Environ(), EnvConfigs...)
+	} else {
+		cmd.Env = append(os.Environ(), envMap...)
 	}
-	cmd.Env = append(cmd.Env, environments...)
 
 	logs, err := cmd.StderrPipe()
 	if err != nil {
@@ -125,10 +123,13 @@ func Stop() (bool, string) {
 		}
 	}
 	cmd.Process.Wait()
-	return waitUntilCompleteShutdown()
+	success, message := waitUntilCompleteShutdown()
+
+	cmd = nil
+	return success, message
 }
 
-func Restart(envMap map[string]any) (bool, string) {
+func Restart(envMap []string) (bool, string) {
 	Stop()
 
 	log.Println("Restarting oCIS server...")

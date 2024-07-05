@@ -3,10 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"ociswrapper/common"
 	"ociswrapper/ocis"
+	"os"
 )
 
 type BasicResponse struct {
@@ -79,15 +81,21 @@ func SetEnvHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	environments, err := parseJsonBody(req.Body)
+	envBody, err := parseJsonBody(req.Body)
 	if err != nil {
 		http.Error(res, "Bad request", http.StatusBadRequest)
 		return
 	}
 
+	var envMap []string
+	for key, value := range envBody {
+		envMap = append(envMap, fmt.Sprintf("%s=%v", key, value))
+	}
+	ocis.EnvConfigs = append(ocis.EnvConfigs, envMap...)
+
 	var message string
 
-	success, _ := ocis.Restart(environments)
+	success, _ := ocis.Restart(ocis.EnvConfigs)
 	if success {
 		message = "oCIS configured successfully"
 	} else {
@@ -104,8 +112,8 @@ func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	var message string
-
-	success, _ := ocis.Restart(nil)
+	ocis.EnvConfigs = []string{}
+	success, _ := ocis.Restart(os.Environ())
 	if success {
 		message = "oCIS configuration rolled back successfully"
 	} else {
