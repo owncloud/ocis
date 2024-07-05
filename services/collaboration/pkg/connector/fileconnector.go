@@ -568,7 +568,7 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		// name with the modified extension
 		oldStatPath := oldStatRes.GetInfo().GetPath()
 		ext := path.Ext(oldStatPath)
-		target = strings.TrimSuffix(oldStatPath, ext) + target
+		target = strings.TrimSuffix(path.Base(oldStatPath), ext) + target
 	}
 
 	finalTarget := target
@@ -797,7 +797,8 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 		if resp.GetLock() != nil {
 			return resp.GetLock().GetLockId(), NewConnectorError(409, "file is locked")
 		} else {
-			return "", err // return the original error since the file isn't locked
+			// return the original error since the file isn't locked
+			return "", NewConnectorError(500, deleteRes.GetStatus().GetCode().String()+" "+deleteRes.GetStatus().GetMessage())
 		}
 	}
 	return "", nil
