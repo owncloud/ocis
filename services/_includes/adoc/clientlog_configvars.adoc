@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-08-06-36-47]
+[#deprecation-note-2024-07-08-06-59-11]
 [caption=]
 .Deprecation notes for the clientlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -159,7 +159,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `CLIENTLOG_REVA_GATEWAY` +
-xref:deprecation-note-2024-07-08-06-36-47[Deprecation Note]
+xref:deprecation-note-2024-07-08-06-59-11[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
