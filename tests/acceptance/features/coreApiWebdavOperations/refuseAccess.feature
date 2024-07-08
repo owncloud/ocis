@@ -33,8 +33,4 @@ Feature: refuse access
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |

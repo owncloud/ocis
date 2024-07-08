@@ -54,7 +54,7 @@ Feature: LOCK file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "409"
 
-  @issue-1347 @skipOnRevaMaster
+  @issue-1347
   Scenario: send LOCK requests to another user's webDav endpoints as normal user using the spaces WebDAV API
     When user "Brian" requests these endpoints with "LOCK" to get property "d:shared" about user "Alice"
       | endpoint                                       |

@@ -24,10 +24,6 @@ Feature: get file properties
       | new              | /strängé file.txt |
       | new              | /नेपाली.txt       |
       | new              | s,a,m,p,l,e.txt   |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name         |
       | spaces           | /upload.txt       |
       | spaces           | /strängé file.txt |
       | spaces           | /नेपाली.txt       |
@@ -51,14 +47,10 @@ Feature: get file properties
       | new              | /file #2.txt  | remote.php/dav/files/%username%/file #2.txt  |
       | new              | /file ?2.txt  | remote.php/dav/files/%username%/file ?2.txt  |
       | new              | /file &2.txt  | remote.php/dav/files/%username%/file &2.txt  |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name     | expected-href                     |
-      | spaces           | /C++ file.cpp | dav/spaces/%spaceid%/C++ file.cpp |
-      | spaces           | /file #2.txt  | dav/spaces/%spaceid%/file #2.txt  |
-      | spaces           | /file ?2.txt  | dav/spaces/%spaceid%/file ?2.txt  |
-      | spaces           | /file &2.txt  | dav/spaces/%spaceid%/file &2.txt  |
+      | spaces           | /C++ file.cpp | dav/spaces/%spaceid%/C++ file.cpp            |
+      | spaces           | /file #2.txt  | dav/spaces/%spaceid%/file #2.txt             |
+      | spaces           | /file ?2.txt  | dav/spaces/%spaceid%/file ?2.txt             |
+      | spaces           | /file &2.txt  | dav/spaces/%spaceid%/file &2.txt             |
 
   @issue-1296
   Scenario Outline: user sends a PROPFIND request on various folder names
@@ -87,17 +79,13 @@ Feature: get file properties
       | new              | /folder #2.txt  | remote.php/dav/files/%username%/folder #2.txt  |
       | new              | /folder ?2.txt  | remote.php/dav/files/%username%/folder ?2.txt  |
       | new              | /folder &2.txt  | remote.php/dav/files/%username%/folder &2.txt  |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | folder-name     | expected-href                       |
-      | spaces           | /upload         | dav/spaces/%spaceid%/upload         |
-      | spaces           | /strängé folder | dav/spaces/%spaceid%/strängé folder |
-      | spaces           | /C++ folder     | dav/spaces/%spaceid%/C++ folder     |
-      | spaces           | /नेपाली         | dav/spaces/%spaceid%/नेपाली         |
-      | spaces           | /folder #2.txt  | dav/spaces/%spaceid%/folder #2.txt  |
-      | spaces           | /folder ?2.txt  | dav/spaces/%spaceid%/folder ?2.txt  |
-      | spaces           | /folder &2.txt  | dav/spaces/%spaceid%/folder &2.txt  |
+      | spaces           | /upload         | dav/spaces/%spaceid%/upload                    |
+      | spaces           | /strängé folder | dav/spaces/%spaceid%/strängé folder            |
+      | spaces           | /C++ folder     | dav/spaces/%spaceid%/C++ folder                |
+      | spaces           | /नेपाली         | dav/spaces/%spaceid%/नेपाली                    |
+      | spaces           | /folder #2.txt  | dav/spaces/%spaceid%/folder #2.txt             |
+      | spaces           | /folder ?2.txt  | dav/spaces/%spaceid%/folder ?2.txt             |
+      | spaces           | /folder &2.txt  | dav/spaces/%spaceid%/folder &2.txt             |
 
 
   Scenario Outline: user sends a PROPFIND request on various files inside various folders
@@ -119,15 +107,11 @@ Feature: get file properties
       | new              | /C++ folder                      | C++ file.cpp                  |
       | new              | /नेपाली                          | नेपाली                        |
       | new              | /folder #2.txt                   | file #2.txt                   |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | folder-name     | file-name        |
-      | spaces           | /upload         | abc.txt          |
-      | spaces           | /strängé folder | strängé file.txt |
-      | spaces           | /C++ folder     | C++ file.cpp     |
-      | spaces           | /नेपाली         | नेपाली           |
-      | spaces           | /folder #2.txt  | file #2.txt      |
+      | spaces           | /upload                          | abc.txt                       |
+      | spaces           | /strängé folder                  | strängé file.txt              |
+      | spaces           | /C++ folder                      | C++ file.cpp                  |
+      | spaces           | /नेपाली                          | नेपाली                        |
+      | spaces           | /folder #2.txt                   | file #2.txt                   |
 
   @issue-1259
   #after fixing all issues delete this Scenario and merge with the one above
@@ -142,10 +126,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -161,10 +141,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -188,10 +164,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -215,10 +187,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -240,10 +208,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -281,10 +245,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest @issue-2809
@@ -300,10 +260,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -314,15 +270,11 @@ Feature: get file properties
     And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
 
     Examples:
-      | url                                  | message1               | message2           |
-      | /remote.php/dav/files/does-not-exist | Resource not found     | Resource not found |
-      | /remote.php/dav/does-not-exist       | File not found in root |                    |
-
-    @skipOnRevaMaster
-    Examples:
-      | url                                             | message1           | message2 |
-      | /remote.php/dav/spaces/%spaceid%/does-not-exist | Resource not found |          |
-      | /remote.php/dav/spaces/%spaceid%/file1.txt      | Resource not found |          |
+      | url                                             | message1               | message2           |
+      | /remote.php/dav/files/does-not-exist            | Resource not found     | Resource not found |
+      | /remote.php/dav/does-not-exist                  | File not found in root |                    |
+      | /remote.php/dav/spaces/%spaceid%/does-not-exist | Resource not found     |                    |
+      | /remote.php/dav/spaces/%spaceid%/file1.txt      | Resource not found     |                    |
 
   @issue-1297
   Scenario Outline: add, receive multiple custom meta properties to a file
@@ -347,10 +299,6 @@ Feature: get file properties
       | dav-path-version |
       | new              |
       | old              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1297
@@ -383,10 +331,6 @@ Feature: get file properties
       | dav-path-version |
       | new              |
       | old              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -402,10 +346,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -421,10 +361,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -440,10 +376,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -459,10 +391,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -478,10 +406,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -497,10 +421,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -516,10 +436,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -535,10 +451,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -554,10 +466,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -573,10 +481,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -592,10 +496,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -611,10 +511,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -630,10 +526,6 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -654,8 +546,4 @@ Feature: get file properties
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |

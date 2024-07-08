@@ -17,10 +17,6 @@ Feature: delete folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -35,10 +31,6 @@ Feature: delete folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -55,10 +47,6 @@ Feature: delete folder
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -84,10 +72,6 @@ Feature: delete folder
       | new              | /..fo       |
       | new              | /fo.xyz     |
       | new              | /fo.exe     |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | folder-name |
       | spaces           | /fo.        |
       | spaces           | /fo.1       |
       | spaces           | /fo...1..   |

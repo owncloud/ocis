@@ -17,10 +17,6 @@ Feature: delete file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -37,10 +33,6 @@ Feature: delete file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -67,10 +59,6 @@ Feature: delete file
       | new              | /...          | ...         |
       | new              | /..upload     | abc         |
       | new              | /..upload     | ..abc       |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | folder-name   | file-name   |
       | spaces           | /upload.      | abc.        |
       | spaces           | /upload...1.. | abc...txt.. |
       | spaces           | /upload.1     | abc.txt     |
@@ -94,10 +82,6 @@ Feature: delete file
       | new              | "sample,1.txt" |
       | new              | ",,,.txt"      |
       | new              | ",,,.,"        |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name      |
       | spaces           | "sample,1.txt" |
       | spaces           | ",,,.txt"      |
       | spaces           | ",,,.,"        |
@@ -119,10 +103,6 @@ Feature: delete file
       | new              | '"double".txt' |
       | new              | "question?"    |
       | new              | "&and#hash"    |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | file-name      |
       | spaces           | "'single'.txt" |
       | spaces           | '"double".txt' |
       | spaces           | "question?"    |
@@ -149,10 +129,6 @@ Feature: delete file
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 

@@ -40,10 +40,6 @@ Feature: list files
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -66,10 +62,6 @@ Feature: list files
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -90,10 +82,6 @@ Feature: list files
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -118,10 +106,6 @@ Feature: list files
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @env-config
@@ -207,10 +191,6 @@ Feature: list files
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -240,8 +220,4 @@ Feature: list files
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |

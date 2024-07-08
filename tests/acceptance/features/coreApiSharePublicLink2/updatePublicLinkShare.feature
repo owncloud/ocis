@@ -319,10 +319,6 @@ Feature: update a public link share
       | old              | 2               | 200             |
       | new              | 1               | 100             |
       | new              | 2               | 200             |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | ocs-api-version | ocs-status-code |
       | spaces           | 1               | 100             |
       | spaces           | 2               | 200             |
 
@@ -369,10 +365,6 @@ Feature: update a public link share
       | old              | 2               | 200             |
       | new              | 1               | 100             |
       | new              | 2               | 200             |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | ocs-api-version | ocs-status-code |
       | spaces           | 1               | 100             |
       | spaces           | 2               | 200             |
 
@@ -397,9 +389,5 @@ Feature: update a public link share
       | old              | 2               | 200             |
       | new              | 1               | 100             |
       | new              | 2               | 200             |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | ocs-api-version | ocs-status-code |
       | spaces           | 1               | 100             |
       | spaces           | 2               | 200             |

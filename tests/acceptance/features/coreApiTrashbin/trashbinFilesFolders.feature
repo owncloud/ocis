@@ -18,10 +18,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest
@@ -34,10 +30,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -53,10 +45,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -79,10 +67,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -103,10 +87,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   # This scenario deletes many files as close together in time as the test can run.
@@ -138,10 +118,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   # Note: the underlying acceptance test code ensures that each delete step is separated by a least 1 second
@@ -161,10 +137,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-3561
@@ -179,7 +151,6 @@ Feature: files and folders exist in the trashbin after being deleted
     And the last webdav response should not contain the following elements
       | path          | user            |
       | textfile1.txt | testtrashbin100 |
-    @skipOnRevaMaster
     Examples:
       | dav-path-version |
       | new              |
@@ -200,7 +171,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | path          | user            |
       | textfile0.txt | testtrashbin101 |
       | textfile2.txt | testtrashbin101 |
-    @skipOnRevaMaster
     Examples:
       | dav-path-version |
       | new              |
@@ -226,7 +196,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | textfile0.txt | testtrashbin102 |
       | textfile2.txt | testtrashbin102 |
       | textfile3.txt | testtrashbin102 |
-    @skipOnRevaMaster
     Examples:
       | dav-path-version |
       | new              |
@@ -242,10 +211,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-3561
@@ -256,10 +221,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest
@@ -275,10 +236,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @smokeTest
@@ -294,10 +251,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -314,10 +267,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | new              | dash-123 |
       | new              | null     |
       | new              | nil      |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | user     |
       | spaces           | dash-123 |
       | spaces           | null     |
       | spaces           | nil      |
@@ -333,10 +282,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -353,10 +298,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-541
@@ -370,10 +311,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1547
@@ -431,10 +368,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-1547
@@ -492,8 +425,4 @@ Feature: files and folders exist in the trashbin after being deleted
     Examples:
       | dav-path-version |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |

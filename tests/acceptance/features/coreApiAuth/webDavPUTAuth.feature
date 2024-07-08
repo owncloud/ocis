@@ -54,7 +54,7 @@ Feature: PUT file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "403"
 
-  @skipOnRevaMaster
+
   Scenario: send PUT requests to another user's webDav endpoints as normal user using the spaces WebDAV API
     When user "Brian" requests these endpoints with "PUT" including body "doesnotmatter" about user "Alice"
       | endpoint                                       |

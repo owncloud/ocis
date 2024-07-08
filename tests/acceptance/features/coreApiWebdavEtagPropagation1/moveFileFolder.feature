@@ -23,10 +23,6 @@ Feature: propagation of etags when moving files or folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-4251
@@ -49,10 +45,6 @@ Feature: propagation of etags when moving files or folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-4251
@@ -75,10 +67,6 @@ Feature: propagation of etags when moving files or folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -98,10 +86,6 @@ Feature: propagation of etags when moving files or folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-4251
@@ -124,10 +108,6 @@ Feature: propagation of etags when moving files or folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-4251
@@ -150,10 +130,6 @@ Feature: propagation of etags when moving files or folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -325,10 +301,6 @@ Feature: propagation of etags when moving files or folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @skipOnReva
@@ -354,8 +326,4 @@ Feature: propagation of etags when moving files or folders
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |

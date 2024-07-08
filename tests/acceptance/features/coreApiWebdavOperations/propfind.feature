@@ -9,12 +9,8 @@ Feature: PROPFIND
     When user "Alice" requests "<dav-path>" with "PROPFIND" using basic auth
     Then the HTTP status code should be "405"
     Examples:
-      | dav-path              |
-      | /remote.php/dav/files |
-
-    @skipOnRevaMaster
-    Examples:
       | dav-path               |
+      | /remote.php/dav/files  |
       | /remote.php/dav/spaces |
 
 
@@ -25,15 +21,11 @@ Feature: PROPFIND
       | depth  | <depth> |
     Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | dav-path                    | depth | http-status-code |
-      | /remote.php/webdav          | 0     | 207              |
-      | /remote.php/webdav          | 1     | 207              |
-      | /remote.php/dav/files/alice | 0     | 207              |
-      | /remote.php/dav/files/alice | 1     | 207              |
-
-    @skipOnRevaMaster
-    Examples:
       | dav-path                         | depth    | http-status-code |
+      | /remote.php/webdav               | 0        | 207              |
+      | /remote.php/webdav               | 1        | 207              |
+      | /remote.php/dav/files/alice      | 0        | 207              |
+      | /remote.php/dav/files/alice      | 1        | 207              |
       | /remote.php/dav/spaces/%spaceid% | 0        | 207              |
       | /remote.php/dav/spaces/%spaceid% | 1        | 207              |
       | /remote.php/dav/spaces/%spaceid% | infinity | 400              |

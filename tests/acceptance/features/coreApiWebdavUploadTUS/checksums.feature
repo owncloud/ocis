@@ -22,10 +22,6 @@ Feature: checksums
       | new              | MD5 827ccb0eea8a706c4c34a16891f84e7b          |
       | old              | SHA1 8cb2237d0679ca88db6464eac60da96345513964 |
       | new              | SHA1 8cb2237d0679ca88db6464eac60da96345513964 |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | checksum                                      |
       | spaces           | MD5 827ccb0eea8a706c4c34a16891f84e7b          |
       | spaces           | SHA1 8cb2237d0679ca88db6464eac60da96345513964 |
 
@@ -44,10 +40,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -65,10 +57,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -87,10 +75,6 @@ Feature: checksums
       | new              | MD5 827ccb0eea8a706c4c34a16891f84e7a          |
       | old              | SHA1 8cb2237d0679ca88db6464eac60da96345513963 |
       | new              | SHA1 8cb2237d0679ca88db6464eac60da96345513963 |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | checksum                                      |
       | spaces           | MD5 827ccb0eea8a706c4c34a16891f84e7a          |
       | spaces           | SHA1 8cb2237d0679ca88db6464eac60da96345513963 |
 
@@ -109,10 +93,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -131,10 +111,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -153,10 +129,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -174,10 +146,6 @@ Feature: checksums
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -202,10 +170,6 @@ Feature: checksums
       | new              | MD5 5d41402abc4b2a76b9719d911017c592          |
       | old              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
       | new              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | checksum                                      |
       | spaces           | MD5 5d41402abc4b2a76b9719d911017c592          |
       | spaces           | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
 
@@ -229,10 +193,6 @@ Feature: checksums
       | new              | MD5 5d41402abc4b2a76b9719d911017c593          |
       | old              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
       | new              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | checksum                                      |
       | spaces           | MD5 5d41402abc4b2a76b9719d911017c593          |
       | spaces           | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
 
@@ -258,10 +218,6 @@ Feature: checksums
       | new              | MD5 5d41402abc4b2a76b9719d911017c592          |
       | old              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
       | new              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | checksum                                      |
       | spaces           | MD5 5d41402abc4b2a76b9719d911017c592          |
       | spaces           | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
 
@@ -285,9 +241,5 @@ Feature: checksums
       | new              | MD5 5d41402abc4b2a76b9719d911017c593          |
       | old              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
       | new              | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version | checksum                                      |
       | spaces           | MD5 5d41402abc4b2a76b9719d911017c593          |
       | spaces           | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |

@@ -22,10 +22,6 @@ Feature: low level tests of the creation extension see https://tus.io/protocols/
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -43,8 +39,4 @@ Feature: low level tests of the creation extension see https://tus.io/protocols/
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
