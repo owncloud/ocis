@@ -117,6 +117,10 @@ func Stop() (bool, string) {
 	log.Println("Stopping oCIS server...")
 	stopSignal = true
 
+	if cmd == nil {
+		return true, "oCIS server is not running"
+	}
+
 	err := cmd.Process.Signal(syscall.SIGINT)
 	if err != nil {
 		if !strings.HasSuffix(err.Error(), "process already finished") {
