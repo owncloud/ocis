@@ -5644,10 +5644,10 @@ IDM_ADMIN_USER_ID:
   removalVersion: ""
   deprecationInfo: ""
 IDM_CREATE_DEMO_USERS:
-  name: SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;IDM_CREATE_DEMO_USERS
+  name: IDM_CREATE_DEMO_USERS
   defaultValue: "false"
   type: bool
-  description: The default role assignments the demo users should be setup.
+  description: Flag to enable or disable the creation of the demo users.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -7419,7 +7419,7 @@ OCDAV_WEBDAV_NAMESPACE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_ADMIN_USER_ID:
-  name: OCIS_ADMIN_USER_ID;SETTINGS_ADMIN_USER_ID
+  name: OCIS_ADMIN_USER_ID;IDM_ADMIN_USER_ID
   defaultValue: ""
   type: string
   description: ID of the user that should receive admin privileges. Consider that
@@ -7449,7 +7449,7 @@ OCIS_ASYNC_UPLOADS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_AUTH_PASSWORD:
-  name: OCIS_CACHE_AUTH_PASSWORD;SETTINGS_CACHE_AUTH_PASSWORD
+  name: OCIS_CACHE_AUTH_PASSWORD;GRAPH_CACHE_AUTH_PASSWORD
   defaultValue: ""
   type: string
   description: The password to authenticate with the cache. Only applies when store
@@ -7459,7 +7459,7 @@ OCIS_CACHE_AUTH_PASSWORD:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_AUTH_USERNAME:
-  name: OCIS_CACHE_AUTH_USERNAME;SETTINGS_CACHE_AUTH_USERNAME
+  name: OCIS_CACHE_AUTH_USERNAME;GRAPH_CACHE_AUTH_USERNAME
   defaultValue: ""
   type: string
   description: The username to authenticate with the cache. Only applies when store
@@ -7470,7 +7470,7 @@ OCIS_CACHE_AUTH_USERNAME:
   deprecationInfo: ""
 OCIS_CACHE_DATABASE:
   name: OCIS_CACHE_DATABASE
-  defaultValue: settings-cache
+  defaultValue: ids-storage-users
   type: string
   description: The database name the configured store should use.
   introductionVersion: pre5.0
@@ -7478,7 +7478,7 @@ OCIS_CACHE_DATABASE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_DISABLE_PERSISTENCE:
-  name: OCIS_CACHE_DISABLE_PERSISTENCE;SETTINGS_CACHE_DISABLE_PERSISTENCE
+  name: OCIS_CACHE_DISABLE_PERSISTENCE;GRAPH_CACHE_DISABLE_PERSISTENCE
   defaultValue: "false"
   type: bool
   description: Disables persistence of the cache. Only applies when store type 'nats-js-kv'
@@ -7488,18 +7488,18 @@ OCIS_CACHE_DISABLE_PERSISTENCE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_SIZE:
-  name: OCIS_CACHE_SIZE;SETTINGS_CACHE_SIZE
+  name: OCIS_CACHE_SIZE;GRAPH_CACHE_SIZE
   defaultValue: "0"
   type: int
-  description: The maximum quantity of items in the cache. Only applies when store
+  description: The maximum quantity of items in the store. Only applies when store
     type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package
-    though not exclicitly set as default.
+    though not explicitly set as default.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_STORE:
-  name: OCIS_CACHE_STORE;SETTINGS_CACHE_STORE
+  name: OCIS_CACHE_STORE;GRAPH_CACHE_STORE
   defaultValue: memory
   type: string
   description: 'The type of the cache store. Supported values are: ''memory'', ''redis-sentinel'',
@@ -7509,7 +7509,7 @@ OCIS_CACHE_STORE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_STORE_NODES:
-  name: OCIS_CACHE_STORE_NODES;SETTINGS_CACHE_STORE_NODES
+  name: OCIS_CACHE_STORE_NODES;GRAPH_CACHE_STORE_NODES
   defaultValue: '[127.0.0.1:9233]'
   type: '[]string'
   description: A list of nodes to access the configured store. This has no effect
@@ -7521,18 +7521,17 @@ OCIS_CACHE_STORE_NODES:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_TTL:
-  name: OCIS_CACHE_TTL;SETTINGS_CACHE_TTL
-  defaultValue: 10m0s
+  name: OCIS_CACHE_TTL;GRAPH_CACHE_TTL
+  defaultValue: 336h0m0s
   type: Duration
-  description: Default time to live for entries in the cache. Only applied when access
-    tokens has no expiration. See the Environment Variable Types description for more
-    details.
+  description: Time to live for cache records in the graph. Defaults to '336h' (2
+    weeks). See the Environment Variable Types description for more details.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_CREDENTIALS:
-  name: OCIS_CORS_ALLOW_CREDENTIALS;SETTINGS_CORS_ALLOW_CREDENTIALS
+  name: OCIS_CORS_ALLOW_CREDENTIALS;GRAPH_CORS_ALLOW_CREDENTIALS
   defaultValue: "true"
   type: bool
   description: 'Allow credentials for CORS.See following chapter for more details:
@@ -7542,8 +7541,9 @@ OCIS_CORS_ALLOW_CREDENTIALS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_HEADERS:
-  name: OCIS_CORS_ALLOW_HEADERS;SETTINGS_CORS_ALLOW_HEADERS
-  defaultValue: '[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id]'
+  name: OCIS_CORS_ALLOW_HEADERS;GRAPH_CORS_ALLOW_HEADERS
+  defaultValue: '[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id
+    Purge Restore]'
   type: '[]string'
   description: 'A list of allowed CORS headers. See following chapter for more details:
     *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -7553,7 +7553,7 @@ OCIS_CORS_ALLOW_HEADERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_METHODS:
-  name: OCIS_CORS_ALLOW_METHODS;SETTINGS_CORS_ALLOW_METHODS
+  name: OCIS_CORS_ALLOW_METHODS;GRAPH_CORS_ALLOW_METHODS
   defaultValue: '[GET POST PUT PATCH DELETE OPTIONS]'
   type: '[]string'
   description: 'A list of allowed CORS methods. See following chapter for more details:
@@ -7564,7 +7564,7 @@ OCIS_CORS_ALLOW_METHODS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_ORIGINS:
-  name: OCIS_CORS_ALLOW_ORIGINS;SETTINGS_CORS_ALLOW_ORIGINS
+  name: OCIS_CORS_ALLOW_ORIGINS;GRAPH_CORS_ALLOW_ORIGINS
   defaultValue: '[*]'
   type: '[]string'
   description: 'A list of allowed CORS origins. See following chapter for more details:
@@ -7672,7 +7672,7 @@ OCIS_DISABLE_VERSIONING:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_EDITION:
-  name: OCIS_EDITION;FRONTEND_EDITION
+  name: OCIS_EDITION;OCDAV_EDITION
   defaultValue: Community
   type: string
   description: Edition of oCIS. Used for branding purposes.
@@ -7761,11 +7761,11 @@ OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_GATEWAY_GRPC_ADDR:
-  name: OCIS_GATEWAY_GRPC_ADDR;GATEWAY_GRPC_ADDR
+  name: OCIS_GATEWAY_GRPC_ADDR;STORAGE_USERS_GATEWAY_GRPC_ADDR
   defaultValue: 127.0.0.1:9142
   type: string
-  description: The bind address of the GRPC service.
-  introductionVersion: pre5.0
+  description: The bind address of the gateway GRPC address.
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -7833,7 +7833,7 @@ OCIS_INSECURE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_JWT_SECRET:
-  name: OCIS_JWT_SECRET;SETTINGS_JWT_SECRET
+  name: OCIS_JWT_SECRET;GRAPH_JWT_SECRET
   defaultValue: ""
   type: string
   description: The secret to mint and validate jwt tokens.
@@ -7842,7 +7842,7 @@ OCIS_JWT_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_BASE_PATH:
-  name: OCIS_KEYCLOAK_BASE_PATH;INVITATIONS_KEYCLOAK_BASE_PATH
+  name: OCIS_KEYCLOAK_BASE_PATH;GRAPH_KEYCLOAK_BASE_PATH
   defaultValue: ""
   type: string
   description: The URL to access keycloak.
@@ -7851,16 +7851,16 @@ OCIS_KEYCLOAK_BASE_PATH:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_CLIENT_ID:
-  name: OCIS_KEYCLOAK_CLIENT_ID;INVITATIONS_KEYCLOAK_CLIENT_ID
+  name: OCIS_KEYCLOAK_CLIENT_ID;GRAPH_KEYCLOAK_CLIENT_ID
   defaultValue: ""
   type: string
-  description: The client ID to authenticate with keycloak.
+  description: The client id to authenticate with keycloak.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_CLIENT_REALM:
-  name: OCIS_KEYCLOAK_CLIENT_REALM;INVITATIONS_KEYCLOAK_CLIENT_REALM
+  name: OCIS_KEYCLOAK_CLIENT_REALM;GRAPH_KEYCLOAK_CLIENT_REALM
   defaultValue: ""
   type: string
   description: The realm the client is defined in.
@@ -7869,7 +7869,7 @@ OCIS_KEYCLOAK_CLIENT_REALM:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_CLIENT_SECRET:
-  name: OCIS_KEYCLOAK_CLIENT_SECRET;INVITATIONS_KEYCLOAK_CLIENT_SECRET
+  name: OCIS_KEYCLOAK_CLIENT_SECRET;GRAPH_KEYCLOAK_CLIENT_SECRET
   defaultValue: ""
   type: string
   description: The client secret to use in authentication.
@@ -7878,7 +7878,7 @@ OCIS_KEYCLOAK_CLIENT_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY:
-  name: OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY;INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY
+  name: OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY;GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY
   defaultValue: "false"
   type: bool
   description: Disable TLS certificate validation for Keycloak connections. Do not
@@ -7888,7 +7888,7 @@ OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_USER_REALM:
-  name: OCIS_KEYCLOAK_USER_REALM;INVITATIONS_KEYCLOAK_USER_REALM
+  name: OCIS_KEYCLOAK_USER_REALM;GRAPH_KEYCLOAK_USER_REALM
   defaultValue: ""
   type: string
   description: The realm users are defined.
@@ -7978,7 +7978,7 @@ OCIS_LDAP_GROUP_OBJECTCLASS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME:
-  name: OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME;USERS_LDAP_GROUP_SCHEMA_DISPLAYNAME
+  name: OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME;GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME
   defaultValue: cn
   type: string
   description: LDAP Attribute to use for the displayname of groups (often the same
@@ -8018,7 +8018,7 @@ OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCHEMA_MAIL:
-  name: OCIS_LDAP_GROUP_SCHEMA_MAIL;USERS_LDAP_GROUP_SCHEMA_MAIL
+  name: OCIS_LDAP_GROUP_SCHEMA_MAIL;GROUPS_LDAP_GROUP_SCHEMA_MAIL
   defaultValue: mail
   type: string
   description: LDAP Attribute to use for the email address of groups (can be empty).
@@ -8115,7 +8115,7 @@ OCIS_LDAP_USER_OBJECTCLASS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_SCHEMA_DISPLAYNAME:
-  name: OCIS_LDAP_USER_SCHEMA_DISPLAYNAME;USERS_LDAP_USER_SCHEMA_DISPLAYNAME
+  name: OCIS_LDAP_USER_SCHEMA_DISPLAYNAME;GROUPS_LDAP_USER_SCHEMA_DISPLAYNAME
   defaultValue: displayname
   type: string
   description: LDAP Attribute to use for the displayname of users.
@@ -8183,7 +8183,7 @@ OCIS_LDAP_USER_SCOPE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_COLOR:
-  name: OCIS_LOG_COLOR;SETTINGS_LOG_COLOR
+  name: OCIS_LOG_COLOR;IDM_LOG_COLOR
   defaultValue: "false"
   type: bool
   description: Activates colorized log output.
@@ -8192,7 +8192,7 @@ OCIS_LOG_COLOR:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_FILE:
-  name: OCIS_LOG_FILE;SETTINGS_LOG_FILE
+  name: OCIS_LOG_FILE;IDM_LOG_FILE
   defaultValue: ""
   type: string
   description: The path to the log file. Activates logging to this file if set.
@@ -8201,7 +8201,7 @@ OCIS_LOG_FILE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_LEVEL:
-  name: OCIS_LOG_LEVEL;SETTINGS_LOG_LEVEL
+  name: OCIS_LOG_LEVEL;IDM_LOG_LEVEL
   defaultValue: ""
   type: string
   description: 'The log level. Valid values are: ''panic'', ''fatal'', ''error'',
@@ -8211,7 +8211,7 @@ OCIS_LOG_LEVEL:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_PRETTY:
-  name: OCIS_LOG_PRETTY;SETTINGS_LOG_PRETTY
+  name: OCIS_LOG_PRETTY;IDM_LOG_PRETTY
   defaultValue: "false"
   type: bool
   description: Activates pretty log output.
@@ -8220,11 +8220,11 @@ OCIS_LOG_PRETTY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_MACHINE_AUTH_API_KEY:
-  name: OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY
+  name: OCIS_MACHINE_AUTH_API_KEY;OCDAV_MACHINE_AUTH_API_KEY
   defaultValue: ""
   type: string
-  description: Machine auth API key used to validate internal requests necessary to
-    access resources from other services.
+  description: Machine auth API key used to validate internal requests necessary for
+    the access to resources from other services.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8317,8 +8317,8 @@ OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE:
-  name: OCIS_PERSISTENT_STORE;EVENTHISTORY_STORE
-  defaultValue: nats-js-kv
+  name: OCIS_PERSISTENT_STORE;USERLOG_STORE
+  defaultValue: memory
   type: string
   description: 'The type of the store. Supported values are: ''memory'', ''ocmem'',
     ''etcd'', ''redis'', ''redis-sentinel'', ''nats-js'', ''noop''. See the text description
@@ -8328,7 +8328,7 @@ OCIS_PERSISTENT_STORE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_AUTH_PASSWORD:
-  name: OCIS_PERSISTENT_STORE_AUTH_PASSWORD;EVENTHISTORY_STORE_AUTH_PASSWORD
+  name: OCIS_PERSISTENT_STORE_AUTH_PASSWORD;USERLOG_STORE_AUTH_PASSWORD
   defaultValue: ""
   type: string
   description: The password to authenticate with the store. Only applies when store
@@ -8338,7 +8338,7 @@ OCIS_PERSISTENT_STORE_AUTH_PASSWORD:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_AUTH_USERNAME:
-  name: OCIS_PERSISTENT_STORE_AUTH_USERNAME;EVENTHISTORY_STORE_AUTH_USERNAME
+  name: OCIS_PERSISTENT_STORE_AUTH_USERNAME;USERLOG_STORE_AUTH_USERNAME
   defaultValue: ""
   type: string
   description: The username to authenticate with the store. Only applies when store
@@ -8348,8 +8348,8 @@ OCIS_PERSISTENT_STORE_AUTH_USERNAME:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_NODES:
-  name: OCIS_PERSISTENT_STORE_NODES;EVENTHISTORY_STORE_NODES
-  defaultValue: '[127.0.0.1:9233]'
+  name: OCIS_PERSISTENT_STORE_NODES;USERLOG_STORE_NODES
+  defaultValue: '[]'
   type: '[]string'
   description: A list of nodes to access the configured store. This has no effect
     when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes
@@ -8360,18 +8360,18 @@ OCIS_PERSISTENT_STORE_NODES:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_SIZE:
-  name: OCIS_PERSISTENT_STORE_SIZE;EVENTHISTORY_STORE_SIZE
+  name: OCIS_PERSISTENT_STORE_SIZE;USERLOG_STORE_SIZE
   defaultValue: "0"
   type: int
   description: The maximum quantity of items in the store. Only applies when store
-    type 'ocmem' is configured. Defaults to 512 which is derived and used from the
-    ocmem package though no explicit default was set.
+    type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package
+    though not exclicitly set as default.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_TTL:
-  name: OCIS_PERSISTENT_STORE_TTL;EVENTHISTORY_STORE_TTL
+  name: OCIS_PERSISTENT_STORE_TTL;USERLOG_STORE_TTL
   defaultValue: 336h0m0s
   type: Duration
   description: Time to live for events in the store. Defaults to '336h' (2 weeks).
@@ -8421,19 +8421,17 @@ OCIS_REVA_GATEWAY_TLS_MODE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SERVICE_ACCOUNT_ID:
-  name: SETTINGS_SERVICE_ACCOUNT_IDS;OCIS_SERVICE_ACCOUNT_ID
+  name: OCIS_SERVICE_ACCOUNT_ID;GRAPH_SERVICE_ACCOUNT_ID
   defaultValue: ""
-  type: '[]string'
-  description: 'The list of all service account IDs. These will be assigned the hidden
-    ''service-account'' role. Note: When using ''OCIS_SERVICE_ACCOUNT_ID'' this will
-    contain only one value while ''SETTINGS_SERVICE_ACCOUNT_IDS'' can have multiple.
-    See the ''auth-service'' service description for more details about service accounts.'
+  type: string
+  description: The ID of the service account the service should use. See the 'auth-service'
+    service description for more details.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SERVICE_ACCOUNT_SECRET:
-  name: OCIS_SERVICE_ACCOUNT_SECRET;OCM_SERVICE_ACCOUNT_SECRET
+  name: OCIS_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET
   defaultValue: ""
   type: string
   description: The service account secret.
@@ -8513,7 +8511,7 @@ OCIS_SYSTEM_USER_IDP:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_COLLECTOR:
-  name: OCIS_TRACING_COLLECTOR;SETTINGS_TRACING_COLLECTOR
+  name: OCIS_TRACING_COLLECTOR;IDM_TRACING_COLLECTOR
   defaultValue: ""
   type: string
   description: The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces.
@@ -8523,7 +8521,7 @@ OCIS_TRACING_COLLECTOR:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENABLED:
-  name: OCIS_TRACING_ENABLED;SETTINGS_TRACING_ENABLED
+  name: OCIS_TRACING_ENABLED;IDM_TRACING_ENABLED
   defaultValue: "false"
   type: bool
   description: Activates tracing.
@@ -8532,7 +8530,7 @@ OCIS_TRACING_ENABLED:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENDPOINT:
-  name: OCIS_TRACING_ENDPOINT;SETTINGS_TRACING_ENDPOINT
+  name: OCIS_TRACING_ENDPOINT;IDM_TRACING_ENDPOINT
   defaultValue: ""
   type: string
   description: The endpoint of the tracing agent.
@@ -8541,7 +8539,7 @@ OCIS_TRACING_ENDPOINT:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_TYPE:
-  name: OCIS_TRACING_TYPE;SETTINGS_TRACING_TYPE
+  name: OCIS_TRACING_TYPE;IDM_TRACING_TYPE
   defaultValue: ""
   type: string
   description: The type of tracing. Defaults to '', which is the same as 'jaeger'.
@@ -8560,7 +8558,7 @@ OCIS_TRANSFER_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRANSLATION_PATH:
-  name: OCIS_TRANSLATION_PATH;NOTIFICATIONS_TRANSLATION_PATH
+  name: OCIS_TRANSLATION_PATH;USERLOG_TRANSLATION_PATH
   defaultValue: ""
   type: string
   description: (optional) Set this to a path with custom translations to overwrite
