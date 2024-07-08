@@ -65,6 +65,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#9473](https://github.com/owncloud/ocis/pull/9473)
 * Enhancement - Empty trash directories: [#9483](https://github.com/owncloud/ocis/pull/9483)
 * Enhancement - Various fixes for the activitylog service: [#9485](https://github.com/owncloud/ocis/pull/9485)
+* Enhancement - Add cli to purge revisions: [#9497](https://github.com/owncloud/ocis/pull/9497)
 * Enhancement - Update web to v9.1.0: [#9547](https://github.com/owncloud/ocis/pull/9547)
 
 ## Details
@@ -197,6 +198,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9485
    https://github.com/owncloud/ocis/pull/9467
+
+* Enhancement - Add cli to purge revisions: [#9497](https://github.com/owncloud/ocis/pull/9497)
+
+   Adds a cli that allows removing all revisions for a storage-provider.
+
+   https://github.com/owncloud/ocis/pull/9497
 
 * Enhancement - Update web to v9.1.0: [#9547](https://github.com/owncloud/ocis/pull/9547)
 
