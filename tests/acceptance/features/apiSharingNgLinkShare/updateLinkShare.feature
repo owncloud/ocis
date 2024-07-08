@@ -10,14 +10,14 @@ Feature: Update a link share for a resource
   Scenario Outline: update role of a file's link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:
-    | resource        | textfile1.txt      |
-    | space           | Personal           |
-    | permissionsRole | <permissions-role> |
-    | password        | %public%           |
+      | resource        | textfile1.txt      |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Alice" updates the last public link share using the permissions endpoint of the Graph API:
-    | resource        | textfile1.txt          |
-    | space           | Personal               |
-    | permissionsRole | <new-permissions-role> |
+      | resource        | textfile1.txt          |
+      | space           | Personal               |
+      | permissionsRole | <new-permissions-role> |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -68,26 +68,26 @@ Feature: Update a link share for a resource
       }
       """
     Examples:
-    | permissions-role | new-permissions-role |
-    | view             | edit                 |
-    | view             | blocksDownload       |
-    | edit             | view                 |
-    | edit             | blocksDownload       |
-    | blocksDownload   | edit                 |
-    | blocksDownload   | blocksDownload       |
+      | permissions-role | new-permissions-role |
+      | view             | edit                 |
+      | view             | blocksDownload       |
+      | edit             | view                 |
+      | edit             | blocksDownload       |
+      | blocksDownload   | edit                 |
+      | blocksDownload   | blocksDownload       |
 
   @issue-8619
   Scenario Outline: update role of a file's to internal link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:
-    | resource        | textfile1.txt      |
-    | space           | Personal           |
-    | permissionsRole | <permissions-role> |
-    | password        | %public%           |
+      | resource        | textfile1.txt      |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
     When user "Alice" updates the last public link share using the permissions endpoint of the Graph API:
-    | resource        | textfile1.txt |
-    | space           | Personal      |
-    | permissionsRole | internal      |
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | permissionsRole | internal      |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -137,26 +137,26 @@ Feature: Update a link share for a resource
       }
       """
     Examples:
-    | permissions-role |
-    | view             |
-    | edit             |
-    | blocksDownload   |
+      | permissions-role |
+      | view             |
+      | edit             |
+      | blocksDownload   |
 
 
   Scenario: update expiration date of a file's link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
-      And user "Alice" has created the following resource link share:
+    And user "Alice" has created the following resource link share:
       | resource           | textfile1.txt            |
       | space              | Personal                 |
       | permissionsRole    | view                     |
       | password           | %public%                 |
       | expirationDateTime | 2200-07-15T14:00:00.000Z |
-      When user "Alice" updates the last public link share using the permissions endpoint of the Graph API:
+    When user "Alice" updates the last public link share using the permissions endpoint of the Graph API:
       | resource           | textfile1.txt            |
       | space              | Personal                 |
       | expirationDateTime | 2201-07-15T14:00:00.000Z |
-      Then the HTTP status code should be "200"
-      And the JSON data of the response should match
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
       """
       {
         "type": "object",

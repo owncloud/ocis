@@ -80,6 +80,7 @@ class OcmHelper {
 	 * @param string $user
 	 * @param string $password
 	 * @param string $token
+	 * @param string $providerDomain
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -89,11 +90,12 @@ class OcmHelper {
 		string $xRequestId,
 		string $user,
 		string $password,
-		string $token
+		string $token,
+		string $providerDomain,
 	): ResponseInterface {
 		$body = [
 		  "token" => $token,
-		  "providerDomain" => 'ocis-server'
+		  "providerDomain" => $providerDomain
 		];
 		$url = self::getFullUrl($baseUrl, 'accept-invite');
 		return HttpRequestHelper::post(

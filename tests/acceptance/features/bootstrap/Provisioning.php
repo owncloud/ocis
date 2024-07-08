@@ -84,6 +84,13 @@ trait Provisioning {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getAllCreatedUsers():array {
+		return array_merge($this->createdUsers, $this->createdRemoteUsers);
+	}
+
+	/**
 	 * @return boolean
 	 */
 	public function someUsersHaveBeenCreated():bool {
@@ -107,8 +114,9 @@ trait Provisioning {
 	 */
 	public function getUserDisplayName(string $username):string {
 		$normalizedUsername = $this->normalizeUsername($username);
-		if (isset($this->createdUsers[$normalizedUsername]['displayname'])) {
-			$displayName = (string) $this->createdUsers[$normalizedUsername]['displayname'];
+		$users = $this->getAllCreatedUsers();
+		if (isset($users[$normalizedUsername]['displayname'])) {
+			$displayName = (string) $users[$normalizedUsername]['displayname'];
 			if ($displayName !== '') {
 				return $displayName;
 			}
@@ -124,7 +132,7 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function getAttributeOfCreatedUser(string $user, string $attribute) {
-		$usersList = $this->getCreatedUsers();
+		$usersList = $this->getAllCreatedUsers();
 		$normalizedUsername = $this->normalizeUsername($user);
 		if (\array_key_exists($normalizedUsername, $usersList)) {
 			if (\array_key_exists($attribute, $usersList[$normalizedUsername])) {
@@ -1118,6 +1126,7 @@ trait Provisioning {
 			// See comment above about the LOCAL case. The logic is the same for the remote case.
 			if ($shouldExist || !\array_key_exists($normalizedUsername, $this->createdRemoteUsers)) {
 				$this->createdRemoteUsers[$normalizedUsername] = $userData;
+				$this->createdUsers[$normalizedUsername] = $userData;
 			}
 		}
 	}

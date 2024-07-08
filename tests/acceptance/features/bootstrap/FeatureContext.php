@@ -2250,6 +2250,14 @@ class FeatureContext extends BehatVariablesContext {
 					"getTusResourceLocation"
 				],
 				"parameter" => []
+			],
+			[
+				"code" => "%fed_invitation_token_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getUUIDv4Regex"
+				],
+				"parameter" => []
 			]
 		];
 		if ($user !== null) {
