@@ -1913,7 +1913,7 @@ github.com/xrash/smetrics
 # github.com/yashtewari/glob-intersection v0.2.0
 ## explicit; go 1.17
 github.com/yashtewari/glob-intersection
-# go-micro.dev/v4 v4.10.2
+# go-micro.dev/v4 v4.11.0
 ## explicit; go 1.18
 go-micro.dev/v4
 go-micro.dev/v4/api
