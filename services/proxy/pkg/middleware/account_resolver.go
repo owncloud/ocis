@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/jellydator/ttlcache/v3"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 
@@ -19,6 +21,12 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 	options := newOptions(optionSetters...)
 	logger := options.Logger
 
+	lastGroupSyncCache := ttlcache.New(
+		ttlcache.WithTTL[string, struct{}](5*time.Minute),
+		ttlcache.WithDisableTouchOnHit[string, struct{}](),
+	)
+	go lastGroupSyncCache.Start()
+
 	return func(next http.Handler) http.Handler {
 		return &accountResolver{
 			next:                  next,
@@ -28,6 +36,7 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 			userCS3Claim:          options.UserCS3Claim,
 			userRoleAssigner:      options.UserRoleAssigner,
 			autoProvisionAccounts: options.AutoprovisionAccounts,
+			lastGroupSyncCache:    lastGroupSyncCache,
 		}
 	}
 }
@@ -40,6 +49,10 @@ type accountResolver struct {
 	autoProvisionAccounts bool
 	userOIDCClaim         string
 	userCS3Claim          string
+	// lastGroupSyncCache is used to keep track of when the last sync of group
+	// memberships was done for a specific user. This is used to trigger a sync
+	// with every single request.
+	lastGroupSyncCache *ttlcache.Cache[string, struct{}]
 }
 
 func readUserIDClaim(path string, claims map[string]interface{}) (string, error) {
@@ -139,6 +152,15 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				m.logger.Error().Err(err).Str("userid", user.GetId().GetOpaqueId()).Interface("claims", claims).Msg("Failed to update autoprovisioned user")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
+			}
+			// Only	sync group memberships if the user has not been synced since the last cache invalidation
+			if !m.lastGroupSyncCache.Has(user.GetId().GetOpaqueId()) {
+				if err = m.userProvider.SyncGroupMemberships(req.Context(), user, claims); err != nil {
+					m.logger.Error().Err(err).Str("userid", user.GetId().GetOpaqueId()).Interface("claims", claims).Msg("Failed to sync group memberships for autoprovisioned user")
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				m.lastGroupSyncCache.Set(user.GetId().GetOpaqueId(), struct{}{}, ttlcache.DefaultTTL)
 			}
 		}
 
