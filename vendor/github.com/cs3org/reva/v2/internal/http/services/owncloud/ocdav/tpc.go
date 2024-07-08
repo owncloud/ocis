@@ -129,7 +129,7 @@ func (s *svc) handleTPCPull(ctx context.Context, w http.ResponseWriter, r *http.
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Overwrite header is set to incorrect value %v", overwrite)
 		sublog.Warn().Msgf("HTTP TPC Pull: %s", m)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -293,7 +293,7 @@ func (s *svc) handleTPCPush(ctx context.Context, w http.ResponseWriter, r *http.
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Overwrite header is set to incorrect value %v", overwrite)
 		sublog.Warn().Msgf("HTTP TPC Push: %s", m)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}

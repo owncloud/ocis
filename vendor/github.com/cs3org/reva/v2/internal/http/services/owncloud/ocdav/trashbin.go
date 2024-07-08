@@ -91,7 +91,7 @@ func (h *TrashbinHandler) Handler(s *svc) http.Handler {
 			// listing other users trash is forbidden, no auth will change that
 			// do not leak existence of space and return 404
 			w.WriteHeader(http.StatusNotFound)
-			b, err := errors.Marshal(http.StatusNotFound, "not found", "")
+			b, err := errors.Marshal(http.StatusNotFound, "not found", "", "")
 			if err != nil {
 				log.Error().Msgf("error marshaling xml response: %s", b)
 				w.WriteHeader(http.StatusInternalServerError)
@@ -110,7 +110,7 @@ func (h *TrashbinHandler) Handler(s *svc) http.Handler {
 		ns, newPath, err := s.ApplyLayout(ctx, h.namespace, useLoggedInUser, r.URL.Path)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
-			b, err := errors.Marshal(http.StatusNotFound, fmt.Sprintf("could not get storage for %s", r.URL.Path), "")
+			b, err := errors.Marshal(http.StatusNotFound, fmt.Sprintf("could not get storage for %s", r.URL.Path), "", "")
 			errors.HandleWebdavError(appctx.GetLogger(r.Context()), w, b, err)
 		}
 		r.URL.Path = newPath
@@ -125,7 +125,7 @@ func (h *TrashbinHandler) Handler(s *svc) http.Handler {
 		case rpcstatus.Code != rpc.Code_CODE_OK:
 			httpStatus := rstatus.HTTPStatusFromCode(rpcstatus.Code)
 			w.WriteHeader(httpStatus)
-			b, err := errors.Marshal(httpStatus, rpcstatus.Message, "")
+			b, err := errors.Marshal(httpStatus, rpcstatus.Message, "", "")
 			errors.HandleWebdavError(log, w, b, err)
 			return
 		}
@@ -165,7 +165,7 @@ func (h *TrashbinHandler) Handler(s *svc) http.Handler {
 			if rpcstatus.Code != rpc.Code_CODE_OK {
 				httpStatus := rstatus.HTTPStatusFromCode(rpcstatus.Code)
 				w.WriteHeader(httpStatus)
-				b, err := errors.Marshal(httpStatus, rpcstatus.Message, "")
+				b, err := errors.Marshal(httpStatus, rpcstatus.Message, "", "")
 				errors.HandleWebdavError(log, w, b, err)
 				return
 			}
@@ -196,7 +196,7 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 		sublog.Debug().Str("depth", dh).Msg(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -208,7 +208,7 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 		sublog.Debug().Str("depth", dh).Msg(errors.ErrInvalidDepth.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -256,7 +256,7 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 	if getRecycleRes.Status.Code != rpc.Code_CODE_OK {
 		httpStatus := rstatus.HTTPStatusFromCode(getRecycleRes.Status.Code)
 		w.WriteHeader(httpStatus)
-		b, err := errors.Marshal(httpStatus, getRecycleRes.Status.Message, "")
+		b, err := errors.Marshal(httpStatus, getRecycleRes.Status.Message, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -286,7 +286,7 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 			if getRecycleRes.Status.Code != rpc.Code_CODE_OK {
 				httpStatus := rstatus.HTTPStatusFromCode(getRecycleRes.Status.Code)
 				w.WriteHeader(httpStatus)
-				b, err := errors.Marshal(httpStatus, getRecycleRes.Status.Message, "")
+				b, err := errors.Marshal(httpStatus, getRecycleRes.Status.Message, "", "")
 				errors.HandleWebdavError(&sublog, w, b, err)
 				return
 			}
@@ -544,6 +544,7 @@ func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc
 				http.StatusPreconditionFailed,
 				"The destination node already exists, and the overwrite header is set to false",
 				net.HeaderOverwrite,
+				"",
 			)
 			errors.HandleWebdavError(&sublog, w, b, err)
 			return
@@ -579,7 +580,7 @@ func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc
 	if res.Status.Code != rpc.Code_CODE_OK {
 		if res.Status.Code == rpc.Code_CODE_PERMISSION_DENIED {
 			w.WriteHeader(http.StatusForbidden)
-			b, err := errors.Marshal(http.StatusForbidden, "Permission denied to restore", "")
+			b, err := errors.Marshal(http.StatusForbidden, "Permission denied to restore", "", "")
 			errors.HandleWebdavError(&sublog, w, b, err)
 		}
 		errors.HandleErrorStatus(&sublog, w, res.Status)
@@ -638,7 +639,7 @@ func (h *TrashbinHandler) delete(w http.ResponseWriter, r *http.Request, s *svc,
 		sublog.Debug().Interface("status", res.Status).Msg("resource not found")
 		w.WriteHeader(http.StatusConflict)
 		m := fmt.Sprintf("path %s not found", trashPath)
-		b, err := errors.Marshal(http.StatusConflict, m, "")
+		b, err := errors.Marshal(http.StatusConflict, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 	case rpc.Code_CODE_PERMISSION_DENIED:
 		w.WriteHeader(http.StatusForbidden)
@@ -648,7 +649,7 @@ func (h *TrashbinHandler) delete(w http.ResponseWriter, r *http.Request, s *svc,
 		} else {
 			m = "Permission denied to delete"
 		}
-		b, err := errors.Marshal(http.StatusForbidden, m, "")
+		b, err := errors.Marshal(http.StatusForbidden, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 	default:
 		errors.HandleErrorStatus(&sublog, w, res.Status)

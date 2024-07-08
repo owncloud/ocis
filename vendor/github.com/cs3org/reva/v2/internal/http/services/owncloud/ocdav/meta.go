@@ -68,7 +68,7 @@ func (h *MetaHandler) Handler(s *svc) http.Handler {
 			logger.Debug().Str("prop", net.PropOcMetaPathForUser).Msg("invalid resource id")
 			w.WriteHeader(http.StatusBadRequest)
 			m := fmt.Sprintf("Invalid resource id %v", id)
-			b, err := errors.Marshal(http.StatusBadRequest, m, "")
+			b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 			errors.HandleWebdavError(logger, w, b, err)
 			return
 		}
@@ -139,7 +139,7 @@ func (h *MetaHandler) handlePathForUser(w http.ResponseWriter, r *http.Request, 
 		sublog.Debug().Str("code", string(pathRes.Status.Code)).Msg("resource not found")
 		w.WriteHeader(http.StatusNotFound)
 		m := fmt.Sprintf("Resource %s not found", id)
-		b, err := errors.Marshal(http.StatusNotFound, m, "")
+		b, err := errors.Marshal(http.StatusNotFound, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	case rpc.Code_CODE_PERMISSION_DENIED:
@@ -147,7 +147,7 @@ func (h *MetaHandler) handlePathForUser(w http.ResponseWriter, r *http.Request, 
 		sublog.Debug().Str("code", string(pathRes.Status.Code)).Msg("resource access denied")
 		w.WriteHeader(http.StatusNotFound)
 		m := fmt.Sprintf("Resource %s not found", id)
-		b, err := errors.Marshal(http.StatusNotFound, m, "")
+		b, err := errors.Marshal(http.StatusNotFound, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}

@@ -243,7 +243,7 @@ func (p *Handler) HandlePathPropfind(w http.ResponseWriter, r *http.Request, ns 
 		sublog.Debug().Str("depth", dh).Msg(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -255,7 +255,7 @@ func (p *Handler) HandlePathPropfind(w http.ResponseWriter, r *http.Request, ns 
 		sublog.Debug().Str("depth", dh).Msg(errors.ErrInvalidDepth.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -312,7 +312,7 @@ func (p *Handler) HandleSpacesPropfind(w http.ResponseWriter, r *http.Request, s
 		sublog.Debug().Str("depth", dh).Msg(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -324,7 +324,7 @@ func (p *Handler) HandleSpacesPropfind(w http.ResponseWriter, r *http.Request, s
 		sublog.Debug().Str("depth", dh).Msg(errors.ErrInvalidDepth.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -341,7 +341,7 @@ func (p *Handler) HandleSpacesPropfind(w http.ResponseWriter, r *http.Request, s
 		sublog.Debug().Msg("invalid space id")
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid space id: %v", spaceID)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "")
+		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -391,7 +391,7 @@ func (p *Handler) HandleSpacesPropfind(w http.ResponseWriter, r *http.Request, s
 			m = "Resource not found" // mimic the oc10 error message
 		}
 		w.WriteHeader(status)
-		b, err := errors.Marshal(status, m, "")
+		b, err := errors.Marshal(status, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
@@ -618,7 +618,7 @@ func (p *Handler) getResourceInfos(ctx context.Context, w http.ResponseWriter, r
 		// TODO if we have children invent node on the fly
 		w.WriteHeader(http.StatusNotFound)
 		m := "Resource not found"
-		b, err := errors.Marshal(http.StatusNotFound, m, "")
+		b, err := errors.Marshal(http.StatusNotFound, m, "", "")
 		errors.HandleWebdavError(&log, w, b, err)
 		return nil, false, false
 	}
