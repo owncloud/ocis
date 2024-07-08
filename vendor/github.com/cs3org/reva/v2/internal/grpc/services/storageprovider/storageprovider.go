@@ -1276,7 +1276,10 @@ func getFS(c *config) (storage.FS, error) {
 	}
 
 	if f, ok := registry.NewFuncs[c.Driver]; ok {
-		return f(c.Drivers[c.Driver], evstream)
+		driverConf := c.Drivers[c.Driver]
+		driverConf["mount_id"] = c.MountID // pass the mount id to the driver
+
+		return f(driverConf, evstream)
 	}
 
 	return nil, errtypes.NotFound("driver not found: " + c.Driver)

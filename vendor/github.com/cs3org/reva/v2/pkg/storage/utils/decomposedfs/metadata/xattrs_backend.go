@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/filelocks"
 	"github.com/pkg/errors"
 	"github.com/pkg/xattr"
@@ -33,7 +34,17 @@ import (
 )
 
 // XattrsBackend stores the file attributes in extended attributes
-type XattrsBackend struct{}
+type XattrsBackend struct {
+	rootPath  string
+	metaCache cache.FileMetadataCache
+}
+
+// NewMessageBackend returns a new XattrsBackend instance
+func NewXattrsBackend(rootPath string, o cache.Config) XattrsBackend {
+	return XattrsBackend{
+		metaCache: cache.GetFileMetadataCache(o),
+	}
+}
 
 // Name returns the name of the backend
 func (XattrsBackend) Name() string { return "xattrs" }
@@ -41,8 +52,14 @@ func (XattrsBackend) Name() string { return "xattrs" }
 // Get an extended attribute value for the given key
 // No file locking is involved here as reading a single xattr is
 // considered to be atomic.
-func (b XattrsBackend) Get(ctx context.Context, filePath, key string) ([]byte, error) {
-	return xattr.Get(filePath, key)
+func (b XattrsBackend) Get(ctx context.Context, path, key string) ([]byte, error) {
+	attribs := map[string][]byte{}
+	err := b.metaCache.PullFromCache(b.cacheKey(path), &attribs)
+	if err == nil && len(attribs[key]) > 0 {
+		return attribs[key], err
+	}
+
+	return xattr.Get(path, key)
 }
 
 // GetInt64 reads a string as int64 from the xattrs
@@ -77,11 +94,27 @@ func (XattrsBackend) List(ctx context.Context, filePath string) (attribs []strin
 
 // All reads all extended attributes for a node, protected by a
 // shared file lock
-func (b XattrsBackend) All(ctx context.Context, filePath string) (attribs map[string][]byte, err error) {
-	attrNames, err := b.List(ctx, filePath)
+func (b XattrsBackend) All(ctx context.Context, path string) (map[string][]byte, error) {
+	return b.getAll(ctx, path, false)
+}
 
+func (b XattrsBackend) getAll(ctx context.Context, path string, skipCache bool) (map[string][]byte, error) {
+	attribs := map[string][]byte{}
+
+	if !skipCache {
+		err := b.metaCache.PullFromCache(b.cacheKey(path), &attribs)
+		if err == nil {
+			return attribs, err
+		}
+	}
+
+	attrNames, err := b.List(ctx, path)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(attrNames) == 0 {
+		return attribs, nil
 	}
 
 	var (
@@ -93,7 +126,7 @@ func (b XattrsBackend) All(ctx context.Context, filePath string) (attribs map[st
 	attribs = make(map[string][]byte, len(attrNames))
 	for _, name := range attrNames {
 		var val []byte
-		if val, xerr = xattr.Get(filePath, name); xerr != nil {
+		if val, xerr = xattr.Get(path, name); xerr != nil && !IsAttrUnset(xerr) {
 			xerrs++
 		} else {
 			attribs[name] = val
@@ -101,10 +134,15 @@ func (b XattrsBackend) All(ctx context.Context, filePath string) (attribs map[st
 	}
 
 	if xerrs > 0 {
-		err = errors.Wrap(xerr, "Failed to read all xattrs")
+		return nil, errors.Wrap(xerr, "Failed to read all xattrs")
 	}
 
-	return attribs, err
+	err = b.metaCache.PushToCache(b.cacheKey(path), attribs)
+	if err != nil {
+		return nil, err
+	}
+
+	return attribs, nil
 }
 
 // Set sets one attribute for the given path
@@ -142,30 +180,55 @@ func (b XattrsBackend) SetMultiple(ctx context.Context, path string, attribs map
 		return errors.Wrap(xerr, "Failed to set all xattrs")
 	}
 
-	return nil
+	attribs, err = b.getAll(ctx, path, true)
+	if err != nil {
+		return err
+	}
+	return b.metaCache.PushToCache(b.cacheKey(path), attribs)
 }
 
 // Remove an extended attribute key
-func (XattrsBackend) Remove(ctx context.Context, filePath string, key string, acquireLock bool) (err error) {
+func (b XattrsBackend) Remove(ctx context.Context, path string, key string, acquireLock bool) error {
 	if acquireLock {
-		lockedFile, err := lockedfile.OpenFile(filePath+filelocks.LockFileSuffix, os.O_CREATE|os.O_WRONLY, 0600)
+		lockedFile, err := lockedfile.OpenFile(path+filelocks.LockFileSuffix, os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
 			return err
 		}
 		defer cleanupLockfile(lockedFile)
 	}
 
-	return xattr.Remove(filePath, key)
+	err := xattr.Remove(path, key)
+	if err != nil {
+		return err
+	}
+
+	attribs, err := b.getAll(ctx, path, true)
+	if err != nil {
+		return err
+	}
+	return b.metaCache.PushToCache(b.cacheKey(path), attribs)
 }
 
 // IsMetaFile returns whether the given path represents a meta file
 func (XattrsBackend) IsMetaFile(path string) bool { return strings.HasSuffix(path, ".meta.lock") }
 
 // Purge purges the data of a given path
-func (XattrsBackend) Purge(path string) error { return nil }
+func (b XattrsBackend) Purge(path string) error {
+	return b.metaCache.RemoveMetadata(b.cacheKey(path))
+}
 
 // Rename moves the data for a given path to a new path
-func (XattrsBackend) Rename(oldPath, newPath string) error { return nil }
+func (b XattrsBackend) Rename(oldPath, newPath string) error {
+	data := map[string][]byte{}
+	err := b.metaCache.PullFromCache(b.cacheKey(oldPath), &data)
+	if err == nil {
+		err = b.metaCache.PushToCache(b.cacheKey(newPath), data)
+		if err != nil {
+			return err
+		}
+	}
+	return b.metaCache.RemoveMetadata(b.cacheKey(oldPath))
+}
 
 // MetadataPath returns the path of the file holding the metadata for the given path
 func (XattrsBackend) MetadataPath(path string) string { return path }
@@ -198,4 +261,11 @@ func cleanupLockfile(f *lockedfile.File) {
 // The path argument is used for storing the data in the cache
 func (b XattrsBackend) AllWithLockedSource(ctx context.Context, path string, _ io.Reader) (map[string][]byte, error) {
 	return b.All(ctx, path)
+}
+
+func (b XattrsBackend) cacheKey(path string) string {
+	// rootPath is guaranteed to have no trailing slash
+	// the cache key shouldn't begin with a slash as some stores drop it which can cause
+	// confusion
+	return strings.TrimPrefix(path, b.rootPath+"/")
 }

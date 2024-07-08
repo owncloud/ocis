@@ -32,6 +32,7 @@ func (iw *InotifyWatcher) Watch(path string) {
 				inotifywaitgo.CREATE,
 				inotifywaitgo.MOVED_TO,
 				inotifywaitgo.CLOSE_WRITE,
+				inotifywaitgo.DELETE,
 			},
 			Monitor: true,
 		},
@@ -46,12 +47,13 @@ func (iw *InotifyWatcher) Watch(path string) {
 					continue
 				}
 				switch e {
+				case inotifywaitgo.DELETE:
+					go func() { _ = iw.tree.HandleFileDelete(event.Filename) }()
 				case inotifywaitgo.CREATE:
 					go func() { _ = iw.tree.Scan(event.Filename, false) }()
 				case inotifywaitgo.MOVED_TO:
 					go func() {
 						_ = iw.tree.Scan(event.Filename, true)
-						_ = iw.tree.WarmupIDCache(event.Filename, false)
 					}()
 				case inotifywaitgo.CLOSE_WRITE:
 					go func() { _ = iw.tree.Scan(event.Filename, true) }()
