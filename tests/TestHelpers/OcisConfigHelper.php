@@ -40,7 +40,7 @@ class OcisConfigHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	private static function sendRequest(
+	public static function sendRequest(
 		string $url,
 		string $method,
 		?string $body = ""
@@ -54,10 +54,18 @@ class OcisConfigHelper {
 		);
 
 		try {
-			return $client->send($request);
+			$response = $client->send($request);
 		} catch (ConnectException $e) {
 			throw new \Error("Cannot connect to the ociswrapper at the moment, make sure that ociswrapper is running before proceeding with the test run.\n" . $e->getMessage());
+		} catch (GuzzleException $ex) {
+			$response = $ex->getResponse();
+
+			if ($response === null) {
+				throw $ex;
+			}
 		}
+
+		return $response;
 	}
 
 	/**
@@ -89,5 +97,23 @@ class OcisConfigHelper {
 	public static function rollbackOcis(): ResponseInterface {
 		$url = self::getWrapperUrl() . "/rollback";
 		return self::sendRequest($url, "DELETE");
+	}
+
+	/**
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function stopOcis(): ResponseInterface {
+		$url = self::getWrapperUrl() . "/stop";
+		return self::sendRequest($url, "POST");
+	}
+
+	/**
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function startOcis(): ResponseInterface {
+		$url = self::getWrapperUrl() . "/start";
+		return self::sendRequest($url, "POST");
 	}
 }
