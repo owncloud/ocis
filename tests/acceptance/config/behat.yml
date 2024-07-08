@@ -294,6 +294,7 @@ default:
         - TUSContext:
         - OcisConfigContext:
         - SharingNgContext:
+        - WebDavPropertiesContext:
 
     apiReshare:
       paths:
