@@ -368,9 +368,9 @@ default:
         - SharingNgContext:
         - SpacesContext:
 
-    cliResetPassword:
+    cliCommands:
       paths:
-        - "%paths.base%/../features/cliResetPassword"
+        - "%paths.base%/../features/cliCommands"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
