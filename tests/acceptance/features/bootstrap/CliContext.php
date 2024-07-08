@@ -45,7 +45,7 @@ class CliContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
-    }
+	}
 
 	/**
 	 * @Given the administrator has stopped the server
@@ -53,7 +53,7 @@ class CliContext implements Context {
 	 * @return void
 	 */
 	public function theAdministratorHasStoppedTheServer(): void {
-        $response = OcisConfigHelper::stopOcis();
+		$response = OcisConfigHelper::stopOcis();
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
@@ -63,7 +63,7 @@ class CliContext implements Context {
 	 * @return void
 	 */
 	public function theAdministratorHasStartedTheServer(): void {
-        $response = OcisConfigHelper::startOcis();
+		$response = OcisConfigHelper::startOcis();
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
@@ -76,13 +76,13 @@ class CliContext implements Context {
 	 * @return void
 	 */
 	public function theAdministratorResetsThePasswordOfUserUsingTheCLI(string $user, string $password): void {
-        $command = "idm resetpassword -u $user";
-        $body = [
-            "command" => $command,
-            "inputs" => [$password, $password]
-        ];
+		$command = "idm resetpassword -u $user";
+		$body = [
+			"command" => $command,
+			"inputs" => [$password, $password]
+		];
 
-        $this->featureContext->setResponse(CliHelper::runCommand($body));
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
 		$this->featureContext->updateUserPassword($user, $password);
 	}
 
@@ -92,24 +92,25 @@ class CliContext implements Context {
 	 * @return void
 	 */
 	public function theCommandShouldBeSuccessful(): void {
-        $response = $this->featureContext->getResponse();
+		$response = $this->featureContext->getResponse();
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 
 		$jsonResponse = $this->featureContext->getJsonDecodedResponse($response);
 
-        Assert::assertSame("OK", $jsonResponse["status"]);
-        Assert::assertSame(0, $jsonResponse["exitCode"], "Expected exit code to be 0, but got " . $jsonResponse["exitCode"]);
+		Assert::assertSame("OK", $jsonResponse["status"]);
+		Assert::assertSame(0, $jsonResponse["exitCode"], "Expected exit code to be 0, but got " . $jsonResponse["exitCode"]);
 	}
 
 	/**
 	 * @Then /^the command output (should|should not) contain "([^"]*)"$/
 	 *
+	 * @param string $shouldOrNot
 	 * @param string $output
 	 *
 	 * @return void
 	 */
-	public function theCommandOutputShouldContain(string $shouldOrNot,string $output): void {
-        $response = $this->featureContext->getResponse();
+	public function theCommandOutputShouldContain(string $shouldOrNot, string $output): void {
+		$response = $this->featureContext->getResponse();
 		$jsonResponse = $this->featureContext->getJsonDecodedResponse($response);
 
 		if ($shouldOrNot === "should") {

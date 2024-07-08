@@ -672,7 +672,6 @@ class FeatureContext extends BehatVariablesContext {
 		$this->theHTTPStatusCodeShouldBe([200, 409], 'Starting oCIS server', $response);
 	}
 
-
 	/**
 	 * Get the externally-defined admin username, if any
 	 *

@@ -32,15 +32,14 @@ use TestHelpers\OcisConfigHelper;
  * A helper class for running oCIS CLI commands
  */
 class CliHelper {
-
 	/**
 	 * @param array $body
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-    public static function runCommand(array $body): ResponseInterface {
+	public static function runCommand(array $body): ResponseInterface {
 		$url = OcisConfigHelper::getWrapperUrl() . "/command";
 		return OcisConfigHelper::sendRequest($url, "POST", \json_encode($body));
-    }
+	}
 }

@@ -266,5 +266,8 @@ func RunCommand(command string, inputs []string) (int, string) {
 	io.Copy(logs, ptyF)
 	cmdOutput += logs.String()
 
+	// TODO: find if there is a better way to remove stdins from the output
+	cmdOutput = strings.TrimLeft(cmdOutput, strings.Join(inputs, "\r\n"))
+
 	return c.ProcessState.ExitCode(), cmdOutput
 }
