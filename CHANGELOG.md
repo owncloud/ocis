@@ -61,6 +61,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Configurable OCM timeouts: [#9450](https://github.com/owncloud/ocis/pull/9450)
 * Enhancement - Deprecate gateway environment variables: [#9451](https://github.com/owncloud/ocis/pull/9451)
 * Enhancement - Allow reindexing all spaces: [#9456](https://github.com/owncloud/ocis/pull/9456)
+* Enhancement - Autoprovision group memberships: [#9458](https://github.com/owncloud/ocis/pull/9458)
 * Enhancement - Allow disable versioning: [#9473](https://github.com/owncloud/ocis/pull/9473)
 * Enhancement - Bump reva: [#9473](https://github.com/owncloud/ocis/pull/9473)
 * Enhancement - Empty trash directories: [#9483](https://github.com/owncloud/ocis/pull/9483)
@@ -170,6 +171,14 @@ The following sections list the changes for unreleased.
    reindexing all spaces at once.
 
    https://github.com/owncloud/ocis/pull/9456
+
+* Enhancement - Autoprovision group memberships: [#9458](https://github.com/owncloud/ocis/pull/9458)
+
+   When PROXY_AUTOPROVISION_ACCOUNTS is enabled it is now possible to automatically
+   maintain the group memberships of users via a configurable OIDC claim.
+
+   https://github.com/owncloud/ocis/issues/5538
+   https://github.com/owncloud/ocis/pull/9458
 
 * Enhancement - Allow disable versioning: [#9473](https://github.com/owncloud/ocis/pull/9473)
 
