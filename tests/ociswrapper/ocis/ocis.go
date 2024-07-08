@@ -230,13 +230,14 @@ func waitUntilCompleteShutdown() (bool, string) {
 	return true, "oCIS server stopped successfully"
 }
 
-func RunCommand(command string) (int, string) {
+func RunCommand(command string, inputs []string) (int, string) {
 	logs := new(strings.Builder)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	// build the command
-	c := exec.CommandContext(ctx, config.Get("bin"), "idm", "resetpassword", "-u", "admin")
+	cmdArgs := strings.Split(command, " ")
+	c := exec.CommandContext(ctx, config.Get("bin"), cmdArgs...)
 
 	// Start the command with a pty (pseudo terminal)
 	// This is required to interact with the command
@@ -246,7 +247,6 @@ func RunCommand(command string) (int, string) {
 	}
 	defer ptyF.Close()
 
-	inputs := []string{"demo", "demo"}
 	for _, input := range inputs {
 		fmt.Fprintf(ptyF, "%s\n", input)
 	}

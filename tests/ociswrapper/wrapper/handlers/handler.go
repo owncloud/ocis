@@ -33,16 +33,15 @@ func parseJsonBody(reqBody io.ReadCloser) (map[string]any, error) {
 	return bodyMap, nil
 }
 
-func sendResponse(res http.ResponseWriter, success bool, message string) {
+func sendResponse(res http.ResponseWriter, statusCode int, message string) {
 	res.Header().Set("Content-Type", "application/json")
+	res.WriteHeader(statusCode)
 
 	var status string
-	if success {
+	if statusCode == http.StatusOK {
 		status = "OK"
-		res.WriteHeader(http.StatusOK)
 	} else {
 		status = "ERROR"
-		res.WriteHeader(http.StatusInternalServerError)
 	}
 
 	resBody := BasicResponse{
@@ -77,13 +76,13 @@ func sendCmdResponse(res http.ResponseWriter, exitCode int, message string) {
 
 func SetEnvHandler(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPut {
-		http.Error(res, "Method not allowed", http.StatusMethodNotAllowed)
+		sendResponse(res, http.StatusMethodNotAllowed, "")
 		return
 	}
 
 	envBody, err := parseJsonBody(req.Body)
 	if err != nil {
-		http.Error(res, "Bad request", http.StatusBadRequest)
+		sendResponse(res, http.StatusMethodNotAllowed, "Invalid json body")
 		return
 	}
 
@@ -98,16 +97,17 @@ func SetEnvHandler(res http.ResponseWriter, req *http.Request) {
 	success, _ := ocis.Restart(ocis.EnvConfigs)
 	if success {
 		message = "oCIS configured successfully"
-	} else {
-		message = "Failed to restart oCIS with new configuration"
+		sendResponse(res, http.StatusOK, message)
+		return
 	}
 
-	sendResponse(res, success, message)
+	message = "Failed to restart oCIS with new configuration"
+	sendResponse(res, http.StatusInternalServerError, message)
 }
 
 func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodDelete {
-		http.Error(res, "Method not allowed", http.StatusMethodNotAllowed)
+		sendResponse(res, http.StatusMethodNotAllowed, "")
 		return
 	}
 
@@ -116,31 +116,37 @@ func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 	success, _ := ocis.Restart(os.Environ())
 	if success {
 		message = "oCIS configuration rolled back successfully"
-	} else {
-		message = "Failed to restart oCIS with initial configuration"
+		sendResponse(res, http.StatusOK, message)
+		return
 	}
 
-	sendResponse(res, success, message)
+	message = "Failed to restart oCIS with initial configuration"
+	sendResponse(res, http.StatusInternalServerError, message)
 }
 
 func StopOcisHandler(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
-		http.Error(res, "Method not allowed", http.StatusMethodNotAllowed)
+		sendResponse(res, http.StatusMethodNotAllowed, "")
 		return
 	}
 
 	success, message := ocis.Stop()
-	sendResponse(res, success, message)
+	if success {
+		sendResponse(res, http.StatusOK, message)
+		return
+	}
+
+	sendResponse(res, http.StatusInternalServerError, message)
 }
 
 func StartOcisHandler(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
-		http.Error(res, "Method not allowed", http.StatusMethodNotAllowed)
+		sendResponse(res, http.StatusMethodNotAllowed, "")
 		return
 	}
 
 	if ocis.IsOcisRunning() {
-		sendResponse(res, false, "oCIS server is already running")
+		sendResponse(res, http.StatusInternalServerError, "oCIS server is already running")
 		return
 	}
 
@@ -148,27 +154,51 @@ func StartOcisHandler(res http.ResponseWriter, req *http.Request) {
 	go ocis.Start(nil)
 
 	success, message := ocis.WaitForConnection()
-	sendResponse(res, success, message)
+	if success {
+		sendResponse(res, http.StatusOK, message)
+		return
+	}
+
+	sendResponse(res, http.StatusInternalServerError, message)
 }
 
 func CommandHandler(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
-		http.Error(res, "Method not allowed", http.StatusMethodNotAllowed)
+		sendResponse(res, http.StatusMethodNotAllowed, "")
 		return
 	}
 
 	if req.Body == nil {
-		http.Error(res, "Bad request", http.StatusBadRequest)
+		sendResponse(res, http.StatusBadRequest, "Body is missing")
 		return
 	}
 
-	body, err := io.ReadAll(req.Body)
+	body, err := parseJsonBody(req.Body)
 	if err != nil {
-		http.Error(res, "Bad request", http.StatusBadRequest)
+		sendResponse(res, http.StatusBadRequest, "Invalid json body")
+		return
+	}
+	if _, ok := body["command"]; !ok {
+		sendResponse(res, http.StatusBadRequest, "Command is missing")
 		return
 	}
 
-	exitCode, output := ocis.RunCommand(string(body))
+	command := body["command"].(string)
 
+	stdIn := []string{}
+	if _, ok := body["inputs"]; ok {
+		if inputs, ok := body["inputs"].([]interface{}); ok {
+			for _, input := range inputs {
+				if _, ok := input.(string); ok {
+					stdIn = append(stdIn, input.(string))
+				} else {
+					sendResponse(res, http.StatusBadRequest, "Invalid input data. Expected string")
+					return
+				}
+			}
+		}
+	}
+
+	exitCode, output := ocis.RunCommand(command, stdIn)
 	sendCmdResponse(res, exitCode, output)
 }
