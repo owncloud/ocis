@@ -43,6 +43,7 @@ use TestHelpers\OcisHelper;
 use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\SettingsHelper;
+use TestHelpers\OcisConfigHelper;
 
 require_once 'bootstrap.php';
 
@@ -654,6 +655,23 @@ class FeatureContext extends BehatVariablesContext {
 		$logMessage = "\t### $step\n";
 		HttpLogger::writeLog(HttpLogger::getScenarioLogPath(), $logMessage);
 	}
+
+	/**
+	 * FIRST AfterScenario HOOK
+	 *
+	 * NOTE: This method is called after each scenario having the @env-config tag
+	 * This ensures that the server is running for clean-up purposes
+	 *
+	 * @AfterScenario @env-config
+	 *
+	 * @return void
+	 */
+	public function startOcisServer(): void {
+		$response = OcisConfigHelper::startOcis();
+		// 409 is returned if the server is already running
+		$this->theHTTPStatusCodeShouldBe([200, 409], 'Starting oCIS server', $response);
+	}
+
 
 	/**
 	 * Get the externally-defined admin username, if any
@@ -1693,6 +1711,24 @@ class FeatureContext extends BehatVariablesContext {
 		// The user has not been created yet and is not one of the pre-known
 		// users. So let the caller have the default password.
 		return (string)$this->getActualPassword($this->regularUserPassword);
+	}
+
+	/**
+	 * @param string $username
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function updateUserPassword(string $username, string $password): void {
+		$username = $this->normalizeUsername($username);
+		if ($username === $this->getAdminUsername()) {
+			$this->adminPassword = $password;
+		} elseif (\array_key_exists($username, $this->createdUsers)) {
+			$this->createdUsers[$username]['password'] = $password;
+		} else {
+			throw new Exception("User '$username' not found");
+		}
 	}
 
 	/**

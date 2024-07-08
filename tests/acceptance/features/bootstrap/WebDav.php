@@ -443,12 +443,13 @@ trait WebDav {
 	 * @param string $user
 	 * @param string $folder
 	 * @param bool|null $isGivenStep
+	 * @param string|null $password
 	 *
 	 * @return ResponseInterface
 	 * @throws JsonException | GuzzleException
 	 * @throws GuzzleException | JsonException
 	 */
-	public function createFolder(string $user, string $folder, ?bool $isGivenStep = false): ResponseInterface {
+	public function createFolder(string $user, string $folder, ?bool $isGivenStep = false, ?string $password = null): ResponseInterface {
 		$folder = '/' . \ltrim($folder, '/');
 		return $this->makeDavRequest(
 			$user,
@@ -459,7 +460,7 @@ trait WebDav {
 			"files",
 			null,
 			false,
-			null,
+			$password,
 			[],
 			null,
 			$isGivenStep
@@ -3350,6 +3351,31 @@ trait WebDav {
 	}
 
 	/**
+	 * @Then user :user should be able to create folder :destination using password :password
+	 *
+	 * @param string $user
+	 * @param string $destination
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userShouldBeAbleToCreateFolderUsingPassword(string $user, string $destination, string $password):void {
+		$user = $this->getActualUsername($user);
+		$response = $this->createFolder($user, $destination, true, $password);
+		$this->theHTTPStatusCodeShouldBe(
+			["201", "204"],
+			"HTTP status code was not 201 or 204 while trying to create folder '$destination' for user '$user'",
+			$response
+		);
+		$this->checkFileOrFolderExistsForUser(
+			$user,
+			"folder",
+			$destination
+		);
+	}
+
+	/**
 	 * @Then user :user should not be able to create folder :destination
 	 *
 	 * @param string $user
@@ -3369,6 +3395,26 @@ trait WebDav {
 		);
 	}
 
+	/**
+	 * @Then user :user should not be able to create folder :destination using password :password
+	 *
+	 * @param string $user
+	 * @param string $destination
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userShouldNotBeAbleToCreateFolderUsingPassword(string $user, string $destination, string $password):void {
+		$user = $this->getActualUsername($user);
+		$response = $this->createFolder($user, $destination, false, $password);
+		$this->theHTTPStatusCodeShouldBeBetween(400, 499, $response);
+		$this->checkFileOrFolderDoesNotExistsForUser(
+			$user,
+			"folder",
+			$destination
+		);
+	}
 	/**
 	 * Old style chunking upload
 	 *
