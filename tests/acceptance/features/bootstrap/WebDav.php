@@ -883,18 +883,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^the user downloads file "([^"]*)" with range "([^"]*)" using the WebDAV API$/
-	 *
-	 * @param string $fileSource
-	 * @param string $range
-	 *
-	 * @return void
-	 */
-	public function theUserDownloadsFileWithRange(string $fileSource, string $range):void {
-		$this->setResponse($this->downloadFileWithRange($this->currentUser, $fileSource, $range));
-	}
-
-	/**
 	 * @param string $user
 	 * @param string $fileSource
 	 * @param string $range
@@ -1424,44 +1412,6 @@ trait WebDav {
 		$password = $this->getActualPassword($password);
 		$response = $this->downloadFileAsUserUsingPassword($user, $fileName, $password);
 		$this->checkDownloadedContentMatches("$content\n", '', $response);
-	}
-
-	/**
-	 * @Then /^the downloaded content when downloading file "([^"]*)" with range "([^"]*)" should be "([^"]*)"$/
-	 *
-	 * @param string $fileSource
-	 * @param string $range
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function downloadedContentWhenDownloadingWithRangeShouldBe(
-		string $fileSource,
-		string $range,
-		string $content
-	):void {
-		$this->checkDownloadedContentMatches($content);
-	}
-
-	/**
-	 * @Then /^the downloaded content when downloading file "([^"]*)" for user "([^"]*)" with range "([^"]*)" should be "([^"]*)"$/
-	 *
-	 * @param string $fileSource
-	 * @param string $user
-	 * @param string $range
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function downloadedContentWhenDownloadingForUserWithRangeShouldBe(
-		string $fileSource,
-		string $user,
-		string $range,
-		string $content
-	):void {
-		$user = $this->getActualUsername($user);
-		$response = $this->downloadFileWithRange($user, $fileSource, $range);
-		$this->checkDownloadedContentMatches($content, '', $response);
 	}
 
 	/**
