@@ -17,8 +17,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -63,11 +63,11 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow reindexing all spaces: [#9456](https://github.com/owncloud/ocis/pull/9456)
 * Enhancement - Autoprovision group memberships: [#9458](https://github.com/owncloud/ocis/pull/9458)
 * Enhancement - Allow disable versioning: [#9473](https://github.com/owncloud/ocis/pull/9473)
-* Enhancement - Bump reva: [#9473](https://github.com/owncloud/ocis/pull/9473)
 * Enhancement - Empty trash directories: [#9483](https://github.com/owncloud/ocis/pull/9483)
 * Enhancement - Various fixes for the activitylog service: [#9485](https://github.com/owncloud/ocis/pull/9485)
 * Enhancement - Add cli to purge revisions: [#9497](https://github.com/owncloud/ocis/pull/9497)
 * Enhancement - Update web to v9.1.0: [#9547](https://github.com/owncloud/ocis/pull/9547)
+* Enhancement - Bump reva to v2.21.0: [#9556](https://github.com/owncloud/ocis/pull/9556)
 
 ## Details
 
@@ -186,12 +186,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9473
 
-* Enhancement - Bump reva: [#9473](https://github.com/owncloud/ocis/pull/9473)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/9473
-
 * Enhancement - Empty trash directories: [#9483](https://github.com/owncloud/ocis/pull/9483)
 
    We have added a cli-command that allows cleaning up empty directories in the
@@ -239,6 +233,20 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9547
    https://github.com/owncloud/web/releases/tag/v9.1.0
+
+* Enhancement - Bump reva to v2.21.0: [#9556](https://github.com/owncloud/ocis/pull/9556)
+
+  *   Bugfix [cs3org/reva#4740](https://github.com/cs3org/reva/pull/4740): Disallow reserved filenames
+  *   Bugfix [cs3org/reva#4748](https://github.com/cs3org/reva/pull/4748): Quotes in dav Content-Disposition header
+  *   Bugfix [cs3org/reva#4750](https://github.com/cs3org/reva/pull/4750): Validate a space path
+  *   Enhancement [cs3org/reva#4737](https://github.com/cs3org/reva/pull/4737): Add the backchannel logout event
+  *   Enhancement [cs3org/reva#4749](https://github.com/cs3org/reva/pull/4749): DAV error codes
+  *   Enhancement [cs3org/reva#4742](https://github.com/cs3org/reva/pull/4742): Expose disable-versioning configuration option
+  *   Enhancement [cs3org/reva#4739](https://github.com/cs3org/reva/pull/4739): Improve posixfs storage driver
+  *   Enhancement [cs3org/reva#4738](https://github.com/cs3org/reva/pull/4738): Add GetServiceUserToken() method to utils pkg
+
+   https://github.com/owncloud/ocis/pull/9556
+   https://github.com/owncloud/ocis/pull/9473
 
 # Changelog for [6.0.0] (2024-06-19)
 
@@ -8530,7 +8538,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -8704,29 +8712,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -8899,6 +8889,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
