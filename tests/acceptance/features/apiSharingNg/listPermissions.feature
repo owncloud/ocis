@@ -1766,3 +1766,122 @@ Feature: List a sharing permissions
         }
       }
       """
+
+  @issue-8922
+  Scenario: list the permissions of a Personal drive using permissions endpoint
+    When user "Alice" lists the permissions of space "Personal" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues"
+        ],
+        "properties": {
+          "@libre.graph.permissions.actions.allowedValues": {
+            "const": [
+              "libre.graph/driveItem/permissions/create",
+              "libre.graph/driveItem/children/create",
+              "libre.graph/driveItem/standard/delete",
+              "libre.graph/driveItem/path/read",
+              "libre.graph/driveItem/quota/read",
+              "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/upload/create",
+              "libre.graph/driveItem/permissions/read",
+              "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/versions/read",
+              "libre.graph/driveItem/deleted/read",
+              "libre.graph/driveItem/path/update",
+              "libre.graph/driveItem/permissions/delete",
+              "libre.graph/driveItem/deleted/delete",
+              "libre.graph/driveItem/versions/update",
+              "libre.graph/driveItem/deleted/update",
+              "libre.graph/driveItem/basic/read",
+              "libre.graph/driveItem/permissions/update",
+              "libre.graph/driveItem/permissions/deny"
+            ]
+          },
+          "@libre.graph.permissions.roles.allowedValues": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf":  [
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "const": 1
+                    },
+                    "description": {
+                      "const": "View and download."
+                    },
+                    "displayName": {
+                      "const": "Can view"
+                    },
+                    "id": {
+                      "const": "a8d5fe5e-96e3-418d-825b-534dbdf22b99"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "const": 2
+                    },
+                    "description": {
+                      "const": "View, download, upload, edit, add and delete."
+                    },
+                    "displayName": {
+                      "const": "Can edit"
+                    },
+                    "id": {
+                      "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "const": 3
+                    },
+                    "description": {
+                      "const": "View, download, upload, edit, add, delete and manage members."
+                    },
+                    "displayName": {
+                      "const": "Can manage"
+                    },
+                    "id": {
+                      "const": "312c0871-5ef7-4b3a-85b6-0e4074c64049"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
