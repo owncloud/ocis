@@ -113,8 +113,15 @@ func (s *svc) handlePathPut(w http.ResponseWriter, r *http.Request, ns string) {
 	defer span.End()
 
 	fn := path.Join(ns, r.URL.Path)
-
 	sublog := appctx.GetLogger(ctx).With().Str("path", fn).Logger()
+
+	if err := ValidateName(filename(r.URL.Path), s.nameValidators); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "")
+		errors.HandleWebdavError(&sublog, w, b, err)
+		return
+	}
+
 	space, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gatewaySelector, fn)
 	if err != nil {
 		sublog.Error().Err(err).Str("path", fn).Msg("failed to look up storage space")
@@ -135,17 +142,10 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	length, err := getContentLength(w, r)
+	length, err := getContentLength(r)
 	if err != nil {
 		log.Error().Err(err).Msg("error getting the content length")
 		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if err := ValidateName(filepath.Base(ref.Path), s.nameValidators); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "")
-		errors.HandleWebdavError(&log, w, b, err)
 		return
 	}
 
@@ -411,6 +411,13 @@ func (s *svc) handleSpacesPut(w http.ResponseWriter, r *http.Request, spaceID st
 		return
 	}
 
+	if err := ValidateName(filename(ref.Path), s.nameValidators); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "")
+		errors.HandleWebdavError(&sublog, w, b, err)
+		return
+	}
+
 	s.handlePut(ctx, w, r, &ref, sublog)
 }
 
@@ -432,7 +439,7 @@ func checkPreconditions(w http.ResponseWriter, r *http.Request, log zerolog.Logg
 	return true
 }
 
-func getContentLength(w http.ResponseWriter, r *http.Request) (int64, error) {
+func getContentLength(r *http.Request) (int64, error) {
 	length, err := strconv.ParseInt(r.Header.Get(net.HeaderContentLength), 10, 64)
 	if err != nil {
 		// Fallback to Upload-Length

@@ -203,22 +203,22 @@ Feature: create files and folder
     Then the HTTP status code should be "<http-status-code>"
     Examples:
       | dav-path-version | file-name | http-status-code |
-      | old              | /.        | 500              |
+      | old              | /.        | 400              |
       | old              | /..       | 404              |
       | old              | /../lorem | 404              |
-      | old              |           | 500              |
-      | new              | /.        | 500              |
+      | old              |           | 400              |
+      | new              | /.        | 400              |
       | new              | /..       | 405              |
-      | new              | /../lorem | 404              |
-      | new              |           | 500              |
+      | new              | /../lorem | 400              |
+      | new              |           | 400              |
 
     @skipOnRevaMaster
     Examples:
       | dav-path-version | file-name | http-status-code |
-      | spaces           | /.        | 500              |
+      | spaces           | /.        | 400              |
       | spaces           | /..       | 405              |
-      | spaces           | /../lorem | 404              |
-      | spaces           |           | 500              |
+      | spaces           | /../lorem | 400              |
+      | spaces           |           | 400              |
 
 
   Scenario Outline: try to create folder with '.', '..' and 'empty'
@@ -227,14 +227,14 @@ Feature: create files and folder
     Then the HTTP status code should be "<http-status-code>"
     Examples:
       | dav-path-version | folder-name | http-status-code |
-      | old              | /.          | 405              |
+      | old              | /.          | 400              |
       | old              | /..         | 404              |
       | old              | /../lorem   | 404              |
-      | old              |             | 405              |
-      | new              | /.          | 405              |
+      | old              |             | 400              |
+      | new              | /.          | 400              |
       | new              | /..         | 405              |
-      | new              | /../lorem   | 409              |
-      | new              |             | 405              |
+      | new              | /../lorem   | 400              |
+      | new              |             | 400              |
 
     @skipOnRevaMaster
     Examples:

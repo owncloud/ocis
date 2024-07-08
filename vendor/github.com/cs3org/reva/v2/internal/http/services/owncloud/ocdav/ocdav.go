@@ -394,3 +394,8 @@ func (s *svc) referenceIsChildOf(ctx context.Context, selector pool.Selectable[g
 	pp := path.Join(parentPathRes.Path, parent.Path) + "/"
 	return strings.HasPrefix(cp, pp), nil
 }
+
+// filename returns the base filename from a path and replaces any slashes with an empty string
+func filename(p string) string {
+	return strings.Trim(path.Base(p), "/")
+}

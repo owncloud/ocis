@@ -58,21 +58,15 @@ func (s *svc) handlePathTusPost(w http.ResponseWriter, r *http.Request, ns strin
 
 	// read filename from metadata
 	meta := tusd.ParseMetadataHeader(r.Header.Get(net.HeaderUploadMetadata))
-	if err := ValidateName(path.Base(meta["filename"]), s.nameValidators); err != nil {
-		w.WriteHeader(http.StatusPreconditionFailed)
-		return
-	}
 
 	// append filename to current dir
-	fn := path.Join(ns, r.URL.Path, meta["filename"])
-
-	sublog := appctx.GetLogger(ctx).With().Str("path", fn).Logger()
-	// check tus headers?
-
 	ref := &provider.Reference{
-		// FIXME ResourceId?
-		Path: fn,
+		// a path based request has no resource id, so we can only provide a path. The gateway has te figure out which provider is responsible
+		Path: path.Join(ns, r.URL.Path, meta["filename"]),
 	}
+
+	sublog := appctx.GetLogger(ctx).With().Str("path", r.URL.Path).Str("filename", meta["filename"]).Logger()
+
 	s.handleTusPost(ctx, w, r, meta, ref, sublog)
 }
 
@@ -82,18 +76,14 @@ func (s *svc) handleSpacesTusPost(w http.ResponseWriter, r *http.Request, spaceI
 
 	// read filename from metadata
 	meta := tusd.ParseMetadataHeader(r.Header.Get(net.HeaderUploadMetadata))
-	if err := ValidateName(path.Base(meta["filename"]), s.nameValidators); err != nil {
-		w.WriteHeader(http.StatusPreconditionFailed)
-		return
-	}
-
-	sublog := appctx.GetLogger(ctx).With().Str("spaceid", spaceID).Str("path", r.URL.Path).Logger()
 
 	ref, err := spacelookup.MakeStorageSpaceReference(spaceID, path.Join(r.URL.Path, meta["filename"]))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	sublog := appctx.GetLogger(ctx).With().Str("spaceid", spaceID).Str("path", r.URL.Path).Str("filename", meta["filename"]).Logger()
 
 	s.handleTusPost(ctx, w, r, meta, &ref, sublog)
 }
@@ -113,6 +103,10 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 		return
 	}
 	if r.Header.Get(net.HeaderUploadLength) == "" {
+		w.WriteHeader(http.StatusPreconditionFailed)
+		return
+	}
+	if err := ValidateName(filename(meta["filename"]), s.nameValidators); err != nil {
 		w.WriteHeader(http.StatusPreconditionFailed)
 		return
 	}

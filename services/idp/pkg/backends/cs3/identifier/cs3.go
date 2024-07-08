@@ -13,9 +13,9 @@ import (
 	"github.com/libregraph/lico/identifier/backends"
 	"github.com/libregraph/lico/identifier/meta/scopes"
 	"github.com/libregraph/lico/identity"
+	"github.com/libregraph/oidc-go"
 	cmap "github.com/orcaman/concurrent-map"
 	"github.com/sirupsen/logrus"
-	"stash.kopano.io/kgol/oidc-go"
 )
 
 const cs3BackendName = "identifier-cs3"
