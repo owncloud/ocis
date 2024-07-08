@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-08-05-03-16]
+[#deprecation-note-2024-07-08-06-36-47]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -821,6 +821,15 @@ a| [subs=-attributes]
 ++com.owncloud.api.settings ++
 a| [subs=-attributes]
 Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'.
+
+a|`OCIS_ASYNC_UPLOADS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Enable asynchronous file uploads.
 
 a|`STORAGE_USERS_POSIX_USE_SPACE_GROUPS` +
 

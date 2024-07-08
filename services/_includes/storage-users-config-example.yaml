@@ -138,6 +138,7 @@ drivers:
     personalspacepath_template: users/{{.User.Username}}
     generalspacepath_template: projects/{{.SpaceId}}
     permissions_endpoint: com.owncloud.api.settings
+    async_uploads: true
     use_space_groups: false
     watch_type: ""
     watch_path: ""
