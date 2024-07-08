@@ -13,6 +13,7 @@ directives:
     - '''self'''
   frame-src:
     - '''self'''
+    - 'blob:'
     - 'https://embed.diagrams.net/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${ONLYOFFICE_DOMAIN|onlyoffice.owncloud.test}/'
