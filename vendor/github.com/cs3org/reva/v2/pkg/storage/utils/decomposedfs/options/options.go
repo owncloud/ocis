@@ -92,6 +92,8 @@ type Options struct {
 	MaxQuota uint64 `mapstructure:"max_quota"`
 
 	DisableVersioning bool `mapstructure:"disable_versioning"`
+
+	MountID string `mapstructure:"mount_id"`
 }
 
 // AsyncPropagatorOptions holds the configuration for the async propagator

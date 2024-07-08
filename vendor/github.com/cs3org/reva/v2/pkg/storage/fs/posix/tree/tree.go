@@ -30,7 +30,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/flock"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -43,6 +42,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/logger"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/options"
@@ -91,6 +91,7 @@ type Tree struct {
 	scanQueue     chan scanItem
 	scanDebouncer *ScanDebouncer
 
+	es  events.Stream
 	log *zerolog.Logger
 }
 
@@ -98,7 +99,7 @@ type Tree struct {
 type PermissionCheckFunc func(rp *provider.ResourcePermissions) bool
 
 // New returns a new instance of Tree
-func New(lu node.PathLookup, bs Blobstore, um usermapper.Mapper, o *options.Options, cache store.Store) (*Tree, error) {
+func New(lu node.PathLookup, bs Blobstore, um usermapper.Mapper, o *options.Options, es events.Stream, cache store.Store) (*Tree, error) {
 	log := logger.New()
 	scanQueue := make(chan scanItem)
 	t := &Tree{
@@ -112,6 +113,7 @@ func New(lu node.PathLookup, bs Blobstore, um usermapper.Mapper, o *options.Opti
 		scanDebouncer: NewScanDebouncer(500*time.Millisecond, func(item scanItem) {
 			scanQueue <- item
 		}),
+		es:  es,
 		log: log,
 	}
 
@@ -134,27 +136,25 @@ func New(lu node.PathLookup, bs Blobstore, um usermapper.Mapper, o *options.Opti
 	}
 
 	// Start watching for fs events and put them into the queue
-	go func() {
-		fileLock := flock.New(filepath.Join(o.Root, ".primary.lock"))
-		locked, err := fileLock.TryLock()
-		if err != nil {
-			log.Err(err).Msg("could not acquire primary lock")
-			return
-		}
-		if !locked {
-			log.Err(err).Msg("watcher is already locked")
-			return
-		}
-		log.Debug().Msg("acquired primary lock")
-
+	if o.WatchFS {
 		go t.watcher.Watch(watchPath)
 		go t.workScanQueue()
 		go func() {
 			_ = t.WarmupIDCache(o.Root, true)
 		}()
-	}()
+	}
 
 	return t, nil
+}
+
+func (t *Tree) PublishEvent(ev interface{}) {
+	if t.es == nil {
+		return
+	}
+
+	if err := events.Publish(context.Background(), t.es, ev); err != nil {
+		t.log.Error().Err(err).Interface("event", ev).Msg("failed to publish event")
+	}
 }
 
 // Setup prepares the tree structure
@@ -484,13 +484,25 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
 	// Remove lock file if it exists
 	_ = os.Remove(n.LockFilePath())
 
-	// finally remove the entry from the parent dir
+	// purge metadata
+	err = filepath.WalkDir(path, func(path string, _ fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if err = t.lookup.(*lookup.Lookup).IDCache.DeleteByPath(ctx, path); err != nil {
+			return err
+		}
+		if err = t.lookup.MetadataBackend().Purge(path); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
 	if err = os.RemoveAll(path); err != nil {
-		// To roll back changes
-		// TODO revert the rename
-		// TODO remove symlink
-		// Roll back changes
-		_ = n.RemoveXattr(ctx, prefixes.TrashOriginAttr, true)
 		return
 	}
 
