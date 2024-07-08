@@ -24,7 +24,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 a| `OCIS_ADMIN_USER_ID`
 
 a| [subs=attributes+]
@@ -77,7 +77,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=attributes+]
@@ -100,7 +100,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=attributes+]
@@ -117,7 +117,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++cache-providers ++
+++settings-cache ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
@@ -142,7 +142,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disables persistence of the provider cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
 a| `OCIS_CACHE_SIZE`
 
 a| [subs=attributes+]
@@ -163,7 +163,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
 a| `OCIS_CACHE_STORE`
 
 a| [subs=attributes+]
@@ -183,7 +183,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++noop ++
+++memory ++
 
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
@@ -229,10 +229,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++5m0s ++
+++10m0s ++
 
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
+Default time to live for entries in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
 a| [subs=attributes+]
@@ -281,7 +281,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Cache-Control] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -307,7 +307,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[GET] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
@@ -394,7 +394,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
+Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
 a| `OCIS_DISABLE_VERSIONING`
 
 a| [subs=attributes+]
@@ -604,7 +604,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the GRPC service.
+The bind address of the gateway GRPC address.
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
 a| [subs=attributes+]
@@ -849,7 +849,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client id to authenticate with keycloak.
+The client ID to authenticate with keycloak.
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
 a| [subs=attributes+]
@@ -919,7 +919,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=idp,ou=sysusers,o=libregraph-idm ++
+++uid=reva,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -956,7 +956,7 @@ a| [subs=-attributes]
 ++/var/lib/ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
 a| `OCIS_LDAP_DISABLED_USERS_GROUP_DN`
 
 a| [subs=attributes+]
@@ -1081,7 +1081,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
 a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=attributes+]
@@ -1097,7 +1097,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
 a| `OCIS_LDAP_GROUP_SCHEMA_MAIL`
 
 a| [subs=attributes+]
@@ -1144,7 +1144,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
 a| `OCIS_LDAP_INSECURE`
 
 a| [subs=attributes+]
@@ -1192,7 +1192,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-Url of the LDAP service to use as IDP.
+URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
 a| `OCIS_LDAP_USER_BASE_DN`
 
 a| [subs=attributes+]
@@ -1225,7 +1225,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as a flag telling if the user is enabled or disabled.
+LDAP attribute to use as a flag telling if the user is enabled or disabled.
 a| `OCIS_LDAP_USER_FILTER`
 
 a| [subs=attributes+]
@@ -1259,7 +1259,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-LDAP User ObjectClass like 'inetOrgPerson'.
+The object class to use for users in the default user search filter ('inetOrgPerson').
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
 a| [subs=attributes+]
@@ -1288,10 +1288,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownCloudUUID ++
+++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP User UUID attribute like 'uid'.
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=attributes+]
@@ -1307,7 +1307,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
+Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
 a| `OCIS_LDAP_USER_SCHEMA_MAIL`
 
 a| [subs=attributes+]
@@ -1324,7 +1324,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP User email attribute like 'mail'.
+LDAP Attribute to use for the email address of users.
 a| `OCIS_LDAP_USER_SCHEMA_USERNAME`
 
 a| [subs=attributes+]
@@ -1338,10 +1338,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++displayName ++
+++uid ++
 
 a| [subs=-attributes]
-LDAP User name attribute like 'displayName'.
+LDAP Attribute to use for username of users.
 a| `OCIS_LDAP_USER_SCHEMA_USER_TYPE`
 
 a| [subs=attributes+]
@@ -1606,7 +1606,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+Machine auth API key used to validate internal requests necessary to access resources from other services.
 a| `OCIS_OIDC_ISSUER`
 
 a| [subs=attributes+]
@@ -1626,7 +1626,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The OIDC issuer URL to use.
+The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
 a| [subs=attributes+]
@@ -2246,7 +2246,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=attributes+]
@@ -2287,10 +2287,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://127.0.0.1:9200 ++
+++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL, where oCIS is reachable for users.
+The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=attributes+]
