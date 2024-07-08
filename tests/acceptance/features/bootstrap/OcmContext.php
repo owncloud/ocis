@@ -176,4 +176,31 @@ class OcmContext implements Context {
 		$response = $this->acceptInvitation($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function findAcceptedUsers(string $user): ResponseInterface {
+		return OcmHelper::findAcceptedUsers(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user)
+		);
+	}
+
+	/**
+	 * @When :user searches for accepted users
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userFindsAcceptedUsers(string $user): void {
+		$this->featureContext->setResponse($this->findAcceptedUsers($user));
+	}
 }

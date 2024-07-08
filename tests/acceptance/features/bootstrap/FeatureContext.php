@@ -1229,13 +1229,13 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @param object $json
+	 * @param object|array $json
 	 * @param object $schema
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertJsonDocumentMatchesSchema(object $json, object $schema): void {
+	public function assertJsonDocumentMatchesSchema(object|array $json, object $schema): void {
 		$schema = JsonSchema::import($schema);
 		$this->validateSchemaRequirements($schema);
 		$schema->in($json);

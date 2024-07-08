@@ -91,7 +91,7 @@ class OcmHelper {
 		string $user,
 		string $password,
 		string $token,
-		string $providerDomain,
+		string $providerDomain
 	): ResponseInterface {
 		$body = [
 		  "token" => $token,
@@ -105,6 +105,31 @@ class OcmHelper {
 			$password,
 			self::getRequestHeaders(),
 			\json_encode($body)
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function findAcceptedUsers(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'find-accepted-users');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
 		);
 	}
 }
