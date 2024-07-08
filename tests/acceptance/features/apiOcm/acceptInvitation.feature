@@ -6,7 +6,7 @@ Feature: accepting invitation
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
     And using server "REMOTE"
-    Given these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
       | Carol    |
@@ -40,7 +40,7 @@ Feature: accepting invitation
     And "Brian" accepts the last federation share invitation
     Then the HTTP status code should be "200"
 
-  
+
   Scenario: user accepts invitation sent with email and description
     Given using server "LOCAL"
     When "Alice" creates the federation share invitation with email "alice@example.com" and description "a share invitation from Alice"
@@ -68,7 +68,7 @@ Feature: accepting invitation
     When using server "REMOTE"
     And "Brian" accepts the last federation share invitation
     Then the HTTP status code should be "200"
-    
+
 
   Scenario: two users can accept one invitation
     Given using server "LOCAL"
@@ -77,7 +77,7 @@ Feature: accepting invitation
     And "Brian" accepts the last federation share invitation
     Then the HTTP status code should be "200"
     And "Carol" accepts the last federation share invitation
-    Then the HTTP status code should be "200"
+    And the HTTP status code should be "200"
 
 
   Scenario: user tries to accept the invitation twice

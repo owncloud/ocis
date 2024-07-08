@@ -87,6 +87,7 @@ Feature: an user shares resources usin ScienceMesh application
       }
       """
 
+
   Scenario: users shares folder to federation users after accepting invitation
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation

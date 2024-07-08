@@ -2,7 +2,7 @@
 Feature: search federation users
   As a user
   I can find federation users after accepting an invitation to share resources
-   
+
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
