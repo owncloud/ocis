@@ -146,7 +146,7 @@ func StartOcisHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	if ocis.IsOcisRunning() {
-		sendResponse(res, http.StatusInternalServerError, "oCIS server is already running")
+		sendResponse(res, http.StatusConflict, "oCIS server is already running")
 		return
 	}
 
