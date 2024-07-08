@@ -59,6 +59,7 @@
 | PROXY_AUTOPROVISION_CLAIM_USERNAME | string | preferred_username | The name of the OIDC claim that holds the username.|
 | PROXY_AUTOPROVISION_CLAIM_EMAIL | string | email | The name of the OIDC claim that holds the email.|
 | PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME | string | name | The name of the OIDC claim that holds the display name.|
+| PROXY_AUTOPROVISION_CLAIM_GROUPS | string | groups | The name of the OIDC claim that holds the groups.|
 | PROXY_ENABLE_BASIC_AUTH | bool | false | Set this to true to enable 'basic authentication' (username/password).|
 | PROXY_INSECURE_BACKENDS | bool | false | Disable TLS certificate validation for all HTTP backend connections.|
 | PROXY_HTTPS_CACERT | string |  | Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services.|

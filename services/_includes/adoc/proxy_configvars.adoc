@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-08-07-48-07]
+[#deprecation-note-2024-07-08-08-01-55]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -565,6 +565,15 @@ a| [subs=-attributes]
 ++name ++
 a| [subs=-attributes]
 The name of the OIDC claim that holds the display name.
+
+a|`PROXY_AUTOPROVISION_CLAIM_GROUPS` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++groups ++
+a| [subs=-attributes]
+The name of the OIDC claim that holds the groups.
 
 a|`PROXY_ENABLE_BASIC_AUTH` +
 

@@ -178,6 +178,7 @@ auto_provision_claims:
   username: preferred_username
   email: email
   display_name: name
+  groups: groups
 enable_basic_auth: false
 insecure_backends: false
 backend_https_cacert: ""
