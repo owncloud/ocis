@@ -93,7 +93,7 @@ require (
 	github.com/unrolled/secure v1.14.0
 	github.com/urfave/cli/v2 v2.27.2
 	github.com/xhit/go-simple-mail/v2 v2.16.0
-	go-micro.dev/v4 v4.10.2
+	go-micro.dev/v4 v4.11.0
 	go.etcd.io/bbolt v1.3.10
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.52.0
 	go.opentelemetry.io/contrib/zpages v0.52.0
