@@ -146,6 +146,7 @@ func DefaultConfig() *config.Config {
 				PersonalSpacePathTemplate: "users/{{.User.Username}}",
 				GeneralSpacePathTemplate:  "projects/{{.SpaceId}}",
 				PermissionsEndpoint:       "com.owncloud.api.settings",
+				AsyncUploads:              true,
 			},
 		},
 		Events: config.Events{
