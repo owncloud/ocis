@@ -2503,14 +2503,38 @@ class GraphContext implements Context {
 		}
 
 		$credentials = $this->getAdminOrUserCredentials($user);
-		$this->featureContext->setResponse(
-			GraphHelper::getSharesSharedWithMe(
+
+		// Sometimes listing shares might not return the updated shares list
+		// so try again until @client.synchronize is true for the max. number of retries (i.e. 10)
+		// and do not retry when the share is expected to be not synced
+		$tryAgain = false;
+		$retried = 0;
+		do {
+			$response = GraphHelper::getSharesSharedWithMe(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password']
-			)
-		);
+			);
+
+			$jsonBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+
+			foreach ($jsonBody->value as $share) {
+				$autoSync = $this->featureContext->getUserAutoSyncSetting($credentials['username']);
+				$tryAgain = !$share->{'@client.synchronize'} && $autoSync && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+
+				if ($tryAgain) {
+					$retried += 1;
+					echo "auto-sync share for user '$user' is enabled\n";
+					echo "but share '$share->name' was not auto-synced, retrying ($retried)...\n";
+					// wait 500ms and try again
+					\usleep(500 * 1000);
+					break;
+				}
+			}
+		} while ($tryAgain);
+
+		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastStatusCodesArrays();
 	}
 

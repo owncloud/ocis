@@ -42,6 +42,7 @@ use TestHelpers\HttpLogger;
 use TestHelpers\OcisHelper;
 use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
+use TestHelpers\SettingsHelper;
 
 require_once 'bootstrap.php';
 
@@ -166,6 +167,41 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	private array $lastHttpStatusCodesArray = [];
 	private array $lastOCSStatusCodesArray = [];
+
+	/**
+	 * Store for auto-sync settings for users
+	 */
+	private array $autoSyncSettings = [];
+
+	/**
+	 * @param string $user
+	 *
+	 * @return bool
+	 */
+	public function getUserAutoSyncSetting(string $user): bool {
+		if (\array_key_exists($user, $this->autoSyncSettings)) {
+			return $this->autoSyncSettings[$user];
+		}
+		$autoSyncSetting = SettingsHelper::getAutoAcceptSharesSettingValue(
+			$this->baseUrl,
+			$user,
+			$this->getPasswordForUser($user),
+			$this->getStepLineRef()
+		);
+		$this->autoSyncSettings[$user] = $autoSyncSetting;
+
+		return $autoSyncSetting;
+	}
+
+	/**
+	 * @param string $user
+	 * @param bool $value
+	 *
+	 * @return void
+	 */
+	public function rememberUserAutoSyncSetting(string $user, bool $value): void {
+		$this->autoSyncSettings[$user] = $value;
+	}
 
 	public const SHARES_SPACE_ID = 'a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668';
 	private bool $useSharingNG = false;
@@ -1432,15 +1468,12 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @param ResponseInterface|null $response
 	 *
-	 * @return object
+	 * @return mixed
 	 */
-	public function getJsonDecodedResponseBodyContent(ResponseInterface $response = null):?object {
+	public function getJsonDecodedResponseBodyContent(ResponseInterface $response = null): mixed {
 		$response = $response ?? $this->response;
-		if ($response !== null) {
-			$response->getBody()->rewind();
-			return json_decode($response->getBody()->getContents());
-		}
-		return null;
+		$response->getBody()->rewind();
+		return HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
 	}
 
 	/**

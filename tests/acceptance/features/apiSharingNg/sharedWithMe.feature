@@ -20,7 +20,7 @@ Feature: an user gets the resources shared to them
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    When user "Brian" lists the shares shared with him after clearing user cache using the Graph API
+    When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
