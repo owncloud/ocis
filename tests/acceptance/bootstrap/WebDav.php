@@ -353,6 +353,7 @@ trait WebDav {
 		?string $password = null,
 		?string $spaceId=null
 	): ResponseInterface {
+
 		return $this->makeDavRequest(
 			$user,
 			"MKCOL",
@@ -2050,12 +2051,6 @@ trait WebDav {
 		$user = $this->getActualUsername($user);
 		$this->pauseUploadDelete();
 
-		if (\str_starts_with($destination, "Shares/")
-			&& $this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES
-		) {
-			$spaceId = $this->spacesContext->getSpaceIdByName($user, "Shares");
-			$destination = \str_replace("Shares/", "", $destination);
-		}
 		$response = $this->makeDavRequest(
 			$user,
 			"PUT",
