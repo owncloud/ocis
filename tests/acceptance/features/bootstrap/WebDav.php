@@ -1576,7 +1576,7 @@ trait WebDav {
 			$type
 		);
 		$statusCode = $response->getStatusCode();
-		if ($statusCode < 401 || $statusCode > 404) {
+		if ($statusCode < 400 || $statusCode > 499) {
 			try {
 				$responseXml = HttpRequestHelper::getResponseXml(
 					$response,
