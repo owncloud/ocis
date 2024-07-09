@@ -144,96 +144,109 @@ Feature: get file properties
       | spaces           |
 
   @skipOnReva
-  Scenario Outline: file that is shared to a user has a share-types property
+  Scenario Outline: resource that is shared to a user has a share-types property
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | test     |
-      | space           | Personal |
-      | sharee          | Brian    |
-      | shareType       | user     |
-      | permissionsRole | Editor   |
-    When user "Alice" gets the following properties of folder "/test" using the WebDAV API
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Alice" gets the following properties of folder "<resource>" using the WebDAV API
       | propertyName   |
       | oc:share-types |
     Then the HTTP status code should be "207"
     And the response should contain a share-types property with
       | 0 |
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+      | dav-path-version | resource     |
+      | old              | test         |
+      | new              | test         |
+      | spaces           | test         |
+      | old              | textfile.txt |
+      | new              | textfile.txt |
+      | spaces           | textfile.txt |
 
   @skipOnReva
-  Scenario Outline: file that is shared to a group has a share-types property
+  Scenario Outline: resource that is shared to a group has a share-types property
     Given using <dav-path-version> DAV path
     And group "grp1" has been created
     And user "Alice" has created folder "/test"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | test     |
-      | space           | Personal |
-      | sharee          | grp1     |
-      | shareType       | group    |
-      | permissionsRole | Editor   |
-    When user "Alice" gets the following properties of folder "/test" using the WebDAV API
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | grp1       |
+      | shareType       | group      |
+      | permissionsRole | Viewer     |
+    When user "Alice" gets the following properties of folder "<resource>" using the WebDAV API
       | propertyName   |
       | oc:share-types |
     Then the HTTP status code should be "207"
     And the response should contain a share-types property with
       | 1 |
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+      | dav-path-version | resource     |
+      | old              | test         |
+      | new              | test         |
+      | spaces           | test         |
+      | old              | textfile.txt |
+      | new              | textfile.txt |
+      | spaces           | textfile.txt |
 
   @skipOnReva
-  Scenario Outline: file that is shared by link has a share-types property
+  Scenario Outline: resource that is shared by link has a share-types property
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/test"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"
     And user "Alice" has created the following resource link share:
-      | resource        | test     |
-      | space           | Personal |
-      | permissionsRole | edit     |
-      | password        | %public% |
-    When user "Alice" gets the following properties of folder "/test" using the WebDAV API
+      | resource        | <resource> |
+      | space           | Personal   |
+      | permissionsRole | edit       |
+      | password        | %public%   |
+    When user "Alice" gets the following properties of folder "<resource>" using the WebDAV API
       | propertyName   |
       | oc:share-types |
     Then the HTTP status code should be "207"
     And the response should contain a share-types property with
       | 3 |
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+      | dav-path-version | resource     |
+      | old              | test         |
+      | new              | test         |
+      | spaces           | test         |
+      | old              | textfile.txt |
+      | new              | textfile.txt |
+      | spaces           | textfile.txt |
 
   @skipOnReva
-  Scenario Outline: file that is shared by user,group and link has a share-types property
+  Scenario Outline: resource that is shared by user,group and link has a share-types property
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Alice" has created folder "/test"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | test     |
-      | space           | Personal |
-      | sharee          | Brian    |
-      | shareType       | user     |
-      | permissionsRole | Editor   |
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     And user "Alice" has sent the following resource share invitation:
-      | resource        | test     |
-      | space           | Personal |
-      | sharee          | grp1     |
-      | shareType       | group    |
-      | permissionsRole | Editor   |
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | grp1       |
+      | shareType       | group      |
+      | permissionsRole | Viewer     |
     And user "Alice" has created the following resource link share:
-      | resource        | test     |
-      | space           | Personal |
-      | permissionsRole | edit     |
-      | password        | %public% |
-    When user "Alice" gets the following properties of folder "/test" using the WebDAV API
+      | resource        | <resource> |
+      | space           | Personal   |
+      | permissionsRole | edit       |
+      | password        | %public%   |
+    When user "Alice" gets the following properties of folder "<resource>" using the WebDAV API
       | propertyName   |
       | oc:share-types |
     Then the HTTP status code should be "207"
@@ -242,10 +255,13 @@ Feature: get file properties
       | 1 |
       | 3 |
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+      | dav-path-version | resource     |
+      | old              | test         |
+      | new              | test         |
+      | spaces           | test         |
+      | old              | textfile.txt |
+      | new              | textfile.txt |
+      | spaces           | textfile.txt |
 
   @smokeTest @issue-2809
   Scenario Outline: retrieving a private link
