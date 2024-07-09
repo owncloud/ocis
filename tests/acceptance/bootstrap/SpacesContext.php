@@ -1424,6 +1424,9 @@ class SpacesContext implements Context {
 		string $destination
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
+		if ($spaceName === "Shares" && !\str_starts_with($destination, "Shares/")) {
+			$destination = "Shares/" . \ltrim($destination, "/");
+		}
 		$response = $this->featureContext->uploadFileWithContent($user, $content, $destination, $spaceId);
 		$this->featureContext->setResponse($response);
 	}
