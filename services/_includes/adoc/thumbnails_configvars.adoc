@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-09-09-48-36]
+[#deprecation-note-2024-07-09-09-57-37]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -195,6 +195,46 @@ a| [subs=-attributes]
 ++/thumbnails ++
 a| [subs=-attributes]
 Subdirectory that serves as the root for this HTTP service.
+
+a|`OCIS_CORS_ALLOW_ORIGINS` +
+`THUMBNAILS_CORS_ALLOW_ORIGINS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[*] ++
+a| [subs=-attributes]
+A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_METHODS` +
+`THUMBNAILS_CORS_ALLOW_METHODS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[GET POST PUT PATCH DELETE OPTIONS] ++
+a| [subs=-attributes]
+A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_HEADERS` +
+`THUMBNAILS_CORS_ALLOW_HEADERS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Cache-Control] ++
+a| [subs=-attributes]
+A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_CREDENTIALS` +
+`THUMBNAILS_CORS_ALLOW_CREDENTIALS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 
 a|`THUMBNAILS_MAX_CONCURRENT_REQUESTS` +
 

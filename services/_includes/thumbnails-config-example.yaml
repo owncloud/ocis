@@ -26,6 +26,25 @@ http:
     cert: ""
     key: ""
   root: /thumbnails
+  cors:
+    allow_origins:
+    - '*'
+    allow_methods:
+    - GET
+    - POST
+    - PUT
+    - PATCH
+    - DELETE
+    - OPTIONS
+    allow_headers:
+    - Authorization
+    - Origin
+    - Content-Type
+    - Accept
+    - X-Requested-With
+    - X-Request-Id
+    - Cache-Control
+    allow_credentials: true
   max_concurrent_requests: 0
 grpc_client_tls: null
 thumbnail:
