@@ -164,14 +164,17 @@ Feature: upload file
       | old              | "filewithLF-and-CR\r\n" | ZmlsZXdpdGhMRi1hbmQtQ1INCgo= |
       | old              | "folder/file"           | Zm9sZGVyL2ZpbGU=             |
       | old              | "my\\file"              | bXkMaWxl                     |
+      | old              | ".."                    | Li4=                         |
       | new              | " "                     | IA==                         |
       | new              | "filewithLF-and-CR\r\n" | ZmlsZXdpdGhMRi1hbmQtQ1INCgo= |
       | new              | "folder/file"           | Zm9sZGVyL2ZpbGU=             |
       | new              | "my\\file"              | bXkMaWxl                     |
+      | new              | ".."                    | Li4=                         |
       | spaces           | " "                     | IA==                         |
       | spaces           | "filewithLF-and-CR\r\n" | ZmlsZXdpdGhMRi1hbmQtQ1INCgo= |
       | spaces           | "folder/file"           | Zm9sZGVyL2ZpbGU=             |
       | spaces           | "my\\file"              | bXkMaWxl                     |
+      | spaces           | ".."                    | Li4=                         |
 
 
   Scenario Outline: upload a zero-byte file
