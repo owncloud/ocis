@@ -27,7 +27,7 @@ reva:
   tls:
     mode: ""
     cacert: ""
-external_addr: ""
+external_addr: com.owncloud.api.app-provider
 driver: ""
 drivers:
   wopi:
