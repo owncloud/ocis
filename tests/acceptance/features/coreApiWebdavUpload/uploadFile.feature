@@ -373,3 +373,17 @@ Feature: upload file
     Then the HTTP status code should be "204"
     And for user "Brian" the content of the file "/textfile.txt" of the space "new-space" should be ""
     And for user "Alice" the content of the file "/textfile.txt" of the space "new-space" should be ""
+
+  @issue-8699
+  Scenario: user updates a file inside a shared space with empty content
+    Given using SharingNG
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | new-space |
+      | permissionsRole | edit      |
+      | password        | %public%  |
+    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the new public WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the content of the file "/test.txt" of the space "new-space" should be "test-file"
