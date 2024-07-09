@@ -37,36 +37,6 @@ The ocis package offers a variety of cli commands to monitor or repair ocis inst
 
 These paths can vary depending on your ocis installation.
 
-### Backup CLI
-
-The backup command allows inspecting the consistency of an ocis storage:
-
-```bash
-ocis backup consistency -p /base/path/storage/users
-```
-
-This will check the consistency of the storage and output a list of inconsistencies. Inconsistencies can be:
-
-* **Orphaned Blobs**\
-A blob in the blobstore that is not referenced by any file metadata.
-* **Missing Blobs**\
-A blob referenced by file metadata that is not present in the blobstore.
-* **Missing Nodes**\
-A node that is referenced by a symlink but doesn't exist.
-* **Missing Link**\
-A node that is not referenced by any symlink but should be.
-* **Missing Files**\
-A node that is missing essential files (such as the `.mpk` metadata file).
-* **Missing/Malformed Metadata**\
-A node that doesn't have any (or malformed) metadata.
-
-This command provides additional options:
-
-* `-b` / `--blobstore`\
-Allows specifying the blobstore to use. Defaults to `ocis`. Empty blobs will not be checked. Can also be switched to `s3ng`, but needs addtional envvar configuration (see the `storage-users` service for more details).
-* `--fail`\
-Exits with non-zero exit code if inconsistencies are found. Useful for automation.
-
 ### Revisions CLI
 
 The revisions command allows removing the revisions of files in the storage.
@@ -90,15 +60,3 @@ Allows specifying the blobstore to use. Defaults to `ocis`. Can be switched to `
 * `-v` / `--verbose`\
 Prints additional information about the revisions that are removed.
 
-### Trash CLI
-
-The trash cli allows removing empty folders from the trashbin. This should be used to speed up trash bin operations.
-
-```bash
-ocis trash purge-empty-dirs -p /base/path/storage/users
-```
-
-This command provides additional options:
-
-* `--dry-run` (default: `true`)\
-Do not remove any empty folders but print the empty folders that would be removed.
