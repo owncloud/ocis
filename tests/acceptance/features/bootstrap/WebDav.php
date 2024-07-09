@@ -1031,59 +1031,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then /^the downloaded content should be "([^"]*)" plus end-of-line$/
-	 *
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function downloadedContentShouldBePlusEndOfLine(string $content):void {
-		$this->checkDownloadedContentMatches("$content\n");
-	}
-
-	/**
-	 * @Then /^the content of file "([^"]*)" should be "([^"]*)"$/
-	 *
-	 * @param string $fileName
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function contentOfFileShouldBe(string $fileName, string $content):void {
-		$response = $this->downloadFileAsUserUsingPassword($this->currentUser, $fileName);
-		$this->checkDownloadedContentMatches($content, '', $response);
-	}
-
-	/**
-	 * @Then /^the content of file "([^"]*)" should be:$/
-	 *
-	 * @param string $fileName
-	 * @param PyStringNode $content
-	 *
-	 * @return void
-	 */
-	public function contentOfFileShouldBePyString(
-		string $fileName,
-		PyStringNode $content
-	):void {
-		$response = $this->downloadFileAsUserUsingPassword($this->currentUser, $fileName);
-		$this->checkDownloadedContentMatches($content->getRaw(), '', $response);
-	}
-
-	/**
-	 * @Then /^the content of file "([^"]*)" should be "([^"]*)" plus end-of-line$/
-	 *
-	 * @param string $fileName
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function contentOfFileShouldBePlusEndOfLine(string $fileName, string $content):void {
-		$this->setResponse($this->downloadFileAsUserUsingPassword($this->currentUser, $fileName));
-		$this->checkDownloadedContentMatches("$content\n");
-	}
-
-	/**
 	 * @Then the content of file :fileName for user :user should be :content
 	 *
 	 * @param string $fileName
@@ -1132,35 +1079,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then /^the content of file "([^"]*)" for user "([^"]*)" on server "([^"]*)" should be "([^"]*)"$/
-	 *
-	 * @param string $fileName
-	 * @param string $user
-	 * @param string $server
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function theContentOfFileForUserOnServerShouldBe(
-		string $fileName,
-		string $user,
-		string $server,
-		string $content
-	):void {
-		$previousServer = $this->usingServer($server);
-		$user = $this->getActualUsername($user);
-		$response = $this->downloadFileAsUserUsingPassword($user, $fileName);
-		$actualStatus = $response->getStatusCode();
-		Assert::assertEquals(
-			200,
-			$actualStatus,
-			"Expected status code to be '200', but got '$actualStatus'"
-		);
-		$this->checkDownloadedContentMatches($content, '', $response);
-		$this->usingServer($previousServer);
-	}
-
-	/**
 	 * @Then /^the content of file "([^"]*)" for user "([^"]*)" using password "([^"]*)" should be "([^"]*)"$/
 	 *
 	 * @param string $fileName
@@ -1205,126 +1123,6 @@ trait WebDav {
 			"Expected status code to be '200', but got '$actualStatus'"
 		);
 		$this->checkDownloadedContentMatches($content->getRaw(), '', $response);
-	}
-
-	/**
-	 * @Then /^the content of file "([^"]*)" for user "([^"]*)" using password "([^"]*)" should be:$/
-	 *
-	 * @param string $fileName
-	 * @param string $user
-	 * @param string|null $password
-	 * @param PyStringNode $content
-	 *
-	 * @return void
-	 */
-	public function contentOfFileForUserUsingPasswordShouldBePyString(
-		string $fileName,
-		string $user,
-		?string $password,
-		PyStringNode $content
-	):void {
-		$user = $this->getActualUsername($user);
-		$password = $this->getActualPassword($password);
-		$response = $this->downloadFileAsUserUsingPassword($user, $fileName, $password);
-		$this->checkDownloadedContentMatches($content->getRaw(), '', $response);
-	}
-
-	/**
-	 * @Then /^the content of file "([^"]*)" for user "([^"]*)" should be "([^"]*)" plus end-of-line$/
-	 *
-	 * @param string $fileName
-	 * @param string $user
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function contentOfFileForUserShouldBePlusEndOfLine(string $fileName, string $user, string $content):void {
-		$user = $this->getActualUsername($user);
-		$response = $this->downloadFileAsUserUsingPassword($user, $fileName);
-		$actualStatus = $response->getStatusCode();
-		Assert::assertEquals(
-			200,
-			$actualStatus,
-			"Expected status code to be '200', but got '$actualStatus'"
-		);
-		$this->checkDownloadedContentMatches("$content\n", '', $response);
-	}
-
-	/**
-	 * @Then the content of the following files for user :user should be the following plus end-of-line
-	 *
-	 * @param string $user
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theContentOfTheFollowingFilesForUserShouldBeTheFollowingPlusEndOfLine(string $user, TableNode $table):void {
-		$this->verifyTableNodeColumns($table, ["filename",  "content"]);
-		$rows = $table->getHash();
-		foreach ($rows as $row) {
-			$content = $row["content"];
-			$user = $this->getActualUsername($user);
-			$response = $this->downloadFileAsUserUsingPassword($user, $row["filename"]);
-			$actualStatus = $response->getStatusCode();
-			Assert::assertEquals(
-				200,
-				$actualStatus,
-				"Expected status code to be '200', but got '$actualStatus'"
-			);
-			$this->checkDownloadedContentMatches("$content\n", '', $response);
-		}
-	}
-
-	/**
-	 * @Then /^the content of file "([^"]*)" for user "([^"]*)" on server "([^"]*)" should be "([^"]*)" plus end-of-line$/
-	 *
-	 * @param string $fileName
-	 * @param string $user
-	 * @param string $server
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function theContentOfFileForUserOnServerShouldBePlusEndOfLine(
-		string $fileName,
-		string $user,
-		string $server,
-		string $content
-	):void {
-		$previousServer = $this->usingServer($server);
-		$user = $this->getActualUsername($user);
-		$response = $this->downloadFileAsUserUsingPassword($user, $fileName);
-		$actualStatus = $response->getStatusCode();
-		Assert::assertEquals(
-			200,
-			$actualStatus,
-			"Expected status code to be '200', but got '$actualStatus'"
-		);
-		$this->checkDownloadedContentMatches("$content\n", '', $response);
-		$this->usingServer($previousServer);
-	}
-
-	/**
-	 * @Then /^the content of file "([^"]*)" for user "([^"]*)" using password "([^"]*)" should be "([^"]*)" plus end-of-line$/
-	 *
-	 * @param string $fileName
-	 * @param string $user
-	 * @param string|null $password
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function contentOfFileForUserUsingPasswordShouldBePlusEndOfLine(
-		string $fileName,
-		string $user,
-		?string $password,
-		string $content
-	):void {
-		$user = $this->getActualUsername($user);
-		$password = $this->getActualPassword($password);
-		$response = $this->downloadFileAsUserUsingPassword($user, $fileName, $password);
-		$this->checkDownloadedContentMatches("$content\n", '', $response);
 	}
 
 	/**
@@ -1437,6 +1235,27 @@ trait WebDav {
 	}
 
 	/**
+	 * @Then /^the content of file "([^"]*)" for user "([^"]*)" should be "([^"]*)" plus end-of-line$/
+	 *
+	 * @param string $fileName
+	 * @param string $user
+	 * @param string $content
+	 *
+	 * @return void
+	 */
+	public function contentOfFileForUserShouldBePlusEndOfLine(string $fileName, string $user, string $content):void {
+		$user = $this->getActualUsername($user);
+		$response = $this->downloadFileAsUserUsingPassword($user, $fileName);
+		$actualStatus = $response->getStatusCode();
+		Assert::assertEquals(
+			200,
+			$actualStatus,
+			"Expected status code to be '200', but got '$actualStatus'"
+		);
+		$this->checkDownloadedContentMatches("$content\n", '', $response);
+	}
+
+	/**
 	 * @Then the following headers should be set
 	 *
 	 * @param TableNode $table
@@ -1470,66 +1289,6 @@ trait WebDav {
 				$headerValue,
 				__METHOD__
 				. " Expected value for header '$headerName' was '$expectedHeaderValue', but got '$headerValue' instead."
-			);
-		}
-	}
-
-	/**
-	 * @Then the downloaded content should start with :start
-	 *
-	 * @param string $start
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function downloadedContentShouldStartWith(string $start):void {
-		Assert::assertEquals(
-			0,
-			\strpos($this->response->getBody()->getContents(), $start),
-			__METHOD__
-			. " The downloaded content was expected to start with '$start', but actually started with '{$this->response->getBody()->getContents()}'"
-		);
-	}
-
-	/**
-	 * @Then the oc job status values of last request for user :user should match these regular expressions
-	 *
-	 * @param string $user
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function jobStatusValuesShouldMatchRegEx(string $user, TableNode $table):void {
-		$user = $this->getActualUsername($user);
-		$this->verifyTableNodeColumnsCount($table, 2);
-		$headerArray = $this->response->getHeader("OC-JobStatus-Location");
-		$url = $headerArray[0];
-		$url = $this->getBaseUrlWithoutPath() . $url;
-		$response = HttpRequestHelper::get(
-			$url,
-			$this->getStepLineRef(),
-			$user,
-			$this->getPasswordForUser($user)
-		);
-		$contents = $response->getBody()->getContents();
-		$result = \json_decode($contents, true);
-		PHPUnit\Framework\Assert::assertNotNull($result, "'$contents' is not valid JSON");
-		foreach ($table->getTable() as $row) {
-			$expectedKey = $row[0];
-			Assert::assertArrayHasKey(
-				$expectedKey,
-				$result,
-				"response does not have expected key '$expectedKey'"
-			);
-			$expectedValue = $this->substituteInLineCodes(
-				$row[1],
-				$user,
-				['preg_quote' => ['/']]
-			);
-			Assert::assertNotFalse(
-				(bool) \preg_match($expectedValue, (string)$result[$expectedKey]),
-				"'$expectedValue' does not match '$result[$expectedKey]'"
 			);
 		}
 	}
@@ -1731,36 +1490,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then /^as "([^"]*)" exactly one of these (files|folders|entries) should exist$/
-	 *
-	 * @param string $user
-	 * @param string $entries
-	 * @param TableNode $table of file, folder or entry paths
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function asExactlyOneOfTheseFilesOrFoldersShouldExist(string $user, string $entries, TableNode $table):void {
-		$numEntriesThatExist = 0;
-		foreach ($table->getTable() as $row) {
-			$path = $this->substituteInLineCodes($row[0]);
-			$responseXml = $this->listFolderAndReturnResponseXml(
-				$user,
-				$path,
-				'0'
-			);
-			if ($this->isEtagValid($this->getEtagFromResponseXmlObject($responseXml))) {
-				$numEntriesThatExist = $numEntriesThatExist + 1;
-			}
-		}
-		Assert::assertEquals(
-			1,
-			$numEntriesThatExist,
-			"exactly one of these $entries should exist but found $numEntriesThatExist $entries"
-		);
-	}
-
-	/**
 	 *
 	 * @param string $user
 	 * @param string $path
@@ -1839,26 +1568,6 @@ trait WebDav {
 	public function userShouldSeeTheElements(string $user, string $shouldOrNot, TableNode $elements):void {
 		$should = ($shouldOrNot !== "not");
 		$this->checkElementList($user, $elements, $should);
-	}
-
-	/**
-	 * @Then /^user "([^"]*)" should not see the following elements if the upper and lower case username are different/
-	 *
-	 * @param string $user
-	 * @param TableNode $elements
-	 *
-	 * @return void
-	 * @throws InvalidArgumentException|Exception
-	 *
-	 */
-	public function userShouldNotSeeTheElementsIfUpperAndLowerCaseUsernameDifferent(string $user, TableNode $elements):void {
-		$effectiveUser = $this->getActualUsername($user);
-		if (\strtoupper($effectiveUser) === \strtolower($effectiveUser)) {
-			$expectedToBeListed = true;
-		} else {
-			$expectedToBeListed = false;
-		}
-		$this->checkElementList($user, $elements, $expectedToBeListed);
 	}
 
 	/**
@@ -2334,25 +2043,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then the HTTP status code of responses on all endpoints should be :statusCode1 or :statusCode2
-	 *
-	 * @param string $statusCode1
-	 * @param string $statusCode2
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theHTTPStatusCodeOfResponsesOnAllEndpointsShouldBeOr(string $statusCode1, string $statusCode2):void {
-		$duplicateRemovedStatusCodes = \array_unique($this->lastHttpStatusCodesArray);
-		foreach ($duplicateRemovedStatusCodes as $status) {
-			$status = (string)$status;
-			if (($status != $statusCode1) && ($status != $statusCode2)) {
-				Assert::fail("Unexpected status code received " . $status);
-			}
-		}
-	}
-
-	/**
 	 * @Then the OCS status code of responses on all endpoints should be :statusCode
 	 *
 	 * @param string $statusCode
@@ -2378,23 +2068,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then /^the HTTP reason phrase of all upload responses should be "([^"]*)"$/
-	 *
-	 * @param string $reasonPhrase
-	 *
-	 * @return void
-	 */
-	public function theHTTPReasonPhraseOfAllUploadResponsesShouldBe(string $reasonPhrase):void {
-		foreach ($this->uploadResponses as $response) {
-			Assert::assertEquals(
-				$reasonPhrase,
-				$response->getReasonPhrase(),
-				'Response did not return expected reason phrase'
-			);
-		}
-	}
-
-	/**
 	 * @Then user :user should be able to upload file :source to :destination
 	 *
 	 * @param string $user
@@ -2413,30 +2086,6 @@ trait WebDav {
 			$response
 		);
 		$this->checkFileOrFolderExistsForUser($user, "file", $destination);
-	}
-
-	/**
-	 * @Then the following users should be able to upload file :source to :destination
-	 *
-	 * @param string $source
-	 * @param string $destination
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function usersShouldBeAbleToUploadFileTo(
-		string $source,
-		string $destination,
-		TableNode $table
-	):void {
-		$this->verifyTableNodeColumns($table, ["username"]);
-		$usernames = $table->getHash();
-		foreach ($usernames as $username) {
-			$actualUser = $this->getActualUsername($username["username"]);
-			$this->uploadFile($actualUser, $source, $destination);
-			$this->checkFileOrFolderExistsForUser($actualUser, "file", $destination);
-		}
 	}
 
 	/**
@@ -2497,33 +2146,6 @@ trait WebDav {
 	}
 
 	/**
-	 * Check that all the files uploaded with old/new DAV and chunked/non-chunked exist.
-	 *
-	 * @Then /^as "([^"]*)" the files uploaded to "([^"]*)" with all mechanisms should (not|)\s?exist$/
-	 *
-	 * @param string $user
-	 * @param string $destination
-	 * @param string $shouldOrNot
-	 * @param string|null $exceptChunkingType empty string or "old" or "new"
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function filesUploadedToWithAllMechanismsShouldExist(
-		string $user,
-		string $destination,
-		string $shouldOrNot,
-		?string $exceptChunkingType = ''
-	):void {
-		$this->checkIfFilesExist(
-			$user,
-			$destination,
-			$shouldOrNot,
-			$exceptChunkingType
-		);
-	}
-
-	/**
 	 * @param string $user
 	 * @param string $destination
 	 * @param string $shouldOrNot
@@ -2574,55 +2196,6 @@ trait WebDav {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Check that all the files uploaded with old/new DAV and chunked/non-chunked exist.
-	 * Except do not check the new-DAV-new-chunking combination. That is not being
-	 * supported on all implementations.
-	 *
-	 * @Then /^as "([^"]*)" the files uploaded to "([^"]*)" with all mechanisms except new chunking should (not|)\s?exist$/
-	 *
-	 * @param string $user
-	 * @param string $destination
-	 * @param string $shouldOrNot
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function filesUploadedToWithAllMechanismsExceptNewChunkingShouldExist(
-		string $user,
-		string $destination,
-		string $shouldOrNot
-	):void {
-		$this->checkIfFilesExist(
-			$user,
-			$destination,
-			$shouldOrNot,
-			'new'
-		);
-	}
-
-	/**
-	 * @Then /^as user "([^"]*)" on server "([^"]*)" the files uploaded to "([^"]*)" with all mechanisms should (not|)\s?exist$/
-	 *
-	 * @param string $user
-	 * @param string $server
-	 * @param string $destination
-	 * @param string $shouldOrNot
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function asUserOnServerTheFilesUploadedToWithAllMechanismsShouldExit(
-		string $user,
-		string $server,
-		string $destination,
-		string $shouldOrNot
-	):void {
-		$previousServer = $this->usingServer($server);
-		$this->checkIfFilesExist($user, $destination, $shouldOrNot);
-		$this->usingServer($previousServer);
 	}
 
 	/**
@@ -2848,39 +2421,6 @@ trait WebDav {
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
 		Assert::assertEquals(
-			$mtime,
-			WebDavHelper::getMtimeOfResource(
-				$user,
-				$password,
-				$baseUrl,
-				$resource,
-				$this->getStepLineRef(),
-				$this->getDavPathVersion()
-			)
-		);
-	}
-
-	/**
-	 * @Then as :user the mtime of the file :resource should not be :mtime
-	 *
-	 * @param string $user
-	 * @param string $resource
-	 * @param string $mtime
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theMtimeOfTheFileShouldNotBe(
-		string $user,
-		string $resource,
-		string $mtime
-	):void {
-		$user = $this->getActualUsername($user);
-		$password = $this->getPasswordForUser($user);
-		$baseUrl = $this->getBaseUrl();
-		$mtime = new DateTime($mtime);
-		$mtime = $mtime->format('U');
-		Assert::assertNotEquals(
 			$mtime,
 			WebDavHelper::getMtimeOfResource(
 				$user,
@@ -4318,25 +3858,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then the downloaded image for user :user should be :width pixels wide and :height pixels high
-	 *
-	 * @param string $user
-	 * @param string $width
-	 * @param string $height
-	 *
-	 * @return void
-	 */
-	public function imageDimensionsForAUserShouldBe(string $user, string $width, string $height):void {
-		if ($this->userResponseBodyContents[$user] === null) {
-			$this->userResponseBodyContents[$user] = $this->response->getBody()->getContents();
-		}
-		$size = \getimagesizefromstring($this->userResponseBodyContents[$user]);
-		Assert::assertNotFalse($size, "could not get size of image");
-		Assert::assertEquals($width, $size[0], "width not as expected");
-		Assert::assertEquals($height, $size[1], "height not as expected");
-	}
-
-	/**
 	 * @Then the downloaded image should be :width pixels wide and :height pixels high
 	 *
 	 * @param string $width
@@ -4364,20 +3885,6 @@ trait WebDav {
 		Assert::assertNotFalse($size, "could not get size of image");
 		Assert::assertEquals($width, $size[0], "width not as expected");
 		Assert::assertEquals($height, $size[1], "height not as expected");
-	}
-
-	/**
-	 * @Then the requested JPEG image should have a quality value of :size
-	 *
-	 * @param string $value
-	 *
-	 * @return void
-	 */
-	public function jpgQualityValueShouldBe(string $value): void {
-		$this->responseBodyContent = $this->response->getBody()->getContents();
-		// quality value is embedded in the string content for JPEG images
-		$qualityString = "quality = $value";
-		Assert::assertStringContainsString($qualityString, $this->responseBodyContent);
 	}
 
 	/**
@@ -4600,21 +4107,6 @@ trait WebDav {
 			$expectedFiles,
 			$user
 		);
-	}
-
-	/**
-	 * @Then /^the (?:propfind|search) result of user "([^"]*)" should not contain any (?:files|entries)$/
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function thePropfindResultShouldNotContainAnyEntries(
-		string $user
-	):void {
-		$multistatusResults = $this->getMultiStatusResultFromPropfindResult($user);
-		Assert::assertEmpty($multistatusResults, 'The propfind response was expected to be empty but was not');
 	}
 
 	/**
@@ -5129,19 +4621,6 @@ trait WebDav {
 		) {
 			\sleep($uploadWaitTime);
 		}
-	}
-
-	/**
-	 * @Then the author of the created version with index :index should be :expectedUsername
-	 *
-	 * @param string $index
-	 * @param string $expectedUsername
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAuthorOfEditedVersionFile(string $index, string $expectedUsername): void {
-		$this->checkAuthorOfAVersionOfFile($index, $expectedUsername);
 	}
 
 	/**
