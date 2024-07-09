@@ -50,6 +50,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Allow all uploads to restart: [#9506](https://github.com/owncloud/ocis/pull/9506)
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
 * Enhancement - Update web to v8.0.4: [#9429](https://github.com/owncloud/ocis/pull/9429)
+* Enhancement - Add cli to purge revisions: [#9497](https://github.com/owncloud/ocis/pull/9497)
 
 ## Details
 
@@ -96,6 +97,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9510
    https://github.com/owncloud/web/releases/tag/v8.0.3
    https://github.com/owncloud/web/releases/tag/v8.0.4
+
+* Enhancement - Add cli to purge revisions: [#9497](https://github.com/owncloud/ocis/pull/9497)
+
+   Adds a cli that allows removing all revisions for a storage-provider.
+
+   https://github.com/owncloud/ocis/pull/9497
 
 # Changelog for [5.0.5] (2024-05-22)
 
