@@ -36,7 +36,9 @@ func serveCmd() *cobra.Command {
 			ocisConfig.Set("adminUsername", cmd.Flag("admin-username").Value.String())
 			ocisConfig.Set("adminPassword", cmd.Flag("admin-password").Value.String())
 
-			go ocis.Start(nil)
+			if cmd.Flag("skip-ocis-run").Value.String() == "false" {
+				go ocis.Start(nil)
+			}
 			go wrapper.Start(cmd.Flag("port").Value.String())
 		},
 	}
@@ -49,6 +51,7 @@ func serveCmd() *cobra.Command {
 	serveCmd.Flags().StringP("port", "p", wrapperConfig.Get("port"), "Wrapper API server port")
 	serveCmd.Flags().StringP("admin-username", "", "", "admin username for oCIS server")
 	serveCmd.Flags().StringP("admin-password", "", "", "admin password for oCIS server")
+	serveCmd.Flags().Bool("skip-ocis-run", false, "Skip running oCIS server")
 
 	return serveCmd
 }

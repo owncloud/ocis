@@ -151,6 +151,12 @@ config = {
                 "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
             },
         },
+        "cli": {
+            "suites": [
+                "cliCommands",
+            ],
+            "skip": False,
+        },
     },
     "apiTests": {
         "numberOfParts": 10,
@@ -859,7 +865,7 @@ def localApiTestPipeline(ctx):
                         pipeline = {
                             "kind": "pipeline",
                             "type": "docker",
-                            "name": "localApiTests-%s-%s" % (suite, storage),
+                            "name": "%s-Tests-%s-%s" % ("CLI" if name.startswith("cli") else "API", suite, storage),
                             "platform": {
                                 "os": "linux",
                                 "arch": "amd64",

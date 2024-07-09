@@ -2,8 +2,10 @@ package ocis
 
 import (
 	"bufio"
+	"context"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -16,13 +18,16 @@ import (
 	"ociswrapper/common"
 	"ociswrapper/log"
 	"ociswrapper/ocis/config"
+
+	"github.com/creack/pty"
 )
 
 var cmd *exec.Cmd
 var retryCount = 0
 var stopSignal = false
+var EnvConfigs = []string{}
 
-func Start(envMap map[string]any) {
+func Start(envMap []string) {
 	// wait for the log scanner to finish
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -33,14 +38,11 @@ func Start(envMap map[string]any) {
 	}
 
 	cmd = exec.Command(config.Get("bin"), "server")
-	cmd.Env = os.Environ()
-	var environments []string
-	if envMap != nil {
-		for key, value := range envMap {
-			environments = append(environments, fmt.Sprintf("%s=%v", key, value))
-		}
+	if envMap == nil {
+		cmd.Env = append(os.Environ(), EnvConfigs...)
+	} else {
+		cmd.Env = append(os.Environ(), envMap...)
 	}
-	cmd.Env = append(cmd.Env, environments...)
 
 	logs, err := cmd.StderrPipe()
 	if err != nil {
@@ -111,21 +113,47 @@ func Start(envMap map[string]any) {
 	close(outChan)
 }
 
-func Stop() {
+func Stop() (bool, string) {
 	log.Println("Stopping oCIS server...")
 	stopSignal = true
+
+	if cmd == nil {
+		return true, "oCIS server is not running"
+	}
 
 	err := cmd.Process.Signal(syscall.SIGINT)
 	if err != nil {
 		if !strings.HasSuffix(err.Error(), "process already finished") {
 			log.Fatalln(err)
+		} else {
+			return true, "oCIS server is already stopped"
 		}
 	}
 	cmd.Process.Wait()
-	waitUntilCompleteShutdown()
+	success, message := waitUntilCompleteShutdown()
+
+	cmd = nil
+	return success, message
 }
 
-func listAllServices(startTime time.Time, timeout time.Duration) {
+func Restart(envMap []string) (bool, string) {
+	Stop()
+
+	log.Println("Restarting oCIS server...")
+	common.Wg.Add(1)
+	go Start(envMap)
+
+	return WaitForConnection()
+}
+
+func IsOcisRunning() bool {
+	if cmd != nil {
+		return cmd.Process.Pid > 0
+	}
+	return false
+}
+
+func waitAllServices(startTime time.Time, timeout time.Duration) {
 	timeoutS := timeout * time.Second
 
 	c := exec.Command(config.Get("bin"), "list")
@@ -133,15 +161,15 @@ func listAllServices(startTime time.Time, timeout time.Duration) {
 	if err != nil {
 		if time.Since(startTime) <= timeoutS {
 			time.Sleep(500 * time.Millisecond)
-			listAllServices(startTime, timeout)
+			waitAllServices(startTime, timeout)
 		}
 		return
 	}
 	log.Println("All services are up")
 }
 
-func WaitForConnection() bool {
-	listAllServices(time.Now(), 30)
+func WaitForConnection() (bool, string) {
+	waitAllServices(time.Now(), 30)
 
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -168,7 +196,7 @@ func WaitForConnection() bool {
 		select {
 		case <-timeout:
 			log.Println(fmt.Sprintf("%v seconds timeout waiting for oCIS server", int64(timeoutValue.Seconds())))
-			return false
+			return false, "Timeout waiting for oCIS server to start"
 		default:
 			req.Header.Set("X-Request-ID", "ociswrapper-"+strconv.Itoa(int(time.Now().UnixMilli())))
 
@@ -180,12 +208,12 @@ func WaitForConnection() bool {
 			}
 
 			log.Println("oCIS server is ready to accept requests")
-			return true
+			return true, "oCIS server is up and running"
 		}
 	}
 }
 
-func waitUntilCompleteShutdown() {
+func waitUntilCompleteShutdown() (bool, string) {
 	timeout := 30 * time.Second
 	startTime := time.Now()
 
@@ -200,17 +228,46 @@ func waitUntilCompleteShutdown() {
 
 		if time.Since(startTime) >= timeout {
 			log.Println(fmt.Sprintf("Unable to kill oCIS server after %v seconds", int64(timeout.Seconds())))
-			break
+			return false, "Timeout waiting for oCIS server to stop"
 		}
 	}
+	return true, "oCIS server stopped successfully"
 }
 
-func Restart(envMap map[string]any) bool {
-	Stop()
+func RunCommand(command string, inputs []string) (int, string) {
+	logs := new(strings.Builder)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	log.Println("Restarting oCIS server...")
-	common.Wg.Add(1)
-	go Start(envMap)
+	// build the command
+	cmdArgs := strings.Split(command, " ")
+	c := exec.CommandContext(ctx, config.Get("bin"), cmdArgs...)
 
-	return WaitForConnection()
+	// Start the command with a pty (pseudo terminal)
+	// This is required to interact with the command
+	ptyF, err := pty.Start(c)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer ptyF.Close()
+
+	for _, input := range inputs {
+		fmt.Fprintf(ptyF, "%s\n", input)
+	}
+
+	var cmdOutput string
+	if err := c.Wait(); err != nil {
+		if ctx.Err() == context.DeadlineExceeded {
+			cmdOutput = "Command timed out:\n"
+		}
+	}
+
+	// Copy the logs from the pty
+	io.Copy(logs, ptyF)
+	cmdOutput += logs.String()
+
+	// TODO: find if there is a better way to remove stdins from the output
+	cmdOutput = strings.TrimLeft(cmdOutput, strings.Join(inputs, "\r\n"))
+
+	return c.ProcessState.ExitCode(), cmdOutput
 }
