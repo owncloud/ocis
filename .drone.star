@@ -865,7 +865,7 @@ def localApiTestPipeline(ctx):
                         pipeline = {
                             "kind": "pipeline",
                             "type": "docker",
-                            "name": "%s-Tests-%s-%s" % ("CLI" if name.startswith("cli") else "API", suite, storage),
+                            "name": "%s-Tests-%s" % ("CLI" if name.startswith("cli") else "API", suite),
                             "platform": {
                                 "os": "linux",
                                 "arch": "amd64",
@@ -911,7 +911,7 @@ def localApiTests(suite, storage, extra_environment = {}):
         environment[item] = extra_environment[item]
 
     return [{
-        "name": "localApiTests-%s-%s" % (suite, storage),
+        "name": "localApiTests-%s" % suite,
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
         "environment": environment,
         "commands": [
@@ -923,7 +923,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "cs3ApiTests-%s" % (storage),
+        "name": "cs3ApiTests",
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -933,7 +933,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
                  ocisServer(storage, accounts_hash_difficulty, [], [], "cs3api_validator") +
                  [
                      {
-                         "name": "cs3ApiTests-%s" % (storage),
+                         "name": "cs3ApiTests",
                          "image": OC_CS3_API_VALIDATOR,
                          "environment": {},
                          "commands": [
@@ -1013,7 +1013,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
 
     for testgroup in testgroups:
         validatorTests.append({
-            "name": "wopiValidatorTests-%s-%s" % (storage, testgroup),
+            "name": "wopiValidatorTests-%s" % testgroup,
             "image": "owncloudci/wopi-validator",
             "commands": [
                 "export WOPI_TOKEN=$(cat accesstoken)",
@@ -1030,7 +1030,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "wopiValidatorTests-%s-%s" % (wopiServerType, storage),
+        "name": "wopiValidatorTests-%s" % wopiServerType,
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -1066,7 +1066,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                          ],
                      },
                      {
-                         "name": "prepare-test-file-%s" % (storage),
+                         "name": "prepare-test-file",
                          "image": OC_CI_ALPINE,
                          "environment": {},
                          "commands": [
@@ -1101,7 +1101,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "Core-API-Tests-%s-storage-%s" % (storage, part_number),
+        "name": "Core-API-Tests-%s" % part_number,
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -1111,7 +1111,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                  ocisServer(storage, accounts_hash_difficulty, with_wrapper = True) +
                  [
                      {
-                         "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
+                         "name": "oC10ApiTests-%s" % part_number,
                          "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                          "environment": {
                              "PATH_TO_OCIS": "%s" % dirs["base"],
