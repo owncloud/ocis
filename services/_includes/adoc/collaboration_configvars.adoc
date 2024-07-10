@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-10-08-38-40]
+[#deprecation-note-2024-07-10-09-32-51]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -160,7 +160,7 @@ Used to mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT tok
 
 a|`OCIS_REVA_GATEWAY` +
 `COLLABORATION_CS3API_GATEWAY_NAME` +
-xref:deprecation-note-2024-07-10-08-38-40[Deprecation Note]
+xref:deprecation-note-2024-07-10-09-32-51[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-10-08-38-40]
+[#deprecation-note-2024-07-10-09-32-51]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -619,6 +619,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Path to the 'banned passwords list' file. See the documentation for more details.
+Path to the 'banned passwords list' file. This only impacts public link password validation. See the documentation for more details.
 |===
 
