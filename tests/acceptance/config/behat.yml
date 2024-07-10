@@ -327,9 +327,20 @@ default:
         - PublicWebDavContext:
         - SharingNgContext:
 
-    apiSharingNg:
+    apiSharingNg1:
       paths:
-        - "%paths.base%/../features/apiSharingNg"
+        - "%paths.base%/../features/apiSharingNg1"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - SpacesContext:
+        - SharingNgContext:
+        - OcisConfigContext:
+        - SettingsContext:
+
+    apiSharingNg2:
+      paths:
+        - "%paths.base%/../features/apiSharingNg2"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
@@ -347,9 +358,20 @@ default:
         - SpacesContext:
         - SharingNgContext:
 
-    apiSharingNgLinkShare:
+    apiSharingNgLinkSharePermission:
       paths:
-        - "%paths.base%/../features/apiSharingNgLinkShare"
+        - "%paths.base%/../features/apiSharingNgLinkSharePermission"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - SpacesContext:
+        - SharingNgContext:
+        - PublicWebDavContext:
+        - OcisConfigContext:
+
+    apiSharingNgLinkShareRoot:
+      paths:
+        - "%paths.base%/../features/apiSharingNgLinkShareRoot"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
