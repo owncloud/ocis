@@ -87,6 +87,20 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator checks the backup consistency using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorChecksTheBackupConsistencyUsingTheCli():void {
+		$path = $this->featureContext->getStorageUsersRoot();
+		$command = "backup consistency -p $path";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @Then the command should be successful
 	 *
 	 * @return void
@@ -112,6 +126,7 @@ class CliContext implements Context {
 	public function theCommandOutputShouldContain(string $shouldOrNot, string $output): void {
 		$response = $this->featureContext->getResponse();
 		$jsonResponse = $this->featureContext->getJsonDecodedResponse($response);
+		$output = $this->featureContext->substituteInLineCodes($output);
 
 		if ($shouldOrNot === "should") {
 			Assert::assertStringContainsString($output, $jsonResponse["message"]);
