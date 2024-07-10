@@ -49,7 +49,7 @@ services:
     restart: always
 
   collabora:
-    image: collabora/code:23.05.7.5.1
+    image: collabora/code:24.04.5.1.1
     networks:
       ocis-net:
     environment:
