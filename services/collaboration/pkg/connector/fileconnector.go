@@ -78,6 +78,7 @@ type FileConnectorService interface {
 	// new file.
 	// This implements the "suggested" code flow for the PutRelativeFile endpoint.
 	// Since we need to upload contents, it will be done through the provided
+	// The target must be UTF8-encoded.
 	// ContentConnectorService
 	PutRelativeFileSuggested(ctx context.Context, ccs ContentConnectorService, stream io.Reader, streamLength int64, target string) (*PutRelativeResponse, error)
 	// PutRelativeFileRelative will create a new file based on the contents of the
@@ -86,6 +87,7 @@ type FileConnectorService interface {
 	// This implements the "relative" code flow for the PutRelativeFile endpoint.
 	// The required headers that could need to be sent through HTTP will also
 	// be returned if needed.
+	// The target must be UTF8-encoded.
 	// Since we need to upload contents, it will be done through the provided
 	// ContentConnectorService
 	PutRelativeFileRelative(ctx context.Context, ccs ContentConnectorService, stream io.Reader, streamLength int64, target string) (*PutRelativeResponse, *PutRelativeHeaders, error)
@@ -94,6 +96,11 @@ type FileConnectorService interface {
 	// assuming the lock matches.
 	// The current lockID will be returned if the file is locked.
 	DeleteFile(ctx context.Context, lockID string) (string, error)
+	// RenameFile will rename the provided file in the context to the requested
+	// filename. The filename must be UTF8-encoded.
+	// In case of conflict, this method will return the actual lockId in
+	// the file.
+	RenameFile(ctx context.Context, lockID, target string) (string, error)
 }
 
 // FileConnector implements the "File" endpoint.
@@ -521,6 +528,9 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 // and "X-WOPI-RelativeTarget" headers. This method only implements the first,
 // so this method must be used only if the "X-WOPI-SuggestedTarget" is present.
 //
+// The "target" filename must be UTF8-encoded. The conversion between UTF7 and
+// UTF8 must happen outside this function.
+//
 // The context MUST have a WOPI context, otherwise an error will be returned.
 // You can pass a pre-configured zerologger instance through the context that
 // will be used to log messages.
@@ -544,7 +554,9 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		return nil, err
 	}
 
-	logger := zerolog.Ctx(ctx)
+	logger := zerolog.Ctx(ctx).With().
+		Str("PutTarget", target).
+		Logger()
 
 	// stat the current file in order to get the reference of the parent folder
 	oldStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
@@ -572,7 +584,7 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 	}
 
 	finalTarget := target
-	newLogger := *logger
+	newLogger := logger
 	for isDone := false; !isDone; {
 		var conError *ConnectorError
 
@@ -592,6 +604,7 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		if err != nil {
 			// if the error isn't a connectorError, fail the request
 			if !errors.As(err, &conError) {
+				newLogger.Error().Err(err).Msg("PutRelativeFileSuggested: put file failed")
 				return nil, err
 			}
 
@@ -603,17 +616,19 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 			} else {
 				// TODO: code 400 might happen, what to do?
 				// in other cases, just return the error
+				newLogger.Error().Err(err).Msg("PutRelativeFileSuggested: put file failed with unhandled status")
 				return nil, err
 			}
 		} else {
 			// if the put is successful, exit the loop and move on
 			isDone = true
-			logger = &newLogger
+			logger = newLogger
 		}
 	}
 
 	wopiSrcURL, err := f.generateWOPISrc(ctx, wopiContext, newLogger)
 	if err != nil {
+		logger.Error().Err(err).Msg("PutRelativeFileSuggested: error generating the WOPISrc parameter")
 		return nil, err
 	}
 
@@ -633,6 +648,9 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 // The PutRelativeFile have 2 variants based on the "X-WOPI-SuggestedTarget"
 // and "X-WOPI-RelativeTarget" headers. This method only implements the second,
 // so this method must be used only if the "X-WOPI-RelativeTarget" is present.
+//
+// The "target" filename must be UTF8-encoded. The conversion between UTF7 and
+// UTF8 must happen outside this function.
 //
 // The context MUST have a WOPI context, otherwise an error will be returned.
 // You can pass a pre-configured zerologger instance through the context that
@@ -655,7 +673,9 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 		return nil, nil, err
 	}
 
-	logger := zerolog.Ctx(ctx)
+	logger := zerolog.Ctx(ctx).With().
+		Str("PutTarget", target).
+		Logger()
 
 	// stat the current file in order to get the reference of the parent folder
 	oldStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
@@ -691,6 +711,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 	if err != nil {
 		// if the error isn't a connectorError, fail the request
 		if !errors.As(err, &conError) {
+			newLogger.Error().Err(err).Msg("PutRelativeFileRelative: put file failed")
 			return nil, nil, err
 		}
 
@@ -699,6 +720,10 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 			// this should happen only once
 			wopiSrcURL, err2 := f.generateWOPISrc(ctx, wopiContext, newLogger)
 			if err2 != nil {
+				newLogger.Error().
+					Err(err2).
+					Str("LockID", lockID).
+					Msg("PutRelativeFileRelative: error generating the WOPISrc parameter for conflict response")
 				return nil, nil, err
 			}
 
@@ -712,16 +737,25 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 				Name: target,
 				Url:  wopiSrcURL.String(),
 			}
+			newLogger.Error().
+				Err(err).
+				Str("LockID", lockID).
+				Msg("PutRelativeFileRelative: error conflict")
 			return response, headers, err
 		} else {
 			// TODO: code 400 might happen, what to do?
 			// in other cases, just return the error
+			newLogger.Error().
+				Err(err).
+				Str("LockID", lockID).
+				Msg("PutRelativeFileRelative: put file failed with unhandled status")
 			return nil, nil, err
 		}
 	}
 
 	wopiSrcURL, err := f.generateWOPISrc(ctx, wopiContext, newLogger)
 	if err != nil {
+		newLogger.Error().Err(err).Msg("PutRelativeFileRelative: error generating the WOPISrc parameter")
 		return nil, nil, err
 	}
 	// send the info
@@ -753,7 +787,9 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 		return "", err
 	}
 
-	logger := zerolog.Ctx(ctx)
+	logger := zerolog.Ctx(ctx).With().
+		Str("RequestedLockID", lockID).
+		Logger()
 
 	deleteRes, err := f.gwc.Delete(ctx, &providerv1beta1.DeleteRequest{
 		Ref:    &wopiContext.FileReference,
@@ -772,6 +808,7 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 
 		if deleteRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_NOT_FOUND {
 			// don't bother to check for locks of a missing file
+			logger.Error().Msg("DeleteFile: tried to delete a missing file")
 			return "", NewConnectorError(404, deleteRes.GetStatus().GetCode().String()+" "+deleteRes.GetStatus().GetMessage())
 		}
 
@@ -795,13 +832,121 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 		}
 
 		if resp.GetLock() != nil {
+			logger.Error().
+				Str("LockID", resp.GetLock().GetLockId()).
+				Msg("DeleteFile: file is locked")
 			return resp.GetLock().GetLockId(), NewConnectorError(409, "file is locked")
 		} else {
 			// return the original error since the file isn't locked
+			logger.Error().Msg("DeleteFile: delete failed on unlocked file")
 			return "", NewConnectorError(500, deleteRes.GetStatus().GetCode().String()+" "+deleteRes.GetStatus().GetMessage())
 		}
 	}
+	logger.Debug().Msg("DeleteFile: success")
 	return "", nil
+}
+
+// RenameFile will rename the requested file
+// https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/renamefile
+//
+// The "target" filename must be UTF8-encoded. The conversion between UTF7 and
+// UTF8 must happen outside this function.
+//
+// The context MUST have a WOPI context, otherwise an error will be returned.
+// You can pass a pre-configured zerologger instance through the context that
+// will be used to log messages.
+//
+// The method will return the actual lockId in case of conflict, otherwise
+// the returned lockId will be empty.
+func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (string, error) {
+	wopiContext, err := middleware.WopiContextFromCtx(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	logger := zerolog.Ctx(ctx).With().
+		Str("RequestedLockID", lockID).
+		Str("RenameTarget", target).
+		Logger()
+
+	// stat the current file in order to get the reference of the parent folder
+	oldStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+		Ref: &wopiContext.FileReference,
+	})
+	if err != nil {
+		logger.Error().Err(err).Msg("RenameFile: stat failed")
+		return "", err
+	}
+
+	if oldStatRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+		logger.Error().
+			Str("StatusCode", oldStatRes.GetStatus().GetCode().String()).
+			Str("StatusMsg", oldStatRes.GetStatus().GetMessage()).
+			Msg("RenameFile: stat failed with unexpected status")
+		return "", NewConnectorError(500, oldStatRes.GetStatus().GetCode().String()+" "+oldStatRes.GetStatus().GetMessage())
+	}
+
+	// the target doesn't include the extension
+	targetWithExt := target + path.Ext(oldStatRes.GetInfo().GetPath())
+	finalTarget := targetWithExt
+	for isDone := false; !isDone; {
+		targetPath := utils.MakeRelativePath(finalTarget)
+		// need to change the file reference of the wopicontext to point to the new path
+		targetFileReference := providerv1beta1.Reference{
+			ResourceId: oldStatRes.GetInfo().GetParentId(),
+			Path:       targetPath,
+		}
+
+		// add the new file reference to the log context
+		newLogger := logger.With().Str("NewFileReference", targetFileReference.String()).Logger()
+
+		// try to put the file. It mustn't return a 400 or 409
+		moveRes, err := f.gwc.Move(ctx, &providerv1beta1.MoveRequest{
+			Source:      &wopiContext.FileReference,
+			Destination: &targetFileReference,
+			LockId:      lockID,
+		})
+		if err != nil {
+			newLogger.Error().Err(err).Msg("RenameFile: move failed")
+			return "", err
+		}
+		if moveRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+			if moveRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_LOCKED {
+				currentLockID := ""
+				if oldStatRes.GetInfo().GetLock() != nil {
+					currentLockID = oldStatRes.GetInfo().GetLock().GetLockId()
+				}
+				newLogger.Error().
+					Str("LockID", currentLockID).
+					Str("StatusCode", moveRes.GetStatus().GetCode().String()).
+					Str("StatusMsg", moveRes.GetStatus().GetMessage()).
+					Msg("RenameFile: conflict")
+				return currentLockID, NewConnectorError(409, "file is locked")
+			}
+
+			if moveRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_ALREADY_EXISTS {
+				// try to generate a different name. This should happen only once
+				actualFilename, _ := f.extractFilenameAndPrefix(targetWithExt)
+				finalTarget = f.generatePrefix() + " " + actualFilename
+			} else {
+				// TODO: code 400 might happen, what to do?
+				// in other cases, just return the error
+				newLogger.Error().
+					Str("StatusCode", moveRes.GetStatus().GetCode().String()).
+					Str("StatusMsg", moveRes.GetStatus().GetMessage()).
+					Msg("RenameFile: move failed with unexpected status")
+
+				return "", NewConnectorError(500, moveRes.GetStatus().GetCode().String()+" "+moveRes.GetStatus().GetMessage())
+			}
+		} else {
+			// if the put is successful, exit the loop and move on
+			isDone = true
+			logger = newLogger
+		}
+	}
+	logger.Debug().Msg("RenameFile: success")
+	return "", nil
+
 }
 
 // CheckFileInfo returns information about the requested file and capabilities of the wopi server
@@ -892,6 +1037,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 		fileinfo.KeySupportsLocks:              true,
 		fileinfo.KeySupportsUpdate:             true,
 		fileinfo.KeySupportsDeleteFile:         true,
+		fileinfo.KeySupportsRename:             true,
 
 		//fileinfo.KeyUserCanNotWriteRelative: true,
 		fileinfo.KeyIsAnonymousUser:  isAnonymousUser,
@@ -904,6 +1050,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 	switch wopiContext.ViewMode {
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE:
 		infoMap[fileinfo.KeyUserCanWrite] = true
+		infoMap[fileinfo.KeyUserCanRename] = true
 
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_ONLY:
 		// nothing special to do here for now

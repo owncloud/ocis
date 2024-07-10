@@ -15,13 +15,14 @@ import (
 )
 
 const (
-	HeaderWopiLock        string = "X-WOPI-Lock"
-	HeaderWopiOldLock     string = "X-WOPI-OldLock"
-	HeaderWopiST          string = "X-WOPI-SuggestedTarget"
-	HeaderWopiRT          string = "X-WOPI-RelativeTarget"
-	HeaderWopiOverwriteRT string = "X-WOPI-OverwriteRelativeTarget"
-	HeaderWopiSize        string = "X-WOPI-Size"
-	HeaderWopiValidRT     string = "X-WOPI-ValidRelativeTarget"
+	HeaderWopiLock          string = "X-WOPI-Lock"
+	HeaderWopiOldLock       string = "X-WOPI-OldLock"
+	HeaderWopiST            string = "X-WOPI-SuggestedTarget"
+	HeaderWopiRT            string = "X-WOPI-RelativeTarget"
+	HeaderWopiOverwriteRT   string = "X-WOPI-OverwriteRelativeTarget"
+	HeaderWopiSize          string = "X-WOPI-Size"
+	HeaderWopiValidRT       string = "X-WOPI-ValidRelativeTarget"
+	HeaderWopiRequestedName string = "X-WOPI-RequestedName"
 )
 
 // HttpAdapter will adapt the responses from the connector to HTTP.
@@ -335,6 +336,35 @@ func (h *HttpAdapter) DeleteFile(w http.ResponseWriter, r *http.Request) {
 
 	fileCon := h.con.GetFileConnector()
 	newLockID, err := fileCon.DeleteFile(r.Context(), lockID)
+	if err != nil {
+		var conError *ConnectorError
+		if errors.As(err, &conError) {
+			if conError.HttpCodeOut == 409 {
+				w.Header().Set(HeaderWopiLock, newLockID)
+			}
+			http.Error(w, http.StatusText(conError.HttpCodeOut), conError.HttpCodeOut)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
+	// If no error, a HTTP 200 should be sent automatically.
+	// X-WOPI-Lock header isn't needed on HTTP 200
+}
+
+func (h *HttpAdapter) RenameFile(w http.ResponseWriter, r *http.Request) {
+	lockID := r.Header.Get(HeaderWopiLock)
+	requestedName := r.Header.Get(HeaderWopiRequestedName)
+
+	utf8Target, decErr := utf7.DecodeString(requestedName)
+	if decErr != nil || len(utf8Target) > 495 { // need space for the possible prefix and the extension
+		w.Header().Set("X-WOPI-InvalidFileNameError", "Filename too long")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	fileCon := h.con.GetFileConnector()
+	newLockID, err := fileCon.RenameFile(r.Context(), lockID, utf8Target)
 	if err != nil {
 		var conError *ConnectorError
 		if errors.As(err, &conError) {

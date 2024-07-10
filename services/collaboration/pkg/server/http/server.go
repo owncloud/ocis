@@ -151,8 +151,7 @@ func prepareRoutes(r *chi.Mux, options Options) {
 				case "PUT_RELATIVE":
 					adapter.PutRelativeFile(w, r)
 				case "RENAME_FILE":
-					// https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/renamefile
-					stdhttp.Error(w, stdhttp.StatusText(stdhttp.StatusNotImplemented), stdhttp.StatusNotImplemented)
+					adapter.RenameFile(w, r)
 				case "DELETE":
 					adapter.DeleteFile(w, r)
 
