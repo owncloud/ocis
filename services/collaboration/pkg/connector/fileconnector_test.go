@@ -1304,6 +1304,185 @@ var _ = Describe("FileConnector", func() {
 		})
 	})
 
+	Describe("RenameFile", func() {
+		It("No valid context", func() {
+			ctx := context.Background()
+			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Stat fails", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			targetErr := errors.New("Something went wrong")
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, targetErr)
+
+			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(targetErr))
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Stat fails status not ok", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(500))
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Rename failed", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			targetErr := errors.New("Something went wrong")
+			gatewayClient.On("Move", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, targetErr)
+
+			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(targetErr))
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Rename failed status not ok", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			gatewayClient.On("Move", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(500))
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Rename conflict", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			gatewayClient.On("Move", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewLocked(ctx, "lock mismatch"),
+			}, nil)
+
+			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(409))
+			Expect(lockID).To(Equal("zzz999"))
+		})
+
+		It("Rename already exists", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			moveParamMatcher := mock.MatchedBy(func(moveReq *providerv1beta1.MoveRequest) bool {
+				if moveReq.Destination.Path == "./newFile.doc" &&
+					moveReq.LockId == "zzz999" {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Move", mock.Anything, moveParamMatcher).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewAlreadyExists(ctx, nil, "target already exists"),
+			}, nil).Once()
+
+			move2ParamMatcher := mock.MatchedBy(func(moveReq *providerv1beta1.MoveRequest) bool {
+				r := regexp.MustCompile(`^\./[a-zA-Z0-9_-]+ newFile\.doc$`)
+				if r.MatchString(moveReq.Destination.Path) &&
+					moveReq.LockId == "zzz999" {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Move", mock.Anything, move2ParamMatcher).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewOK(ctx),
+			}, nil).Once()
+
+			lockID, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
+			Expect(err).To(Succeed())
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Success", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			moveParamMatcher := mock.MatchedBy(func(moveReq *providerv1beta1.MoveRequest) bool {
+				if moveReq.Destination.Path == "./newFile.doc" &&
+					moveReq.LockId == "zzz999" {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Move", mock.Anything, moveParamMatcher).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewOK(ctx),
+			}, nil).Once()
+
+			lockID, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
+			Expect(err).To(Succeed())
+			Expect(lockID).To(Equal(""))
+		})
+	})
+
 	Describe("CheckFileInfo", func() {
 		It("No valid context", func() {
 			ctx := context.Background()
