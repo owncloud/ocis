@@ -151,6 +151,7 @@ func (s *Service) OpenInApp(
 
 		q := u.Query()
 		q.Add("WOPISrc", wopiSrcURL.String())
+		q.Add("dchat", "1")
 		qs := q.Encode()
 		u.RawQuery = qs
 
