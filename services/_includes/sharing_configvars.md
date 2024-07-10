@@ -64,4 +64,4 @@
 | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | int | 1 | Define the minimum number of lowercase letters. Defaults to 1 if not set.|
 | OCIS_PASSWORD_POLICY_MIN_DIGITS<br/>SHARING_PASSWORD_POLICY_MIN_DIGITS | int | 1 | Define the minimum number of digits. Defaults to 1 if not set.|
 | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS<br/>SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 1 | Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set.|
-| OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST<br/>SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST | string |  | Path to the 'banned passwords list' file. See the documentation for more details.|
+| OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST<br/>SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST | string |  | Path to the 'banned passwords list' file. This only impacts public link password validation. See the documentation for more details.|
