@@ -1374,7 +1374,9 @@ var _ = Describe("FileConnector", func() {
 				SupportsLocks:              true,
 				SupportsUpdate:             true,
 				SupportsDeleteFile:         true,
+				SupportsRename:             true,
 				UserCanWrite:               true,
+				UserCanRename:              true,
 				UserID:                     "6f7061717565496440696e6d656d6f7279", // hex of opaqueId@inmemory
 				UserFriendlyName:           "Pet Shaft",
 			}
@@ -1431,6 +1433,8 @@ var _ = Describe("FileConnector", func() {
 				UserFriendlyName:        "guest zzz000",
 				EnableOwnerTermination:  true,
 				SupportsLocks:           true,
+				SupportsRename:          true,
+				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://ocis.example.prv",
 			}
@@ -1488,6 +1492,8 @@ var _ = Describe("FileConnector", func() {
 				EnableOwnerTermination:  true,
 				WatermarkText:           "Pet Shaft shaft@example.com",
 				SupportsLocks:           true,
+				SupportsRename:          true,
+				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://ocis.example.prv",
 			}

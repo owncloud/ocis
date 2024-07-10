@@ -446,6 +446,64 @@ func (_c *FileConnectorService_RefreshLock_Call) RunAndReturn(run func(context.C
 	return _c
 }
 
+// RenameFile provides a mock function with given fields: ctx, lockID, target
+func (_m *FileConnectorService) RenameFile(ctx context.Context, lockID string, target string) (string, error) {
+	ret := _m.Called(ctx, lockID, target)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RenameFile")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (string, error)); ok {
+		return rf(ctx, lockID, target)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) string); ok {
+		r0 = rf(ctx, lockID, target)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = rf(ctx, lockID, target)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FileConnectorService_RenameFile_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RenameFile'
+type FileConnectorService_RenameFile_Call struct {
+	*mock.Call
+}
+
+// RenameFile is a helper method to define mock.On call
+//   - ctx context.Context
+//   - lockID string
+//   - target string
+func (_e *FileConnectorService_Expecter) RenameFile(ctx interface{}, lockID interface{}, target interface{}) *FileConnectorService_RenameFile_Call {
+	return &FileConnectorService_RenameFile_Call{Call: _e.mock.On("RenameFile", ctx, lockID, target)}
+}
+
+func (_c *FileConnectorService_RenameFile_Call) Run(run func(ctx context.Context, lockID string, target string)) *FileConnectorService_RenameFile_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *FileConnectorService_RenameFile_Call) Return(_a0 string, _a1 error) *FileConnectorService_RenameFile_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FileConnectorService_RenameFile_Call) RunAndReturn(run func(context.Context, string, string) (string, error)) *FileConnectorService_RenameFile_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UnLock provides a mock function with given fields: ctx, lockID
 func (_m *FileConnectorService) UnLock(ctx context.Context, lockID string) (string, error) {
 	ret := _m.Called(ctx, lockID)
