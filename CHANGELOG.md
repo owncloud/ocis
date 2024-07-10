@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Allow all uploads to restart: [#9506](https://github.com/owncloud/ocis/pull/9506)
+* Bugfix - Fix the email notification service: [#9514](https://github.com/owncloud/ocis/pull/9514)
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
 * Enhancement - Update web to v8.0.4: [#9429](https://github.com/owncloud/ocis/pull/9429)
 * Enhancement - Add cli to purge revisions: [#9497](https://github.com/owncloud/ocis/pull/9497)
@@ -59,6 +60,14 @@ The following sections list the changes for unreleased.
    On postprocessing-restart, allow all uploads to restart even if one fails.
 
    https://github.com/owncloud/ocis/pull/9506
+
+* Bugfix - Fix the email notification service: [#9514](https://github.com/owncloud/ocis/pull/9514)
+
+   We fixed an error in the notification service that caused the email notification
+   to fail when the user's display name contained special characters.
+
+   https://github.com/owncloud/ocis/issues/9402
+   https://github.com/owncloud/ocis/pull/9514
 
 * Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
 
