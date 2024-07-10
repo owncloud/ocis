@@ -25,7 +25,10 @@ import (
 
 // NewHandler creates a new grpc service implementing the OpenInApp interface
 func NewHandler(opts ...Option) (*Service, func(), error) {
-	teardown := func() {}
+	teardown := func() {
+		/* this is required as a argument for the return value to satisfy the interface */
+		/* in case you are wondering about the necessity of this comment, sonarcloud is asking for it */
+	}
 	options := newOptions(opts...)
 
 	gwc := options.Gwc
@@ -93,18 +96,18 @@ func (s *Service) OpenInApp(
 	var viewAppURL string
 	var editAppURL string
 	if viewCommentAppURLs, ok := s.appURLs["view_comment"]; ok {
-		if url := viewCommentAppURLs[fileExt]; ok {
-			viewCommentAppURL = url
+		if u, ok := viewCommentAppURLs[fileExt]; ok {
+			viewCommentAppURL = u
 		}
 	}
 	if viewAppURLs, ok := s.appURLs["view"]; ok {
-		if url := viewAppURLs[fileExt]; ok {
-			viewAppURL = url
+		if u, ok := viewAppURLs[fileExt]; ok {
+			viewAppURL = u
 		}
 	}
 	if editAppURLs, ok := s.appURLs["edit"]; ok {
-		if url, ok := editAppURLs[fileExt]; ok {
-			editAppURL = url
+		if u, ok := editAppURLs[fileExt]; ok {
+			editAppURL = u
 		}
 	}
 	if editAppURL == "" && viewAppURL == "" && viewCommentAppURL == "" {
