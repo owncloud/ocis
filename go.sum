@@ -1025,6 +1025,8 @@ github.com/crewjam/saml v0.4.14 h1:g9FBNx62osKusnFzs3QTN5L9CVA/Egfgm+stJShzw/c=
 github.com/crewjam/saml v0.4.14/go.mod h1:UVSZCf18jJkk6GpWNVqcyQJMD5HsRugBPf4I1nl2mME=
 github.com/cs3org/go-cs3apis v0.0.0-20240425114016-d2cb31692b4e h1:Cm2l8m2riLa79eh7V2wHd1Ra7wR3TbngmeLZBJ9MxTU=
 github.com/cs3org/go-cs3apis v0.0.0-20240425114016-d2cb31692b4e/go.mod h1:yyP8PRo0EZou3nSH7H4qjlzQwaydPeIRNgX50npQHpE=
+github.com/cs3org/reva/v2 v2.21.1-0.20240711153523-f9083e96d2ea h1:fMT9FvEsfR+OLS4SWNNkxgUrCtgAuJABRTK+f+VRETk=
+github.com/cs3org/reva/v2 v2.21.1-0.20240711153523-f9083e96d2ea/go.mod h1:+5pteFc4ymQnhYG2cOtg/jzaIZKgxrgIeH0D4fuC6gA=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
 github.com/cyphar/filepath-securejoin v0.2.4 h1:Ugdm7cg7i6ZK6x3xDF1oEu1nfkyfH53EtKeQYTC3kyg=
 github.com/cyphar/filepath-securejoin v0.2.4/go.mod h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=
@@ -1914,8 +1916,6 @@ github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 h1:MkV+77GLUNo
 github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
 github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
-github.com/rhafer/reva/v2 v2.0.0-20240711124633-d9f27b3a83d1 h1:glMiCv50PUgbf/vpWUzsprE3OMLtq7fQAtheVsDiuEU=
-github.com/rhafer/reva/v2 v2.0.0-20240711124633-d9f27b3a83d1/go.mod h1:+5pteFc4ymQnhYG2cOtg/jzaIZKgxrgIeH0D4fuC6gA=
 github.com/riandyrn/otelchi v0.8.0 h1:q60HKpwt1MmGjOWgM7m5gGyXYAY3DfTSdfBdBt6ICV4=
 github.com/riandyrn/otelchi v0.8.0/go.mod h1:ErTae2TG7lrOtEPFsd5/hYLOHJpkk0NNyMaeTMWxl0U=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
