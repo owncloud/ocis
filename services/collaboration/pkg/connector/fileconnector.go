@@ -1164,23 +1164,11 @@ func (f *FileConnector) generatePrefix() string {
 	return base64.RawURLEncoding.EncodeToString(bytes.TrimLeft(byteArray, "\x00"))
 }
 
+// The adjustWopiReference should be called first so the file reference
+// contains the resource id of the target file without the path
+// (storage, opaque and space points directly to the file). The path component
+// will be ignored
 func (f *FileConnector) generateWOPISrc(ctx context.Context, wopiContext middleware.WopiContext, logger zerolog.Logger) (*url.URL, error) {
-	statRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
-		Ref: &wopiContext.FileReference,
-	})
-	if err != nil {
-		logger.Error().Err(err).Msg("generateWOPISrc: stat failed")
-		return nil, err
-	}
-
-	if statRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
-		logger.Error().
-			Str("StatusCode", statRes.GetStatus().GetCode().String()).
-			Str("StatusMsg", statRes.GetStatus().GetMessage()).
-			Msg("generateWOPISrc: stat failed with unexpected status")
-		return nil, NewConnectorError(500, statRes.GetStatus().GetCode().String()+" "+statRes.GetStatus().GetMessage())
-	}
-
 	// get the WOPI token for the new file
 	accessToken, _, err := middleware.GenerateWopiToken(wopiContext, f.cfg)
 	if err != nil {
@@ -1189,8 +1177,9 @@ func (f *FileConnector) generateWOPISrc(ctx context.Context, wopiContext middlew
 	}
 
 	// get the reference
+	resourceId := wopiContext.FileReference.GetResourceId()
 	c := sha256.New()
-	c.Write([]byte(statRes.GetInfo().GetId().GetStorageId() + "$" + statRes.GetInfo().GetId().GetSpaceId() + "!" + statRes.GetInfo().GetId().GetOpaqueId()))
+	c.Write([]byte(resourceId.GetStorageId() + "$" + resourceId.GetSpaceId() + "!" + resourceId.GetOpaqueId()))
 	fileRef := hex.EncodeToString(c.Sum(nil))
 
 	// generate the URL for the WOPI app to access the new created file

@@ -1307,9 +1307,10 @@ var _ = Describe("FileConnector", func() {
 	Describe("RenameFile", func() {
 		It("No valid context", func() {
 			ctx := context.Background()
-			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
 			Expect(err).To(HaveOccurred())
 			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Stat fails", func() {
@@ -1320,10 +1321,11 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
 			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Stat fails status not ok", func() {
@@ -1333,11 +1335,12 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, nil)
 
-			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
 			Expect(err).To(HaveOccurred())
 			conErr := err.(*connector.ConnectorError)
 			Expect(conErr.HttpCodeOut).To(Equal(500))
 			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Rename failed", func() {
@@ -1358,10 +1361,11 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
 			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Rename failed status not ok", func() {
@@ -1381,11 +1385,12 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, nil)
 
-			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
 			Expect(err).To(HaveOccurred())
 			conErr := err.(*connector.ConnectorError)
 			Expect(conErr.HttpCodeOut).To(Equal(500))
 			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Rename conflict", func() {
@@ -1405,11 +1410,12 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewLocked(ctx, "lock mismatch"),
 			}, nil)
 
-			lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
 			Expect(err).To(HaveOccurred())
 			conErr := err.(*connector.ConnectorError)
 			Expect(conErr.HttpCodeOut).To(Equal(409))
 			Expect(lockID).To(Equal("zzz999"))
+			Expect(response).To(BeNil())
 		})
 
 		It("Rename already exists", func() {
@@ -1448,9 +1454,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewOK(ctx),
 			}, nil).Once()
 
-			lockID, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
+			response, lockID, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
 			Expect(err).To(Succeed())
 			Expect(lockID).To(Equal(""))
+			Expect(response.Name).To(MatchRegexp(`^[a-zA-Z0-9_-]+ newFile$`))
 		})
 
 		It("Success", func() {
@@ -1477,9 +1484,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewOK(ctx),
 			}, nil).Once()
 
-			lockID, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
+			response, lockID, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
 			Expect(err).To(Succeed())
 			Expect(lockID).To(Equal(""))
+			Expect(response.Name).To(Equal("newFile"))
 		})
 	})
 

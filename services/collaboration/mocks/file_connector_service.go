@@ -447,31 +447,40 @@ func (_c *FileConnectorService_RefreshLock_Call) RunAndReturn(run func(context.C
 }
 
 // RenameFile provides a mock function with given fields: ctx, lockID, target
-func (_m *FileConnectorService) RenameFile(ctx context.Context, lockID string, target string) (string, error) {
+func (_m *FileConnectorService) RenameFile(ctx context.Context, lockID string, target string) (*connector.RenameResponse, string, error) {
 	ret := _m.Called(ctx, lockID, target)
 
 	if len(ret) == 0 {
 		panic("no return value specified for RenameFile")
 	}
 
-	var r0 string
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (string, error)); ok {
+	var r0 *connector.RenameResponse
+	var r1 string
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*connector.RenameResponse, string, error)); ok {
 		return rf(ctx, lockID, target)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) *connector.RenameResponse); ok {
 		r0 = rf(ctx, lockID, target)
 	} else {
-		r0 = ret.Get(0).(string)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connector.RenameResponse)
+		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) string); ok {
 		r1 = rf(ctx, lockID, target)
 	} else {
-		r1 = ret.Error(1)
+		r1 = ret.Get(1).(string)
 	}
 
-	return r0, r1
+	if rf, ok := ret.Get(2).(func(context.Context, string, string) error); ok {
+		r2 = rf(ctx, lockID, target)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
 // FileConnectorService_RenameFile_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RenameFile'
@@ -494,12 +503,12 @@ func (_c *FileConnectorService_RenameFile_Call) Run(run func(ctx context.Context
 	return _c
 }
 
-func (_c *FileConnectorService_RenameFile_Call) Return(_a0 string, _a1 error) *FileConnectorService_RenameFile_Call {
-	_c.Call.Return(_a0, _a1)
+func (_c *FileConnectorService_RenameFile_Call) Return(_a0 *connector.RenameResponse, _a1 string, _a2 error) *FileConnectorService_RenameFile_Call {
+	_c.Call.Return(_a0, _a1, _a2)
 	return _c
 }
 
-func (_c *FileConnectorService_RenameFile_Call) RunAndReturn(run func(context.Context, string, string) (string, error)) *FileConnectorService_RenameFile_Call {
+func (_c *FileConnectorService_RenameFile_Call) RunAndReturn(run func(context.Context, string, string) (*connector.RenameResponse, string, error)) *FileConnectorService_RenameFile_Call {
 	_c.Call.Return(run)
 	return _c
 }
