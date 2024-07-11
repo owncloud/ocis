@@ -49,6 +49,10 @@ type PutRelativeResponse struct {
 	HostEdit string
 }
 
+type RenameResponse struct {
+	Name string
+}
+
 // FileConnectorService is the interface to implement the "Files"
 // endpoint. Basically lock operations on the file plus the CheckFileInfo.
 // All operations need a context containing a WOPI context and, optionally,
@@ -99,8 +103,8 @@ type FileConnectorService interface {
 	// RenameFile will rename the provided file in the context to the requested
 	// filename. The filename must be UTF8-encoded.
 	// In case of conflict, this method will return the actual lockId in
-	// the file.
-	RenameFile(ctx context.Context, lockID, target string) (string, error)
+	// the file as second return value.
+	RenameFile(ctx context.Context, lockID, target string) (*RenameResponse, string, error)
 }
 
 // FileConnector implements the "File" endpoint.
@@ -626,6 +630,11 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		}
 	}
 
+	// adjust the wopi file reference to use only the resource id without path
+	if err := f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
+		return nil, err
+	}
+
 	wopiSrcURL, err := f.generateWOPISrc(ctx, wopiContext, newLogger)
 	if err != nil {
 		logger.Error().Err(err).Msg("PutRelativeFileSuggested: error generating the WOPISrc parameter")
@@ -638,7 +647,9 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		Url:  wopiSrcURL.String(),
 	}
 
-	logger.Debug().Msg("PutRelativeFileSuggested: success")
+	logger.Debug().
+		Str("FinalReference", wopiContext.FileReference.String()).
+		Msg("PutRelativeFileSuggested: success")
 	return result, nil
 }
 
@@ -716,6 +727,9 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 		}
 
 		if conError.HttpCodeOut == 409 {
+			if err := f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
+				return nil, nil, err
+			}
 			// if conflict generate a different name and retry.
 			// this should happen only once
 			wopiSrcURL, err2 := f.generateWOPISrc(ctx, wopiContext, newLogger)
@@ -751,6 +765,10 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 				Msg("PutRelativeFileRelative: put file failed with unhandled status")
 			return nil, nil, err
 		}
+	}
+
+	if err := f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
+		return nil, nil, err
 	}
 
 	wopiSrcURL, err := f.generateWOPISrc(ctx, wopiContext, newLogger)
@@ -856,12 +874,14 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 // You can pass a pre-configured zerologger instance through the context that
 // will be used to log messages.
 //
-// The method will return the actual lockId in case of conflict, otherwise
-// the returned lockId will be empty.
-func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (string, error) {
+// The method will return the final target name as first return value (target
+// is just a suggestion, so it could have changed) and the actual lockId in
+// case of conflict as second return value, otherwise the returned lockId will
+// be empty.
+func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (*RenameResponse, string, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 
 	logger := zerolog.Ctx(ctx).With().
@@ -875,15 +895,20 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("RenameFile: stat failed")
-		return "", err
+		return nil, "", err
 	}
 
 	if oldStatRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
-		logger.Error().
-			Str("StatusCode", oldStatRes.GetStatus().GetCode().String()).
-			Str("StatusMsg", oldStatRes.GetStatus().GetMessage()).
-			Msg("RenameFile: stat failed with unexpected status")
-		return "", NewConnectorError(500, oldStatRes.GetStatus().GetCode().String()+" "+oldStatRes.GetStatus().GetMessage())
+		if oldStatRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_NOT_FOUND {
+			logger.Error().Msg("RenameFile: file not found")
+			return nil, "", NewConnectorError(404, oldStatRes.GetStatus().GetCode().String()+" "+oldStatRes.GetStatus().GetMessage())
+		} else {
+			logger.Error().
+				Str("StatusCode", oldStatRes.GetStatus().GetCode().String()).
+				Str("StatusMsg", oldStatRes.GetStatus().GetMessage()).
+				Msg("RenameFile: stat failed with unexpected status")
+			return nil, "", NewConnectorError(500, oldStatRes.GetStatus().GetCode().String()+" "+oldStatRes.GetStatus().GetMessage())
+		}
 	}
 
 	// the target doesn't include the extension
@@ -908,10 +933,10 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 		})
 		if err != nil {
 			newLogger.Error().Err(err).Msg("RenameFile: move failed")
-			return "", err
+			return nil, "", err
 		}
 		if moveRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
-			if moveRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_LOCKED {
+			if moveRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_LOCKED || moveRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_ABORTED {
 				currentLockID := ""
 				if oldStatRes.GetInfo().GetLock() != nil {
 					currentLockID = oldStatRes.GetInfo().GetLock().GetLockId()
@@ -921,7 +946,7 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 					Str("StatusCode", moveRes.GetStatus().GetCode().String()).
 					Str("StatusMsg", moveRes.GetStatus().GetMessage()).
 					Msg("RenameFile: conflict")
-				return currentLockID, NewConnectorError(409, "file is locked")
+				return nil, currentLockID, NewConnectorError(409, "file is locked")
 			}
 
 			if moveRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_ALREADY_EXISTS {
@@ -936,7 +961,7 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 					Str("StatusMsg", moveRes.GetStatus().GetMessage()).
 					Msg("RenameFile: move failed with unexpected status")
 
-				return "", NewConnectorError(500, moveRes.GetStatus().GetCode().String()+" "+moveRes.GetStatus().GetMessage())
+				return nil, "", NewConnectorError(500, moveRes.GetStatus().GetCode().String()+" "+moveRes.GetStatus().GetMessage())
 			}
 		} else {
 			// if the put is successful, exit the loop and move on
@@ -944,8 +969,11 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 			logger = newLogger
 		}
 	}
+
 	logger.Debug().Msg("RenameFile: success")
-	return "", nil
+	return &RenameResponse{
+		Name: strings.TrimSuffix(path.Base(finalTarget), path.Ext(finalTarget)), // return the final filename without extension
+	}, "", nil
 
 }
 
@@ -1177,4 +1205,30 @@ func (f *FileConnector) generateWOPISrc(ctx context.Context, wopiContext middlew
 	wopiSrcURL.RawQuery = q.Encode()
 
 	return wopiSrcURL, nil
+}
+
+func (f *FileConnector) adjustWopiReference(ctx context.Context, wopiContext *middleware.WopiContext, logger zerolog.Logger) error {
+	// using resourceid + path won't do for WOPI, we need just the resource if of the new file
+	// the wopicontext has resourceid + path, which is good enough for the stat request
+	newStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+		Ref: &wopiContext.FileReference,
+	})
+	if err != nil {
+		logger.Error().Err(err).Msg("stat failed")
+		return err
+	}
+
+	if newStatRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+		logger.Error().
+			Str("StatusCode", newStatRes.GetStatus().GetCode().String()).
+			Str("StatusMsg", newStatRes.GetStatus().GetMessage()).
+			Msg("stat failed with unexpected status")
+		return NewConnectorError(500, newStatRes.GetStatus().GetCode().String()+" "+newStatRes.GetStatus().GetMessage())
+	}
+	// adjust the reference in the wopi context to use only the resourceid without the path
+	wopiContext.FileReference = providerv1beta1.Reference{
+		ResourceId: newStatRes.GetInfo().GetId(),
+	}
+
+	return nil
 }

@@ -364,7 +364,7 @@ func (h *HttpAdapter) RenameFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fileCon := h.con.GetFileConnector()
-	newLockID, err := fileCon.RenameFile(r.Context(), lockID, utf8Target)
+	response, newLockID, err := fileCon.RenameFile(r.Context(), lockID, utf8Target)
 	if err != nil {
 		var conError *ConnectorError
 		if errors.As(err, &conError) {
@@ -377,6 +377,25 @@ func (h *HttpAdapter) RenameFile(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	// If no error, a HTTP 200 should be sent automatically.
-	// X-WOPI-Lock header isn't needed on HTTP 200
+
+	// need to return a JSON response with the name if this is successful
+	logger := zerolog.Ctx(r.Context())
+
+	jsonFileInfo, err := json.Marshal(response)
+	if err != nil {
+		logger.Error().Err(err).Msg("RenameFile: failed to marshal response")
+		return
+	}
+
+	w.Header().Set("Content-Length", strconv.Itoa(len(jsonFileInfo)))
+	w.WriteHeader(http.StatusOK)
+	bytes, err := w.Write(jsonFileInfo)
+
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Int("TotalBytes", len(jsonFileInfo)).
+			Int("WrittenBytes", bytes).
+			Msg("RenameFile: failed to write contents in the HTTP response")
+	}
 }
