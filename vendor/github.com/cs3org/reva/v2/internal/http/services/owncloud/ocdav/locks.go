@@ -647,3 +647,7 @@ func (s *svc) unlockReference(ctx context.Context, _ http.ResponseWriter, r *htt
 	}
 	return http.StatusInternalServerError, err
 }
+
+func requestLockToken(r *http.Request) string {
+	return strings.TrimSuffix(strings.TrimPrefix(r.Header.Get(net.HeaderLockToken), "<"), ">")
+}

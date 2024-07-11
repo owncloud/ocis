@@ -48,6 +48,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
+	"google.golang.org/protobuf/proto"
 )
 
 func init() {
@@ -304,7 +305,7 @@ func (s *svc) handleNew(w http.ResponseWriter, r *http.Request) {
 			writeError(w, r, appErrorInvalidParameter, "the given file id does not point to a file", nil)
 			return
 		}
-		fileid = storagespace.FormatResourceID(*statRes.Info.Id)
+		fileid = storagespace.FormatResourceID(statRes.Info.Id)
 	}
 
 	js, err := json.Marshal(
@@ -574,7 +575,8 @@ func buildApps(mimeTypes []*appregistry.MimeTypeInfo, userAgent, secureViewAppAd
 	for _, m := range mimeTypes {
 		apps := []*ProviderInfo{}
 		for _, p := range m.AppProviders {
-			ep := &ProviderInfo{ProviderInfo: *p}
+			ep := &ProviderInfo{}
+			proto.Merge(&ep.ProviderInfo, p)
 			if p.Address == secureViewAppAddr {
 				ep.SecureView = true
 			}
@@ -586,7 +588,8 @@ func buildApps(mimeTypes []*appregistry.MimeTypeInfo, userAgent, secureViewAppAd
 			}
 		}
 		if len(apps) > 0 {
-			mt := &MimeTypeInfo{MimeTypeInfo: *m}
+			mt := &MimeTypeInfo{}
+			proto.Merge(&mt.MimeTypeInfo, m)
 			mt.AppProviders = apps
 			res = append(res, mt)
 		}

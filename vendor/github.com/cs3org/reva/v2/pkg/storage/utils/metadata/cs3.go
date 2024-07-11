@@ -98,7 +98,7 @@ func (cs3 *CS3) Init(ctx context.Context, spaceid string) (err error) {
 	ctx, span := tracer.Start(ctx, "Init")
 	defer span.End()
 
-	client, err := cs3.providerClient()
+	client, err := cs3.spacesClient()
 	if err != nil {
 		return err
 	}
@@ -514,6 +514,10 @@ func (cs3 *CS3) ResolveSymlink(ctx context.Context, name string) (string, error)
 
 func (cs3 *CS3) providerClient() (provider.ProviderAPIClient, error) {
 	return pool.GetStorageProviderServiceClient(cs3.providerAddr)
+}
+
+func (cs3 *CS3) spacesClient() (provider.SpacesAPIClient, error) {
+	return pool.GetSpacesProviderServiceClient(cs3.providerAddr)
 }
 
 func (cs3 *CS3) getAuthContext(ctx context.Context) (context.Context, error) {

@@ -57,7 +57,7 @@ var _ = Describe("Notifications", func() {
 		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
 			"GatewaySelector",
 			"com.owncloud.api.gateway",
-			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+			func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 				return gatewayClient
 			},
 		)
@@ -250,7 +250,7 @@ var _ = Describe("Notifications X-Site Scripting", func() {
 		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
 			"GatewaySelector",
 			"com.owncloud.api.gateway",
-			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+			func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 				return gatewayClient
 			},
 		)

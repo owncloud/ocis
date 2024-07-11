@@ -81,7 +81,7 @@ func handleGetToken(ctx context.Context, tkn string, pw string, c gateway.Gatewa
 	}
 
 	if protected && !t.PasswordProtected {
-		space, status, err := spacelookup.LookUpStorageSpaceByID(ctx, c, storagespace.FormatResourceID(provider.ResourceId{StorageId: t.StorageID, SpaceId: t.SpaceID, OpaqueId: t.OpaqueID}))
+		space, status, err := spacelookup.LookUpStorageSpaceByID(ctx, c, storagespace.FormatResourceID(&provider.ResourceId{StorageId: t.StorageID, SpaceId: t.SpaceID, OpaqueId: t.OpaqueID}))
 		// add info only if user is able to stat
 		if err == nil && status.Code == rpc.Code_CODE_OK {
 			t.SpacePath = utils.ReadPlainFromOpaque(space.Opaque, "path")
@@ -111,7 +111,7 @@ func buildTokenInfo(owner *user.User, tkn string, token string, passProtected bo
 		return t, fmt.Errorf("can't stat resource. %+v %s", sRes, err)
 	}
 
-	t.ID = storagespace.FormatResourceID(*sRes.Share.GetResourceId())
+	t.ID = storagespace.FormatResourceID(sRes.Share.GetResourceId())
 	t.StorageID = sRes.Share.ResourceId.GetStorageId()
 	t.SpaceID = sRes.Share.ResourceId.GetSpaceId()
 	t.OpaqueID = sRes.Share.ResourceId.GetOpaqueId()

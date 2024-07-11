@@ -317,6 +317,17 @@ func (t *Tree) Move(ctx context.Context, oldNode *node.Node, newNode *node.Node)
 		return errors.Wrap(err, "Decomposedfs: could not move child")
 	}
 
+	// rename the lock (if it exists)
+	if _, err := os.Stat(oldNode.LockFilePath()); err == nil {
+		err = os.Rename(
+			filepath.Join(oldNode.ParentPath(), oldNode.Name+".lock"),
+			filepath.Join(newNode.ParentPath(), newNode.Name+".lock"),
+		)
+		if err != nil {
+			return errors.Wrap(err, "Decomposedfs: could not move lock")
+		}
+	}
+
 	// update the id cache
 	if newNode.ID == "" {
 		newNode.ID = oldNode.ID

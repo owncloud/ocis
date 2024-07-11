@@ -147,7 +147,7 @@ func prepare(q string) (http.Handler, *mocks.PoliciesProviderService, *cs3mocks.
 	gatewaySelector := pool.GetSelector[gateway.GatewayAPIClient](
 		"GatewaySelector",
 		"com.owncloud.api.gateway",
-		func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+		func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 			return gatewayClient
 		},
 	)

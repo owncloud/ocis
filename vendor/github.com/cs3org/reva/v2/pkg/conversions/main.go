@@ -345,7 +345,7 @@ func ReceivedOCMShare2ShareData(share *ocm.ReceivedShare, path string) (*ShareDa
 		FileTarget:   shareTarget,
 		MimeType:     mime.Detect(share.ResourceType == provider.ResourceType_RESOURCE_TYPE_CONTAINER, share.Name),
 		ItemType:     ResourceType(share.ResourceType).String(),
-		ItemSource: storagespace.FormatResourceID(provider.ResourceId{
+		ItemSource: storagespace.FormatResourceID(&provider.ResourceId{
 			StorageId: utils.OCMStorageProviderID,
 			SpaceId:   share.Id.OpaqueId,
 			OpaqueId:  opaqueid,

@@ -56,6 +56,6 @@ func VerifyScope(ctx context.Context, scopeMap map[string]*authpb.Scope, resourc
 	return false, nil
 }
 
-func hasRoleEditor(scope authpb.Scope) bool {
+func hasRoleEditor(scope *authpb.Scope) bool {
 	return scope.Role == authpb.Role_ROLE_OWNER || scope.Role == authpb.Role_ROLE_EDITOR || scope.Role == authpb.Role_ROLE_UPLOADER
 }

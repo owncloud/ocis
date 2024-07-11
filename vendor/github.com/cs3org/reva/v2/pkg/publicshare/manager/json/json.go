@@ -32,6 +32,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/protobuf/proto"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -273,7 +274,7 @@ func (m *manager) CreatePublicShare(ctx context.Context, u *user.User, rInfo *pr
 		Nanos:   uint32(now % int64(time.Second)),
 	}
 
-	s := link.PublicShare{
+	s := &link.PublicShare{
 		Id:                id,
 		Owner:             rInfo.GetOwner(),
 		Creator:           u.Id,
@@ -289,9 +290,9 @@ func (m *manager) CreatePublicShare(ctx context.Context, u *user.User, rInfo *pr
 	}
 
 	ps := &publicShare{
-		PublicShare: s,
-		Password:    password,
+		Password: password,
 	}
+	proto.Merge(&ps.PublicShare, s)
 
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
@@ -324,7 +325,7 @@ func (m *manager) CreatePublicShare(ctx context.Context, u *user.User, rInfo *pr
 		return nil, err
 	}
 
-	return &s, nil
+	return s, nil
 }
 
 // UpdatePublicShare updates the public share
@@ -461,7 +462,7 @@ func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.Pu
 		}
 
 		if ref.GetId().GetOpaqueId() == ps.Id.OpaqueId {
-			if publicshare.IsExpired(ps) {
+			if publicshare.IsExpired(&ps) {
 				if err := m.revokeExpiredPublicShare(ctx, &ps); err != nil {
 					return nil, err
 				}
@@ -509,7 +510,7 @@ func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 			return nil, err
 		}
 
-		if publicshare.IsExpired(local.PublicShare) {
+		if publicshare.IsExpired(&local.PublicShare) {
 			if err := m.revokeExpiredPublicShare(ctx, &local.PublicShare); err != nil {
 				log.Error().Err(err).
 					Str("share_token", local.Token).
@@ -518,12 +519,12 @@ func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 			continue
 		}
 
-		if !publicshare.MatchesFilters(local.PublicShare, filters) {
+		if !publicshare.MatchesFilters(&local.PublicShare, filters) {
 			continue
 		}
 
 		key := strings.Join([]string{local.ResourceId.StorageId, local.ResourceId.OpaqueId}, "!")
-		if _, hit := cache[key]; !hit && !publicshare.IsCreatedByUser(local.PublicShare, u) {
+		if _, hit := cache[key]; !hit && !publicshare.IsCreatedByUser(&local.PublicShare, u) {
 			sRes, err := client.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: local.ResourceId}})
 			if err != nil {
 				log.Error().
@@ -583,7 +584,7 @@ func (m *manager) cleanupExpiredShares() {
 		var ps link.PublicShare
 		_ = utils.UnmarshalJSONToProtoV1([]byte(d.(string)), &ps)
 
-		if publicshare.IsExpired(ps) {
+		if publicshare.IsExpired(&ps) {
 			_ = m.revokeExpiredPublicShare(context.Background(), &ps)
 		}
 	}
@@ -693,7 +694,7 @@ func (m *manager) GetPublicShareByToken(ctx context.Context, token string, auth 
 		}
 
 		if local.Token == token {
-			if publicshare.IsExpired(local) {
+			if publicshare.IsExpired(&local) {
 				if err := m.revokeExpiredPublicShare(ctx, &local); err != nil {
 					return nil, err
 				}

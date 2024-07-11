@@ -287,7 +287,7 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 				// If the link is internal then 307 redirect
 				if psRes.Status.Code == rpc.Code_CODE_OK && grants.PermissionsEqual(psRes.Share.Permissions.GetPermissions(), &provider.ResourcePermissions{}) {
 					if psRes.GetShare().GetResourceId() != nil {
-						rUrl := path.Join("/dav/spaces", storagespace.FormatResourceID(*psRes.GetShare().GetResourceId()))
+						rUrl := path.Join("/dav/spaces", storagespace.FormatResourceID(psRes.GetShare().GetResourceId()))
 						http.Redirect(w, r, rUrl, http.StatusTemporaryRedirect)
 						return
 					}

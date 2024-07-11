@@ -167,7 +167,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 			continue
 		}
 		opaqueMap := sdk.DecodeOpaqueMap(space.Opaque)
-		grantSpaceID := storagespace.FormatResourceID(provider.ResourceId{
+		grantSpaceID := storagespace.FormatResourceID(&provider.ResourceId{
 			StorageId: opaqueMap["grantStorageID"],
 			SpaceId:   opaqueMap["grantSpaceID"],
 			OpaqueId:  opaqueMap["grantOpaqueID"],
@@ -443,7 +443,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
 
 		searchRes, err := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
-			Query: "id:" + storagespace.FormatResourceID(*info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano),
+			Query: "id:" + storagespace.FormatResourceID(info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano),
 		})
 
 		if err == nil && len(searchRes.Matches) >= 1 {
@@ -471,7 +471,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 
 // TrashItem marks the item as deleted.
 func (s *Service) TrashItem(rID *provider.ResourceId) {
-	err := s.engine.Delete(storagespace.FormatResourceID(*rID))
+	err := s.engine.Delete(storagespace.FormatResourceID(rID))
 	if err != nil {
 		s.logger.Error().Err(err).Interface("Id", rID).Msg("failed to remove item from index")
 	}
@@ -491,8 +491,8 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	}
 
 	r := engine.Resource{
-		ID: storagespace.FormatResourceID(*stat.Info.Id),
-		RootID: storagespace.FormatResourceID(provider.ResourceId{
+		ID: storagespace.FormatResourceID(stat.Info.Id),
+		RootID: storagespace.FormatResourceID(&provider.ResourceId{
 			StorageId: stat.Info.Id.StorageId,
 			OpaqueId:  stat.Info.Id.SpaceId,
 			SpaceId:   stat.Info.Id.SpaceId,
@@ -504,7 +504,7 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	r.Hidden = strings.HasPrefix(r.Path, ".")
 
 	if parentID := stat.GetInfo().GetParentId(); parentID != nil {
-		r.ParentID = storagespace.FormatResourceID(*parentID)
+		r.ParentID = storagespace.FormatResourceID(parentID)
 	}
 
 	if err = s.engine.Upsert(r.ID, r); err != nil {
@@ -615,7 +615,7 @@ func (s *Service) RestoreItem(ref *provider.Reference) {
 		return
 	}
 
-	if err := s.engine.Restore(storagespace.FormatResourceID(*stat.Info.Id)); err != nil {
+	if err := s.engine.Restore(storagespace.FormatResourceID(stat.Info.Id)); err != nil {
 		s.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
 	}
 }
@@ -627,7 +627,7 @@ func (s *Service) MoveItem(ref *provider.Reference) {
 		return
 	}
 
-	if err := s.engine.Move(storagespace.FormatResourceID(*stat.GetInfo().GetId()), storagespace.FormatResourceID(*stat.GetInfo().GetParentId()), path); err != nil {
+	if err := s.engine.Move(storagespace.FormatResourceID(stat.GetInfo().GetId()), storagespace.FormatResourceID(stat.GetInfo().GetParentId()), path); err != nil {
 		s.logger.Error().Err(err).Msg("failed to move the changed resource in the index")
 	}
 }

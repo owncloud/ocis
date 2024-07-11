@@ -116,6 +116,7 @@ func (s *Service) UnprotectedEndpoints() []string { return []string{} }
 
 func (s *Service) Register(ss *grpc.Server) {
 	provider.RegisterProviderAPIServer(ss, s)
+	provider.RegisterSpacesAPIServer(ss, s)
 }
 
 func parseXSTypes(xsTypes map[string]uint32) ([]*provider.ResourceChecksumPriority, error) {
@@ -298,7 +299,7 @@ func (s *Service) InitiateFileDownload(ctx context.Context, req *provider.Initia
 	if utils.IsRelativeReference(req.Ref) {
 		s.addMissingStorageProviderID(req.GetRef().GetResourceId(), nil)
 		protocol.Protocol = "spaces"
-		u.Path = path.Join(u.Path, "spaces", storagespace.FormatResourceID(*req.Ref.ResourceId), req.Ref.Path)
+		u.Path = path.Join(u.Path, "spaces", storagespace.FormatResourceID(req.Ref.ResourceId), req.Ref.Path)
 	} else {
 		// Currently, we only support the simple protocol for GET requests
 		// Once we have multiple protocols, this would be moved to the fs layer
@@ -612,7 +613,7 @@ func (s *Service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteSt
 	// FIXME: why is this string parsing necessary?
 	idraw, _ := storagespace.ParseID(req.Id.GetOpaqueId())
 	idraw.OpaqueId = idraw.GetSpaceId()
-	id := &provider.StorageSpaceId{OpaqueId: storagespace.FormatResourceID(idraw)}
+	id := &provider.StorageSpaceId{OpaqueId: storagespace.FormatResourceID(&idraw)}
 
 	spaces, err := s.Storage.ListStorageSpaces(ctx, []*provider.ListStorageSpacesRequest_Filter{{Type: provider.ListStorageSpacesRequest_Filter_TYPE_ID, Term: &provider.ListStorageSpacesRequest_Filter_Id{Id: id}}}, true)
 	if err != nil {

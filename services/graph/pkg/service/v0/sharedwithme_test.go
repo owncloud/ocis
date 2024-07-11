@@ -52,7 +52,7 @@ var _ = Describe("SharedWithMe", func() {
 		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
 			"GatewaySelector",
 			"com.owncloud.api.gateway",
-			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+			func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 				return gatewayClient
 			},
 		)
@@ -253,7 +253,7 @@ var _ = Describe("SharedWithMe", func() {
 
 			Expect(jsonData.Get("eTag").String()).To(Equal(resourceInfo.Etag))
 			Expect(jsonData.Get("id").String()).To(Equal(storagespace.FormatResourceID(
-				providerv1beta1.ResourceId{
+				&providerv1beta1.ResourceId{
 					StorageId: utils.ShareStorageProviderID,
 					SpaceId:   utils.ShareStorageSpaceID,
 					OpaqueId:  share.Id.OpaqueId,
@@ -299,7 +299,7 @@ var _ = Describe("SharedWithMe", func() {
 			jsonData := gjson.Get(tape.Body.String(), "value.0.remoteItem")
 
 			Expect(jsonData.Get("eTag").String()).To(Equal(resourceInfo.Etag))
-			Expect(jsonData.Get("id").String()).To(Equal(storagespace.FormatResourceID(*share.ResourceId)))
+			Expect(jsonData.Get("id").String()).To(Equal(storagespace.FormatResourceID(share.ResourceId)))
 			Expect(jsonData.Get("lastModifiedDateTime").String()).To(Equal(utils.TSToTime(resourceInfo.Mtime).Format(time.RFC3339Nano)))
 			Expect(jsonData.Get("name").String()).To(Equal(resourceInfo.Name))
 			Expect(jsonData.Get("size").Num).To(Equal(float64(resourceInfo.Size)))

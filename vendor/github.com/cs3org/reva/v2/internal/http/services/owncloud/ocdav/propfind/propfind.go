@@ -1177,7 +1177,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 		// return all known properties
 
 		if id != nil {
-			sid := storagespace.FormatResourceID(*id)
+			sid := storagespace.FormatResourceID(id)
 			appendToOK(
 				prop.Escaped("oc:id", sid),
 				prop.Escaped("oc:fileid", sid),
@@ -1186,7 +1186,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 		}
 
 		if md.ParentId != nil {
-			appendToOK(prop.Escaped("oc:file-parent", storagespace.FormatResourceID(*md.ParentId)))
+			appendToOK(prop.Escaped("oc:file-parent", storagespace.FormatResourceID(md.ParentId)))
 		} else {
 			appendToNotFound(prop.NotFound("oc:file-parent"))
 		}
@@ -1305,19 +1305,19 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 				// I tested the desktop client and phoenix to annotate which properties are requestted, see below cases
 				case "fileid": // phoenix only
 					if id != nil {
-						appendToOK(prop.Escaped("oc:fileid", storagespace.FormatResourceID(*id)))
+						appendToOK(prop.Escaped("oc:fileid", storagespace.FormatResourceID(id)))
 					} else {
 						appendToNotFound(prop.NotFound("oc:fileid"))
 					}
 				case "id": // desktop client only
 					if id != nil {
-						appendToOK(prop.Escaped("oc:id", storagespace.FormatResourceID(*id)))
+						appendToOK(prop.Escaped("oc:id", storagespace.FormatResourceID(id)))
 					} else {
 						appendToNotFound(prop.NotFound("oc:id"))
 					}
 				case "file-parent":
 					if md.ParentId != nil {
-						appendToOK(prop.Escaped("oc:file-parent", storagespace.FormatResourceID(*md.ParentId)))
+						appendToOK(prop.Escaped("oc:file-parent", storagespace.FormatResourceID(md.ParentId)))
 					} else {
 						appendToNotFound(prop.NotFound("oc:file-parent"))
 					}
@@ -1521,7 +1521,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 				case "privatelink":
 					privateURL, err := url.Parse(publicURL)
 					if err == nil && id != nil {
-						privateURL.Path = path.Join(privateURL.Path, "f", storagespace.FormatResourceID(*id))
+						privateURL.Path = path.Join(privateURL.Path, "f", storagespace.FormatResourceID(id))
 						propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:privatelink", privateURL.String()))
 					} else {
 						propstatNotFound.Prop = append(propstatNotFound.Prop, prop.NotFound("oc:privatelink"))

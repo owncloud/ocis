@@ -223,7 +223,7 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 		Service:        c.serviceName,
 		UserName:       usr.GetUsername(),
 		Timestamp:      ts.Format(time.RFC3339Nano),
-		ResourceID:     storagespace.FormatResourceID(*info.GetId()),
+		ResourceID:     storagespace.FormatResourceID(info.GetId()),
 		ResourceType:   _resourceTypeShare,
 		Subject:        subj,
 		SubjectRaw:     subjraw,
@@ -257,7 +257,7 @@ func (c *Converter) virusMessage(eventid string, nt NotificationTemplate, execut
 		Service:        c.serviceName,
 		UserName:       executant.GetUsername(),
 		Timestamp:      ts.Format(time.RFC3339Nano),
-		ResourceID:     storagespace.FormatResourceID(*rid),
+		ResourceID:     storagespace.FormatResourceID(rid),
 		ResourceType:   _resourceTypeResource,
 		Subject:        subj,
 		SubjectRaw:     subjraw,
@@ -415,7 +415,7 @@ func generateDetails(user *user.User, space *storageprovider.StorageSpace, item 
 
 	if item != nil {
 		details["resource"] = map[string]string{
-			"id":   storagespace.FormatResourceID(*item.GetId()),
+			"id":   storagespace.FormatResourceID(item.GetId()),
 			"name": item.GetName(),
 		}
 	}

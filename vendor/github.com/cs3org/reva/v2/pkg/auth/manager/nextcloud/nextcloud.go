@@ -180,8 +180,8 @@ func (am *Manager) Authenticate(ctx context.Context, clientID, clientSecret stri
 	}
 
 	type resultsObj struct {
-		User   user.User               `json:"user"`
-		Scopes map[string]authpb.Scope `json:"scopes"`
+		User   user.User                `json:"user"`
+		Scopes map[string]*authpb.Scope `json:"scopes"`
 	}
 	result := &resultsObj{}
 	err = json.Unmarshal(body, &result)
@@ -191,7 +191,7 @@ func (am *Manager) Authenticate(ctx context.Context, clientID, clientSecret stri
 	var pointersMap = make(map[string]*authpb.Scope)
 	for k := range result.Scopes {
 		scope := result.Scopes[k]
-		pointersMap[k] = &scope
+		pointersMap[k] = scope
 	}
 	return &result.User, pointersMap, nil
 }

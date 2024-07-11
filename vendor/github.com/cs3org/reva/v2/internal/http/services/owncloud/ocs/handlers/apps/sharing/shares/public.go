@@ -323,7 +323,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 		return
 	}
 
-	createdByUser := publicshare.IsCreatedByUser(*share, user)
+	createdByUser := publicshare.IsCreatedByUser(share, user)
 
 	// NOTE: you are allowed to update a link TO a public link without the `PublicLink.Write` permission if you created it yourself
 	if (permKey != nil && *permKey != 0) || !createdByUser {
@@ -540,7 +540,7 @@ func (h *Handler) removePublicShare(w http.ResponseWriter, r *http.Request, shar
 	}
 
 	u := ctxpkg.ContextMustGetUser(ctx)
-	if !publicshare.IsCreatedByUser(*share, u) {
+	if !publicshare.IsCreatedByUser(share, u) {
 		sRes, err := c.Stat(r.Context(), &provider.StatRequest{Ref: &provider.Reference{ResourceId: share.ResourceId}})
 		if err != nil {
 			log.Err(err).Interface("resource_id", share.ResourceId).Msg("failed to stat shared resource")

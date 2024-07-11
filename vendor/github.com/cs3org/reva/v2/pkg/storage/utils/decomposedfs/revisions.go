@@ -352,7 +352,7 @@ func (fs *Decomposedfs) getRevisionNode(ctx context.Context, ref *provider.Refer
 	switch {
 	case err != nil:
 		return nil, err
-	case !hasPermission(&p):
+	case !hasPermission(p):
 		return nil, errtypes.PermissionDenied(filepath.Join(n.ParentID, n.Name))
 	}
 

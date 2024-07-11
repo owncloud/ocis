@@ -32,6 +32,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/group/manager/registry"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"google.golang.org/protobuf/proto"
 )
 
 func init() {
@@ -90,11 +91,11 @@ func New(m map[string]interface{}) (group.Manager, error) {
 func (m *manager) GetGroup(ctx context.Context, gid *grouppb.GroupId, skipFetchingMembers bool) (*grouppb.Group, error) {
 	for _, g := range m.groups {
 		if (g.Id.GetOpaqueId() == gid.OpaqueId || g.GroupName == gid.OpaqueId) && (gid.Idp == "" || gid.Idp == g.Id.GetIdp()) {
-			group := *g
+			group := proto.Clone(g).(*grouppb.Group)
 			if skipFetchingMembers {
 				group.Members = nil
 			}
-			return &group, nil
+			return group, nil
 		}
 	}
 	return nil, errtypes.NotFound(gid.OpaqueId)
@@ -103,11 +104,11 @@ func (m *manager) GetGroup(ctx context.Context, gid *grouppb.GroupId, skipFetchi
 func (m *manager) GetGroupByClaim(ctx context.Context, claim, value string, skipFetchingMembers bool) (*grouppb.Group, error) {
 	for _, g := range m.groups {
 		if groupClaim, err := extractClaim(g, claim); err == nil && value == groupClaim {
-			group := *g
+			group := proto.Clone(g).(*grouppb.Group)
 			if skipFetchingMembers {
 				group.Members = nil
 			}
-			return &group, nil
+			return group, nil
 		}
 	}
 	return nil, errtypes.NotFound(value)
@@ -131,11 +132,11 @@ func (m *manager) FindGroups(ctx context.Context, query string, skipFetchingMemb
 	groups := []*grouppb.Group{}
 	for _, g := range m.groups {
 		if groupContains(g, query) {
-			group := *g
+			group := proto.Clone(g).(*grouppb.Group)
 			if skipFetchingMembers {
 				group.Members = nil
 			}
-			groups = append(groups, &group)
+			groups = append(groups, group)
 		}
 	}
 	return groups, nil

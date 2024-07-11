@@ -93,25 +93,25 @@ func ocmShareScope(_ context.Context, scope *authpb.Scope, resource interface{},
 
 	// editor role
 	case *provider.CreateContainerRequest:
-		return hasRoleEditor(*scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
+		return hasRoleEditor(scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
 	case *provider.TouchFileRequest:
-		return hasRoleEditor(*scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
+		return hasRoleEditor(scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
 	case *provider.DeleteRequest:
-		return hasRoleEditor(*scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
+		return hasRoleEditor(scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
 	case *provider.MoveRequest:
-		return hasRoleEditor(*scope) && checkStorageRefForOCMShare(&share, v.GetSource(), ocmNamespace) && checkStorageRefForOCMShare(&share, v.GetDestination(), ocmNamespace), nil
+		return hasRoleEditor(scope) && checkStorageRefForOCMShare(&share, v.GetSource(), ocmNamespace) && checkStorageRefForOCMShare(&share, v.GetDestination(), ocmNamespace), nil
 	case *provider.InitiateFileUploadRequest:
-		return hasRoleEditor(*scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
+		return hasRoleEditor(scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
 	case *provider.SetArbitraryMetadataRequest:
-		return hasRoleEditor(*scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
+		return hasRoleEditor(scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
 	case *provider.UnsetArbitraryMetadataRequest:
-		return hasRoleEditor(*scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
+		return hasRoleEditor(scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
 	case *provider.SetLockRequest:
-		return hasRoleEditor(*scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
+		return hasRoleEditor(scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
 	case *provider.RefreshLockRequest:
-		return hasRoleEditor(*scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
+		return hasRoleEditor(scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
 	case *provider.UnlockRequest:
-		return hasRoleEditor(*scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
+		return hasRoleEditor(scope) && checkStorageRefForOCMShare(&share, v.GetRef(), ocmNamespace), nil
 
 	// App provider requests
 	case *appregistry.GetDefaultAppProviderForMimeTypeRequest:

@@ -42,17 +42,17 @@ import (
 	tusd "github.com/tus/tusd/pkg/handler"
 )
 
-func (fs *cephfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+func (fs *cephfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
 	user := fs.makeUser(ctx)
 	upload, err := fs.GetUpload(ctx, req.Ref.GetPath())
 	if err != nil {
 		metadata := map[string]string{"sizedeferred": "true"}
 		uploadIDs, err := fs.InitiateUpload(ctx, req.Ref, 0, metadata)
 		if err != nil {
-			return provider.ResourceInfo{}, err
+			return &provider.ResourceInfo{}, err
 		}
 		if upload, err = fs.GetUpload(ctx, uploadIDs["simple"]); err != nil {
-			return provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error retrieving upload")
+			return &provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error retrieving upload")
 		}
 	}
 
@@ -61,19 +61,19 @@ func (fs *cephfs) Upload(ctx context.Context, req storage.UploadRequest, uff sto
 	p := uploadInfo.info.Storage["InternalDestination"]
 	ok, err := IsChunked(p)
 	if err != nil {
-		return provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error checking path")
+		return &provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error checking path")
 	}
 	if ok {
 		var assembledFile string
 		p, assembledFile, err = NewChunkHandler(ctx, fs).WriteChunk(p, req.Body)
 		if err != nil {
-			return provider.ResourceInfo{}, err
+			return &provider.ResourceInfo{}, err
 		}
 		if p == "" {
 			if err = uploadInfo.Terminate(ctx); err != nil {
-				return provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error removing auxiliary files")
+				return &provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error removing auxiliary files")
 			}
-			return provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
+			return &provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
 		}
 		uploadInfo.info.Storage["InternalDestination"] = p
 
@@ -81,14 +81,14 @@ func (fs *cephfs) Upload(ctx context.Context, req storage.UploadRequest, uff sto
 			req.Body, err = cv.mount.Open(assembledFile, os.O_RDONLY, 0)
 		})
 		if err != nil {
-			return provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error opening assembled file")
+			return &provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error opening assembled file")
 		}
 		defer req.Body.Close()
 		defer user.op(func(cv *cacheVal) {
 			_ = cv.mount.Unlink(assembledFile)
 		})
 	}
-	ri := provider.ResourceInfo{
+	ri := &provider.ResourceInfo{
 		// fill with at least fileid, mtime and etag
 		Id: &provider.ResourceId{
 			StorageId: uploadInfo.info.MetaData["providerID"],
@@ -103,7 +103,7 @@ func (fs *cephfs) Upload(ctx context.Context, req storage.UploadRequest, uff sto
 	}
 
 	if _, err := uploadInfo.WriteChunk(ctx, 0, req.Body); err != nil {
-		return provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error writing to binary file")
+		return &provider.ResourceInfo{}, errors.Wrap(err, "cephfs: error writing to binary file")
 	}
 
 	return ri, uploadInfo.FinishUpload(ctx)

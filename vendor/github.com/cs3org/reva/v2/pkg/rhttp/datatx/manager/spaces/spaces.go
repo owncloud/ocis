@@ -109,7 +109,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				ResourceId: &rid,
 				Path:       fn,
 			}
-			var info provider.ResourceInfo
+			var info *provider.ResourceInfo
 			info, err = fs.Upload(ctx, storage.UploadRequest{
 				Ref:    ref,
 				Body:   r.Body,
@@ -125,7 +125,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				w.Header().Set(net.HeaderETag, info.Etag)
 				w.Header().Set(net.HeaderOCETag, info.Etag)
 				if info.Id != nil {
-					w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(*info.Id))
+					w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(info.Id))
 				}
 				if info.Mtime != nil {
 					t := utils.TSToTime(info.Mtime).UTC()

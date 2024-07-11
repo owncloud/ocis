@@ -46,10 +46,10 @@ import (
 // Upload uploads data to the given resource
 // TODO Upload (and InitiateUpload) needs a way to receive the expected checksum.
 // Maybe in metadata as 'checksum' => 'sha1 aeosvp45w5xaeoe' = lowercase, space separated?
-func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
 	up, err := fs.GetUpload(ctx, req.Ref.GetPath())
 	if err != nil {
-		return provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error retrieving upload")
+		return &provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error retrieving upload")
 	}
 
 	session := up.(*upload.OcisSession)
@@ -59,17 +59,17 @@ func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, u
 	if session.Chunk() != "" { // check chunking v1
 		p, assembledFile, err := fs.chunkHandler.WriteChunk(session.Chunk(), req.Body)
 		if err != nil {
-			return provider.ResourceInfo{}, err
+			return &provider.ResourceInfo{}, err
 		}
 		if p == "" {
 			if err = session.Terminate(ctx); err != nil {
-				return provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error removing auxiliary files")
+				return &provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error removing auxiliary files")
 			}
-			return provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
+			return &provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
 		}
 		fd, err := os.Open(assembledFile)
 		if err != nil {
-			return provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error opening assembled file")
+			return &provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error opening assembled file")
 		}
 		defer fd.Close()
 		defer os.RemoveAll(assembledFile)
@@ -77,21 +77,21 @@ func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, u
 
 		size, err := session.WriteChunk(ctx, 0, req.Body)
 		if err != nil {
-			return provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error writing to binary file")
+			return &provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error writing to binary file")
 		}
 		session.SetSize(size)
 	} else {
 		size, err := session.WriteChunk(ctx, 0, req.Body)
 		if err != nil {
-			return provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error writing to binary file")
+			return &provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error writing to binary file")
 		}
 		if size != req.Length {
-			return provider.ResourceInfo{}, errtypes.PartialContent("Decomposedfs: unexpected end of stream")
+			return &provider.ResourceInfo{}, errtypes.PartialContent("Decomposedfs: unexpected end of stream")
 		}
 	}
 
 	if err := session.FinishUpload(ctx); err != nil {
-		return provider.ResourceInfo{}, err
+		return &provider.ResourceInfo{}, err
 	}
 
 	if uff != nil {
@@ -107,7 +107,7 @@ func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, u
 		uff(session.SpaceOwner(), &executant, uploadRef)
 	}
 
-	ri := provider.ResourceInfo{
+	ri := &provider.ResourceInfo{
 		// fill with at least fileid, mtime and etag
 		Id: &provider.ResourceId{
 			StorageId: session.ProviderID(),

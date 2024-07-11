@@ -31,8 +31,8 @@ const (
 
 // PermissionsChecker defines an interface for checking permissions on a Node
 type PermissionsChecker interface {
-	AssemblePermissions(ctx context.Context, n *node.Node) (ap provider.ResourcePermissions, err error)
-	AssembleTrashPermissions(ctx context.Context, n *node.Node) (ap provider.ResourcePermissions, err error)
+	AssemblePermissions(ctx context.Context, n *node.Node) (ap *provider.ResourcePermissions, err error)
+	AssembleTrashPermissions(ctx context.Context, n *node.Node) (ap *provider.ResourcePermissions, err error)
 }
 
 // CS3PermissionsClient defines an interface for checking permissions against the CS3 permissions service
@@ -52,14 +52,14 @@ func NewPermissions(item PermissionsChecker, permissionsSelector pool.Selectable
 }
 
 // AssemblePermissions is used to assemble file permissions
-func (p Permissions) AssemblePermissions(ctx context.Context, n *node.Node) (provider.ResourcePermissions, error) {
+func (p Permissions) AssemblePermissions(ctx context.Context, n *node.Node) (*provider.ResourcePermissions, error) {
 	ctx, span := tracer.Start(ctx, "AssemblePermissions")
 	defer span.End()
 	return p.item.AssemblePermissions(ctx, n)
 }
 
 // AssembleTrashPermissions is used to assemble file permissions
-func (p Permissions) AssembleTrashPermissions(ctx context.Context, n *node.Node) (provider.ResourcePermissions, error) {
+func (p Permissions) AssembleTrashPermissions(ctx context.Context, n *node.Node) (*provider.ResourcePermissions, error) {
 	return p.item.AssembleTrashPermissions(ctx, n)
 }
 
@@ -143,17 +143,17 @@ func (p Permissions) checkPermission(ctx context.Context, perm string, ref *prov
 }
 
 // IsManager returns true if the given resource permissions evaluate the user as "manager"
-func IsManager(rp provider.ResourcePermissions) bool {
+func IsManager(rp *provider.ResourcePermissions) bool {
 	return rp.RemoveGrant
 }
 
 // IsEditor returns true if the given resource permissions evaluate the user as "editor"
-func IsEditor(rp provider.ResourcePermissions) bool {
+func IsEditor(rp *provider.ResourcePermissions) bool {
 	return rp.InitiateFileUpload
 }
 
 // IsViewer returns true if the given resource permissions evaluate the user as "viewer"
-func IsViewer(rp provider.ResourcePermissions) bool {
+func IsViewer(rp *provider.ResourcePermissions) bool {
 	return rp.Stat
 }
 

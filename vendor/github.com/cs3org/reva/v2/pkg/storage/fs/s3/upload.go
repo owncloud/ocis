@@ -32,12 +32,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (fs *s3FS) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+func (fs *s3FS) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
 	log := appctx.GetLogger(ctx)
 
 	fn, err := fs.resolve(ctx, req.Ref)
 	if err != nil {
-		return provider.ResourceInfo{}, errors.Wrap(err, "error resolving ref")
+		return &provider.ResourceInfo{}, errors.Wrap(err, "error resolving ref")
 	}
 
 	upParams := &s3manager.UploadInput{
@@ -52,10 +52,10 @@ func (fs *s3FS) Upload(ctx context.Context, req storage.UploadRequest, uff stora
 		log.Error().Err(err)
 		if aerr, ok := err.(awserr.Error); ok {
 			if aerr.Code() == s3.ErrCodeNoSuchBucket {
-				return provider.ResourceInfo{}, errtypes.NotFound(fn)
+				return &provider.ResourceInfo{}, errtypes.NotFound(fn)
 			}
 		}
-		return provider.ResourceInfo{}, errors.Wrap(err, "s3fs: error creating object "+fn)
+		return &provider.ResourceInfo{}, errors.Wrap(err, "s3fs: error creating object "+fn)
 	}
 
 	log.Debug().Interface("result", result) // todo cache etag?
@@ -63,10 +63,10 @@ func (fs *s3FS) Upload(ctx context.Context, req storage.UploadRequest, uff stora
 	// return id, etag and mtime
 	ri, err := fs.GetMD(ctx, req.Ref, []string{}, []string{"id", "etag", "mtime"})
 	if err != nil {
-		return provider.ResourceInfo{}, err
+		return &provider.ResourceInfo{}, err
 	}
 
-	return *ri, nil
+	return ri, nil
 }
 
 // InitiateUpload returns upload ids corresponding to different protocols it supports

@@ -20,7 +20,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 )
 
-func (s DriveItemPermissionsService) CreateLink(ctx context.Context, driveItemID storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error) {
+func (s DriveItemPermissionsService) CreateLink(ctx context.Context, driveItemID *storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		s.logger.Error().Err(err).Msg("could not select next gateway client")
@@ -31,7 +31,7 @@ func (s DriveItemPermissionsService) CreateLink(ctx context.Context, driveItemID
 		ctx,
 		&storageprovider.StatRequest{
 			Ref: &storageprovider.Reference{
-				ResourceId: &driveItemID,
+				ResourceId: driveItemID,
 				Path:       ".",
 			},
 		})
@@ -93,7 +93,7 @@ func (s DriveItemPermissionsService) CreateLink(ctx context.Context, driveItemID
 	return *perm, nil
 }
 
-func (s DriveItemPermissionsService) CreateSpaceRootLink(ctx context.Context, driveID storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error) {
+func (s DriveItemPermissionsService) CreateSpaceRootLink(ctx context.Context, driveID *storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return libregraph.Permission{}, err
@@ -108,10 +108,10 @@ func (s DriveItemPermissionsService) CreateSpaceRootLink(ctx context.Context, dr
 	}
 
 	rootResourceID := space.GetRoot()
-	return s.CreateLink(ctx, *rootResourceID, createLink)
+	return s.CreateLink(ctx, rootResourceID, createLink)
 }
 
-func (s DriveItemPermissionsService) SetPublicLinkPassword(ctx context.Context, driveItemId storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error) {
+func (s DriveItemPermissionsService) SetPublicLinkPassword(ctx context.Context, driveItemId *storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error) {
 	publicShare, err := s.getCS3PublicShareByID(ctx, permissionID)
 	if err != nil {
 		return libregraph.Permission{}, err
@@ -119,7 +119,7 @@ func (s DriveItemPermissionsService) SetPublicLinkPassword(ctx context.Context, 
 
 	// The resourceID of the shared resource need to match the item ID from the Request Path
 	// otherwise this is an invalid Request.
-	if !utils.ResourceIDEqual(publicShare.GetResourceId(), &driveItemId) {
+	if !utils.ResourceIDEqual(publicShare.GetResourceId(), driveItemId) {
 		s.logger.Debug().Msg("resourceID of shared does not match itemID")
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "permissionID and itemID do not match")
 	}
@@ -131,7 +131,7 @@ func (s DriveItemPermissionsService) SetPublicLinkPassword(ctx context.Context, 
 	return *permission, nil
 }
 
-func (s DriveItemPermissionsService) SetPublicLinkPasswordOnSpaceRoot(ctx context.Context, driveID storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error) {
+func (s DriveItemPermissionsService) SetPublicLinkPasswordOnSpaceRoot(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return libregraph.Permission{}, err
@@ -145,7 +145,7 @@ func (s DriveItemPermissionsService) SetPublicLinkPasswordOnSpaceRoot(ctx contex
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 	rootResourceID := space.GetRoot()
-	return s.SetPublicLinkPassword(ctx, *rootResourceID, permissionID, password)
+	return s.SetPublicLinkPassword(ctx, rootResourceID, permissionID, password)
 }
 
 // CreateLink creates a public link on the cs3 api
@@ -166,7 +166,7 @@ func (api DriveItemPermissionsApi) CreateLink(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	perm, err := api.driveItemPermissionsService.CreateLink(r.Context(), driveItemID, createLink)
+	perm, err := api.driveItemPermissionsService.CreateLink(r.Context(), &driveItemID, createLink)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -195,7 +195,7 @@ func (api DriveItemPermissionsApi) CreateSpaceRootLink(w http.ResponseWriter, r 
 		return
 	}
 
-	perm, err := api.driveItemPermissionsService.CreateSpaceRootLink(r.Context(), driveID, createLink)
+	perm, err := api.driveItemPermissionsService.CreateSpaceRootLink(r.Context(), &driveID, createLink)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -228,7 +228,7 @@ func (api DriveItemPermissionsApi) SetLinkPassword(w http.ResponseWriter, r *htt
 		return
 	}
 
-	newPermission, err := api.driveItemPermissionsService.SetPublicLinkPassword(ctx, itemID, permissionID, password.GetPassword())
+	newPermission, err := api.driveItemPermissionsService.SetPublicLinkPassword(ctx, &itemID, permissionID, password.GetPassword())
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -262,7 +262,7 @@ func (api DriveItemPermissionsApi) SetSpaceRootLinkPassword(w http.ResponseWrite
 	}
 
 	ctx := r.Context()
-	newPermission, err := api.driveItemPermissionsService.SetPublicLinkPasswordOnSpaceRoot(ctx, driveID, permissionID, password.GetPassword())
+	newPermission, err := api.driveItemPermissionsService.SetPublicLinkPasswordOnSpaceRoot(ctx, &driveID, permissionID, password.GetPassword())
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return

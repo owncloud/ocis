@@ -76,23 +76,23 @@ func (d *driver) InitiateUpload(ctx context.Context, ref *provider.Reference, up
 	}, nil
 }
 
-func (d *driver) Upload(ctx context.Context, req storage.UploadRequest, _ storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+func (d *driver) Upload(ctx context.Context, req storage.UploadRequest, _ storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
 	shareID, _ := shareInfoFromReference(req.Ref)
 	u, err := d.GetUpload(ctx, shareID.OpaqueId)
 	if err != nil {
-		return provider.ResourceInfo{}, err
+		return &provider.ResourceInfo{}, err
 	}
 
 	info, err := u.GetInfo(ctx)
 	if err != nil {
-		return provider.ResourceInfo{}, err
+		return &provider.ResourceInfo{}, err
 	}
 
 	client, _, rel, err := d.webdavClient(ctx, nil, &provider.Reference{
 		Path: filepath.Join(info.MetaData["dir"], info.MetaData["filename"]),
 	})
 	if err != nil {
-		return provider.ResourceInfo{}, err
+		return &provider.ResourceInfo{}, err
 	}
 	client.SetInterceptor(func(method string, rq *http.Request) {
 		// Set the content length on the request struct directly instead of the header.
@@ -104,7 +104,7 @@ func (d *driver) Upload(ctx context.Context, req storage.UploadRequest, _ storag
 		}
 	})
 
-	return provider.ResourceInfo{}, client.WriteStream(rel, req.Body, 0)
+	return &provider.ResourceInfo{}, client.WriteStream(rel, req.Body, 0)
 }
 
 // UseIn tells the tus upload middleware which extensions it supports.

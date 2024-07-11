@@ -196,8 +196,8 @@ func processFileEvent(ctx context.Context, ref *provider.Reference, gwc gateway.
 	}
 
 	data := FileEvent{
-		ParentItemID: storagespace.FormatResourceID(*info.GetParentId()),
-		ItemID:       storagespace.FormatResourceID(*info.GetId()),
+		ParentItemID: storagespace.FormatResourceID(info.GetParentId()),
+		ItemID:       storagespace.FormatResourceID(info.GetId()),
 		SpaceID:      storagespace.FormatStorageID(info.GetSpace().GetRoot().GetStorageId(), info.GetSpace().GetRoot().GetSpaceId()),
 		InitiatorID:  initiatorid,
 		Etag:         info.GetEtag(),
@@ -233,7 +233,7 @@ func processItemTrashedEvent(ctx context.Context, ref *provider.Reference, gwc g
 		if item.GetKey() == itemID.GetOpaqueId() {
 
 			data := FileEvent{
-				ItemID: storagespace.FormatResourceID(*itemID),
+				ItemID: storagespace.FormatResourceID(itemID),
 				// TODO: check with web if parentID is needed
 				// ParentItemID: storagespace.FormatResourceID(*item.GetRef().GetResourceId()),
 				SpaceID:     storagespace.FormatStorageID(itemID.GetStorageId(), itemID.GetSpaceId()),

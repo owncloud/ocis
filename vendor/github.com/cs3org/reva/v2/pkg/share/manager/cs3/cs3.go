@@ -718,8 +718,7 @@ func (m *Manager) getShareByID(ctx context.Context, id string) (*collaboration.S
 	}
 	err = json.Unmarshal(data, userShare)
 	if err == nil && userShare.Grantee.GetUserId() != nil {
-		id := storagespace.UpdateLegacyResourceID(*userShare.GetResourceId())
-		userShare.ResourceId = &id
+		userShare.ResourceId = storagespace.UpdateLegacyResourceID(userShare.GetResourceId())
 		return userShare, nil
 	}
 
@@ -728,8 +727,7 @@ func (m *Manager) getShareByID(ctx context.Context, id string) (*collaboration.S
 	}
 	err = json.Unmarshal(data, groupShare) // try to unmarshal to a group share if the user share unmarshalling failed
 	if err == nil && groupShare.Grantee.GetGroupId() != nil {
-		id := storagespace.UpdateLegacyResourceID(*groupShare.GetResourceId())
-		groupShare.ResourceId = &id
+		groupShare.ResourceId = storagespace.UpdateLegacyResourceID(groupShare.GetResourceId())
 		return groupShare, nil
 	}
 

@@ -43,7 +43,7 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 	getSpaceID := func(ref *provider.Reference) *provider.StorageSpaceId {
 		return &provider.StorageSpaceId{
 			OpaqueId: storagespace.FormatResourceID(
-				provider.ResourceId{
+				&provider.ResourceId{
 					StorageId: ref.GetResourceId().GetStorageId(),
 					SpaceId:   ref.GetResourceId().GetSpaceId(),
 				},

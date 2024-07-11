@@ -150,17 +150,17 @@ func parseConfig(m map[string]interface{}) (*config, error) {
 
 // New creates an implementation of the storage.Registry interface that
 // uses the available storage spaces from the configured storage providers
-func New(m map[string]interface{}, getClientFunc GetStorageProviderServiceClientFunc) (storage.Registry, error) {
+func New(m map[string]interface{}, getClientFunc GetSpacesProviderServiceClientFunc) (storage.Registry, error) {
 	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err
 	}
 	c.init()
 	r := &registry{
-		c:                               c,
-		resources:                       make(map[string][]*registrypb.ProviderInfo),
-		resourceNameCache:               make(map[string]string),
-		getStorageProviderServiceClient: getClientFunc,
+		c:                              c,
+		resources:                      make(map[string][]*registrypb.ProviderInfo),
+		resourceNameCache:              make(map[string]string),
+		getSpacesProviderServiceClient: getClientFunc,
 	}
 	return r, nil
 }
@@ -169,13 +169,13 @@ func New(m map[string]interface{}, getClientFunc GetStorageProviderServiceClient
 // uses the available storage spaces from the configured storage providers
 func NewDefault(m map[string]interface{}) (storage.Registry, error) {
 	getClientFunc := func(addr string) (StorageProviderClient, error) {
-		return pool.GetStorageProviderServiceClient(addr)
+		return pool.GetSpacesProviderServiceClient(addr)
 	}
 	return New(m, getClientFunc)
 }
 
 // GetStorageProviderServiceClientFunc is a callback used to pass in a StorageProviderClient during testing
-type GetStorageProviderServiceClientFunc func(addr string) (StorageProviderClient, error)
+type GetSpacesProviderServiceClientFunc func(addr string) (StorageProviderClient, error)
 
 type registry struct {
 	c *config
@@ -183,7 +183,7 @@ type registry struct {
 	resources         map[string][]*registrypb.ProviderInfo
 	resourceNameCache map[string]string
 
-	getStorageProviderServiceClient GetStorageProviderServiceClientFunc
+	getSpacesProviderServiceClient GetSpacesProviderServiceClientFunc
 }
 
 // GetProvider return the storage provider for the given spaces according to the rule configuration
@@ -276,7 +276,7 @@ func (r *registry) ListProviders(ctx context.Context, filters map[string]string)
 		if filters["opaque_id"] == "" {
 			filters["opaque_id"] = filters["space_id"]
 		}
-		id := storagespace.FormatResourceID(providerpb.ResourceId{
+		id := storagespace.FormatResourceID(&providerpb.ResourceId{
 			StorageId: filters["storage_id"],
 			SpaceId:   filters["space_id"],
 			OpaqueId:  filters["opaque_id"],
@@ -719,7 +719,7 @@ func setSpaces(providerInfo *registrypb.ProviderInfo, spaces []*providerpb.Stora
 }
 
 func (r *registry) findStorageSpaceOnProvider(ctx context.Context, addr string, filters []*providerpb.ListStorageSpacesRequest_Filter, unrestricted bool) ([]*providerpb.StorageSpace, error) {
-	c, err := r.getStorageProviderServiceClient(addr)
+	c, err := r.getSpacesProviderServiceClient(addr)
 	if err != nil {
 		return nil, err
 	}

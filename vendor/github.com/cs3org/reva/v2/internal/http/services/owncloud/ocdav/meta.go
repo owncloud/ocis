@@ -104,7 +104,7 @@ func (h *MetaHandler) handlePathForUser(w http.ResponseWriter, r *http.Request, 
 	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "meta_propfind")
 	defer span.End()
 
-	id := storagespace.FormatResourceID(*rid)
+	id := storagespace.FormatResourceID(rid)
 	sublog := appctx.GetLogger(ctx).With().Str("path", r.URL.Path).Str("resourceid", id).Logger()
 	sublog.Info().Msg("calling get path for user")
 

@@ -42,6 +42,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/protobuf/proto"
 
 	// Provides mysql drivers
 	_ "github.com/go-sql-driver/mysql"
@@ -268,7 +269,7 @@ func (m *mgr) GetPublicShare(ctx context.Context, u *user.User, ref *link.Public
 		return nil, err
 	}
 
-	if publicshare.IsExpired(ps.PublicShare) {
+	if publicshare.IsExpired(&ps.PublicShare) {
 		if err := m.cleanupExpiredShares(); err != nil {
 			return nil, err
 		}
@@ -305,10 +306,11 @@ func (m *mgr) getByToken(ctx context.Context, token string) (*publicshare.WithPa
 	if err != nil {
 		return nil, err
 	}
-	return &publicshare.WithPassword{
-		PublicShare: *ps,
-		Password:    strings.TrimPrefix(s.ShareWith, "1|"),
-	}, nil
+	ret := &publicshare.WithPassword{
+		Password: strings.TrimPrefix(s.ShareWith, "1|"),
+	}
+	proto.Merge(&ret.PublicShare, ps)
+	return ret, nil
 }
 
 func getByToken(db *sql.DB, token string) (DBShare, error) {
@@ -352,10 +354,11 @@ func (m *mgr) getByID(ctx context.Context, id string) (*publicshare.WithPassword
 	if err != nil {
 		return nil, err
 	}
-	return &publicshare.WithPassword{
-		PublicShare: *ps,
-		Password:    strings.TrimPrefix(s.ShareWith, "1|"),
-	}, nil
+	ret := &publicshare.WithPassword{
+		Password: strings.TrimPrefix(s.ShareWith, "1|"),
+	}
+	proto.Merge(&ret.PublicShare, ps)
+	return ret, nil
 }
 
 func (m *mgr) ListPublicShares(ctx context.Context, u *user.User, filters []*link.ListPublicSharesRequest_Filter, sign bool) ([]*link.PublicShare, error) {
@@ -436,7 +439,7 @@ func (m *mgr) ListPublicShares(ctx context.Context, u *user.User, filters []*lin
 		if cs3Share, err = m.ConvertToCS3PublicShare(ctx, s); err != nil {
 			return nil, err
 		}
-		if publicshare.IsExpired(*cs3Share) {
+		if publicshare.IsExpired(cs3Share) {
 			_ = m.cleanupExpiredShares()
 		} else {
 			if cs3Share.PasswordProtected && sign {
@@ -495,7 +498,7 @@ func (m *mgr) GetPublicShareByToken(ctx context.Context, token string, auth *lin
 		return nil, err
 	}
 
-	if publicshare.IsExpired(ps.PublicShare) {
+	if publicshare.IsExpired(&ps.PublicShare) {
 		if err := m.cleanupExpiredShares(); err != nil {
 			return nil, err
 		}

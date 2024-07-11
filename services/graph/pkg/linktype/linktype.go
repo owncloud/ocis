@@ -40,7 +40,7 @@ func SharingLinkTypeFromCS3Permissions(permissions *linkv1beta1.PublicSharePermi
 			return &linkType.linkType, nil
 		}
 	}
-	return nil, unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissions.GetPermissions())
+	return nil, unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissions.GetPermissions())
 }
 
 // CS3ResourcePermissionsFromSharingLink creates a cs3 resource permissions type

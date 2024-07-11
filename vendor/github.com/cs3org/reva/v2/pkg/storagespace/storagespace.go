@@ -74,7 +74,7 @@ func SplitStorageID(sid string) (storageID, spaceID string) {
 // FormatResourceID converts a ResourceId into the string format.
 // The result format will look like:
 // <storageid>$<spaceid>!<opaqueid>
-func FormatResourceID(sid provider.ResourceId) string {
+func FormatResourceID(sid *provider.ResourceId) string {
 	if sid.OpaqueId == "" {
 		return FormatStorageID(sid.StorageId, sid.SpaceId)
 	}
@@ -140,15 +140,15 @@ func FormatReference(ref *provider.Reference) (string, error) {
 	if ref == nil || ref.ResourceId == nil || ref.ResourceId.SpaceId == "" {
 		return "", ErrInvalidSpaceReference
 	}
-	ssid := FormatResourceID(*ref.ResourceId)
+	ssid := FormatResourceID(ref.ResourceId)
 	return path.Join(ssid, ref.Path), nil
 }
 
 // UpdateLegacyResourceID checks if the given resource id contains a correct triple and will convert legacy ids without a spaceid
 // by splitting the storageid.
-func UpdateLegacyResourceID(id provider.ResourceId) provider.ResourceId {
+func UpdateLegacyResourceID(id *provider.ResourceId) *provider.ResourceId {
 	if storageid, spaceid := SplitStorageID(id.StorageId); storageid != "" && id.SpaceId == "" {
-		return provider.ResourceId{
+		return &provider.ResourceId{
 			StorageId: storageid,
 			SpaceId:   spaceid,
 			OpaqueId:  id.OpaqueId,

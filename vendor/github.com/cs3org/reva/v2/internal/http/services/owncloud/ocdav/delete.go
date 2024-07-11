@@ -61,7 +61,10 @@ func (s *svc) handleDelete(ctx context.Context, w http.ResponseWriter, r *http.R
 	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(ctx, "delete")
 	defer span.End()
 
-	req := &provider.DeleteRequest{Ref: ref}
+	req := &provider.DeleteRequest{
+		Ref:    ref,
+		LockId: requestLockToken(r),
+	}
 
 	// FIXME the lock token is part of the application level protocol, it should be part of the DeleteRequest message not the opaque
 	ih, ok := parseIfHeader(r.Header.Get(net.HeaderIf))

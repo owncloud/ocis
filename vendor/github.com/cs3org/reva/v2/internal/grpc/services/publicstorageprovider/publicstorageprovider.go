@@ -75,6 +75,7 @@ func (s *service) UnprotectedEndpoints() []string {
 
 func (s *service) Register(ss *grpc.Server) {
 	provider.RegisterProviderAPIServer(ss, s)
+	provider.RegisterSpacesAPIServer(ss, s)
 }
 
 func parseConfig(m map[string]interface{}) (*config, error) {
@@ -453,7 +454,7 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 			// we know a grant for this resource
 			space := &provider.StorageSpace{
 				Id: &provider.StorageSpaceId{
-					OpaqueId: storagespace.FormatResourceID(*root),
+					OpaqueId: storagespace.FormatResourceID(root),
 				},
 				SpaceType: "grant",
 				Owner:     &userv1beta1.User{Id: grantee},
@@ -485,7 +486,7 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 			}
 			space := &provider.StorageSpace{
 				Id: &provider.StorageSpaceId{
-					OpaqueId: storagespace.FormatResourceID(*root),
+					OpaqueId: storagespace.FormatResourceID(root),
 				},
 				SpaceType: "mountpoint",
 				Owner:     &userv1beta1.User{Id: grantee}, // FIXME actually, the mount point belongs to no one?

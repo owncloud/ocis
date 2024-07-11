@@ -501,7 +501,7 @@ func (n *Node) readOwner(ctx context.Context) (*userpb.UserId, error) {
 // the parent nodes are not taken into account
 // accessDenied is separate from the resource permissions
 // because we only support full denials
-func (n *Node) PermissionSet(ctx context.Context) (provider.ResourcePermissions, bool) {
+func (n *Node) PermissionSet(ctx context.Context) (*provider.ResourcePermissions, bool) {
 	u, ok := ctxpkg.ContextGetUser(ctx)
 	if !ok {
 		appctx.GetLogger(ctx).Debug().Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Msg("no user in context, returning default permissions")
@@ -1002,14 +1002,14 @@ func isGrantExpired(g *provider.Grant) bool {
 
 // ReadUserPermissions will assemble the permissions for the current user on the given node without parent nodes
 // we indicate if the access was denied by setting a grant with no permissions
-func (n *Node) ReadUserPermissions(ctx context.Context, u *userpb.User) (ap provider.ResourcePermissions, accessDenied bool, err error) {
+func (n *Node) ReadUserPermissions(ctx context.Context, u *userpb.User) (ap *provider.ResourcePermissions, accessDenied bool, err error) {
 	// check if the current user is the owner
 	if utils.UserEqual(u.Id, n.Owner()) {
 		appctx.GetLogger(ctx).Debug().Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Msg("user is owner, returning owner permissions")
 		return OwnerPermissions(), false, nil
 	}
 
-	ap = provider.ResourcePermissions{}
+	ap = &provider.ResourcePermissions{}
 
 	// for an efficient group lookup convert the list of groups to a map
 	// groups are just strings ... groupnames ... or group ids ??? AAARGH !!!
@@ -1062,7 +1062,7 @@ func (n *Node) ReadUserPermissions(ctx context.Context, u *userpb.User) (ap prov
 			if grants.PermissionsEqual(g.Permissions, &provider.ResourcePermissions{}) {
 				return NoPermissions(), true, nil
 			}
-			AddPermissions(&ap, g.GetPermissions())
+			AddPermissions(ap, g.GetPermissions())
 		case metadata.IsAttrUnset(err):
 			appctx.GetLogger(ctx).Error().Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Str("grant", grantees[i]).Interface("grantees", grantees).Msg("grant vanished from node after listing")
 			// continue with next segment

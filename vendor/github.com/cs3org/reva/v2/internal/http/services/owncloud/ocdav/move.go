@@ -294,7 +294,11 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 		dst.Path = utils.MakeRelativePath(dstStatRes.GetInfo().GetName())
 		dst.ResourceId = dstStatRes.GetInfo().GetParentId()
 	}
-	mReq := &provider.MoveRequest{Source: src, Destination: dst}
+	mReq := &provider.MoveRequest{
+		Source:      src,
+		Destination: dst,
+		LockId:      requestLockToken(r),
+	}
 	mRes, err := client.Move(ctx, mReq)
 	if err != nil {
 		log.Error().Err(err).Msg("error sending move grpc request")
@@ -341,7 +345,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 	info := dstStatRes.Info
 	w.Header().Set(net.HeaderContentType, info.MimeType)
 	w.Header().Set(net.HeaderETag, info.Etag)
-	w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(*info.Id))
+	w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(info.Id))
 	w.Header().Set(net.HeaderOCETag, info.Etag)
 	w.WriteHeader(successCode)
 }

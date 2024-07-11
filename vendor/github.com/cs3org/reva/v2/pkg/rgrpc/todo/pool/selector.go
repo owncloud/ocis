@@ -57,7 +57,7 @@ func RemoveSelector(id string) {
 	selectors.Delete(id)
 }
 
-func GetSelector[T any](k string, id string, f func(cc *grpc.ClientConn) T, options ...Option) *Selector[T] {
+func GetSelector[T any](k string, id string, f func(cc grpc.ClientConnInterface) T, options ...Option) *Selector[T] {
 	existingSelector, ok := selectors.Load(k + id)
 	if ok {
 		return existingSelector.(*Selector[T])
@@ -76,7 +76,7 @@ func GetSelector[T any](k string, id string, f func(cc *grpc.ClientConn) T, opti
 
 type Selector[T any] struct {
 	id            string
-	clientFactory func(cc *grpc.ClientConn) T
+	clientFactory func(cc grpc.ClientConnInterface) T
 	clientMap     sync.Map
 	options       []Option
 }
@@ -160,6 +160,16 @@ func StorageProviderSelector(id string, options ...Option) (*Selector[storagePro
 		"StorageProviderSelector",
 		id,
 		storageProvider.NewProviderAPIClient,
+		options...,
+	), nil
+}
+
+// SpacesProviderSelector returns a Selector[storageProvider.SpacesAPIClient].
+func SpacesProviderSelector(id string, options ...Option) (*Selector[storageProvider.SpacesAPIClient], error) {
+	return GetSelector[storageProvider.SpacesAPIClient](
+		"SpacesProviderSelector",
+		id,
+		storageProvider.NewSpacesAPIClient,
 		options...,
 	), nil
 }

@@ -58,7 +58,7 @@ func (h *VersionsHandler) Handler(s *svc, rid *provider.ResourceId) http.Handler
 		}
 
 		// baseURI is encoded as part of the response payload in href field
-		baseURI := path.Join(ctx.Value(net.CtxKeyBaseURI).(string), storagespace.FormatResourceID(*rid))
+		baseURI := path.Join(ctx.Value(net.CtxKeyBaseURI).(string), storagespace.FormatResourceID(rid))
 		ctx = context.WithValue(ctx, net.CtxKeyBaseURI, baseURI)
 		r = r.WithContext(ctx)
 

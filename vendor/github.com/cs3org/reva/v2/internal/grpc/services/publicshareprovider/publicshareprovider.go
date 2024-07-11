@@ -350,7 +350,7 @@ func (s *service) RemovePublicShare(ctx context.Context, req *link.RemovePublicS
 			Status: status.NewInternal(ctx, "error loading public share"),
 		}, err
 	}
-	if !publicshare.IsCreatedByUser(*ps, user) {
+	if !publicshare.IsCreatedByUser(ps, user) {
 		sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: ps.ResourceId}})
 		if err != nil {
 			log.Err(err).Interface("resource_id", ps.ResourceId).Msg("failed to stat shared resource")
@@ -480,7 +480,7 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 	// users should always be able to downgrade links to internal links
 	// when they are the creator of the link
 	// all other users should have the WritePublicLink permission
-	if !isInternalLink && !publicshare.IsCreatedByUser(*ps, user) {
+	if !isInternalLink && !publicshare.IsCreatedByUser(ps, user) {
 		canWriteLink, err := utils.CheckPermission(ctx, permission.WritePublicLink, gatewayClient)
 		if err != nil {
 			return &link.UpdatePublicShareResponse{
@@ -502,7 +502,7 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 		}, err
 	}
 
-	if !publicshare.IsCreatedByUser(*ps, user) {
+	if !publicshare.IsCreatedByUser(ps, user) {
 		if !sRes.GetInfo().GetPermissionSet().UpdateGrant {
 			return &link.UpdatePublicShareResponse{
 				Status: status.NewPermissionDenied(ctx, nil, "no permission to update public share"),

@@ -162,7 +162,7 @@ func newSpaceData(u *userpb.User, st, n, id string) *SpaceData {
 func newResourceData(i *providerv1beta1.ResourceInfo) *ResourceData {
 	rd := &ResourceData{
 		ResourceInfo: i,
-		ResourceID:   storagespace.FormatResourceID(*i.Id),
+		ResourceID:   storagespace.FormatResourceID(i.Id),
 	}
 	return rd
 }

@@ -38,6 +38,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sethvargo/go-password/password"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/protobuf/proto"
 )
 
 func init() {
@@ -165,9 +166,9 @@ func (mgr *jsonManager) GenerateAppPassword(ctx context.Context, scope map[strin
 		return nil, errors.Wrap(err, "error saving new token")
 	}
 
-	clonedAppPass := *appPass
+	clonedAppPass := proto.Clone(appPass).(*apppb.AppPassword)
 	clonedAppPass.Password = token
-	return &clonedAppPass, nil
+	return clonedAppPass, nil
 }
 
 func (mgr *jsonManager) ListAppPasswords(ctx context.Context) ([]*apppb.AppPassword, error) {

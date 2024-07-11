@@ -409,7 +409,7 @@ func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.Resource
 		if res.GetInfo().GetSpace().GetRoot() != nil {
 			webDavURL := *baseURL
 			relativePath := res.GetInfo().GetPath()
-			webDavURL.Path = path.Join(webDavURL.Path, storagespace.FormatResourceID(*res.GetInfo().GetSpace().GetRoot()), relativePath)
+			webDavURL.Path = path.Join(webDavURL.Path, storagespace.FormatResourceID(res.GetInfo().GetSpace().GetRoot()), relativePath)
 			item.WebDavUrl = libregraph.PtrString(webDavURL.String())
 		}
 	}
@@ -438,7 +438,7 @@ func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInf
 	*size = int64(res.GetSize()) // TODO lurking overflow: make size of libregraph drive item use uint64
 
 	driveItem := &libregraph.DriveItem{
-		Id:   libregraph.PtrString(storagespace.FormatResourceID(*res.GetId())),
+		Id:   libregraph.PtrString(storagespace.FormatResourceID(res.GetId())),
 		Size: size,
 	}
 
@@ -456,7 +456,7 @@ func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInf
 		parentRef := libregraph.NewItemReference()
 		parentRef.SetDriveType(res.GetSpace().GetSpaceType())
 		parentRef.SetDriveId(storagespace.FormatStorageID(res.GetParentId().GetStorageId(), res.GetParentId().GetSpaceId()))
-		parentRef.SetId(storagespace.FormatResourceID(*res.GetParentId()))
+		parentRef.SetId(storagespace.FormatResourceID(res.GetParentId()))
 		parentRef.SetName(path.Base(path.Dir(res.GetPath())))
 		parentRef.SetPath(path.Dir(res.GetPath()))
 		driveItem.ParentReference = parentRef
@@ -602,7 +602,7 @@ func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.Rem
 	*size = int64(res.GetSize()) // TODO lurking overflow: make size of libregraph drive item use uint64
 
 	remoteItem := &libregraph.RemoteItem{
-		Id:   libregraph.PtrString(storagespace.FormatResourceID(*res.GetId())),
+		Id:   libregraph.PtrString(storagespace.FormatResourceID(res.GetId())),
 		Size: size,
 	}
 
@@ -626,7 +626,7 @@ func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.Rem
 		remoteItem.Folder = &libregraph.Folder{}
 	}
 	if res.GetSpace() != nil && res.GetSpace().GetRoot() != nil {
-		remoteItem.RootId = libregraph.PtrString(storagespace.FormatResourceID(*res.GetSpace().GetRoot()))
+		remoteItem.RootId = libregraph.PtrString(storagespace.FormatResourceID(res.GetSpace().GetRoot()))
 		grantSpaceAlias := utils.ReadPlainFromOpaque(res.GetSpace().GetOpaque(), "spaceAlias")
 		if grantSpaceAlias != "" {
 			remoteItem.DriveAlias = libregraph.PtrString(grantSpaceAlias)
@@ -692,12 +692,12 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 }
 
 func (g Graph) fetchSpecialDriveItem(ctx context.Context, spaceItems []libregraph.DriveItem, itemName string, itemNode string, space *storageprovider.StorageSpace, baseURL *url.URL) []libregraph.DriveItem {
-	var ref storageprovider.Reference
+	var ref *storageprovider.Reference
 	if itemNode != "" {
 		rid, _ := storagespace.ParseID(itemNode)
 
 		rid.StorageId = space.GetRoot().GetStorageId()
-		ref = storageprovider.Reference{
+		ref = &storageprovider.Reference{
 			ResourceId: &rid,
 		}
 		spaceItem := g.getSpecialDriveItem(ctx, ref, itemName, baseURL, space)
@@ -730,7 +730,7 @@ type specialDriveItemEntry struct {
 	rootMtime         *types.Timestamp
 }
 
-func (g Graph) getSpecialDriveItem(ctx context.Context, ref storageprovider.Reference, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
+func (g Graph) getSpecialDriveItem(ctx context.Context, ref *storageprovider.Reference, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
 	var spaceItem *libregraph.DriveItem
 	if ref.GetResourceId().GetSpaceId() == "" && ref.GetResourceId().GetOpaqueId() == "" {
 		return nil

@@ -146,7 +146,7 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 			&query.TermQuery{
 				FieldVal: "RootID",
 				Term: storagespace.FormatResourceID(
-					storageProvider.ResourceId{
+					&storageProvider.ResourceId{
 						StorageId: sir.Ref.GetResourceId().GetStorageId(),
 						SpaceId:   sir.Ref.GetResourceId().GetSpaceId(),
 						OpaqueId:  sir.Ref.GetResourceId().GetOpaqueId(),

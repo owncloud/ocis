@@ -89,7 +89,7 @@ func (g Graph) applyDefaultTemplate(ctx context.Context, gwc gateway.GatewayAPIC
 	resp, err := gwc.UpdateStorageSpace(ctx, &storageprovider.UpdateStorageSpaceRequest{
 		StorageSpace: &storageprovider.StorageSpace{
 			Id: &storageprovider.StorageSpaceId{
-				OpaqueId: storagespace.FormatResourceID(*root),
+				OpaqueId: storagespace.FormatResourceID(root),
 			},
 			Root:   root,
 			Opaque: opaque,

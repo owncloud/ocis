@@ -229,7 +229,7 @@ var _ = Describe("sharedbyme", func() {
 		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
 			"GatewaySelector",
 			"com.owncloud.api.gateway",
-			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+			func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 				return gatewayClient
 			},
 		)
@@ -336,7 +336,7 @@ var _ = Describe("sharedbyme", func() {
 			Expect(len(res.Value)).To(Equal(1))
 
 			di := res.Value[0]
-			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(*userShare.GetResourceId())))
+			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(userShare.GetResourceId())))
 
 			perm := di.GetPermissions()
 			Expect(perm[0].GetId()).To(Equal(userShare.GetId().GetOpaqueId()))
@@ -380,7 +380,7 @@ var _ = Describe("sharedbyme", func() {
 			Expect(len(res.Value)).To(Equal(1))
 
 			di := res.Value[0]
-			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(*groupShare.GetResourceId())))
+			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(groupShare.GetResourceId())))
 
 			perm := di.GetPermissions()
 			Expect(perm[0].GetId()).To(Equal(userShare.GetId().GetOpaqueId()))
@@ -425,7 +425,7 @@ var _ = Describe("sharedbyme", func() {
 			Expect(len(res.Value)).To(Equal(1))
 
 			di := res.Value[0]
-			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(*groupShare.GetResourceId())))
+			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(groupShare.GetResourceId())))
 
 			// one permission per share
 			Expect(len(di.GetPermissions())).To(Equal(2))
@@ -456,7 +456,7 @@ var _ = Describe("sharedbyme", func() {
 			Expect(len(res.Value)).To(Equal(1))
 
 			di := res.Value[0]
-			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(*userShareWithExpiration.GetResourceId())))
+			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(userShareWithExpiration.GetResourceId())))
 
 			perm := di.GetPermissions()
 			Expect(perm[0].GetId()).To(Equal(userShareWithExpiration.GetId().GetOpaqueId()))
@@ -519,7 +519,7 @@ var _ = Describe("sharedbyme", func() {
 			Expect(len(res.Value)).To(Equal(1))
 
 			di := res.Value[0]
-			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(*publicShare.GetResourceId())))
+			Expect(di.GetId()).To(Equal(storagespace.FormatResourceID(publicShare.GetResourceId())))
 
 			perm := di.GetPermissions()
 			Expect(perm[0].GetId()).To(Equal(publicShare.GetId().GetOpaqueId()))
