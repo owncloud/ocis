@@ -31,14 +31,15 @@ Feature: Report test
     And the following headers should match these regular expressions
       | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
     And the "REPORT" response to user "Brian" should contain a mountpoint "folderMain" with these key and value pairs:
-      | key              | value                |
-      | oc:fileid        | UUIDof:SubFolder1    |
-      | oc:file-parent   | UUIDof:folderMain    |
-      | oc:shareroot     | /folderMain          |
-      | oc:name          | SubFolder1           |
-      | d:getcontenttype | httpd/unix-directory |
-      | oc:permissions   | S                    |
-      | oc:size          | 12                   |
+      | key               | value                |
+      | oc:fileid         | UUIDof:SubFolder1    |
+      | oc:file-parent    | UUIDof:folderMain    |
+      | oc:shareroot      | /folderMain          |
+      | oc:name           | SubFolder1           |
+      | d:getcontenttype  | httpd/unix-directory |
+      | oc:permissions    | S                    |
+      | oc:size           | 12                   |
+      | oc:remote-item-id | UUIDof:folderMain    |
 
 
   Scenario: check the response of the found file
@@ -61,6 +62,7 @@ Feature: Report test
       | d:getcontenttype   | text/plain                                       |
       | oc:permissions     | SD                                               |
       | d:getcontentlength | 12                                               |
+      | oc:remote-item-id  | UUIDof:folderMain                                |
 
 
   Scenario: search for the shared folder when the share is not accepted

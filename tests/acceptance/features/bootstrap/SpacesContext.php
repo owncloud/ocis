@@ -3893,6 +3893,9 @@ class SpacesContext implements Context {
 						Assert::assertTrue($responseValue >= ($value - 3));
 					}
 					break;
+				case "oc:remote-item-id":
+					Assert::assertContainsEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong remoteItemId in the response');
+					break;
 				default:
 					Assert::assertContainsEquals($value, $responseValues, "wrong $findItem in the response");
 					break;
