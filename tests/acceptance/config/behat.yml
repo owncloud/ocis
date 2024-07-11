@@ -399,6 +399,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - CliContext:
         - OcisConfigContext:
+        - FilesVersionsContext:
         - SharingNgContext:
 
   extensions:
