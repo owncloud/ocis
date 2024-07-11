@@ -23,6 +23,7 @@ import (
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/protobuf/proto"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -259,7 +260,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	log.Debug().Msg("calling list storage spaces with id filter")
 
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{
-		listStorageSpacesIDFilter(storagespace.FormatResourceID(rid)),
+		listStorageSpacesIDFilter(storagespace.FormatResourceID(&rid)),
 	}
 	res, err := g.ListStorageSpacesWithFilters(ctx, filters, true)
 	switch {
@@ -492,7 +493,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		// the original storage space.
 		StorageSpace: &storageprovider.StorageSpace{
 			Id: &storageprovider.StorageSpaceId{
-				OpaqueId: storagespace.FormatResourceID(rid),
+				OpaqueId: storagespace.FormatResourceID(&rid),
 			},
 			Root: root,
 		},
@@ -743,7 +744,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		logger.Error().Msg("unable to parse space: space has no root")
 		return nil, errors.New("space has no root")
 	}
-	spaceRid := *space.Root
+	spaceRid := proto.Clone(space.Root).(*storageprovider.ResourceId)
 	if space.Root.GetSpaceId() == space.Root.GetOpaqueId() {
 		spaceRid.OpaqueId = ""
 	}
@@ -1047,11 +1048,11 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	dRes, err := gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 		Opaque: opaque,
 		Id: &storageprovider.StorageSpaceId{
-			OpaqueId: storagespace.FormatResourceID(rid),
+			OpaqueId: storagespace.FormatResourceID(&rid),
 		},
 	})
 	if err != nil {
-		logger.Error().Err(err).Interface("id", rid).Msg("could not delete drive: transport error")
+		logger.Error().Err(err).Str("id", rid.String()).Msg("could not delete drive: transport error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "transport error")
 		return
 	}

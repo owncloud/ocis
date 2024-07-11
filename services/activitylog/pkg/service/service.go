@@ -158,7 +158,7 @@ func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId,
 	}
 
 	// store activity on trashed item
-	if err := a.storeActivity(storagespace.FormatResourceID(*resourceID), eventID, 0, timestamp); err != nil {
+	if err := a.storeActivity(storagespace.FormatResourceID(resourceID), eventID, 0, timestamp); err != nil {
 		return fmt.Errorf("could not store activity: %w", err)
 	}
 
@@ -183,7 +183,7 @@ func (a *ActivitylogService) AddSpaceActivity(spaceID *provider.StorageSpaceId, 
 		return fmt.Errorf("could not parse space id: %w", err)
 	}
 	rid.OpaqueId = rid.GetSpaceId()
-	return a.storeActivity(storagespace.FormatResourceID(rid), eventID, 0, timestamp)
+	return a.storeActivity(storagespace.FormatResourceID(&rid), eventID, 0, timestamp)
 
 }
 
@@ -218,7 +218,7 @@ func (a *ActivitylogService) RemoveActivities(rid *provider.ResourceId, toDelete
 	}
 
 	return a.store.Write(&microstore.Record{
-		Key:   storagespace.FormatResourceID(*rid),
+		Key:   storagespace.FormatResourceID(rid),
 		Value: b,
 	})
 }
@@ -232,11 +232,11 @@ func (a *ActivitylogService) RemoveResource(rid *provider.ResourceId) error {
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
-	return a.store.Delete(storagespace.FormatResourceID(*rid))
+	return a.store.Delete(storagespace.FormatResourceID(rid))
 }
 
 func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity, error) {
-	resourceID := storagespace.FormatResourceID(*rid)
+	resourceID := storagespace.FormatResourceID(rid)
 
 	records, err := a.store.Read(resourceID)
 	if err != nil && err != microstore.ErrNotFound {
@@ -269,7 +269,7 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 			return fmt.Errorf("could not get resource info: %w", err)
 		}
 
-		if err := a.storeActivity(storagespace.FormatResourceID(*info.GetId()), eventID, depth, timestamp); err != nil {
+		if err := a.storeActivity(storagespace.FormatResourceID(info.GetId()), eventID, depth, timestamp); err != nil {
 			return fmt.Errorf("could not store activity: %w", err)
 		}
 

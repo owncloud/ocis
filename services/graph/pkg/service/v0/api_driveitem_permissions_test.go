@@ -56,7 +56,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			},
 		}
 		statResponse *provider.StatResponse
-		driveItemId  provider.ResourceId
+		driveItemId  *provider.ResourceId
 		ctx          context.Context
 	)
 
@@ -88,7 +88,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Status: status.NewOK(ctx),
 		}
 
-		driveItemId = provider.ResourceId{
+		driveItemId = &provider.ResourceId{
 			StorageId: "1",
 			SpaceId:   "2",
 			OpaqueId:  "3",
@@ -106,7 +106,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		BeforeEach(func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			statResponse.Info = &provider.ResourceInfo{
-				Id:   &driveItemId,
+				Id:   driveItemId,
 				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
 			}
 
@@ -258,12 +258,12 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		var (
 			createShareResponse *collaboration.CreateShareResponse
 			driveItemInvite     libregraph.DriveItemInvite
-			driveId             provider.ResourceId
+			driveId             *provider.ResourceId
 			getUserResponse     *userpb.GetUserResponse
 		)
 
 		BeforeEach(func() {
-			driveId = provider.ResourceId{
+			driveId = &provider.ResourceId{
 				StorageId: "1",
 				SpaceId:   "2",
 			}
@@ -423,11 +423,11 @@ var _ = Describe("DriveItemPermissionsService", func() {
 	})
 	Describe("ListSpaceRootPermissions", func() {
 		var (
-			driveId provider.ResourceId
+			driveId *provider.ResourceId
 		)
 
 		BeforeEach(func() {
-			driveId = provider.ResourceId{
+			driveId = &provider.ResourceId{
 				StorageId: "1",
 				SpaceId:   "2",
 			}
@@ -489,7 +489,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(&getPublicShareResponse, nil)
 
 			err := driveItemPermissionsService.DeletePermission(context.Background(),
-				*getShareResponse.Share.ResourceId,
+				getShareResponse.Share.ResourceId,
 				"permissionid",
 			)
 			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, "failed to resolve resource id for shared resource")))
@@ -515,7 +515,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			).Return(rmShareMockResponse, nil)
 
 			err := driveItemPermissionsService.DeletePermission(context.Background(),
-				*getShareResponse.Share.ResourceId,
+				getShareResponse.Share.ResourceId,
 				"permissionid",
 			)
 			Expect(err).ToNot(HaveOccurred())
@@ -545,7 +545,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			)
 
 			err := driveItemPermissionsService.DeletePermission(context.Background(),
-				*getShareResponse.Share.ResourceId,
+				getShareResponse.Share.ResourceId,
 				"linkpermissionid",
 			)
 			Expect(err).ToNot(HaveOccurred())
@@ -564,7 +564,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			})
 
 			err := driveItemPermissionsService.DeletePermission(context.Background(),
-				provider.ResourceId{
+				&provider.ResourceId{
 					StorageId: "1",
 					SpaceId:   "2",
 					OpaqueId:  "2",
@@ -597,7 +597,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			ctx = context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
 
 			err := driveItemPermissionsService.DeletePermission(context.Background(),
-				provider.ResourceId{
+				&provider.ResourceId{
 					StorageId: "1",
 					SpaceId:   "2",
 					OpaqueId:  "3",
@@ -625,7 +625,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				Id: &collaboration.ShareId{
 					OpaqueId: "permissionid",
 				},
-				ResourceId: &driveItemId,
+				ResourceId: driveItemId,
 				Grantee: &provider.Grantee{
 					Type: provider.GranteeType_GRANTEE_TYPE_USER,
 					Id: &provider.Grantee_UserId{
@@ -659,7 +659,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					Id: &link.PublicShareId{
 						OpaqueId: "permissionid",
 					},
-					ResourceId: &driveItemId,
+					ResourceId: driveItemId,
 					Permissions: &link.PublicSharePermissions{
 						Permissions: linktype.NewViewLinkPermissionSet().GetPermissions(),
 					},
@@ -669,7 +669,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			statResponse = &provider.StatResponse{
 				Status: status.NewOK(ctx),
 				Info: &provider.ResourceInfo{
-					Id:   &driveItemId,
+					Id:   driveItemId,
 					Type: provider.ResourceType_RESOURCE_TYPE_CONTAINER,
 				},
 			}
@@ -739,7 +739,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			})).Return(getPublicShareMockResponse, nil)
 
 			gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(req *provider.StatRequest) bool {
-				return utils.ResourceIDEqual(req.GetRef().GetResourceId(), &driveItemId) && req.GetRef().GetPath() == "."
+				return utils.ResourceIDEqual(req.GetRef().GetResourceId(), driveItemId) && req.GetRef().GetPath() == "."
 			})).Return(statResponse, nil)
 
 			gatewayClient.On("UpdatePublicShare",
@@ -851,7 +851,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 
 			driveItemPermission.SetRoles([]string{unifiedrole.NewFileEditorUnifiedRole().GetId()})
-			spaceId := provider.ResourceId{
+			spaceId := &provider.ResourceId{
 				StorageId: "1",
 				SpaceId:   "2",
 				OpaqueId:  "2",
@@ -1072,7 +1072,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 
 			onInvite := mockProvider.On("Invite", mock.Anything, mock.Anything, mock.Anything)
 
-			onInvite.Return(func(ctx context.Context, resourceID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+			onInvite.Return(func(ctx context.Context, resourceID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 				return libregraph.Permission{}, errors.New("any")
 			}).Once()
 
@@ -1088,7 +1088,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			onInvite := mockProvider.On("Invite", mock.Anything, mock.Anything, mock.Anything)
-			onInvite.Return(func(ctx context.Context, resourceID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+			onInvite.Return(func(ctx context.Context, resourceID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 				Expect(storagespace.FormatResourceID(resourceID)).To(Equal("1$2!3"))
 				return libregraph.Permission{}, nil
 			}).Once()
@@ -1109,7 +1109,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			onInvite := mockProvider.On("SpaceRootInvite", mock.Anything, mock.Anything, mock.Anything)
-			onInvite.Return(func(ctx context.Context, driveID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+			onInvite.Return(func(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 				Expect(storagespace.FormatResourceID(driveID)).To(Equal("1$2"))
 				return libregraph.Permission{}, nil
 			}).Once()
@@ -1146,7 +1146,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 
 			mockProvider.On("ListPermissions", mock.Anything, mock.Anything, mock.Anything).
 				Return(func(ctx context.Context, itemid storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
-					Expect(storagespace.FormatResourceID(itemid)).To(Equal("1$2!3"))
+					Expect(storagespace.FormatResourceID(&itemid)).To(Equal("1$2!3"))
 					return libregraph.CollectionOfPermissionsWithAllowedValues{}, nil
 				}).Once()
 

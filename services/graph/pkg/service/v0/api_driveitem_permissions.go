@@ -41,18 +41,18 @@ const (
 
 // DriveItemPermissionsProvider contains the methods related to handling permissions on drive items
 type DriveItemPermissionsProvider interface {
-	Invite(ctx context.Context, resourceId storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
-	SpaceRootInvite(ctx context.Context, driveID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
+	Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
+	SpaceRootInvite(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	ListPermissions(ctx context.Context, itemID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
-	ListSpaceRootPermissions(ctx context.Context, driveID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
-	DeletePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string) error
-	DeleteSpaceRootPermission(ctx context.Context, driveID storageprovider.ResourceId, permissionID string) error
-	UpdatePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error)
-	UpdateSpaceRootPermission(ctx context.Context, driveID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error)
-	CreateLink(ctx context.Context, driveItemID storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error)
-	CreateSpaceRootLink(ctx context.Context, driveID storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error)
-	SetPublicLinkPassword(ctx context.Context, driveItemID storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error)
-	SetPublicLinkPasswordOnSpaceRoot(ctx context.Context, driveID storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error)
+	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	DeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) error
+	DeleteSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string) error
+	UpdatePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error)
+	UpdateSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error)
+	CreateLink(ctx context.Context, driveItemID *storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error)
+	CreateSpaceRootLink(ctx context.Context, driveID *storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error)
+	SetPublicLinkPassword(ctx context.Context, driveItemID *storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error)
+	SetPublicLinkPasswordOnSpaceRoot(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error)
 }
 
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
@@ -82,13 +82,13 @@ func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Sele
 }
 
 // Invite invites a user to a drive item.
-func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return libregraph.Permission{}, err
 	}
 
-	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &resourceId}})
+	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: resourceId}})
 	if err := errorcode.FromStat(statResponse, err); err != nil {
 		s.logger.Warn().Err(err).Interface("stat.res", statResponse).Msg("stat failed")
 		return libregraph.Permission{}, err
@@ -284,7 +284,7 @@ func createShareRequestToFederatedUser(user libregraph.User, resourceId *storage
 }
 
 // SpaceRootInvite handles invitation request on project spaces
-func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveID storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return libregraph.Permission{}, err
@@ -300,7 +300,7 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 	}
 
 	rootResourceID := space.GetRoot()
-	return s.Invite(ctx, *rootResourceID, invite)
+	return s.Invite(ctx, rootResourceID, invite)
 }
 
 // ListPermissions lists the permissions of a driveItem
@@ -374,7 +374,7 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 }
 
 // ListSpaceRootPermissions handles ListPermissions request on project spaces
-func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Context, driveID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{}
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -396,7 +396,7 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 }
 
 // DeletePermission deletes a permission from a drive item
-func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string) error {
+func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) error {
 	var permissionType permissionType
 
 	sharedResourceID, err := s.getLinkPermissionResourceID(ctx, permissionID)
@@ -406,9 +406,9 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 		permissionType = Public
 	// If the item id is referring to a space root and this is not a public share
 	// we have to deal with space permissions
-	case IsSpaceRoot(&itemID):
+	case IsSpaceRoot(itemID):
 		permissionType = Space
-		sharedResourceID = &itemID
+		sharedResourceID = itemID
 		err = nil
 	// If this is neither a public share nor a space permission, check if this is a
 	// user share
@@ -430,7 +430,7 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 
 	// The resourceID of the shared resource need to match the item ID from the Request Path
 	// otherwise this is an invalid Request.
-	if !utils.ResourceIDEqual(sharedResourceID, &itemID) {
+	if !utils.ResourceIDEqual(sharedResourceID, itemID) {
 		s.logger.Debug().Msg("resourceID of shared does not match itemID")
 		return errorcode.New(errorcode.InvalidRequest, "permissionID and itemID do not match")
 	}
@@ -449,7 +449,7 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 }
 
 // DeleteSpaceRootPermission deletes a permission on the root item of a project space
-func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Context, driveID storageprovider.ResourceId, permissionID string) error {
+func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string) error {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return err
@@ -465,26 +465,26 @@ func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Conte
 	}
 
 	rootResourceID := space.GetRoot()
-	return s.DeletePermission(ctx, *rootResourceID, permissionID)
+	return s.DeletePermission(ctx, rootResourceID, permissionID)
 }
 
 // UpdatePermission updates a permission on a drive item
-func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
-	oldPermission, sharedResourceID, err := s.getPermissionByID(ctx, permissionID, &itemID)
+func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
+	oldPermission, sharedResourceID, err := s.getPermissionByID(ctx, permissionID, itemID)
 	if err != nil {
 		return libregraph.Permission{}, err
 	}
 
 	// The resourceID of the shared resource need to match the item ID from the Request Path
 	// otherwise this is an invalid Request.
-	if !utils.ResourceIDEqual(sharedResourceID, &itemID) {
+	if !utils.ResourceIDEqual(sharedResourceID, itemID) {
 		s.logger.Debug().Msg("resourceID of shared does not match itemID")
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "permissionID and itemID do not match")
 	}
 
 	// This is a public link
 	if _, ok := oldPermission.GetLinkOk(); ok {
-		updatedPermission, err := s.updatePublicLinkPermission(ctx, permissionID, &itemID, &newPermission)
+		updatedPermission, err := s.updatePublicLinkPermission(ctx, permissionID, itemID, &newPermission)
 		if err != nil {
 			return libregraph.Permission{}, err
 		}
@@ -500,7 +500,7 @@ func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemI
 }
 
 // UpdateSpaceRootPermission updates a permission on the root item of a project space
-func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Context, driveID storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
+func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return libregraph.Permission{}, err
@@ -516,7 +516,7 @@ func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Conte
 	}
 
 	rootResourceID := space.GetRoot()
-	return s.UpdatePermission(ctx, *rootResourceID, permissionID, newPermission)
+	return s.UpdatePermission(ctx, rootResourceID, permissionID, newPermission)
 }
 
 // DriveItemPermissionsService is the api that registers the http endpoints which expose needed operation to the graph api.
@@ -557,7 +557,7 @@ func (api DriveItemPermissionsApi) Invite(w http.ResponseWriter, r *http.Request
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	permission, err := api.driveItemPermissionsService.Invite(ctx, itemID, *driveItemInvite)
+	permission, err := api.driveItemPermissionsService.Invite(ctx, &itemID, *driveItemInvite)
 
 	if err != nil {
 		errorcode.RenderError(w, r, err)
@@ -590,7 +590,7 @@ func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *htt
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	permission, err := api.driveItemPermissionsService.SpaceRootInvite(ctx, driveID, *driveItemInvite)
+	permission, err := api.driveItemPermissionsService.SpaceRootInvite(ctx, &driveID, *driveItemInvite)
 
 	if err != nil {
 		errorcode.RenderError(w, r, err)
@@ -632,7 +632,7 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 	}
 
 	ctx := r.Context()
-	permissions, err := api.driveItemPermissionsService.ListSpaceRootPermissions(ctx, driveID)
+	permissions, err := api.driveItemPermissionsService.ListSpaceRootPermissions(ctx, &driveID)
 
 	if err != nil {
 		errorcode.RenderError(w, r, err)
@@ -660,7 +660,7 @@ func (api DriveItemPermissionsApi) DeletePermission(w http.ResponseWriter, r *ht
 	}
 
 	ctx := r.Context()
-	err = api.driveItemPermissionsService.DeletePermission(ctx, itemID, permissionID)
+	err = api.driveItemPermissionsService.DeletePermission(ctx, &itemID, permissionID)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -687,7 +687,7 @@ func (api DriveItemPermissionsApi) DeleteSpaceRootPermission(w http.ResponseWrit
 	}
 
 	ctx := r.Context()
-	err = api.driveItemPermissionsService.DeleteSpaceRootPermission(ctx, driveID, permissionID)
+	err = api.driveItemPermissionsService.DeleteSpaceRootPermission(ctx, &driveID, permissionID)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -727,7 +727,7 @@ func (api DriveItemPermissionsApi) UpdatePermission(w http.ResponseWriter, r *ht
 		return
 	}
 
-	updatedPermission, err := api.driveItemPermissionsService.UpdatePermission(ctx, itemID, permissionID, permission)
+	updatedPermission, err := api.driveItemPermissionsService.UpdatePermission(ctx, &itemID, permissionID, permission)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -766,7 +766,7 @@ func (api DriveItemPermissionsApi) UpdateSpaceRootPermission(w http.ResponseWrit
 		return
 	}
 
-	updatedPermission, err := api.driveItemPermissionsService.UpdateSpaceRootPermission(ctx, driveID, permissionID, permission)
+	updatedPermission, err := api.driveItemPermissionsService.UpdateSpaceRootPermission(ctx, &driveID, permissionID, permission)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return

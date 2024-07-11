@@ -92,7 +92,7 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 				RevaGatewaySelector: pool.GetSelector[gateway.GatewayAPIClient](
 					"GatewaySelector",
 					"com.owncloud.api.gateway",
-					func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+					func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 						return mockGatewayClient{
 							AuthenticateFunc: func(authType, clientID, clientSecret string) (string, rpcv1beta1.Code) {
 								if authType != "publicshares" {

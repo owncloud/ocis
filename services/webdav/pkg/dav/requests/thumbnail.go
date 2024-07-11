@@ -43,7 +43,7 @@ type ThumbnailRequest struct {
 }
 
 func addMissingStorageID(id string) string {
-	rid := providerv1beta1.ResourceId{}
+	rid := &providerv1beta1.ResourceId{}
 	rid.StorageId, rid.SpaceId, rid.OpaqueId, _ = storagespace.SplitID(id)
 	if rid.StorageId == "" && rid.SpaceId == utils.ShareStorageSpaceID {
 		rid.StorageId = utils.ShareStorageProviderID

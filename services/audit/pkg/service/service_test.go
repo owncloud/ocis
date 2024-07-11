@@ -108,7 +108,7 @@ var testCases = []struct {
 			require.Equal(t, "", ev.ItemType)       // not implemented atm
 			require.Equal(t, "", ev.ExpirationDate) // no expiration for shares
 			require.Equal(t, false, ev.SharePass)
-			require.Equal(t, "get_quota:true stat:true ", ev.Permissions)
+			require.Equal(t, "get_quota:true stat:true", ev.Permissions)
 			require.Equal(t, "group", ev.ShareType)
 			require.Equal(t, "beshared-groupid", ev.ShareWith)
 			require.Equal(t, "sharing-userid", ev.ShareOwner)
@@ -142,7 +142,7 @@ var testCases = []struct {
 			require.Equal(t, "", ev.ItemType) // not implemented atm
 			require.Equal(t, "2001-09-20T15:33:20Z", ev.ExpirationDate)
 			require.Equal(t, true, ev.SharePass)
-			require.Equal(t, "stat:true ", ev.Permissions)
+			require.Equal(t, "stat:true", ev.Permissions)
 			require.Equal(t, "link", ev.ShareType)
 			require.Equal(t, "", ev.ShareWith) // not filled on links
 			require.Equal(t, "sharing-userid", ev.ShareOwner)

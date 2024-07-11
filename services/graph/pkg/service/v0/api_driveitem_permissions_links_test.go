@@ -29,7 +29,7 @@ import (
 var _ = Describe("createLinkTests", func() {
 	var (
 		svc             service.DriveItemPermissionsService
-		driveItemId     provider.ResourceId
+		driveItemId     *provider.ResourceId
 		ctx             context.Context
 		gatewayClient   *cs3mocks.GatewayAPIClient
 		gatewaySelector *mocks.Selectable[gateway.GatewayAPIClient]
@@ -56,7 +56,7 @@ var _ = Describe("createLinkTests", func() {
 		cfg := defaults.FullDefaultConfig()
 		svc, err = service.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg)
 		Expect(err).ToNot(HaveOccurred())
-		driveItemId = provider.ResourceId{
+		driveItemId = &provider.ResourceId{
 			StorageId: "1",
 			SpaceId:   "2",
 			OpaqueId:  "3",
@@ -225,7 +225,7 @@ var _ = Describe("createLinkTests", func() {
 					Id: &link.PublicShareId{
 						OpaqueId: "permissionid",
 					},
-					ResourceId: &driveItemId,
+					ResourceId: driveItemId,
 					Permissions: &link.PublicSharePermissions{
 						Permissions: linktype.NewViewLinkPermissionSet().GetPermissions(),
 					},

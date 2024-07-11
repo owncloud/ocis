@@ -156,7 +156,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 			continue
 		}
 
-		rIDStr := storagespace.FormatResourceID(*receivedShare.GetShare().GetResourceId())
+		rIDStr := storagespace.FormatResourceID(receivedShare.GetShare().GetResourceId())
 		receivedSharesByResourceID[rIDStr] = append(receivedSharesByResourceID[rIDStr], receivedShare)
 	}
 
@@ -203,7 +203,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 			remoteItem := driveItem.RemoteItem
 			{
 				if id := shareStat.GetInfo().GetId(); id != nil {
-					remoteItem.SetId(storagespace.FormatResourceID(*id))
+					remoteItem.SetId(storagespace.FormatResourceID(id))
 				}
 
 				if name := shareStat.GetInfo().GetName(); name != "" {
@@ -228,7 +228,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 				}
 
 				if root := shareStat.GetInfo().GetSpace().GetRoot(); root != nil {
-					parentReference.SetDriveId(storagespace.FormatResourceID(*root))
+					parentReference.SetDriveId(storagespace.FormatResourceID(root))
 				}
 				if !reflect.ValueOf(*parentReference).IsZero() {
 					remoteItem.ParentReference = parentReference
@@ -241,7 +241,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 			driveItem.ParentReference = libregraph.NewItemReference()
 			driveItem.ParentReference.SetDriveType(_spaceTypeVirtual)
 			driveItem.ParentReference.SetDriveId(storagespace.FormatStorageID(utils.ShareStorageProviderID, utils.ShareStorageSpaceID))
-			driveItem.ParentReference.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+			driveItem.ParentReference.SetId(storagespace.FormatResourceID(&storageprovider.ResourceId{
 				StorageId: utils.ShareStorageProviderID,
 				OpaqueId:  utils.ShareStorageSpaceID,
 				SpaceId:   utils.ShareStorageSpaceID,
@@ -383,7 +383,7 @@ func fillDriveItemPropertiesFromReceivedShare(ctx context.Context, logger *log.L
 		//   ID across all services this means we needed to make similar adjustments
 		//   to the sharejail (usershareprovider, webdav). Which we can't currently do
 		//   as some clients rely on the IDs used there having a special format.
-		driveItem.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+		driveItem.SetId(storagespace.FormatResourceID(&storageprovider.ResourceId{
 			StorageId: utils.ShareStorageProviderID,
 			OpaqueId:  oldestReceivedShare.GetShare().GetId().GetOpaqueId(),
 			SpaceId:   utils.ShareStorageSpaceID,
@@ -537,7 +537,7 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 			remoteItem := driveItem.RemoteItem
 			{
 				if id := shareStat.GetInfo().GetId(); id != nil {
-					remoteItem.SetId(storagespace.FormatResourceID(*id))
+					remoteItem.SetId(storagespace.FormatResourceID(id))
 				}
 
 				if name := shareStat.GetInfo().GetName(); name != "" {
@@ -562,7 +562,7 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 				}
 
 				if root := shareStat.GetInfo().GetSpace().GetRoot(); root != nil {
-					parentReference.SetDriveId(storagespace.FormatResourceID(*root))
+					parentReference.SetDriveId(storagespace.FormatResourceID(root))
 				}
 				if !reflect.ValueOf(*parentReference).IsZero() {
 					remoteItem.ParentReference = parentReference
@@ -575,7 +575,7 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 			driveItem.ParentReference = libregraph.NewItemReference()
 			driveItem.ParentReference.SetDriveType("virtual")
 			driveItem.ParentReference.SetDriveId(storagespace.FormatStorageID(utils.ShareStorageProviderID, utils.ShareStorageSpaceID))
-			driveItem.ParentReference.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+			driveItem.ParentReference.SetId(storagespace.FormatResourceID(&storageprovider.ResourceId{
 				StorageId: utils.ShareStorageProviderID,
 				OpaqueId:  utils.ShareStorageSpaceID,
 				SpaceId:   utils.ShareStorageSpaceID,
@@ -721,7 +721,7 @@ func fillDriveItemPropertiesFromReceivedOCMShare(ctx context.Context, logger *lo
 		//   ID across all services this means we needed to make similar adjustments
 		//   to the sharejail (usershareprovider, webdav). Which we can't currently do
 		//   as some clients rely on the IDs used there having a special format.
-		driveItem.SetId(storagespace.FormatResourceID(storageprovider.ResourceId{
+		driveItem.SetId(storagespace.FormatResourceID(&storageprovider.ResourceId{
 			StorageId: utils.OCMStorageProviderID,
 			SpaceId:   utils.OCMStorageSpaceID,
 			OpaqueId:  oldestReceivedShare.GetRemoteShareId(),

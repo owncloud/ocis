@@ -25,7 +25,7 @@ func (_m *DriveItemPermissionsProvider) EXPECT() *DriveItemPermissionsProvider_E
 }
 
 // CreateLink provides a mock function with given fields: ctx, driveItemID, createLink
-func (_m *DriveItemPermissionsProvider) CreateLink(ctx context.Context, driveItemID providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error) {
+func (_m *DriveItemPermissionsProvider) CreateLink(ctx context.Context, driveItemID *providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error) {
 	ret := _m.Called(ctx, driveItemID, createLink)
 
 	if len(ret) == 0 {
@@ -34,16 +34,16 @@ func (_m *DriveItemPermissionsProvider) CreateLink(ctx context.Context, driveIte
 
 	var r0 libregraph.Permission
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) (libregraph.Permission, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) (libregraph.Permission, error)); ok {
 		return rf(ctx, driveItemID, createLink)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) libregraph.Permission); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) libregraph.Permission); ok {
 		r0 = rf(ctx, driveItemID, createLink)
 	} else {
 		r0 = ret.Get(0).(libregraph.Permission)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) error); ok {
 		r1 = rf(ctx, driveItemID, createLink)
 	} else {
 		r1 = ret.Error(1)
@@ -59,15 +59,15 @@ type DriveItemPermissionsProvider_CreateLink_Call struct {
 
 // CreateLink is a helper method to define mock.On call
 //   - ctx context.Context
-//   - driveItemID providerv1beta1.ResourceId
+//   - driveItemID *providerv1beta1.ResourceId
 //   - createLink libregraph.DriveItemCreateLink
 func (_e *DriveItemPermissionsProvider_Expecter) CreateLink(ctx interface{}, driveItemID interface{}, createLink interface{}) *DriveItemPermissionsProvider_CreateLink_Call {
 	return &DriveItemPermissionsProvider_CreateLink_Call{Call: _e.mock.On("CreateLink", ctx, driveItemID, createLink)}
 }
 
-func (_c *DriveItemPermissionsProvider_CreateLink_Call) Run(run func(ctx context.Context, driveItemID providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink)) *DriveItemPermissionsProvider_CreateLink_Call {
+func (_c *DriveItemPermissionsProvider_CreateLink_Call) Run(run func(ctx context.Context, driveItemID *providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink)) *DriveItemPermissionsProvider_CreateLink_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(libregraph.DriveItemCreateLink))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(libregraph.DriveItemCreateLink))
 	})
 	return _c
 }
@@ -77,13 +77,13 @@ func (_c *DriveItemPermissionsProvider_CreateLink_Call) Return(_a0 libregraph.Pe
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_CreateLink_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) (libregraph.Permission, error)) *DriveItemPermissionsProvider_CreateLink_Call {
+func (_c *DriveItemPermissionsProvider_CreateLink_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) (libregraph.Permission, error)) *DriveItemPermissionsProvider_CreateLink_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // CreateSpaceRootLink provides a mock function with given fields: ctx, driveID, createLink
-func (_m *DriveItemPermissionsProvider) CreateSpaceRootLink(ctx context.Context, driveID providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error) {
+func (_m *DriveItemPermissionsProvider) CreateSpaceRootLink(ctx context.Context, driveID *providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error) {
 	ret := _m.Called(ctx, driveID, createLink)
 
 	if len(ret) == 0 {
@@ -92,16 +92,16 @@ func (_m *DriveItemPermissionsProvider) CreateSpaceRootLink(ctx context.Context,
 
 	var r0 libregraph.Permission
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) (libregraph.Permission, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) (libregraph.Permission, error)); ok {
 		return rf(ctx, driveID, createLink)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) libregraph.Permission); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) libregraph.Permission); ok {
 		r0 = rf(ctx, driveID, createLink)
 	} else {
 		r0 = ret.Get(0).(libregraph.Permission)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) error); ok {
 		r1 = rf(ctx, driveID, createLink)
 	} else {
 		r1 = ret.Error(1)
@@ -117,15 +117,15 @@ type DriveItemPermissionsProvider_CreateSpaceRootLink_Call struct {
 
 // CreateSpaceRootLink is a helper method to define mock.On call
 //   - ctx context.Context
-//   - driveID providerv1beta1.ResourceId
+//   - driveID *providerv1beta1.ResourceId
 //   - createLink libregraph.DriveItemCreateLink
 func (_e *DriveItemPermissionsProvider_Expecter) CreateSpaceRootLink(ctx interface{}, driveID interface{}, createLink interface{}) *DriveItemPermissionsProvider_CreateSpaceRootLink_Call {
 	return &DriveItemPermissionsProvider_CreateSpaceRootLink_Call{Call: _e.mock.On("CreateSpaceRootLink", ctx, driveID, createLink)}
 }
 
-func (_c *DriveItemPermissionsProvider_CreateSpaceRootLink_Call) Run(run func(ctx context.Context, driveID providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink)) *DriveItemPermissionsProvider_CreateSpaceRootLink_Call {
+func (_c *DriveItemPermissionsProvider_CreateSpaceRootLink_Call) Run(run func(ctx context.Context, driveID *providerv1beta1.ResourceId, createLink libregraph.DriveItemCreateLink)) *DriveItemPermissionsProvider_CreateSpaceRootLink_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(libregraph.DriveItemCreateLink))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(libregraph.DriveItemCreateLink))
 	})
 	return _c
 }
@@ -135,13 +135,13 @@ func (_c *DriveItemPermissionsProvider_CreateSpaceRootLink_Call) Return(_a0 libr
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_CreateSpaceRootLink_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) (libregraph.Permission, error)) *DriveItemPermissionsProvider_CreateSpaceRootLink_Call {
+func (_c *DriveItemPermissionsProvider_CreateSpaceRootLink_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemCreateLink) (libregraph.Permission, error)) *DriveItemPermissionsProvider_CreateSpaceRootLink_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // DeletePermission provides a mock function with given fields: ctx, itemID, permissionID
-func (_m *DriveItemPermissionsProvider) DeletePermission(ctx context.Context, itemID providerv1beta1.ResourceId, permissionID string) error {
+func (_m *DriveItemPermissionsProvider) DeletePermission(ctx context.Context, itemID *providerv1beta1.ResourceId, permissionID string) error {
 	ret := _m.Called(ctx, itemID, permissionID)
 
 	if len(ret) == 0 {
@@ -149,7 +149,7 @@ func (_m *DriveItemPermissionsProvider) DeletePermission(ctx context.Context, it
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string) error); ok {
 		r0 = rf(ctx, itemID, permissionID)
 	} else {
 		r0 = ret.Error(0)
@@ -165,15 +165,15 @@ type DriveItemPermissionsProvider_DeletePermission_Call struct {
 
 // DeletePermission is a helper method to define mock.On call
 //   - ctx context.Context
-//   - itemID providerv1beta1.ResourceId
+//   - itemID *providerv1beta1.ResourceId
 //   - permissionID string
 func (_e *DriveItemPermissionsProvider_Expecter) DeletePermission(ctx interface{}, itemID interface{}, permissionID interface{}) *DriveItemPermissionsProvider_DeletePermission_Call {
 	return &DriveItemPermissionsProvider_DeletePermission_Call{Call: _e.mock.On("DeletePermission", ctx, itemID, permissionID)}
 }
 
-func (_c *DriveItemPermissionsProvider_DeletePermission_Call) Run(run func(ctx context.Context, itemID providerv1beta1.ResourceId, permissionID string)) *DriveItemPermissionsProvider_DeletePermission_Call {
+func (_c *DriveItemPermissionsProvider_DeletePermission_Call) Run(run func(ctx context.Context, itemID *providerv1beta1.ResourceId, permissionID string)) *DriveItemPermissionsProvider_DeletePermission_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(string))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(string))
 	})
 	return _c
 }
@@ -183,13 +183,13 @@ func (_c *DriveItemPermissionsProvider_DeletePermission_Call) Return(_a0 error) 
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_DeletePermission_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, string) error) *DriveItemPermissionsProvider_DeletePermission_Call {
+func (_c *DriveItemPermissionsProvider_DeletePermission_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, string) error) *DriveItemPermissionsProvider_DeletePermission_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // DeleteSpaceRootPermission provides a mock function with given fields: ctx, driveID, permissionID
-func (_m *DriveItemPermissionsProvider) DeleteSpaceRootPermission(ctx context.Context, driveID providerv1beta1.ResourceId, permissionID string) error {
+func (_m *DriveItemPermissionsProvider) DeleteSpaceRootPermission(ctx context.Context, driveID *providerv1beta1.ResourceId, permissionID string) error {
 	ret := _m.Called(ctx, driveID, permissionID)
 
 	if len(ret) == 0 {
@@ -197,7 +197,7 @@ func (_m *DriveItemPermissionsProvider) DeleteSpaceRootPermission(ctx context.Co
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string) error); ok {
 		r0 = rf(ctx, driveID, permissionID)
 	} else {
 		r0 = ret.Error(0)
@@ -213,15 +213,15 @@ type DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call struct {
 
 // DeleteSpaceRootPermission is a helper method to define mock.On call
 //   - ctx context.Context
-//   - driveID providerv1beta1.ResourceId
+//   - driveID *providerv1beta1.ResourceId
 //   - permissionID string
 func (_e *DriveItemPermissionsProvider_Expecter) DeleteSpaceRootPermission(ctx interface{}, driveID interface{}, permissionID interface{}) *DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call {
 	return &DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call{Call: _e.mock.On("DeleteSpaceRootPermission", ctx, driveID, permissionID)}
 }
 
-func (_c *DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call) Run(run func(ctx context.Context, driveID providerv1beta1.ResourceId, permissionID string)) *DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call {
+func (_c *DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call) Run(run func(ctx context.Context, driveID *providerv1beta1.ResourceId, permissionID string)) *DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(string))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(string))
 	})
 	return _c
 }
@@ -231,13 +231,13 @@ func (_c *DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call) Return(_a
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, string) error) *DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call {
+func (_c *DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, string) error) *DriveItemPermissionsProvider_DeleteSpaceRootPermission_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Invite provides a mock function with given fields: ctx, resourceId, invite
-func (_m *DriveItemPermissionsProvider) Invite(ctx context.Context, resourceId providerv1beta1.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+func (_m *DriveItemPermissionsProvider) Invite(ctx context.Context, resourceId *providerv1beta1.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 	ret := _m.Called(ctx, resourceId, invite)
 
 	if len(ret) == 0 {
@@ -246,16 +246,16 @@ func (_m *DriveItemPermissionsProvider) Invite(ctx context.Context, resourceId p
 
 	var r0 libregraph.Permission
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) (libregraph.Permission, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemInvite) (libregraph.Permission, error)); ok {
 		return rf(ctx, resourceId, invite)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) libregraph.Permission); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemInvite) libregraph.Permission); ok {
 		r0 = rf(ctx, resourceId, invite)
 	} else {
 		r0 = ret.Get(0).(libregraph.Permission)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemInvite) error); ok {
 		r1 = rf(ctx, resourceId, invite)
 	} else {
 		r1 = ret.Error(1)
@@ -271,15 +271,15 @@ type DriveItemPermissionsProvider_Invite_Call struct {
 
 // Invite is a helper method to define mock.On call
 //   - ctx context.Context
-//   - resourceId providerv1beta1.ResourceId
+//   - resourceId *providerv1beta1.ResourceId
 //   - invite libregraph.DriveItemInvite
 func (_e *DriveItemPermissionsProvider_Expecter) Invite(ctx interface{}, resourceId interface{}, invite interface{}) *DriveItemPermissionsProvider_Invite_Call {
 	return &DriveItemPermissionsProvider_Invite_Call{Call: _e.mock.On("Invite", ctx, resourceId, invite)}
 }
 
-func (_c *DriveItemPermissionsProvider_Invite_Call) Run(run func(ctx context.Context, resourceId providerv1beta1.ResourceId, invite libregraph.DriveItemInvite)) *DriveItemPermissionsProvider_Invite_Call {
+func (_c *DriveItemPermissionsProvider_Invite_Call) Run(run func(ctx context.Context, resourceId *providerv1beta1.ResourceId, invite libregraph.DriveItemInvite)) *DriveItemPermissionsProvider_Invite_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(libregraph.DriveItemInvite))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(libregraph.DriveItemInvite))
 	})
 	return _c
 }
@@ -289,7 +289,7 @@ func (_c *DriveItemPermissionsProvider_Invite_Call) Return(_a0 libregraph.Permis
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_Invite_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) (libregraph.Permission, error)) *DriveItemPermissionsProvider_Invite_Call {
+func (_c *DriveItemPermissionsProvider_Invite_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemInvite) (libregraph.Permission, error)) *DriveItemPermissionsProvider_Invite_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -352,7 +352,7 @@ func (_c *DriveItemPermissionsProvider_ListPermissions_Call) RunAndReturn(run fu
 }
 
 // ListSpaceRootPermissions provides a mock function with given fields: ctx, driveID
-func (_m *DriveItemPermissionsProvider) ListSpaceRootPermissions(ctx context.Context, driveID providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (_m *DriveItemPermissionsProvider) ListSpaceRootPermissions(ctx context.Context, driveID *providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	ret := _m.Called(ctx, driveID)
 
 	if len(ret) == 0 {
@@ -361,16 +361,16 @@ func (_m *DriveItemPermissionsProvider) ListSpaceRootPermissions(ctx context.Con
 
 	var r0 libregraph.CollectionOfPermissionsWithAllowedValues
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
 		return rf(ctx, driveID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
 		r0 = rf(ctx, driveID)
 	} else {
 		r0 = ret.Get(0).(libregraph.CollectionOfPermissionsWithAllowedValues)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId) error); ok {
 		r1 = rf(ctx, driveID)
 	} else {
 		r1 = ret.Error(1)
@@ -386,14 +386,14 @@ type DriveItemPermissionsProvider_ListSpaceRootPermissions_Call struct {
 
 // ListSpaceRootPermissions is a helper method to define mock.On call
 //   - ctx context.Context
-//   - driveID providerv1beta1.ResourceId
+//   - driveID *providerv1beta1.ResourceId
 func (_e *DriveItemPermissionsProvider_Expecter) ListSpaceRootPermissions(ctx interface{}, driveID interface{}) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
 	return &DriveItemPermissionsProvider_ListSpaceRootPermissions_Call{Call: _e.mock.On("ListSpaceRootPermissions", ctx, driveID)}
 }
 
-func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) Run(run func(ctx context.Context, driveID providerv1beta1.ResourceId)) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
+func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) Run(run func(ctx context.Context, driveID *providerv1beta1.ResourceId)) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId))
 	})
 	return _c
 }
@@ -403,13 +403,13 @@ func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) Return(_a0
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
+func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // SetPublicLinkPassword provides a mock function with given fields: ctx, driveItemID, permissionID, password
-func (_m *DriveItemPermissionsProvider) SetPublicLinkPassword(ctx context.Context, driveItemID providerv1beta1.ResourceId, permissionID string, password string) (libregraph.Permission, error) {
+func (_m *DriveItemPermissionsProvider) SetPublicLinkPassword(ctx context.Context, driveItemID *providerv1beta1.ResourceId, permissionID string, password string) (libregraph.Permission, error) {
 	ret := _m.Called(ctx, driveItemID, permissionID, password)
 
 	if len(ret) == 0 {
@@ -418,16 +418,16 @@ func (_m *DriveItemPermissionsProvider) SetPublicLinkPassword(ctx context.Contex
 
 	var r0 libregraph.Permission
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, string) (libregraph.Permission, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string, string) (libregraph.Permission, error)); ok {
 		return rf(ctx, driveItemID, permissionID, password)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, string) libregraph.Permission); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string, string) libregraph.Permission); ok {
 		r0 = rf(ctx, driveItemID, permissionID, password)
 	} else {
 		r0 = ret.Get(0).(libregraph.Permission)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, string, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, string, string) error); ok {
 		r1 = rf(ctx, driveItemID, permissionID, password)
 	} else {
 		r1 = ret.Error(1)
@@ -443,16 +443,16 @@ type DriveItemPermissionsProvider_SetPublicLinkPassword_Call struct {
 
 // SetPublicLinkPassword is a helper method to define mock.On call
 //   - ctx context.Context
-//   - driveItemID providerv1beta1.ResourceId
+//   - driveItemID *providerv1beta1.ResourceId
 //   - permissionID string
 //   - password string
 func (_e *DriveItemPermissionsProvider_Expecter) SetPublicLinkPassword(ctx interface{}, driveItemID interface{}, permissionID interface{}, password interface{}) *DriveItemPermissionsProvider_SetPublicLinkPassword_Call {
 	return &DriveItemPermissionsProvider_SetPublicLinkPassword_Call{Call: _e.mock.On("SetPublicLinkPassword", ctx, driveItemID, permissionID, password)}
 }
 
-func (_c *DriveItemPermissionsProvider_SetPublicLinkPassword_Call) Run(run func(ctx context.Context, driveItemID providerv1beta1.ResourceId, permissionID string, password string)) *DriveItemPermissionsProvider_SetPublicLinkPassword_Call {
+func (_c *DriveItemPermissionsProvider_SetPublicLinkPassword_Call) Run(run func(ctx context.Context, driveItemID *providerv1beta1.ResourceId, permissionID string, password string)) *DriveItemPermissionsProvider_SetPublicLinkPassword_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(string), args[3].(string))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(string), args[3].(string))
 	})
 	return _c
 }
@@ -462,13 +462,13 @@ func (_c *DriveItemPermissionsProvider_SetPublicLinkPassword_Call) Return(_a0 li
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_SetPublicLinkPassword_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, string, string) (libregraph.Permission, error)) *DriveItemPermissionsProvider_SetPublicLinkPassword_Call {
+func (_c *DriveItemPermissionsProvider_SetPublicLinkPassword_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, string, string) (libregraph.Permission, error)) *DriveItemPermissionsProvider_SetPublicLinkPassword_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // SetPublicLinkPasswordOnSpaceRoot provides a mock function with given fields: ctx, driveID, permissionID, password
-func (_m *DriveItemPermissionsProvider) SetPublicLinkPasswordOnSpaceRoot(ctx context.Context, driveID providerv1beta1.ResourceId, permissionID string, password string) (libregraph.Permission, error) {
+func (_m *DriveItemPermissionsProvider) SetPublicLinkPasswordOnSpaceRoot(ctx context.Context, driveID *providerv1beta1.ResourceId, permissionID string, password string) (libregraph.Permission, error) {
 	ret := _m.Called(ctx, driveID, permissionID, password)
 
 	if len(ret) == 0 {
@@ -477,16 +477,16 @@ func (_m *DriveItemPermissionsProvider) SetPublicLinkPasswordOnSpaceRoot(ctx con
 
 	var r0 libregraph.Permission
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, string) (libregraph.Permission, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string, string) (libregraph.Permission, error)); ok {
 		return rf(ctx, driveID, permissionID, password)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, string) libregraph.Permission); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string, string) libregraph.Permission); ok {
 		r0 = rf(ctx, driveID, permissionID, password)
 	} else {
 		r0 = ret.Get(0).(libregraph.Permission)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, string, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, string, string) error); ok {
 		r1 = rf(ctx, driveID, permissionID, password)
 	} else {
 		r1 = ret.Error(1)
@@ -502,16 +502,16 @@ type DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call struct {
 
 // SetPublicLinkPasswordOnSpaceRoot is a helper method to define mock.On call
 //   - ctx context.Context
-//   - driveID providerv1beta1.ResourceId
+//   - driveID *providerv1beta1.ResourceId
 //   - permissionID string
 //   - password string
 func (_e *DriveItemPermissionsProvider_Expecter) SetPublicLinkPasswordOnSpaceRoot(ctx interface{}, driveID interface{}, permissionID interface{}, password interface{}) *DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call {
 	return &DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call{Call: _e.mock.On("SetPublicLinkPasswordOnSpaceRoot", ctx, driveID, permissionID, password)}
 }
 
-func (_c *DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call) Run(run func(ctx context.Context, driveID providerv1beta1.ResourceId, permissionID string, password string)) *DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call {
+func (_c *DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call) Run(run func(ctx context.Context, driveID *providerv1beta1.ResourceId, permissionID string, password string)) *DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(string), args[3].(string))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(string), args[3].(string))
 	})
 	return _c
 }
@@ -521,13 +521,13 @@ func (_c *DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call) Re
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, string, string) (libregraph.Permission, error)) *DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call {
+func (_c *DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, string, string) (libregraph.Permission, error)) *DriveItemPermissionsProvider_SetPublicLinkPasswordOnSpaceRoot_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // SpaceRootInvite provides a mock function with given fields: ctx, driveID, invite
-func (_m *DriveItemPermissionsProvider) SpaceRootInvite(ctx context.Context, driveID providerv1beta1.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+func (_m *DriveItemPermissionsProvider) SpaceRootInvite(ctx context.Context, driveID *providerv1beta1.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 	ret := _m.Called(ctx, driveID, invite)
 
 	if len(ret) == 0 {
@@ -536,16 +536,16 @@ func (_m *DriveItemPermissionsProvider) SpaceRootInvite(ctx context.Context, dri
 
 	var r0 libregraph.Permission
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) (libregraph.Permission, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemInvite) (libregraph.Permission, error)); ok {
 		return rf(ctx, driveID, invite)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) libregraph.Permission); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemInvite) libregraph.Permission); ok {
 		r0 = rf(ctx, driveID, invite)
 	} else {
 		r0 = ret.Get(0).(libregraph.Permission)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemInvite) error); ok {
 		r1 = rf(ctx, driveID, invite)
 	} else {
 		r1 = ret.Error(1)
@@ -561,15 +561,15 @@ type DriveItemPermissionsProvider_SpaceRootInvite_Call struct {
 
 // SpaceRootInvite is a helper method to define mock.On call
 //   - ctx context.Context
-//   - driveID providerv1beta1.ResourceId
+//   - driveID *providerv1beta1.ResourceId
 //   - invite libregraph.DriveItemInvite
 func (_e *DriveItemPermissionsProvider_Expecter) SpaceRootInvite(ctx interface{}, driveID interface{}, invite interface{}) *DriveItemPermissionsProvider_SpaceRootInvite_Call {
 	return &DriveItemPermissionsProvider_SpaceRootInvite_Call{Call: _e.mock.On("SpaceRootInvite", ctx, driveID, invite)}
 }
 
-func (_c *DriveItemPermissionsProvider_SpaceRootInvite_Call) Run(run func(ctx context.Context, driveID providerv1beta1.ResourceId, invite libregraph.DriveItemInvite)) *DriveItemPermissionsProvider_SpaceRootInvite_Call {
+func (_c *DriveItemPermissionsProvider_SpaceRootInvite_Call) Run(run func(ctx context.Context, driveID *providerv1beta1.ResourceId, invite libregraph.DriveItemInvite)) *DriveItemPermissionsProvider_SpaceRootInvite_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(libregraph.DriveItemInvite))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(libregraph.DriveItemInvite))
 	})
 	return _c
 }
@@ -579,13 +579,13 @@ func (_c *DriveItemPermissionsProvider_SpaceRootInvite_Call) Return(_a0 libregra
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_SpaceRootInvite_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, libregraph.DriveItemInvite) (libregraph.Permission, error)) *DriveItemPermissionsProvider_SpaceRootInvite_Call {
+func (_c *DriveItemPermissionsProvider_SpaceRootInvite_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, libregraph.DriveItemInvite) (libregraph.Permission, error)) *DriveItemPermissionsProvider_SpaceRootInvite_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UpdatePermission provides a mock function with given fields: ctx, itemID, permissionID, newPermission
-func (_m *DriveItemPermissionsProvider) UpdatePermission(ctx context.Context, itemID providerv1beta1.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
+func (_m *DriveItemPermissionsProvider) UpdatePermission(ctx context.Context, itemID *providerv1beta1.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
 	ret := _m.Called(ctx, itemID, permissionID, newPermission)
 
 	if len(ret) == 0 {
@@ -594,16 +594,16 @@ func (_m *DriveItemPermissionsProvider) UpdatePermission(ctx context.Context, it
 
 	var r0 libregraph.Permission
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) (libregraph.Permission, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string, libregraph.Permission) (libregraph.Permission, error)); ok {
 		return rf(ctx, itemID, permissionID, newPermission)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) libregraph.Permission); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string, libregraph.Permission) libregraph.Permission); ok {
 		r0 = rf(ctx, itemID, permissionID, newPermission)
 	} else {
 		r0 = ret.Get(0).(libregraph.Permission)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, string, libregraph.Permission) error); ok {
 		r1 = rf(ctx, itemID, permissionID, newPermission)
 	} else {
 		r1 = ret.Error(1)
@@ -619,16 +619,16 @@ type DriveItemPermissionsProvider_UpdatePermission_Call struct {
 
 // UpdatePermission is a helper method to define mock.On call
 //   - ctx context.Context
-//   - itemID providerv1beta1.ResourceId
+//   - itemID *providerv1beta1.ResourceId
 //   - permissionID string
 //   - newPermission libregraph.Permission
 func (_e *DriveItemPermissionsProvider_Expecter) UpdatePermission(ctx interface{}, itemID interface{}, permissionID interface{}, newPermission interface{}) *DriveItemPermissionsProvider_UpdatePermission_Call {
 	return &DriveItemPermissionsProvider_UpdatePermission_Call{Call: _e.mock.On("UpdatePermission", ctx, itemID, permissionID, newPermission)}
 }
 
-func (_c *DriveItemPermissionsProvider_UpdatePermission_Call) Run(run func(ctx context.Context, itemID providerv1beta1.ResourceId, permissionID string, newPermission libregraph.Permission)) *DriveItemPermissionsProvider_UpdatePermission_Call {
+func (_c *DriveItemPermissionsProvider_UpdatePermission_Call) Run(run func(ctx context.Context, itemID *providerv1beta1.ResourceId, permissionID string, newPermission libregraph.Permission)) *DriveItemPermissionsProvider_UpdatePermission_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(string), args[3].(libregraph.Permission))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(string), args[3].(libregraph.Permission))
 	})
 	return _c
 }
@@ -638,13 +638,13 @@ func (_c *DriveItemPermissionsProvider_UpdatePermission_Call) Return(_a0 libregr
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_UpdatePermission_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) (libregraph.Permission, error)) *DriveItemPermissionsProvider_UpdatePermission_Call {
+func (_c *DriveItemPermissionsProvider_UpdatePermission_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, string, libregraph.Permission) (libregraph.Permission, error)) *DriveItemPermissionsProvider_UpdatePermission_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UpdateSpaceRootPermission provides a mock function with given fields: ctx, driveID, permissionID, newPermission
-func (_m *DriveItemPermissionsProvider) UpdateSpaceRootPermission(ctx context.Context, driveID providerv1beta1.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
+func (_m *DriveItemPermissionsProvider) UpdateSpaceRootPermission(ctx context.Context, driveID *providerv1beta1.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
 	ret := _m.Called(ctx, driveID, permissionID, newPermission)
 
 	if len(ret) == 0 {
@@ -653,16 +653,16 @@ func (_m *DriveItemPermissionsProvider) UpdateSpaceRootPermission(ctx context.Co
 
 	var r0 libregraph.Permission
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) (libregraph.Permission, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string, libregraph.Permission) (libregraph.Permission, error)); ok {
 		return rf(ctx, driveID, permissionID, newPermission)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) libregraph.Permission); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string, libregraph.Permission) libregraph.Permission); ok {
 		r0 = rf(ctx, driveID, permissionID, newPermission)
 	} else {
 		r0 = ret.Get(0).(libregraph.Permission)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, string, libregraph.Permission) error); ok {
 		r1 = rf(ctx, driveID, permissionID, newPermission)
 	} else {
 		r1 = ret.Error(1)
@@ -678,16 +678,16 @@ type DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call struct {
 
 // UpdateSpaceRootPermission is a helper method to define mock.On call
 //   - ctx context.Context
-//   - driveID providerv1beta1.ResourceId
+//   - driveID *providerv1beta1.ResourceId
 //   - permissionID string
 //   - newPermission libregraph.Permission
 func (_e *DriveItemPermissionsProvider_Expecter) UpdateSpaceRootPermission(ctx interface{}, driveID interface{}, permissionID interface{}, newPermission interface{}) *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call {
 	return &DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call{Call: _e.mock.On("UpdateSpaceRootPermission", ctx, driveID, permissionID, newPermission)}
 }
 
-func (_c *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call) Run(run func(ctx context.Context, driveID providerv1beta1.ResourceId, permissionID string, newPermission libregraph.Permission)) *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call {
+func (_c *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call) Run(run func(ctx context.Context, driveID *providerv1beta1.ResourceId, permissionID string, newPermission libregraph.Permission)) *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(providerv1beta1.ResourceId), args[2].(string), args[3].(libregraph.Permission))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(string), args[3].(libregraph.Permission))
 	})
 	return _c
 }
@@ -697,7 +697,7 @@ func (_c *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call) Return(_a
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call) RunAndReturn(run func(context.Context, providerv1beta1.ResourceId, string, libregraph.Permission) (libregraph.Permission, error)) *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call {
+func (_c *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, string, libregraph.Permission) (libregraph.Permission, error)) *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call {
 	_c.Call.Return(run)
 	return _c
 }

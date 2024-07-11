@@ -308,7 +308,7 @@ func (g BaseGraphService) listPublicShares(ctx context.Context, filters []*link.
 func (g BaseGraphService) cs3UserSharesToDriveItems(ctx context.Context, shares []*collaboration.Share, driveItems driveItemsByResourceID) (driveItemsByResourceID, error) {
 	for _, s := range shares {
 		g.logger.Debug().Interface("CS3 UserShare", s).Msg("Got Share")
-		resIDStr := storagespace.FormatResourceID(*s.ResourceId)
+		resIDStr := storagespace.FormatResourceID(s.ResourceId)
 		item, ok := driveItems[resIDStr]
 		if !ok {
 			itemptr, err := g.getDriveItem(ctx, storageprovider.Reference{ResourceId: s.ResourceId})
@@ -410,7 +410,7 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 func (g BaseGraphService) cs3PublicSharesToDriveItems(ctx context.Context, shares []*link.PublicShare, driveItems driveItemsByResourceID) (driveItemsByResourceID, error) {
 	for _, s := range shares {
 		g.logger.Debug().Interface("CS3 PublicShare", s).Msg("Got Share")
-		resIDStr := storagespace.FormatResourceID(*s.ResourceId)
+		resIDStr := storagespace.FormatResourceID(s.ResourceId)
 		item, ok := driveItems[resIDStr]
 		if !ok {
 			itemptr, err := g.getDriveItem(ctx, storageprovider.Reference{ResourceId: s.ResourceId})

@@ -64,7 +64,7 @@ func WithResource(ref *provider.Reference, addSpace bool) ActivityOption {
 		}
 
 		vars["resource"] = Resource{
-			ID:   storagespace.FormatResourceID(*info.GetId()),
+			ID:   storagespace.FormatResourceID(info.GetId()),
 			Name: info.GetName(),
 		}
 
@@ -111,7 +111,7 @@ func WithTrashedResource(ref *provider.Reference, rid *provider.ResourceId) Acti
 			if item.GetKey() == rid.GetOpaqueId() {
 
 				vars["resource"] = Resource{
-					ID:   storagespace.FormatResourceID(*rid),
+					ID:   storagespace.FormatResourceID(rid),
 					Name: filepath.Base(item.GetRef().GetPath()),
 				}
 
