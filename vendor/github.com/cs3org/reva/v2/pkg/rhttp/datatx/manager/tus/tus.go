@@ -215,7 +215,7 @@ func setHeaders(fs storage.FS, w http.ResponseWriter, r *http.Request) {
 	if expires != "" {
 		w.Header().Set(net.HeaderTusUploadExpires, expires)
 	}
-	resourceid := provider.ResourceId{
+	resourceid := &provider.ResourceId{
 		StorageId: info.MetaData["providerID"],
 		SpaceId:   info.Storage["SpaceRoot"],
 		OpaqueId:  info.Storage["NodeId"],

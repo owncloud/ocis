@@ -40,10 +40,10 @@ import (
 
 var defaultFilePerm = os.FileMode(0664)
 
-func (fs *localfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+func (fs *localfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
 	upload, err := fs.GetUpload(ctx, req.Ref.GetPath())
 	if err != nil {
-		return provider.ResourceInfo{}, errors.Wrap(err, "localfs: error retrieving upload")
+		return &provider.ResourceInfo{}, errors.Wrap(err, "localfs: error retrieving upload")
 	}
 
 	uploadInfo := upload.(*fileUpload)
@@ -53,18 +53,18 @@ func (fs *localfs) Upload(ctx context.Context, req storage.UploadRequest, uff st
 		var assembledFile string
 		p, assembledFile, err = fs.chunkHandler.WriteChunk(p, req.Body)
 		if err != nil {
-			return provider.ResourceInfo{}, err
+			return &provider.ResourceInfo{}, err
 		}
 		if p == "" {
 			if err = uploadInfo.Terminate(ctx); err != nil {
-				return provider.ResourceInfo{}, errors.Wrap(err, "localfs: error removing auxiliary files")
+				return &provider.ResourceInfo{}, errors.Wrap(err, "localfs: error removing auxiliary files")
 			}
-			return provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
+			return &provider.ResourceInfo{}, errtypes.PartialContent(req.Ref.String())
 		}
 		uploadInfo.info.Storage["InternalDestination"] = p
 		fd, err := os.Open(assembledFile)
 		if err != nil {
-			return provider.ResourceInfo{}, errors.Wrap(err, "localfs: error opening assembled file")
+			return &provider.ResourceInfo{}, errors.Wrap(err, "localfs: error opening assembled file")
 		}
 		defer fd.Close()
 		defer os.RemoveAll(assembledFile)
@@ -72,11 +72,11 @@ func (fs *localfs) Upload(ctx context.Context, req storage.UploadRequest, uff st
 	}
 
 	if _, err := uploadInfo.WriteChunk(ctx, 0, req.Body); err != nil {
-		return provider.ResourceInfo{}, errors.Wrap(err, "localfs: error writing to binary file")
+		return &provider.ResourceInfo{}, errors.Wrap(err, "localfs: error writing to binary file")
 	}
 
 	if err := uploadInfo.FinishUpload(ctx); err != nil {
-		return provider.ResourceInfo{}, err
+		return &provider.ResourceInfo{}, err
 	}
 
 	if uff != nil {
@@ -91,7 +91,7 @@ func (fs *localfs) Upload(ctx context.Context, req storage.UploadRequest, uff st
 		}
 		owner, ok := ctxpkg.ContextGetUser(uploadInfo.ctx)
 		if !ok {
-			return provider.ResourceInfo{}, errtypes.PreconditionFailed("error getting user from uploadinfo context")
+			return &provider.ResourceInfo{}, errtypes.PreconditionFailed("error getting user from uploadinfo context")
 		}
 		// spaces support in localfs needs to be revisited:
 		// * info.Storage["SpaceRoot"] is never set
@@ -102,10 +102,10 @@ func (fs *localfs) Upload(ctx context.Context, req storage.UploadRequest, uff st
 	// return id, etag and mtime
 	ri, err := fs.GetMD(ctx, req.Ref, []string{}, []string{"id", "etag", "mtime"})
 	if err != nil {
-		return provider.ResourceInfo{}, err
+		return &provider.ResourceInfo{}, err
 	}
 
-	return *ri, nil
+	return ri, nil
 }
 
 // InitiateUpload returns upload ids corresponding to different protocols it supports

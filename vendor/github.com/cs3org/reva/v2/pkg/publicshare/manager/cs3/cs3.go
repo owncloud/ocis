@@ -32,6 +32,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/protobuf/proto"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -175,7 +176,7 @@ func (m *Manager) Dump(ctx context.Context, shareChan chan<- *publicshare.WithPa
 			return err
 		}
 		local.Password = ps.Password
-		local.PublicShare = ps.PublicShare
+		proto.Merge(&local.PublicShare, &ps.PublicShare)
 
 		shareChan <- &local
 	}
@@ -361,8 +362,8 @@ func (m *Manager) getByToken(ctx context.Context, token string) (*publicshare.Wi
 	if err != nil {
 		return nil, err
 	}
-	id := storagespace.UpdateLegacyResourceID(*ps.PublicShare.ResourceId)
-	ps.PublicShare.ResourceId = &id
+	id := storagespace.UpdateLegacyResourceID(ps.PublicShare.ResourceId)
+	ps.PublicShare.ResourceId = id
 	return ps, nil
 }
 
@@ -421,11 +422,11 @@ func (m *Manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 			return nil, err
 		}
 
-		if !publicshare.MatchesFilters(ps.PublicShare, filters) {
+		if !publicshare.MatchesFilters(&ps.PublicShare, filters) {
 			continue
 		}
 
-		if publicshare.IsExpired(ps.PublicShare) {
+		if publicshare.IsExpired(&ps.PublicShare) {
 			ref := &link.PublicShareReference{
 				Spec: &link.PublicShareReference_Id{
 					Id: ps.PublicShare.Id,
@@ -505,7 +506,7 @@ func (m *Manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 			statMem[resourceIDToIndex(s.PublicShare.GetResourceId())] = struct{}{}
 		}
 
-		if publicshare.MatchesFilters(s.PublicShare, filters) {
+		if publicshare.MatchesFilters(&s.PublicShare, filters) {
 			result = append(result, &s.PublicShare)
 			shareMem[s.PublicShare.Token] = struct{}{}
 		}
@@ -545,7 +546,7 @@ func (m *Manager) GetPublicShareByToken(ctx context.Context, token string, auth 
 		return nil, err
 	}
 
-	if publicshare.IsExpired(ps.PublicShare) {
+	if publicshare.IsExpired(&ps.PublicShare) {
 		return nil, errtypes.NotFound("public share has expired")
 	}
 

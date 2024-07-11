@@ -21,7 +21,6 @@ package conversions
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -573,19 +572,12 @@ func SufficientCS3Permissions(existing, requested *provider.ResourcePermissions)
 	if grants.PermissionsEqual(requested, &provider.ResourcePermissions{}) {
 		return existing.DenyGrant
 	}
-	requestedPermissionsType := reflect.TypeOf(provider.ResourcePermissions{})
-	numFields := requestedPermissionsType.NumField()
-	requestedPermissionsValues := reflect.ValueOf(requested)
-	existingPermissionsValues := reflect.ValueOf(existing)
 
+	numFields := existing.ProtoReflect().Descriptor().Fields().Len()
 	for i := 0; i < numFields; i++ {
-		permissionName := requestedPermissionsType.Field(i).Name
-		// filter out irrelevant fields
-		if strings.Contains(permissionName, "XXX") {
-			continue
-		}
-		existingPermission := reflect.Indirect(existingPermissionsValues).FieldByName(permissionName).Bool()
-		requestedPermission := requestedPermissionsValues.Elem().Field(i).Bool()
+		field := existing.ProtoReflect().Descriptor().Fields().Get(i)
+		existingPermission := existing.ProtoReflect().Get(field).Bool()
+		requestedPermission := requested.ProtoReflect().Get(field).Bool()
 		// every requested permission needs to exist for the creator
 		if requestedPermission && !existingPermission {
 			return false

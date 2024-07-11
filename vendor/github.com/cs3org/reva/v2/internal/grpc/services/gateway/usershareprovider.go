@@ -22,6 +22,7 @@ import (
 	"context"
 	"slices"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -363,6 +364,10 @@ func (s *svc) UpdateReceivedShare(ctx context.Context, req *collaboration.Update
 			}
 			return res, nil
 	*/
+}
+
+func (s *svc) ListExistingReceivedShares(_ context.Context, _ *collaboration.ListReceivedSharesRequest) (*gateway.ListExistingReceivedSharesResponse, error) {
+	return nil, errtypes.NotSupported("Unimplemented")
 }
 
 func (s *svc) denyGrant(ctx context.Context, id *provider.ResourceId, g *provider.Grantee, opaque *typesv1beta1.Opaque) (*rpc.Status, error) {

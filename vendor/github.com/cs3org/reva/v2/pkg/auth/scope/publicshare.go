@@ -106,19 +106,19 @@ func publicshareScope(ctx context.Context, scope *authpb.Scope, resource interfa
 	// Editor role
 	// need to return appropriate status codes in the ocs/ocdav layers.
 	case *provider.CreateContainerRequest:
-		return hasRoleEditor(*scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
+		return hasRoleEditor(scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
 	case *provider.TouchFileRequest:
-		return hasRoleEditor(*scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
+		return hasRoleEditor(scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
 	case *provider.DeleteRequest:
-		return hasRoleEditor(*scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
+		return hasRoleEditor(scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
 	case *provider.MoveRequest:
-		return hasRoleEditor(*scope) && checkStorageRef(ctx, &share, v.GetSource()) && checkStorageRef(ctx, &share, v.GetDestination()), nil
+		return hasRoleEditor(scope) && checkStorageRef(ctx, &share, v.GetSource()) && checkStorageRef(ctx, &share, v.GetDestination()), nil
 	case *provider.InitiateFileUploadRequest:
-		return hasRoleEditor(*scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
+		return hasRoleEditor(scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
 	case *provider.SetArbitraryMetadataRequest:
-		return hasRoleEditor(*scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
+		return hasRoleEditor(scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
 	case *provider.UnsetArbitraryMetadataRequest:
-		return hasRoleEditor(*scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
+		return hasRoleEditor(scope) && checkStorageRef(ctx, &share, v.GetRef()), nil
 
 	// App provider requests
 	case *appregistry.GetDefaultAppProviderForMimeTypeRequest:

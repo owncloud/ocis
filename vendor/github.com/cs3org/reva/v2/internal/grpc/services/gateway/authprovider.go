@@ -36,6 +36,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/proto"
 )
 
 func (s *svc) Authenticate(ctx context.Context, req *gateway.AuthenticateRequest) (*gateway.AuthenticateResponse, error) {
@@ -92,12 +93,12 @@ func (s *svc) Authenticate(ctx context.Context, req *gateway.AuthenticateRequest
 		}, nil
 	}
 
-	u := *res.User
+	u := proto.Clone(res.User).(*userpb.User)
 	if sharedconf.SkipUserGroupsInToken() {
 		u.Groups = []string{}
 	}
 
-	token, err := s.tokenmgr.MintToken(ctx, &u, res.TokenScope)
+	token, err := s.tokenmgr.MintToken(ctx, u, res.TokenScope)
 	if err != nil {
 		err = errors.Wrap(err, "authsvc: error in MintToken")
 		res := &gateway.AuthenticateResponse{

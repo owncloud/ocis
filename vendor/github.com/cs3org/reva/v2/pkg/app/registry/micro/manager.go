@@ -190,13 +190,13 @@ func (m *manager) getProvidersFromMicroRegistry(ctx context.Context) ([]*registr
 	for _, node := range services[0].Nodes {
 		p := m.providerFromMetadata(node.Metadata)
 		p.Address = node.Address
-		providers = append(providers, &p)
+		providers = append(providers, p)
 	}
 	return providers, nil
 }
 
-func (m *manager) providerFromMetadata(metadata map[string]string) registrypb.ProviderInfo {
-	p := registrypb.ProviderInfo{
+func (m *manager) providerFromMetadata(metadata map[string]string) *registrypb.ProviderInfo {
+	p := &registrypb.ProviderInfo{
 		MimeTypes: splitMimeTypes(metadata[m.namespace+".app-provider.mime_type"]),
 		//		Address:     node.Address,
 		Name:        metadata[m.namespace+".app-provider.name"],

@@ -228,7 +228,7 @@ func GetOrHeadFile(w http.ResponseWriter, r *http.Request, fs storage.FS, spaceI
 
 	w.Header().Set(net.HeaderContentDisposistion, net.ContentDispositionAttachment(path.Base(md.Path)))
 	w.Header().Set(net.HeaderETag, md.Etag)
-	w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(*md.Id))
+	w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(md.Id))
 	w.Header().Set(net.HeaderOCETag, md.Etag)
 	w.Header().Set(net.HeaderLastModified, net.RFC1123Z(md.Mtime))
 

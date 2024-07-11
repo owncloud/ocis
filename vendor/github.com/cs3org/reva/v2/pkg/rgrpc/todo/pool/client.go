@@ -64,6 +64,12 @@ func GetStorageProviderServiceClient(id string, opts ...Option) (storageprovider
 	return selector.Next()
 }
 
+// GetSpacesProviderServiceClient returns a SpacesProviderServiceClient.
+func GetSpacesProviderServiceClient(id string, opts ...Option) (storageprovider.SpacesAPIClient, error) {
+	selector, _ := SpacesProviderSelector(id, opts...)
+	return selector.Next()
+}
+
 // GetAuthRegistryServiceClient returns a new AuthRegistryServiceClient.
 func GetAuthRegistryServiceClient(id string, opts ...Option) (authregistry.RegistryAPIClient, error) {
 	selector, _ := AuthRegistrySelector(id, opts...)

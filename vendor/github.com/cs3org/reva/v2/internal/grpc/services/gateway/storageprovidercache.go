@@ -78,6 +78,50 @@ func (c *cachedRegistryClient) GetHome(ctx context.Context, in *registry.GetHome
 }
 
 /*
+   Cached Spaces Provider
+*/
+
+type cachedSpacesAPIClient struct {
+	c                        provider.SpacesAPIClient
+	createPersonalSpaceCache cache.CreatePersonalSpaceCache
+}
+
+// CreateStorageSpace creates a storage space
+func (c *cachedSpacesAPIClient) CreateStorageSpace(ctx context.Context, in *provider.CreateStorageSpaceRequest, opts ...grpc.CallOption) (*provider.CreateStorageSpaceResponse, error) {
+	if in.Type == "personal" {
+		key := c.createPersonalSpaceCache.GetKey(ctxpkg.ContextMustGetUser(ctx).GetId())
+		if key != "" {
+			s := &provider.CreateStorageSpaceResponse{}
+			if err := c.createPersonalSpaceCache.PullFromCache(key, s); err == nil {
+				return s, nil
+			}
+		}
+		resp, err := c.c.CreateStorageSpace(ctx, in, opts...)
+		switch {
+		case err != nil:
+			return nil, err
+		case resp.Status.Code != rpc.Code_CODE_OK && resp.Status.Code != rpc.Code_CODE_ALREADY_EXISTS:
+			return resp, nil
+		case key == "":
+			return resp, nil
+		default:
+			return resp, c.createPersonalSpaceCache.PushToCache(key, resp)
+		}
+	}
+	return c.c.CreateStorageSpace(ctx, in, opts...)
+}
+
+func (c *cachedSpacesAPIClient) ListStorageSpaces(ctx context.Context, in *provider.ListStorageSpacesRequest, opts ...grpc.CallOption) (*provider.ListStorageSpacesResponse, error) {
+	return c.c.ListStorageSpaces(ctx, in, opts...)
+}
+func (c *cachedSpacesAPIClient) UpdateStorageSpace(ctx context.Context, in *provider.UpdateStorageSpaceRequest, opts ...grpc.CallOption) (*provider.UpdateStorageSpaceResponse, error) {
+	return c.c.UpdateStorageSpace(ctx, in, opts...)
+}
+func (c *cachedSpacesAPIClient) DeleteStorageSpace(ctx context.Context, in *provider.DeleteStorageSpaceRequest, opts ...grpc.CallOption) (*provider.DeleteStorageSpaceResponse, error) {
+	return c.c.DeleteStorageSpace(ctx, in, opts...)
+}
+
+/*
    Cached Storage Provider
 */
 
@@ -106,31 +150,6 @@ func (c *cachedAPIClient) CreateHome(ctx context.Context, in *provider.CreateHom
 	default:
 		return resp, c.createPersonalSpaceCache.PushToCache(key, resp)
 	}
-}
-
-// CreateStorageSpace creates a storage space
-func (c *cachedAPIClient) CreateStorageSpace(ctx context.Context, in *provider.CreateStorageSpaceRequest, opts ...grpc.CallOption) (*provider.CreateStorageSpaceResponse, error) {
-	if in.Type == "personal" {
-		key := c.createPersonalSpaceCache.GetKey(ctxpkg.ContextMustGetUser(ctx).GetId())
-		if key != "" {
-			s := &provider.CreateStorageSpaceResponse{}
-			if err := c.createPersonalSpaceCache.PullFromCache(key, s); err == nil {
-				return s, nil
-			}
-		}
-		resp, err := c.c.CreateStorageSpace(ctx, in, opts...)
-		switch {
-		case err != nil:
-			return nil, err
-		case resp.Status.Code != rpc.Code_CODE_OK && resp.Status.Code != rpc.Code_CODE_ALREADY_EXISTS:
-			return resp, nil
-		case key == "":
-			return resp, nil
-		default:
-			return resp, c.createPersonalSpaceCache.PushToCache(key, resp)
-		}
-	}
-	return c.c.CreateStorageSpace(ctx, in, opts...)
 }
 
 // methods below here are not cached, they just call the client directly
@@ -225,15 +244,6 @@ func (c *cachedAPIClient) Unlock(ctx context.Context, in *provider.UnlockRequest
 }
 func (c *cachedAPIClient) GetHome(ctx context.Context, in *provider.GetHomeRequest, opts ...grpc.CallOption) (*provider.GetHomeResponse, error) {
 	return c.c.GetHome(ctx, in, opts...)
-}
-func (c *cachedAPIClient) ListStorageSpaces(ctx context.Context, in *provider.ListStorageSpacesRequest, opts ...grpc.CallOption) (*provider.ListStorageSpacesResponse, error) {
-	return c.c.ListStorageSpaces(ctx, in, opts...)
-}
-func (c *cachedAPIClient) UpdateStorageSpace(ctx context.Context, in *provider.UpdateStorageSpaceRequest, opts ...grpc.CallOption) (*provider.UpdateStorageSpaceResponse, error) {
-	return c.c.UpdateStorageSpace(ctx, in, opts...)
-}
-func (c *cachedAPIClient) DeleteStorageSpace(ctx context.Context, in *provider.DeleteStorageSpaceRequest, opts ...grpc.CallOption) (*provider.DeleteStorageSpaceResponse, error) {
-	return c.c.DeleteStorageSpace(ctx, in, opts...)
 }
 func (c *cachedAPIClient) TouchFile(ctx context.Context, in *provider.TouchFileRequest, opts ...grpc.CallOption) (*provider.TouchFileResponse, error) {
 	return c.c.TouchFile(ctx, in, opts...)

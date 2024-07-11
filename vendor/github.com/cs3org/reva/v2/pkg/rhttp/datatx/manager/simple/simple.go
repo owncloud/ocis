@@ -118,7 +118,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				w.Header().Set(net.HeaderETag, info.Etag)
 				w.Header().Set(net.HeaderOCETag, info.Etag)
 				if info.Id != nil {
-					w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(*info.Id))
+					w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(info.Id))
 				}
 				if info.Mtime != nil {
 					t := utils.TSToTime(info.Mtime).UTC()

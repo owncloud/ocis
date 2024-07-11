@@ -142,7 +142,7 @@ func resolveLightweightScope(ctx context.Context, ref *provider.Reference, scope
 	}
 
 	for _, share := range shares.Shares {
-		shareKey := "lw:" + user.Id.OpaqueId + scopeDelimiter + storagespace.FormatResourceID(*share.Share.ResourceId)
+		shareKey := "lw:" + user.Id.OpaqueId + scopeDelimiter + storagespace.FormatResourceID(share.Share.ResourceId)
 		_ = scopeExpansionCache.SetWithExpire(shareKey, nil, scopeCacheExpiration*time.Second)
 
 		if ref.ResourceId != nil && utils.ResourceIDEqual(share.Share.ResourceId, ref.ResourceId) {
@@ -229,7 +229,7 @@ func checkRelativeReference(ctx context.Context, requested *provider.Reference, 
 		}
 	}
 
-	key := storagespace.FormatResourceID(*sharedResourceID) + scopeDelimiter + getRefKey(requested)
+	key := storagespace.FormatResourceID(sharedResourceID) + scopeDelimiter + getRefKey(requested)
 	_ = scopeExpansionCache.SetWithExpire(key, nil, scopeCacheExpiration*time.Second)
 	return nil
 }
@@ -246,7 +246,7 @@ func resolveUserShare(ctx context.Context, ref *provider.Reference, scope *authp
 
 func checkCacheForNestedResource(ctx context.Context, ref *provider.Reference, resource *provider.ResourceId, client gateway.GatewayAPIClient, mgr token.Manager) error {
 	// Check if this ref is cached
-	key := storagespace.FormatResourceID(*resource) + scopeDelimiter + getRefKey(ref)
+	key := storagespace.FormatResourceID(resource) + scopeDelimiter + getRefKey(ref)
 	if _, err := scopeExpansionCache.Get(key); err == nil {
 		return nil
 	}
@@ -520,7 +520,7 @@ func getRefKey(ref *provider.Reference) string {
 	}
 
 	if ref.GetResourceId() != nil {
-		return storagespace.FormatResourceID(*ref.ResourceId)
+		return storagespace.FormatResourceID(ref.ResourceId)
 	}
 
 	// on malicious request both path and rid could be empty

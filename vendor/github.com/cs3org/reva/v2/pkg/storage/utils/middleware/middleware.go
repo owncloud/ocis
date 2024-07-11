@@ -334,7 +334,7 @@ func (f *FS) InitiateUpload(ctx context.Context, ref *provider.Reference, upload
 	return res0, res1
 }
 
-func (f *FS) Upload(ctx context.Context, req storage.UploadRequest, uploadFunc storage.UploadFinishedFunc) (provider.ResourceInfo, error) {
+func (f *FS) Upload(ctx context.Context, req storage.UploadRequest, uploadFunc storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
 	var (
 		err     error
 		unhook  UnHook
@@ -343,7 +343,7 @@ func (f *FS) Upload(ctx context.Context, req storage.UploadRequest, uploadFunc s
 	for _, hook := range f.hooks {
 		ctx, unhook, err = hook("Upload", ctx, req.Ref.GetResourceId().GetSpaceId())
 		if err != nil {
-			return provider.ResourceInfo{}, err
+			return &provider.ResourceInfo{}, err
 		}
 		if unhook != nil {
 			unhooks = append(unhooks, unhook)
@@ -354,7 +354,7 @@ func (f *FS) Upload(ctx context.Context, req storage.UploadRequest, uploadFunc s
 
 	for _, unhook := range unhooks {
 		if err := unhook(); err != nil {
-			return provider.ResourceInfo{}, err
+			return &provider.ResourceInfo{}, err
 		}
 	}
 

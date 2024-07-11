@@ -42,13 +42,13 @@ var (
 )
 
 // NoPermissions represents an empty set of permissions
-func NoPermissions() provider.ResourcePermissions {
-	return provider.ResourcePermissions{}
+func NoPermissions() *provider.ResourcePermissions {
+	return &provider.ResourcePermissions{}
 }
 
 // ShareFolderPermissions defines permissions for the shared jail
-func ShareFolderPermissions() provider.ResourcePermissions {
-	return provider.ResourcePermissions{
+func ShareFolderPermissions() *provider.ResourcePermissions {
+	return &provider.ResourcePermissions{
 		// read permissions
 		ListContainer:        true,
 		Stat:                 true,
@@ -60,8 +60,8 @@ func ShareFolderPermissions() provider.ResourcePermissions {
 }
 
 // OwnerPermissions defines permissions for nodes owned by the user
-func OwnerPermissions() provider.ResourcePermissions {
-	return provider.ResourcePermissions{
+func OwnerPermissions() *provider.ResourcePermissions {
+	return &provider.ResourcePermissions{
 		// all permissions
 		AddGrant:             true,
 		CreateContainer:      true,
@@ -86,9 +86,9 @@ func OwnerPermissions() provider.ResourcePermissions {
 }
 
 // ServiceAccountPermissions defines the permissions for nodes when requested by a service account
-func ServiceAccountPermissions() provider.ResourcePermissions {
+func ServiceAccountPermissions() *provider.ResourcePermissions {
 	// TODO: Different permissions for different service accounts
-	return provider.ResourcePermissions{
+	return &provider.ResourcePermissions{
 		Stat:                 true,
 		ListContainer:        true,
 		GetPath:              true, // for search index
@@ -117,17 +117,17 @@ func NewPermissions(lu PathLookup) *Permissions {
 }
 
 // AssemblePermissions will assemble the permissions for the current user on the given node, taking into account all parent nodes
-func (p *Permissions) AssemblePermissions(ctx context.Context, n *Node) (ap provider.ResourcePermissions, err error) {
+func (p *Permissions) AssemblePermissions(ctx context.Context, n *Node) (ap *provider.ResourcePermissions, err error) {
 	return p.assemblePermissions(ctx, n, true)
 }
 
 // AssembleTrashPermissions will assemble the permissions for the current user on the given node, taking into account all parent nodes
-func (p *Permissions) AssembleTrashPermissions(ctx context.Context, n *Node) (ap provider.ResourcePermissions, err error) {
+func (p *Permissions) AssembleTrashPermissions(ctx context.Context, n *Node) (ap *provider.ResourcePermissions, err error) {
 	return p.assemblePermissions(ctx, n, false)
 }
 
 // assemblePermissions will assemble the permissions for the current user on the given node, taking into account all parent nodes
-func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTrashedSubtree bool) (ap provider.ResourcePermissions, err error) {
+func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTrashedSubtree bool) (ap *provider.ResourcePermissions, err error) {
 	u, ok := ctxpkg.ContextGetUser(ctx)
 	if !ok {
 		return NoPermissions(), nil
@@ -151,7 +151,7 @@ func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTr
 	// determine root
 	rn := n.SpaceRoot
 	cn := n
-	ap = provider.ResourcePermissions{}
+	ap = &provider.ResourcePermissions{}
 
 	// for an efficient group lookup convert the list of groups to a map
 	// groups are just strings ... groupnames ... or group ids ??? AAARGH !!!
@@ -167,7 +167,7 @@ func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTr
 			if accessDenied {
 				return np, nil
 			}
-			AddPermissions(&ap, &np)
+			AddPermissions(ap, np)
 		} else {
 			appctx.GetLogger(ctx).Error().Err(err).Str("spaceid", cn.SpaceID).Str("nodeid", cn.ID).Msg("error reading permissions")
 			// continue with next segment
@@ -193,7 +193,7 @@ func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTr
 		if accessDenied {
 			return np, nil
 		}
-		AddPermissions(&ap, &np)
+		AddPermissions(ap, np)
 	} else {
 		appctx.GetLogger(ctx).Error().Err(err).Str("spaceid", cn.SpaceID).Str("nodeid", cn.ID).Msg("error reading root node permissions")
 	}

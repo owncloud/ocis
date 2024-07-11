@@ -179,13 +179,14 @@ func (h *Handler) startCacheWarmup(c sharecache.Warmup) {
 	}
 }
 
-func (h *Handler) extractReference(r *http.Request) (provider.Reference, error) {
-	var ref provider.Reference
+func (h *Handler) extractReference(r *http.Request) (*provider.Reference, error) {
+	ref := &provider.Reference{}
 
 	// NOTE: space_ref is deprecated and will be removed in ~2 weeks (1.6.22)
 	sr := r.FormValue("space_ref")
 	if sr != "" {
-		return storagespace.ParseReference(sr)
+		ref, err := storagespace.ParseReference(sr)
+		return &ref, err
 	}
 
 	p, id := r.FormValue("path"), r.FormValue("space")
@@ -243,7 +244,7 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	statReq := provider.StatRequest{Ref: &ref, FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"space"}}}
+	statReq := provider.StatRequest{Ref: ref, FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"space"}}}
 	statRes, err := client.Stat(ctx, &statReq)
 	if err != nil {
 		sublog.Debug().Err(err).Msg("CreateShare: error on stat call")
@@ -976,7 +977,7 @@ func (h *Handler) listSharesWithMe(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var status *rpc.Status
-		pinfo, status, err = h.getResourceInfoByReference(ctx, client, &ref)
+		pinfo, status, err = h.getResourceInfoByReference(ctx, client, ref)
 		if err != nil {
 			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error sending a grpc stat request", err)
 			return
@@ -1157,7 +1158,7 @@ func (h *Handler) listSharesWithOthers(w http.ResponseWriter, r *http.Request) {
 			response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, errParsingSpaceReference.Error(), errParsingSpaceReference)
 			return
 		}
-		filters, linkFilters, e = h.addFilters(w, r, &ref)
+		filters, linkFilters, e = h.addFilters(w, r, ref)
 		if e != nil {
 			// result has been written as part of addFilters
 			return
@@ -1275,7 +1276,7 @@ func (h *Handler) addFileInfo(ctx context.Context, s *conversions.ShareData, inf
 	s.MimeType = parsedMt
 	// TODO STime:     &types.Timestamp{Seconds: info.Mtime.Seconds, Nanos: info.Mtime.Nanos},
 	// TODO Storage: int
-	s.ItemSource = storagespace.FormatResourceID(*info.Id)
+	s.ItemSource = storagespace.FormatResourceID(info.Id)
 	s.FileSource = s.ItemSource
 	s.Path = path.Join("/", info.Path)
 	switch {
@@ -1317,7 +1318,7 @@ func (h *Handler) addFileInfo(ctx context.Context, s *conversions.ShareData, inf
 	s.StorageID = storageIDPrefix + s.FileTarget
 
 	if info.ParentId != nil {
-		s.FileParent = storagespace.FormatResourceID(*info.ParentId)
+		s.FileParent = storagespace.FormatResourceID(info.ParentId)
 	}
 	// item type
 	s.ItemType = conversions.ResourceType(info.GetType()).String()
@@ -1333,7 +1334,7 @@ func (h *Handler) addFileInfo(ctx context.Context, s *conversions.ShareData, inf
 	}
 
 	if info.GetSpace().GetRoot() != nil {
-		s.SpaceID = storagespace.FormatResourceID(*info.GetSpace().GetRoot())
+		s.SpaceID = storagespace.FormatResourceID(info.GetSpace().GetRoot())
 	}
 	s.SpaceAlias = utils.ReadPlainFromOpaque(info.GetSpace().GetOpaque(), "spaceAlias")
 }

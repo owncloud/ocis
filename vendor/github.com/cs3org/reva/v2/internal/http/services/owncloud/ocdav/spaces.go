@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"path"
 
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
@@ -30,6 +31,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"google.golang.org/protobuf/proto"
 )
 
 // SpacesHandler handles trashbin requests
@@ -167,10 +169,10 @@ func (h *SpacesHandler) handleSpacesTrashbin(w http.ResponseWriter, r *http.Requ
 		}
 		log.Debug().Str("key", key).Str("path", r.URL.Path).Str("dst", dst).Msg("spaces restore")
 
-		dstRef := ref
+		dstRef := proto.Clone(&ref).(*provider.Reference)
 		dstRef.Path = utils.MakeRelativePath(dst)
 
-		trashbinHandler.restore(w, r, s, &ref, &dstRef, key, r.URL.Path)
+		trashbinHandler.restore(w, r, s, &ref, dstRef, key, r.URL.Path)
 	case http.MethodDelete:
 		trashbinHandler.delete(w, r, s, &ref, key, r.URL.Path)
 	default:

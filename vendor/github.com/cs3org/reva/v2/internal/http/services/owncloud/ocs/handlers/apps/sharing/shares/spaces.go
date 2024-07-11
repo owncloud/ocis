@@ -150,14 +150,14 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 		return
 	}
 
-	if !isSpaceManagerRemaining(lgRes.Grants, grantee) {
+	if !isSpaceManagerRemaining(lgRes.Grants, &grantee) {
 		response.WriteOCSError(w, r, http.StatusForbidden, "the space must have at least one manager", nil)
 		return
 	}
 
 	// we have to send the update request to the gateway to give it a chance to invalidate its cache
 	// TODO the gateway no longer should cache stuff because invalidation is to expensive. The decomposedfs already has a better cache.
-	if granteeExists(lgRes.Grants, grantee) {
+	if granteeExists(lgRes.Grants, &grantee) {
 		if permissions != nil {
 			fieldmask = append(fieldmask, "permissions")
 		}
@@ -257,7 +257,7 @@ func (h *Handler) removeSpaceMember(w http.ResponseWriter, r *http.Request, spac
 		return
 	}
 
-	if len(lgRes.Grants) == 1 || !isSpaceManagerRemaining(lgRes.Grants, grantee) {
+	if len(lgRes.Grants) == 1 || !isSpaceManagerRemaining(lgRes.Grants, &grantee) {
 		response.WriteOCSError(w, r, http.StatusForbidden, "can't remove the last manager", nil)
 		return
 	}
@@ -349,28 +349,28 @@ func (h *Handler) findProvider(ctx context.Context, ref *provider.Reference) (*r
 	return res.Providers[0], nil
 }
 
-func isSpaceManagerRemaining(grants []*provider.Grant, grantee provider.Grantee) bool {
+func isSpaceManagerRemaining(grants []*provider.Grant, grantee *provider.Grantee) bool {
 	for _, g := range grants {
 		// RemoveGrant is currently the way to check for the manager role
 		// If it is not set than the current grant is not for a manager and
 		// we can just continue with the next one.
-		if g.Permissions.RemoveGrant && !isEqualGrantee(*g.Grantee, grantee) {
+		if g.Permissions.RemoveGrant && !isEqualGrantee(g.Grantee, grantee) {
 			return true
 		}
 	}
 	return false
 }
 
-func granteeExists(grants []*provider.Grant, grantee provider.Grantee) bool {
+func granteeExists(grants []*provider.Grant, grantee *provider.Grantee) bool {
 	for _, g := range grants {
-		if isEqualGrantee(*g.Grantee, grantee) {
+		if isEqualGrantee(g.Grantee, grantee) {
 			return true
 		}
 	}
 	return false
 }
 
-func isEqualGrantee(a, b provider.Grantee) bool {
+func isEqualGrantee(a, b *provider.Grantee) bool {
 	// Ideally we would want to use utils.GranteeEqual()
 	// but the grants stored in the decomposedfs aren't complete (missing usertype and idp)
 	// because of that the check would fail so we can only check the ... for now.

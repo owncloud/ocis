@@ -1002,7 +1002,7 @@ func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, 
 	}
 	if si := spaceAttributes.String(prefixes.SpaceImageAttr); si != "" {
 		space.Opaque = utils.AppendPlainToOpaque(space.Opaque, "image", storagespace.FormatResourceID(
-			provider.ResourceId{StorageId: space.Root.StorageId, SpaceId: space.Root.SpaceId, OpaqueId: si},
+			&provider.ResourceId{StorageId: space.Root.StorageId, SpaceId: space.Root.SpaceId, OpaqueId: si},
 		))
 	}
 	if sd := spaceAttributes.String(prefixes.SpaceDescriptionAttr); sd != "" {
@@ -1010,7 +1010,7 @@ func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, 
 	}
 	if sr := spaceAttributes.String(prefixes.SpaceReadmeAttr); sr != "" {
 		space.Opaque = utils.AppendPlainToOpaque(space.Opaque, "readme", storagespace.FormatResourceID(
-			provider.ResourceId{StorageId: space.Root.StorageId, SpaceId: space.Root.SpaceId, OpaqueId: sr},
+			&provider.ResourceId{StorageId: space.Root.StorageId, SpaceId: space.Root.SpaceId, OpaqueId: sr},
 		))
 	}
 	if sa := spaceAttributes.String(prefixes.SpaceAliasAttr); sa != "" {
@@ -1019,7 +1019,7 @@ func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, 
 
 	// add rootinfo
 	ps, _ := n.SpaceRoot.PermissionSet(ctx)
-	space.RootInfo, _ = n.SpaceRoot.AsResourceInfo(ctx, &ps, []string{"quota"}, nil, false)
+	space.RootInfo, _ = n.SpaceRoot.AsResourceInfo(ctx, ps, []string{"quota"}, nil, false)
 
 	// we cannot put free, used and remaining into the quota, as quota, when set would always imply a quota limit
 	// for now we use opaque properties with a 'quota.' prefix

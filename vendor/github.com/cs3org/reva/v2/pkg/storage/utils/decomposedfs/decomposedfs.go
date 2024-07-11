@@ -567,7 +567,7 @@ func (fs *Decomposedfs) GetQuota(ctx context.Context, ref *provider.Reference) (
 	}
 
 	// FIXME move treesize & quota to fieldmask
-	ri, err := n.AsResourceInfo(ctx, &rp, []string{"treesize", "quota"}, []string{}, true)
+	ri, err := n.AsResourceInfo(ctx, rp, []string{"treesize", "quota"}, []string{}, true)
 	if err != nil {
 		return 0, 0, 0, err
 	}
@@ -661,7 +661,7 @@ func (fs *Decomposedfs) GetPathByID(ctx context.Context, id *provider.ResourceId
 	case err != nil:
 		return "", err
 	case !rp.GetPath:
-		f := storagespace.FormatResourceID(*id)
+		f := storagespace.FormatResourceID(id)
 		if rp.Stat {
 			return "", errtypes.PermissionDenied(f)
 		}
@@ -855,11 +855,6 @@ func (fs *Decomposedfs) Move(ctx context.Context, oldRef, newRef *provider.Refer
 		return err
 	}
 
-	// check lock on target
-	if err := newNode.CheckLock(ctx); err != nil {
-		return err
-	}
-
 	return fs.tp.Move(ctx, oldNode, newNode)
 }
 
@@ -886,7 +881,7 @@ func (fs *Decomposedfs) GetMD(ctx context.Context, ref *provider.Reference, mdKe
 		return nil, errtypes.NotFound(f)
 	}
 
-	md, err := node.AsResourceInfo(ctx, &rp, mdKeys, fieldMask, utils.IsRelativeReference(ref))
+	md, err := node.AsResourceInfo(ctx, rp, mdKeys, fieldMask, utils.IsRelativeReference(ref))
 	if err != nil {
 		return nil, err
 	}
@@ -966,8 +961,8 @@ func (fs *Decomposedfs) ListFolder(ctx context.Context, ref *provider.Reference,
 				np := rp
 				// add this childs permissions
 				pset, _ := child.PermissionSet(ctx)
-				node.AddPermissions(&np, &pset)
-				ri, err := child.AsResourceInfo(ctx, &np, mdKeys, fieldMask, utils.IsRelativeReference(ref))
+				node.AddPermissions(np, pset)
+				ri, err := child.AsResourceInfo(ctx, np, mdKeys, fieldMask, utils.IsRelativeReference(ref))
 				if err != nil {
 					return errtypes.InternalError(err.Error())
 				}

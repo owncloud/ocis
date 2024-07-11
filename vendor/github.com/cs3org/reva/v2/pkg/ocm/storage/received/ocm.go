@@ -491,7 +491,7 @@ func (d *driver) ListStorageSpaces(ctx context.Context, filters []*provider.List
 				}
 				space := &provider.StorageSpace{
 					Id: &provider.StorageSpaceId{
-						OpaqueId: storagespace.FormatResourceID(*root),
+						OpaqueId: storagespace.FormatResourceID(root),
 					},
 					SpaceType: "mountpoint",
 					Owner: &userv1beta1.User{
@@ -510,7 +510,7 @@ func (d *driver) ListStorageSpaces(ctx context.Context, filters []*provider.List
 				}
 				space := &provider.StorageSpace{
 					Id: &provider.StorageSpaceId{
-						OpaqueId: storagespace.FormatResourceID(*root),
+						OpaqueId: storagespace.FormatResourceID(root),
 					},
 					SpaceType: "mountpoint",
 					Owner: &userv1beta1.User{

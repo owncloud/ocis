@@ -213,7 +213,7 @@ func (s *svc) CreateStorageSpace(ctx context.Context, req *provider.CreateStorag
 	}
 
 	// just pick the first provider, we expect only one
-	c, err := s.getStorageProviderClient(ctx, res.Providers[0])
+	c, err := s.getSpacesProviderClient(ctx, res.Providers[0])
 	if err != nil {
 		return &provider.CreateStorageSpaceResponse{
 			Status: status.NewStatusFromErrType(ctx, "gateway could not get storage provider client", err),
@@ -310,7 +310,7 @@ func (s *svc) ListStorageSpaces(ctx context.Context, req *provider.ListStorageSp
 func (s *svc) UpdateStorageSpace(ctx context.Context, req *provider.UpdateStorageSpaceRequest) (*provider.UpdateStorageSpaceResponse, error) {
 	// TODO: needs to be fixed
 	ref := &provider.Reference{ResourceId: req.StorageSpace.Root}
-	c, _, err := s.find(ctx, ref)
+	c, _, err := s.findSpacesProvider(ctx, ref)
 	if err != nil {
 		return &provider.UpdateStorageSpaceResponse{
 			Status: status.NewStatusFromErrType(ctx, fmt.Sprintf("gateway could not find reference %+v", ref), err),
@@ -347,7 +347,7 @@ func (s *svc) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorag
 	}
 
 	ref := &provider.Reference{ResourceId: &rid}
-	c, _, err := s.find(ctx, ref)
+	c, _, err := s.findSpacesProvider(ctx, ref)
 	if err != nil {
 		return &provider.DeleteStorageSpaceResponse{
 			Status: status.NewStatusFromErrType(ctx, fmt.Sprintf("gateway could not find reference %+v", ref), err),
@@ -1028,6 +1028,20 @@ func (s *svc) find(ctx context.Context, ref *provider.Reference) (provider.Provi
 	return client, p[0], err
 }
 
+// findSpacesProvider looks up the provider that is responsible for the given request
+// It will return a client that the caller can use to make the call, as well as the ProviderInfo. It:
+// - contains the provider path, which is the mount point of the provider
+// - may contain a list of storage spaces with their id and space path
+func (s *svc) findSpacesProvider(ctx context.Context, ref *provider.Reference) (provider.SpacesAPIClient, *registry.ProviderInfo, error) {
+	p, err := s.findSpaces(ctx, ref)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	client, err := s.getSpacesProviderClient(ctx, p[0])
+	return client, p[0], err
+}
+
 func (s *svc) findUnique(ctx context.Context, ref *provider.Reference) (provider.ProviderAPIClient, *registry.ProviderInfo, error) {
 	p, err := s.findSingleSpace(ctx, ref)
 	if err != nil {
@@ -1080,6 +1094,18 @@ func (s *svc) findAndUnwrapUnique(ctx context.Context, ref *provider.Reference) 
 	relativeReference := unwrap(ref, mountPath, root)
 
 	return c, p, relativeReference, nil
+}
+
+func (s *svc) getSpacesProviderClient(_ context.Context, p *registry.ProviderInfo) (provider.SpacesAPIClient, error) {
+	c, err := pool.GetSpacesProviderServiceClient(p.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cachedSpacesAPIClient{
+		c:                        c,
+		createPersonalSpaceCache: s.createPersonalSpaceCache,
+	}, nil
 }
 
 func (s *svc) getStorageProviderClient(_ context.Context, p *registry.ProviderInfo) (provider.ProviderAPIClient, error) {

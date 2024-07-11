@@ -214,7 +214,7 @@ func (s *svc) executePathCopy(ctx context.Context, selector pool.Selectable[gate
 			return fmt.Errorf("status code %d", r.GetStatus().GetCode())
 		}
 
-		fileid = storagespace.FormatResourceID(*r.GetInfo().GetId())
+		fileid = storagespace.FormatResourceID(r.GetInfo().GetId())
 	} else {
 		// copy file
 
@@ -438,7 +438,7 @@ func (s *svc) executeSpacesCopy(ctx context.Context, w http.ResponseWriter, sele
 			return fmt.Errorf("stat: status code %d", r.GetStatus().GetCode())
 		}
 
-		fileid = storagespace.FormatResourceID(*r.GetInfo().GetId())
+		fileid = storagespace.FormatResourceID(r.GetInfo().GetId())
 	} else {
 		// copy file
 		// 1. get download url
