@@ -152,9 +152,14 @@ func (s *Service) OpenInApp(
 			return "", err
 		}
 
+		lang := utils.ReadPlainFromOpaque(req.GetOpaque(), "lang")
+
 		q := u.Query()
 		q.Add("WOPISrc", wopiSrcURL.String())
 		q.Add("dchat", "1")
+		q.Add("ui", lang)      // OnlyOffice
+		q.Add("lang", lang)    // Collabora, Impact on the default document language of OnlyOffice
+		q.Add("UI_LLCC", lang) // Office365
 		qs := q.Encode()
 		u.RawQuery = qs
 
