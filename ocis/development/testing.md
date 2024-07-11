@@ -362,7 +362,6 @@ PROXY_ENABLE_BASIC_AUTH=true \
 NOTIFICATIONS_SMTP_HOST=localhost \
 NOTIFICATIONS_SMTP_PORT=2500 \
 NOTIFICATIONS_SMTP_INSECURE=true \
-NOTIFICATIONS_SMTP_SENDER="owncloud <noreply@example.com>" \
 ocis/bin/ocis server
 ```
 
