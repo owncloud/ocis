@@ -156,7 +156,11 @@ func (s *Service) OpenInApp(
 
 		q := u.Query()
 		q.Add("WOPISrc", wopiSrcURL.String())
-		q.Add("dchat", "1")
+
+		if s.config.Wopi.DisableChat {
+			q.Add("dchat", "1")
+		}
+
 		q.Add("ui", lang)      // OnlyOffice
 		q.Add("lang", lang)    // Collabora, Impact on the default document language of OnlyOffice
 		q.Add("UI_LLCC", lang) // Office365

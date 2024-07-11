@@ -2,6 +2,7 @@ package config
 
 // Wopi defines the available configuration for the WOPI endpoint.
 type Wopi struct {
-	WopiSrc string `yaml:"wopisrc" env:"COLLABORATION_WOPI_SRC" desc:"The WOPISrc base URL containing schema, host and port. Set this to the schema and domain where the collaboration service is reachable for the wopi app, such as https://office.owncloud.test." introductionVersion:"6.0.0"`
-	Secret  string `yaml:"secret" env:"COLLABORATION_WOPI_SECRET" desc:"Used to mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT token embedded in the WOPI JWT token." introductionVersion:"6.0.0"`
+	WopiSrc     string `yaml:"wopisrc" env:"COLLABORATION_WOPI_SRC" desc:"The WOPISrc base URL containing schema, host and port. Set this to the schema and domain where the collaboration service is reachable for the wopi app, such as https://office.owncloud.test." introductionVersion:"6.0.0"`
+	Secret      string `yaml:"secret" env:"COLLABORATION_WOPI_SECRET" desc:"Used to mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT token embedded in the WOPI JWT token." introductionVersion:"6.0.0"`
+	DisableChat bool   `yaml:"disable_chat" env:"COLLABORATION_WOPI_DISABLE_CHAT;OCIS_WOPI_DISABLE_CHAT" desc:"Disable chat in the frontend." introductionVersion:"%%NEXT%%"`
 }
