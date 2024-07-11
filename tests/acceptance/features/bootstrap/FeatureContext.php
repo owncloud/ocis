@@ -795,6 +795,14 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getStorageUsersRoot(): string {
+		$ocisDataPath = getenv("OCIS_BASE_DATA_PATH") ? getenv("OCIS_BASE_DATA_PATH") : getenv("HOME") . '/.ocis';
+		return getenv("STORAGE_USERS_OCIS_ROOT") ? getenv("STORAGE_USERS_OCIS_ROOT") : $ocisDataPath . "/storage/users";
+	}
+
+	/**
 	 * returns the path of the base URL
 	 * e.g. owncloud-core/10 if the baseUrl is http://localhost/owncloud-core/10
 	 * the path is without a slash at the end and without a slash at the beginning
@@ -2069,6 +2077,14 @@ class FeatureContext extends BehatVariablesContext {
 				"function" => [
 					$this,
 					"getBaseUrl"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%storage_path%",
+				"function" => [
+					$this,
+					"getStorageUsersRoot"
 				],
 				"parameter" => []
 			],
