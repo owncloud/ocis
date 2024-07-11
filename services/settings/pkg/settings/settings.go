@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	cs3permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
+
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
@@ -12,11 +13,6 @@ import (
 var (
 	// Registry uses the strategy pattern as a registry
 	Registry = map[string]RegisterFunc{}
-
-	// ErrPermissionNotFound defines a new error for when a permission was not found
-	//
-	// Deprecated use the more generic ErrNotFound
-	ErrPermissionNotFound = errors.New("permission not found")
 
 	// ErrNotFound is the error to use when a resource was not found.
 	ErrNotFound = errors.New("not found")
