@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 6.1.0](#changelog-for-610-2024-07-08)
 * [Changelog for 6.0.0](#changelog-for-600-2024-06-19)
 * [Changelog for 5.0.3](#changelog-for-503-2024-05-02)
@@ -38,6 +39,32 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v6.1.0...master
+
+## Summary
+
+* Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
+
+## Details
+
+* Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
+
+   Tags: web
+
+   We updated ownCloud Web to v9.1.0-alpha.1. Please refer to the changelog
+   (linked) for details on the web release.
+
+   - Enhancement
+   [owncloud/web#11101](https://github.com/owncloud/web/issues/11101): Add share
+   role icon to shared with me table
+
+   https://github.com/owncloud/ocis/pull/9585
+   https://github.com/owncloud/web/releases/tag/v9.2.0-alpha.1
 
 # Changelog for [6.1.0] (2024-07-08)
 
