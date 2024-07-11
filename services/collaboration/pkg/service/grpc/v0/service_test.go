@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/golang-jwt/jwt/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -163,6 +164,7 @@ var _ = Describe("Discovery", func() {
 				ViewMode:    appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE,
 				AccessToken: MintToken(myself, cfg.Wopi.Secret, nowTime),
 			}
+			req.Opaque = utils.AppendPlainToOpaque(req.Opaque, "lang", "de")
 
 			gatewayClient.On("WhoAmI", mock.Anything, mock.Anything).Times(1).Return(&gatewayv1beta1.WhoAmIResponse{
 				Status: status.NewOK(ctx),
@@ -173,7 +175,7 @@ var _ = Describe("Discovery", func() {
 			Expect(err).To(Succeed())
 			Expect(resp.GetStatus().GetCode()).To(Equal(rpcv1beta1.Code_CODE_OK))
 			Expect(resp.GetAppUrl().GetMethod()).To(Equal("POST"))
-			Expect(resp.GetAppUrl().GetAppUrl()).To(Equal("https://test.server.prv/hosting/wopi/word/edit?UI_LLCC=&WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&lang=&ui="))
+			Expect(resp.GetAppUrl().GetAppUrl()).To(Equal("https://test.server.prv/hosting/wopi/word/edit?UI_LLCC=de&WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&lang=de&ui=de"))
 			Expect(resp.GetAppUrl().GetFormParameters()["access_token_ttl"]).To(Equal(strconv.FormatInt(nowTime.Add(5*time.Hour).Unix()*1000, 10)))
 		})
 
