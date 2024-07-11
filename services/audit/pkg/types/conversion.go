@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -81,7 +82,7 @@ func LinkCreated(ev events.LinkCreated) AuditEventShareCreated {
 		ShareType:         typ,
 		ExpirationDate:    formatTime(ev.Expiration),
 		SharePass:         ev.PasswordProtected,
-		Permissions:       ev.Permissions.String(),
+		Permissions:       normalizeString(ev.Permissions.GetPermissions().String()),
 		ShareToken:        ev.Token,
 
 		// NOTE: those values are not in the event and can therefore not be filled at the moment
@@ -99,7 +100,7 @@ func ShareUpdated(ev events.ShareUpdated) AuditEventShareUpdated {
 		ShareOwner:        uid,
 		ShareWith:         with,
 		ShareType:         typ,
-		Permissions:       ev.Permissions.Permissions.String(),
+		Permissions:       normalizeString(ev.Permissions.GetPermissions().String()),
 
 		// NOTE: those values are not in the event and can therefore not be filled at the moment
 		ItemType:       "",
@@ -119,7 +120,7 @@ func LinkUpdated(ev events.LinkUpdated) AuditEventShareUpdated {
 		ShareOwner:        uid,
 		ShareWith:         with,
 		ShareType:         typ,
-		Permissions:       ev.Permissions.Permissions.String(),
+		Permissions:       normalizeString(ev.Permissions.GetPermissions().String()),
 		ExpirationDate:    formatTime(ev.Expiration),
 		SharePass:         ev.PasswordProtected,
 		ShareToken:        ev.Token,
@@ -554,4 +555,12 @@ func updateType(u string) string {
 		fmt.Println("Unknown update type", u)
 		return ""
 	}
+}
+
+// normalizeString tries to create a somewhat stable string
+// from a prototext string. The prototext strings are unstable
+// on purpose an insert additional spaces randomly.
+// See: https://protobuf.dev/reference/go/faq/#unstable-text
+func normalizeString(str string) string {
+	return strings.Join(strings.Fields(str), " ")
 }
