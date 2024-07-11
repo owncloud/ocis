@@ -68,21 +68,24 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * @When the administrator resets the password of user :user to :password using the CLI
+	 * @When /^the administrator resets the password of (non-existing|existing) user "([^"]*)" to "([^"]*)" using the CLI$/
 	 *
+	 * @param string $status
 	 * @param string $user
 	 * @param string $password
 	 *
 	 * @return void
 	 */
-	public function theAdministratorResetsThePasswordOfUserUsingTheCLI(string $user, string $password): void {
+	public function theAdministratorResetsThePasswordOfUserUsingTheCLI(string $status, string $user, string $password): void {
 		$command = "idm resetpassword -u $user";
 		$body = [
 			"command" => $command,
 			"inputs" => [$password, $password]
 		];
-
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
+		if ($status === "non-existing") {
+			return;
+		}
 		$this->featureContext->updateUserPassword($user, $password);
 	}
 
