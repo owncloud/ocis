@@ -344,11 +344,11 @@ var _ = Describe("DriveItemPermissionsService", func() {
 	})
 	Describe("ListPermissions", func() {
 		var (
-			itemID             provider.ResourceId
+			itemID             *provider.ResourceId
 			listSharesResponse *collaboration.ListSharesResponse
 		)
 		BeforeEach(func() {
-			itemID = provider.ResourceId{
+			itemID = &provider.ResourceId{
 				StorageId: "1",
 				SpaceId:   "2",
 				OpaqueId:  "3",
@@ -358,7 +358,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				Shares: []*collaboration.Share{},
 			}
 			statResponse.Info = &provider.ResourceInfo{
-				Id:            &itemID,
+				Id:            itemID,
 				Type:          provider.ResourceType_RESOURCE_TYPE_FILE,
 				PermissionSet: roleconversions.NewViewerRole().CS3ResourcePermissions(),
 			}
@@ -1145,8 +1145,8 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			mockProvider.On("ListPermissions", mock.Anything, mock.Anything, mock.Anything).
-				Return(func(ctx context.Context, itemid storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
-					Expect(storagespace.FormatResourceID(&itemid)).To(Equal("1$2!3"))
+				Return(func(ctx context.Context, itemid *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+					Expect(storagespace.FormatResourceID(itemid)).To(Equal("1$2!3"))
 					return libregraph.CollectionOfPermissionsWithAllowedValues{}, nil
 				}).Once()
 

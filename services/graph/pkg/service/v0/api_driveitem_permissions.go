@@ -43,7 +43,7 @@ const (
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	SpaceRootInvite(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
-	ListPermissions(ctx context.Context, itemID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	DeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) error
 	DeleteSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string) error
@@ -121,12 +121,12 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(unifiedRolePermissions)
 
 	permission := &libregraph.Permission{}
-	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*cs3ResourcePermissions, condition); role != nil {
+	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(cs3ResourcePermissions, condition); role != nil {
 		permission.Roles = []string{role.GetId()}
 	}
 
 	if len(permission.GetRoles()) == 0 {
-		permission.LibreGraphPermissionsActions = unifiedrole.CS3ResourcePermissionsToLibregraphActions(*cs3ResourcePermissions)
+		permission.LibreGraphPermissionsActions = unifiedrole.CS3ResourcePermissionsToLibregraphActions(cs3ResourcePermissions)
 	}
 
 	var shareid string
@@ -304,14 +304,14 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 }
 
 // ListPermissions lists the permissions of a driveItem
-func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{}
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return collectionOfPermissions, err
 	}
 
-	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: &itemID}})
+	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: itemID}})
 	if err := errorcode.FromStat(statResponse, err); err != nil {
 		s.logger.Warn().Err(err).Interface("stat.res", statResponse).Msg("stat failed")
 		return collectionOfPermissions, err
@@ -322,7 +322,7 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 		return collectionOfPermissions, err
 	}
 
-	permissionSet := *statResponse.GetInfo().GetPermissionSet()
+	permissionSet := statResponse.GetInfo().GetPermissionSet()
 	allowedActions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissionSet)
 
 	collectionOfPermissions = libregraph.CollectionOfPermissionsWithAllowedValues{
@@ -352,7 +352,7 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 	} else {
 		// "normal" driveItem, populate user  permissions via share providers
 		driveItems, err = s.listUserShares(ctx, []*collaboration.Filter{
-			share.ResourceIDFilter(conversions.ToPointer(itemID)),
+			share.ResourceIDFilter(itemID),
 		}, driveItems)
 		if err != nil {
 			return collectionOfPermissions, err
@@ -360,7 +360,7 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 	}
 	// finally get public shares, which are possible for spaceroots and "normal" resources
 	driveItems, err = s.listPublicShares(ctx, []*link.ListPublicSharesRequest_Filter{
-		publicshare.ResourceIDFilter(conversions.ToPointer(itemID)),
+		publicshare.ResourceIDFilter(itemID),
 	}, driveItems)
 	if err != nil {
 		return collectionOfPermissions, err
@@ -392,7 +392,7 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 	}
 
 	rootResourceID := space.GetRoot()
-	return s.ListPermissions(ctx, *rootResourceID)
+	return s.ListPermissions(ctx, rootResourceID)
 }
 
 // DeletePermission deletes a permission from a drive item
@@ -612,7 +612,7 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 
 	ctx := r.Context()
 
-	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, itemID)
+	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, &itemID)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return

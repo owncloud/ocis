@@ -368,7 +368,7 @@ func PermissionsToCS3ResourcePermissions(unifiedRolePermissions []*libregraph.Un
 
 // CS3ResourcePermissionsToLibregraphActions converts the provided cs3 ResourcePermissions to a list of
 // libregraph actions
-func CS3ResourcePermissionsToLibregraphActions(p provider.ResourcePermissions) (actions []string) {
+func CS3ResourcePermissionsToLibregraphActions(p *provider.ResourcePermissions) (actions []string) {
 	if p.GetAddGrant() {
 		actions = append(actions, DriveItemPermissionsCreate)
 	}
@@ -435,7 +435,7 @@ func GetLegacyName(role libregraph.UnifiedRoleDefinition) string {
 
 // CS3ResourcePermissionsToUnifiedRole tries to find the UnifiedRoleDefinition that matches the supplied
 // CS3 ResourcePermissions and constraints.
-func CS3ResourcePermissionsToUnifiedRole(p provider.ResourcePermissions, constraints string) *libregraph.UnifiedRoleDefinition {
+func CS3ResourcePermissionsToUnifiedRole(p *provider.ResourcePermissions, constraints string) *libregraph.UnifiedRoleDefinition {
 	actionSet := map[string]struct{}{}
 	for _, action := range CS3ResourcePermissionsToLibregraphActions(p) {
 		actionSet[action] = struct{}{}
@@ -514,7 +514,7 @@ func convert(role *conversions.Role) []string {
 	if role == nil && role.CS3ResourcePermissions() == nil {
 		return actions
 	}
-	return CS3ResourcePermissionsToLibregraphActions(*role.CS3ResourcePermissions())
+	return CS3ResourcePermissionsToLibregraphActions(role.CS3ResourcePermissions())
 }
 
 func GetAllowedResourceActions(role *libregraph.UnifiedRoleDefinition, condition string) []string {

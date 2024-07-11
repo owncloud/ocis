@@ -692,12 +692,12 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 }
 
 func (g Graph) fetchSpecialDriveItem(ctx context.Context, spaceItems []libregraph.DriveItem, itemName string, itemNode string, space *storageprovider.StorageSpace, baseURL *url.URL) []libregraph.DriveItem {
-	var ref storageprovider.Reference
+	var ref *storageprovider.Reference
 	if itemNode != "" {
 		rid, _ := storagespace.ParseID(itemNode)
 
 		rid.StorageId = space.GetRoot().GetStorageId()
-		ref = storageprovider.Reference{
+		ref = &storageprovider.Reference{
 			ResourceId: &rid,
 		}
 		spaceItem := g.getSpecialDriveItem(ctx, ref, itemName, baseURL, space)
@@ -730,7 +730,7 @@ type specialDriveItemEntry struct {
 	rootMtime         *types.Timestamp
 }
 
-func (g Graph) getSpecialDriveItem(ctx context.Context, ref storageprovider.Reference, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
+func (g Graph) getSpecialDriveItem(ctx context.Context, ref *storageprovider.Reference, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
 	var spaceItem *libregraph.DriveItem
 	if ref.GetResourceId().GetSpaceId() == "" && ref.GetResourceId().GetOpaqueId() == "" {
 		return nil

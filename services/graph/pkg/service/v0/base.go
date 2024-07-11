@@ -62,18 +62,18 @@ func (g BaseGraphService) getSpaceRootPermissions(ctx context.Context, spaceID *
 	return g.cs3SpacePermissionsToLibreGraph(ctx, space, APIVersion_1_Beta_1), nil
 }
 
-func (g BaseGraphService) getDriveItem(ctx context.Context, ref storageprovider.Reference) (*libregraph.DriveItem, error) {
+func (g BaseGraphService) getDriveItem(ctx context.Context, ref *storageprovider.Reference) (*libregraph.DriveItem, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &ref})
+	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
 	if err != nil {
 		return nil, err
 	}
 	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		refStr, _ := storagespace.FormatReference(&ref)
+		refStr, _ := storagespace.FormatReference(ref)
 		return nil, fmt.Errorf("could not stat %s: %s", refStr, res.GetStatus().GetMessage())
 	}
 	return cs3ResourceToDriveItem(g.logger, res.GetInfo())
@@ -191,7 +191,7 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
 		}
 
-		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*perm, unifiedrole.UnifiedRoleConditionDrive); role != nil {
+		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(perm, unifiedrole.UnifiedRoleConditionDrive); role != nil {
 			switch apiVersion {
 			case APIVersion_1:
 				if r := unifiedrole.GetLegacyName(*role); r != "" {
@@ -311,7 +311,7 @@ func (g BaseGraphService) cs3UserSharesToDriveItems(ctx context.Context, shares 
 		resIDStr := storagespace.FormatResourceID(s.ResourceId)
 		item, ok := driveItems[resIDStr]
 		if !ok {
-			itemptr, err := g.getDriveItem(ctx, storageprovider.Reference{ResourceId: s.ResourceId})
+			itemptr, err := g.getDriveItem(ctx, &storageprovider.Reference{ResourceId: s.ResourceId})
 			if err != nil {
 				g.logger.Debug().Err(err).Interface("Share", s.ResourceId).Msg("could not stat share, skipping")
 				continue
@@ -393,13 +393,13 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 		perm.SetCreatedDateTime(cs3TimestampToTime(share.GetCtime()))
 	}
 	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
-		*share.GetPermissions().GetPermissions(),
+		share.GetPermissions().GetPermissions(),
 		roleCondition,
 	)
 	if role != nil {
 		perm.SetRoles([]string{role.GetId()})
 	} else {
-		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*share.GetPermissions().GetPermissions())
+		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(share.GetPermissions().GetPermissions())
 		perm.SetLibreGraphPermissionsActions(actions)
 		perm.SetRoles(nil)
 	}
@@ -413,7 +413,7 @@ func (g BaseGraphService) cs3PublicSharesToDriveItems(ctx context.Context, share
 		resIDStr := storagespace.FormatResourceID(s.ResourceId)
 		item, ok := driveItems[resIDStr]
 		if !ok {
-			itemptr, err := g.getDriveItem(ctx, storageprovider.Reference{ResourceId: s.ResourceId})
+			itemptr, err := g.getDriveItem(ctx, &storageprovider.Reference{ResourceId: s.ResourceId})
 			if err != nil {
 				g.logger.Debug().Err(err).Interface("Share", s.ResourceId).Msg("could not stat share, skipping")
 				continue

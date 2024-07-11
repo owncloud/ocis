@@ -416,13 +416,13 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 		if err != nil {
 			return nil, err
 		}
-		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*permissionSet, condition)
+		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(permissionSet, condition)
 
 		if role != nil {
 			permission.SetRoles([]string{role.GetId()})
 		}
 
-		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissionSet)
+		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissionSet)
 
 		// actions only make sense if no role is set
 		if role == nil && len(actions) > 0 {
