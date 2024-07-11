@@ -966,6 +966,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
     ]
     builtinOnlyTestGroups = [
         "PutRelativeFile",
+        "RenameFileIfCreateChildFileIsNotSupported",
     ]
 
     ocis_bin = "ocis/bin/ocis"
@@ -1037,7 +1038,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
     if wopiServerType == "builtin":
         for builtinOnlyGroup in builtinOnlyTestGroups:
             validatorTests.append({
-                "name": "wopiValidatorTests-%s-%s" % (storage, builtinOnlyGroup),
+                "name": "wopiValidatorTests-%s" % builtinOnlyGroup,
                 "image": "owncloudci/wopi-validator",
                 "commands": [
                     "export WOPI_TOKEN=$(cat accesstoken)",
