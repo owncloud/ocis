@@ -48,9 +48,17 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
 * Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
 
 ## Details
+
+* Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
+
+   We added the feature to disable the chat for onlyoffice and added the missing
+   language parameters to the wopi app url.
+
+   https://github.com/owncloud/ocis/pull/9580
 
 * Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
 
