@@ -1,5 +1,5 @@
 ---
-title: Addes Services per Release
+title: Added Services per Release
 date: 2024-07-12T00:00:00+00:00
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
@@ -8,7 +8,7 @@ geekdocFilePath: added-services.md
 geekdocCollapseSection: true
 ---
 
-Over time, services get added with new releases published. This page gives an overview which services exist respectively
+Over time, services get added with new releases published. This page gives an overview of which services exist and which
 have been added per release.
 
 ## Added Services
