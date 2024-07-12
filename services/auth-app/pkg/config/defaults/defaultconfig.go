@@ -18,13 +18,13 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:   "127.0.0.1:9197",
+			Addr:   "127.0.0.1:9245",
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:      "127.0.0.1:9195",
+			Addr:      "127.0.0.1:9246",
 			Namespace: "com.owncloud.api",
 			Protocol:  "tcp",
 		},

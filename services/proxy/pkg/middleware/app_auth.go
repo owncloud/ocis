@@ -13,7 +13,7 @@ import (
 // AppAuthAuthenticator defines the app auth authenticator
 type AppAuthAuthenticator struct {
 	Logger              log.Logger
-	RevaGatewaySelector *pool.Selector[gateway.GatewayAPIClient]
+	RevaGatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via app auth.
