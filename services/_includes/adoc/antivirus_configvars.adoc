@@ -1,10 +1,12 @@
 // set the attribute to true or leave empty, true without any quotes.
+// if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
+// if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
 
 :show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-12-11-34-40]
+[#deprecation-note-2024-07-12-15-17-45]
 [caption=]
 .Deprecation notes for the antivirus service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -19,6 +21,8 @@ ifeval::[{show-deprecation} == true]
 | 6.0
 | ANTIVIRUS_ICAP_SCAN_TIMEOUT
 |===
+
+{empty} +
 
 endif::[]
 
@@ -245,7 +249,7 @@ a| [subs=-attributes]
 The socket clamav is running on. Note the default value is an example which needs adaption according your OS.
 
 a|`ANTIVIRUS_ICAP_TIMEOUT` +
-xref:deprecation-note-2024-07-12-11-34-40[Deprecation Note]
+xref:deprecation-note-2024-07-12-15-17-45[Deprecation Note]
 a| [subs=-attributes]
 ++int64 ++
 a| [subs=-attributes]
