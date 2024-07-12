@@ -25,7 +25,10 @@ import (
 
 // NewHandler creates a new grpc service implementing the OpenInApp interface
 func NewHandler(opts ...Option) (*Service, func(), error) {
-	teardown := func() {}
+	teardown := func() {
+		/* this is required as a argument for the return value to satisfy the interface */
+		/* in case you are wondering about the necessity of this comment, sonarcloud is asking for it */
+	}
 	options := newOptions(opts...)
 
 	gwc := options.Gwc
@@ -93,18 +96,18 @@ func (s *Service) OpenInApp(
 	var viewAppURL string
 	var editAppURL string
 	if viewCommentAppURLs, ok := s.appURLs["view_comment"]; ok {
-		if url := viewCommentAppURLs[fileExt]; ok {
-			viewCommentAppURL = url
+		if u, ok := viewCommentAppURLs[fileExt]; ok {
+			viewCommentAppURL = u
 		}
 	}
 	if viewAppURLs, ok := s.appURLs["view"]; ok {
-		if url := viewAppURLs[fileExt]; ok {
-			viewAppURL = url
+		if u, ok := viewAppURLs[fileExt]; ok {
+			viewAppURL = u
 		}
 	}
 	if editAppURLs, ok := s.appURLs["edit"]; ok {
-		if url, ok := editAppURLs[fileExt]; ok {
-			editAppURL = url
+		if u, ok := editAppURLs[fileExt]; ok {
+			editAppURL = u
 		}
 	}
 	if editAppURL == "" && viewAppURL == "" && viewCommentAppURL == "" {
@@ -151,6 +154,18 @@ func (s *Service) OpenInApp(
 
 		q := u.Query()
 		q.Add("WOPISrc", wopiSrcURL.String())
+
+		if s.config.Wopi.DisableChat {
+			q.Add("dchat", "1")
+		}
+
+		lang := utils.ReadPlainFromOpaque(req.GetOpaque(), "lang")
+
+		if lang != "" {
+			q.Add("ui", lang)      // OnlyOffice
+			q.Add("lang", lang)    // Collabora, Impact on the default document language of OnlyOffice
+			q.Add("UI_LLCC", lang) // Office365
+		}
 		qs := q.Encode()
 		u.RawQuery = qs
 
@@ -199,7 +214,7 @@ func (s *Service) OpenInApp(
 	wopiContext := middleware.WopiContext{
 		AccessToken:   cryptedReqAccessToken,
 		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
-		FileReference: providerFileRef,
+		FileReference: &providerFileRef,
 		User:          user,
 		ViewMode:      req.GetViewMode(),
 		EditAppUrl:    editAppURL,

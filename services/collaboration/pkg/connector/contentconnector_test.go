@@ -44,7 +44,7 @@ var _ = Describe("ContentConnector", func() {
 
 		wopiCtx = middleware.WopiContext{
 			AccessToken: "abcdef123456",
-			FileReference: providerv1beta1.Reference{
+			FileReference: &providerv1beta1.Reference{
 				ResourceId: &providerv1beta1.ResourceId{
 					StorageId: "abc",
 					OpaqueId:  "12345",
@@ -178,7 +178,7 @@ var _ = Describe("ContentConnector", func() {
 			wopiCtx = middleware.WopiContext{
 				AccessToken:   "abcdef123456",
 				ViewOnlyToken: "view.only.123456",
-				FileReference: providerv1beta1.Reference{
+				FileReference: &providerv1beta1.Reference{
 					ResourceId: &providerv1beta1.ResourceId{
 						StorageId: "abc",
 						OpaqueId:  "12345",

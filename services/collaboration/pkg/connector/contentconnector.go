@@ -71,7 +71,7 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 
 	// Initiate download request
 	req := &providerv1beta1.InitiateFileDownloadRequest{
-		Ref: &wopiContext.FileReference,
+		Ref: wopiContext.FileReference,
 	}
 
 	if wopiContext.ViewMode == appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY && wopiContext.ViewOnlyToken != "" {
@@ -206,7 +206,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 	// We need a stat call on the target file in order to get both the lock
 	// (if any) and the current size of the file
 	statRes, err := c.gwc.Stat(ctx, &providerv1beta1.StatRequest{
-		Ref: &wopiContext.FileReference,
+		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("PutFile: stat failed")
@@ -254,7 +254,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 
 	req := &providerv1beta1.InitiateFileUploadRequest{
 		Opaque: opaque,
-		Ref:    &wopiContext.FileReference,
+		Ref:    wopiContext.FileReference,
 		LockId: lockID,
 		Options: &providerv1beta1.InitiateFileUploadRequest_IfMatch{
 			IfMatch: statRes.GetInfo().GetEtag(),
