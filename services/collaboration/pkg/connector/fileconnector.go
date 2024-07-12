@@ -564,7 +564,7 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 
 	// stat the current file in order to get the reference of the parent folder
 	oldStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
-		Ref: &wopiContext.FileReference,
+		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("PutRelativeFileSuggested: stat failed")
@@ -594,7 +594,7 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 
 		targetPath := utils.MakeRelativePath(finalTarget)
 		// need to change the file reference of the wopicontext to point to the new path
-		wopiContext.FileReference = providerv1beta1.Reference{
+		wopiContext.FileReference = &providerv1beta1.Reference{
 			ResourceId: oldStatRes.GetInfo().GetParentId(),
 			Path:       targetPath,
 		}
@@ -690,7 +690,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 
 	// stat the current file in order to get the reference of the parent folder
 	oldStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
-		Ref: &wopiContext.FileReference,
+		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("PutRelativeFileRelative: stat failed")
@@ -707,7 +707,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 
 	targetPath := utils.MakeRelativePath(target)
 	// need to change the file reference of the wopicontext to point to the new path
-	wopiContext.FileReference = providerv1beta1.Reference{
+	wopiContext.FileReference = &providerv1beta1.Reference{
 		ResourceId: oldStatRes.GetInfo().GetParentId(),
 		Path:       targetPath,
 	}
@@ -810,7 +810,7 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 		Logger()
 
 	deleteRes, err := f.gwc.Delete(ctx, &providerv1beta1.DeleteRequest{
-		Ref:    &wopiContext.FileReference,
+		Ref:    wopiContext.FileReference,
 		LockId: lockID,
 	})
 	if err != nil {
@@ -832,7 +832,7 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 
 		// check if the file is locked to return a proper lockID
 		req := &providerv1beta1.GetLockRequest{
-			Ref: &wopiContext.FileReference,
+			Ref: wopiContext.FileReference,
 		}
 
 		resp, err2 := f.gwc.GetLock(ctx, req)
@@ -891,7 +891,7 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 
 	// stat the current file in order to get the reference of the parent folder
 	oldStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
-		Ref: &wopiContext.FileReference,
+		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("RenameFile: stat failed")
@@ -917,7 +917,7 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 	for isDone := false; !isDone; {
 		targetPath := utils.MakeRelativePath(finalTarget)
 		// need to change the file reference of the wopicontext to point to the new path
-		targetFileReference := providerv1beta1.Reference{
+		targetFileReference := &providerv1beta1.Reference{
 			ResourceId: oldStatRes.GetInfo().GetParentId(),
 			Path:       targetPath,
 		}
@@ -927,8 +927,8 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 
 		// try to put the file. It mustn't return a 400 or 409
 		moveRes, err := f.gwc.Move(ctx, &providerv1beta1.MoveRequest{
-			Source:      &wopiContext.FileReference,
-			Destination: &targetFileReference,
+			Source:      wopiContext.FileReference,
+			Destination: targetFileReference,
 			LockId:      lockID,
 		})
 		if err != nil {
@@ -1200,7 +1200,7 @@ func (f *FileConnector) adjustWopiReference(ctx context.Context, wopiContext *mi
 	// using resourceid + path won't do for WOPI, we need just the resource if of the new file
 	// the wopicontext has resourceid + path, which is good enough for the stat request
 	newStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
-		Ref: &wopiContext.FileReference,
+		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("stat failed")
@@ -1215,7 +1215,7 @@ func (f *FileConnector) adjustWopiReference(ctx context.Context, wopiContext *mi
 		return NewConnectorError(500, newStatRes.GetStatus().GetCode().String()+" "+newStatRes.GetStatus().GetMessage())
 	}
 	// adjust the reference in the wopi context to use only the resourceid without the path
-	wopiContext.FileReference = providerv1beta1.Reference{
+	wopiContext.FileReference = &providerv1beta1.Reference{
 		ResourceId: newStatRes.GetInfo().GetId(),
 	}
 
