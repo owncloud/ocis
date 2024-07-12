@@ -25,7 +25,7 @@ The following table gives an overview about releases and their services.
 | auth-basic         | auth-basic         | auth-basic         | auth-basic         |
 | auth-bearer        | auth-bearer        | auth-bearer        | auth-bearer        |
 | auth-machine       | auth-machine       | auth-machine       | auth-machine       |
-| eventhistory       | eventhistory       | auth-service       | auth-service       |
+|                    |                    | auth-service       | auth-service       |
 |                    |                    | clientlog          | clientlog          |
 |                    |                    |                    | collaboration      |
 |                    |                    | eventhistory       | eventhistory       |
