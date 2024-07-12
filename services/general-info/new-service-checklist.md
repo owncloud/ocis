@@ -15,6 +15,7 @@ When a new service gets introduced, this checklist is a good starting point for 
 Use this checklist with copy/paste in your PR - right from the beginning. It renders correctly in your PR.
 
 ```markdown
+- [ ] Services MUST NOT be named `extended` or `global`. These are reserved names for the automated documentation process.
 - [ ] Provide a README.md for that service in the root folder of that service.
   - Use CamelCase for section headers.
 - [ ] For images and example files used in README.md:
