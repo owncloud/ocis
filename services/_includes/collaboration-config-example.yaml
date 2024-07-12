@@ -21,6 +21,7 @@ http:
 wopi:
   wopisrc: https://localhost:9300
   secret: ""
+  disable_chat: false
 cs3api:
   gateway:
     name: com.owncloud.api.gateway

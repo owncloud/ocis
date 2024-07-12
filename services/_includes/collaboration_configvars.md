@@ -16,6 +16,7 @@
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | COLLABORATION_WOPI_SRC | string | https://localhost:9300 | The WOPISrc base URL containing schema, host and port. Set this to the schema and domain where the collaboration service is reachable for the wopi app, such as https://office.owncloud.test.|
 | COLLABORATION_WOPI_SECRET | string |  | Used to mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT token embedded in the WOPI JWT token.|
+| COLLABORATION_WOPI_DISABLE_CHAT<br/>OCIS_WOPI_DISABLE_CHAT | bool | false | Disable chat in the frontend.|
 | OCIS_REVA_GATEWAY<br/>COLLABORATION_CS3API_GATEWAY_NAME | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata.|
 | COLLABORATION_CS3API_DATAGATEWAY_INSECURE | bool | false | Connect to the CS3API data gateway insecurely.|
 | OCIS_TRACING_ENABLED<br/>COLLABORATION_TRACING_ENABLED | bool | false | Activates tracing.|

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-12-08-41-26]
+[#deprecation-note-2024-07-12-11-34-40]
 [caption=]
 .Deprecation notes for the app-provider service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -279,6 +279,7 @@ a| [subs=-attributes]
 URL for end users to access the app.
 
 a|`APP_PROVIDER_WOPI_DISABLE_CHAT` +
+`OCIS_WOPI_DISABLE_CHAT` +
 
 a| [subs=-attributes]
 ++bool ++

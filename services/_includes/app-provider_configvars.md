@@ -29,7 +29,7 @@
 | APP_PROVIDER_WOPI_APP_INTERNAL_URL | string |  | Internal URL to the app, like in your DMZ.|
 | APP_PROVIDER_WOPI_APP_NAME | string |  | Human readable app name.|
 | APP_PROVIDER_WOPI_APP_URL | string |  | URL for end users to access the app.|
-| APP_PROVIDER_WOPI_DISABLE_CHAT | bool | false | Disable the chat functionality of the office app.|
+| APP_PROVIDER_WOPI_DISABLE_CHAT<br/>OCIS_WOPI_DISABLE_CHAT | bool | false | Disable the chat functionality of the office app.|
 | APP_PROVIDER_WOPI_INSECURE | bool | false | Disable TLS certificate validation for requests to the WOPI server and the web office application. Do not set this in production environments.|
 | APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET | string |  | Shared secret of the CS3org WOPI server.|
 | APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL | string |  | External url of the CS3org WOPI server.|
