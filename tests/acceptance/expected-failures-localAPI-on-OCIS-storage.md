@@ -312,5 +312,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/share.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L12)
 - [apiOcm/share.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L91)
 
+### [OCM. user cannot see invite description and inviteUser email](https://github.com/owncloud/ocis/issues/9591)
+
+- [apiOcm/createInvitation.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/createInvitation.feature#L63)
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.

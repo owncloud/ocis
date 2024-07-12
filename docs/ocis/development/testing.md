@@ -561,7 +561,7 @@ OCM_OCM_INVITE_MANAGER_INSECURE=true \
 OCM_OCM_SHARE_PROVIDER_INSECURE=true \
 OCM_OCM_STORAGE_PROVIDER_INSECURE=true \
 OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE="${workspaceFolder}/tests/config/drone/providers.json" \
-OCIS_ADD_RUN_SERVICES="ocm"
+OCIS_ADD_RUN_SERVICES="ocm" \
 ocis/bin/ocis server
 ```
 
@@ -587,7 +587,7 @@ To enable ocm in the web interface, you need to set the following envs:
 `FRONTEND_OCS_INCLUDE_OCM_SHAREES=true` \
 `FRONTEND_OCS_LIST_OCM_SHARES=true` \
 `FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING=true` \
-`FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING=true`
+`FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING=true` \
 
 and put `ocm` to apps https://github.com/owncloud/ocis/blob/master/services/web/pkg/config/defaults/defaultconfig.go#L101
 {{< /hint>}}

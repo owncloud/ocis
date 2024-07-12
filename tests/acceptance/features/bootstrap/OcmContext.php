@@ -25,6 +25,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\OcisHelper;
 use TestHelpers\OcmHelper;
+use TestHelpers\WebDavHelper;
 
 /**
  * Acceptance test steps related to testing federation share(ocm) features
@@ -122,31 +123,35 @@ class OcmContext implements Context {
 
 	/**
 	 * @Given :user has created the federation share invitation
+	 * @Given :user has created the federation share invitation with email :email and description :description
 	 *
 	 * @param string $user
+	 * @param string $email
+	 * @param string $description
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userHasCreatedTheFederationShareInvitation(string $user): void {
-		$response = $this->createInvitation($user);
+	public function userHasCreatedTheFederationShareInvitation(string $user, $email = null, $description = null): void {
+		$response = $this->createInvitation($user, $email, $description);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
 	/**
 	 * @param string $user
+	 * @param string $token
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function acceptInvitation(string $user): ResponseInterface {
+	public function acceptInvitation(string $user, string $token = null): ResponseInterface {
 		$providerDomain = ($this->featureContext->getCurrentServer() === "LOCAL") ? $this->getFedOcisDomain() : $this->getOcisDomain();
 		return OcmHelper::acceptInvitation(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$this->invitationToken,
+			$token ? $token : $this->invitationToken,
 			$providerDomain
 		);
 	}
@@ -162,6 +167,18 @@ class OcmContext implements Context {
 	 */
 	public function userAcceptsTheLastFederationShareInvitation(string $user): void {
 		$this->featureContext->setResponse($this->acceptInvitation($user));
+	}
+
+	/**
+	 * @When :user tries to accept the invitation with invalid token
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userTriesToAcceptInvitationWithInvalidToken(string $user): void {
+		$this->featureContext->setResponse($this->acceptInvitation($user, WebDavHelper::generateUUIDv4()));
 	}
 
 	/**
@@ -202,5 +219,44 @@ class OcmContext implements Context {
 	 */
 	public function userFindsAcceptedUsers(string $user): void {
 		$this->featureContext->setResponse($this->findAcceptedUsers($user));
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function listInvitations(string $user): ResponseInterface {
+		return OcmHelper::listInvite(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user)
+		);
+	}
+
+	/**
+	 * @When :user lists the created invitations
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userListsCreatedInvitations(string $user): void {
+		$this->featureContext->setResponse($this->listInvitations($user));
+	}
+
+	/**
+	 * @When the user waits :number seconds for the token to expire
+	 *
+	 * @param int $number
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theUserWaitsForTokenToExpire(int $number): void {
+		\sleep($number);
 	}
 }

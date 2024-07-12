@@ -9,7 +9,6 @@
 namespace TestHelpers;
 
 use GuzzleHttp\Exception\GuzzleException;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -124,6 +123,31 @@ class OcmHelper {
 		string $password
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'find-accepted-users');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function listInvite(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'list-invite');
 		return HttpRequestHelper::get(
 			$url,
 			$xRequestId,
