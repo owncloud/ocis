@@ -214,7 +214,7 @@ func (s *Service) OpenInApp(
 	wopiContext := middleware.WopiContext{
 		AccessToken:   cryptedReqAccessToken,
 		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
-		FileReference: providerFileRef,
+		FileReference: &providerFileRef,
 		User:          user,
 		ViewMode:      req.GetViewMode(),
 		EditAppUrl:    editAppURL,

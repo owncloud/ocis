@@ -89,7 +89,7 @@ func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
 	logger := zerolog.Ctx(ctx)
 
 	req := &providerv1beta1.GetLockRequest{
-		Ref: &wopiContext.FileReference,
+		Ref: wopiContext.FileReference,
 	}
 
 	resp, err := f.gwc.GetLock(ctx, req)
@@ -158,7 +158,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 	if oldLockID == "" {
 		// If the oldLockID is empty, this is a "LOCK" request
 		req := &providerv1beta1.SetLockRequest{
-			Ref: &wopiContext.FileReference,
+			Ref: wopiContext.FileReference,
 			Lock: &providerv1beta1.Lock{
 				LockId:  lockID,
 				AppName: f.cfg.App.LockName + "." + f.cfg.App.Name,
@@ -179,7 +179,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 		// If the oldLockID isn't empty, this is a "UnlockAndRelock" request. We'll
 		// do a "RefreshLock" in reva and provide the old lock
 		req := &providerv1beta1.RefreshLockRequest{
-			Ref: &wopiContext.FileReference,
+			Ref: wopiContext.FileReference,
 			Lock: &providerv1beta1.Lock{
 				LockId:  lockID,
 				AppName: f.cfg.App.LockName + "." + f.cfg.App.Name,
@@ -211,7 +211,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 		// In both cases, we need to get the current lock to return it in a
 		// 409 response if needed
 		req := &providerv1beta1.GetLockRequest{
-			Ref: &wopiContext.FileReference,
+			Ref: wopiContext.FileReference,
 		}
 
 		resp, err := f.gwc.GetLock(ctx, req)
@@ -292,7 +292,7 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 	}
 
 	req := &providerv1beta1.RefreshLockRequest{
-		Ref: &wopiContext.FileReference,
+		Ref: wopiContext.FileReference,
 		Lock: &providerv1beta1.Lock{
 			LockId:  lockID,
 			AppName: f.cfg.App.LockName + "." + f.cfg.App.Name,
@@ -330,7 +330,7 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 		// Either the file is unlocked or there is no lock
 		// We need to return 409 with the current lock
 		req := &providerv1beta1.GetLockRequest{
-			Ref: &wopiContext.FileReference,
+			Ref: wopiContext.FileReference,
 		}
 
 		resp, err := f.gwc.GetLock(ctx, req)
@@ -400,7 +400,7 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 	}
 
 	req := &providerv1beta1.UnlockRequest{
-		Ref: &wopiContext.FileReference,
+		Ref: wopiContext.FileReference,
 		Lock: &providerv1beta1.Lock{
 			LockId:  lockID,
 			AppName: f.cfg.App.LockName + "." + f.cfg.App.Name,
@@ -424,7 +424,7 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 	case rpcv1beta1.Code_CODE_LOCKED:
 		// We need to return 409 with the current lock
 		req := &providerv1beta1.GetLockRequest{
-			Ref: &wopiContext.FileReference,
+			Ref: wopiContext.FileReference,
 		}
 
 		resp, err := f.gwc.GetLock(ctx, req)
@@ -485,7 +485,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 	logger := zerolog.Ctx(ctx)
 
 	statRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
-		Ref: &wopiContext.FileReference,
+		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("CheckFileInfo: stat failed")
