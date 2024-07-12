@@ -2647,4 +2647,58 @@ class GraphContext implements Context {
 			"Response contains email '$email' but should not."
 		);
 	}
+
+	/**
+	 * @Then user :byUser using password :password should be able to create a new user :user with default attributes
+	 *
+	 * @param string $byUser
+	 * @param string $password
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userUsingPasswordShouldBeAbleToCreateANewUserWithDefaultAttributes(string $byUser, string $password, string $user): void {
+		$response = GraphHelper::createUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$byUser,
+			$password,
+			$user,
+			$this->featureContext->getPasswordForUser($user)
+		);
+		Assert::assertEquals(
+			201,
+			$response->getStatusCode(),
+			__METHOD__ . " cannot create new user '$user' by user '$byUser'.\nResponse:" .
+			json_encode($this->featureContext->getJsonDecodedResponse($response))
+		);
+		$this->featureContext->addUserToCreatedUsersList($user, $this->featureContext->getPasswordForUser($user));
+	}
+
+	/**
+	 * @Given user :byUser has changed the username to :userName
+	 *
+	 * @param string $byUser
+	 * @param string $userName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function theUserHasChangedItsOwnUsernameTo(string $byUser, string $userName): void {
+		$userId = $this->featureContext->getUserIdByUserName($byUser);
+		$response = GraphHelper::editUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$byUser,
+			$this->featureContext->getPasswordForUser($byUser),
+			$userId,
+			'PATCH',
+			$userName,
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+		$this->featureContext->updateUsernameInCreatedUserList($byUser, $userName);
+	}
 }
