@@ -1,10 +1,12 @@
 // set the attribute to true or leave empty, true without any quotes.
+// if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
+// if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
 
 :show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-12-00-02-50]
+[#deprecation-note-2024-07-12-16-06-01]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -19,6 +21,8 @@ ifeval::[{show-deprecation} == true]
 | 6.0.0
 | Use 'starttls' instead of 'tls' and 'ssltls' instead of 'ssl'.
 |===
+
+{empty} +
 
 endif::[]
 
@@ -221,7 +225,7 @@ a| [subs=-attributes]
 Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none' or 'auto'. If set to 'auto' or unset, the authentication method is automatically negotiated with the server.
 
 a|`NOTIFICATIONS_SMTP_ENCRYPTION` +
-xref:deprecation-note-2024-07-12-00-02-50[Deprecation Note]
+xref:deprecation-note-2024-07-12-16-06-01[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

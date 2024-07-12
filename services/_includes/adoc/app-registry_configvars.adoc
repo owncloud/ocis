@@ -1,10 +1,12 @@
 // set the attribute to true or leave empty, true without any quotes.
+// if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
+// if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
 
 :show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-12-00-02-50]
+[#deprecation-note-2024-07-12-16-06-01]
 [caption=]
 .Deprecation notes for the app-registry service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -14,6 +16,8 @@ ifeval::[{show-deprecation} == true]
 | Removal Version
 | Deprecation Replacement
 |===
+
+{empty} +
 
 endif::[]
 
