@@ -100,23 +100,8 @@ func DecodeString(s string) (string, error) {
 		} else {
 			// utf7 range
 			utf7ByteRange := byteArray[v.Low:v.High]
-			if len(utf7ByteRange) == 2 && utf7ByteRange[0] == '+' && utf7ByteRange[1] == '-' {
-				// special case for the "+-" sequence -> just write "+" as replacement
-				sb.WriteByte('+')
-			} else {
-				// utf7 range must start with "+" and should (but might not) end with "-"
-				// we need to remove those chars before decoding
-				toDecode := byteArray[v.Low+1 : v.High-1]
-				if byteArray[v.High-1] != '-' {
-					toDecode = byteArray[v.Low+1 : v.High]
-				}
-				runeArray, err := convertFromUtf7(toDecode)
-				if err != nil {
-					return "", err
-				}
-				for _, r := range runeArray {
-					sb.WriteRune(r)
-				}
+			if err := convertRangeFromUtf7(utf7ByteRange, &sb); err != nil {
+				return "", err
 			}
 		}
 	}
@@ -267,6 +252,32 @@ func convertToUtf7(runes []rune) []byte {
 	base64.RawStdEncoding.Encode(dst[1:len(dst)-1], byteArray)
 	dst[len(dst)-1] = '-'
 	return dst
+}
+
+// convertRangeFromUtf7 will convert an utf7 byte range (enclosed in
+// the "+" and "-" chars) and write the result in the provided string builder.
+// The string builder won't be modified other than to append the result.
+// An error might be returned if there is any problem with the conversion.
+func convertRangeFromUtf7(utf7ByteRange []byte, sb *strings.Builder) error {
+	if len(utf7ByteRange) == 2 && utf7ByteRange[0] == '+' && utf7ByteRange[1] == '-' {
+		// special case for the "+-" sequence -> just write "+" as replacement
+		sb.WriteByte('+')
+	} else {
+		// utf7 range must start with "+" and should (but might not) end with "-"
+		// we need to remove those chars before decoding
+		toDecode := utf7ByteRange[1 : len(utf7ByteRange)-1]
+		if utf7ByteRange[len(utf7ByteRange)-1] != '-' {
+			toDecode = utf7ByteRange[1:]
+		}
+		runeArray, err := convertFromUtf7(toDecode)
+		if err != nil {
+			return err
+		}
+		for _, r := range runeArray {
+			sb.WriteRune(r)
+		}
+	}
+	return nil
 }
 
 // convertFromUtf7 will convert the sequence of bytes to runes. The sequence

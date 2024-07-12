@@ -23,6 +23,8 @@ const (
 	HeaderWopiSize          string = "X-WOPI-Size"
 	HeaderWopiValidRT       string = "X-WOPI-ValidRelativeTarget"
 	HeaderWopiRequestedName string = "X-WOPI-RequestedName"
+	HeaderContentLength     string = "Content-Length"
+	HeaderContentType       string = "Content-Type"
 )
 
 // HttpAdapter will adapt the responses from the connector to HTTP.
@@ -171,8 +173,8 @@ func (h *HttpAdapter) UnLock(w http.ResponseWriter, r *http.Request) {
 func (h *HttpAdapter) CheckFileInfo(w http.ResponseWriter, r *http.Request) {
 	fileCon := h.con.GetFileConnector()
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", "0")
+	w.Header().Set(HeaderContentType, "application/json")
+	w.Header().Set(HeaderContentLength, "0")
 
 	fileInfo, err := fileCon.CheckFileInfo(r.Context())
 	if err != nil {
@@ -190,10 +192,11 @@ func (h *HttpAdapter) CheckFileInfo(w http.ResponseWriter, r *http.Request) {
 	jsonFileInfo, err := json.Marshal(fileInfo)
 	if err != nil {
 		logger.Error().Err(err).Msg("CheckFileInfo: failed to marshal fileinfo")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Length", strconv.Itoa(len(jsonFileInfo)))
+	w.Header().Set(HeaderContentLength, strconv.Itoa(len(jsonFileInfo)))
 	w.WriteHeader(http.StatusOK)
 	bytes, err := w.Write(jsonFileInfo)
 
@@ -257,8 +260,8 @@ func (h *HttpAdapter) PutRelativeFile(w http.ResponseWriter, r *http.Request) {
 	relativeTarget := r.Header.Get(HeaderWopiRT)
 	suggestedTarget := r.Header.Get(HeaderWopiST)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", "0")
+	w.Header().Set(HeaderContentType, "application/json")
+	w.Header().Set(HeaderContentLength, "0")
 
 	if relativeTarget != "" && suggestedTarget != "" {
 		// headers are mutually exclusive
@@ -290,17 +293,9 @@ func (h *HttpAdapter) PutRelativeFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var conError *ConnectorError
-	if putErr != nil {
-		if errors.As(putErr, &conError) {
-			if headers != nil {
-				w.Header().Set(HeaderWopiValidRT, utf7.EncodeString(headers.ValidTarget))
-				w.Header().Set(HeaderWopiLock, headers.LockID)
-			}
-			// we might still need to send a body, so we'll hold the write for now
-		} else {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
+	if putErr != nil && !errors.As(putErr, &conError) {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	logger := zerolog.Ctx(r.Context())
@@ -308,11 +303,16 @@ func (h *HttpAdapter) PutRelativeFile(w http.ResponseWriter, r *http.Request) {
 	jsonFileInfo, err := json.Marshal(response)
 	if err != nil {
 		logger.Error().Err(err).Msg("PutRelativeFile: failed to marshal response")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Length", strconv.Itoa(len(jsonFileInfo)))
+	w.Header().Set(HeaderContentLength, strconv.Itoa(len(jsonFileInfo)))
 	if conError != nil {
+		if headers != nil {
+			w.Header().Set(HeaderWopiValidRT, utf7.EncodeString(headers.ValidTarget))
+			w.Header().Set(HeaderWopiLock, headers.LockID)
+		}
 		w.WriteHeader(conError.HttpCodeOut)
 	} else {
 		w.WriteHeader(http.StatusOK)
@@ -384,10 +384,11 @@ func (h *HttpAdapter) RenameFile(w http.ResponseWriter, r *http.Request) {
 	jsonFileInfo, err := json.Marshal(response)
 	if err != nil {
 		logger.Error().Err(err).Msg("RenameFile: failed to marshal response")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Length", strconv.Itoa(len(jsonFileInfo)))
+	w.Header().Set(HeaderContentLength, strconv.Itoa(len(jsonFileInfo)))
 	w.WriteHeader(http.StatusOK)
 	bytes, err := w.Write(jsonFileInfo)
 
