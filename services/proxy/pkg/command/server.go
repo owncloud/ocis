@@ -294,10 +294,12 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		})
 	}
 
-	authenticators = append(authenticators, middleware.AppAuthAuthenticator{
-		Logger:              logger,
-		RevaGatewaySelector: gatewaySelector,
-	})
+	if cfg.AuthMiddleware.AllowAppAuth {
+		authenticators = append(authenticators, middleware.AppAuthAuthenticator{
+			Logger:              logger,
+			RevaGatewaySelector: gatewaySelector,
+		})
+	}
 	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
 		Logger:              logger,
 		RevaGatewaySelector: gatewaySelector,

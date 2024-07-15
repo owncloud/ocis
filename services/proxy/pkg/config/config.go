@@ -91,6 +91,7 @@ var (
 // AuthMiddleware configures the proxy http auth middleware.
 type AuthMiddleware struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
+	AllowAppAuth           bool              `yaml:"allow_app_auth" env:"PROXY_ENABLE_APP_AUTH" desc:"Allow app authentication. This can be used to authenticate 3rd party applications. Note that auth-app service must be running for this feature to work." introductionVersion:"%NEXT%"`
 }
 
 // PoliciesMiddleware configures the proxy's policies middleware.

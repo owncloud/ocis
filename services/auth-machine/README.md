@@ -7,6 +7,7 @@ ocis uses serveral authentication services for different use cases. All services
   -   `auth-bearer` handles oidc authentication
   -   `auth-machine` handles interservice authentication when a user is impersonated
   -   `auth-service` handles interservice authentication when using service accounts
+  -   `auth-app` handles authentication of external 3rd party apps
 
 ## User Impersonation
 
