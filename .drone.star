@@ -1414,7 +1414,7 @@ def dockerRelease(ctx, arch, repo, build_type):
                 },
             },
             {
-                "name": "docker",
+                "name": "docker.io",
                 "image": PLUGINS_DOCKER,
                 "settings": {
                     "username": {
@@ -1423,6 +1423,33 @@ def dockerRelease(ctx, arch, repo, build_type):
                     "password": {
                         "from_secret": "docker_password",
                     },
+                    "registry": "docker.io",
+                    "auto_tag": True,
+                    "context": "ocis",
+                    "auto_tag_suffix": "linux-%s" % (arch),
+                    "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
+                    "repo": repo,
+                    "build_args": build_args,
+                },
+                "when": {
+                    "ref": {
+                        "exclude": [
+                            "refs/pull/**",
+                        ],
+                    },
+                },
+            },
+            {
+                "name": "quay.io",
+                "image": PLUGINS_DOCKER,
+                "settings": {
+                    "username": {
+                        "from_secret": "quay_username",
+                    },
+                    "password": {
+                        "from_secret": "quay_password",
+                    },
+                    "registry": "quay.io",
                     "auto_tag": True,
                     "context": "ocis",
                     "auto_tag_suffix": "linux-%s" % (arch),
