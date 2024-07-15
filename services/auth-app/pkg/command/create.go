@@ -3,12 +3,16 @@ package command
 import (
 	"context"
 	"fmt"
+
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/auth/scope"
+
+	"time"
 
 	applicationsv1beta1 "github.com/cs3org/go-cs3apis/cs3/auth/applications/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -19,7 +23,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/config/parser"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/grpc/metadata"
-	"time"
 )
 
 // Create is the entrypoint for the app auth create command
@@ -30,16 +33,14 @@ func Create(cfg *config.Config) *cli.Command {
 		Category: "maintenance",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "user-name",
-				Value:    "",
-				Usage:    "the user name",
-				Required: true,
+				Name:  "user-name",
+				Value: "",
+				Usage: "user to create the app-token for",
 			},
-			&cli.IntFlag{
-				Name:     "expiration",
-				Value:    72,
-				Usage:    "expiration of the app password in hours",
-				Required: false,
+			&cli.StringFlag{
+				Name:  "expiration",
+				Value: "72h",
+				Usage: "expiration of the app password, e.g. 72h, 1h, 1m, 1s. Default is 72h.",
 			},
 		},
 		Before: func(_ *cli.Context) error {
@@ -67,22 +68,36 @@ func Create(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			userID := c.String("user-name")
+			userName := c.String("user-name")
+			if userName == "" {
+				fmt.Printf("Username to create app token for: ")
+				if _, err := fmt.Scanln(&userName); err != nil {
+					return err
+				}
+			}
+
 			ctx := context.Background()
 			authRes, err := next.Authenticate(ctx, &gatewayv1beta1.AuthenticateRequest{
 				Type:         "machine",
-				ClientId:     "username:" + userID,
-				ClientSecret: cfg.Commons.MachineAuthAPIKey,
+				ClientId:     "username:" + userName,
+				ClientSecret: cfg.MachineAuthAPIKey,
 			})
 			if err != nil {
 				return err
 			}
+			if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+				return fmt.Errorf("error authenticating user: %s", authRes.GetStatus().GetMessage())
+			}
+
 			granteeCtx := ctxpkg.ContextSetUser(context.Background(), &userpb.User{Id: authRes.GetUser().GetId()})
 			granteeCtx = metadata.AppendToOutgoingContext(granteeCtx, ctxpkg.TokenHeader, authRes.GetToken())
 
-			exp := c.Int("expiration")
-			expiryDuration := time.Duration(exp) * time.Hour
 			scopes, err := scope.AddOwnerScope(map[string]*authpb.Scope{})
+			if err != nil {
+				return err
+			}
+
+			expiry, err := time.ParseDuration(c.String("expiration"))
 			if err != nil {
 				return err
 			}
@@ -91,16 +106,16 @@ func Create(cfg *config.Config) *cli.Command {
 				TokenScope: scopes,
 				Label:      "Generated via CLI",
 				Expiration: &typesv1beta1.Timestamp{
-					Seconds: uint64(time.Now().Add(expiryDuration).Unix()),
+					Seconds: uint64(time.Now().Add(expiry).Unix()),
 				},
 			})
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("App password created for %s", authRes.GetUser().GetUsername())
+			fmt.Printf("App token created for %s", authRes.GetUser().GetUsername())
 			fmt.Println()
-			fmt.Printf(" password: %s", appPassword.GetAppPassword().GetPassword())
+			fmt.Printf(" token: %s", appPassword.GetAppPassword().GetPassword())
 			fmt.Println()
 
 			return nil
