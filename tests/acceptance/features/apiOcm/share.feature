@@ -8,7 +8,7 @@ Feature: an user shares resources usin ScienceMesh application
     And using server "REMOTE"
     And user "Brian" has been created with default attributes and without skeleton files
 
-
+  @issue-9534
   Scenario: users shares folder to federation users after receiver accepted invitation
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation
@@ -87,7 +87,7 @@ Feature: an user shares resources usin ScienceMesh application
       }
       """
 
-
+  @issue-9534
   Scenario: users shares folder to federation users after accepting invitation
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation

@@ -14,28 +14,7 @@ Feature: accepting invitation
 
   Scenario: user accepts invitation
     Given using server "LOCAL"
-    When "Alice" creates the federation share invitation
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-      """
-      {
-        "type": "object",
-        "required": [
-          "expiration",
-          "token"
-        ],
-        "properties": {
-          "expiration": {
-            "type": "integer",
-            "pattern": "^[0-9]{10}$"
-          },
-          "token": {
-            "type": "string",
-            "pattern": "^%fed_invitation_token_pattern%$"
-          }
-        }
-      }
-      """
+    And "Alice" has created the federation share invitation
     When using server "REMOTE"
     And "Brian" accepts the last federation share invitation
     Then the HTTP status code should be "200"
@@ -43,28 +22,7 @@ Feature: accepting invitation
 
   Scenario: user accepts invitation sent with email and description
     Given using server "LOCAL"
-    When "Alice" creates the federation share invitation with email "alice@example.com" and description "a share invitation from Alice"
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-      """
-      {
-        "type": "object",
-        "required": [
-          "expiration",
-          "token"
-        ],
-        "properties": {
-          "expiration": {
-            "type": "integer",
-            "pattern": "^[0-9]{10}$"
-          },
-          "token": {
-            "type": "string",
-            "pattern": "^%fed_invitation_token_pattern%$"
-          }
-        }
-      }
-      """
+    And "Alice" has created the federation share invitation with email "brian@example.com" and description "a share invitation from Alice"
     When using server "REMOTE"
     And "Brian" accepts the last federation share invitation
     Then the HTTP status code should be "200"
@@ -135,3 +93,56 @@ Feature: accepting invitation
         }
       }
       """
+
+  @env-config
+  Scenario: user cannot accept expired invitation tokens
+    Given using server "LOCAL"
+    And the config "OCM_OCM_INVITE_MANAGER_TOKEN_EXPIRATION" has been set to "1s"
+    And "Alice" has created the federation share invitation
+    When using server "REMOTE"
+    And the user waits "2" seconds for the token to expire
+    And "Brian" tries to accept the last federation share invitation
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "INVALID_PARAMETER"
+          },
+          "message": {
+            "const": "token has expired"
+          }
+        }
+      }
+      """
+
+
+  Scenario: user cannot accept invalid invitation token
+    Given using server "LOCAL"
+    And "Alice" tries to accept the invitation with invalid token
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "RESOURCE_NOT_FOUND"
+          },
+          "message": {
+            "const": "token not found"
+          }
+        }
+      }
+      """
+

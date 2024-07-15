@@ -389,6 +389,7 @@ default:
         - OcmContext:
         - SharingNgContext:
         - SpacesContext:
+        - OcisConfigContext:
 
     cliCommands:
       paths:
