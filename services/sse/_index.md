@@ -1,6 +1,6 @@
 ---
 title: SSE
-date: 2024-07-15T00:07:40.37476946Z
+date: 2024-07-15T03:27:56.211535383Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/sse
