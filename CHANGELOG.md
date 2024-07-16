@@ -48,11 +48,20 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix crash on empty tracing provider: [#9622](https://github.com/owncloud/ocis/pull/9622)
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 * Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
 * Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
 
 ## Details
+
+* Bugfix - Fix crash on empty tracing provider: [#9622](https://github.com/owncloud/ocis/pull/9622)
+
+   We have fixed a bug that causes a crash when OCIS_TRACING_ENABLED is set to
+   true, but no tracing Endpoints or Collectors have been provided.a
+
+   https://github.com/owncloud/ocis/issues/7012
+   https://github.com/owncloud/ocis/pull/9622
 
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 
