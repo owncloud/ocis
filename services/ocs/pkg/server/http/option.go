@@ -7,6 +7,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/config"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/metrics"
 	"github.com/urfave/cli/v2"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -14,12 +15,13 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Namespace string
-	Logger    log.Logger
-	Context   context.Context
-	Config    *config.Config
-	Metrics   *metrics.Metrics
-	Flags     []cli.Flag
+	Namespace     string
+	Logger        log.Logger
+	Context       context.Context
+	Config        *config.Config
+	Metrics       *metrics.Metrics
+	Flags         []cli.Flag
+	TraceProvider trace.TracerProvider
 }
 
 // newOptions initializes the available default options.
@@ -72,5 +74,12 @@ func Flags(val []cli.Flag) Option {
 func Namespace(val string) Option {
 	return func(o *Options) {
 		o.Namespace = val
+	}
+}
+
+// TraceProvider provides a function to set the TraceProvider option.
+func TraceProvider(tp trace.TracerProvider) Option {
+	return func(o *Options) {
+		o.TraceProvider = tp
 	}
 }
