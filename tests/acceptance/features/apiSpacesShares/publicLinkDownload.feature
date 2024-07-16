@@ -24,7 +24,7 @@ Feature: Public can download folders from project space public link
       | permissionsRole | view      |
     When public downloads the folder "NewFolder" from the last created public link using the public files API
     Then the HTTP status code should be "200"
-    And the downloaded tar archive should contain these files:
+    And the downloaded zip archive should contain these files:
       | name               | content      |
       | NewFolder/test.txt | some content |
 
@@ -42,6 +42,6 @@ Feature: Public can download folders from project space public link
       | permissionsRole | view        |
     When public downloads the folder "folder" from the last created public link using the public files API
     Then the HTTP status code should be "200"
-    And the downloaded tar archive should contain these files:
+    And the downloaded zip archive should contain these files:
       | name            | content      |
       | folder/test.txt | some content |

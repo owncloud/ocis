@@ -22,7 +22,7 @@ Feature: download multiple resources bundled into an archive
       | textfile0.txt | some data |
     Examples:
       | user-agent | archive-type |
-      | Linux      | tar          |
+      | Linux      | zip          |
       | Windows NT | zip          |
 
 
@@ -40,7 +40,7 @@ Feature: download multiple resources bundled into an archive
       | my_data/an_other_file.txt | more data |
     Examples:
       | user-agent | archive-type |
-      | Linux      | tar          |
+      | Linux      | zip          |
       | Windows NT | zip          |
 
 
@@ -57,7 +57,7 @@ Feature: download multiple resources bundled into an archive
       | my_data       |
       | more_data     |
     Then the HTTP status code should be "200"
-    And the downloaded tar archive should contain these files:
+    And the downloaded zip archive should contain these files:
       | name                        | content    |
       | textfile0.txt               | some data  |
       | textfile1.txt               | other data |
@@ -110,7 +110,7 @@ Feature: download multiple resources bundled into an archive
       | /Shares/my_data       |
       | /Shares/more_data     |
     Then the HTTP status code should be "200"
-    And the downloaded tar archive should contain these files:
+    And the downloaded zip archive should contain these files:
       | name                        | content    |
       | textfile0.txt               | some data  |
       | textfile1.txt               | other data |
