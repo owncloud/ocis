@@ -3,10 +3,10 @@ package theme
 import (
 	"bytes"
 	"encoding/json"
+	"strings"
 
 	"dario.cat/mergo"
 	"github.com/spf13/afero"
-	"github.com/tidwall/sjson"
 )
 
 // KV is a generic key-value map.
@@ -27,30 +27,33 @@ func MergeKV(values ...KV) (KV, error) {
 }
 
 // PatchKV injects the given values into to v.
-func PatchKV(v any, values KV) error {
-	bv, err := json.Marshal(v)
-	if err != nil {
-		return err
+func PatchKV(v map[string]interface{}, values KV) KV {
+	if v == nil {
+		v = KV{}
 	}
-
-	nv := string(bv)
-
 	for k, val := range values {
-		var err error
-		switch val {
-		// if the value is nil, we delete the key
-		case nil:
-			nv, err = sjson.Delete(nv, k)
-		default:
-			nv, err = sjson.Set(nv, k, val)
-		}
+		t := v
+		path := strings.Split(k, ".")
+		for i, p := range path {
+			if i == len(path)-1 {
+				switch val {
+				// if the value is nil, we delete the key
+				case nil:
+					delete(t, p)
+				default:
+					t[p] = val
+				}
+				break
+			}
 
-		if err != nil {
-			return err
+			if _, ok := t[p]; !ok {
+				t[p] = map[string]interface{}{}
+			}
+
+			t = t[p].(map[string]interface{})
 		}
 	}
-
-	return json.Unmarshal([]byte(nv), v)
+	return v
 }
 
 // LoadKV loads a key-value map from the given file system.
@@ -89,10 +92,7 @@ func UpdateKV(fsys afero.Fs, p string, values KV) error {
 		kv = existing
 	}
 
-	err = PatchKV(&kv, values)
-	if err != nil {
-		return err
-	}
+	kv = PatchKV(kv, values)
 
 	return WriteKV(fsys, p, kv)
 }

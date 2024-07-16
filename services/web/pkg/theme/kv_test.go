@@ -32,19 +32,20 @@ func TestMergeKV(t *testing.T) {
 
 func TestPatchKV(t *testing.T) {
 	in := theme.KV{
-		"a": theme.KV{
+		"a": map[string]interface{}{
 			"value": "a",
 		},
-		"b": theme.KV{
+		"b": map[string]interface{}{
 			"value": "b",
 		},
 	}
-	err := theme.PatchKV(&in, theme.KV{
-		"b.value": "b-new",
-		"c.value": "c-new",
+	out := theme.PatchKV(in, theme.KV{
+		"b.value":          "b-new",
+		"c.value":          "c-new",
+		"d":                "d-new",
+		"e.value.subvalue": "e-new",
 	})
-	assert.Nil(t, err)
-	assert.Equal(t, in, theme.KV{
+	assert.Equal(t, theme.KV{
 		"a": map[string]interface{}{
 			"value": "a",
 		},
@@ -54,7 +55,55 @@ func TestPatchKV(t *testing.T) {
 		"c": map[string]interface{}{
 			"value": "c-new",
 		},
+		"d": "d-new",
+		"e": map[string]interface{}{
+			"value": map[string]interface{}{
+				"subvalue": "e-new",
+			},
+		},
+	}, out)
+}
+
+func TestPatchKVUnset(t *testing.T) {
+	in := theme.KV{
+		"a": map[string]interface{}{
+			"value": "a",
+		},
+		"b": map[string]interface{}{
+			"value": "b",
+		},
+	}
+	out := theme.PatchKV(in, theme.KV{
+		"a.value": nil,
+		"b":       nil,
 	})
+	assert.Equal(t, theme.KV{
+		"a": map[string]interface{}{},
+	}, out)
+}
+
+func TestPatchKVwithNil(t *testing.T) {
+	var in theme.KV
+	out := theme.PatchKV(in, theme.KV{
+		"b.value":          "b-new",
+		"c.value":          "c-new",
+		"d":                "d-new",
+		"e.value.subvalue": "e-new",
+	})
+	assert.Equal(t, theme.KV{
+		"b": map[string]interface{}{
+			"value": "b-new",
+		},
+		"c": map[string]interface{}{
+			"value": "c-new",
+		},
+		"d": "d-new",
+		"e": map[string]interface{}{
+			"value": map[string]interface{}{
+				"subvalue": "e-new",
+			},
+		},
+	}, out)
 }
 
 func TestLoadKV(t *testing.T) {
@@ -113,10 +162,10 @@ func TestUpdateKV(t *testing.T) {
 
 	fsys := fsx.NewMemMapFs()
 	assert.Nil(t, afero.WriteFile(fsys, "some.json", wb, 0644))
-	assert.Nil(t, theme.UpdateKV(fsys, "some.json", theme.KV{
+	_ = theme.UpdateKV(fsys, "some.json", theme.KV{
 		"b.value": "b-new",
 		"c.value": "c-new",
-	}))
+	})
 
 	f, err := fsys.Open("some.json")
 	assert.Nil(t, err)
