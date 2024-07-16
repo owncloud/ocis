@@ -11,20 +11,20 @@ ocis uses serveral authentication services for different use cases. All services
   -   `auth-service` handles interservice authentication when using service accounts
   -   `auth-app` handles authentication of external 3rd party apps
 
-## Optional Service
+## Service Startup
 
-This service is an optional service that will not run with default settings. To start use it, two envvars need to be set:
+Because this service is not started automatically, a manual start needs to be initiated which can be done in several ways. To configure the service usage, an environment variable for the proxy service needs to be set to allow app authentication.
 ```bash
-OCIS_ADD_RUN_SERVICES=auth-app # to start the service. Alternatively you can start the service explicitly via the command line.
-PROXY_ENABLE_APP_AUTH=true # to allow app authentication. This envvar goes to the proxy service in case of a distributed environment.
+OCIS_ADD_RUN_SERVICES=auth-app  # deployment specific. Add the service to the manual startup list, use with binary deployments. Alternatively you can start the service explicitly via the command line.
+PROXY_ENABLE_APP_AUTH=true      # mandatory, allow app authentication. In case of a distributed environment, this envvar needs to be set in the the proxy service.
 ```
 
 ## App Tokens
 
-App Tokens are used to authenticate 3rd party apps. To be able to use an app token, one must first create a token via cli.
+App Tokens are used to authenticate 3rd party access via https like when using curl (apps) to access an API endpoint. These apps need to authenticate themselve as no logged in user authenticates the request. To be able to use an app token, one must first create a token via the cli. Replace the `user-name` with an existing user. For the `token-expiration`, you can use any time abbreviation from the following list: `h, m, s`. Examples: `72h` or `1h` or `1m` or `1s.` Default is `72h`.
 
 ```bash
 ocis auth-app create --user-name={user-name} --expiration={token-expiration}
 ```
 
-Once generated, these tokens can be used to authenticate requests to the oCIS services. They can be passed in any request as `Basic Auth` header.
+Once generated, these tokens can be used to authenticate requests to ocis. They are passed as part of the request as `Basic Auth` header.
