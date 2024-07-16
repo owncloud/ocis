@@ -210,3 +210,28 @@ Feature: Email notification
 
       Zum Ansehen hier klicken: %base_url%/files/shares/with-me
       """
+
+  @issue-9530
+  Scenario: user gets an email notification when someone with comma in display name shares a file
+    Given the administrator has assigned the role "Admin" to user "Brian" using the Graph API
+    And the user "Brian" has created a new user with the following attributes:
+      | userName    | Carol             |
+      | displayName | Carol, King       |
+      | email       | carol@example.com |
+      | password    | 1234              |
+    And user "Carol" has uploaded file with content "sample text" to "lorem.txt"
+    When user "Carol" sends the following resource share invitation using the Graph API:
+      | resource        | lorem.txt |
+      | space           | Personal  |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have received the following email from user "Carol"
+      """
+      Hello Brian Murphy
+
+      Carol, King has shared "lorem.txt" with you.
+
+      Click here to view it: %base_url%/files/shares/with-me
+      """
