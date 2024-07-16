@@ -41,7 +41,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/gdexlab/go-render/render"
-	ua "github.com/mileusna/useragent"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
 )
@@ -232,6 +231,10 @@ func (s *svc) Handler() http.Handler {
 		if !ok {
 			ids = []string{}
 		}
+		format := v.Get("output-format")
+		if format == "" {
+			format = "zip"
+		}
 
 		resources, err := s.getResources(ctx, paths, ids)
 		if err != nil {
@@ -248,26 +251,24 @@ func (s *svc) Handler() http.Handler {
 			return
 		}
 
-		userAgent := ua.Parse(r.Header.Get("User-Agent"))
-
 		archName := s.config.Name
-		if userAgent.OS == ua.Windows {
-			archName += ".zip"
-		} else {
+		if format == "tar" {
 			archName += ".tar"
+		} else {
+			archName += ".zip"
 		}
 
-		s.log.Debug().Msg("Requested the following resoucres to archive: " + render.Render(resources))
+		s.log.Debug().Msg("Requested the following resources to archive: " + render.Render(resources))
 
 		rw.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", archName))
 		rw.Header().Set("Content-Transfer-Encoding", "binary")
 
 		// create the archive
 		var closeArchive func()
-		if userAgent.OS == ua.Windows {
-			closeArchive, err = arch.CreateZip(ctx, rw)
-		} else {
+		if format == "tar" {
 			closeArchive, err = arch.CreateTar(ctx, rw)
+		} else {
+			closeArchive, err = arch.CreateZip(ctx, rw)
 		}
 		defer closeArchive()
 

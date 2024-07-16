@@ -354,8 +354,31 @@ func (store OcisStore) updateExistingNode(ctx context.Context, session *OcisSess
 		versionPath := session.store.lu.InternalPath(spaceID, n.ID+node.RevisionIDDelimiter+oldNodeMtime.UTC().Format(time.RFC3339Nano))
 
 		// create version node
-		if _, err := os.Create(versionPath); err != nil {
-			return unlock, err
+		_, err := os.OpenFile(versionPath, os.O_CREATE|os.O_EXCL, 0600)
+		if err != nil {
+			if !errors.Is(err, os.ErrExist) {
+				return unlock, err
+			}
+
+			// a revision with this mtime does already exist.
+			// If the blobs are the same we can just delete the old one
+			if err := validateChecksums(ctx, old, session, versionPath); err != nil {
+				return unlock, err
+			}
+
+			// delete old blob
+			bID, err := session.store.lu.ReadBlobIDAttr(ctx, versionPath)
+			if err != nil {
+				return unlock, err
+			}
+			if err := session.store.tp.DeleteBlob(&node.Node{BlobID: bID, SpaceID: n.SpaceID}); err != nil {
+				return unlock, err
+			}
+
+			// clean revision file
+			if _, err := os.Create(versionPath); err != nil {
+				return unlock, err
+			}
 		}
 
 		// copy blob metadata to version node
@@ -378,4 +401,30 @@ func (store OcisStore) updateExistingNode(ctx context.Context, session *OcisSess
 	session.info.MetaData["sizeDiff"] = strconv.FormatInt((int64(fsize) - old.Blobsize), 10)
 
 	return unlock, nil
+}
+
+func validateChecksums(ctx context.Context, n *node.Node, session *OcisSession, versionPath string) error {
+	for _, t := range []string{"md5", "sha1", "adler32"} {
+		key := prefixes.ChecksumPrefix + t
+
+		checksum, err := n.Xattr(ctx, key)
+		if err != nil {
+			return err
+		}
+
+		revisionChecksum, err := session.store.lu.MetadataBackend().Get(ctx, versionPath, key)
+		if err != nil {
+			return err
+		}
+
+		if string(checksum) == "" || string(revisionChecksum) == "" {
+			return errors.New("checksum not found")
+		}
+
+		if string(checksum) != string(revisionChecksum) {
+			return errors.New("checksum mismatch")
+		}
+	}
+
+	return nil
 }

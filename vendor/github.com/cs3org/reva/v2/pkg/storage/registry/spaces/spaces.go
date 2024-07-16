@@ -264,7 +264,7 @@ func (r *registry) GetProvider(ctx context.Context, space *providerpb.StorageSpa
 // matches = /foo/bar       <=> /foo/bar        -> list(spaceid, .)
 // below   = /foo/bar/bif   <=> /foo/bar        -> list(spaceid, ./bif)
 func (r *registry) ListProviders(ctx context.Context, filters map[string]string) ([]*registrypb.ProviderInfo, error) {
-	b, _ := strconv.ParseBool(filters["unique"])
+	unique, _ := strconv.ParseBool(filters["unique"])
 	unrestricted, _ := strconv.ParseBool(filters["unrestricted"])
 	mask := filters["mask"]
 	switch {
@@ -284,7 +284,7 @@ func (r *registry) ListProviders(ctx context.Context, filters map[string]string)
 
 		return r.findProvidersForResource(ctx, id, findMountpoint, findGrant, unrestricted, mask), nil
 	case filters["path"] != "":
-		return r.findProvidersForAbsolutePathReference(ctx, filters["path"], b, unrestricted, mask), nil
+		return r.findProvidersForAbsolutePathReference(ctx, filters["path"], unique, unrestricted, mask), nil
 	case len(filters) == 0:
 		// return all providers
 		return r.findAllProviders(ctx, mask), nil
