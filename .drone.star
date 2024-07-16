@@ -1917,7 +1917,7 @@ def releaseDockerReadme(ctx, repo, build_type):
         },
         "steps": [
             {
-                "name": "execute",
+                "name": "execute docker.io",
                 "image": CHKO_DOCKER_PUSHRM,
                 "environment": {
                     "DOCKER_USER": {
@@ -1929,6 +1929,22 @@ def releaseDockerReadme(ctx, repo, build_type):
                     "PUSHRM_TARGET": repo,
                     "PUSHRM_SHORT": "Docker images for %s" % (ctx.repo.name),
                     "PUSHRM_FILE": "README.md",
+                },
+            },
+            {
+                "name": "execute quay.io",
+                "image": CHKO_DOCKER_PUSHRM,
+                "environment": {
+                    "DOCKER_USER": {
+                        "from_secret": "quay_username",
+                    },
+                    "DOCKER_PASS": {
+                        "from_secret": "quay_password",
+                    },
+                    "PUSHRM_TARGET": repo,
+                    "PUSHRM_SHORT": "Docker images for %s" % (ctx.repo.name),
+                    "PUSHRM_FILE": "README.md",
+                    "PUSHRM_PROVIDER": "quay",
                 },
             },
         ],
