@@ -672,6 +672,28 @@ class TrashbinContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has deleted the (?:file|folder|entry) with original path "([^"]*)" from the trashbin$/
+	 *
+	 * @param string $user
+	 * @param string $originalPath
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHasDeletedTheFolderWithOriginalPathFromTheTrashbin(string $user, string $originalPath):void {
+		$responseArray = $this->tryToDeleteFileFromTrashbin($user, $originalPath);
+		$numItemDeleted = \count($responseArray);
+		Assert::assertEquals(
+			1,
+			$numItemDeleted,
+			"Expected to delete exactly one item from the trashbin but $numItemDeleted were deleted"
+		);
+		foreach ($responseArray as $response) {
+			$this->featureContext->theHTTPStatusCodeShouldBe(204, '', $response);
+		}
+	}
+
+	/**
 	 * @When /^user "([^"]*)" deletes the following (?:files|folders|entries) with original path from the trashbin$/
 	 *
 	 * @param string $user
