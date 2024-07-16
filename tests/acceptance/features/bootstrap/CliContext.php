@@ -82,6 +82,7 @@ class CliContext implements Context {
 			"command" => $command,
 			"inputs" => [$password, $password]
 		];
+
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 		if ($status === "non-existing") {
 			return;
@@ -97,6 +98,20 @@ class CliContext implements Context {
 	public function theAdministratorChecksTheBackupConsistencyUsingTheCli():void {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "backup consistency -p $path";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator removes all the file versions using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRemovesAllVersionsOfResources() {
+		$path = $this->featureContext->getStorageUsersRoot();
+		$command = "revisions purge -p $path --dry-run=false";
 		$body = [
 			"command" => $command
 		];
