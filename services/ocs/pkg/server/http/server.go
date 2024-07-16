@@ -2,18 +2,17 @@ package http
 
 import (
 	"fmt"
-
 	"github.com/cs3org/reva/v2/pkg/store"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	ocsmw "github.com/owncloud/ocis/v2/services/ocs/pkg/middleware"
 	svc "github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0"
 	ocisstore "github.com/owncloud/ocis/v2/services/store/pkg/store"
 	"go-micro.dev/v4"
 	microstore "go-micro.dev/v4/store"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 // Server initializes the http service and server.
@@ -29,6 +28,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
+		http.TraceProvider(options.TraceProvider),
 	)
 	if err != nil {
 		options.Logger.Error().
@@ -74,16 +74,11 @@ func Server(opts ...Option) (http.Service, error) {
 				version.GetString(),
 			),
 			middleware.Logger(options.Logger),
-			ocsmw.LogTrace,
+			middleware.TraceContext,
+			otelhttp.NewMiddleware(options.Config.Service.Name, otelhttp.WithTracerProvider(options.TraceProvider)),
 		),
 		svc.Store(signingKeyStore),
 	)
-
-	{
-		handle = svc.NewInstrument(handle, options.Metrics)
-		handle = svc.NewLogging(handle, options.Logger)
-		handle = svc.NewTracing(handle)
-	}
 
 	if err := micro.RegisterHandler(service.Server(), handle); err != nil {
 		return http.Service{}, err

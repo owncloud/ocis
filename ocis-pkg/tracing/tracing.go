@@ -86,6 +86,8 @@ func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdkt
 					jaeger.WithEndpoint(collector),
 				),
 			)
+		} else {
+			return sdktrace.NewTracerProvider(sdktrace.WithSampler(sdktrace.NeverSample())), nil
 		}
 		if err != nil {
 			return nil, err
