@@ -9,7 +9,7 @@ import (
 
 // NatsWatcher is the watcher of the nats interface
 type NatsWatcher interface {
-	Watch(bucket string) (nats.KeyWatcher, error)
+	WatchAll(bucket string, opts ...nats.WatchOpt) (nats.KeyWatcher, error)
 }
 
 // Watcher is used to keep track of changes in the registry
@@ -26,7 +26,7 @@ func NewWatcher(s *storeregistry) (*Watcher, error) {
 		return nil, errors.New("store does not implement watcher interface")
 	}
 
-	watcher, err := w.Watch("service-registry")
+	watcher, err := w.WatchAll("service-registry")
 	if err != nil {
 		return nil, err
 	}

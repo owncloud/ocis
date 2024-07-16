@@ -966,7 +966,7 @@ github.com/go-micro/plugins/v4/server/http
 # github.com/go-micro/plugins/v4/store/nats-js v1.2.1-0.20231129143103-d72facc652f0
 ## explicit; go 1.21
 github.com/go-micro/plugins/v4/store/nats-js
-# github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-20231226212146-94a49ba3e06e
+# github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-20231226212146-94a49ba3e06e => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240716134540-6dfbf5819fbf
 ## explicit; go 1.21
 github.com/go-micro/plugins/v4/store/nats-js-kv
 # github.com/go-micro/plugins/v4/store/redis v1.2.1
@@ -2435,3 +2435,4 @@ stash.kopano.io/kgol/rndm
 # github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
 # github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
+# github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240716134540-6dfbf5819fbf
