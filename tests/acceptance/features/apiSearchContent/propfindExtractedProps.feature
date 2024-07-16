@@ -76,3 +76,52 @@ Feature: propfind extracted props
       | oc:photo/oc:f-number             | 4.5                  |
       | oc:photo/oc:focal-length         | 6                    |
 
+
+  Scenario: check extracted properties of a file by sharee from shares space
+    Given these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+    And user "Alice" has uploaded file "filesForUpload/testaudio.mp3" to "testaudio.mp3"
+    And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testaudio.mp3 |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Brian" has a share "testaudio.mp3" synced
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testavatar.jpg |
+      | space           | Personal       |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | Viewer         |
+    And user "Brian" has a share "testavatar.jpg" synced
+    When user "Brian" gets the following extracted properties of resource "testaudio.mp3" inside space "Shares" using the WebDAV API
+      | propertyName |
+      | oc:audio     |
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response to user "Brian" should contain a space "Shares" with these key and value pairs:
+      | key                | value                          |
+      | oc:audio/oc:album  | ALBUM1234567890123456789012345 |
+      | oc:audio/oc:artist | ARTIST123456789012345678901234 |
+      | oc:audio/oc:genre  | Pop                            |
+      | oc:audio/oc:title  | TITLE1234567890123456789012345 |
+      | oc:audio/oc:track  | 1                              |
+      | oc:audio/oc:year   | 2001                           |
+    When user "Brian" gets the following extracted properties of resource "testavatar.jpg" inside space "Shares" using the WebDAV API
+      | propertyName |
+      | oc:image     |
+      | oc:location  |
+      | oc:photo     |
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response to user "Brian" should contain a space "Shares" with these key and value pairs:
+      | key                              | value                |
+      | oc:image/oc:width                | 640                  |
+      | oc:image/oc:height               | 480                  |
+      | oc:location/oc:latitude          | 43.467157            |
+      | oc:location/oc:longitude         | 11.885395            |
+      | oc:photo/oc:camera-make          | NIKON                |
+      | oc:photo/oc:camera-model         | COOLPIX P6000        |
+      | oc:photo/oc:f-number             | 4.5                  |
+      | oc:photo/oc:focal-length         | 6                    |
