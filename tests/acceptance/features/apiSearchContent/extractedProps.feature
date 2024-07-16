@@ -389,3 +389,147 @@ Feature: propfind extracted props
           }
         }
       """
+
+
+  Scenario: GET extracted properties of an audio file (Shares space)
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded a file "filesForUpload/testaudio.mp3" to "testaudio.mp3" in space "Personal"
+    And user "Alice" has sent the following resource share invitation:
+      | resource           | testaudio.mp3        |
+      | space              | Personal             |
+      | sharee             | Brian                |
+      | shareType          | user                 |
+      | permissionsRole    | Viewer               |
+    When user "Brian" gets the file "testaudio.mp3" from space "Shares" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+        {
+          "type": "object",
+          "required": [
+            "audio"
+          ],
+          "properties": {
+            "audio": {
+              "type": "object",
+              "required": [
+                "album",
+                "artist",
+                "genre",
+                "title",
+                "track",
+                "year"
+              ],
+              "properties": {
+                "album": {
+                  "const": "ALBUM1234567890123456789012345"
+                },
+                "artist": {
+                  "const": "ARTIST123456789012345678901234"
+                },
+                "genre": {
+                  "const": "Pop"
+                },
+                "title": {
+                  "const": "TITLE1234567890123456789012345"
+                },
+                "track": {
+                  "const": 1
+                },
+                "year": {
+                  "const": 2001
+                }
+              }
+            }
+          }
+        }
+      """
+
+
+  Scenario: GET extracted properties of an image file (Shares space)
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded a file "filesForUpload/testavatar.jpg" to "testavatar.jpg" in space "Personal"
+    And user "Alice" has sent the following resource share invitation:
+      | resource           | testavatar.jpg       |
+      | space              | Personal             |
+      | sharee             | Brian                |
+      | shareType          | user                 |
+      | permissionsRole    | Viewer               |
+    When user "Brian" gets the file "testavatar.jpg" from space "Shares" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+        {
+          "type": "object",
+          "required": [
+            "image",
+            "location",
+            "photo"
+          ],
+          "properties": {
+            "image": {
+              "type": "object",
+              "required": [ "height", "width" ],
+              "properties": {
+                "height": {
+                  "const": 480
+                },
+                "width": {
+                  "const": 640
+                }
+              }
+            },
+            "location": {
+              "type": "object",
+              "required": [ "latitude", "longitude" ],
+              "properties": {
+                "latitude": {
+                  "const": 43.467157
+                },
+                "longitude": {
+                  "const": 11.885395
+                }
+              }
+            },
+            "photo": {
+              "type": "object",
+              "required": [
+                "cameraMake",
+                "cameraModel",
+                "exposureDenominator",
+                "exposureNumerator",
+                "fNumber",
+                "focalLength",
+                "orientation",
+                "takenDateTime"
+              ],
+              "properties": {
+                "cameraMake": {
+                  "const": "NIKON"
+                },
+                "cameraModel": {
+                  "const": "COOLPIX P6000"
+                },
+                "exposureDenominator": {
+                  "const": 178
+                },
+                "exposureNumerator": {
+                  "const": 1
+                },
+                "fNumber": {
+                  "const": 4.5
+                },
+                "focalLength": {
+                  "const": 6
+                },
+                "orientation": {
+                  "const": 1
+                },
+                "takenDateTime": {
+                  "const": "2008-10-22T16:29:49Z"
+                }
+              }
+            }
+          }
+        }
+      """
