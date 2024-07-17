@@ -841,7 +841,7 @@ func (s *svc) Unlock(ctx context.Context, req *provider.UnlockRequest) (*provide
 
 // Stat returns the Resoure info for a given resource by forwarding the request to the responsible provider.
 func (s *svc) Stat(ctx context.Context, req *provider.StatRequest) (*provider.StatResponse, error) {
-	c, _, ref, err := s.findAndUnwrapUnique(ctx, req.Ref)
+	c, _, ref, err := s.findAndUnwrap(ctx, req.Ref)
 	if err != nil {
 		return &provider.StatResponse{
 			Status: status.NewNotFound(ctx, fmt.Sprintf("gateway could not find space for ref=%+v", req.Ref)),
@@ -1019,30 +1019,6 @@ func (s *svc) GetQuota(ctx context.Context, req *gateway.GetQuotaRequest) (*prov
 // - contains the provider path, which is the mount point of the provider
 // - may contain a list of storage spaces with their id and space path
 func (s *svc) find(ctx context.Context, ref *provider.Reference) (provider.ProviderAPIClient, *registry.ProviderInfo, error) {
-	p, err := s.findSpaces(ctx, ref)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	client, err := s.getStorageProviderClient(ctx, p[0])
-	return client, p[0], err
-}
-
-// findSpacesProvider looks up the provider that is responsible for the given request
-// It will return a client that the caller can use to make the call, as well as the ProviderInfo. It:
-// - contains the provider path, which is the mount point of the provider
-// - may contain a list of storage spaces with their id and space path
-func (s *svc) findSpacesProvider(ctx context.Context, ref *provider.Reference) (provider.SpacesAPIClient, *registry.ProviderInfo, error) {
-	p, err := s.findSpaces(ctx, ref)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	client, err := s.getSpacesProviderClient(ctx, p[0])
-	return client, p[0], err
-}
-
-func (s *svc) findUnique(ctx context.Context, ref *provider.Reference) (provider.ProviderAPIClient, *registry.ProviderInfo, error) {
 	p, err := s.findSingleSpace(ctx, ref)
 	if err != nil {
 		return nil, nil, err
@@ -1052,31 +1028,22 @@ func (s *svc) findUnique(ctx context.Context, ref *provider.Reference) (provider
 	return client, p[0], err
 }
 
-// FIXME findAndUnwrap currently just returns the first provider ... which may not be what is needed.
-// for the ListRecycle call we need an exact match, for Stat and List we need to query all related providers
-func (s *svc) findAndUnwrap(ctx context.Context, ref *provider.Reference) (provider.ProviderAPIClient, *registry.ProviderInfo, *provider.Reference, error) {
-	c, p, err := s.find(ctx, ref)
+// findSpacesProvider looks up the spaces provider that is responsible for the given request
+// It will return a client that the caller can use to make the call, as well as the ProviderInfo. It:
+// - contains the provider path, which is the mount point of the provider
+// - may contain a list of storage spaces with their id and space path
+func (s *svc) findSpacesProvider(ctx context.Context, ref *provider.Reference) (provider.SpacesAPIClient, *registry.ProviderInfo, error) {
+	p, err := s.findSingleSpace(ctx, ref)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
-	var (
-		root      *provider.ResourceId
-		mountPath string
-	)
-	for _, space := range decodeSpaces(p) {
-		mountPath = decodePath(space)
-		root = space.Root
-		break // TODO can there be more than one space for a path?
-	}
-
-	relativeReference := unwrap(ref, mountPath, root)
-
-	return c, p, relativeReference, nil
+	client, err := s.getSpacesProviderClient(ctx, p[0])
+	return client, p[0], err
 }
 
-func (s *svc) findAndUnwrapUnique(ctx context.Context, ref *provider.Reference) (provider.ProviderAPIClient, *registry.ProviderInfo, *provider.Reference, error) {
-	c, p, err := s.findUnique(ctx, ref)
+func (s *svc) findAndUnwrap(ctx context.Context, ref *provider.Reference) (provider.ProviderAPIClient, *registry.ProviderInfo, *provider.Reference, error) {
+	c, p, err := s.find(ctx, ref)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1129,39 +1096,6 @@ func (s *svc) getStorageRegistryClient(_ context.Context, address string) (regis
 		c:     c,
 		cache: s.providerCache,
 	}, nil
-}
-
-func (s *svc) findSpaces(ctx context.Context, ref *provider.Reference) ([]*registry.ProviderInfo, error) {
-	switch {
-	case ref == nil:
-		return nil, errtypes.BadRequest("missing reference")
-	case ref.ResourceId != nil:
-		if ref.ResourceId.OpaqueId == "" {
-			ref.ResourceId.OpaqueId = ref.ResourceId.SpaceId
-		}
-	case ref.Path != "": //  TODO implement a mount path cache in the registry?
-		// nothing to do here either
-	default:
-		return nil, errtypes.BadRequest("invalid reference, at least path or id must be set")
-	}
-
-	filters := map[string]string{
-		"mask": "root", // we only need the root for routing
-		"path": ref.Path,
-	}
-	if ref.ResourceId != nil {
-		filters["storage_id"] = ref.ResourceId.StorageId
-		filters["space_id"] = ref.ResourceId.SpaceId
-		filters["opaque_id"] = ref.ResourceId.OpaqueId
-	}
-
-	listReq := &registry.ListStorageProvidersRequest{
-		Opaque: &typesv1beta1.Opaque{Map: make(map[string]*typesv1beta1.OpaqueEntry)},
-	}
-
-	sdk.EncodeOpaqueMap(listReq.Opaque, filters)
-
-	return s.findProvider(ctx, listReq)
 }
 
 func (s *svc) findSingleSpace(ctx context.Context, ref *provider.Reference) ([]*registry.ProviderInfo, error) {

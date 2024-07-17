@@ -21,7 +21,7 @@ Feature: Download space
     Given user "Alice" has uploaded a file inside space "Project-space" with content "other data" to "file2.txt"
     When user "Alice" downloads the space "Project-space" using the WebDAV API
     Then the HTTP status code should be "200"
-    And the downloaded "tar" archive should contain these files:
+    And the downloaded "zip" archive should contain these files:
       | name             | content           |
       | file1.txt        | some data         |
       | file2.txt        | other data        |
@@ -36,7 +36,7 @@ Feature: Download space
       | permissionsRole | <space-role>  |
     When user "Brian" downloads the space "Project-space" using the WebDAV API
     Then the HTTP status code should be "200"
-    And the downloaded "tar" archive should contain these files:
+    And the downloaded "zip" archive should contain these files:
       | name             | content           |
       | file1.txt        | some data         |
       | .space/readme.md | space description |
