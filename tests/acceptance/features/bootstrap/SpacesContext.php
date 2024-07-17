@@ -4094,4 +4094,30 @@ class SpacesContext implements Context {
 			"OCS status code is not any of the expected values " . \implode(",", $statusCodes) . " got " . $responseStatusCode
 		);
 	}
+
+	/**
+	 * @When user :user gets the file :file from space :space using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $space
+	 *
+	 * @return void
+	 */
+	public function userGetsTheDriveItemInSpace(string $user, string $file, string $space):void {
+		$spaceId = ($this->getSpaceByName($user, $space))["id"];
+		$itemId = $this->getFileId($user, $space, $file);
+		$url = $this->featureContext->getBaseUrl() . "/graph/v1.0/drives/$spaceId/items/$itemId";
+		// NOTE: extracting properties occurs asynchronously
+		// short wait is necessary before getting those properties
+		sleep(2);
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$url,
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+			)
+		);
+	}
 }
