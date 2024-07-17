@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-16-14-18-51]
+[#deprecation-note-2024-07-17-04-05-57]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -174,7 +174,7 @@ Disable chat in the frontend.
 
 a|`OCIS_REVA_GATEWAY` +
 `COLLABORATION_CS3API_GATEWAY_NAME` +
-xref:deprecation-note-2024-07-16-14-18-51[Deprecation Note]
+xref:deprecation-note-2024-07-17-04-05-57[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
