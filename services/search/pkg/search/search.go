@@ -10,7 +10,9 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/conversions"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/grants"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -140,6 +142,9 @@ func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.
 		p.GetCreateContainer() &&
 		p.GetInitiateFileUpload() {
 		fmt.Fprintf(&b, "CK")
+	}
+	if grants.PermissionsEqual(p, conversions.NewSecureViewerRole().CS3ResourcePermissions()) {
+		fmt.Fprintf(&b, "X")
 	}
 	return b.String()
 }
