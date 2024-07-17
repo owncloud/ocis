@@ -184,10 +184,10 @@ Feature: create files and folder
       | new              | /..       | 405              |
       | new              | /../lorem | 400              |
       | new              |           | 400              |
-      | spaces           | /.        | 500              |
+      | spaces           | /.        | 400              |
       | spaces           | /..       | 405              |
-      | spaces           | /../lorem | 404              |
-      | spaces           |           | 500              |
+      | spaces           | /../lorem | 400              |
+      | spaces           |           | 400              |
 
 
   Scenario Outline: try to create folder with '.', '..' and 'empty'
