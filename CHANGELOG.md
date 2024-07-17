@@ -53,6 +53,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
 * Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
 * Enhancement - Bump reva: [#9621](https://github.com/owncloud/ocis/pull/9621)
+* Enhancement - Bump commitID for web: [#9631](https://github.com/owncloud/ocis/pull/9631)
 
 ## Details
 
@@ -98,6 +99,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#9621](https://github.com/owncloud/ocis/pull/9621)
 
    https://github.com/owncloud/ocis/pull/9621
+
+* Enhancement - Bump commitID for web: [#9631](https://github.com/owncloud/ocis/pull/9631)
+
+   Bump the web commitID to current master
+
+   https://github.com/owncloud/ocis/pull/9631
 
 # Changelog for [6.1.0] (2024-07-08)
 
