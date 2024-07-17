@@ -310,7 +310,7 @@ func setCmd(cfg *config.Config) *cli.Command {
 func backend(root, backend string) metadata.Backend {
 	switch backend {
 	case "xattrs":
-		return metadata.XattrsBackend{}
+		return metadata.NewXattrsBackend(root, cache.Config{})
 	case "mpk":
 		return metadata.NewMessagePackBackend(root, cache.Config{})
 	}
