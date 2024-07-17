@@ -52,6 +52,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 * Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
 * Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
+* Enhancement - Bump reva: [#9621](https://github.com/owncloud/ocis/pull/9621)
 
 ## Details
 
@@ -93,6 +94,10 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9585
    https://github.com/owncloud/web/releases/tag/v9.2.0-alpha.1
+
+* Enhancement - Bump reva: [#9621](https://github.com/owncloud/ocis/pull/9621)
+
+   https://github.com/owncloud/ocis/pull/9621
 
 # Changelog for [6.1.0] (2024-07-08)
 
