@@ -300,10 +300,6 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			RevaGatewaySelector: gatewaySelector,
 		})
 	}
-	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
-		Logger:              logger,
-		RevaGatewaySelector: gatewaySelector,
-	})
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
 		middleware.UserInfoCache(userInfoCache),
@@ -359,7 +355,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.CredentialsByUserAgent(cfg.AuthMiddleware.CredentialsByUserAgent),
 			middleware.Logger(logger),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
-			middleware.EnableBasicAuth(true),
+			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
 			middleware.TraceProvider(traceProvider),
 		),
 		middleware.AccountResolver(
