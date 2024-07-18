@@ -65,6 +65,7 @@ linters-settings:
       - github.com/studio-b12/gowebdav
       - github.com/egirna/icap-client
       - github.com/unrolled/secure
+      - github.com/go-micro/plugins/v4/store/nats-js-kv
   interfacebloat:
     max: 15
 
