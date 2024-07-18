@@ -32,6 +32,7 @@ use TestHelpers\OcisConfigHelper;
  */
 class CliContext implements Context {
 	private FeatureContext $featureContext;
+	private SpacesContext $spacesContext;
 
 	/**
 	 * @BeforeScenario
@@ -45,6 +46,7 @@ class CliContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
+		$this->spacesContext = $environment->getContext('SpacesContext');
 	}
 
 	/**
@@ -112,6 +114,25 @@ class CliContext implements Context {
 	public function theAdministratorRemovesAllVersionsOfResources() {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "revisions purge -p $path --dry-run=false";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator removes the versions of file :file of user :user from space :space using the CLI
+	 *
+	 * @param string $file
+	 * @param string $user
+	 * @param string $space
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRemovesTheVersionsOfFileUsingFileId($file, $user, $space) {
+		$path = $this->featureContext->getStorageUsersRoot();
+		$fileId = $this->spacesContext->getFileId($user, $space, $file);
+		$command = "revisions purge -p $path -r $fileId --dry-run=false";
 		$body = [
 			"command" => $command
 		];
