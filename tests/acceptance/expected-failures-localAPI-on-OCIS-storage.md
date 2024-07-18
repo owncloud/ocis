@@ -74,30 +74,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiGraphUserGroup/addUserToGroup.feature:289](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L289)
 
-#### [API requests from an unauthorized user should return 403](https://github.com/owncloud/ocis/issues/5938)
-
-- [apiGraphUserGroup/addUserToGroup.feature:152](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L152)
-- [apiGraphUserGroup/addUserToGroup.feature:153](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L153)
-- [apiGraphUserGroup/addUserToGroup.feature:154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L154)
-- [apiGraphUserGroup/addUserToGroup.feature:188](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L188)
-- [apiGraphUserGroup/addUserToGroup.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L189)
-- [apiGraphUserGroup/addUserToGroup.feature:190](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L190)
-- [apiGraphUserGroup/createGroup.feature:42](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/createGroup.feature#L42)
-- [apiGraphUserGroup/createGroup.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/createGroup.feature#L43)
-- [apiGraphUserGroup/createGroup.feature:44](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/createGroup.feature#L44)
-- [apiGraphUserGroup/deleteGroup.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/deleteGroup.feature#L63)
-- [apiGraphUserGroup/deleteGroup.feature:62](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/deleteGroup.feature#L62)
-- [apiGraphUserGroup/deleteGroup.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/deleteGroup.feature#L64)
-- [apiGraphUserGroup/editGroup.feature:35](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/editGroup.feature#L35)
-- [apiGraphUserGroup/editGroup.feature:34](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/editGroup.feature#L34)
-- [apiGraphUserGroup/editGroup.feature:36](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/editGroup.feature#L36)
-- [apiGraphUserGroup/getGroup.feature:107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getGroup.feature#L107)
-- [apiGraphUserGroup/getGroup.feature:108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getGroup.feature#L108)
-- [apiGraphUserGroup/getGroup.feature:109](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/getGroup.feature#L109)
-- [apiGraphUserGroup/removeUserFromGroup.feature:193](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/removeUserFromGroup.feature#L193)
-- [apiGraphUserGroup/removeUserFromGroup.feature:194](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/removeUserFromGroup.feature#L194)
-- [apiGraphUserGroup/removeUserFromGroup.feature:195](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/removeUserFromGroup.feature#L195)
-
 #### [API requests for a non-existent resources should return 404](https://github.com/owncloud/ocis/issues/5939)
 
 - [apiGraphUserGroup/addUserToGroup.feature:205](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L205)
@@ -305,7 +281,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:207](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L207)
 - [apiSpacesDavOperation/moveByFileId.feature:208](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L208)
 - [apiSpacesDavOperation/moveByFileId.feature:209](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L209)
-
 
 ### [OCM. sharing issues](https://github.com/owncloud/ocis/issues/9534)
 

@@ -95,7 +95,7 @@ Feature: get groups and their members
             "properties": {
               "message": {
                 "type": "string",
-                "enum": ["Unauthorized"]
+                "enum": ["Forbidden"]
               }
             }
           }

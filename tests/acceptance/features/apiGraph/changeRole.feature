@@ -51,7 +51,7 @@ Feature: change role
     Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" tries to change the role of user "Alice" to role "Admin" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And user "Brian" should have the role "User"
     Examples:
       | user-role   |

@@ -48,7 +48,7 @@ func RequireAdmin(rm *roles.Manager, logger log.Logger) func(next http.Handler) 
 				return
 			}
 
-			errorcode.AccessDenied.Render(w, r, http.StatusUnauthorized, "Unauthorized")
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "Forbidden")
 		})
 	}
 }

@@ -56,7 +56,7 @@ Feature: create user
       | email          | @example.org |
       | password       | 123          |
       | accountEnabled | true         |
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And user "user" should not exist
     Examples:
       | user-role   |
