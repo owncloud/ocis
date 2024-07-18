@@ -44,7 +44,7 @@ func Server(opts ...Option) (http.Service, error) {
 			options.Config.Service.Name+"."+options.Config.App.Name,
 			version.GetString(),
 		),
-		middleware.Logger(
+		colabmiddleware.AccessLog(
 			options.Logger,
 		),
 		middleware.ExtractAccountUUID(
