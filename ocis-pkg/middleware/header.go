@@ -7,7 +7,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 
-	chicors "github.com/go-chi/cors"
+	rscors "github.com/rs/cors"
 )
 
 // NoCache writes required cache headers to all requests.
@@ -31,10 +31,11 @@ func Cors(opts ...cors.Option) func(http.Handler) http.Handler {
 		Str("allowed_headers", strings.Join(options.AllowedHeaders, ", ")).
 		Bool("allow_credentials", options.AllowCredentials).
 		Msg("setup cors middleware")
-	return chicors.Handler(chicors.Options{
+	c := rscors.New(rscors.Options{
 		AllowedOrigins:   options.AllowedOrigins,
 		AllowedMethods:   options.AllowedMethods,
 		AllowedHeaders:   options.AllowedHeaders,
 		AllowCredentials: options.AllowCredentials,
 	})
+	return c.Handler
 }
