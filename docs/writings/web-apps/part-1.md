@@ -18,9 +18,12 @@ In this series, we will delve into the world of web applications in oCIS, focusi
 
 Web applications are essential for several reasons:
 
-1. **Accessibility**: Web applications can be accessed from any device with an internet connection, providing flexibility and convenience.
-2. **Customization**: They allow organizations to customize and extend the functionality of their platform to meet specific needs.
-3. **Integration**: Web applications enable seamless integration with third-party services and tools, enhancing overall functionality.
+1. **Accessibility**:\
+Web applications can be accessed from any device with an internet connection, providing flexibility and convenience.
+2. **Customization**:\
+They allow organizations to customize and extend the functionality of their platform to meet specific needs.
+3. **Integration**:\
+Web applications enable seamless integration with third-party services and tools, enhancing overall functionality.
 
 By leveraging web applications, organizations can create a more tailored and efficient environment for their users, ensuring that they have the tools they need to succeed.
 
@@ -30,20 +33,20 @@ By leveraging web applications, organizations can create a more tailored and eff
 
 The ability to provide custom extensions in oCIS opens up a myriad of possibilities for organizations. Here are some key use cases and benefits:
 
-1. **Tailored User Experience**: Custom extensions allow organizations to create a unique user experience that aligns with their specific needs.
-   For instance, a company can develop a custom dashboard that displays relevant metrics and reports, enhancing productivity and decision-making.
+1. **Tailored User Experience**:\
+Custom extensions allow organizations to create a unique user experience that aligns with their specific needs. For instance, a company can develop a custom dashboard that displays relevant metrics and reports, enhancing productivity and decision-making.
 
-2. **Third-Party Integrations**: Organizations can integrate third-party services and tools directly into their oCIS environment.
-   This can include CRM systems, marketing automation tools, or custom data visualization tools, providing a seamless workflow for users.
+2. **Third-Party Integrations**:\
+Organizations can integrate third-party services and tools directly into their oCIS environment. This can include CRM systems, marketing automation tools, or custom data visualization tools, providing a seamless workflow for users.
 
-3. **Enhanced Security and Compliance**: Custom extensions can help organizations adhere to specific security and compliance requirements by adding features like
-   custom authentication mechanisms, data encryption tools, or compliance reporting modules.
+3. **Enhanced Security and Compliance**:\
+Custom extensions can help organizations adhere to specific security and compliance requirements by adding features like custom authentication mechanisms, data encryption tools, or compliance reporting modules.
 
-4. **Branding and Identity**: By customizing the look and feel of the web applications, organizations can ensure their brand identity is consistently represented across their digital platforms.
-   This can include custom themes, logos, and color schemes.
+4. **Branding and Identity**:\
+By customizing the look and feel of the web applications, organizations can ensure their brand identity is consistently represented across their digital platforms. This can include custom themes, logos, and color schemes.
 
-5. **Innovative Features**: Custom extensions allow organizations to experiment with new features and functionalities that are not available in the default setup.
-   This can include AI-powered tools, advanced analytics, or unique collaboration features.
+5. **Innovative Features**:\
+Custom extensions allow organizations to experiment with new features and functionalities that are not available in the default setup. This can include AI-powered tools, advanced analytics, or unique collaboration features.
 
 The ability to provide custom extensions makes oCIS a powerful and flexible platform that can adapt to the evolving needs of any organization.
 
@@ -55,11 +58,11 @@ It empowers administrators to craft solutions that are not only functional but a
 
 In oCIS, extensions can be loaded at both build time and runtime. Understanding the difference between these two methods is key to effectively managing and utilizing extensions.
 
-- **Build Time Extensions**: These are integrated into the binary during the build process. They are part of the core system and cannot be altered without rebuilding the system.
-  This ensures a stable and consistent environment where critical applications are always available.
+- **Build Time Extensions**:\
+These are integrated into the binary during the build process. They are part of the core system and cannot be altered without rebuilding the system. This ensures a stable and consistent environment where critical applications are always available.
 
-- **Run Time Extensions**: These are loaded dynamically at runtime, providing greater flexibility.
-  They can be placed in a designated directory and are automatically picked up by the system. This allows administrators to easily add, update, or remove extensions as needed, without the need for a system rebuild.
+- **Run Time Extensions**:\
+These are loaded dynamically at runtime, providing greater flexibility. They can be placed in a designated directory and are automatically picked up by the system. This allows administrators to easily add, update, or remove extensions as needed, without the need for a system rebuild.
 
 ---
 
