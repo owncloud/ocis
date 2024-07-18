@@ -65,6 +65,7 @@ func (h *HttpAdapter) GetLock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set(HeaderWopiLock, lockID)
+	w.WriteHeader(http.StatusOK)
 }
 
 // Lock adapts the "Lock" and "UnlockAndRelock" operations for WOPI.
@@ -91,8 +92,7 @@ func (h *HttpAdapter) Lock(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	// If no error, a HTTP 200 should be sent automatically.
-	// X-WOPI-Lock header isn't needed on HTTP 200
+	w.WriteHeader(http.StatusOK)
 }
 
 // RefreshLock adapts the "RefreshLock" operation for WOPI
@@ -119,8 +119,7 @@ func (h *HttpAdapter) RefreshLock(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	// If no error, a HTTP 200 should be sent automatically.
-	// X-WOPI-Lock header isn't needed on HTTP 200
+	w.WriteHeader(http.StatusOK)
 }
 
 // UnLock adapts the "Unlock" operation for WOPI
@@ -145,8 +144,7 @@ func (h *HttpAdapter) UnLock(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	// If no error, a HTTP 200 should be sent automatically.
-	// X-WOPI-Lock header isn't needed on HTTP 200
+	w.WriteHeader(http.StatusOK)
 }
 
 // CheckFileInfo will retrieve the information of the file in json format
@@ -229,6 +227,5 @@ func (h *HttpAdapter) PutFile(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	// If no error, a HTTP 200 should be sent automatically.
-	// X-WOPI-Lock header isn't needed on HTTP 200
+	w.WriteHeader(http.StatusOK)
 }
