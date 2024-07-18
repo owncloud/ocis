@@ -1157,6 +1157,26 @@ trait Provisioning {
 	}
 
 	/**
+	 * @param string $oldUserName
+	 * @param string $newUserName
+	 *
+	 * @return void
+	 */
+	public function updateUsernameInCreatedUserList(string $oldUserName, string $newUserName) :void {
+		$normalizedUsername = $this->normalizeUsername($oldUserName);
+		$normalizeNewUserName = $this->normalizeUsername($newUserName);
+		if (\array_key_exists($normalizedUsername, $this->createdUsers)) {
+			foreach ($this->createdUsers as $createdUser) {
+				if ($createdUser['actualUsername'] === $oldUserName) {
+					$this->createdUsers[$normalizeNewUserName] = $this->createdUsers[$normalizedUsername];
+					$this->createdUsers[$normalizeNewUserName]['actualUsername'] = $newUserName;
+					unset($this->createdUsers[$normalizedUsername]);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Remembers that a user from the list of users that were created during
 	 * test runs is no longer expected to exist. Useful if a user was created
 	 * during the setup phase but was deleted in a test run. We don't expect

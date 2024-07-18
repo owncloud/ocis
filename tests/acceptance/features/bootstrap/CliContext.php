@@ -60,7 +60,7 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * @Given the administrator has started the server
+	 * @Given /^the administrator (?:starts|has started) the server$/
 	 *
 	 * @return void
 	 */
