@@ -39,7 +39,7 @@ Feature: edit/search user including email
   Scenario Outline: normal user should not be able to change their email address
     Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to change the email of user "Brian" to "newemail@example.com" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the user information of "Brian" should match this JSON schema
       """
       {
@@ -68,7 +68,7 @@ Feature: edit/search user including email
       | password    | 1234              |
     And the administrator has assigned the role "<user-role-2>" to user "Carol" using the Graph API
     When the user "Brian" tries to change the email of user "Carol" to "newemail@example.com" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the user information of "Carol" should match this JSON schema
       """
       {

@@ -60,7 +60,7 @@ Feature: delete user
   Scenario Outline: non-admin user tries to delete his/her own account
     Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Alice" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And user "Alice" should exist
     Examples:
       | user-role   |
@@ -78,7 +78,7 @@ Feature: delete user
   Scenario Outline: non-admin user tries to delete a nonexistent user
     Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When the user "Alice" tries to delete a nonexistent user using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     Examples:
       | user-role   |
       | Space Admin |
@@ -91,7 +91,7 @@ Feature: delete user
     And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
     And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And user "Brian" should exist
     Examples:
       | user-role   | user-role-2 |
@@ -126,7 +126,7 @@ Feature: delete user
     And the administrator has assigned the role "<user-role>" to user "Carol" using the Graph API
     And the user "Alice" has disabled user "Brian"
     When the user "Carol" deletes a user "Brian" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And user "Brian" should exist
     Examples:
       | user-role   | user-role-2 |

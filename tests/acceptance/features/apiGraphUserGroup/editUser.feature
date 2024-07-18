@@ -123,7 +123,7 @@ Feature: edit user
   Scenario Outline: normal user should not be able to change his/her own display name
     Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to change the display name of user "Brian" to "Brian Murphy" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the user information of "Alice" should match this JSON schema
       """
       {
@@ -155,7 +155,7 @@ Feature: edit user
       | password    | 1234              |
     And the administrator has assigned the role "<user-role-2>" to user "Carol" using the Graph API
     When the user "Brian" tries to change the display name of user "Carol" to "Alice Hansen" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the user information of "Carol" should match this JSON schema
       """
       {
@@ -204,7 +204,7 @@ Feature: edit user
     And the administrator has assigned the role "<user-role-2>" to user "Carol" using the Graph API
     And user "Carol" has uploaded file with content "test file for reset password" to "/resetpassword.txt"
     When the user "Brian" resets the password of user "Carol" to "newpassword" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the content of file "resetpassword.txt" for user "Carol" using password "1234" should be "test file for reset password"
     But user "Carol" using password "newpassword" should not be able to download file "resetpassword.txt"
     Examples:
@@ -264,7 +264,7 @@ Feature: edit user
     Given user "Carol" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to disable user "Carol" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     When user "Alice" gets information of user "Carol" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -347,7 +347,7 @@ Feature: edit user
     And the user "Alice" has disabled user "Carol"
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to enable user "Carol" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     When user "Alice" gets information of user "Carol" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match

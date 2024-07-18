@@ -180,7 +180,7 @@ Feature: remove a user from a group
             "properties": {
               "message": {
                 "type": "string",
-                "enum": ["Unauthorized"]
+                "enum": ["Forbidden"]
               }
             }
           }

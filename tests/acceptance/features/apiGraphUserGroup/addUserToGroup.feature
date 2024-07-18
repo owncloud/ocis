@@ -140,7 +140,7 @@ Feature: add users to group
             "properties": {
               "message": {
                 "type": "string",
-                "enum": ["Unauthorized"]
+                "enum": ["Forbidden"]
               }
             }
           }
@@ -176,7 +176,7 @@ Feature: add users to group
             "properties": {
               "message" : {
                 "type": "string",
-                "enum": ["Unauthorized"]
+                "enum": ["Forbidden"]
               }
             }
           }
