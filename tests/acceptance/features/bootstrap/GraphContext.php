@@ -2732,4 +2732,47 @@ class GraphContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 		$this->featureContext->updateUsernameInCreatedUserList($byUser, $userName);
 	}
+
+	/**
+	 * @When user :user gets a list of permissions role definitions using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function getListOfPermissionRoleDefinitionsUsingTheGraphAPI(string $user): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->setResponse(
+			GraphHelper::getPermissionsRoleDefinitions(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
+			)
+		);
+	}
+
+	/**
+	 * @When user :user gets the :permissionRole role definition using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $permissionRole
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function getPermissionRoleDefinitionUsingGraphAPI(string $user, string $permissionRole):void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->setResponse(
+			GraphHelper::getPermissionRoleDefinition(
+				$permissionRole,
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
+			)
+		);
+	}
 }
