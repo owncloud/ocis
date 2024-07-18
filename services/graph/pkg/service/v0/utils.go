@@ -145,7 +145,6 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 	identityCache identity.IdentityCache,
 	receivedShares []*collaboration.ReceivedShare) ([]libregraph.DriveItem, error) {
 
-	ch := make(chan libregraph.DriveItem)
 	group := new(errgroup.Group)
 	// Set max concurrency
 	group.SetLimit(10)
@@ -160,6 +159,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 		receivedSharesByResourceID[rIDStr] = append(receivedSharesByResourceID[rIDStr], receivedShare)
 	}
 
+	ch := make(chan libregraph.DriveItem, len(receivedSharesByResourceID))
 	for _, receivedSharesForResource := range receivedSharesByResourceID {
 		receivedShares := receivedSharesForResource
 
@@ -477,7 +477,6 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 	identityCache identity.IdentityCache,
 	receivedShares []*ocm.ReceivedShare) ([]libregraph.DriveItem, error) {
 
-	ch := make(chan libregraph.DriveItem)
 	group := new(errgroup.Group)
 	// Set max concurrency
 	group.SetLimit(10)
@@ -488,6 +487,7 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 		receivedSharesByResourceID[rIDStr] = append(receivedSharesByResourceID[rIDStr], receivedShare)
 	}
 
+	ch := make(chan libregraph.DriveItem, len(receivedSharesByResourceID))
 	for _, receivedSharesForResource := range receivedSharesByResourceID {
 		receivedShares := receivedSharesForResource
 
