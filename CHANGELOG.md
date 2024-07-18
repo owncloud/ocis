@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix restarting of postprocessing: [#6945](https://github.com/owncloud/ocis/pull/6945)
 * Bugfix - Fix crash on empty tracing provider: [#9622](https://github.com/owncloud/ocis/pull/9622)
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 * Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
@@ -56,6 +57,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump commitID for web: [#9631](https://github.com/owncloud/ocis/pull/9631)
 
 ## Details
+
+* Bugfix - Fix restarting of postprocessing: [#6945](https://github.com/owncloud/ocis/pull/6945)
+
+   We fixed a bug where non-admin requests to admin resources would get 401
+   Unauthorized. Now, the server sends 403 Forbidden response.
+
+   https://github.com/owncloud/ocis/issues/5938
+   https://github.com/owncloud/ocis/pull/6945
 
 * Bugfix - Fix crash on empty tracing provider: [#9622](https://github.com/owncloud/ocis/pull/9622)
 
