@@ -141,7 +141,7 @@ class GraphContext implements Context {
 		$response = $this->editUserUsingTheGraphApi($byUser, $user, $userName);
 		$this->featureContext->setResponse($response);
 		// need to add user to list to delete him after test
-		if (!empty($userName)) {
+		if (!empty($userName) && $this->featureContext->getAttributeOfCreatedUser($userName, 'id')) {
 			$this->featureContext->addUserToCreatedUsersList($userName, $this->featureContext->getUserPassword($user));
 		}
 	}
@@ -230,8 +230,7 @@ class GraphContext implements Context {
 	 */
 	public function editUserUsingTheGraphApi(string $byUser, string $user, string $userName = null, string $password = null, string $email = null, string $displayName = null, bool $accountEnabled = true, string $method="PATCH"): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-		$userId = $userId ?? $user;
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 		return GraphHelper::editUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -491,8 +490,7 @@ class GraphContext implements Context {
 	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$user = $this->featureContext->getActualUsername($user);
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		$userId = $userId ?? $user;
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id") ?: $user;
 		return GraphHelper::editUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -793,18 +791,20 @@ class GraphContext implements Context {
 
 	/**
 	 * @When the administrator tries to add nonexistent user to group :group using the Graph API
+	 * @When user :byUser tries to add nonexistent user to group :group using the Graph API
 	 *
 	 * @param string $group
+	 * @param string|null $byUser
 	 *
 	 * @return void
 	 */
-	public function theAdministratorTriesToAddNonExistentUserToGroupUsingTheGraphAPI(string $group): void {
-		$this->featureContext->setResponse($this->addUserToGroup($group, "nonexistent"));
+	public function theAdministratorTriesToAddNonExistentUserToGroupUsingTheGraphAPI(string $group, ?string $byUser = null): void {
+		$this->featureContext->setResponse($this->addUserToGroup($group, "nonexistent", $byUser));
 	}
 
 	/**
 	 * @When the administrator tries to add user :user to a nonexistent group using the Graph API
-	 * @When the user :byUser tries to add user :user to a nonexistent group using the Graph API
+	 * @When user :byUser tries to add user :user to a nonexistent group using the Graph API
 	 *
 	 * @param string $user
 	 * @param string|null $byUser
@@ -1038,7 +1038,7 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function userDeletesGroupUsingTheGraphApi(string $group, ?string $user = null): void {
-		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id") ?: $group;
 		$response = $this->deleteGroupWithId($groupId, $user);
 		if ($response->getStatusCode() === 204) {
 			$this->featureContext->rememberThatGroupIsNotExpectedToExist($group);
@@ -1750,7 +1750,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function theAdministratorHasGivenTheRoleUsingTheGraphApi(string $role, string $user): void {
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 
 		if (empty($this->appEntity)) {
 			$this->setApplicationEntity();
@@ -1783,13 +1783,36 @@ class GraphContext implements Context {
 	 */
 	public function userRetrievesAssignedRoleUsingTheGraphApi(string $user): void {
 		$admin = $this->featureContext->getAdminUserName();
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 		$this->featureContext->setResponse(
 			GraphHelper::getAssignedRole(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$admin,
 				$this->featureContext->getPasswordForUser($admin),
+				$userId
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" tries to get the assigned role of user "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $ofUser
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userTriesToGetAssignedRoleOfUserUsingTheGraphApi(string $user, string $ofUser): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$userId = $this->featureContext->getAttributeOfCreatedUser($ofUser, 'id') ?: $user;
+		$this->featureContext->setResponse(
+			GraphHelper::getAssignedRole(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
 				$userId
 			)
 		);
@@ -2323,7 +2346,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getAssignedRole(string $user): ResponseInterface {
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $this->featureContext->getUserIdByUserName($user);
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $this->featureContext->getUserIdByUserName($user);
 		return (
 			GraphHelper::getAssignedRole(
 				$this->featureContext->getBAseUrl(),
@@ -2347,9 +2370,17 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserUnassignsTheRoleOfUserUsingTheGraphApi(string $user, string $ofUser): void {
-		$userId = $this->featureContext->getAttributeOfCreatedUser($ofUser, 'id') ?? $ofUser;
 		$credentials = $this->getAdminOrUserCredentials($user);
-		$appRoleAssignmentId = $this->featureContext->getJsonDecodedResponse($this->getAssignedRole($ofUser))["value"][0]["id"];
+		$userId = $this->featureContext->getAttributeOfCreatedUser($ofUser, 'id');
+
+		// get 'User' role id for nonexistent user
+		if (!$userId && $ofUser !== $this->featureContext->getAdminUsername()) {
+			$appRoleAssignmentId = $this->getRoleIdByRoleName("User");
+		} else {
+			$appRoleAssignmentId = $this->featureContext->getJsonDecodedResponse($this->getAssignedRole($ofUser))["value"][0]["id"];
+		}
+
+		$userId = $userId ?: $ofUser;
 
 		$this->featureContext->setResponse(
 			GraphHelper::unassignRole(
@@ -2419,7 +2450,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function userChangesTheRoleOfUserToRoleUsingTheGraphApi(string $user, string $ofUser, string $role): void {
-		$userId = $this->featureContext->getAttributeOfCreatedUser($ofUser, 'id') ?? $ofUser;
+		$userId = $this->featureContext->getAttributeOfCreatedUser($ofUser, 'id') ?: $ofUser;
 		$credentials = $this->getAdminOrUserCredentials($user);
 		if (empty($this->appEntity)) {
 			$this->setApplicationEntity();

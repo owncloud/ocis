@@ -3,10 +3,12 @@ Feature: assign role
   I want to assign roles to users.
   So that users without an admin role cannot get the list of roles, assignments list and assign roles to users
 
-
-  Scenario Outline: assign role to the user using graph api
+  Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+
+
+  Scenario Outline: get assigned role of a user
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When the administrator retrieves the assigned role of user "Alice" using the Graph API
     Then the HTTP status code should be "200"
     And the Graph API response should have the role "<user-role>"
@@ -18,9 +20,8 @@ Feature: assign role
       | User Light  |
 
   @issue-5032
-  Scenario Outline: assign role to the user with graph api and list role with setting api
-    Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+  Scenario Outline: get assigned role of a user via setting api
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" tries to get list of assignment
     Then the HTTP status code should be "<http-status-code>"
     And the setting API response should have the role "<user-role>"
@@ -32,9 +33,8 @@ Feature: assign role
       | User Light  | 401              |
 
 
-  Scenario Outline: assign role to the user with setting api and list role with graph api
-    Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "<user-role>" using the settings api
+  Scenario Outline: get role of a user assigned via setting api
+    Given the administrator has given "Alice" the role "<user-role>" using the settings api
     When the administrator retrieves the assigned role of user "Alice" using the Graph API
     Then the HTTP status code should be "200"
     And the Graph API response should have the role "<user-role>"
@@ -44,3 +44,15 @@ Feature: assign role
       | Space Admin |
       | User        |
       | User Light  |
+
+
+  Scenario: non-admin user tries to get assigned role of another user
+    Given user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" tries to get the assigned role of user "Brian" using the Graph API
+    Then the HTTP status code should be "403"
+
+
+  Scenario: non-admin user tries to get assigned role of nonexistent user
+    Given user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" tries to get the assigned role of user "nonexistent" using the Graph API
+    Then the HTTP status code should be "403"

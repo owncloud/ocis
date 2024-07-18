@@ -375,7 +375,7 @@ Feature: upload file
     And for user "Alice" the content of the file "/textfile.txt" of the space "new-space" should be ""
 
   @issue-8699
-  Scenario: user updates a file inside a shared space with empty content
+  Scenario: user updates a file inside a link shared space with empty content
     Given using SharingNG
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API

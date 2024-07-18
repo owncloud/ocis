@@ -131,7 +131,7 @@ class SettingsContext implements Context {
 	public function theAdministratorHasGivenUserTheRole(string $user, string $role): void {
 		$admin = $this->featureContext->getAdminUserName();
 		$roleId = $this->getRoleIdByRoleName($admin, $role);
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 		$response = $this->assignRoleToUser($admin, $userId, $roleId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,

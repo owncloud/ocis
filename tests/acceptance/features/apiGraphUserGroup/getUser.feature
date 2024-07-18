@@ -55,7 +55,7 @@ Feature: get users
     Given the administrator has assigned the role "<user-role-2>" to user "Alice" using the Graph API
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Brian" tries to get information of user "Alice" using Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the JSON data of the response should match
       """
       {
@@ -72,7 +72,7 @@ Feature: get users
             "properties": {
               "message": {
                 "type": "string",
-                "const": "Unauthorized"
+                "const": "Forbidden"
               }
             }
           }
@@ -608,7 +608,7 @@ Feature: get users
     And group "coffee-lover" has been created
     And user "Brian" has been added to group "coffee-lover"
     When the user "Alice" gets user "Brian" along with his group information using Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the JSON data of the response should match
       """
       {
@@ -625,7 +625,7 @@ Feature: get users
             "properties": {
               "message": {
                 "type": "string",
-                "const": "Unauthorized"
+                "const": "Forbidden"
               }
             }
           }
@@ -646,6 +646,23 @@ Feature: get users
       | User Light  | User        |
       | User Light  | User Light  |
       | User Light  | Admin       |
+
+
+  Scenario: admin user tries to get the information of nonexistent user
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    When user "Alice" tries to get information of user "nonexistent" using Graph API
+    Then the HTTP status code should be "404"
+
+  @issue-5125
+  Scenario Outline: non-admin user tries to get the information of nonexistent user
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    When user "Alice" tries to get information of user "nonexistent" using Graph API
+    Then the HTTP status code should be "403"
+    Examples:
+      | user-role   |
+      | Space Admin |
+      | User        |
+      | User Light  |
 
 
   Scenario: admin user gets all users of certain groups

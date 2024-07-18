@@ -58,3 +58,15 @@ Feature: change role
       | Space Admin |
       | User        |
       | User Light  |
+
+
+  Scenario Outline: non-admin user tries to change the role of nonexistent user
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Alice" tries to change the role of user "nonexistent" to role "Admin" using the Graph API
+    Then the HTTP status code should be "403"
+    Examples:
+      | user-role   |
+      | Space Admin |
+      | User        |
+      | User Light  |

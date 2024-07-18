@@ -40,3 +40,15 @@ Feature: edit group name
     When user "Alice" tries to rename a nonexistent group to "grp1" using the Graph API
     Then the HTTP status code should be "404"
     And group "grp1" should not exist
+
+
+  Scenario Outline: non-admin user tries to rename nonexistent group
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    When user "Alice" tries to rename a nonexistent group to "grp1" using the Graph API
+    Then the HTTP status code should be "403"
+    And group "grp1" should not exist
+    Examples:
+      | user-role   |
+      | Space Admin |
+      | User        |
+      | User Light  |
