@@ -1,6 +1,6 @@
 ---
 title: Web
-date: 2024-07-17T09:52:50.975934214Z
+date: 2024-07-18T03:34:38.81371847Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/web
