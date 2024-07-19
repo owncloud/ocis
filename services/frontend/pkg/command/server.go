@@ -86,7 +86,7 @@ func Server(cfg *config.Config) *cli.Command {
 				sync.Trap(&gr, cancel)
 			}
 
-			httpSvc := registry.BuildHTTPService(cfg.HTTP.Namespace+"."+cfg.Service.Name, uuid.Must(uuid.NewV4()).String(), cfg.HTTP.Addr, version.GetString())
+			httpSvc := registry.BuildHTTPService(cfg.HTTP.Namespace+"."+cfg.Service.Name, cfg.HTTP.Addr, version.GetString())
 			if err := registry.RegisterService(ctx, httpSvc, logger); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the http service")
 			}
