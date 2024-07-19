@@ -40,22 +40,22 @@ func NewRegistry(opts ...registry.Option) registry.Registry {
 	for _, o := range opts {
 		o(&options)
 	}
-	exp, _ := options.Context.Value(expiryKey{}).(time.Duration)
+	defaultTTL, _ := options.Context.Value(defaultTTLKey{}).(time.Duration)
 	n := &storeregistry{
-		opts:   options,
-		typ:    _registryName,
-		expiry: exp,
+		opts:       options,
+		typ:        _registryName,
+		defaultTTL: defaultTTL,
 	}
 	n.store = natsjskv.NewStore(n.storeOptions(options)...)
 	return n
 }
 
 type storeregistry struct {
-	opts   registry.Options
-	store  store.Store
-	typ    string
-	expiry time.Duration
-	lock   sync.RWMutex
+	opts       registry.Options
+	store      store.Store
+	typ        string
+	defaultTTL time.Duration
+	lock       sync.RWMutex
 }
 
 // Init inits the registry
@@ -76,12 +76,18 @@ func (n *storeregistry) Options() registry.Options {
 }
 
 // Register adds a service to the registry
-func (n *storeregistry) Register(s *registry.Service, _ ...registry.RegisterOption) error {
+func (n *storeregistry) Register(s *registry.Service, opts ...registry.RegisterOption) error {
 	n.lock.RLock()
 	defer n.lock.RUnlock()
 
 	if s == nil {
 		return errors.New("wont store nil service")
+	}
+
+	var options registry.RegisterOptions
+	options.TTL = n.defaultTTL
+	for _, o := range opts {
+		o(&options)
 	}
 
 	unique := uuid.New().String()
@@ -97,7 +103,7 @@ func (n *storeregistry) Register(s *registry.Service, _ ...registry.RegisterOpti
 	return n.store.Write(&store.Record{
 		Key:    s.Name + _serviceDelimiter + unique,
 		Value:  b,
-		Expiry: n.expiry,
+		Expiry: options.TTL,
 	})
 }
 
@@ -178,6 +184,10 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 		store.Table("service-registry"),
 		natsjskv.DefaultMemory(),
 		natsjskv.EncodeKeys(),
+	}
+
+	if defaultTTL, ok := opts.Context.Value(defaultTTLKey{}).(time.Duration); ok {
+		storeoptions = append(storeoptions, natsjskv.DefaultTTL(defaultTTL))
 	}
 
 	addr := []string{"127.0.0.1:9233"}
