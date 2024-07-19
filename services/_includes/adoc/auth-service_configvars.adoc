@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-10-01-34]
+[#deprecation-note-2024-07-19-10-34-05]
 [caption=]
 .Deprecation notes for the auth-service service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -23,7 +23,7 @@ endif::[]
 
 [caption=]
 .Environment variables for the auth-service service
-[width="100%",cols="~,~,~,~",options="header"]
+[width="100%",cols="~,~,~,~,~",options="header"]
 |===
 | Name
 | IV
