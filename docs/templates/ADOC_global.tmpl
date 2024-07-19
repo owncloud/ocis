@@ -6,12 +6,16 @@
 [width="100%",cols="30%,25%,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Services
 | Type
 | Default Value
 | Description
 {{ range . }}
 a| `{{ .Name }}`
+
+a| [subs=-attributes]
+++{{ .IntroductionVersion }} ++
 
 a| [subs=attributes+]
 {{- range .Services}}
