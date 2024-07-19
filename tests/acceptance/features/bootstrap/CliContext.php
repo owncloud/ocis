@@ -169,6 +169,24 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator removes the file versions of space :space using the CLI
+	 *
+	 * @param string $space
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRemovesTheVersionsOfFilesInSpaceUsingSpaceId(string $space):void {
+		$path = $this->featureContext->getStorageUsersRoot();
+		$adminUsername = $this->featureContext->getAdminUsername();
+		$spaceId = $this->spacesContext->getSpaceIdByName($adminUsername, $space);
+		$command = "revisions purge -p $path -r $spaceId --dry-run=false";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @Then the command should be successful
 	 *
 	 * @return void
