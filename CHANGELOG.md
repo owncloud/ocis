@@ -59,6 +59,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#9621](https://github.com/owncloud/ocis/pull/9621)
 * Enhancement - Bump commitID for web: [#9631](https://github.com/owncloud/ocis/pull/9631)
 * Enhancement - Remove oidc-go dependency: [#9641](https://github.com/owncloud/ocis/pull/9641)
+* Enhancement - Improve the collaboration service logging: [#9653](https://github.com/owncloud/ocis/pull/9653)
 
 ## Details
 
@@ -147,6 +148,13 @@ The following sections list the changes for unreleased.
    Luckily us we only used it for importing the strings "profile" and "email".
 
    https://github.com/owncloud/ocis/pull/9641
+
+* Enhancement - Improve the collaboration service logging: [#9653](https://github.com/owncloud/ocis/pull/9653)
+
+   We added more debug log information to the collaboration service. This is vital
+   for scenarios when we need to debug in remote setups.
+
+   https://github.com/owncloud/ocis/pull/9653
 
 # Changelog for [6.1.0] (2024-07-08)
 
