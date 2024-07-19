@@ -152,6 +152,7 @@ func main() {
 	    if len(env.Services) > 1 {
 		tmplValues = append(tmplValues, map[string]interface{}{
 			"Name":         env.Name,
+			"IntroductionVersion": env.IntroductionVersion,
 			"Services":     env.Services,
 			"Description":  env.Description,
 			"DefaultValue": env.DefaultValue,
