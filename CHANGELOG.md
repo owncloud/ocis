@@ -49,11 +49,11 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix restarting of postprocessing: [#6945](https://github.com/owncloud/ocis/pull/6945)
-* Bugfix - Repair nats-js-kv registry: [#9620](https://github.com/owncloud/ocis/pull/9620)
 * Bugfix - Fix crash on empty tracing provider: [#9622](https://github.com/owncloud/ocis/pull/9622)
 * Bugfix - Fix a missing SecureView permission attribute in the REPORT response: [#9638](https://github.com/owncloud/ocis/pull/9638)
 * Bugfix - Fixed the channel lock in a workers pool: [#9647](https://github.com/owncloud/ocis/pull/9647)
 * Bugfix - Missing invitation in permission responses: [#9652](https://github.com/owncloud/ocis/pull/9652)
+* Bugfix - Repair nats-js-kv registry: [#9654](https://github.com/owncloud/ocis/pull/9654)
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 * Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
 * Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
@@ -71,14 +71,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/5938
    https://github.com/owncloud/ocis/pull/6945
-
-* Bugfix - Repair nats-js-kv registry: [#9620](https://github.com/owncloud/ocis/pull/9620)
-
-   The registry would always send traffic to only one pod. This is now fixed and
-   load should be spread evenly. Also implements watcher method so the cache can
-   use it.
-
-   https://github.com/owncloud/ocis/pull/9620
 
 * Bugfix - Fix crash on empty tracing provider: [#9622](https://github.com/owncloud/ocis/pull/9622)
 
@@ -109,6 +101,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9571
    https://github.com/owncloud/ocis/pull/9652
+
+* Bugfix - Repair nats-js-kv registry: [#9654](https://github.com/owncloud/ocis/pull/9654)
+
+   The registry would always send traffic to only one pod. This is now fixed and
+   load should be spread evenly. Also implements watcher method so the cache can
+   use it.
+
+   https://github.com/owncloud/ocis/pull/9654
+   https://github.com/owncloud/ocis/pull/9620
 
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 
