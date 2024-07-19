@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `FRONTEND_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `FRONTEND_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `FRONTEND_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `FRONTEND_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `FRONTEND_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `FRONTEND_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `FRONTEND_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `FRONTEND_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`FRONTEND_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`FRONTEND_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`FRONTEND_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`FRONTEND_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -148,6 +173,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`FRONTEND_HTTP_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -158,6 +185,8 @@ The bind address of the HTTP service.
 a|`FRONTEND_HTTP_PROTOCOL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++tcp ++
@@ -166,6 +195,8 @@ The transport protocol of the HTTP service.
 
 a|`FRONTEND_HTTP_PREFIX` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -177,6 +208,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `FRONTEND_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[https://localhost:9200] ++
@@ -186,6 +219,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `FRONTEND_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -197,6 +232,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `FRONTEND_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
@@ -207,6 +244,8 @@ a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `FRONTEND_CORS_ALLOW_CREDENTIALS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -215,6 +254,8 @@ Allow credentials for CORS.See following chapter for more details: *Access-Contr
 
 a|`OCIS_TRANSFER_SECRET` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -226,6 +267,8 @@ a|`OCIS_JWT_SECRET` +
 `FRONTEND_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -234,6 +277,8 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -244,6 +289,8 @@ The CS3 gateway endpoint.
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -252,6 +299,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -263,6 +312,8 @@ a|`OCIS_MACHINE_AUTH_API_KEY` +
 `FRONTEND_MACHINE_AUTH_API_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -272,6 +323,8 @@ The machine auth API key used to validate internal requests necessary to access 
 a|`FRONTEND_SKIP_USER_GROUPS_IN_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -280,6 +333,8 @@ Disables the loading of user's group memberships from the reva access token.
 
 a|`FRONTEND_ENABLE_FAVORITES` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -291,6 +346,8 @@ a|`OCIS_SPACES_MAX_QUOTA` +
 `FRONTEND_MAX_QUOTA` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
 ++0 ++
@@ -299,6 +356,8 @@ Set the global max quota value in bytes. A value of 0 equals unlimited. The valu
 
 a|`FRONTEND_UPLOAD_MAX_CHUNK_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -309,6 +368,8 @@ Sets the max chunk sizes in bytes for uploads via the clients.
 a|`FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -317,6 +378,8 @@ Advise TUS to replace PATCH requests by POST requests.
 
 a|`FRONTEND_DEFAULT_UPLOAD_PROTOCOL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -327,6 +390,8 @@ The default upload protocol to use in clients. Currently only 'tus' is available
 a|`FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -336,6 +401,8 @@ Changing this value is NOT supported. Enables support for incoming federated sha
 a|`FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -344,6 +411,8 @@ Changing this value is NOT supported. Enables support for outgoing federated sha
 
 a|`FRONTEND_SEARCH_MIN_LENGTH` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -355,6 +424,8 @@ a|`OCIS_EDITION` +
 `FRONTEND_EDITION` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++Community ++
@@ -365,6 +436,8 @@ a|`OCIS_DISABLE_SSE` +
 `FRONTEND_DISABLE_SSE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -373,6 +446,8 @@ When set to true, clients are informed that the Server-Sent Events endpoint is n
 
 a|`FRONTEND_DEFAULT_LINK_PERMISSIONS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -384,6 +459,8 @@ a|`OCIS_URL` +
 `FRONTEND_PUBLIC_URL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -394,6 +471,8 @@ a|`OCIS_INSECURE` +
 `FRONTEND_APP_HANDLER_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -402,6 +481,8 @@ Allow insecure connections to the frontend.
 
 a|`FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -412,6 +493,8 @@ Service name or address of the app provider to use for secure view. Should match
 a|`FRONTEND_ARCHIVER_MAX_NUM_FILES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int64 ++
 a| [subs=-attributes]
 ++10000 ++
@@ -420,6 +503,8 @@ Max number of files that can be packed into an archive.
 
 a|`FRONTEND_ARCHIVER_MAX_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int64 ++
 a| [subs=-attributes]
@@ -431,6 +516,8 @@ a|`OCIS_INSECURE` +
 `FRONTEND_ARCHIVER_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -439,6 +526,8 @@ Allow insecure connections to the archiver.
 
 a|`FRONTEND_DATA_GATEWAY_PREFIX` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -449,6 +538,8 @@ Path prefix for the data gateway.
 a|`FRONTEND_OCS_PREFIX` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ocs ++
@@ -457,6 +548,8 @@ URL path prefix for the OCS service. Note that the string must not start with '/
 
 a|`FRONTEND_OCS_SHARE_PREFIX` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -467,6 +560,8 @@ Path prefix for shares as part of an ocis resource. Note that the path must star
 a|`FRONTEND_OCS_PERSONAL_NAMESPACE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/users/{{.Id.OpaqueId}} ++
@@ -475,6 +570,8 @@ Home namespace identifier.
 
 a|`FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -486,6 +583,8 @@ a|`OCIS_CACHE_STORE` +
 `FRONTEND_OCS_STAT_CACHE_STORE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
@@ -496,6 +595,8 @@ a|`OCIS_CACHE_STORE_NODES` +
 `FRONTEND_OCS_STAT_CACHE_STORE_NODES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
@@ -505,6 +606,8 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 a|`OCIS_CACHE_DATABASE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++cache-stat ++
@@ -513,6 +616,8 @@ The database name the configured store should use.
 
 a|`FRONTEND_OCS_STAT_CACHE_TABLE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -524,6 +629,8 @@ a|`OCIS_CACHE_TTL` +
 `FRONTEND_OCS_STAT_CACHE_TTL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++5m0s ++
@@ -533,6 +640,8 @@ Default time to live for user info in the cache. Only applied when access tokens
 a|`OCIS_CACHE_SIZE` +
 `FRONTEND_OCS_STAT_CACHE_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -544,6 +653,8 @@ a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `FRONTEND_OCS_STAT_CACHE_DISABLE_PERSISTENCE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -553,6 +664,8 @@ Disable persistence of the cache. Only applies when using the 'nats-js-kv' store
 a|`OCIS_CACHE_AUTH_USERNAME` +
 `FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -564,6 +677,8 @@ a|`OCIS_CACHE_AUTH_PASSWORD` +
 `FRONTEND_OCS_STAT_CACHE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -573,6 +688,8 @@ The password to use for authentication. Only applies when using the 'nats-js-kv'
 a|`FRONTEND_OCS_ENABLE_DENIALS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -581,6 +698,8 @@ EXPERIMENTAL: enable the feature to deny access on folders.
 
 a|`FRONTEND_OCS_LIST_OCM_SHARES` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -592,6 +711,8 @@ a|`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
 `FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -602,6 +723,8 @@ a|`OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
 `FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -610,6 +733,8 @@ Set this to true if you want to enforce passwords for writable shares. Only effe
 
 a|`FRONTEND_OCS_INCLUDE_OCM_SHAREES` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -620,6 +745,8 @@ Include OCM sharees when listing sharees.
 a|`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -628,6 +755,8 @@ Mask user email addresses in responses.
 
 a|`FRONTEND_CHECKSUMS_SUPPORTED_TYPES` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -638,6 +767,8 @@ A list of checksum types that indicate to clients which hashes the server can us
 a|`FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++sha1 ++
@@ -646,6 +777,8 @@ The supported checksum type for uploads that indicates to clients supporting mul
 
 a|`FRONTEND_READONLY_USER_ATTRIBUTES` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -657,6 +790,8 @@ a|`OCIS_LDAP_SERVER_WRITE_ENABLED` +
 `FRONTEND_LDAP_SERVER_WRITE_ENABLED` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -665,6 +800,8 @@ Allow creating, modifying and deleting LDAP users via the GRAPH API. This can on
 
 a|`FRONTEND_FULL_TEXT_SEARCH_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -676,6 +813,8 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `FRONTEND_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
@@ -685,6 +824,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 `FRONTEND_EVENTS_CLUSTER` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -696,6 +837,8 @@ a|`OCIS_INSECURE` +
 `FRONTEND_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -705,6 +848,8 @@ Whether to verify the server TLS certificates.
 a|`FRONTEND_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `OCS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -716,6 +861,8 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `FRONTEND_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -725,6 +872,8 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a|`OCIS_EVENTS_AUTH_USERNAME` +
 `FRONTEND_EVENTS_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -736,6 +885,8 @@ a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `FRONTEND_EVENTS_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -744,6 +895,8 @@ The password to authenticate with the events broker. The events broker is the oc
 
 a|`FRONTEND_AUTO_ACCEPT_SHARES` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -755,6 +908,8 @@ a|`OCIS_SERVICE_ACCOUNT_ID` +
 `FRONTEND_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -764,6 +919,8 @@ The ID of the service account the service should use. See the 'auth-service' ser
 a|`OCIS_SERVICE_ACCOUNT_SECRET` +
 `FRONTEND_SERVICE_ACCOUNT_SECRET` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -775,6 +932,8 @@ a|`OCIS_PASSWORD_POLICY_DISABLED` +
 `FRONTEND_PASSWORD_POLICY_DISABLED` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -784,6 +943,8 @@ Disable the password policy. Defaults to false if not set.
 a|`OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
 `FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -795,6 +956,8 @@ a|`OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
 `FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++1 ++
@@ -804,6 +967,8 @@ Define the minimum number of uppercase letters. Defaults to 1 if not set.
 a|`OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
 `FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -815,6 +980,8 @@ a|`OCIS_PASSWORD_POLICY_MIN_DIGITS` +
 `FRONTEND_PASSWORD_POLICY_MIN_DIGITS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++1 ++
@@ -825,6 +992,8 @@ a|`OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
 `FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++1 ++
@@ -834,6 +1003,8 @@ Define the minimum number of characters from the special characters list to be p
 a|`OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
 `FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

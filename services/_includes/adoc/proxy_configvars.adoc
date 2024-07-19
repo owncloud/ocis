@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `PROXY_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `PROXY_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `PROXY_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `PROXY_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `PROXY_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `PROXY_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `PROXY_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `PROXY_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`PROXY_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`PROXY_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`PROXY_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`PROXY_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -148,6 +173,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`PROXY_HTTP_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -158,6 +185,8 @@ The bind address of the HTTP service.
 a|`PROXY_HTTP_ROOT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/ ++
@@ -166,6 +195,8 @@ Subdirectory that serves as the root for this HTTP service.
 
 a|`PROXY_TRANSPORT_TLS_CERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -176,6 +207,8 @@ Path/File name of the TLS server certificate (in PEM format) for the external ht
 a|`PROXY_TRANSPORT_TLS_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/var/lib/ocis/proxy/server.key ++
@@ -184,6 +217,8 @@ Path/File name for the TLS certificate key (in PEM format) for the server certif
 
 a|`PROXY_TLS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -194,6 +229,8 @@ Enable/Disable HTTPS for external HTTP services. Must be set to 'true' if the bu
 a|`OCIS_REVA_GATEWAY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
@@ -203,6 +240,8 @@ The CS3 gateway endpoint.
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -211,6 +250,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -223,6 +264,8 @@ a|`OCIS_URL` +
 `PROXY_OIDC_ISSUER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -233,6 +276,8 @@ a|`OCIS_INSECURE` +
 `PROXY_OIDC_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -242,6 +287,8 @@ Disable TLS certificate validation for connections to the IDP. Note that this is
 a|`PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++jwt ++
@@ -250,6 +297,8 @@ Sets how OIDC access tokens should be verified. Possible values are 'none' and '
 
 a|`PROXY_OIDC_SKIP_USER_INFO` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -261,6 +310,8 @@ a|`OCIS_CACHE_STORE` +
 `PROXY_OIDC_USERINFO_CACHE_STORE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
@@ -271,6 +322,8 @@ a|`OCIS_CACHE_STORE_NODES` +
 `PROXY_OIDC_USERINFO_CACHE_STORE_NODES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
@@ -280,6 +333,8 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 a|`OCIS_CACHE_DATABASE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++cache-userinfo ++
@@ -288,6 +343,8 @@ The database name the configured store should use.
 
 a|`PROXY_OIDC_USERINFO_CACHE_TABLE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -299,6 +356,8 @@ a|`OCIS_CACHE_TTL` +
 `PROXY_OIDC_USERINFO_CACHE_TTL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++10s ++
@@ -308,6 +367,8 @@ Default time to live for user info in the user info cache. Only applied when acc
 a|`OCIS_CACHE_SIZE` +
 `PROXY_OIDC_USERINFO_CACHE_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -319,6 +380,8 @@ a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `PROXY_OIDC_USERINFO_CACHE_DISABLE_PERSISTENCE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -328,6 +391,8 @@ Disables persistence of the cache. Only applies when store type 'nats-js-kv' is 
 a|`OCIS_CACHE_AUTH_USERNAME` +
 `PROXY_OIDC_USERINFO_CACHE_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -339,6 +404,8 @@ a|`OCIS_CACHE_AUTH_PASSWORD` +
 `PROXY_OIDC_USERINFO_CACHE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -347,6 +414,8 @@ The password to authenticate with the cache. Only applies when store type 'nats-
 
 a|`PROXY_OIDC_JWKS_REFRESH_INTERVAL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
@@ -357,6 +426,8 @@ The interval for refreshing the JWKS (JSON Web Key Set) in minutes in the backgr
 a|`PROXY_OIDC_JWKS_REFRESH_TIMEOUT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
 ++10 ++
@@ -365,6 +436,8 @@ The timeout in seconds for an outgoing JWKS request.
 
 a|`PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
@@ -375,6 +448,8 @@ Limits the rate in seconds at which refresh requests are performed for unknown k
 a|`PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -383,6 +458,8 @@ If set to 'true', the JWKS refresh request will occur every time an unknown KEY 
 
 a|`PROXY_OIDC_REWRITE_WELLKNOWN` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -394,6 +471,8 @@ a|`OCIS_SERVICE_ACCOUNT_ID` +
 `PROXY_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -404,6 +483,8 @@ a|`OCIS_SERVICE_ACCOUNT_SECRET` +
 `PROXY_SERVICE_ACCOUNT_SECRET` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -412,6 +493,8 @@ The service account secret.
 
 a|`PROXY_ROLE_ASSIGNMENT_DRIVER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -422,6 +505,8 @@ The mechanism that should be used to assign roles to user upon login. Supported 
 a|`PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++roles ++
@@ -430,6 +515,8 @@ The OIDC claim used to create the users role assignment.
 
 a|`PROXY_ENABLE_PRESIGNEDURLS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -441,6 +528,8 @@ a|`OCIS_CACHE_STORE` +
 `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++nats-js-kv ++
@@ -450,6 +539,8 @@ The type of the signing key store. Supported values are: 'redis-sentinel', 'nats
 a|`OCIS_CACHE_STORE_NODES` +
 `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -461,6 +552,8 @@ a|`OCIS_CACHE_TTL` +
 `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++12h0m0s ++
@@ -470,6 +563,8 @@ Default time to live for signing keys. See the Environment Variable Types descri
 a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -481,6 +576,8 @@ a|`OCIS_CACHE_AUTH_USERNAME` +
 `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -491,6 +588,8 @@ a|`OCIS_CACHE_AUTH_PASSWORD` +
 `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -499,6 +598,8 @@ The password to authenticate with the store. Only applies when store type 'nats-
 
 a|`PROXY_ACCOUNT_BACKEND_TYPE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -509,6 +610,8 @@ Account backend the PROXY service should use. Currently only 'cs3' is possible h
 a|`PROXY_USER_OIDC_CLAIM` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++preferred_username ++
@@ -517,6 +620,8 @@ The name of an OpenID Connect claim that is used for resolving users with the ac
 
 a|`PROXY_USER_CS3_CLAIM` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -528,6 +633,8 @@ a|`OCIS_MACHINE_AUTH_API_KEY` +
 `PROXY_MACHINE_AUTH_API_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -536,6 +643,8 @@ Machine auth API key used to validate internal requests necessary to access reso
 
 a|`PROXY_AUTOPROVISION_ACCOUNTS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -546,6 +655,8 @@ Set this to 'true' to automatically provision users that do not yet exist in the
 a|`PROXY_AUTOPROVISION_CLAIM_USERNAME` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++preferred_username ++
@@ -554,6 +665,8 @@ The name of the OIDC claim that holds the username.
 
 a|`PROXY_AUTOPROVISION_CLAIM_EMAIL` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -564,6 +677,8 @@ The name of the OIDC claim that holds the email.
 a|`PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++name ++
@@ -572,6 +687,8 @@ The name of the OIDC claim that holds the display name.
 
 a|`PROXY_AUTOPROVISION_CLAIM_GROUPS` +
 
+a| [subs=-attributes]
+++6.1.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -582,6 +699,8 @@ The name of the OIDC claim that holds the groups.
 a|`PROXY_ENABLE_BASIC_AUTH` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -590,6 +709,8 @@ Set this to true to enable 'basic authentication' (username/password).
 
 a|`PROXY_INSECURE_BACKENDS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -600,6 +721,8 @@ Disable TLS certificate validation for all HTTP backend connections.
 a|`PROXY_HTTPS_CACERT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -609,6 +732,8 @@ Path/File for the root CA certificate used to validate the server’s TLS certif
 a|`PROXY_POLICIES_QUERY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -617,6 +742,8 @@ Defines the 'Complete Rules' variable defined in the rego rule set this step use
 
 a|`PROXY_CSP_CONFIG_FILE_LOCATION` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -628,6 +755,8 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `PROXY_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
@@ -637,6 +766,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 `PROXY_EVENTS_CLUSTER` +
 
+a| [subs=-attributes]
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -648,6 +779,8 @@ a|`OCIS_INSECURE` +
 `PROXY_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -657,6 +790,8 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `PROXY_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
+a| [subs=-attributes]
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -668,6 +803,8 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `PROXY_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -678,6 +815,8 @@ a|`OCIS_EVENTS_AUTH_USERNAME` +
 `PROXY_EVENTS_AUTH_USERNAME` +
 
 a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -687,6 +826,8 @@ The username to authenticate with the events broker. The events broker is the oc
 a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `PROXY_EVENTS_AUTH_PASSWORD` +
 
+a| [subs=-attributes]
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

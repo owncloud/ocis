@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the activitylog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `ACTIVITYLOG_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `ACTIVITYLOG_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `ACTIVITYLOG_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `ACTIVITYLOG_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `ACTIVITYLOG_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `ACTIVITYLOG_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `ACTIVITYLOG_LOG_COLOR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `ACTIVITYLOG_LOG_FILE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`ACTIVITYLOG_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`ACTIVITYLOG_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`ACTIVITYLOG_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`ACTIVITYLOG_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -148,6 +173,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`OCIS_EVENTS_ENDPOINT` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -158,6 +185,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ocis-cluster ++
@@ -166,6 +195,8 @@ The clusterID of the event system. The event system is the message queuing servi
 
 a|`OCIS_INSECURE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -176,6 +207,8 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -184,6 +217,8 @@ The root CA certificate used to validate the server's TLS certificate. If provid
 
 a|`OCIS_EVENTS_ENABLE_TLS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -194,6 +229,8 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a|`OCIS_EVENTS_AUTH_USERNAME` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -202,6 +239,8 @@ The username to authenticate with the events broker. The events broker is the oc
 
 a|`OCIS_EVENTS_AUTH_PASSWORD` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -213,6 +252,8 @@ a|`OCIS_PERSISTENT_STORE` +
 `ACTIVITYLOG_STORE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++nats-js-kv ++
@@ -223,6 +264,8 @@ a|`OCIS_PERSISTENT_STORE_NODES` +
 `ACTIVITYLOG_STORE_NODES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
@@ -232,6 +275,8 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 a|`ACTIVITYLOG_STORE_DATABASE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++activitylog ++
@@ -240,6 +285,8 @@ The database name the configured store should use.
 
 a|`ACTIVITYLOG_STORE_TABLE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -251,6 +298,8 @@ a|`OCIS_PERSISTENT_STORE_TTL` +
 `ACTIVITYLOG_STORE_TTL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++0s ++
@@ -260,6 +309,8 @@ Time to live for events in the store. See the Environment Variable Types descrip
 a|`OCIS_PERSISTENT_STORE_SIZE` +
 `ACTIVITYLOG_STORE_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -271,6 +322,8 @@ a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
 `ACTIVITYLOG_STORE_AUTH_USERNAME` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -281,6 +334,8 @@ a|`OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
 `ACTIVITYLOG_STORE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -289,6 +344,8 @@ The password to authenticate with the store. Only applies when store type 'nats-
 
 a|`OCIS_REVA_GATEWAY` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -299,6 +356,8 @@ CS3 gateway used to look up user metadata
 a|`ACTIVITYLOG_HTTP_ADDR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:0 ++
@@ -307,6 +366,8 @@ The bind address of the HTTP service.
 
 a|`ACTIVITYLOG_HTTP_ROOT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -318,6 +379,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `ACTIVITYLOG_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[*] ++
@@ -327,6 +390,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `ACTIVITYLOG_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -338,6 +403,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `ACTIVITYLOG_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
@@ -348,6 +415,8 @@ a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `ACTIVITYLOG_CORS_ALLOW_CREDENTIALS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -356,6 +425,8 @@ Allow credentials for CORS.See following chapter for more details: *Access-Contr
 
 a|`OCIS_HTTP_TLS_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -366,6 +437,8 @@ Activates TLS for the http based services using the server certifcate and key co
 a|`OCIS_HTTP_TLS_CERTIFICATE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -374,6 +447,8 @@ Path/File name of the TLS server certificate (in PEM format) for the http servic
 
 a|`OCIS_HTTP_TLS_KEY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -385,6 +460,8 @@ a|`OCIS_JWT_SECRET` +
 `ACTIVITYLOG_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -395,6 +472,8 @@ a|`OCIS_SERVICE_ACCOUNT_ID` +
 `ACTIVITYLOG_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -404,6 +483,8 @@ The ID of the service account the service should use. See the 'auth-service' ser
 a|`OCIS_SERVICE_ACCOUNT_SECRET` +
 `ACTIVITYOG_SERVICE_ACCOUNT_SECRET` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the search service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `SEARCH_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `SEARCH_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `SEARCH_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `SEARCH_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `SEARCH_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `SEARCH_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `SEARCH_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `SEARCH_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`SEARCH_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`SEARCH_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`SEARCH_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`SEARCH_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -148,6 +173,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`SEARCH_GRPC_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -159,6 +186,8 @@ a|`OCIS_JWT_SECRET` +
 `SEARCH_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -167,6 +196,8 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -177,6 +208,8 @@ The CS3 gateway endpoint.
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -185,6 +218,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -196,6 +231,8 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `SEARCH_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
@@ -205,6 +242,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 `SEARCH_EVENTS_CLUSTER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -216,6 +255,8 @@ a|`OCIS_ASYNC_UPLOADS` +
 `SEARCH_EVENTS_ASYNC_UPLOADS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -225,6 +266,8 @@ Enable asynchronous file uploads.
 a|`SEARCH_EVENTS_NUM_CONSUMERS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++0 ++
@@ -233,6 +276,8 @@ The amount of concurrent event consumers to start. Event consumers are used for 
 
 a|`SEARCH_EVENTS_REINDEX_DEBOUNCE_DURATION` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -244,6 +289,8 @@ a|`OCIS_INSECURE` +
 `SEARCH_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -253,6 +300,8 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SEARCH_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -264,6 +313,8 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `SEARCH_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -273,6 +324,8 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a|`OCIS_EVENTS_AUTH_USERNAME` +
 `SEARCH_EVENTS_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -284,6 +337,8 @@ a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `SEARCH_EVENTS_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -292,6 +347,8 @@ The password to authenticate with the events broker. The events broker is the oc
 
 a|`SEARCH_ENGINE_TYPE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -302,6 +359,8 @@ Defines which search engine to use. Defaults to 'bleve'. Supported values are: '
 a|`SEARCH_ENGINE_BLEVE_DATA_PATH` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/var/lib/ocis/search ++
@@ -310,6 +369,8 @@ The directory where the filesystem will store search data. If not defined, the r
 
 a|`SEARCH_EXTRACTOR_TYPE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -321,6 +382,8 @@ a|`OCIS_INSECURE` +
 `SEARCH_EXTRACTOR_CS3SOURCE_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -329,6 +392,8 @@ Ignore untrusted SSL certificates when connecting to the CS3 source.
 
 a|`SEARCH_EXTRACTOR_TIKA_TIKA_URL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -339,6 +404,8 @@ URL of the tika server.
 a|`SEARCH_EXTRACTOR_TIKA_CLEAN_STOP_WORDS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -347,6 +414,8 @@ Defines if stop words should be cleaned or not. See the documentation for more d
 
 a|`SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
@@ -358,6 +427,8 @@ a|`OCIS_SERVICE_ACCOUNT_ID` +
 `SEARCH_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -367,6 +438,8 @@ The ID of the service account the service should use. See the 'auth-service' ser
 a|`OCIS_SERVICE_ACCOUNT_SECRET` +
 `SEARCH_SERVICE_ACCOUNT_SECRET` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

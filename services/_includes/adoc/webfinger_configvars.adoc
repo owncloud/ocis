@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the webfinger service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `WEBFINGER_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `WEBFINGER_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `WEBFINGER_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `WEBFINGER_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `WEBFINGER_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `WEBFINGER_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `WEBFINGER_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `WEBFINGER_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`WEBFINGER_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`WEBFINGER_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`WEBFINGER_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`WEBFINGER_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -149,6 +174,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a|`WEBFINGER_HTTP_ADDR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:0 ++
@@ -157,6 +184,8 @@ The bind address of the HTTP service.
 
 a|`WEBFINGER_HTTP_ROOT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -168,6 +197,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `WEBFINGER_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[https://localhost:9200] ++
@@ -177,6 +208,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `WEBFINGER_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -188,6 +221,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `WEBFINGER_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[] ++
@@ -198,6 +233,8 @@ a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `WEBFINGER_CORS_ALLOW_CREDENTIALS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -206,6 +243,8 @@ Allow credentials for CORS.See following chapter for more details: *Access-Contr
 
 a|`OCIS_HTTP_TLS_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -216,6 +255,8 @@ Activates TLS for the http based services using the server certifcate and key co
 a|`OCIS_HTTP_TLS_CERTIFICATE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -225,6 +266,8 @@ Path/File name of the TLS server certificate (in PEM format) for the http servic
 a|`OCIS_HTTP_TLS_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -233,6 +276,8 @@ Path/File name for the TLS certificate key (in PEM format) for the server certif
 
 a|`WEBFINGER_RELATIONS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -245,6 +290,8 @@ a|`OCIS_URL` +
 `WEBFINGER_OIDC_ISSUER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -255,6 +302,8 @@ a|`OCIS_URL` +
 `WEBFINGER_OWNCLOUD_SERVER_INSTANCE_URL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -264,6 +313,8 @@ The URL for the legacy ownCloud server instance relation (not to be confused wit
 a|`OCIS_INSECURE` +
 `WEBFINGER_INSECURE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

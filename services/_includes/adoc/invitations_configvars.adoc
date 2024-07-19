@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the invitations service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `INVITATIONS_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `INVITATIONS_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `INVITATIONS_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `INVITATIONS_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `INVITATIONS_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `INVITATIONS_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `INVITATIONS_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `INVITATIONS_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`INVITATIONS_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`INVITATIONS_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`INVITATIONS_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`INVITATIONS_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -149,6 +174,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a|`INVITATIONS_HTTP_ADDR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:0 ++
@@ -157,6 +184,8 @@ The bind address of the HTTP service.
 
 a|`INVITATIONS_HTTP_ROOT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -168,6 +197,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `INVITATIONS_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[https://localhost:9200] ++
@@ -177,6 +208,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `INVITATIONS_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -188,6 +221,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `INVITATIONS_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[] ++
@@ -198,6 +233,8 @@ a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `INVITATIONS_CORS_ALLOW_CREDENTIALS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -206,6 +243,8 @@ Allow credentials for CORS.See following chapter for more details: *Access-Contr
 
 a|`OCIS_HTTP_TLS_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -216,6 +255,8 @@ Activates TLS for the http based services using the server certifcate and key co
 a|`OCIS_HTTP_TLS_CERTIFICATE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -224,6 +265,8 @@ Path/File name of the TLS server certificate (in PEM format) for the http servic
 
 a|`OCIS_HTTP_TLS_KEY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -235,6 +278,8 @@ a|`OCIS_KEYCLOAK_BASE_PATH` +
 `INVITATIONS_KEYCLOAK_BASE_PATH` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -244,6 +289,8 @@ The URL to access keycloak.
 a|`OCIS_KEYCLOAK_CLIENT_ID` +
 `INVITATIONS_KEYCLOAK_CLIENT_ID` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -255,6 +302,8 @@ a|`OCIS_KEYCLOAK_CLIENT_SECRET` +
 `INVITATIONS_KEYCLOAK_CLIENT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -264,6 +313,8 @@ The client secret to use in authentication.
 a|`OCIS_KEYCLOAK_CLIENT_REALM` +
 `INVITATIONS_KEYCLOAK_CLIENT_REALM` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -275,6 +326,8 @@ a|`OCIS_KEYCLOAK_USER_REALM` +
 `INVITATIONS_KEYCLOAK_USER_REALM` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -285,6 +338,8 @@ a|`OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY` +
 `INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -294,6 +349,8 @@ Disable TLS certificate validation for Keycloak connections. Do not set this in 
 a|`OCIS_JWT_SECRET` +
 `INVITATIONS_JWT_SECRET` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

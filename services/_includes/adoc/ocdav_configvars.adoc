@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the ocdav service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `OCDAV_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `OCDAV_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `OCDAV_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `OCDAV_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `OCDAV_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `OCDAV_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `OCDAV_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `OCDAV_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`OCDAV_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`OCDAV_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`OCDAV_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`OCDAV_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -148,6 +173,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`OCDAV_HTTP_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -158,6 +185,8 @@ The bind address of the HTTP service.
 a|`OCDAV_HTTP_PROTOCOL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++tcp ++
@@ -166,6 +195,8 @@ The transport protocol of the HTTP service.
 
 a|`OCDAV_HTTP_PREFIX` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -177,6 +208,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `OCDAV_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[https://localhost:9200] ++
@@ -186,6 +219,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `OCDAV_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -197,6 +232,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `OCDAV_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
@@ -206,6 +243,8 @@ A list of allowed CORS headers. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `OCDAV_CORS_ALLOW_CREDENTIALS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -217,6 +256,8 @@ a|`OCIS_JWT_SECRET` +
 `OCDAV_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -225,6 +266,8 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -235,6 +278,8 @@ The CS3 gateway endpoint.
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -243,6 +288,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -253,6 +300,8 @@ Path/File name for the root CA certificate (in PEM format) used to validate TLS 
 a|`OCDAV_SKIP_USER_GROUPS_IN_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -261,6 +310,8 @@ Disables the loading of user's group memberships from the reva access token.
 
 a|`OCDAV_WEBDAV_NAMESPACE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -271,6 +322,8 @@ Jail requests to /dav/webdav into this CS3 namespace. Supports template layoutin
 a|`OCDAV_FILES_NAMESPACE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/users/{{.Id.OpaqueId}} ++
@@ -280,6 +333,8 @@ Jail requests to /dav/files/{username} into this CS3 namespace. Supports templat
 a|`OCDAV_SHARES_NAMESPACE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/Shares ++
@@ -288,6 +343,8 @@ The human readable path for the share jail. Relative to a users personal space r
 
 a|`OCDAV_OCM_NAMESPACE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -299,6 +356,8 @@ a|`OCIS_URL` +
 `OCDAV_PUBLIC_URL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -309,6 +368,8 @@ a|`OCIS_INSECURE` +
 `OCDAV_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -317,6 +378,8 @@ Allow insecure connections to the GATEWAY service.
 
 a|`OCDAV_GATEWAY_REQUEST_TIMEOUT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int64 ++
 a| [subs=-attributes]
@@ -328,6 +391,8 @@ a|`OCIS_MACHINE_AUTH_API_KEY` +
 `OCDAV_MACHINE_AUTH_API_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -338,6 +403,8 @@ a|`OCIS_EDITION` +
 `OCDAV_EDITION` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++Community ++
@@ -346,6 +413,8 @@ Edition of oCIS. Used for branding purposes.
 
 a|`OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

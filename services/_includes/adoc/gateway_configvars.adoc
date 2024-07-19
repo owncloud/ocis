@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `GATEWAY_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `GATEWAY_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `GATEWAY_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `GATEWAY_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `GATEWAY_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `GATEWAY_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `GATEWAY_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `GATEWAY_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`GATEWAY_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`GATEWAY_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -131,6 +152,8 @@ Token to secure the metrics endpoint.
 a|`GATEWAY_DEBUG_PPROF` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -139,6 +162,8 @@ Enables pprof, which can be used for profiling.
 
 a|`GATEWAY_DEBUG_ZPAGES` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -150,6 +175,8 @@ a|`OCIS_GATEWAY_GRPC_ADDR` +
 `GATEWAY_GRPC_ADDR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9142 ++
@@ -158,6 +185,8 @@ The bind address of the GRPC service.
 
 a|`GATEWAY_GRPC_PROTOCOL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -169,6 +198,8 @@ a|`OCIS_JWT_SECRET` +
 `GATEWAY_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -177,6 +208,8 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -187,6 +220,8 @@ The CS3 gateway endpoint.
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -195,6 +230,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -205,6 +242,8 @@ Path/File name for the root CA certificate (in PEM format) used to validate TLS 
 a|`GATEWAY_SKIP_USER_GROUPS_IN_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -213,6 +252,8 @@ Disables the loading of user's group memberships from the reva access token.
 
 a|`GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -223,6 +264,8 @@ Commit shares to storage grants. This grants access to shared resources for the 
 a|`GATEWAY_SHARE_FOLDER_NAME` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++Shares ++
@@ -231,6 +274,8 @@ Name of the share folder in users' home space.
 
 a|`GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -241,6 +286,8 @@ Disable creation of the home space on login.
 a|`OCIS_TRANSFER_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -249,6 +296,8 @@ The storage transfer secret.
 
 a|`GATEWAY_TRANSFER_EXPIRES` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -260,6 +309,8 @@ a|`OCIS_CACHE_STORE` +
 `GATEWAY_PROVIDER_CACHE_STORE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++noop ++
@@ -270,6 +321,8 @@ a|`OCIS_CACHE_STORE_NODES` +
 `GATEWAY_PROVIDER_CACHE_STORE_NODES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
@@ -278,6 +331,8 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 
 a|`OCIS_CACHE_DATABASE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -289,6 +344,8 @@ a|`OCIS_CACHE_TTL` +
 `GATEWAY_PROVIDER_CACHE_TTL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++5m0s ++
@@ -298,6 +355,8 @@ Default time to live for user info in the cache. Only applied when access tokens
 a|`OCIS_CACHE_SIZE` +
 `GATEWAY_PROVIDER_CACHE_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -309,6 +368,8 @@ a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `GATEWAY_PROVIDER_CACHE_DISABLE_PERSISTENCE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -318,6 +379,8 @@ Disables persistence of the provider cache. Only applies when store type 'nats-j
 a|`OCIS_CACHE_AUTH_USERNAME` +
 `GATEWAY_PROVIDER_CACHE_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -329,6 +392,8 @@ a|`OCIS_CACHE_AUTH_PASSWORD` +
 `GATEWAY_PROVIDER_CACHE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -338,6 +403,8 @@ The password to use for authentication. Only applies when store type 'nats-js-kv
 a|`OCIS_CACHE_STORE` +
 `GATEWAY_CREATE_HOME_CACHE_STORE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -349,6 +416,8 @@ a|`OCIS_CACHE_STORE_NODES` +
 `GATEWAY_CREATE_HOME_CACHE_STORE_NODES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
@@ -357,6 +426,8 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 
 a|`OCIS_CACHE_DATABASE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -368,6 +439,8 @@ a|`OCIS_CACHE_TTL` +
 `GATEWAY_CREATE_HOME_CACHE_TTL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++5m0s ++
@@ -377,6 +450,8 @@ Default time to live for user info in the cache. Only applied when access tokens
 a|`OCIS_CACHE_SIZE` +
 `GATEWAY_CREATE_HOME_CACHE_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -388,6 +463,8 @@ a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `GATEWAY_CREATE_HOME_CACHE_DISABLE_PERSISTENCE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -397,6 +474,8 @@ Disables persistence of the create home cache. Only applies when store type 'nat
 a|`OCIS_CACHE_AUTH_USERNAME` +
 `GATEWAY_CREATE_HOME_CACHE_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -408,6 +487,8 @@ a|`OCIS_CACHE_AUTH_PASSWORD` +
 `GATEWAY_CREATE_HOME_CACHE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -418,6 +499,8 @@ a|`OCIS_URL` +
 `GATEWAY_FRONTEND_PUBLIC_URL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -426,6 +509,8 @@ The public facing URL of the oCIS frontend.
 
 a|`GATEWAY_STORAGE_REGISTRY_DRIVER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -436,6 +521,8 @@ The driver name of the storage registry to use.
 a|`GATEWAY_STORAGE_REGISTRY_RULES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[] ++
@@ -445,6 +532,8 @@ The rules for the storage registry. See the Environment Variable Types descripti
 a|`GATEWAY_STORAGE_REGISTRY_CONFIG_JSON` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -453,6 +542,8 @@ Additional configuration for the storage registry in json format.
 
 a|`GATEWAY_STORAGE_USERS_MOUNT_ID` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `GRAPH_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `GRAPH_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `GRAPH_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `GRAPH_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `GRAPH_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `GRAPH_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `GRAPH_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `GRAPH_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -113,6 +130,8 @@ The path to the log file. Activates logging to this file if set.
 a|`OCIS_CACHE_STORE` +
 `GRAPH_CACHE_STORE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -124,6 +143,8 @@ a|`OCIS_CACHE_STORE_NODES` +
 `GRAPH_CACHE_STORE_NODES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
@@ -133,6 +154,8 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 a|`GRAPH_CACHE_STORE_DATABASE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++cache-roles ++
@@ -141,6 +164,8 @@ The database name the configured store should use.
 
 a|`GRAPH_CACHE_STORE_TABLE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -152,6 +177,8 @@ a|`OCIS_CACHE_TTL` +
 `GRAPH_CACHE_TTL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++336h0m0s ++
@@ -161,6 +188,8 @@ Time to live for cache records in the graph. Defaults to '336h' (2 weeks). See t
 a|`OCIS_CACHE_SIZE` +
 `GRAPH_CACHE_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -172,6 +201,8 @@ a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `GRAPH_CACHE_DISABLE_PERSISTENCE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -181,6 +212,8 @@ Disables persistence of the cache. Only applies when store type 'nats-js-kv' is 
 a|`OCIS_CACHE_AUTH_USERNAME` +
 `GRAPH_CACHE_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -192,6 +225,8 @@ a|`OCIS_CACHE_AUTH_PASSWORD` +
 `GRAPH_CACHE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -200,6 +235,8 @@ The password to authenticate with the cache. Only applies when store type 'nats-
 
 a|`GRAPH_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -210,6 +247,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`GRAPH_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -218,6 +257,8 @@ Token to secure the metrics endpoint.
 
 a|`GRAPH_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -228,6 +269,8 @@ Enables pprof, which can be used for profiling.
 a|`GRAPH_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -236,6 +279,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`GRAPH_HTTP_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -246,6 +291,8 @@ The bind address of the HTTP service.
 a|`GRAPH_HTTP_ROOT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/graph ++
@@ -254,6 +301,8 @@ Subdirectory that serves as the root for this HTTP service.
 
 a|`OCIS_HTTP_TLS_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -264,6 +313,8 @@ Activates TLS for the http based services using the server certifcate and key co
 a|`OCIS_HTTP_TLS_CERTIFICATE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -273,6 +324,8 @@ Path/File name of the TLS server certificate (in PEM format) for the http servic
 a|`OCIS_HTTP_TLS_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -281,6 +334,8 @@ Path/File name for the TLS certificate key (in PEM format) for the server certif
 
 a|`GRAPH_HTTP_API_TOKEN` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -292,6 +347,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `GRAPH_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[*] ++
@@ -301,6 +358,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `GRAPH_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -312,6 +371,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `GRAPH_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Purge Restore] ++
@@ -322,6 +383,8 @@ a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `GRAPH_CORS_ALLOW_CREDENTIALS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -330,6 +393,8 @@ Allow credentials for CORS.See following chapter for more details: *Access-Contr
 
 a|`GRAPH_GROUP_MEMBERS_PATCH_LIMIT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -340,6 +405,8 @@ The amount of group members allowed to be added with a single patch request.
 a|`GRAPH_USERNAME_MATCH` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++default ++
@@ -348,6 +415,8 @@ Apply restrictions to usernames. Supported values are 'default' and 'none'. When
 
 a|`GRAPH_ASSIGN_DEFAULT_USER_ROLE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -358,6 +427,8 @@ Whether to assign newly created users the default role 'User'. Set this to 'fals
 a|`GRAPH_IDENTITY_SEARCH_MIN_LENGTH` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++3 ++
@@ -366,6 +437,8 @@ The minimum length the search term needs to have for unprivileged users when sea
 
 a|`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -376,6 +449,8 @@ Mask user email addresses in responses.
 a|`OCIS_REVA_GATEWAY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
@@ -385,6 +460,8 @@ The CS3 gateway endpoint.
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -393,6 +470,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -404,6 +483,8 @@ a|`OCIS_JWT_SECRET` +
 `GRAPH_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -413,6 +494,8 @@ The secret to mint and validate jwt tokens.
 a|`GRAPH_APPLICATION_ID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -421,6 +504,8 @@ The ocis application ID shown in the graph. All app roles are tied to this ID.
 
 a|`GRAPH_APPLICATION_DISPLAYNAME` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -432,6 +517,8 @@ a|`OCIS_URL` +
 `GRAPH_SPACES_WEBDAV_BASE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -440,6 +527,8 @@ The public facing URL of WebDAV.
 
 a|`GRAPH_SPACES_WEBDAV_PATH` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -450,6 +539,8 @@ The WebDAV sub-path for spaces.
 a|`GRAPH_SPACES_DEFAULT_QUOTA` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++1000000000 ++
@@ -458,6 +549,8 @@ The default quota in bytes.
 
 a|`GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -468,6 +561,8 @@ Max TTL in seconds for the spaces property cache.
 a|`GRAPH_SPACES_USERS_CACHE_TTL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++60000000000 ++
@@ -476,6 +571,8 @@ Max TTL in seconds for the spaces users cache.
 
 a|`GRAPH_SPACES_GROUPS_CACHE_TTL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -486,6 +583,8 @@ Max TTL in seconds for the spaces groups cache.
 a|`GRAPH_SPACES_STORAGE_USERS_ADDRESS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++com.owncloud.api.storage-users ++
@@ -495,6 +594,8 @@ The address of the storage-users service.
 a|`OCIS_DEFAULT_LANGUAGE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -503,6 +604,8 @@ The default language used by services and the WebUI. If not defined, English wil
 
 a|`GRAPH_IDENTITY_BACKEND` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -514,6 +617,8 @@ a|`OCIS_LDAP_URI` +
 `GRAPH_LDAP_URI` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
@@ -523,6 +628,8 @@ URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and '
 a|`OCIS_LDAP_CACERT` +
 `GRAPH_LDAP_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -534,6 +641,8 @@ a|`OCIS_LDAP_INSECURE` +
 `GRAPH_LDAP_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -543,6 +652,8 @@ Disable TLS certificate validation for the LDAP connections. Do not set this in 
 a|`OCIS_LDAP_BIND_DN` +
 `GRAPH_LDAP_BIND_DN` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -554,6 +665,8 @@ a|`OCIS_LDAP_BIND_PASSWORD` +
 `GRAPH_LDAP_BIND_PASSWORD` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -563,6 +676,8 @@ Password to use for authenticating the 'bind_dn'.
 a|`GRAPH_LDAP_SERVER_UUID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -571,6 +686,8 @@ If set to true, rely on the LDAP Server to generate a unique ID for users and gr
 
 a|`GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -582,6 +699,8 @@ a|`OCIS_LDAP_SERVER_WRITE_ENABLED` +
 `GRAPH_LDAP_SERVER_WRITE_ENABLED` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -590,6 +709,8 @@ Allow creating, modifying and deleting LDAP users via the GRAPH API. This can on
 
 a|`GRAPH_LDAP_REFINT_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -601,6 +722,8 @@ a|`OCIS_LDAP_USER_BASE_DN` +
 `GRAPH_LDAP_USER_BASE_DN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ou=users,o=libregraph-idm ++
@@ -610,6 +733,8 @@ Search base DN for looking up LDAP users.
 a|`OCIS_LDAP_USER_SCOPE` +
 `GRAPH_LDAP_USER_SCOPE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -621,6 +746,8 @@ a|`OCIS_LDAP_USER_FILTER` +
 `GRAPH_LDAP_USER_FILTER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -630,6 +757,8 @@ LDAP filter to add to the default filters for user search like '(objectclass=own
 a|`OCIS_LDAP_USER_OBJECTCLASS` +
 `GRAPH_LDAP_USER_OBJECTCLASS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -641,6 +770,8 @@ a|`OCIS_LDAP_USER_SCHEMA_MAIL` +
 `GRAPH_LDAP_USER_EMAIL_ATTRIBUTE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++mail ++
@@ -650,6 +781,8 @@ LDAP Attribute to use for the email address of users.
 a|`LDAP_USER_SCHEMA_DISPLAY_NAME` +
 `GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -661,6 +794,8 @@ a|`OCIS_LDAP_USER_SCHEMA_USERNAME` +
 `GRAPH_LDAP_USER_NAME_ATTRIBUTE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++uid ++
@@ -670,6 +805,8 @@ LDAP Attribute to use for username of users.
 a|`OCIS_LDAP_USER_SCHEMA_ID` +
 `GRAPH_LDAP_USER_UID_ATTRIBUTE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -681,6 +818,8 @@ a|`OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
 `GRAPH_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -690,6 +829,8 @@ Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING'
 a|`OCIS_LDAP_USER_SCHEMA_USER_TYPE` +
 `GRAPH_LDAP_USER_TYPE_ATTRIBUTE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -701,6 +842,8 @@ a|`OCIS_LDAP_USER_ENABLED_ATTRIBUTE` +
 `GRAPH_USER_ENABLED_ATTRIBUTE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ownCloudUserEnabled ++
@@ -710,6 +853,8 @@ LDAP Attribute to use as a flag telling if the user is enabled or disabled.
 a|`OCIS_LDAP_DISABLE_USER_MECHANISM` +
 `GRAPH_DISABLE_USER_MECHANISM` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -721,6 +866,8 @@ a|`OCIS_LDAP_DISABLED_USERS_GROUP_DN` +
 `GRAPH_DISABLED_USERS_GROUP_DN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++cn=DisabledUsersGroup,ou=groups,o=libregraph-idm ++
@@ -731,6 +878,8 @@ a|`OCIS_LDAP_GROUP_BASE_DN` +
 `GRAPH_LDAP_GROUP_BASE_DN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ou=groups,o=libregraph-idm ++
@@ -739,6 +888,8 @@ Search base DN for looking up LDAP groups.
 
 a|`GRAPH_LDAP_GROUP_CREATE_BASE_DN` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -750,6 +901,8 @@ a|`OCIS_LDAP_GROUP_SCOPE` +
 `GRAPH_LDAP_GROUP_SEARCH_SCOPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++sub ++
@@ -759,6 +912,8 @@ LDAP search scope to use when looking up groups. Supported scopes are 'base', 'o
 a|`OCIS_LDAP_GROUP_FILTER` +
 `GRAPH_LDAP_GROUP_FILTER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -770,6 +925,8 @@ a|`OCIS_LDAP_GROUP_OBJECTCLASS` +
 `GRAPH_LDAP_GROUP_OBJECTCLASS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++groupOfNames ++
@@ -779,6 +936,8 @@ The object class to use for groups in the default group search filter ('groupOfN
 a|`OCIS_LDAP_GROUP_SCHEMA_GROUPNAME` +
 `GRAPH_LDAP_GROUP_NAME_ATTRIBUTE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -790,6 +949,8 @@ a|`OCIS_LDAP_GROUP_SCHEMA_MEMBER` +
 `GRAPH_LDAP_GROUP_MEMBER_ATTRIBUTE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++member ++
@@ -799,6 +960,8 @@ LDAP Attribute that is used for group members.
 a|`OCIS_LDAP_GROUP_SCHEMA_ID` +
 `GRAPH_LDAP_GROUP_ID_ATTRIBUTE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -810,6 +973,8 @@ a|`OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
 `GRAPH_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -818,6 +983,8 @@ Set this to true if the defined 'ID' attribute for groups is of the 'OCTETSTRING
 
 a|`GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -828,6 +995,8 @@ Enable LDAP support for managing education related resources.
 a|`GRAPH_LDAP_SCHOOL_BASE_DN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -836,6 +1005,8 @@ Search base DN for looking up LDAP schools.
 
 a|`GRAPH_LDAP_SCHOOL_SEARCH_SCOPE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -846,6 +1017,8 @@ LDAP search scope to use when looking up schools. Supported scopes are 'base', '
 a|`GRAPH_LDAP_SCHOOL_FILTER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -854,6 +1027,8 @@ LDAP filter to add to the default filters for school searches.
 
 a|`GRAPH_LDAP_SCHOOL_OBJECTCLASS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -864,6 +1039,8 @@ The object class to use for schools in the default school search filter.
 a|`GRAPH_LDAP_SCHOOL_NAME_ATTRIBUTE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -872,6 +1049,8 @@ LDAP Attribute to use for the name of a school.
 
 a|`GRAPH_LDAP_SCHOOL_NUMBER_ATTRIBUTE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -882,6 +1061,8 @@ LDAP Attribute to use for the number of a school.
 a|`GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -891,6 +1072,8 @@ LDAP Attribute to use as the unique id for schools. This should be a stable glob
 a|`GRAPH_LDAP_SCHOOL_TERMINATION_MIN_GRACE_DAYS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++0 ++
@@ -899,6 +1082,8 @@ When setting a 'terminationDate' for a school, require the date to be at least t
 
 a|`GRAPH_INCLUDE_OCM_SHAREES` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -910,6 +1095,8 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `GRAPH_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
@@ -919,6 +1106,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 `GRAPH_EVENTS_CLUSTER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -930,6 +1119,8 @@ a|`OCIS_INSECURE` +
 `GRAPH_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -939,6 +1130,8 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `GRAPH_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -950,6 +1143,8 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `GRAPH_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -959,6 +1154,8 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a|`OCIS_EVENTS_AUTH_USERNAME` +
 `GRAPH_EVENTS_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -970,6 +1167,8 @@ a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `GRAPH_EVENTS_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -979,6 +1178,8 @@ The password to authenticate with the events broker. The events broker is the oc
 a|`OCIS_KEYCLOAK_BASE_PATH` +
 `GRAPH_KEYCLOAK_BASE_PATH` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -990,6 +1191,8 @@ a|`OCIS_KEYCLOAK_CLIENT_ID` +
 `GRAPH_KEYCLOAK_CLIENT_ID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -999,6 +1202,8 @@ The client id to authenticate with keycloak.
 a|`OCIS_KEYCLOAK_CLIENT_SECRET` +
 `GRAPH_KEYCLOAK_CLIENT_SECRET` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -1010,6 +1215,8 @@ a|`OCIS_KEYCLOAK_CLIENT_REALM` +
 `GRAPH_KEYCLOAK_CLIENT_REALM` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -1019,6 +1226,8 @@ The realm the client is defined in.
 a|`OCIS_KEYCLOAK_USER_REALM` +
 `GRAPH_KEYCLOAK_USER_REALM` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -1030,6 +1239,8 @@ a|`OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY` +
 `GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -1040,6 +1251,8 @@ a|`OCIS_SERVICE_ACCOUNT_ID` +
 `GRAPH_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -1049,6 +1262,8 @@ The ID of the service account the service should use. See the 'auth-service' ser
 a|`OCIS_SERVICE_ACCOUNT_SECRET` +
 `GRAPH_SERVICE_ACCOUNT_SECRET` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -18,7 +18,7 @@ ifeval::[{show-deprecation} == true]
 
 | COLLABORATION_CS3API_GATEWAY_NAME removed for simplicity.
 | 6.0
-| %%NEXT_PRODUCTION_VERSION%%
+| next-prod
 | 
 |===
 
@@ -31,12 +31,15 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
 
 a|`COLLABORATION_APP_NAME` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -47,6 +50,8 @@ The name of the app, either Collabora, OnlyOffice or Microsoft365
 a|`COLLABORATION_APP_DESCRIPTION` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++Open office documents with Collabora ++
@@ -55,6 +60,8 @@ App description
 
 a|`COLLABORATION_APP_ICON` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -65,6 +72,8 @@ Icon for the app
 a|`COLLABORATION_APP_LOCKNAME` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++com.github.owncloud.collaboration ++
@@ -74,6 +83,8 @@ Name for the app lock
 a|`COLLABORATION_APP_ADDR` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://127.0.0.1:9980 ++
@@ -82,6 +93,8 @@ The URL where the WOPI app is located, such as \https://127.0.0.1:8080.
 
 a|`COLLABORATION_APP_INSECURE` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -93,6 +106,8 @@ a|`OCIS_JWT_SECRET` +
 `COLLABORATION_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -101,6 +116,8 @@ The secret to mint and validate jwt tokens.
 
 a|`COLLABORATION_GRPC_ADDR` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -111,6 +128,8 @@ The bind address of the GRPC service.
 a|`COLLABORATION_HTTP_ADDR` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9300 ++
@@ -119,6 +138,8 @@ The bind address of the HTTP service.
 
 a|`OCIS_HTTP_TLS_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -129,6 +150,8 @@ Activates TLS for the http based services using the server certifcate and key co
 a|`OCIS_HTTP_TLS_CERTIFICATE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -137,6 +160,8 @@ Path/File name of the TLS server certificate (in PEM format) for the http servic
 
 a|`OCIS_HTTP_TLS_KEY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -147,6 +172,8 @@ Path/File name for the TLS certificate key (in PEM format) for the server certif
 a|`COLLABORATION_WOPI_SRC` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9300 ++
@@ -155,6 +182,8 @@ The WOPISrc base URL containing schema, host and port. Set this to the schema an
 
 a|`COLLABORATION_WOPI_SECRET` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -166,6 +195,8 @@ a|`COLLABORATION_WOPI_DISABLE_CHAT` +
 `OCIS_WOPI_DISABLE_CHAT` +
 
 a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -174,7 +205,9 @@ Disable chat in the frontend.
 
 a|`OCIS_REVA_GATEWAY` +
 `COLLABORATION_CS3API_GATEWAY_NAME` +
-xref:deprecation-note-2024-07-19-09-38-47[Deprecation Note]
+xref:deprecation-note-2024-07-19-10-01-34[Deprecation Note]
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -184,6 +217,8 @@ CS3 gateway used to look up user metadata.
 
 a|`COLLABORATION_CS3API_DATAGATEWAY_INSECURE` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -195,6 +230,8 @@ a|`OCIS_TRACING_ENABLED` +
 `COLLABORATION_TRACING_ENABLED` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -204,6 +241,8 @@ Activates tracing.
 a|`OCIS_TRACING_TYPE` +
 `COLLABORATION_TRACING_TYPE` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -215,6 +254,8 @@ a|`OCIS_TRACING_ENDPOINT` +
 `COLLABORATION_TRACING_ENDPOINT` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -224,6 +265,8 @@ The endpoint of the tracing agent.
 a|`OCIS_TRACING_COLLECTOR` +
 `COLLABORATION_TRACING_COLLECTOR` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -235,6 +278,8 @@ a|`OCIS_LOG_LEVEL` +
 `COLLABORATION_LOG_LEVEL` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -244,6 +289,8 @@ The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'deb
 a|`OCIS_LOG_PRETTY` +
 `COLLABORATION_LOG_PRETTY` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -255,6 +302,8 @@ a|`OCIS_LOG_COLOR` +
 `COLLABORATION_LOG_COLOR` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -265,6 +314,8 @@ a|`OCIS_LOG_FILE` +
 `COLLABORATION_LOG_FILE` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -273,6 +324,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`COLLABORATION_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -283,6 +336,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`COLLABORATION_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -292,6 +347,8 @@ Token to secure the metrics endpoint.
 a|`COLLABORATION_DEBUG_PPROF` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -300,6 +357,8 @@ Enables pprof, which can be used for profiling.
 
 a|`COLLABORATION_DEBUG_ZPAGES` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

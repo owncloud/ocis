@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the clientlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -18,7 +18,7 @@ ifeval::[{show-deprecation} == true]
 
 | CLIENTLOG_REVA_GATEWAY removed for simplicity.
 | 6.0
-| %%NEXT_PRODUCTION_VERSION%%
+| next-prod
 | 
 |===
 
@@ -31,6 +31,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -38,6 +39,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `CLIENTLOG_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -49,6 +52,8 @@ a|`OCIS_TRACING_TYPE` +
 `CLIENTLOG_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -58,6 +63,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `CLIENTLOG_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -69,6 +76,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `CLIENTLOG_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -78,6 +87,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `CLIENTLOG_USERLOG_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -89,6 +100,8 @@ a|`OCIS_LOG_PRETTY` +
 `CLIENTLOG_USERLOG_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -98,6 +111,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `CLIENTLOG_USERLOG_LOG_COLOR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -109,6 +124,8 @@ a|`OCIS_LOG_FILE` +
 `CLIENTLOG_USERLOG_LOG_FILE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -117,6 +134,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`CLIENTLOG_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -127,6 +146,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`CLIENTLOG_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -136,6 +157,8 @@ Token to secure the metrics endpoint.
 a|`CLIENTLOG_DEBUG_PPROF` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -144,6 +167,8 @@ Enables pprof, which can be used for profiling.
 
 a|`CLIENTLOG_DEBUG_ZPAGES` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -155,6 +180,8 @@ a|`OCIS_JWT_SECRET` +
 `CLIENTLOG_JWT_SECRET` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -163,7 +190,9 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `CLIENTLOG_REVA_GATEWAY` +
-xref:deprecation-note-2024-07-19-09-38-47[Deprecation Note]
+xref:deprecation-note-2024-07-19-10-01-34[Deprecation Note]
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -175,6 +204,8 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `CLIENTLOG_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
@@ -184,6 +215,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 `CLIENTLOG_EVENTS_CLUSTER` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -195,6 +228,8 @@ a|`OCIS_INSECURE` +
 `CLIENTLOG_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -204,6 +239,8 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `CLIENTLOG_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -215,6 +252,8 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `CLIENTLOG_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -224,6 +263,8 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a|`OCIS_EVENTS_AUTH_USERNAME` +
 `CLIENTLOG_EVENTS_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -235,6 +276,8 @@ a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `CLIENTLOG_EVENTS_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -245,6 +288,8 @@ a|`OCIS_SERVICE_ACCOUNT_ID` +
 `CLIENTLOG_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -254,6 +299,8 @@ The ID of the service account the service should use. See the 'auth-service' ser
 a|`OCIS_SERVICE_ACCOUNT_SECRET` +
 `CLIENTLOG_SERVICE_ACCOUNT_SECRET` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

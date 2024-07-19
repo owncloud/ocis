@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the storage-system service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `STORAGE_SYSTEM_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `STORAGE_SYSTEM_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `STORAGE_SYSTEM_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `STORAGE_SYSTEM_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `STORAGE_SYSTEM_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `STORAGE_SYSTEM_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `STORAGE_SYSTEM_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `STORAGE_SYSTEM_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`STORAGE_SYSTEM_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`STORAGE_SYSTEM_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint
 
 a|`STORAGE_SYSTEM_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling
 a|`STORAGE_SYSTEM_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -148,6 +173,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`STORAGE_SYSTEM_GRPC_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -158,6 +185,8 @@ The bind address of the GRPC service.
 a|`STORAGE_SYSTEM_GRPC_PROTOCOL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++tcp ++
@@ -167,6 +196,8 @@ The transport protocol of the GPRC service.
 a|`STORAGE_SYSTEM_HTTP_ADDR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9216 ++
@@ -175,6 +206,8 @@ The bind address of the HTTP service.
 
 a|`STORAGE_SYSTEM_HTTP_PROTOCOL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -186,6 +219,8 @@ a|`OCIS_JWT_SECRET` +
 `STORAGE_SYSTEM_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -194,6 +229,8 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -204,6 +241,8 @@ The CS3 gateway endpoint.
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -212,6 +251,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -222,6 +263,8 @@ Path/File name for the root CA certificate (in PEM format) used to validate TLS 
 a|`OCIS_SYSTEM_USER_ID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -231,6 +274,8 @@ ID of the oCIS storage-system system user. Admins need to set the ID for the STO
 a|`OCIS_SYSTEM_USER_API_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -239,6 +284,8 @@ API key for the STORAGE-SYSTEM system user.
 
 a|`STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -250,6 +297,8 @@ a|`OCIS_CACHE_STORE` +
 `STORAGE_SYSTEM_CACHE_STORE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
@@ -260,6 +309,8 @@ a|`OCIS_CACHE_STORE_NODES` +
 `STORAGE_SYSTEM_CACHE_STORE_NODES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
@@ -268,6 +319,8 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 
 a|`OCIS_CACHE_DATABASE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -279,6 +332,8 @@ a|`OCIS_CACHE_TTL` +
 `STORAGE_SYSTEM_CACHE_TTL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++24m0s ++
@@ -288,6 +343,8 @@ Default time to live for user info in the user info cache. Only applied when acc
 a|`OCIS_CACHE_SIZE` +
 `STORAGE_SYSTEM_CACHE_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -299,6 +356,8 @@ a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `STORAGE_SYSTEM_CACHE_DISABLE_PERSISTENCE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -308,6 +367,8 @@ Disables persistence of the cache. Only applies when store type 'nats-js-kv' is 
 a|`OCIS_CACHE_AUTH_USERNAME` +
 `STORAGE_SYSTEM_CACHE_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -319,6 +380,8 @@ a|`OCIS_CACHE_AUTH_PASSWORD` +
 `STORAGE_SYSTEM_CACHE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -327,6 +390,8 @@ Password for the configured store. Only applies when store type 'nats-js-kv' is 
 
 a|`STORAGE_SYSTEM_DRIVER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -338,6 +403,8 @@ a|`OCIS_DECOMPOSEDFS_METADATA_BACKEND` +
 `STORAGE_SYSTEM_OCIS_METADATA_BACKEND` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++messagepack ++
@@ -346,6 +413,8 @@ The backend to use for storing metadata. Supported values are 'messagepack' and 
 
 a|`STORAGE_SYSTEM_OCIS_ROOT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -356,6 +425,8 @@ Path for the directory where the STORAGE-SYSTEM service stores it's persistent d
 a|`STORAGE_SYSTEM_OCIS_MAX_ACQUIRE_LOCK_CYCLES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++20 ++
@@ -365,6 +436,8 @@ When trying to lock files, ocis will try this amount of times to acquire the loc
 a|`STORAGE_SYSTEM_OCIS_LOCK_CYCLE_DURATION_FACTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++30 ++
@@ -373,6 +446,8 @@ When trying to lock files, ocis will multiply the cycle with this factor and use
 
 a|`STORAGE_SYSTEM_DATA_SERVER_URL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

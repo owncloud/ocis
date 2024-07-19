@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `THUMBNAILS_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `THUMBNAILS_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `THUMBNAILS_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `THUMBNAILS_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `THUMBNAILS_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `THUMBNAILS_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `THUMBNAILS_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `THUMBNAILS_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`THUMBNAILS_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`THUMBNAILS_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`THUMBNAILS_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`THUMBNAILS_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -148,6 +173,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`THUMBNAILS_GRPC_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -158,6 +185,8 @@ The bind address of the GRPC service.
 a|`THUMBNAILS_HTTP_ADDR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9186 ++
@@ -166,6 +195,8 @@ The bind address of the HTTP service.
 
 a|`OCIS_HTTP_TLS_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -176,6 +207,8 @@ Activates TLS for the http based services using the server certifcate and key co
 a|`OCIS_HTTP_TLS_CERTIFICATE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -185,6 +218,8 @@ Path/File name of the TLS server certificate (in PEM format) for the http servic
 a|`OCIS_HTTP_TLS_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -193,6 +228,8 @@ Path/File name for the TLS certificate key (in PEM format) for the server certif
 
 a|`THUMBNAILS_HTTP_ROOT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -204,6 +241,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `THUMBNAILS_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++6.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[*] ++
@@ -213,6 +252,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `THUMBNAILS_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++6.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -224,6 +265,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `THUMBNAILS_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++6.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Cache-Control] ++
@@ -234,6 +277,8 @@ a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `THUMBNAILS_CORS_ALLOW_CREDENTIALS` +
 
 a| [subs=-attributes]
+++6.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -242,6 +287,8 @@ Allow credentials for CORS.See following chapter for more details: *Access-Contr
 
 a|`THUMBNAILS_MAX_CONCURRENT_REQUESTS` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -252,6 +299,8 @@ Number of maximum concurrent thumbnail requests. Default is 0 which is unlimited
 a|`THUMBNAILS_RESOLUTIONS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[16x16 32x32 64x64 128x128 1080x1920 1920x1080 2160x3840 3840x2160 4320x7680 7680x4320] ++
@@ -260,6 +309,8 @@ The supported list of target resolutions in the format WidthxHeight like 32x32. 
 
 a|`THUMBNAILS_FILESYSTEMSTORAGE_ROOT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -271,6 +322,8 @@ a|`OCIS_INSECURE` +
 `THUMBNAILS_WEBDAVSOURCE_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -281,6 +334,8 @@ a|`OCIS_INSECURE` +
 `THUMBNAILS_CS3SOURCE_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -289,6 +344,8 @@ Ignore untrusted SSL certificates when connecting to the CS3 source.
 
 a|`OCIS_REVA_GATEWAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -299,6 +356,8 @@ CS3 gateway used to look up user metadata
 a|`THUMBNAILS_TXT_FONTMAP_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -307,6 +366,8 @@ The path to a font file for txt thumbnails.
 
 a|`THUMBNAILS_TRANSFER_TOKEN` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -317,6 +378,8 @@ The secret to sign JWT to download the actual thumbnail file.
 a|`THUMBNAILS_DATA_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++http://127.0.0.1:9186/thumbnails/data ++
@@ -325,6 +388,8 @@ The HTTP endpoint where the actual thumbnail file can be downloaded.
 
 a|`THUMBNAILS_MAX_INPUT_WIDTH` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -335,6 +400,8 @@ The maximum width of an input image which is being processed.
 a|`THUMBNAILS_MAX_INPUT_HEIGHT` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++7680 ++
@@ -343,6 +410,8 @@ The maximum height of an input image which is being processed.
 
 a|`THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

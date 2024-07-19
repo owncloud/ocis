@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -31,6 +31,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -38,6 +39,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `NOTIFICATIONS_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -49,6 +52,8 @@ a|`OCIS_TRACING_TYPE` +
 `NOTIFICATIONS_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -58,6 +63,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `NOTIFICATIONS_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -69,6 +76,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `NOTIFICATIONS_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -78,6 +87,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `NOTIFICATIONS_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -89,6 +100,8 @@ a|`OCIS_LOG_PRETTY` +
 `NOTIFICATIONS_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -98,6 +111,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `NOTIFICATIONS_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -109,6 +124,8 @@ a|`OCIS_LOG_FILE` +
 `NOTIFICATIONS_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -117,6 +134,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`NOTIFICATIONS_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -127,6 +146,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`NOTIFICATIONS_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -136,6 +157,8 @@ Token to secure the metrics endpoint.
 a|`NOTIFICATIONS_DEBUG_PPROF` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -144,6 +167,8 @@ Enables pprof, which can be used for profiling.
 
 a|`NOTIFICATIONS_DEBUG_ZPAGES` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -155,6 +180,8 @@ a|`OCIS_URL` +
 `NOTIFICATIONS_WEB_UI_URL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -163,6 +190,8 @@ The public facing URL of the oCIS Web UI, used e.g. when sending notification eM
 
 a|`NOTIFICATIONS_SMTP_HOST` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -173,6 +202,8 @@ SMTP host to connect to.
 a|`NOTIFICATIONS_SMTP_PORT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++0 ++
@@ -181,6 +212,8 @@ Port of the SMTP host to connect to.
 
 a|`NOTIFICATIONS_SMTP_SENDER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -191,6 +224,8 @@ Sender address of emails that will be sent (e.g. 'ownCloud <noreply@example.com>
 a|`NOTIFICATIONS_SMTP_USERNAME` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -199,6 +234,8 @@ Username for the SMTP host to connect to.
 
 a|`NOTIFICATIONS_SMTP_PASSWORD` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -209,6 +246,8 @@ Password for the SMTP host to connect to.
 a|`NOTIFICATIONS_SMTP_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -218,6 +257,8 @@ Allow insecure connections to the SMTP server.
 a|`NOTIFICATIONS_SMTP_AUTHENTICATION` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -225,7 +266,9 @@ a| [subs=-attributes]
 Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none' or 'auto'. If set to 'auto' or unset, the authentication method is automatically negotiated with the server.
 
 a|`NOTIFICATIONS_SMTP_ENCRYPTION` +
-xref:deprecation-note-2024-07-19-09-38-47[Deprecation Note]
+xref:deprecation-note-2024-07-19-10-01-34[Deprecation Note]
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -237,6 +280,8 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `NOTIFICATIONS_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
@@ -246,6 +291,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 `NOTIFICATIONS_EVENTS_CLUSTER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -257,6 +304,8 @@ a|`OCIS_INSECURE` +
 `NOTIFICATIONS_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -266,6 +315,8 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `NOTIFICATIONS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -277,6 +328,8 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `NOTIFICATIONS_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -286,6 +339,8 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a|`OCIS_EVENTS_AUTH_USERNAME` +
 `NOTIFICATIONS_EVENTS_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -297,6 +352,8 @@ a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `NOTIFICATIONS_EVENTS_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -306,6 +363,8 @@ The password to authenticate with the events broker. The events broker is the oc
 a|`OCIS_EMAIL_TEMPLATE_PATH` +
 `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -317,6 +376,8 @@ a|`OCIS_TRANSLATION_PATH` +
 `NOTIFICATIONS_TRANSLATION_PATH` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -325,6 +386,8 @@ a| [subs=-attributes]
 
 a|`OCIS_DEFAULT_LANGUAGE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -335,6 +398,8 @@ The default language used by services and the WebUI. If not defined, English wil
 a|`OCIS_REVA_GATEWAY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
@@ -344,6 +409,8 @@ CS3 gateway used to look up user metadata
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -352,6 +419,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -363,6 +432,8 @@ a|`OCIS_SERVICE_ACCOUNT_ID` +
 `NOTIFICATIONS_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -372,6 +443,8 @@ The ID of the service account the service should use. See the 'auth-service' ser
 a|`OCIS_SERVICE_ACCOUNT_SECRET` +
 `NOTIFICATIONS_SERVICE_ACCOUNT_SECRET` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

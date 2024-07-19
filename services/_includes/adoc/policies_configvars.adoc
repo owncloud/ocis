@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the policies service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,12 +26,15 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
 
 a|`POLICIES_GRPC_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -42,6 +45,8 @@ The bind address of the GRPC service.
 a|`POLICIES_DEBUG_ADDR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9129 ++
@@ -50,6 +55,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 
 a|`POLICIES_DEBUG_TOKEN` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -60,6 +67,8 @@ Token to secure the metrics endpoint.
 a|`POLICIES_DEBUG_PPROF` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -68,6 +77,8 @@ Enables pprof, which can be used for profiling.
 
 a|`POLICIES_DEBUG_ZPAGES` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -79,6 +90,8 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `POLICIES_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
@@ -88,6 +101,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 `POLICIES_EVENTS_CLUSTER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -99,6 +114,8 @@ a|`OCIS_INSECURE` +
 `POLICIES_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -108,6 +125,8 @@ Whether the server should skip the client certificate verification during the TL
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `POLICIES_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -119,6 +138,8 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `POLICIES_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -128,6 +149,8 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a|`OCIS_EVENTS_AUTH_USERNAME` +
 `POLICIES_EVENTS_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -139,6 +162,8 @@ a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `POLICIES_EVENTS_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -148,6 +173,8 @@ The password to authenticate with the events broker. The events broker is the oc
 a|`OCIS_LOG_LEVEL` +
 `POLICIES_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -159,6 +186,8 @@ a|`OCIS_LOG_PRETTY` +
 `POLICIES_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -168,6 +197,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `POLICIES_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -179,6 +210,8 @@ a|`OCIS_LOG_FILE` +
 `POLICIES_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -187,6 +220,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`POLICIES_ENGINE_TIMEOUT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
@@ -197,6 +232,8 @@ Sets the timeout the rego expression evaluation can take. Rules default to deny 
 a|`POLICIES_ENGINE_MIMES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -205,6 +242,8 @@ Sets the mimes file path which maps mimetypes to associated file extensions. See
 
 a|`POLICIES_POSTPROCESSING_QUERY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -216,6 +255,8 @@ a|`OCIS_TRACING_ENABLED` +
 `POLICIES_TRACING_ENABLED` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -225,6 +266,8 @@ Activates tracing.
 a|`OCIS_TRACING_TYPE` +
 `POLICIES_TRACING_TYPE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -236,6 +279,8 @@ a|`OCIS_TRACING_ENDPOINT` +
 `POLICIES_TRACING_ENDPOINT` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -245,6 +290,8 @@ The endpoint of the tracing agent.
 a|`OCIS_TRACING_COLLECTOR` +
 `POLICIES_TRACING_COLLECTOR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

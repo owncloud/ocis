@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `STORAGE_USERS_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `STORAGE_USERS_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `STORAGE_USERS_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `STORAGE_USERS_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `STORAGE_USERS_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `STORAGE_USERS_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `STORAGE_USERS_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `STORAGE_USERS_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`STORAGE_USERS_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`STORAGE_USERS_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`STORAGE_USERS_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`STORAGE_USERS_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -148,6 +173,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`STORAGE_USERS_GRPC_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -158,6 +185,8 @@ The bind address of the GRPC service.
 a|`STORAGE_USERS_GRPC_PROTOCOL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++tcp ++
@@ -167,6 +196,8 @@ The transport protocol of the GPRC service.
 a|`STORAGE_USERS_HTTP_ADDR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9158 ++
@@ -175,6 +206,8 @@ The bind address of the HTTP service.
 
 a|`STORAGE_USERS_HTTP_PROTOCOL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -186,6 +219,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `STORAGE_USERS_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[https://localhost:9200] ++
@@ -195,6 +230,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `STORAGE_USERS_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -206,6 +243,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `STORAGE_USERS_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[Authorization Origin X-Requested-With X-Request-Id X-HTTP-Method-Override Content-Type Upload-Length Upload-Offset Tus-Resumable Upload-Metadata Upload-Defer-Length Upload-Concat Upload-Incomplete Upload-Draft-Interop-Version] ++
@@ -215,6 +254,8 @@ A list of allowed CORS headers. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `STORAGE_USERS_CORS_ALLOW_CREDENTIALS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -226,6 +267,8 @@ a|`OCIS_CORS_EXPOSE_HEADERS` +
 `STORAGE_USERS_CORS_EXPOSE_HEADERS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[Upload-Offset Location Upload-Length Tus-Version Tus-Resumable Tus-Max-Size Tus-Extension Upload-Metadata Upload-Defer-Length Upload-Concat Upload-Incomplete Upload-Draft-Interop-Version] ++
@@ -235,6 +278,8 @@ A list of exposed CORS headers. See following chapter for more details: *Access-
 a|`OCIS_CORS_MAX_AGE` +
 `STORAGE_USERS_CORS_MAX_AGE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++uint ++
 a| [subs=-attributes]
@@ -246,6 +291,8 @@ a|`OCIS_JWT_SECRET` +
 `STORAGE_USERS_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -254,6 +301,8 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -264,6 +313,8 @@ The CS3 gateway endpoint.
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -272,6 +323,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -282,6 +335,8 @@ Path/File name for the root CA certificate (in PEM format) used to validate TLS 
 a|`STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -291,6 +346,8 @@ Disables the loading of user's group memberships from the reva access token.
 a|`STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++30 ++
@@ -299,6 +356,8 @@ The number of seconds to wait for the 'storage-users' service to shutdown cleanl
 
 a|`STORAGE_USERS_DRIVER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -310,6 +369,8 @@ a|`OCIS_DECOMPOSEDFS_METADATA_BACKEND` +
 `STORAGE_USERS_OCIS_METADATA_BACKEND` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++messagepack ++
@@ -320,6 +381,8 @@ a|`OCIS_DECOMPOSEDFS_PROPAGATOR` +
 `STORAGE_USERS_OCIS_PROPAGATOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++sync ++
@@ -328,6 +391,8 @@ The propagator used for decomposedfs. At the moment, only 'sync' is fully suppor
 
 a|`STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
@@ -338,6 +403,8 @@ The delay between a change made to a tree and the propagation start on treesize 
 a|`STORAGE_USERS_OCIS_ROOT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/users ++
@@ -346,6 +413,8 @@ The directory where the filesystem storage will store blobs and metadata. If not
 
 a|`STORAGE_USERS_OCIS_USER_LAYOUT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -357,6 +426,8 @@ a|`STORAGE_USERS_PERMISSION_ENDPOINT` +
 `STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++com.owncloud.api.settings ++
@@ -365,6 +436,8 @@ Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3
 
 a|`STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -375,6 +448,8 @@ Template string to construct personal space aliases.
 a|`STORAGE_USERS_OCIS_PERSONAL_SPACE_PATH_TEMPLATE` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -383,6 +458,8 @@ Template string to construct the paths of the personal space roots.
 
 a|`STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -393,6 +470,8 @@ Template string to construct general space aliases.
 a|`STORAGE_USERS_OCIS_GENERAL_SPACE_PATH_TEMPLATE` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -401,6 +480,8 @@ Template string to construct the paths of the projects space roots.
 
 a|`STORAGE_USERS_OCIS_SHARE_FOLDER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -411,6 +492,8 @@ Name of the folder jailing all shares.
 a|`STORAGE_USERS_OCIS_MAX_ACQUIRE_LOCK_CYCLES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++20 ++
@@ -419,6 +502,8 @@ When trying to lock files, ocis will try this amount of times to acquire the loc
 
 a|`STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -429,6 +514,8 @@ When trying to lock files, ocis will multiply the cycle with this factor and use
 a|`STORAGE_USERS_OCIS_MAX_CONCURRENCY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++5 ++
@@ -437,6 +524,8 @@ Maximum number of concurrent go-routines. Higher values can potentially get work
 
 a|`OCIS_ASYNC_UPLOADS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -448,6 +537,8 @@ a|`OCIS_SPACES_MAX_QUOTA` +
 `STORAGE_USERS_OCIS_MAX_QUOTA` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
 ++0 ++
@@ -457,6 +548,8 @@ Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If no
 a|`OCIS_DISABLE_VERSIONING` +
 
 a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -465,6 +558,8 @@ Disables versioning of files. When set to true, new uploads with the same filena
 
 a|`STORAGE_USERS_S3NG_METADATA_BACKEND` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -476,6 +571,8 @@ a|`OCIS_DECOMPOSEDFS_PROPAGATOR` +
 `STORAGE_USERS_S3NG_PROPAGATOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++sync ++
@@ -484,6 +581,8 @@ The propagator used for decomposedfs. At the moment, only 'sync' is fully suppor
 
 a|`STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
@@ -494,6 +593,8 @@ The delay between a change made to a tree and the propagation start on treesize 
 a|`STORAGE_USERS_S3NG_ROOT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/users ++
@@ -502,6 +603,8 @@ The directory where the filesystem storage will store metadata for blobs. If not
 
 a|`STORAGE_USERS_S3NG_USER_LAYOUT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -513,6 +616,8 @@ a|`STORAGE_USERS_PERMISSION_ENDPOINT` +
 `STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++com.owncloud.api.settings ++
@@ -521,6 +626,8 @@ Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3
 
 a|`STORAGE_USERS_S3NG_REGION` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -531,6 +638,8 @@ Region of the S3 bucket.
 a|`STORAGE_USERS_S3NG_ACCESS_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -539,6 +648,8 @@ Access key for the S3 bucket.
 
 a|`STORAGE_USERS_S3NG_SECRET_KEY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -549,6 +660,8 @@ Secret key for the S3 bucket.
 a|`STORAGE_USERS_S3NG_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -557,6 +670,8 @@ Endpoint for the S3 bucket.
 
 a|`STORAGE_USERS_S3NG_BUCKET` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -567,6 +682,8 @@ Name of the S3 bucket.
 a|`STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_CONTENT_SHA256` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -575,6 +692,8 @@ Disable sending content sha256 when copying objects to S3.
 
 a|`STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_MULTIPART` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -585,6 +704,8 @@ Disable multipart uploads when copying objects to S3
 a|`STORAGE_USERS_S3NG_PUT_OBJECT_SEND_CONTENT_MD5` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -593,6 +714,8 @@ Send a Content-MD5 header when copying objects to S3.
 
 a|`STORAGE_USERS_S3NG_PUT_OBJECT_CONCURRENT_STREAM_PARTS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -603,6 +726,8 @@ Always precreate parts when copying objects to S3.
 a|`STORAGE_USERS_S3NG_PUT_OBJECT_NUM_THREADS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++uint ++
 a| [subs=-attributes]
 ++4 ++
@@ -611,6 +736,8 @@ Number of concurrent uploads to use when copying objects to S3.
 
 a|`STORAGE_USERS_S3NG_PUT_OBJECT_PART_SIZE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
@@ -621,6 +748,8 @@ Part size for concurrent uploads to S3.
 a|`STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++{{.SpaceType}}/{{.User.Username \| lower}} ++
@@ -629,6 +758,8 @@ Template string to construct personal space aliases.
 
 a|`STORAGE_USERS_S3NG_PERSONAL_SPACE_PATH_TEMPLATE` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -639,6 +770,8 @@ Template string to construct the paths of the personal space roots.
 a|`STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++{{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}} ++
@@ -647,6 +780,8 @@ Template string to construct general space aliases.
 
 a|`STORAGE_USERS_S3NG_GENERAL_SPACE_PATH_TEMPLATE` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -657,6 +792,8 @@ Template string to construct the paths of the projects space roots.
 a|`STORAGE_USERS_S3NG_SHARE_FOLDER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/Shares ++
@@ -665,6 +802,8 @@ Name of the folder jailing all shares.
 
 a|`STORAGE_USERS_S3NG_MAX_ACQUIRE_LOCK_CYCLES` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -675,6 +814,8 @@ When trying to lock files, ocis will try this amount of times to acquire the loc
 a|`STORAGE_USERS_S3NG_LOCK_CYCLE_DURATION_FACTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++30 ++
@@ -683,6 +824,8 @@ When trying to lock files, ocis will multiply the cycle with this factor and use
 
 a|`STORAGE_USERS_S3NG_MAX_CONCURRENCY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -693,6 +836,8 @@ Maximum number of concurrent go-routines. Higher values can potentially get work
 a|`OCIS_DISABLE_VERSIONING` +
 
 a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -701,6 +846,8 @@ Disables versioning of files. When set to true, new uploads with the same filena
 
 a|`STORAGE_USERS_OWNCLOUDSQL_DATADIR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -711,6 +858,8 @@ The directory where the filesystem storage will store SQL migration data. If not
 a|`STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/Shares ++
@@ -719,6 +868,8 @@ Name of the folder jailing all shares.
 
 a|`STORAGE_USERS_OWNCLOUDSQL_LAYOUT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -729,6 +880,8 @@ Path layout to use to navigate into a users folder in an owncloud data directory
 a|`STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/uploadinfo ++
@@ -737,6 +890,8 @@ The directory where the filesystem will store uploads temporarily. If not define
 
 a|`STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -747,6 +902,8 @@ Username for the database.
 a|`STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++owncloud ++
@@ -755,6 +912,8 @@ Password for the database.
 
 a|`STORAGE_USERS_OWNCLOUDSQL_DB_HOST` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -765,6 +924,8 @@ Hostname or IP of the database server.
 a|`STORAGE_USERS_OWNCLOUDSQL_DB_PORT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++3306 ++
@@ -773,6 +934,8 @@ Port that the database server is listening on.
 
 a|`STORAGE_USERS_OWNCLOUDSQL_DB_NAME` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -783,6 +946,8 @@ Name of the database to be used.
 a|`STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++com.owncloud.api.users ++
@@ -791,6 +956,8 @@ Endpoint of the users provider.
 
 a|`STORAGE_USERS_POSIX_ROOT` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -801,6 +968,8 @@ The directory where the filesystem storage will store its data. If not defined, 
 a|`STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++users/{{.User.Username}} ++
@@ -809,6 +978,8 @@ Template string to construct the paths of the personal space roots.
 
 a|`STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -820,6 +991,8 @@ a|`STORAGE_USERS_PERMISSION_ENDPOINT` +
 `STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++com.owncloud.api.settings ++
@@ -828,6 +1001,8 @@ Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix
 
 a|`OCIS_ASYNC_UPLOADS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -838,6 +1013,8 @@ Enable asynchronous file uploads.
 a|`STORAGE_USERS_POSIX_USE_SPACE_GROUPS` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -846,6 +1023,8 @@ Use space groups to manage permissions on spaces.
 
 a|`STORAGE_USERS_POSIX_WATCH_TYPE` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -856,6 +1035,8 @@ Type of the watcher to use for getting notified about changes to the filesystem.
 a|`STORAGE_USERS_POSIX_WATCH_PATH` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -864,6 +1045,8 @@ Path to the watch directory/file. Only applies to the 'gpfsfileauditlogging' and
 
 a|`STORAGE_USERS_POSIX_WATCH_FOLDER_KAFKA_BROKERS` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -874,6 +1057,8 @@ Comma-separated list of kafka brokers to read the watchfolder events from.
 a|`STORAGE_USERS_DATA_SERVER_URL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++http://localhost:9158/data ++
@@ -883,6 +1068,8 @@ URL of the data server, needs to be reachable by the data gateway provided by th
 a|`STORAGE_USERS_DATA_GATEWAY_URL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200/data ++
@@ -891,6 +1078,8 @@ URL of the data gateway server
 
 a|`STORAGE_USERS_TRANSFER_EXPIRES` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int64 ++
 a| [subs=-attributes]
@@ -902,6 +1091,8 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `STORAGE_USERS_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
@@ -911,6 +1102,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 `STORAGE_USERS_EVENTS_CLUSTER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -922,6 +1115,8 @@ a|`OCIS_INSECURE` +
 `STORAGE_USERS_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -931,6 +1126,8 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -942,6 +1139,8 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `STORAGE_USERS_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -950,6 +1149,8 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 
 a|`STORAGE_USERS_EVENTS_NUM_CONSUMERS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -961,6 +1162,8 @@ a|`OCIS_EVENTS_AUTH_USERNAME` +
 `STORAGE_USERS_EVENTS_AUTH_USERNAME` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -970,6 +1173,8 @@ The username to authenticate with the events broker. The events broker is the oc
 a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `STORAGE_USERS_EVENTS_AUTH_PASSWORD` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -981,6 +1186,8 @@ a|`OCIS_CACHE_STORE` +
 `STORAGE_USERS_FILEMETADATA_CACHE_STORE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
@@ -991,6 +1198,8 @@ a|`OCIS_CACHE_STORE_NODES` +
 `STORAGE_USERS_FILEMETADATA_CACHE_STORE_NODES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
@@ -999,6 +1208,8 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 
 a|`OCIS_CACHE_DATABASE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -1010,6 +1221,8 @@ a|`OCIS_CACHE_TTL` +
 `STORAGE_USERS_FILEMETADATA_CACHE_TTL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++24m0s ++
@@ -1019,6 +1232,8 @@ Default time to live for user info in the user info cache. Only applied when acc
 a|`OCIS_CACHE_SIZE` +
 `STORAGE_USERS_FILEMETADATA_CACHE_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -1030,6 +1245,8 @@ a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `STORAGE_USERS_FILEMETADATA_CACHE_DISABLE_PERSISTENCE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -1039,6 +1256,8 @@ Disables persistence of the cache. Only applies when store type 'nats-js-kv' is 
 a|`OCIS_CACHE_AUTH_USERNAME` +
 `STORAGE_USERS_FILEMETADATA_CACHE_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -1050,6 +1269,8 @@ a|`OCIS_CACHE_AUTH_PASSWORD` +
 `STORAGE_USERS_FILEMETADATA_CACHE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -1059,6 +1280,8 @@ The password to authenticate with the cache store. Only applies when store type 
 a|`OCIS_CACHE_STORE` +
 `STORAGE_USERS_ID_CACHE_STORE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -1070,6 +1293,8 @@ a|`OCIS_CACHE_STORE_NODES` +
 `STORAGE_USERS_ID_CACHE_STORE_NODES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
@@ -1078,6 +1303,8 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 
 a|`OCIS_CACHE_DATABASE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -1089,6 +1316,8 @@ a|`OCIS_CACHE_TTL` +
 `STORAGE_USERS_ID_CACHE_TTL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++24m0s ++
@@ -1098,6 +1327,8 @@ Default time to live for user info in the user info cache. Only applied when acc
 a|`OCIS_CACHE_SIZE` +
 `STORAGE_USERS_ID_CACHE_SIZE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -1109,6 +1340,8 @@ a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `STORAGE_USERS_ID_CACHE_DISABLE_PERSISTENCE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -1118,6 +1351,8 @@ Disables persistence of the cache. Only applies when store type 'nats-js-kv' is 
 a|`OCIS_CACHE_AUTH_USERNAME` +
 `STORAGE_USERS_ID_CACHE_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -1129,6 +1364,8 @@ a|`OCIS_CACHE_AUTH_PASSWORD` +
 `STORAGE_USERS_ID_CACHE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -1137,6 +1374,8 @@ The password to authenticate with the cache store. Only applies when store type 
 
 a|`STORAGE_USERS_MOUNT_ID` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -1147,6 +1386,8 @@ Mount ID of this storage.
 a|`STORAGE_USERS_EXPOSE_DATA_SERVER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -1156,6 +1397,8 @@ Exposes the data server directly to users and bypasses the data gateway. Ensure 
 a|`STORAGE_USERS_READ_ONLY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -1164,6 +1407,8 @@ Set this storage to be read-only.
 
 a|`STORAGE_USERS_UPLOAD_EXPIRATION` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int64 ++
 a| [subs=-attributes]
@@ -1175,6 +1420,8 @@ a|`OCIS_ADMIN_USER_ID` +
 `STORAGE_USERS_PURGE_TRASH_BIN_USER_ID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -1184,6 +1431,8 @@ ID of the user who collects all necessary information for deletion. Consider tha
 a|`STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++720h0m0s ++
@@ -1192,6 +1441,8 @@ Specifies the period of time in which items that have been in the personal trash
 
 a|`STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
@@ -1203,6 +1454,8 @@ a|`OCIS_SERVICE_ACCOUNT_ID` +
 `STORAGE_USERS_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -1212,6 +1465,8 @@ The ID of the service account the service should use. See the 'auth-service' ser
 a|`OCIS_SERVICE_ACCOUNT_SECRET` +
 `STORAGE_USERS_SERVICE_ACCOUNT_SECRET` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -1223,6 +1478,8 @@ a|`OCIS_GATEWAY_GRPC_ADDR` +
 `STORAGE_USERS_GATEWAY_GRPC_ADDR` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9142 ++
@@ -1233,6 +1490,8 @@ a|`OCIS_MACHINE_AUTH_API_KEY` +
 `STORAGE_USERS_MACHINE_AUTH_API_KEY` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -1241,6 +1500,8 @@ Machine auth API key used to validate internal requests necessary for the access
 
 a|`STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]

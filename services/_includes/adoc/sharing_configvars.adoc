@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `SHARING_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `SHARING_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `SHARING_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `SHARING_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `SHARING_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `SHARING_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `SHARING_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `SHARING_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`SHARING_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`SHARING_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`SHARING_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`SHARING_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -149,6 +174,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a|`SHARING_GRPC_ADDR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9150 ++
@@ -157,6 +184,8 @@ The bind address of the GRPC service.
 
 a|`SHARING_GRPC_PROTOCOL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -168,6 +197,8 @@ a|`OCIS_JWT_SECRET` +
 `SHARING_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -176,6 +207,8 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -186,6 +219,8 @@ The CS3 gateway endpoint.
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -194,6 +229,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -205,6 +242,8 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `SHARING_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
@@ -214,6 +253,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 `SHARING_EVENTS_CLUSTER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -225,6 +266,8 @@ a|`OCIS_INSECURE` +
 `SHARING_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -234,6 +277,8 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -245,6 +290,8 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `SHARING_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -254,6 +301,8 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a|`OCIS_EVENTS_AUTH_USERNAME` +
 `SHARING_EVENTS_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -265,6 +314,8 @@ a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `SHARING_EVENTS_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -273,6 +324,8 @@ Password for the events broker.
 
 a|`SHARING_SKIP_USER_GROUPS_IN_TOKEN` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -283,6 +336,8 @@ Disables the loading of user's group memberships from the reva access token.
 a|`SHARING_USER_DRIVER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++jsoncs3 ++
@@ -291,6 +346,8 @@ Driver to be used to persist shares. Supported values are 'jsoncs3', 'json', 'cs
 
 a|`SHARING_USER_JSONCS3_PROVIDER_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -302,6 +359,8 @@ a|`OCIS_SYSTEM_USER_ID` +
 `SHARING_USER_JSONCS3_SYSTEM_USER_ID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -311,6 +370,8 @@ ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STO
 a|`OCIS_SYSTEM_USER_IDP` +
 `SHARING_USER_JSONCS3_SYSTEM_USER_IDP` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -322,6 +383,8 @@ a|`OCIS_SYSTEM_USER_API_KEY` +
 `SHARING_USER_JSONCS3_SYSTEM_USER_API_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -330,6 +393,8 @@ API key for the STORAGE-SYSTEM system user.
 
 a|`SHARING_USER_JSONCS3_CACHE_TTL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -340,6 +405,8 @@ TTL for the internal caches in seconds.
 a|`SHARING_USER_JSON_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/shares.json ++
@@ -348,6 +415,8 @@ Path to the JSON file where shares will be persisted. If not defined, the root d
 
 a|`SHARING_USER_CS3_PROVIDER_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -359,6 +428,8 @@ a|`OCIS_SYSTEM_USER_ID` +
 `SHARING_USER_CS3_SYSTEM_USER_ID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -368,6 +439,8 @@ ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STO
 a|`OCIS_SYSTEM_USER_IDP` +
 `SHARING_USER_CS3_SYSTEM_USER_IDP` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -379,6 +452,8 @@ a|`OCIS_SYSTEM_USER_API_KEY` +
 `SHARING_USER_CS3_SYSTEM_USER_API_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -387,6 +462,8 @@ API key for the STORAGE-SYSTEM system user.
 
 a|`SHARING_USER_OWNCLOUDSQL_DB_USERNAME` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -397,6 +474,8 @@ Username for the database.
 a|`SHARING_USER_OWNCLOUDSQL_DB_PASSWORD` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -405,6 +484,8 @@ Password for the database.
 
 a|`SHARING_USER_OWNCLOUDSQL_DB_HOST` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -415,6 +496,8 @@ Hostname or IP of the database server.
 a|`SHARING_USER_OWNCLOUDSQL_DB_PORT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++3306 ++
@@ -423,6 +506,8 @@ Port that the database server is listening on.
 
 a|`SHARING_USER_OWNCLOUDSQL_DB_NAME` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -433,6 +518,8 @@ Name of the database to be used.
 a|`SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -441,6 +528,8 @@ Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares.
 
 a|`SHARING_PUBLIC_DRIVER` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -451,6 +540,8 @@ Driver to be used to persist public shares. Supported values are 'jsoncs3', 'jso
 a|`SHARING_PUBLIC_JSON_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/publicshares.json ++
@@ -459,6 +550,8 @@ Path to the JSON file where public share meta-data will be stored. This JSON fil
 
 a|`SHARING_PUBLIC_JSONCS3_PROVIDER_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -470,6 +563,8 @@ a|`OCIS_SYSTEM_USER_ID` +
 `SHARING_PUBLIC_JSONCS3_SYSTEM_USER_ID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -479,6 +574,8 @@ ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STO
 a|`OCIS_SYSTEM_USER_IDP` +
 `SHARING_PUBLIC_JSONCS3_SYSTEM_USER_IDP` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -490,6 +587,8 @@ a|`OCIS_SYSTEM_USER_API_KEY` +
 `SHARING_PUBLIC_JSONCS3_SYSTEM_USER_API_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -498,6 +597,8 @@ API key for the STORAGE-SYSTEM system user.
 
 a|`SHARING_PUBLIC_CS3_PROVIDER_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -509,6 +610,8 @@ a|`OCIS_SYSTEM_USER_ID` +
 `SHARING_PUBLIC_CS3_SYSTEM_USER_ID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -518,6 +621,8 @@ ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STO
 a|`OCIS_SYSTEM_USER_IDP` +
 `SHARING_PUBLIC_CS3_SYSTEM_USER_IDP` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -529,6 +634,8 @@ a|`OCIS_SYSTEM_USER_API_KEY` +
 `SHARING_PUBLIC_CS3_SYSTEM_USER_API_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -538,6 +645,8 @@ API key for the STORAGE-SYSTEM system user.
 a|`OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
 `SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -549,6 +658,8 @@ a|`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
 `SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -558,6 +669,8 @@ Set this to true if you want to enforce passwords on all public shares.
 a|`OCIS_PASSWORD_POLICY_DISABLED` +
 `SHARING_PASSWORD_POLICY_DISABLED` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -569,6 +682,8 @@ a|`OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
 `SHARING_PASSWORD_POLICY_MIN_CHARACTERS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++8 ++
@@ -578,6 +693,8 @@ Define the minimum password length. Defaults to 8 if not set.
 a|`OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
 `SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -589,6 +706,8 @@ a|`OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
 `SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++1 ++
@@ -598,6 +717,8 @@ Define the minimum number of lowercase letters. Defaults to 1 if not set.
 a|`OCIS_PASSWORD_POLICY_MIN_DIGITS` +
 `SHARING_PASSWORD_POLICY_MIN_DIGITS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -609,6 +730,8 @@ a|`OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
 `SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++1 ++
@@ -618,6 +741,8 @@ Define the minimum number of characters from the special characters list to be p
 a|`OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
 `SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

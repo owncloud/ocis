@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -31,6 +31,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -38,6 +39,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `WEB_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -49,6 +52,8 @@ a|`OCIS_TRACING_TYPE` +
 `WEB_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -58,6 +63,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `WEB_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -69,6 +76,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `WEB_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -78,6 +87,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `WEB_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -89,6 +100,8 @@ a|`OCIS_LOG_PRETTY` +
 `WEB_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -98,6 +111,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `WEB_LOG_COLOR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -109,6 +124,8 @@ a|`OCIS_LOG_FILE` +
 `WEB_LOG_FILE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -117,6 +134,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`WEB_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -127,6 +146,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`WEB_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -135,6 +156,8 @@ Token to secure the metrics endpoint.
 
 a|`WEB_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -145,6 +168,8 @@ Enables pprof, which can be used for profiling.
 a|`WEB_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -153,6 +178,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`WEB_HTTP_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -163,6 +190,8 @@ The bind address of the HTTP service.
 a|`OCIS_HTTP_TLS_ENABLED` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -171,6 +200,8 @@ Activates TLS for the http based services using the server certifcate and key co
 
 a|`OCIS_HTTP_TLS_CERTIFICATE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -181,6 +212,8 @@ Path/File name of the TLS server certificate (in PEM format) for the http servic
 a|`OCIS_HTTP_TLS_KEY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -190,6 +223,8 @@ Path/File name for the TLS certificate key (in PEM format) for the server certif
 a|`WEB_HTTP_ROOT` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/ ++
@@ -198,6 +233,8 @@ Subdirectory that serves as the root for this HTTP service.
 
 a|`WEB_CACHE_TTL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -209,6 +246,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `WEB_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[https://localhost:9200] ++
@@ -218,6 +257,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `WEB_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -229,6 +270,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `WEB_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override] ++
@@ -239,6 +282,8 @@ a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `WEB_CORS_ALLOW_CREDENTIALS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -246,7 +291,9 @@ a| [subs=-attributes]
 Allow credentials for CORS. See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 
 a|`WEB_ASSET_PATH` +
-xref:deprecation-note-2024-07-19-09-38-47[Deprecation Note]
+xref:deprecation-note-2024-07-19-10-01-34[Deprecation Note]
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -256,6 +303,8 @@ Serve ownCloud Web assets from a path on the filesystem instead of the builtin a
 
 a|`WEB_ASSET_CORE_PATH` +
 
+a| [subs=-attributes]
+++6.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -267,6 +316,8 @@ a|`OCIS_ASSET_THEMES_PATH` +
 `WEB_ASSET_THEMES_PATH` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/var/lib/ocis/web/assets/themes ++
@@ -276,6 +327,8 @@ Serve ownCloud themes from a path on the filesystem instead of the builtin asset
 a|`WEB_ASSET_APPS_PATH` +
 
 a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/var/lib/ocis/web/assets/apps ++
@@ -284,6 +337,8 @@ Serve ownCloud Web apps assets from a path on the filesystem instead of the buil
 
 a|`WEB_UI_CONFIG_FILE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -295,6 +350,8 @@ a|`OCIS_URL` +
 `WEB_UI_THEME_SERVER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -303,6 +360,8 @@ Base URL to load themes from. Will be prepended to the theme path.
 
 a|`WEB_UI_THEME_PATH` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -314,6 +373,8 @@ a|`OCIS_URL` +
 `WEB_UI_CONFIG_SERVER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -322,6 +383,8 @@ URL, where the oCIS APIs are reachable for ownCloud Web.
 
 a|`WEB_OIDC_METADATA_URL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -334,6 +397,8 @@ a|`OCIS_URL` +
 `WEB_OIDC_AUTHORITY` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
@@ -344,6 +409,8 @@ a|`OCIS_OIDC_CLIENT_ID` +
 `WEB_OIDC_CLIENT_ID` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++web ++
@@ -352,6 +419,8 @@ The OIDC client ID which ownCloud Web uses. This client needs to be set up in yo
 
 a|`WEB_OIDC_RESPONSE_TYPE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -362,6 +431,8 @@ The OIDC response type to use for authentication.
 a|`WEB_OIDC_SCOPE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++openid profile email ++
@@ -370,6 +441,8 @@ OIDC scopes to request during authentication to authorize access to user details
 
 a|`WEB_OIDC_POST_LOGOUT_REDIRECT_URI` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -380,6 +453,8 @@ This value needs to point to a valid and reachable web page. The web client will
 a|`WEB_OPTION_HOME_FOLDER` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -388,6 +463,8 @@ Specifies a folder that is used when the user navigates 'home'. Navigating home 
 
 a|`WEB_OPTION_OPEN_APPS_IN_TAB` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -399,6 +476,8 @@ a|`OCIS_DISABLE_PREVIEWS` +
 `WEB_OPTION_DISABLE_PREVIEWS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -407,6 +486,8 @@ Set this option to 'true' to disable previews in all the different web file list
 
 a|`WEB_OPTION_PREVIEW_FILE_MIMETYPES` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -417,6 +498,8 @@ A list of mimeTypes to specify which ones will be previewed in the UI. For examp
 a|`WEB_OPTION_DISABLE_FEEDBACK_LINK` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -425,6 +508,8 @@ Set this option to 'true' to disable the feedback link in the top bar. Keeping i
 
 a|`WEB_OPTION_SHARING_RECIPIENTS_PER_PAGE` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -435,6 +520,8 @@ Sets the number of users shown as recipients in the dropdown menu when sharing r
 a|`WEB_OPTION_SIDEBAR_SHARES_SHOW_ALL_ON_LOAD` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -443,6 +530,8 @@ Sets the list of the (link) shares list in the sidebar to be initially expanded.
 
 a|`WEB_OPTION_RUNNING_ON_EOS` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -453,6 +542,8 @@ Set this option to 'true' if running on an EOS storage backend (\https://eos-web
 a|`WEB_OPTION_HOVERABLE_QUICK_ACTIONS` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -461,6 +552,8 @@ Set this option to 'true' to hide quick actions (buttons appearing on file rows)
 
 a|`WEB_OPTION_ROUTING_ID_BASED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -471,6 +564,8 @@ Enable or disable fileIds being added to the URL. Defaults to 'true', because ot
 a|`WEB_OPTION_CONTEXTHELPERS_READ_MORE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -479,6 +574,8 @@ Specifies whether the 'Read more' link should be displayed or not.
 
 a|`WEB_OPTION_LOGOUT_URL` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -489,6 +586,8 @@ Adds a link to the user's profile page to point him to an external page, where h
 a|`WEB_OPTION_LOGIN_URL` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -497,6 +596,8 @@ Specifies the target URL to the login page. This is helpful when an external IdP
 
 a|`WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -507,6 +608,8 @@ Specifies whether single file link shares should be opened with the default app 
 a|`WEB_OPTION_TOKEN_STORAGE_LOCAL` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -515,6 +618,8 @@ Specifies whether the access token will be stored in the local storage when set 
 
 a|`WEB_OPTION_DISABLED_EXTENSIONS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -525,6 +630,8 @@ A list to disable specific Web extensions identified by their ID. The ID can e.g
 a|`WEB_OPTION_USER_LIST_REQUIRES_FILTER` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -533,6 +640,8 @@ Defines whether one or more filters must be set in order to list users in the We
 
 a|`WEB_OPTION_CONCURRENT_REQUESTS_RESOURCE_BATCH_ACTIONS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -543,6 +652,8 @@ Defines the maximum number of concurrent requests per file/folder/space batch ac
 a|`WEB_OPTION_CONCURRENT_REQUESTS_SSE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++0 ++
@@ -552,6 +663,8 @@ Defines the maximum number of concurrent requests in SSE event handlers. Default
 a|`WEB_OPTION_CONCURRENT_REQUESTS_SHARES_CREATE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++0 ++
@@ -560,6 +673,8 @@ Defines the maximum number of concurrent requests per sharing invite batch. Defa
 
 a|`WEB_OPTION_CONCURRENT_REQUESTS_SHARES_LIST` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
@@ -571,6 +686,8 @@ a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -579,6 +696,8 @@ The secret to mint and validate jwt tokens.
 
 a|`WEB_GATEWAY_GRPC_ADDR` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

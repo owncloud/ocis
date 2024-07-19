@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_TRACING_ENABLED` +
 `OCM_TRACING_ENABLED` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_TRACING_TYPE` +
 `OCM_TRACING_TYPE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -53,6 +58,8 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 a|`OCIS_TRACING_ENDPOINT` +
 `OCM_TRACING_ENDPOINT` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_TRACING_COLLECTOR` +
 `OCM_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -73,6 +82,8 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`OCIS_LOG_LEVEL` +
 `OCM_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -84,6 +95,8 @@ a|`OCIS_LOG_PRETTY` +
 `OCM_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -93,6 +106,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `OCM_LOG_COLOR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,6 +119,8 @@ a|`OCIS_LOG_FILE` +
 `OCM_LOG_FILE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -112,6 +129,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`OCM_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -122,6 +141,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`OCM_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -130,6 +151,8 @@ Token to secure the metrics endpoint.
 
 a|`OCM_DEBUG_PPROF` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -140,6 +163,8 @@ Enables pprof, which can be used for profiling.
 a|`OCM_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -148,6 +173,8 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`OCM_HTTP_ADDR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -158,6 +185,8 @@ The bind address of the HTTP service.
 a|`OCM_HTTP_PROTOCOL` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++tcp ++
@@ -166,6 +195,8 @@ The transport protocol of the HTTP service.
 
 a|`OCM_HTTP_PREFIX` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -177,6 +208,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `OCM_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[https://localhost:9200] ++
@@ -186,6 +219,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `OCM_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -197,6 +232,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `OCM_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
@@ -207,6 +244,8 @@ a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `OCM_CORS_ALLOW_CREDENTIALS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -216,6 +255,8 @@ Allow credentials for CORS.See following chapter for more details: *Access-Contr
 a|`OCM_GRPC_ADDR` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9282 ++
@@ -224,6 +265,8 @@ The bind address of the GRPC service.
 
 a|`OCM_GRPC_PROTOCOL` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -235,6 +278,8 @@ a|`OCIS_SERVICE_ACCOUNT_ID` +
 `OCM_SERVICE_ACCOUNT_ID` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -245,6 +290,8 @@ a|`OCIS_SERVICE_ACCOUNT_SECRET` +
 `OCM_SERVICE_ACCOUNT_SECRET` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -253,6 +300,8 @@ The service account secret.
 
 a|`OCIS_REVA_GATEWAY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -263,6 +312,8 @@ The CS3 gateway endpoint.
 a|`OCIS_GRPC_CLIENT_TLS_MODE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -271,6 +322,8 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 
 a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -281,6 +334,8 @@ Path/File name for the root CA certificate (in PEM format) used to validate TLS 
 a|`OCM_OCMD_PREFIX` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ocm ++
@@ -289,6 +344,8 @@ URL path prefix for the OCMD service. Note that the string must not start with '
 
 a|`OCM_OCMD_EXPOSE_RECIPIENT_DISPLAY_NAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -299,6 +356,8 @@ Expose the display name of OCM share recipients.
 a|`OCM_SCIENCEMESH_PREFIX` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++sciencemesh ++
@@ -307,6 +366,8 @@ URL path prefix for the ScienceMesh service. Note that the string must not start
 
 a|`OCM_MESH_DIRECTORY_URL` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -317,6 +378,8 @@ URL of the mesh directory service.
 a|`OCM_OCM_INVITE_MANAGER_DRIVER` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++json ++
@@ -325,6 +388,8 @@ Driver to be used to persist OCM invites. Supported value is only 'json'.
 
 a|`OCM_OCM_INVITE_MANAGER_JSON_FILE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -335,6 +400,8 @@ Path to the JSON file where OCM invite data will be stored. If not defined, the 
 a|`OCM_OCM_INVITE_MANAGER_TOKEN_EXPIRATION` +
 
 a| [subs=-attributes]
+++6.0.1 ++
+a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
 ++24h0m0s ++
@@ -343,6 +410,8 @@ Expiry duration for invite tokens.
 
 a|`OCM_OCM_INVITE_MANAGER_TIMEOUT` +
 
+a| [subs=-attributes]
+++6.0.1 ++
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
@@ -353,6 +422,8 @@ Timeout specifies a time limit for requests made to OCM endpoints.
 a|`OCM_OCM_INVITE_MANAGER_INSECURE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -361,6 +432,8 @@ Disable TLS certificate validation for the OCM connections. Do not set this in p
 
 a|`SHARING_OCM_PROVIDER_AUTHORIZER_DRIVER` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -371,6 +444,8 @@ Driver to be used to persist ocm invites. Supported value is only 'json'.
 a|`OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/ocm/ocmproviders.json ++
@@ -379,6 +454,8 @@ Path to the JSON file where ocm invite data will be stored. If not defined, the 
 
 a|`OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -389,6 +466,8 @@ Verify the hostname of the incoming request against the hostname of the OCM prov
 a|`OCM_OCM_SHARE_PROVIDER_DRIVER` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++json ++
@@ -397,6 +476,8 @@ Driver to be used for the OCM share provider. Supported value is only 'json'.
 
 a|`OCM_OCM_SHAREPROVIDER_JSON_FILE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -407,6 +488,8 @@ Path to the JSON file where OCM share data will be stored. If not defined, the r
 a|`OCM_OCM_SHARE_PROVIDER_INSECURE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -415,6 +498,8 @@ Disable TLS certificate validation for the OCM connections. Do not set this in p
 
 a|`OCM_WEBAPP_TEMPLATE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -425,6 +510,8 @@ Template for the webapp url.
 a|`OCM_OCM_CORE_DRIVER` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++json ++
@@ -433,6 +520,8 @@ Driver to be used for the OCM core. Supported value is only 'json'.
 
 a|`OCM_OCM_CORE_JSON_FILE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -443,6 +532,8 @@ Path to the JSON file where OCM share data will be stored. If not defined, the r
 a|`OCM_OCM_STORAGE_PROVIDER_INSECURE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -451,6 +542,8 @@ Disable TLS certificate validation for the OCM connections. Do not set this in p
 
 a|`OCM_OCM_STORAGE_PROVIDER_STORAGE_ROOT` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

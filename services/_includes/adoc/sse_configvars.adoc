@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-19-09-38-47]
+[#deprecation-note-2024-07-19-10-01-34]
 [caption=]
 .Deprecation notes for the sse service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -26,6 +26,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -33,6 +34,8 @@ endif::[]
 a|`OCIS_LOG_LEVEL` +
 `SSE_LOG_LEVEL` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -44,6 +47,8 @@ a|`OCIS_LOG_PRETTY` +
 `SSE_LOG_PRETTY` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -53,6 +58,8 @@ Activates pretty log output.
 a|`OCIS_LOG_COLOR` +
 `SSE_LOG_COLOR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -64,6 +71,8 @@ a|`OCIS_LOG_FILE` +
 `SSE_LOG_FILE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -72,6 +81,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`SSE_DEBUG_ADDR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -82,6 +93,8 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`SSE_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -91,6 +104,8 @@ Token to secure the metrics endpoint.
 a|`SSE_DEBUG_PPROF` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -99,6 +114,8 @@ Enables pprof, which can be used for profiling.
 
 a|`SSE_DEBUG_ZPAGES` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -110,6 +127,8 @@ a|`OCIS_TRACING_ENABLED` +
 `SSE_TRACING_ENABLED` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -119,6 +138,8 @@ Activates tracing.
 a|`OCIS_TRACING_TYPE` +
 `SSE_TRACING_TYPE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -130,6 +151,8 @@ a|`OCIS_TRACING_ENDPOINT` +
 `SSE_TRACING_ENDPOINT` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -139,6 +162,8 @@ The endpoint of the tracing agent.
 a|`OCIS_TRACING_COLLECTOR` +
 `SSE_TRACING_COLLECTOR` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -150,6 +175,8 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `SSE_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
@@ -159,6 +186,8 @@ The address of the event system. The event system is the message queuing service
 a|`OCIS_EVENTS_CLUSTER` +
 `SSE_EVENTS_CLUSTER` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -170,6 +199,8 @@ a|`OCIS_INSECURE` +
 `SSE_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -179,6 +210,8 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SSE_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -190,6 +223,8 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `SSE_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
@@ -199,6 +234,8 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a|`OCIS_EVENTS_AUTH_USERNAME` +
 `SSE_EVENTS_AUTH_USERNAME` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -210,6 +247,8 @@ a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `SSE_EVENTS_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -219,6 +258,8 @@ The password to authenticate with the events broker. The events broker is the oc
 a|`SSE_HTTP_ADDR` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:0 ++
@@ -227,6 +268,8 @@ The bind address of the HTTP service.
 
 a|`SSE_HTTP_ROOT` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -238,6 +281,8 @@ a|`OCIS_CORS_ALLOW_ORIGINS` +
 `SSE_CORS_ALLOW_ORIGINS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[*] ++
@@ -247,6 +292,8 @@ A list of allowed CORS origins. See following chapter for more details: *Access-
 a|`OCIS_CORS_ALLOW_METHODS` +
 `SSE_CORS_ALLOW_METHODS` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -258,6 +305,8 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 `SSE_CORS_ALLOW_HEADERS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
@@ -268,6 +317,8 @@ a|`OCIS_CORS_ALLOW_CREDENTIALS` +
 `SSE_CORS_ALLOW_CREDENTIALS` +
 
 a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
@@ -276,6 +327,8 @@ Allow credentials for CORS.See following chapter for more details: *Access-Contr
 
 a|`OCIS_HTTP_TLS_ENABLED` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -286,6 +339,8 @@ Activates TLS for the http based services using the server certifcate and key co
 a|`OCIS_HTTP_TLS_CERTIFICATE` +
 
 a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
@@ -294,6 +349,8 @@ Path/File name of the TLS server certificate (in PEM format) for the http servic
 
 a|`OCIS_HTTP_TLS_KEY` +
 
+a| [subs=-attributes]
+++pre5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -304,6 +361,8 @@ Path/File name for the TLS certificate key (in PEM format) for the server certif
 a|`OCIS_JWT_SECRET` +
 `SSE_JWT_SECRET` +
 
+a| [subs=-attributes]
+++5.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
