@@ -140,6 +140,35 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When /^the administrator reindexes all spaces using the CLI$/
+	 *
+	 * @return void
+	 */
+	public function theAdministratorReindexesAllSpacesUsingTheCli(): void {
+		$command = "search index --all-spaces";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When /^the administrator reindexes a space "([^"]*)" using the CLI$/
+	 *
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 */
+	public function theAdministratorReindexesASpaceUsingTheCli(string $spaceName): void {
+		$spaceId = $this->spacesContext->getSpaceIdByName($this->featureContext->getAdminUsername(), $spaceName);
+		$command = "search index --space $spaceId";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @Then the command should be successful
 	 *
 	 * @return void
