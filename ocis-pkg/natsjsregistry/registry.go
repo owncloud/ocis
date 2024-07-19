@@ -180,6 +180,10 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 		natsjskv.EncodeKeys(),
 	}
 
+	if ttl, ok := opts.Context.Value(expiryKey{}).(time.Duration); ok {
+		storeoptions = append(storeoptions, natsjskv.DefaultTTL(ttl))
+	}
+
 	addr := []string{"127.0.0.1:9233"}
 	if len(opts.Addrs) > 0 {
 		addr = opts.Addrs
