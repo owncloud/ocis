@@ -34,6 +34,7 @@ endif::[]
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
+| IV
 | Type
 | Default Value
 | Description
@@ -45,6 +46,8 @@ a| {{- range $i, $value := .EnvVars }}{{- if $i }} +
 `{{- $value }}`
 {{- end }} +
 {{ .DeprecationLink }}
+a| [subs=-attributes]
+++{{.IntroductionVersion}} ++
 a| [subs=-attributes]
 ++{{.Type}} ++
 a| [subs=-attributes]
