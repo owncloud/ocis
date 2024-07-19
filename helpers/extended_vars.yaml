@@ -42,7 +42,7 @@ variables:
   do_ignore: true
 - rawname: _registryEnv
   path: ocis-pkg/registry/registry.go:114
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY
   type: string
   default_value: nats-js-kv
@@ -53,7 +53,7 @@ variables:
   do_ignore: false
 - rawname: _registryAddressEnv
   path: ocis-pkg/natsjsregistry/registry.go:186
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_ADDRESS
   type: string
   default_value: 127.0.0.1:9233
@@ -62,7 +62,7 @@ variables:
   do_ignore: false
 - rawname: _registryAddressEnv
   path: ocis-pkg/registry/registry.go:118
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_ADDRESS
   type: ""
   default_value: ""
@@ -70,7 +70,7 @@ variables:
   do_ignore: true
 - rawname: _registryPasswordEnv
   path: ocis-pkg/natsjsregistry/registry.go:214
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_AUTH_PASSWORD
   type: string
   default_value: ""
@@ -78,7 +78,7 @@ variables:
   do_ignore: false
 - rawname: _registryUsernameEnv
   path: ocis-pkg/natsjsregistry/registry.go:214
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_AUTH_USERNAME
   type: string
   default_value: ""
@@ -112,6 +112,62 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
+- rawname: _registryAddressEnv
+  path: ocis-pkg/registry/registry.go:120
+  foundincode: true
+  name: _registryAddressEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryAddressEnv
+  path: ocis-pkg/natsjsregistry/registry.go:196
+  foundincode: true
+  name: _registryAddressEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryEnv
+  path: ocis-pkg/registry/registry.go:116
+  foundincode: true
+  name: _registryEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryPasswordEnv
+  path: ocis-pkg/natsjsregistry/registry.go:224
+  foundincode: true
+  name: _registryPasswordEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryRegisterIntervalEnv
+  path: ocis-pkg/registry/expiry.go:19
+  foundincode: true
+  name: _registryRegisterIntervalEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryRegisterTTLEnv
+  path: ocis-pkg/registry/expiry.go:28
+  foundincode: true
+  name: _registryRegisterTTLEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryUsernameEnv
+  path: ocis-pkg/natsjsregistry/registry.go:224
+  foundincode: true
+  name: _registryUsernameEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:382
   foundincode: true

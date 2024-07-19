@@ -70,5 +70,61 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++The default directory location for config files. See the General Info section in the documentation for more details on defaults. ++
     
+
+a| `_registryAddressEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
+a| `_registryAddressEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
+a| `_registryEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
+a| `_registryPasswordEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
+a| `_registryRegisterIntervalEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
+a| `_registryRegisterTTLEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
+a| `_registryUsernameEnv` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
     
 |===
