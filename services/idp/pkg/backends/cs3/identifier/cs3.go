@@ -15,19 +15,18 @@ import (
 	"github.com/libregraph/lico/identity"
 	cmap "github.com/orcaman/concurrent-map"
 	"github.com/sirupsen/logrus"
-	"stash.kopano.io/kgol/oidc-go"
 )
 
 const cs3BackendName = "identifier-cs3"
 
 var cs3SpportedScopes = []string{
-	oidc.ScopeProfile,
-	oidc.ScopeEmail,
+	"profile",
+	"email",
 	lico.ScopeUniqueUserID,
 	lico.ScopeRawSubject,
 }
 
-// CS3 Backend holds the data for the CS3 identifier backend
+// CS3Backend holds the data for the CS3 identifier backend
 type CS3Backend struct {
 	supportedScopes []string
 
@@ -71,7 +70,7 @@ func NewCS3Backend(
 }
 
 // RunWithContext implements the Backend interface.
-func (b *CS3Backend) RunWithContext(ctx context.Context) error {
+func (b *CS3Backend) RunWithContext(_ context.Context) error {
 	return nil
 }
 
@@ -92,13 +91,13 @@ func (b *CS3Backend) Logon(ctx context.Context, audience, username, password str
 	if err != nil {
 		return false, nil, nil, nil, fmt.Errorf("cs3 backend basic authenticate rpc error: %v", err)
 	}
-	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		return false, nil, nil, nil, fmt.Errorf("cs3 backend basic authenticate failed with code %s: %s", res.Status.Code.String(), res.Status.Message)
+	if res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
+		return false, nil, nil, nil, fmt.Errorf("cs3 backend basic authenticate failed with code %s: %s", res.GetStatus().GetCode().String(), res.GetStatus().GetMessage())
 	}
 
-	session := createSession(ctx, res.User)
+	session := createSession(ctx, res.GetUser())
 
-	user, err := newCS3User(res.User)
+	user, err := newCS3User(res.GetUser())
 	if err != nil {
 		return false, nil, nil, nil, fmt.Errorf("cs3 backend resolve entry data error: %v", err)
 	}
@@ -121,7 +120,7 @@ func (b *CS3Backend) Logon(ctx context.Context, audience, username, password str
 // GetUser implements the Backend interface, providing user meta data retrieval
 // for the user specified by the userID. Requests are bound to the provided
 // context.
-func (b *CS3Backend) GetUser(ctx context.Context, userEntryID string, sessionRef *string, requestedScopes map[string]bool) (backends.UserFromBackend, error) {
+func (b *CS3Backend) GetUser(ctx context.Context, userEntryID string, sessionRef *string, _ map[string]bool) (backends.UserFromBackend, error) {
 
 	var session *cs3Session
 	if s, ok := b.sessions.Get(*sessionRef); ok {
@@ -151,15 +150,15 @@ func (b *CS3Backend) GetUser(ctx context.Context, userEntryID string, sessionRef
 	if err != nil {
 		return nil, fmt.Errorf("cs3 backend get user machine authenticate rpc error: %v", err)
 	}
-	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("cs3 backend get user machine authenticate failed with code %s: %s", res.Status.Code.String(), res.Status.Message)
+	if res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("cs3 backend get user machine authenticate failed with code %s: %s", res.GetStatus().GetCode().String(), res.GetStatus().GetMessage())
 	}
 
 	// cache session
-	session = createSession(ctx, res.User)
+	session = createSession(ctx, res.GetUser())
 	b.sessions.Set(*sessionRef, session)
 
-	user, err := newCS3User(res.User)
+	user, err := newCS3User(res.GetUser())
 	if err != nil {
 		return nil, fmt.Errorf("cs3 backend get user data error: %v", err)
 	}
@@ -184,11 +183,11 @@ func (b *CS3Backend) ResolveUserByUsername(ctx context.Context, username string)
 	if err != nil {
 		return nil, fmt.Errorf("cs3 backend machine authenticate rpc error: %v", err)
 	}
-	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("cs3 backend machine authenticate failed with code %s: %s", res.Status.Code.String(), res.Status.Message)
+	if res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("cs3 backend machine authenticate failed with code %s: %s", res.GetStatus().GetCode().String(), res.GetStatus().GetMessage())
 	}
 
-	user, err := newCS3User(res.User)
+	user, err := newCS3User(res.GetUser())
 	if err != nil {
 		return nil, fmt.Errorf("cs3 backend resolve username data error: %v", err)
 	}
@@ -197,19 +196,19 @@ func (b *CS3Backend) ResolveUserByUsername(ctx context.Context, username string)
 }
 
 // RefreshSession implements the Backend interface.
-func (b *CS3Backend) RefreshSession(ctx context.Context, userID string, sessionRef *string, claims map[string]interface{}) error {
+func (b *CS3Backend) RefreshSession(_ context.Context, _ string, _ *string, _ map[string]interface{}) error {
 	return nil
 }
 
 // DestroySession implements the Backend interface providing destroy CS3 session.
-func (b *CS3Backend) DestroySession(ctx context.Context, sessionRef *string) error {
+func (b *CS3Backend) DestroySession(_ context.Context, sessionRef *string) error {
 	b.sessions.Remove(*sessionRef)
 	return nil
 }
 
 // UserClaims implements the Backend interface, providing user specific claims
 // for the user specified by the userID.
-func (b *CS3Backend) UserClaims(userID string, authorizedScopes map[string]bool) map[string]interface{} {
+func (b *CS3Backend) UserClaims(_ string, _ map[string]bool) map[string]interface{} {
 	return nil
 	// TODO should we return the "ownclouduuid" as a claim? there is also "LibgreGraph.UUID" / lico.ScopeUniqueUserID
 }
