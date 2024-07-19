@@ -57,6 +57,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
 * Enhancement - Bump reva: [#9621](https://github.com/owncloud/ocis/pull/9621)
 * Enhancement - Bump commitID for web: [#9631](https://github.com/owncloud/ocis/pull/9631)
+* Enhancement - Remove oidc-go dependency: [#9641](https://github.com/owncloud/ocis/pull/9641)
 
 ## Details
 
@@ -131,6 +132,13 @@ The following sections list the changes for unreleased.
    Bump the web commitID to current master
 
    https://github.com/owncloud/ocis/pull/9631
+
+* Enhancement - Remove oidc-go dependency: [#9641](https://github.com/owncloud/ocis/pull/9641)
+
+   Removes the kgol/oidc-go dependency because it was flagged by dependabot.
+   Luckily us we only used it for importing the strings "profile" and "email".
+
+   https://github.com/owncloud/ocis/pull/9641
 
 # Changelog for [6.1.0] (2024-07-08)
 
