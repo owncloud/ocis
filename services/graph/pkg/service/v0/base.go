@@ -404,6 +404,19 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 		perm.SetRoles(nil)
 	}
 	perm.SetGrantedToV2(grantedTo)
+	if share.GetCreator() != nil {
+		identity, err := cs3UserIdToIdentity(ctx, g.identityCache, share.GetCreator())
+		if err != nil {
+			return nil, errorcode.New(errorcode.GeneralException, err.Error())
+		}
+		perm.SetInvitation(
+			libregraph.SharingInvitation{
+				InvitedBy: &libregraph.IdentitySet{
+					User: &identity,
+				},
+			},
+		)
+	}
 	return &perm, nil
 }
 
