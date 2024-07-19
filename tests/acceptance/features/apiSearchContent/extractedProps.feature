@@ -255,3 +255,137 @@ Feature: propfind extracted props
           }
         }
       """
+
+
+  Scenario: GET extracted properties of an audio file (Project space)
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file "filesForUpload/testaudio.mp3" to "testaudio.mp3" in space "new-space"
+    When user "Alice" gets the file "testaudio.mp3" from space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+        {
+          "type": "object",
+          "required": [
+            "audio"
+          ],
+          "properties": {
+            "audio": {
+              "type": "object",
+              "required": [
+                "album",
+                "artist",
+                "genre",
+                "title",
+                "track",
+                "year"
+              ],
+              "properties": {
+                "album": {
+                  "const": "ALBUM1234567890123456789012345"
+                },
+                "artist": {
+                  "const": "ARTIST123456789012345678901234"
+                },
+                "genre": {
+                  "const": "Pop"
+                },
+                "title": {
+                  "const": "TITLE1234567890123456789012345"
+                },
+                "track": {
+                  "const": 1
+                },
+                "year": {
+                  "const": 2001
+                }
+              }
+            }
+          }
+        }
+      """
+
+
+  Scenario: GET extracted properties of an image file (Project space)
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file "filesForUpload/testavatar.jpg" to "testavatar.jpg" in space "new-space"
+    When user "Alice" gets the file "testavatar.jpg" from space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+        {
+          "type": "object",
+          "required": [
+            "image",
+            "location",
+            "photo"
+          ],
+          "properties": {
+            "image": {
+              "type": "object",
+              "required": [ "height", "width" ],
+              "properties": {
+                "height": {
+                  "const": 480
+                },
+                "width": {
+                  "const": 640
+                }
+              }
+            },
+            "location": {
+              "type": "object",
+              "required": [ "latitude", "longitude" ],
+              "properties": {
+                "latitude": {
+                  "const": 43.467157
+                },
+                "longitude": {
+                  "const": 11.885395
+                }
+              }
+            },
+            "photo": {
+              "type": "object",
+              "required": [
+                "cameraMake",
+                "cameraModel",
+                "exposureDenominator",
+                "exposureNumerator",
+                "fNumber",
+                "focalLength",
+                "orientation",
+                "takenDateTime"
+              ],
+              "properties": {
+                "cameraMake": {
+                  "const": "NIKON"
+                },
+                "cameraModel": {
+                  "const": "COOLPIX P6000"
+                },
+                "exposureDenominator": {
+                  "const": 178
+                },
+                "exposureNumerator": {
+                  "const": 1
+                },
+                "fNumber": {
+                  "const": 4.5
+                },
+                "focalLength": {
+                  "const": 6
+                },
+                "orientation": {
+                  "const": 1
+                },
+                "takenDateTime": {
+                  "const": "2008-10-22T16:29:49Z"
+                }
+              }
+            }
+          }
+        }
+      """
