@@ -16,12 +16,12 @@ func RegisterService(ctx context.Context, service *mRegistry.Service, logger log
 
 	logger.Info().Msgf("registering external service %v@%v", node.Id, node.Address)
 
-	rOpts := []mRegistry.RegisterOption{mRegistry.RegisterTTL(time.Minute)}
+	rOpts := []mRegistry.RegisterOption{mRegistry.RegisterTTL(GetRegisterTTL())}
 	if err := registry.Register(service, rOpts...); err != nil {
 		logger.Fatal().Err(err).Msgf("Registration error for external service %v", service.Name)
 	}
 
-	t := time.NewTicker(time.Second * 30)
+	t := time.NewTicker(GetRegisterInterval())
 
 	go func() {
 		for {
