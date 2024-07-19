@@ -27,6 +27,7 @@ func AccessLog(logger log.Logger) func(http.Handler) http.Handler {
 				Str("traceid", spanContext.TraceID().String()).
 				Str("remote-addr", r.RemoteAddr).
 				Str("method", r.Method).
+				Str("wopi-action", r.Header.Get("X-WOPI-Override")).
 				Int("status", wrap.Status()).
 				Str("path", r.URL.Path).
 				Dur("duration", time.Since(start)).

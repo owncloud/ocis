@@ -148,6 +148,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 		Str("RequestedLockID", lockID).
 		Str("RequestedOldLockID", oldLockID).
 		Logger()
+	logger.Debug().Msg("Lock: start")
 
 	if lockID == "" {
 		logger.Error().Msg("Lock failed due to empty lockID")
@@ -157,6 +158,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 	var setOrRefreshStatus *rpcv1beta1.Status
 	if oldLockID == "" {
 		// If the oldLockID is empty, this is a "LOCK" request
+		logger.Debug().Msg("Lock: this is a SetLock request")
 		req := &providerv1beta1.SetLockRequest{
 			Ref: wopiContext.FileReference,
 			Lock: &providerv1beta1.Lock{
@@ -178,6 +180,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 	} else {
 		// If the oldLockID isn't empty, this is a "UnlockAndRelock" request. We'll
 		// do a "RefreshLock" in reva and provide the old lock
+		logger.Debug().Msg("Lock: this is a RefreshLock request")
 		req := &providerv1beta1.RefreshLockRequest{
 			Ref: wopiContext.FileReference,
 			Lock: &providerv1beta1.Lock{
@@ -285,6 +288,7 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 	logger := zerolog.Ctx(ctx).With().
 		Str("RequestedLockID", lockID).
 		Logger()
+	logger.Debug().Msg("RefreshLock: start")
 
 	if lockID == "" {
 		logger.Error().Msg("RefreshLock failed due to empty lockID")
@@ -393,6 +397,7 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 	logger := zerolog.Ctx(ctx).With().
 		Str("RequestedLockID", lockID).
 		Logger()
+	logger.Debug().Msg("UnLock: start")
 
 	if lockID == "" {
 		logger.Error().Msg("Unlock failed due to empty lockID")
@@ -579,7 +584,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 
 	info.SetProperties(infoMap)
 
-	logger.Debug().Msg("CheckFileInfo: success")
+	logger.Debug().Interface("FileInfo", info).Msg("CheckFileInfo: success")
 	return info, nil
 }
 
