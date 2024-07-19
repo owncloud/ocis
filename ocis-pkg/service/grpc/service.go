@@ -25,6 +25,7 @@ func NewServiceWithClient(client client.Client, opts ...Option) (Service, error)
 	var mServer server.Server
 	sopts := newOptions(opts...)
 	tlsConfig := &tls.Config{}
+
 	if sopts.TLSEnabled {
 		var cert tls.Certificate
 		var err error

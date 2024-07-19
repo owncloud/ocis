@@ -12,9 +12,9 @@ import (
 	"time"
 
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
-	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
 	"go-micro.dev/v4/registry"
+	"go-micro.dev/v4/server"
 	"go-micro.dev/v4/store"
 	"go-micro.dev/v4/util/cmd"
 )
@@ -25,7 +25,7 @@ var (
 	_registryUsernameEnv = "MICRO_REGISTRY_AUTH_USERNAME"
 	_registryPasswordEnv = "MICRO_REGISTRY_AUTH_PASSWORD"
 
-	_serviceDelimiter = "/"
+	_serviceDelimiter = "@"
 )
 
 func init() {
@@ -90,18 +90,12 @@ func (n *storeregistry) Register(s *registry.Service, opts ...registry.RegisterO
 		o(&options)
 	}
 
-	unique := uuid.New().String()
-	if s.Metadata == nil {
-		s.Metadata = make(map[string]string)
-	}
-	s.Metadata["uuid"] = unique
-
 	b, err := json.Marshal(s)
 	if err != nil {
 		return err
 	}
 	return n.store.Write(&store.Record{
-		Key:    s.Name + _serviceDelimiter + unique,
+		Key:    s.Name + _serviceDelimiter + server.DefaultId,
 		Value:  b,
 		Expiry: options.TTL,
 	})
@@ -111,13 +105,7 @@ func (n *storeregistry) Register(s *registry.Service, opts ...registry.RegisterO
 func (n *storeregistry) Deregister(s *registry.Service, _ ...registry.DeregisterOption) error {
 	n.lock.RLock()
 	defer n.lock.RUnlock()
-
-	var unique string
-	if s.Metadata != nil {
-		unique = s.Metadata["uuid"]
-	}
-
-	return n.store.Delete(s.Name + _serviceDelimiter + unique)
+	return n.store.Delete(s.Name + _serviceDelimiter + server.DefaultId)
 }
 
 // GetService gets a specific service from the registry
