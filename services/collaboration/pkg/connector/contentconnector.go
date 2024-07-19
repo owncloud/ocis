@@ -67,7 +67,10 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 		return err
 	}
 
-	logger := zerolog.Ctx(ctx)
+	logger := zerolog.Ctx(ctx).With().
+		Interface("FileReference", wopiContext.FileReference).
+		Logger()
+	logger.Debug().Msg("GetFile: start")
 
 	// Initiate download request
 	req := &providerv1beta1.InitiateFileDownloadRequest{
@@ -201,7 +204,9 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 	logger := zerolog.Ctx(ctx).With().
 		Str("RequestedLockID", lockID).
 		Int64("UploadLength", streamLength).
+		Interface("FileReference", wopiContext.FileReference).
 		Logger()
+	logger.Debug().Msg("PutFile: start")
 
 	// We need a stat call on the target file in order to get both the lock
 	// (if any) and the current size of the file
