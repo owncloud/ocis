@@ -16,6 +16,7 @@ import (
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/publicshare"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/share"
@@ -222,6 +223,19 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 
 	if expiration != nil {
 		permission.SetExpirationDateTime(utils.TSToTime(expiration))
+	}
+
+	if user, ok := revactx.ContextGetUser(ctx); ok {
+		identity, err := userIdToIdentity(ctx, s.identityCache, user.GetId().GetOpaqueId())
+		if err != nil {
+			s.logger.Error().Err(err).Msg("identity lookup failed")
+			return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, err.Error())
+		}
+		permission.SetInvitation(libregraph.SharingInvitation{
+			InvitedBy: &libregraph.IdentitySet{
+				User: &identity,
+			},
+		})
 	}
 
 	return *permission, nil
