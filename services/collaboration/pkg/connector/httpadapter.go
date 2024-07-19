@@ -223,6 +223,9 @@ func (h *HttpAdapter) GetFile(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 	}
+	// status might have been already sent if the file is big enough, but for
+	// small files, the content might still be buffered.
+	w.WriteHeader(http.StatusOK)
 }
 
 // PutFile will upload the file
@@ -348,8 +351,7 @@ func (h *HttpAdapter) DeleteFile(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	// If no error, a HTTP 200 should be sent automatically.
-	// X-WOPI-Lock header isn't needed on HTTP 200
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *HttpAdapter) RenameFile(w http.ResponseWriter, r *http.Request) {
