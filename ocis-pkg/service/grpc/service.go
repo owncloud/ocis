@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"strings"
-	"time"
 
 	mgrpcs "github.com/go-micro/plugins/v4/server/grpc"
 	"github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus"
@@ -59,8 +58,8 @@ func NewServiceWithClient(client client.Client, opts ...Option) (Service, error)
 		micro.Version(sopts.Version),
 		micro.Context(sopts.Context),
 		micro.Registry(registry.GetRegistry()),
-		micro.RegisterTTL(time.Second * 30),
-		micro.RegisterInterval(time.Second * 10),
+		micro.RegisterTTL(registry.GetRegisterTTL()),
+		micro.RegisterInterval(registry.GetRegisterInterval()),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),
 		micro.WrapClient(mtracer.NewClientWrapper(
 			mtracer.WithTraceProvider(sopts.TraceProvider),
