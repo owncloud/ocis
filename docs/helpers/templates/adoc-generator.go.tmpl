@@ -105,7 +105,7 @@ func main() {
 		    } else {
 			all[e] = EnvVar{
 			    Name:         e,
-				IntroductionVersion: f.IntroductionVersion,
+				IntroductionVersion: replaceEnvVarPlaceHolder(f.IntroductionVersion),
 			    Description:  f.Description,
 			    Type: 	  f.Type,
 			    DefaultValue: f.DefaultValue,
@@ -152,7 +152,7 @@ func main() {
 	    if len(env.Services) > 1 {
 		tmplValues = append(tmplValues, map[string]interface{}{
 			"Name":         env.Name,
-			"IntroductionVersion": env.IntroductionVersion,
+			"IntroductionVersion": replaceEnvVarPlaceHolder(env.IntroductionVersion),
 			"Services":     env.Services,
 			"Description":  env.Description,
 			"DefaultValue": env.DefaultValue,
@@ -182,6 +182,15 @@ func main() {
 	}
 
 	fmt.Println("done")
+}
+
+func replaceEnvVarPlaceHolder(s string) string {
+	return strings.Replace(
+		strings.Replace(s, "%%NEXT%%", "next", -1),
+		"%%NEXT_PRODUCTION_VERSION%%",
+		"next-prod",
+		-1,
+	)
 }
 
 func GetAnnotatedVariables(s interface{}, timestamp string) ([]ConfigField, []DeprecationField) {
@@ -228,7 +237,7 @@ func GetAnnotatedVariables(s interface{}, timestamp string) ([]ConfigField, []De
 			fields = append(fields,
 				ConfigField{
 					EnvVars:         td,
-					IntroductionVersion: introductionVersion,
+					IntroductionVersion: replaceEnvVarPlaceHolder(introductionVersion),
 					DefaultValue:    v,
 					Description:     desc,
 					Type:            typeName,
@@ -237,10 +246,10 @@ func GetAnnotatedVariables(s interface{}, timestamp string) ([]ConfigField, []De
 			if deprecationLink != "" {
 				deprecations = append(deprecations,
 					DeprecationField{
-						DeprecationVersion:     deprecationVersion,
+						DeprecationVersion:     replaceEnvVarPlaceHolder(deprecationVersion),
 						DeprecationInfo:        deprecationInfo,
 						DeprecationReplacement: deprecationReplacement,
-						RemovalVersion:         removalVersion,
+						RemovalVersion:         replaceEnvVarPlaceHolder(removalVersion),
 					})
 			}
 		case reflect.Ptr:
