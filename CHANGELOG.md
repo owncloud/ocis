@@ -62,6 +62,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Remove oidc-go dependency: [#9641](https://github.com/owncloud/ocis/pull/9641)
 * Enhancement - Improve the collaboration service logging: [#9653](https://github.com/owncloud/ocis/pull/9653)
 * Enhancement - Bump reva: [#9662](https://github.com/owncloud/ocis/pull/9662)
+* Enhancement - Fix trash command: [#9665](https://github.com/owncloud/ocis/pull/9665)
 
 ## Details
 
@@ -175,6 +176,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9662
    https://github.com/owncloud/ocis/pull/9621
+
+* Enhancement - Fix trash command: [#9665](https://github.com/owncloud/ocis/pull/9665)
+
+   The `ocis trash purge-empty-dirs` command should work on any storage provider,
+   not just `storage/users`.
+
+   https://github.com/owncloud/ocis/pull/9665
 
 # Changelog for [6.1.0] (2024-07-08)
 
