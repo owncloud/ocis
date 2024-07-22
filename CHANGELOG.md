@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Improve the collaboration service logging: [#9653](https://github.com/owncloud/ocis/pull/9653)
 * Enhancement - Bump reva: [#9662](https://github.com/owncloud/ocis/pull/9662)
 * Enhancement - Fix trash command: [#9665](https://github.com/owncloud/ocis/pull/9665)
+* Enhancement - Added the debugging to full ocis docker example: [#9666](https://github.com/owncloud/ocis/pull/9666)
 
 ## Details
 
@@ -183,6 +184,12 @@ The following sections list the changes for unreleased.
    not just `storage/users`.
 
    https://github.com/owncloud/ocis/pull/9665
+
+* Enhancement - Added the debugging to full ocis docker example: [#9666](https://github.com/owncloud/ocis/pull/9666)
+
+   Added the debugging to full ocis docker example
+
+   https://github.com/owncloud/ocis/pull/9666
 
 # Changelog for [6.1.0] (2024-07-08)
 
