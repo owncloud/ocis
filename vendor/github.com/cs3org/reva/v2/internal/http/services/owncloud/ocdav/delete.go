@@ -137,8 +137,11 @@ func (s *svc) handleSpacesDelete(w http.ResponseWriter, r *http.Request, spaceID
 
 	// do not allow deleting spaces via dav endpoint - use graph endpoint instead
 	// we get a relative reference coming from the space root
-	// so if the path is "empty" we a referencing the space
-	if ref.GetPath() == "." {
+	// so if the path is "empty" and no opaque id is present or the opaque id equals
+	// the space id, we are referencing the space
+	rid := ref.GetResourceId()
+	if ref.GetPath() == "." &&
+		(rid.GetOpaqueId() == "" || rid.GetOpaqueId() == rid.GetSpaceId()) {
 		return http.StatusMethodNotAllowed, errors.New("deleting spaces via dav is not allowed")
 	}
 
