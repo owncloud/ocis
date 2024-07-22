@@ -133,14 +133,14 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: accept an accepted share
-    Given user "Brian" has disabled auto-accepting
-    And user "Alice" has created folder "/shared"
+    Given user "Alice" has created folder "/shared"
     And user "Alice" has sent the following resource share invitation:
       | resource        | shared   |
       | space           | Personal |
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "shared" synced
     When user "Brian" accepts share "/shared" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
@@ -214,7 +214,8 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: deleting shares in pending state
-    Given user "Alice" has sent the following resource share invitation:
+    Given user "Brian" has disabled auto-accepting
+    And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
       | sharee          | Brian    |
@@ -320,6 +321,7 @@ Feature: accept/decline shares coming from internal users
       | sharee          | Carol        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
+    And user "Carol" has a share "testfile.txt" synced
     And user "Carol" has declined share "/Shares/testfile.txt" offered by user "Alice"
     And user "Carol" has disabled auto-accepting
     And user "Brian" has sent the following resource share invitation:

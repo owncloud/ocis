@@ -19,12 +19,14 @@ Feature: sharing
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
+    And user "Brian" has a share "sharefile.txt" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharefile.txt |
       | space           | Personal      |
       | sharee          | Carol         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
+    And user "Carol" has a share "sharefile.txt" synced
     When user "Alice" moves file "sharefile.txt" to "renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "renamedsharefile.txt" should exist
@@ -57,12 +59,14 @@ Feature: sharing
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
+    And user "Brian" has a share "sharefile.txt" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharefile.txt |
       | space           | Personal      |
       | sharee          | Carol         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
+    And user "Carol" has a share "sharefile.txt" synced
     When user "Alice" moves file "sharefile.txt" to "renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "renamedsharefile.txt" should exist
@@ -96,12 +100,14 @@ Feature: sharing
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Brian" has a share "sharefile.txt" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharefile.txt      |
       | space           | Personal           |
       | sharee          | Carol              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Carol" has a share "sharefile.txt" synced
     When user "Carol" moves file "Shares/sharefile.txt" to "Shares/renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "Shares/renamedsharefile.txt" should exist
@@ -137,12 +143,14 @@ Feature: sharing
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Brian" has a share "sharefile.txt" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharefile.txt      |
       | space           | Personal           |
       | sharee          | Carol              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Carol" has a share "sharefile.txt" synced
     When user "Carol" moves file "Shares/sharefile.txt" to "Shares/renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "Shares/renamedsharefile.txt" should exist
@@ -196,6 +204,7 @@ Feature: sharing
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Editor        |
+    And user "Brian" has a share "folderToShare" synced
     When user "Brian" moves folder "/Shares/folderToShare" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -217,6 +226,7 @@ Feature: sharing
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Brian" has a share "folderToShare" synced
     When user "Brian" moves folder "/Shares/folderToShare" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -243,6 +253,7 @@ Feature: sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -257,6 +268,7 @@ Feature: sharing
       | sharee          | Brian           |
       | shareType       | user            |
       | permissionsRole | File Editor     |
+    And user "Brian" has a share "fileToShare.txt" synced
     When user "Brian" moves file "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -273,6 +285,7 @@ Feature: sharing
       | sharee          | grp1            |
       | shareType       | group           |
       | permissionsRole | File Editor     |
+    And user "Brian" has a share "fileToShare.txt" synced
     When user "Brian" moves file "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -289,6 +302,7 @@ Feature: sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -305,6 +319,7 @@ Feature: sharing
       | sharee          | grp1            |
       | shareType       | group           |
       | permissionsRole | File Editor     |
+    And user "Brian" has a share "fileToShare.txt" synced
     When user "Brian" moves folder "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -321,6 +336,7 @@ Feature: sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -337,6 +353,7 @@ Feature: sharing
       | sharee          | grp1            |
       | shareType       | group           |
       | permissionsRole | Viewer          |
+    And user "Brian" has a share "fileToShare.txt" synced
     When user "Brian" moves file "/Shares/fileToShare.txt" to "/Shares/newFile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
@@ -353,6 +370,7 @@ Feature: sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" moves folder "/Shares/PARENT" to "/Shares/myFolder" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
@@ -370,6 +388,7 @@ Feature: sharing
       | sharee          | Brian           |
       | shareType       | user            |
       | permissionsRole | Editor          |
+    And user "Brian" has a share "<sharer-folder>" synced
     When user "Brian" moves folder "/Shares/<sharer-folder>" to "/Shares/<receiver-folder>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" folder "<receiver-folder>" should not exist
@@ -398,6 +417,7 @@ Feature: sharing
       | sharee          | Brian           |
       | shareType       | user            |
       | permissionsRole | Editor          |
+    And user "Brian" has a share "<sharer-folder>" synced
     When user "Brian" moves folder "/Shares/<sharer-folder>/fileInside" to "/Shares/<sharer-folder>/<receiver_file>" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "<sharer-folder>/<receiver_file>" should exist

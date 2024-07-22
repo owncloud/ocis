@@ -36,6 +36,7 @@ Feature: sharing
       | sharee          | Brian       |
       | shareType       | user        |
       | permissionsRole | File Editor |
+    And user "Brian" has a share "tmp.txt" synced
     When user "Brian" gets the following properties of file "/Shares/tmp.txt" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -58,6 +59,7 @@ Feature: sharing
       | sharee          | grp1        |
       | shareType       | group       |
       | permissionsRole | File Editor |
+    And user "Brian" has a share "tmp.txt" synced
     When user "Brian" gets the following properties of file "/Shares/tmp.txt" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -78,6 +80,7 @@ Feature: sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "tmp.txt" synced
     When user "Brian" gets the following properties of file "/Shares/tmp.txt" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -113,6 +116,7 @@ Feature: sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "tmp" synced
     When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -135,6 +139,7 @@ Feature: sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "tmp" synced
     When user "Brian" gets the following properties of folder "/Shares/tmp" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
@@ -155,6 +160,7 @@ Feature: sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "tmp" synced
     And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | delete,create,read |
@@ -178,6 +184,7 @@ Feature: sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "tmp" synced
     When user "Alice" updates the last share using the sharing API with
       | permissions | delete,create,read |
     Then the HTTP status code should be "200"
@@ -197,6 +204,7 @@ Feature: sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "tmp" synced
     And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | delete,update,read |
@@ -220,6 +228,7 @@ Feature: sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "tmp" synced
     When user "Alice" updates the last share using the sharing API with
       | permissions | delete,update,read |
     Then the HTTP status code should be "200"
@@ -239,6 +248,7 @@ Feature: sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "tmp" synced
     And using SharingNG
     When user "Alice" updates the last share using the sharing API with
       | permissions | create,update,read |
@@ -262,6 +272,7 @@ Feature: sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "tmp" synced
     When user "Alice" updates the last share using the sharing API with
       | permissions | create,update,read |
     Then the HTTP status code should be "200"

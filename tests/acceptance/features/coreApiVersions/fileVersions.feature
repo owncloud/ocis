@@ -280,6 +280,7 @@ Feature: dav-versions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Brian" has a share "sharefile.txt" synced
     When user "Brian" uploads file with content "Second content" to "/Shares/sharefile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the version folder of file "/sharefile.txt" for user "Alice" should contain "1" element
@@ -296,6 +297,7 @@ Feature: dav-versions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Brian" has a share "sharefile.txt" synced
     And user "Brian" has uploaded file with content "Second content" to "/Shares/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharefile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -312,6 +314,7 @@ Feature: dav-versions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Editor        |
+    And user "Brian" has a share "sharingfolder" synced
     And user "Alice" has uploaded file with content "First content" to "/sharingfolder/sharefile.txt"
     And user "Brian" has uploaded file with content "Second content" to "/Shares/sharingfolder/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharingfolder/sharefile.txt" using the WebDAV API
@@ -329,6 +332,7 @@ Feature: dav-versions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Editor        |
+    And user "Brian" has a share "sharingfolder" synced
     And user "Alice" has uploaded file with content "First content" to "/sharingfolder/sharefile.txt"
     When user "Brian" has uploaded file with content "Second content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Brian" gets the number of versions of file "/Shares/sharingfolder/sharefile.txt"
@@ -346,6 +350,7 @@ Feature: dav-versions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Editor        |
+    And user "Brian" has a share "sharingfolder" synced
     And user "Brian" has uploaded file with content "First content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Alice" has uploaded file with content "Second content" to "/sharingfolder/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharingfolder/sharefile.txt" using the WebDAV API
@@ -363,6 +368,7 @@ Feature: dav-versions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Editor        |
+    And user "Brian" has a share "sharingfolder" synced
     And user "Brian" has uploaded file with content "old content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Brian" has uploaded file with content "new content" to "/Shares/sharingfolder/sharefile.txt"
     When user "Alice" restores version index "1" of file "/sharingfolder/sharefile.txt" using the WebDAV API
@@ -384,6 +390,8 @@ Feature: dav-versions
       | sharee          | grp1          |
       | shareType       | group         |
       | permissionsRole | Editor        |
+    And user "Brian" has a share "sharingfolder" synced
+    And user "Carol" has a share "sharingfolder" synced
     And user "Alice" has uploaded file with content "First content" to "/sharingfolder/sharefile.txt"
     And user "Brian" has uploaded file with content "Second content" to "/Shares/sharingfolder/sharefile.txt"
     And user "Carol" has uploaded file with content "Third content" to "/Shares/sharingfolder/sharefile.txt"
@@ -404,6 +412,7 @@ Feature: dav-versions
       | sharee          | Alice              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Alice" has a share "testshare" synced
     And user "Brian" has uploaded file with content "test data 1" to "/testfile.txt"
     And user "Brian" has uploaded file with content "test data 2" to "/testfile.txt"
     And user "Brian" has uploaded file with content "test data 3" to "/testfile.txt"
@@ -434,6 +443,7 @@ Feature: dav-versions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Brian" has a share "textfile0.txt" synced
     When user "Brian" tries to get versions of file "textfile1.txt" from "Alice"
     Then the HTTP status code should be "404"
     And the value of the item "//s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
@@ -451,6 +461,7 @@ Feature: dav-versions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Brian" has a share "textfile0.txt" synced
     When user "Brian" tries to get versions of file "textfile0.txt" from "Alice"
     Then the HTTP status code should be "403"
 
@@ -466,6 +477,7 @@ Feature: dav-versions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Brian" has a share "textfile0.txt" synced
     When user "Brian" tries to get versions of file "textfile0.txt" from "Alice"
     Then the HTTP status code should be "403"
     And the value of the item "//s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\Forbidden"

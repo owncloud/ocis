@@ -58,6 +58,7 @@ Feature: set file properties
       | sharee          | Brian                    |
       | shareType       | user                     |
       | permissionsRole | File Editor              |
+    And user "Brian" has a share "testcustompropshared.txt" synced
     And user "Alice" has set property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "/testcustompropshared.txt" to "valueForSharetest"
     When user "Brian" gets a custom property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "/testcustompropshared.txt"
     Then the response should contain a custom "very-custom-prop" property with namespace "x1='http://whatever.org/ns'" and value "valueForSharetest"

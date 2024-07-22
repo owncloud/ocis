@@ -20,6 +20,7 @@ Feature: sharing files and folders
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Editor       |
+    And user "Brian" has a share "textfile.txt" synced
     And using "ocis" as owncloud selector
     And the sharing API should report to user "Brian" that these shares are in the accepted state
       | path                 |

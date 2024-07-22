@@ -22,6 +22,7 @@ Feature: sharing works when a username and group name are the same
       | sharee          | Brian          |
       | shareType       | group          |
       | permissionsRole | File Editor    |
+    And user "Carol" has a share "randomfile.txt" synced
     When user "Alice" shares file "randomfile.txt" with user "Brian" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
@@ -47,6 +48,7 @@ Feature: sharing works when a username and group name are the same
       | sharee          | Brian          |
       | shareType       | user           |
       | permissionsRole | File Editor    |
+    And user "Brian" has a share "randomfile.txt" synced
     When user "Alice" shares file "randomfile.txt" with group "Brian" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
@@ -72,6 +74,7 @@ Feature: sharing works when a username and group name are the same
       | sharee          | brian          |
       | shareType       | group          |
       | permissionsRole | File Editor    |
+    And user "Carol" has a share "randomfile.txt" synced
     When user "Alice" shares file "randomfile.txt" with user "Brian" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
@@ -95,8 +98,9 @@ Feature: sharing works when a username and group name are the same
       | resource        | randomfile.txt |
       | space           | Personal       |
       | sharee          | Brian          |
-      | shareType       | user              |
+      | shareType       | user           |
       | permissionsRole | File Editor    |
+    And user "Brian" has a share "randomfile.txt" synced
     When user "Alice" shares file "randomfile.txt" with group "brian" using the sharing API
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"

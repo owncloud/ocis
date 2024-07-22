@@ -144,6 +144,7 @@ Feature: propagation of etags when moving files or folders
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -175,6 +176,7 @@ Feature: propagation of etags when moving files or folders
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
     And user "Brian" has stored etag of element "/"
@@ -207,12 +209,14 @@ Feature: propagation of etags when moving files or folders
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "src" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | dst      |
       | space           | Personal |
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "dst" synced
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/src"
     And user "Alice" has stored etag of element "/dst"
@@ -249,12 +253,14 @@ Feature: propagation of etags when moving files or folders
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "src" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | dst      |
       | space           | Personal |
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "dst" synced
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/src"
     And user "Alice" has stored etag of element "/dst"
