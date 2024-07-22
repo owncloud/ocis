@@ -147,8 +147,8 @@ make debug-docker
 ```bash
 export OCIS_DOCKER_TAG=debug
 ```
-3. Run the docker-compose
-Building the docker-compose command depends on what you want to debug, for example `ocis` and `collaboration` with the `collabora` supports.
+3. Run docker compose
+Building the docker compose command depends on what you want to debug, for example `ocis` and `collaboration` with the `collabora` supports.
 ```bash
 docker compose -f docker-compose.yml -f ocis.yml -f collabora.yml -f debug-ocis.yml -f debug-collaboration-collabora.yml up -d
 ```
