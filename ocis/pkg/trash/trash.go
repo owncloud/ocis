@@ -9,7 +9,7 @@ import (
 
 const (
 	// _trashGlobPattern is the glob pattern to find all trash items
-	_trashGlobPattern = "storage/users/spaces/*/*/trash/*/*/*/*"
+	_trashGlobPattern = "spaces/*/*/trash/*/*/*/*"
 )
 
 // PurgeTrashEmptyPaths purges empty paths in the trash
