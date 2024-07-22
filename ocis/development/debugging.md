@@ -136,7 +136,7 @@ bin/ocis --log-level=$LOG_LEVEL proxy &
 
 ### Debugging the ocis in a docker container
 
-Remote debugging is the debug mode commonly used to work with a debugger and target running on a remote machine or a container for example a wopi stack `deployments/examples/ocis_full/docker-compose.yml`.
+Remote debugging is the debug mode commonly used to work with a debugger and target running on a remote machine or a container for example a wopi stack `deployments/examples/ocis_full/docker-compose.yml`. Docker compose lets us define a compose application model through multiple compose files. When doing so, compose follows certain rules to merge compose files. See [Merge and override](https://docs.docker.com/compose/compose-file/13-merge/) in the Compose Specification. Based on this rules, we added the extra files `deployments/examples/ocis_full/debug-ocis.yml`, `deployments/examples/ocis_full/debug-collaboration-collabora.yml`, `deployments/examples/ocis_full/debug-collaboration-onlyoffice.yml` that overwrites the `command` attribute and extends the `ports` attribute.
 Below we describe the steps how to build the image, run the docker-compose and connect via remote debugger.
 1. Build the image:
 ```bash
@@ -147,28 +147,16 @@ make debug-docker
 ```bash
 export OCIS_DOCKER_TAG=debug
 ```
-3. Change the docker-compose `ocis` or `collaboration` depends on what do you want to debug:
-For example `deployments/examples/ocis_full/ocis.yml`
-```yaml
-  ocis:
-    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
-    networks:
-      ocis-net:
-    entrypoint:
-      - /bin/sh
-# Comment out command
-#    command: ["-c", "ocis init || true; ocis server"]
-# Replace the command and expose the port
-    command: [ "-c", "ocis init || true; dlv --listen=:40000 --headless=true --api-version=2 --accept-multiclient exec /usr/bin/ocis server" ]
-    ports:
-      - 40000:40000
+3. Run docker compose
+Building the docker compose command depends on what you want to debug, for example `ocis` and `collaboration` with the `collabora` supports.
+```bash
+docker compose -f docker-compose.yml -f ocis.yml -f collabora.yml -f debug-ocis.yml -f debug-collaboration-collabora.yml up -d
 ```
-4. Run the docker-compose
-5. Connect to remote `delve`
+4. Connect to remote `delve`
 * For the VS Code add the configuration to the `.vscode/launch.json` [https://github.com/golang/vscode-go/wiki/debugging#remote-debugging](https://github.com/golang/vscode-go/wiki/debugging#remote-debugging)
 ```json
  {
-  "name": "Debug remote :40000",
+  "name": "Debug remote ocis :40000",
   "type": "go",
   "request": "attach",
   "mode": "remote",
@@ -177,7 +165,28 @@ For example `deployments/examples/ocis_full/ocis.yml`
   "trace": "verbose",  // optional
   "showLog": true      // optional
 },
+{
+  "name": "Debug remote collaboration collabora :40001",
+  "type": "go",
+  "request": "attach",
+  "mode": "remote",
+  "port": 40001,
+  "host": "localhost", // optional
+  "trace": "verbose",  // optional
+  "showLog": true      // optional
+},
+{
+  "name": "Debug remote collaboration onlyoffice :40002",
+  "type": "go",
+  "request": "attach",
+  "mode": "remote",
+  "port": 40002,
+  "host": "localhost", // optional
+  "trace": "verbose",  // optional
+  "showLog": true      // optional
+},
 ```
+* For the Jetbrains Goland add the configuration following the docs [https://www.jetbrains.com/help/go/go-remote.html](https://www.jetbrains.com/help/go/go-remote.html)
 
 
 ### Gather error messages
