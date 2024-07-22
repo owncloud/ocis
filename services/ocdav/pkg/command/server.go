@@ -9,6 +9,7 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/broker"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
@@ -86,6 +87,8 @@ func Server(cfg *config.Config) *cli.Command {
 					ocdav.MetricsNamespace("ocis"),
 					ocdav.Tracing("Adding these strings is a workaround for ->", "https://github.com/cs3org/reva/issues/4131"),
 					ocdav.WithTraceProvider(traceProvider),
+					ocdav.RegisterTTL(registry.GetRegisterTTL()),
+					ocdav.RegisterInterval(registry.GetRegisterInterval()),
 				}
 
 				s, err := ocdav.Service(opts...)
