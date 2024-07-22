@@ -21,7 +21,6 @@
   },
   "apps": [
     "files",
-    "draw-io",
     "text-editor",
     "preview",
     "pdf-viewer",
