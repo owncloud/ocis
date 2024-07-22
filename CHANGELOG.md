@@ -50,6 +50,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix restarting of postprocessing: [#6945](https://github.com/owncloud/ocis/pull/6945)
 * Bugfix - Fix crash on empty tracing provider: [#9622](https://github.com/owncloud/ocis/pull/9622)
+* Bugfix - Fixed the file name validation if nodeid is used: [#9634](https://github.com/owncloud/ocis/pull/9634)
 * Bugfix - Fix a missing SecureView permission attribute in the REPORT response: [#9638](https://github.com/owncloud/ocis/pull/9638)
 * Bugfix - Fixed the channel lock in a workers pool: [#9647](https://github.com/owncloud/ocis/pull/9647)
 * Bugfix - Missing invitation in permission responses: [#9652](https://github.com/owncloud/ocis/pull/9652)
@@ -79,6 +80,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/7012
    https://github.com/owncloud/ocis/pull/9622
+
+* Bugfix - Fixed the file name validation if nodeid is used: [#9634](https://github.com/owncloud/ocis/pull/9634)
+
+   We have fixed the file name validation if nodeid is used
+
+   https://github.com/owncloud/ocis/issues/9568
+   https://github.com/owncloud/ocis/pull/9634
 
 * Bugfix - Fix a missing SecureView permission attribute in the REPORT response: [#9638](https://github.com/owncloud/ocis/pull/9638)
 
