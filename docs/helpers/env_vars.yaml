@@ -8477,7 +8477,7 @@ OCIS_SHOW_USER_EMAIL_IN_RESULTS:
   name: OCIS_SHOW_USER_EMAIL_IN_RESULTS
   defaultValue: "false"
   type: bool
-  description: Mask user email addresses in responses.
+  description: Mask user email addresses in responses when set to 'false' (the default). Only effective for non-admin users."
   introductionVersion: 6.0.0
   deprecationVersion: ""
   removalVersion: ""
