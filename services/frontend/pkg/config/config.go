@@ -145,7 +145,7 @@ type OCS struct {
 	PublicShareMustHavePassword          bool               `yaml:"public_sharing_share_must_have_password" env:"OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on all public shares." introductionVersion:"5.0"`
 	WriteablePublicShareMustHavePassword bool               `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false." introductionVersion:"5.0"`
 	IncludeOCMSharees                    bool               `yaml:"include_ocm_sharees" env:"FRONTEND_OCS_INCLUDE_OCM_SHAREES" desc:"Include OCM sharees when listing sharees." introductionVersion:"5.0"`
-	ShowUserEmailInResults               bool               `yaml:"show_email_in_results" env:"OCIS_SHOW_USER_EMAIL_IN_RESULTS" desc:"Mask user email addresses in responses." introductionVersion:"6.0.0"`
+	ShowUserEmailInResults               bool               `yaml:"show_email_in_results" env:"OCIS_SHOW_USER_EMAIL_IN_RESULTS" desc:"Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses." introductionVersion:"6.0.0"`
 }
 
 type CacheWarmupDrivers struct {
