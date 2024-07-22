@@ -120,6 +120,22 @@ Feature: edit user
       | displayName with characters       | *:!;_+-&#(?)     | *:!;_+-&#(?)          |
 
 
+  Scenario: admin user tries to edit nonexistent user's name
+    When the user "Alice" tries to change the user name of user "nonexistent" to "newusername" using the Graph API
+    Then the HTTP status code should be "404"
+
+
+  Scenario Outline: non-admin user tries to edit nonexistent user's name
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    When the user "Alice" tries to change the user name of user "nonexistent" to "newusername" using the Graph API
+    Then the HTTP status code should be "403"
+    Examples:
+      | user-role   |
+      | Space Admin |
+      | User        |
+      | User Light  |
+
+
   Scenario Outline: normal user should not be able to change his/her own display name
     Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to change the display name of user "Brian" to "Brian Murphy" using the Graph API

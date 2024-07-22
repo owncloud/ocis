@@ -387,7 +387,7 @@ Feature: get groups and their members
             "properties": {
               "message": {
                 "type": "string",
-                "enum": ["Unauthorized"]
+                "enum": ["Forbidden"]
               }
             }
           }
@@ -401,7 +401,7 @@ Feature: get groups and their members
       | User Light  |
 
 
-  Scenario: get details of a group
+  Scenario: admin user gets details of a group
     Given group "tea-lover" has been created
     When user "Alice" gets details of the group "tea-lover" using the Graph API
     Then the HTTP status code should be "200"
@@ -425,6 +425,41 @@ Feature: get groups and their members
         }
       }
       """
+
+  @issue-5604
+  Scenario Outline: non-admin user tries to get details of a group
+    Given group "tea-lover" has been created
+    And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    When user "Alice" gets details of the group "tea-lover" using the Graph API
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "enum": ["Forbidden"]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | user-role   |
+      | Space Admin |
+      | User        |
+      | User Light  |
 
 
   Scenario Outline: get details of group with UTF-8 characters name
@@ -462,6 +497,17 @@ Feature: get groups and their members
   Scenario: admin user tries to get group information of non-existing group
     When user "Alice" gets details of the group "non-existing" using the Graph API
     Then the HTTP status code should be "404"
+
+  @issue-5604
+  Scenario Outline: non-admin user tries to get group information of non-existing group
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    When user "Alice" gets details of the group "non-existing" using the Graph API
+    Then the HTTP status code should be "403"
+    Examples:
+      | user-role   |
+      | Space Admin |
+      | User        |
+      | User Light  |
 
 
   Scenario Outline: non-admin user searches for a group by group name

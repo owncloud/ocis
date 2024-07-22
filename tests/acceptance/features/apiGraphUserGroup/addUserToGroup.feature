@@ -198,8 +198,8 @@ Feature: add users to group
   Scenario Outline: user other than the admin tries to add user to a nonexistent group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
-    When the user "Alice" tries to add user "Brian" to a nonexistent group using the Graph API
-    Then the HTTP status code should be "404"
+    When user "Alice" tries to add user "Brian" to a nonexistent group using the Graph API
+    Then the HTTP status code should be "403"
     Examples:
       | user-role   |
       | Space Admin |
@@ -211,6 +211,12 @@ Feature: add users to group
     Given group "groupA" has been created
     When the administrator tries to add nonexistent user to group "groupA" using the Graph API
     Then the HTTP status code should be "404"
+
+
+  Scenario: non-admin user tries to add a nonexistent user to a group
+    Given group "groupA" has been created
+    When user "Alice" tries to add nonexistent user to group "groupA" using the Graph API
+    Then the HTTP status code should be "403"
 
 
   Scenario: admin tries to add user to a group without sending the group

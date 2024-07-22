@@ -49,6 +49,11 @@ Feature: delete groups
       | 50%2Eagle | %2E literal looks like an escaped "."   |
       | 50%2Fix   | %2F literal looks like an escaped slash |
 
+
+  Scenario: admin user tries to delete nonexistent group
+    When user "Alice" tries to delete group "nonexistent" using the Graph API
+    Then the HTTP status code should be "404"
+
   @issue-5938
   Scenario Outline: user other than the admin can't delete a group
     Given user "Brian" has been created with default attributes and without skeleton files
@@ -57,6 +62,17 @@ Feature: delete groups
     When user "Brian" tries to delete group "new-group" using the Graph API
     Then the HTTP status code should be "403"
     And group "new-group" should exist
+    Examples:
+      | user-role   |
+      | Space Admin |
+      | User        |
+      | User Light  |
+
+
+  Scenario Outline: non-admin user tries to delete nonexistent group
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    When user "Alice" tries to delete group "nonexistent" using the Graph API
+    Then the HTTP status code should be "403"
     Examples:
       | user-role   |
       | Space Admin |
