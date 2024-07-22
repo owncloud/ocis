@@ -54,14 +54,14 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix a missing SecureView permission attribute in the REPORT response: [#9638](https://github.com/owncloud/ocis/pull/9638)
 * Bugfix - Fixed the channel lock in a workers pool: [#9647](https://github.com/owncloud/ocis/pull/9647)
 * Bugfix - Missing invitation in permission responses: [#9652](https://github.com/owncloud/ocis/pull/9652)
-* Bugfix - Repair nats-js-kv registry: [#9654](https://github.com/owncloud/ocis/pull/9654)
+* Bugfix - Repair nats-js-kv registry: [#9662](https://github.com/owncloud/ocis/pull/9662)
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 * Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
 * Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
-* Enhancement - Bump reva: [#9621](https://github.com/owncloud/ocis/pull/9621)
 * Enhancement - Bump commitID for web: [#9631](https://github.com/owncloud/ocis/pull/9631)
 * Enhancement - Remove oidc-go dependency: [#9641](https://github.com/owncloud/ocis/pull/9641)
 * Enhancement - Improve the collaboration service logging: [#9653](https://github.com/owncloud/ocis/pull/9653)
+* Enhancement - Bump reva: [#9662](https://github.com/owncloud/ocis/pull/9662)
 
 ## Details
 
@@ -110,12 +110,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/9571
    https://github.com/owncloud/ocis/pull/9652
 
-* Bugfix - Repair nats-js-kv registry: [#9654](https://github.com/owncloud/ocis/pull/9654)
+* Bugfix - Repair nats-js-kv registry: [#9662](https://github.com/owncloud/ocis/pull/9662)
 
    The registry would always send traffic to only one pod. This is now fixed and
    load should be spread evenly. Also implements watcher method so the cache can
    use it.
 
+   https://github.com/owncloud/ocis/pull/9662
    https://github.com/owncloud/ocis/pull/9654
    https://github.com/owncloud/ocis/pull/9620
 
@@ -150,10 +151,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9585
    https://github.com/owncloud/web/releases/tag/v9.2.0-alpha.1
 
-* Enhancement - Bump reva: [#9621](https://github.com/owncloud/ocis/pull/9621)
-
-   https://github.com/owncloud/ocis/pull/9621
-
 * Enhancement - Bump commitID for web: [#9631](https://github.com/owncloud/ocis/pull/9631)
 
    Bump the web commitID to current master
@@ -173,6 +170,11 @@ The following sections list the changes for unreleased.
    for scenarios when we need to debug in remote setups.
 
    https://github.com/owncloud/ocis/pull/9653
+
+* Enhancement - Bump reva: [#9662](https://github.com/owncloud/ocis/pull/9662)
+
+   https://github.com/owncloud/ocis/pull/9662
+   https://github.com/owncloud/ocis/pull/9621
 
 # Changelog for [6.1.0] (2024-07-08)
 
