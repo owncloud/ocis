@@ -126,7 +126,7 @@ Feature: sharing
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
-    And user "Carol" has a share "textfile0.txt" synced
+    And user "Brian" has a share "textfile0.txt" synced
     And using SharingNG
     When user "Carol" gets the info of the last share using the sharing API
     Then the OCS status code should be "404"

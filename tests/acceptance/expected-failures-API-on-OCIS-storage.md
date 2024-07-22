@@ -8,8 +8,8 @@ Basic file management like up and download, move, copy, properties, trash, versi
 
 #### [copy personal space file to shared folder root result share in decline state](https://github.com/owncloud/ocis/issues/6999)
 
-- [coreApiWebdavProperties/copyFile.feature:257](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L257)
-- [coreApiWebdavProperties/copyFile.feature:258](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L258)
+- [coreApiWebdavProperties/copyFile.feature:261](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L261)
+- [coreApiWebdavProperties/copyFile.feature:262](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L262)
 
 #### [Custom dav properties with namespaces are rendered incorrectly](https://github.com/owncloud/ocis/issues/2140)
 
@@ -18,7 +18,7 @@ _ocdav: double-check the webdav property parsing when custom namespaces are used
 - [coreApiWebdavProperties/setFileProperties.feature:32](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L32)
 - [coreApiWebdavProperties/setFileProperties.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L33)
 - [coreApiWebdavProperties/setFileProperties.feature:34](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L34)
-- [coreApiWebdavProperties/setFileProperties.feature:66](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L66)
+- [coreApiWebdavProperties/setFileProperties.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L69)
 - [coreApiWebdavProperties/setFileProperties.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L67)
 - [coreApiWebdavProperties/setFileProperties.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L68)
 
@@ -34,16 +34,16 @@ _ocdav: double-check the webdav property parsing when custom namespaces are used
 #### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
 
 - [coreApiVersions/fileVersionAuthor.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L15)
-- [coreApiVersions/fileVersionAuthor.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L58)
-- [coreApiVersions/fileVersionAuthor.feature:88](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L88)
-- [coreApiVersions/fileVersionAuthor.feature:117](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L117)
-- [coreApiVersions/fileVersionAuthor.feature:153](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L153)
-- [coreApiVersions/fileVersionAuthor.feature:183](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L183)
-- [coreApiVersions/fileVersionAuthor.feature:217](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L217)
-- [coreApiVersions/fileVersionAuthor.feature:258](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L258)
-- [coreApiVersions/fileVersionAuthor.feature:334](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L334)
-- [coreApiVersions/fileVersionAuthor.feature:407](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L407)
+- [coreApiVersions/fileVersionAuthor.feature:61](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L61)
+- [coreApiVersions/fileVersionAuthor.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L93)
+- [coreApiVersions/fileVersionAuthor.feature:124](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L124)
+- [coreApiVersions/fileVersionAuthor.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L162)
+- [coreApiVersions/fileVersionAuthor.feature:194](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L194)
+- [coreApiVersions/fileVersionAuthor.feature:230](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L230)
+- [coreApiVersions/fileVersionAuthor.feature:275](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L275)
+- [coreApiVersions/fileVersionAuthor.feature:357](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L357)
 - [coreApiVersions/fileVersionAuthor.feature:436](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L436)
+- [coreApiVersions/fileVersionAuthor.feature:467](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L467)
 
 ### Sync
 
@@ -51,8 +51,8 @@ Synchronization features like etag propagation, setting mtime and locking files
 
 #### [Uploading an old method chunked file with checksum should fail using new DAV path](https://github.com/owncloud/ocis/issues/2323)
 
-- [coreApiMain/checksums.feature:217](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiMain/checksums.feature#L217)
-- [coreApiMain/checksums.feature:218](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiMain/checksums.feature#L218)
+- [coreApiMain/checksums.feature:219](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiMain/checksums.feature#L219)
+- [coreApiMain/checksums.feature:220](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiMain/checksums.feature#L220)
 
 ### Share
 
@@ -67,26 +67,26 @@ Synchronization features like etag propagation, setting mtime and locking files
 
 #### [d:quota-available-bytes in dprop of PROPFIND give wrong response value](https://github.com/owncloud/ocis/issues/8197)
 
-- [coreApiWebdavProperties/getQuota.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L56)
 - [coreApiWebdavProperties/getQuota.feature:57](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L57)
 - [coreApiWebdavProperties/getQuota.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L58)
-- [coreApiWebdavProperties/getQuota.feature:72](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L72)
+- [coreApiWebdavProperties/getQuota.feature:59](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L59)
 - [coreApiWebdavProperties/getQuota.feature:73](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L73)
 - [coreApiWebdavProperties/getQuota.feature:74](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L74)
+- [coreApiWebdavProperties/getQuota.feature:75](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L75)
 
 #### [deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver](https://github.com/owncloud/ocis/issues/1124)
 
 - [coreApiTrashbin/trashbinSharingToShares.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L30)
-- [coreApiTrashbin/trashbinSharingToShares.feature:51](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L51)
-- [coreApiTrashbin/trashbinSharingToShares.feature:52](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L52)
-- [coreApiTrashbin/trashbinSharingToShares.feature:77](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L77)
-- [coreApiTrashbin/trashbinSharingToShares.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L78)
-- [coreApiTrashbin/trashbinSharingToShares.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L130)
-- [coreApiTrashbin/trashbinSharingToShares.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L131)
-- [coreApiTrashbin/trashbinSharingToShares.feature:185](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L185)
-- [coreApiTrashbin/trashbinSharingToShares.feature:186](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L186)
-- [coreApiTrashbin/trashbinSharingToShares.feature:209](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L209)
-- [coreApiTrashbin/trashbinSharingToShares.feature:233](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L233)
+- [coreApiTrashbin/trashbinSharingToShares.feature:53](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L53)
+- [coreApiTrashbin/trashbinSharingToShares.feature:54](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L54)
+- [coreApiTrashbin/trashbinSharingToShares.feature:81](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L81)
+- [coreApiTrashbin/trashbinSharingToShares.feature:82](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L82)
+- [coreApiTrashbin/trashbinSharingToShares.feature:138](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L138)
+- [coreApiTrashbin/trashbinSharingToShares.feature:139](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L139)
+- [coreApiTrashbin/trashbinSharingToShares.feature:196](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L196)
+- [coreApiTrashbin/trashbinSharingToShares.feature:197](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L197)
+- [coreApiTrashbin/trashbinSharingToShares.feature:220](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L220)
+- [coreApiTrashbin/trashbinSharingToShares.feature:245](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L245)
 
 ### Other
 
@@ -142,8 +142,8 @@ And other missing implementation of favorites
 - [coreApiFavorites/favorites.feature:174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favorites.feature#L174)
 - [coreApiFavorites/favorites.feature:175](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favorites.feature#L175)
 - [coreApiFavorites/favorites.feature:176](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favorites.feature#L176)
-- [coreApiFavorites/favoritesSharingToShares.feature:84](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favoritesSharingToShares.feature#L84)
-- [coreApiFavorites/favoritesSharingToShares.feature:85](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favoritesSharingToShares.feature#L85)
+- [coreApiFavorites/favoritesSharingToShares.feature:88](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favoritesSharingToShares.feature#L88)
+- [coreApiFavorites/favoritesSharingToShares.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favoritesSharingToShares.feature#L89)
 
 #### [WWW-Authenticate header for unauthenticated requests is not clear](https://github.com/owncloud/ocis/issues/2285)
 
@@ -175,16 +175,16 @@ And other missing implementation of favorites
 - [coreApiWebdavUploadTUS/checksums.feature:244](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/checksums.feature#L244)
 - [coreApiWebdavUploadTUS/optionsRequest.feature:10](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/optionsRequest.feature#L10)
 - [coreApiWebdavUploadTUS/optionsRequest.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/optionsRequest.feature#L25)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:216](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L216)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:217](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L217)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:239](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L239)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:240](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L240)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:262](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L262)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:263](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L263)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:304](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L304)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:305](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L305)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:354](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L354)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:355](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L355)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:226](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L226)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:227](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L227)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:250](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L250)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:251](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L251)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:274](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L274)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:275](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L275)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:317](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L317)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:318](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L318)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:369](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L369)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:370](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L370)
 
 #### [TUS OPTIONS requests do not reply with TUS headers when invalid password](https://github.com/owncloud/ocis/issues/1012)
 
@@ -193,14 +193,14 @@ And other missing implementation of favorites
 
 #### [copying the file inside Shares folder returns 412](https://github.com/owncloud/ocis/issues/3874)
 
-- [coreApiWebdavProperties/copyFile.feature:399](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L399)
-- [coreApiWebdavProperties/copyFile.feature:400](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L400)
-- [coreApiWebdavProperties/copyFile.feature:401](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L401)
-- [coreApiWebdavProperties/copyFile.feature:425](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L425)
-- [coreApiWebdavProperties/copyFile.feature:426](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L426)
-- [coreApiWebdavProperties/copyFile.feature:427](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L427)
-- [coreApiWebdavProperties/copyFile.feature:235](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L235)
-- [coreApiWebdavProperties/copyFile.feature:236](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L236)
+- [coreApiWebdavProperties/copyFile.feature:408](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L408)
+- [coreApiWebdavProperties/copyFile.feature:409](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L409)
+- [coreApiWebdavProperties/copyFile.feature:410](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L410)
+- [coreApiWebdavProperties/copyFile.feature:435](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L435)
+- [coreApiWebdavProperties/copyFile.feature:436](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L436)
+- [coreApiWebdavProperties/copyFile.feature:437](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L437)
+- [coreApiWebdavProperties/copyFile.feature:238](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L238)
+- [coreApiWebdavProperties/copyFile.feature:239](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L239)
 
 ### Won't fix
 
@@ -211,9 +211,9 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [Blacklist files extensions](https://github.com/owncloud/ocis/issues/2177)
 
-- [coreApiWebdavProperties/copyFile.feature:105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L105)
-- [coreApiWebdavProperties/copyFile.feature:106](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L106)
 - [coreApiWebdavProperties/copyFile.feature:107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L107)
+- [coreApiWebdavProperties/copyFile.feature:108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L108)
+- [coreApiWebdavProperties/copyFile.feature:109](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L109)
 - [coreApiWebdavProperties/createFileFolder.feature:95](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/createFileFolder.feature#L95)
 - [coreApiWebdavProperties/createFileFolder.feature:96](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/createFileFolder.feature#L96)
 - [coreApiWebdavProperties/createFileFolder.feature:97](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/createFileFolder.feature#L97)
@@ -249,8 +249,8 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiWebdavMove1/moveFolder.feature:217](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L217)
 - [coreApiWebdavMove1/moveFolder.feature:218](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L218)
 - [coreApiWebdavMove1/moveFolder.feature:219](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L219)
-- [coreApiWebdavMove2/moveShareOnOcis.feature:303](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L303)
-- [coreApiWebdavMove2/moveShareOnOcis.feature:306](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L306)
+- [coreApiWebdavMove2/moveShareOnOcis.feature:307](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L307)
+- [coreApiWebdavMove2/moveShareOnOcis.feature:310](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L310)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

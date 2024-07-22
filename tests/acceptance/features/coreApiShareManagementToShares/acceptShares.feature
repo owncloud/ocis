@@ -141,7 +141,7 @@ Feature: accept/decline shares coming from internal users
       | shareType       | user     |
       | permissionsRole | Viewer   |
     And user "Brian" has a share "shared" synced
-    When user "Brian" accepts share "/shared" offered by user "Alice" using the sharing API
+    When user "Brian" accepts the already accepted share "/shared" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
     And user "Brian" should see the following elements
