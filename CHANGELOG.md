@@ -55,6 +55,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fixed the channel lock in a workers pool: [#9647](https://github.com/owncloud/ocis/pull/9647)
 * Bugfix - Missing invitation in permission responses: [#9652](https://github.com/owncloud/ocis/pull/9652)
 * Bugfix - Repair nats-js-kv registry: [#9662](https://github.com/owncloud/ocis/pull/9662)
+* Bugfix - Fix panic: [#9673](https://github.com/owncloud/ocis/pull/9673)
 * Enhancement - Introduce auth-app service: [#9079](https://github.com/owncloud/ocis/pull/9079)
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 * Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
@@ -122,6 +123,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9662
    https://github.com/owncloud/ocis/pull/9654
    https://github.com/owncloud/ocis/pull/9620
+
+* Bugfix - Fix panic: [#9673](https://github.com/owncloud/ocis/pull/9673)
+
+   Fixes panic occuring when the nats-js-kv is not properly initialized.
+
+   https://github.com/owncloud/ocis/pull/9673
 
 * Enhancement - Introduce auth-app service: [#9079](https://github.com/owncloud/ocis/pull/9079)
 
