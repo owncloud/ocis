@@ -11,7 +11,6 @@
   },
   "options": {
     "topCenterNotifications": true,
-    "disablePreviews": true,
     "displayResourcesLazy": false,
     "sidebar": {
       "shares": {
@@ -21,7 +20,6 @@
   },
   "apps": [
     "files",
-    "draw-io",
     "text-editor",
     "preview",
     "pdf-viewer",
