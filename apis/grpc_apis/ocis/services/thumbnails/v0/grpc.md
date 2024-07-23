@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.thumbnails.v0"
 url: /apis/grpc_apis/ocis_services_thumbnails_v0
-date: 2024-07-23T08:42:03Z
+date: 2024-07-23T11:33:06Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
