@@ -13,6 +13,7 @@ import (
 	appprovider "github.com/owncloud/ocis/v2/services/app-provider/pkg/command"
 	appregistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/command"
 	audit "github.com/owncloud/ocis/v2/services/audit/pkg/command"
+	authapp "github.com/owncloud/ocis/v2/services/auth-app/pkg/command"
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/command"
 	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/command"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
@@ -76,6 +77,11 @@ var svccmds = []register.Command{
 	func(cfg *config.Config) *cli.Command {
 		return ServiceCommand(cfg, cfg.Audit.Service.Name, audit.GetCommands(cfg.Audit), func(c *config.Config) {
 			cfg.Audit.Commons = cfg.Commons
+		})
+	},
+	func(cfg *config.Config) *cli.Command {
+		return ServiceCommand(cfg, cfg.AuthApp.Service.Name, authapp.GetCommands(cfg.AuthApp), func(_ *config.Config) {
+			cfg.AuthApp.Commons = cfg.Commons
 		})
 	},
 	func(cfg *config.Config) *cli.Command {
@@ -266,10 +272,10 @@ var svccmds = []register.Command{
 }
 
 // ServiceCommand is the entry point for the all service commands.
-func ServiceCommand(cfg *config.Config, servicename string, subcommands []*cli.Command, f func(*config.Config)) *cli.Command {
+func ServiceCommand(cfg *config.Config, serviceName string, subcommands []*cli.Command, f func(*config.Config)) *cli.Command {
 	return &cli.Command{
-		Name:     servicename,
-		Usage:    helper.SubcommandDescription(servicename),
+		Name:     serviceName,
+		Usage:    helper.SubcommandDescription(serviceName),
 		Category: "services",
 		Before: func(c *cli.Context) error {
 			configlog.Error(parser.ParseConfig(cfg, true))

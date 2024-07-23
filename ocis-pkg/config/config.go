@@ -7,6 +7,7 @@ import (
 	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
 	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/config"
 	audit "github.com/owncloud/ocis/v2/services/audit/pkg/config"
+	authapp "github.com/owncloud/ocis/v2/services/auth-app/pkg/config"
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/config"
 	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/config"
@@ -86,6 +87,7 @@ type Config struct {
 	AppProvider       *appProvider.Config    `yaml:"app_provider"`
 	AppRegistry       *appRegistry.Config    `yaml:"app_registry"`
 	Audit             *audit.Config          `yaml:"audit"`
+	AuthApp           *authapp.Config        `yaml:"auth_app"`
 	AuthBasic         *authbasic.Config      `yaml:"auth_basic"`
 	AuthBearer        *authbearer.Config     `yaml:"auth_bearer"`
 	AuthMachine       *authmachine.Config    `yaml:"auth_machine"`

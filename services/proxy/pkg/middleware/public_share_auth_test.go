@@ -18,6 +18,7 @@ import (
 var _ = Describe("Authenticating requests", Label("PublicShareAuthenticator"), func() {
 	var authenticator Authenticator
 	BeforeEach(func() {
+		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
 		authenticator = PublicShareAuthenticator{
 			Logger: log.NewLogger(),
 			RevaGatewaySelector: pool.GetSelector[gateway.GatewayAPIClient](

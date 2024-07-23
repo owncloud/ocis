@@ -25,6 +25,7 @@ OCIS_MODULES = \
 	services/app-provider \
 	services/app-registry \
 	services/audit \
+	services/auth-app \
 	services/auth-basic \
 	services/auth-bearer \
 	services/auth-machine \

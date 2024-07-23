@@ -194,6 +194,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			{
 				middlewares := loadMiddlewares(logger, cfg, userInfoCache, signingKeyStore, traceProvider, *m, userProvider, gatewaySelector)
+
 				server, err := proxyHTTP.Server(
 					proxyHTTP.Handler(lh.Handler()),
 					proxyHTTP.Logger(logger),
@@ -293,6 +294,12 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		})
 	}
 
+	if cfg.AuthMiddleware.AllowAppAuth {
+		authenticators = append(authenticators, middleware.AppAuthAuthenticator{
+			Logger:              logger,
+			RevaGatewaySelector: gatewaySelector,
+		})
+	}
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
 		middleware.UserInfoCache(userInfoCache),

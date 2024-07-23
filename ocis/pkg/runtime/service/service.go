@@ -13,6 +13,8 @@ import (
 	"syscall"
 	"time"
 
+	authapp "github.com/owncloud/ocis/v2/services/auth-app/pkg/command"
+
 	"github.com/cenkalti/backoff"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/logger"
@@ -323,6 +325,11 @@ func NewService(options ...Option) (*Service, error) {
 		cfg.Audit.Context = ctx
 		cfg.Audit.Commons = cfg.Commons
 		return audit.Execute(cfg.Audit)
+	})
+	areg(opts.Config.AuthApp.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.AuthApp.Context = ctx
+		cfg.AuthApp.Commons = cfg.Commons
+		return authapp.Execute(cfg.AuthApp)
 	})
 	areg(opts.Config.Policies.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.Policies.Context = ctx

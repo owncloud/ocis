@@ -6,6 +6,7 @@ import (
 	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/config/defaults"
 	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/config/defaults"
 	audit "github.com/owncloud/ocis/v2/services/audit/pkg/config/defaults"
+	authapp "github.com/owncloud/ocis/v2/services/auth-app/pkg/config/defaults"
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/config/defaults"
 	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config/defaults"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/config/defaults"
@@ -58,6 +59,7 @@ func DefaultConfig() *Config {
 		AppProvider:       appProvider.DefaultConfig(),
 		AppRegistry:       appRegistry.DefaultConfig(),
 		Audit:             audit.DefaultConfig(),
+		AuthApp:           authapp.DefaultConfig(),
 		AuthBasic:         authbasic.DefaultConfig(),
 		AuthBearer:        authbearer.DefaultConfig(),
 		AuthMachine:       authmachine.DefaultConfig(),
