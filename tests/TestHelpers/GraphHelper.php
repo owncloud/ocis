@@ -2240,4 +2240,57 @@ class GraphHelper {
 			$body
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getPermissionsRoleDefinitions(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "roleManagement/permissions/roleDefinitions");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $permissionRole
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws \Exception|GuzzleException
+	 */
+	public static function getPermissionRoleDefinition(
+		string $permissionRole,
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+	): ResponseInterface {
+		$roleId = self::getPermissionsRoleIdByName($permissionRole);
+		$url = self::getBetaFullUrl($baseUrl, "roleManagement/permissions/roleDefinitions/{$roleId}");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
 }
