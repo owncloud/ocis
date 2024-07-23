@@ -28,7 +28,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 a| `OCIS_ADMIN_USER_ID`
 
 a| [subs=-attributes]
@@ -46,7 +46,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+ID of the user who collects all necessary information for deletion. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 a| `OCIS_ASYNC_UPLOADS`
 
 a| [subs=-attributes]
@@ -90,7 +90,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=-attributes]
@@ -116,7 +116,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=-attributes]
@@ -136,7 +136,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++cache-providers ++
+++storage-users ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
@@ -164,7 +164,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disables persistence of the provider cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
 a| `OCIS_CACHE_SIZE`
 
 a| [subs=-attributes]
@@ -188,7 +188,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
 a| `OCIS_CACHE_STORE`
 
 a| [subs=-attributes]
@@ -211,7 +211,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++noop ++
+++memory ++
 
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
@@ -263,10 +263,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++5m0s ++
+++24m0s ++
 
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
 a| [subs=-attributes]
@@ -293,7 +293,7 @@ a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++true ++
+++false ++
 
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
@@ -323,7 +323,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
+++[Authorization Origin X-Requested-With X-Request-Id X-HTTP-Method-Override Content-Type Upload-Length Upload-Offset Tus-Resumable Upload-Metadata Upload-Defer-Length Upload-Concat Upload-Incomplete Upload-Draft-Interop-Version] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -353,7 +353,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET] ++
+++[POST HEAD PATCH OPTIONS GET DELETE] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
@@ -383,7 +383,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[*] ++
+++[https://localhost:9200] ++
 
 a| [subs=-attributes]
 A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
@@ -676,11 +676,11 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided POSTPROCESSING_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/gateway.adoc[gateway] +
@@ -693,7 +693,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the GRPC service.
+The bind address of the gateway GRPC address.
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
 a| [subs=-attributes]
@@ -889,7 +889,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether the ocis server should skip the client certificate verification during the TLS handshake.
+Whether to verify the server TLS certificates.
 a| `OCIS_JWT_SECRET`
 
 a| [subs=-attributes]
@@ -965,7 +965,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client ID to authenticate with keycloak.
+The client id to authenticate with keycloak.
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
 a| [subs=-attributes]
@@ -1819,7 +1819,7 @@ Activates pretty log output.
 a| `OCIS_MACHINE_AUTH_API_KEY`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/auth-machine.adoc[auth-machine] +
@@ -1994,7 +1994,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++nats-js-kv ++
+++memory ++
 
 a| [subs=-attributes]
 The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
@@ -2051,7 +2051,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[127.0.0.1:9233] ++
+++[] ++
 
 a| [subs=-attributes]
 A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
@@ -2089,10 +2089,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++0s ++
+++336h0m0s ++
 
 a| [subs=-attributes]
-Time to live for events in the store. See the Environment Variable Types description for more details.
+Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
 a| `OCIS_REVA_GATEWAY`
 
 a| [subs=-attributes]
@@ -2222,7 +2222,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
 a| `OCIS_SHOW_USER_EMAIL_IN_RESULTS`
 
 a| [subs=-attributes]
@@ -2256,7 +2256,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
+Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
 a| `OCIS_SYSTEM_USER_API_KEY`
 
 a| [subs=-attributes]
@@ -2298,7 +2298,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the oCIS storage-system system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
+ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 a| `OCIS_SYSTEM_USER_IDP`
 
 a| [subs=-attributes]
@@ -2563,7 +2563,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=-attributes]
@@ -2610,14 +2610,14 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://localhost:9200/ ++
+++https://localhost:9200 ++
 
 a| [subs=-attributes]
-Base url to navigate back from the app to the containing folder in the file list.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 a| `OCIS_WOPI_DISABLE_CHAT`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 
 a| [subs=attributes+]
 * xref:{s-path}/app-provider.adoc[app-provider] +
@@ -2630,7 +2630,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disable the chat functionality of the office app.
+Disable chat in the frontend.
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=-attributes]
