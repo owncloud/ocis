@@ -560,10 +560,18 @@ trait WebDav {
 	 * @throws GuzzleException
 	 */
 	public function destinationHeaderValue(string $user, string $fileDestination):string {
+		$fileDestination = \ltrim($fileDestination, "/");
 		$spaceId = $this->getPersonalSpaceIdForUser($user);
+		// If the destination is a share, we need to get the space ID for the Shares space
+		if (\str_starts_with($fileDestination, "Shares/")) {
+			$spaceId = $this->spacesContext->getSpaceIdByName($user, "Shares");
+			if ($this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
+				$fileDestination = \preg_replace("/^Shares\//", "", $fileDestination);
+			}
+		}
 		$fullUrl = $this->getBaseUrl() . '/' .
 			WebDavHelper::getDavPath($user, $this->getDavPathVersion(), "files", $spaceId);
-		return \rtrim($fullUrl, '/') . '/' . \ltrim($fileDestination, '/');
+		return \rtrim($fullUrl, '/') . '/' . $fileDestination;
 	}
 
 	/**
@@ -580,17 +588,7 @@ trait WebDav {
 		?string $fileSource,
 		?string $fileDestination
 	):void {
-		$user = $this->getActualUsername($user);
-		$headers['Destination'] = $this->destinationHeaderValue(
-			$user,
-			$fileDestination
-		);
-		$response = $this->makeDavRequest(
-			$user,
-			"MOVE",
-			$fileSource,
-			$headers
-		);
+		$response = $this->moveResource($user, $fileSource, $fileDestination);
 		$actualStatusCode = $response->getStatusCode();
 		$this->theHTTPStatusCodeShouldBe(
 			201,

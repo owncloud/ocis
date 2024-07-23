@@ -76,7 +76,6 @@ Synchronization features like etag propagation, setting mtime and locking files
 
 #### [deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver](https://github.com/owncloud/ocis/issues/1124)
 
-- [coreApiTrashbin/trashbinSharingToShares.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L30)
 - [coreApiTrashbin/trashbinSharingToShares.feature:53](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L53)
 - [coreApiTrashbin/trashbinSharingToShares.feature:54](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L54)
 - [coreApiTrashbin/trashbinSharingToShares.feature:81](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L81)
@@ -85,8 +84,6 @@ Synchronization features like etag propagation, setting mtime and locking files
 - [coreApiTrashbin/trashbinSharingToShares.feature:139](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L139)
 - [coreApiTrashbin/trashbinSharingToShares.feature:196](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L196)
 - [coreApiTrashbin/trashbinSharingToShares.feature:197](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L197)
-- [coreApiTrashbin/trashbinSharingToShares.feature:220](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L220)
-- [coreApiTrashbin/trashbinSharingToShares.feature:245](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L245)
 
 ### Other
 

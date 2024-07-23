@@ -378,7 +378,7 @@ Feature: share resources where the sharee receives the share in multiple ways
       | shareType       | group    |
       | permissionsRole | Viewer   |
     And user "Alice" has a share "parent" synced
-    And user "Brian" has a share "child1" synced
+    And user "Brian" has a share "parent" synced
     And user "Carol" has sent the following resource share invitation:
       | resource        | parent/child1 |
       | space           | Personal      |

@@ -155,7 +155,7 @@ Feature: using trashbin together with sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
-    And user "Brain" has a share "shared" synced
+    And user "Brian" has a share "shared" synced
     And user "Carol" has a share "shared" synced
     When user "Alice" deletes file "/shared/sub/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -179,7 +179,7 @@ Feature: using trashbin together with sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
-    And user "Brain" has a share "shared" synced
+    And user "Brian" has a share "shared" synced
     And user "Brian" has moved folder "/Shares/shared" to "/Shares/renamed_shared"
     And user "Brian" has deleted file "/Shares/renamed_shared/shared_file.txt"
     When user "Brian" restores the file with original path "/Shares/renamed_shared/shared_file.txt" using the trashbin API
