@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-23-07-52-59]
+[#deprecation-note-2024-07-23-08-39-18]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -728,6 +728,17 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services.
+
+a|`PROXY_ENABLE_APP_AUTH` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Allow app authentication. This can be used to authenticate 3rd party applications. Note that auth-app service must be running for this feature to work.
 
 a|`PROXY_POLICIES_QUERY` +
 

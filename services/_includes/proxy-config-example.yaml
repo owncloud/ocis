@@ -184,6 +184,7 @@ insecure_backends: false
 backend_https_cacert: ""
 auth_middleware:
   credentials_by_user_agent: {}
+  allow_app_auth: false
 policies_middleware:
   query: ""
 csp_config_file_location: ""

@@ -8,7 +8,7 @@ ifeval::[{show-deprecation} == true]
 
 [#deprecation-note-2024-07-23-08-39-18]
 [caption=]
-.Deprecation notes for the app-registry service
+.Deprecation notes for the auth-app service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Deprecation Info
@@ -22,7 +22,7 @@ ifeval::[{show-deprecation} == true]
 endif::[]
 
 [caption=]
-.Environment variables for the app-registry service
+.Environment variables for the auth-app service
 [width="100%",cols="~,~,~,~,~",options="header"]
 |===
 | Name
@@ -32,10 +32,10 @@ endif::[]
 | Description
 
 a|`OCIS_TRACING_ENABLED` +
-`APP_REGISTRY_TRACING_ENABLED` +
+`AUTH_APP_TRACING_ENABLED` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -44,10 +44,10 @@ a| [subs=-attributes]
 Activates tracing.
 
 a|`OCIS_TRACING_TYPE` +
-`APP_REGISTRY_TRACING_TYPE` +
+`AUTH_APP_TRACING_TYPE` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -56,10 +56,10 @@ a| [subs=-attributes]
 The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
 
 a|`OCIS_TRACING_ENDPOINT` +
-`APP_REGISTRY_TRACING_ENDPOINT` +
+`AUTH_APP_TRACING_ENDPOINT` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -68,10 +68,10 @@ a| [subs=-attributes]
 The endpoint of the tracing agent.
 
 a|`OCIS_TRACING_COLLECTOR` +
-`APP_REGISTRY_TRACING_COLLECTOR` +
+`AUTH_APP_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -80,10 +80,10 @@ a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 a|`OCIS_LOG_LEVEL` +
-`APP_REGISTRY_LOG_LEVEL` +
+`AUTH_APP_LOG_LEVEL` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -92,10 +92,10 @@ a| [subs=-attributes]
 The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
 
 a|`OCIS_LOG_PRETTY` +
-`APP_REGISTRY_LOG_PRETTY` +
+`AUTH_APP_LOG_PRETTY` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -104,10 +104,10 @@ a| [subs=-attributes]
 Activates pretty log output.
 
 a|`OCIS_LOG_COLOR` +
-`APP_REGISTRY_LOG_COLOR` +
+`AUTH_APP_LOG_COLOR` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -116,10 +116,10 @@ a| [subs=-attributes]
 Activates colorized log output.
 
 a|`OCIS_LOG_FILE` +
-`APP_REGISTRY_LOG_FILE` +
+`AUTH_APP_LOG_FILE` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -127,21 +127,21 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 
-a|`APP_REGISTRY_DEBUG_ADDR` +
+a|`AUTH_APP_DEBUG_ADDR` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9243 ++
+++127.0.0.1:9245 ++
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
-a|`APP_REGISTRY_DEBUG_TOKEN` +
+a|`AUTH_APP_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -149,10 +149,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
 
-a|`APP_REGISTRY_DEBUG_PPROF` +
+a|`AUTH_APP_DEBUG_PPROF` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -160,32 +160,32 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
 
-a|`APP_REGISTRY_DEBUG_ZPAGES` +
+a|`AUTH_APP_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+Enables zpages, which can  be used for collecting and viewing traces in-memory.
 
-a|`APP_REGISTRY_GRPC_ADDR` +
+a|`AUTH_APP_GRPC_ADDR` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9242 ++
+++127.0.0.1:9246 ++
 a| [subs=-attributes]
 The bind address of the GRPC service.
 
-a|`APP_REGISTRY_GRPC_PROTOCOL` +
+a|`AUTH_APP_GRPC_PROTOCOL` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -194,10 +194,10 @@ a| [subs=-attributes]
 The transport protocol of the GRPC service.
 
 a|`OCIS_JWT_SECRET` +
-`APP_REGISTRY_JWT_SECRET` +
+`AUTH_APP_JWT_SECRET` +
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -237,5 +237,28 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
+
+a|`AUTH_APP_SKIP_USER_GROUPS_IN_TOKEN` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disables the encoding of the user's group memberships in the access token. This reduces the token size, especially when users are members of a large number of groups.
+
+a|`OCIS_MACHINE_AUTH_API_KEY` +
+`AUTH_APP_MACHINE_AUTH_API_KEY` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The machine auth API key used to validate internal requests necessary to access resources from other services.
 |===
 

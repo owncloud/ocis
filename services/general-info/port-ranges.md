@@ -60,7 +60,7 @@ We also suggest using the last port in your extensions' range as a debug/metrics
 | 9230-9234  | [nats]({{< ref "../nats/_index.md" >}})                                                |
 | 9235-9239  | [idm]({{< ref "../idm/_index.md" >}})                                                  |
 | 9240-9244  | [app-registry]({{< ref "../app-registry/_index.md" >}})                                |
-| 9245-9249  | FREE                                                                                   |
+| 9245-9249  | [auth-app]({{< ref "../auth-app/_index.md" >}})                                        |
 | 9250-9254  | [ocis server (runtime)](https://github.com/owncloud/ocis/tree/master/ocis/pkg/runtime) |
 | 9255-9259  | [postprocessing]({{< ref "../postprocessing/_index.md" >}})                            |
 | 9260-9264  | [clientlog]({{< ref "../clientlog/_index.md" >}})                                      |

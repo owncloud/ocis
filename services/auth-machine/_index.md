@@ -1,6 +1,6 @@
 ---
 title: Auth-Machine
-date: 2024-07-23T07:53:05.792940898Z
+date: 2024-07-23T08:39:24.035712743Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-machine
@@ -16,6 +16,7 @@ geekdocCollapseSection: true
 The oCIS Auth Machine is used for interservice communication when using user impersonation.
 
 ocis uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
+  -   `auth-app` handles authentication of external 3rd party apps
   -   `auth-basic` handles basic authentication
   -   `auth-bearer` handles oidc authentication
   -   `auth-machine` handles interservice authentication when a user is impersonated

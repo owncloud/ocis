@@ -63,6 +63,7 @@
 | PROXY_ENABLE_BASIC_AUTH | bool | false | Set this to true to enable 'basic authentication' (username/password).|
 | PROXY_INSECURE_BACKENDS | bool | false | Disable TLS certificate validation for all HTTP backend connections.|
 | PROXY_HTTPS_CACERT | string |  | Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services.|
+| PROXY_ENABLE_APP_AUTH | bool | false | Allow app authentication. This can be used to authenticate 3rd party applications. Note that auth-app service must be running for this feature to work.|
 | PROXY_POLICIES_QUERY | string |  | Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Rules default to deny if the variable was not found.|
 | PROXY_CSP_CONFIG_FILE_LOCATION | string |  | The location of the CSP configuration file.|
 | OCIS_EVENTS_ENDPOINT<br/>PROXY_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.|
