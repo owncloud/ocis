@@ -341,6 +341,10 @@ func (n *natsStore) WatchAll(bucket string, opts ...nats.WatchOpt) (nats.KeyWatc
 		return nil, errors.New("multi bucket watching is not supported")
 	}
 
+	if err := n.initConn(); err != nil {
+		return nil, err
+	}
+
 	b, err := n.js.KeyValue(bucket)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to get bucket")
