@@ -3,11 +3,11 @@
 The oCIS Auth Machine is used for interservice communication when using user impersonation.
 
 ocis uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
+  -   `auth-app` handles authentication of external 3rd party apps
   -   `auth-basic` handles basic authentication
   -   `auth-bearer` handles oidc authentication
   -   `auth-machine` handles interservice authentication when a user is impersonated
   -   `auth-service` handles interservice authentication when using service accounts
-  -   `auth-app` handles authentication of external 3rd party apps
 
 ## User Impersonation
 
