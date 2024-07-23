@@ -92,7 +92,6 @@ web:
     - external
     - admin-settings
     - epub-reader
-    - draw-io
     applications: []
     external_apps:
     - id: preview
