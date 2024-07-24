@@ -35,9 +35,6 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			if err != nil {
-				return err
-			}
 			cfg.GrpcClient, err = ogrpc.NewClient(
 				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(traceProvider))...,
 			)
@@ -47,13 +44,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 			var (
 				gr          = run.Group{}
-				ctx, cancel = func() (context.Context, context.CancelFunc) {
-					if cfg.Context == nil {
-						return context.WithCancel(context.Background())
-					}
-					return context.WithCancel(cfg.Context)
-				}()
-				metrics = metrics.New()
+				ctx, cancel = context.WithCancel(c.Context)
+				metrics     = metrics.New()
 			)
 
 			defer cancel()
