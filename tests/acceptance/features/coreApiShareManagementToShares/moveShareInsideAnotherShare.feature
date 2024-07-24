@@ -20,12 +20,14 @@ Feature: moving a share inside another share
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "folderA" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | folderB  |
       | space           | Personal |
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "folderB" synced
 
 
   Scenario: share receiver cannot move a whole share inside another share

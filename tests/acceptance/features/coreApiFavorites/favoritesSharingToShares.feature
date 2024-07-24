@@ -19,6 +19,7 @@ Feature: favorite
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" favorites element "/Shares/PARENT/parent.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" file "/Shares/PARENT/parent.txt" should be favorited
@@ -38,6 +39,7 @@ Feature: favorite
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" favorites element "/Shares/PARENT/sub-folder" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" folder "/Shares/PARENT/sub-folder" should be favorited
@@ -56,6 +58,7 @@ Feature: favorite
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" favorites element "/Shares/PARENT" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" folder "/Shares/PARENT" should be favorited
@@ -74,6 +77,7 @@ Feature: favorite
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     And user "Brian" has favorited element "/Shares/PARENT/parent.txt"
     When user "Brian" moves file "/Shares/PARENT/parent.txt" to "/taken_out.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -94,6 +98,7 @@ Feature: favorite
       | sharee          | Brian             |
       | shareType       | user              |
       | permissionsRole | File Editor       |
+    And user "Brian" has a share "parent.txt" synced
     When user "Brian" favorites element "/Shares/parent.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" file "/Shares/parent.txt" should be favorited

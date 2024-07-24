@@ -20,6 +20,7 @@ Feature: using trashbin together with sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "shared" synced
     And user "Brian" has moved folder "/Shares/shared" to "/Shares/renamed_shared"
     When user "Brian" deletes folder "/Shares/renamed_shared" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -41,6 +42,7 @@ Feature: using trashbin together with sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "shared" synced
     And user "Brian" has moved file "/Shares/shared" to "/Shares/renamed_shared"
     When user "Brian" deletes file "/Shares/renamed_shared/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -67,6 +69,8 @@ Feature: using trashbin together with sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "shared" synced
+    And user "Carol" has a share "shared" synced
     When user "Brian" deletes file "/Shares/shared/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Brian" the file with original path "/Shares/shared/shared_file.txt" should exist in the trashbin
@@ -93,6 +97,8 @@ Feature: using trashbin together with sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "shared" synced
+    And user "Carol" has a share "shared" synced
     When user "Alice" deletes file "/shared/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" the file with original path "/shared/shared_file.txt" should exist in the trashbin
@@ -120,6 +126,8 @@ Feature: using trashbin together with sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "shared" synced
+    And user "Carol" has a share "shared" synced
     When user "Brian" deletes file "/Shares/shared/sub/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Brian" the file with original path "/Shares/shared/sub/shared_file.txt" should exist in the trashbin
@@ -147,6 +155,8 @@ Feature: using trashbin together with sharing
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "shared" synced
+    And user "Carol" has a share "shared" synced
     When user "Alice" deletes file "/shared/sub/shared_file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" the file with original path "/shared/sub/shared_file.txt" should exist in the trashbin
@@ -169,6 +179,7 @@ Feature: using trashbin together with sharing
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "shared" synced
     And user "Brian" has moved folder "/Shares/shared" to "/Shares/renamed_shared"
     And user "Brian" has deleted file "/Shares/renamed_shared/shared_file.txt"
     When user "Brian" restores the file with original path "/Shares/renamed_shared/shared_file.txt" using the trashbin API
@@ -196,6 +207,7 @@ Feature: using trashbin together with sharing
       | sharee          | Alice             |
       | shareType       | user              |
       | permissionsRole | Viewer            |
+    And user "Alice" has a share "shareFolderParent" synced
     And as "Alice" folder "/Shares/shareFolderParent" should exist
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Alice" restores the file with original path "/textfile0.txt" to "/Shares/shareFolderParent/textfile0.txt" using the trashbin API
@@ -220,6 +232,7 @@ Feature: using trashbin together with sharing
       | sharee          | Alice             |
       | shareType       | user              |
       | permissionsRole | Viewer            |
+    And user "Alice" has a share "shareFolderParent" synced
     And as "Alice" folder "/Shares/shareFolderParent/shareFolderChild" should exist
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Alice" restores the file with original path "/textfile0.txt" to "/Shares/shareFolderParent/shareFolderChild/textfile0.txt" using the trashbin API

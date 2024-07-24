@@ -21,18 +21,21 @@ Feature: file versions remember the author of each version
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "test" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | test     |
       | space           | Personal |
       | sharee          | Carol    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Carol" has a share "test" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | test     |
       | space           | Personal |
       | sharee          | David    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "David" has a share "test" synced
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test/textfile0.txt"
@@ -67,6 +70,8 @@ Feature: file versions remember the author of each version
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "test" synced
+    And user "Carol" has a share "test" synced
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test/textfile0.txt"
@@ -97,6 +102,8 @@ Feature: file versions remember the author of each version
       | sharee          | grp1          |
       | shareType       | group         |
       | permissionsRole | File Editor   |
+    And user "Brian" has a share "textfile0.txt" synced
+    And user "Carol" has a share "textfile0.txt" synced
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/textfile0.txt"
     When user "Alice" gets the number of versions of file "textfile0.txt"
@@ -126,6 +133,8 @@ Feature: file versions remember the author of each version
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "test" synced
+    And user "Carol" has a share "test" synced
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test/textfile0.txt"
@@ -162,6 +171,8 @@ Feature: file versions remember the author of each version
       | sharee          | grp1        |
       | shareType       | group       |
       | permissionsRole | File Editor |
+    And user "Brian" has a share "exist.txt" synced
+    And user "Carol" has a share "exist.txt" synced
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/exist.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/exist.txt"
     And user "Alice" has moved file "/exist.txt" to "/textfile0.txt"
@@ -192,6 +203,8 @@ Feature: file versions remember the author of each version
       | sharee          | grp1        |
       | shareType       | group       |
       | permissionsRole | File Editor |
+    And user "Brian" has a share "exist.txt" synced
+    And user "Carol" has a share "exist.txt" synced
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/exist.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/exist.txt"
     And user "Brian" has moved file "/Shares/exist.txt" to "/Shares/textfile0.txt"
@@ -226,6 +239,8 @@ Feature: file versions remember the author of each version
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "test" synced
+    And user "Carol" has a share "test" synced
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test/textfile0.txt"
@@ -237,6 +252,8 @@ Feature: file versions remember the author of each version
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "test" synced
+    And user "Carol" has a share "test" synced
     When user "Alice" gets the number of versions of file "/test/textfile0.txt"
     Then the HTTP status code should be "207"
     And the number of versions should be "3"
@@ -266,20 +283,23 @@ Feature: file versions remember the author of each version
       | sharee          | Carol    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Carol" has a share "test" synced
     And user "Brian" has sent the following resource share invitation:
       | resource        | test     |
       | space           | Personal |
       | sharee          | David    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "David" has a share "test" synced
     And user "Carol" has created folder "/test"
     And user "Carol" has uploaded file with content "duplicate carol" to "/test/textfile0.txt"
     And user "Carol" has sent the following resource share invitation:
       | resource        | test     |
       | space           | Personal |
-      | sharee          | David    |
+      | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "test" synced
     And user "Alice" has created folder "/test"
     And user "Alice" has sent the following resource share invitation:
       | resource        | test     |
@@ -287,18 +307,21 @@ Feature: file versions remember the author of each version
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "test (1)" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | test     |
       | space           | Personal |
       | sharee          | Carol    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Carol" has a share "test (1)" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | test     |
       | space           | Personal |
       | sharee          | David    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "David" has a share "test (1)" synced
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test (1)/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test (1)/textfile0.txt"
@@ -341,12 +364,14 @@ Feature: file versions remember the author of each version
       | sharee          | Carol         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Carol" has a share "textfile0.txt" synced
     And user "Brian" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | David         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "David" has a share "textfile0.txt" synced
     And user "Carol" has uploaded file with content "duplicate carol" to "/textfile0.txt"
     And user "Carol" has sent the following resource share invitation:
       | resource        | textfile0.txt |
@@ -354,6 +379,7 @@ Feature: file versions remember the author of each version
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Brian" has a share "textfile0.txt" synced
     And user "Alice" has uploaded file with content "uploaded content alice" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
@@ -361,18 +387,21 @@ Feature: file versions remember the author of each version
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Brian" has a share "textfile0 (1).txt" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | Carol         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Carol" has a share "textfile0 (1).txt" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | David         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "David" has a share "textfile0 (1).txt" synced
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/textfile0 (1).txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/textfile0 (1).txt"
     And user "David" has uploaded file with content "uploaded content david" to "/Shares/textfile0 (1).txt"
@@ -412,12 +441,14 @@ Feature: file versions remember the author of each version
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "test" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | test     |
       | space           | Personal |
       | sharee          | Carol    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Carol" has a share "test" synced
     And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/test/textfile0.txt"
@@ -441,12 +472,14 @@ Feature: file versions remember the author of each version
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Brian" has a share "textfile0.txt" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
       | sharee          | Carol         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Carol" has a share "textfile0.txt" synced
     And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/textfile0.txt"
     And user "Carol" has uploaded file with content "uploaded content carol" to "/Shares/textfile0.txt"
     When user "Brian" restores version index "1" of file "/Shares/textfile0.txt" using the WebDAV API

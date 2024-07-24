@@ -2858,6 +2858,29 @@ trait Sharing {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" (declines|accepts) the already (?:accepted|declined) share "([^"]*)" offered by user "([^"]*)" using the sharing API$/
+	 *
+	 * @param string $user
+	 * @param string $action
+	 * @param string $share
+	 * @param string $offeredBy
+	 * @param string|null $state specify 'accepted', 'pending', 'rejected' or 'declined' to only consider shares in that state
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userAcceptsTheAlreadyAcceptedShareOfferedByUsingTheSharingApi(string $user, string $action, string $share, string $offeredBy, ?string $state = ''):void {
+		$response = $this->reactToShareOfferedBy(
+			$user,
+			$action,
+			"/Shares/" . \trim($share, "/"),
+			$offeredBy
+		);
+		$this->setResponse($response);
+		$this->pushToLastStatusCodesArrays();
+	}
+
+	/**
 	 * @When /^user "([^"]*)" (declines|accepts) the following shares offered by user "([^"]*)" using the sharing API$/
 	 *
 	 * @param string $user

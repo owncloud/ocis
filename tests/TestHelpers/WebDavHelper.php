@@ -444,6 +444,35 @@ class WebDavHelper {
 	}
 
 	/**
+	 *
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param string $xRequestId
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public static function getSharesSpaceIdForUser(string $baseUrl, string $user, string $password, string $xRequestId): string {
+		if (\array_key_exists($user, self::$spacesIdRef) && \array_key_exists("virtual", self::$spacesIdRef[$user])) {
+			return self::$spacesIdRef[$user]["virtual"];
+		}
+
+		$response = GraphHelper::getMySpaces($baseUrl, $user, $password, '', $xRequestId);
+		$body = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
+
+		$spaceId = null;
+		foreach ($body->value as $spaces) {
+			if ($spaces->driveType === "virtual") {
+				$spaceId = $spaces->id;
+				break;
+			}
+		}
+		return $spaceId;
+	}
+
+	/**
 	 * fetches personal space id for provided user
 	 *
 	 * @param string $baseUrl
@@ -641,12 +670,23 @@ class WebDavHelper {
 
 		// get space id if testing with spaces dav
 		if (self::$SPACE_ID_FROM_OCIS === '' && $davPathVersionToUse === self::DAV_VERSION_SPACES) {
-			$spaceId = self::getPersonalSpaceIdForUserOrFakeIfNotFound(
-				$baseUrl,
-				$doDavRequestAsUser ?? $user,
-				$password,
-				$xRequestId
-			);
+			$path = \ltrim($path, "/");
+			if (\str_starts_with($path, "Shares/")) {
+				$spaceId = self::getSharesSpaceIdForUser(
+					$baseUrl,
+					$doDavRequestAsUser ?? $user,
+					$password,
+					$xRequestId
+				);
+				$path = "/" . preg_replace("/^Shares\//", "", $path);
+			} else {
+				$spaceId = self::getPersonalSpaceIdForUserOrFakeIfNotFound(
+					$baseUrl,
+					$doDavRequestAsUser ?? $user,
+					$password,
+					$xRequestId
+				);
+			}
 		} else {
 			$spaceId = self::$SPACE_ID_FROM_OCIS;
 		}

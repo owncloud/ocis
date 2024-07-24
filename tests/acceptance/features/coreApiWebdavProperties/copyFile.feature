@@ -59,6 +59,7 @@ Feature: copy file
       | sharee          | Alice     |
       | shareType       | user      |
       | permissionsRole | Viewer    |
+    And user "Alice" has a share "testshare" synced
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And user "Alice" should not be able to download file "/Shares/testshare/textfile0.txt"
@@ -79,6 +80,7 @@ Feature: copy file
       | sharee          | Alice     |
       | shareType       | user      |
       | permissionsRole | Viewer    |
+    And user "Alice" has a share "testshare" synced
     And user "Brian" has copied file "textfile1.txt" to "/testshare/overwritethis.txt"
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/overwritethis.txt" using the WebDAV API
     Then the HTTP status code should be "403"
@@ -224,6 +226,7 @@ Feature: copy file
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-Folder" synced
     When user "Alice" copies file "/textfile1.txt" to "/Shares/BRIAN-Folder" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "/Shares/BRIAN-Folder" for user "Alice" should be "ownCloud test text file 1"
@@ -246,6 +249,7 @@ Feature: copy file
       | sharee          | Alice           |
       | shareType       | user            |
       | permissionsRole | File Editor     |
+    And user "Alice" has a share "sharedfile1.txt" synced
     And user "Alice" has created folder "FOLDER/sample-folder"
     When user "Alice" copies folder "/FOLDER" to "/Shares/sharedfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -271,6 +275,7 @@ Feature: copy file
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-FOLDER" synced
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b/sample-folder-c"
@@ -299,6 +304,7 @@ Feature: copy file
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-FOLDER" synced
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -328,6 +334,7 @@ Feature: copy file
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-FOLDER" synced
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -358,6 +365,7 @@ Feature: copy file
       | sharee          | Alice        |
       | shareType       | user         |
       | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-FOLDER" synced
     And user "Alice" has created folder "FOLDER/second-level-folder"
     And user "Alice" has created folder "FOLDER/second-level-folder/third-level-folder"
     When user "Alice" copies folder "FOLDER/second-level-folder" to "/Shares/BRIAN-FOLDER/second-level-folder/third-level-file.txt" using the WebDAV API
@@ -388,6 +396,7 @@ Feature: copy file
       | sharee          | grp1         |
       | shareType       | group        |
       | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-Folder" synced
     When user "Alice" copies file "/textfile1.txt" to "/Shares/BRIAN-Folder" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "/Shares/BRIAN-Folder" for user "Alice" should be "ownCloud test text file 1"
@@ -414,6 +423,7 @@ Feature: copy file
       | sharee          | grp1            |
       | shareType       | group           |
       | permissionsRole | File Editor     |
+    And user "Alice" has a share "sharedfile1.txt" synced
     And user "Alice" has created folder "FOLDER/sample-folder"
     When user "Alice" copies folder "/FOLDER" to "/Shares/sharedfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -443,6 +453,7 @@ Feature: copy file
       | sharee          | grp1         |
       | shareType       | group        |
       | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-FOLDER" synced
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b/sample-folder-c"
@@ -474,6 +485,7 @@ Feature: copy file
       | sharee          | grp1         |
       | shareType       | group        |
       | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-FOLDER" synced
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -506,6 +518,7 @@ Feature: copy file
       | sharee          | grp1         |
       | shareType       | group        |
       | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-FOLDER" synced
     And user "Alice" has created folder "Sample-Folder-A"
     And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
@@ -539,6 +552,7 @@ Feature: copy file
       | sharee          | grp1         |
       | shareType       | group        |
       | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-FOLDER" synced
     And user "Alice" has created folder "FOLDER/second-level-folder"
     And user "Alice" has created folder "FOLDER/second-level-folder/third-level-folder"
     When user "Alice" copies folder "FOLDER/second-level-folder" to "Shares/BRIAN-FOLDER/second-level-folder/third-level-file.txt" using the WebDAV API
@@ -619,6 +633,7 @@ Feature: copy file
       | sharee          | Alice     |
       | shareType       | user      |
       | permissionsRole | Editor    |
+    And user "Alice" has a share "testshare" synced
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/Shares/testshare/textfile0.txt" for user "Alice" should be "ownCloud test text file 0"
@@ -639,6 +654,7 @@ Feature: copy file
       | sharee          | Alice     |
       | shareType       | user      |
       | permissionsRole | Editor    |
+    And user "Alice" has a share "testshare" synced
     And user "Brian" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Brian" copies file "/textfile0.txt" to "/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -660,6 +676,7 @@ Feature: copy file
       | sharee          | Alice     |
       | shareType       | user      |
       | permissionsRole | Editor    |
+    And user "Alice" has a share "testshare" synced
     And user "Alice" has uploaded file with content "ownCloud test text file inside share" to "/Shares/testshare/fileInsideShare.txt"
     When user "Alice" copies file "/Shares/testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -683,6 +700,7 @@ Feature: copy file
       | sharee          | Alice     |
       | shareType       | user      |
       | permissionsRole | Editor    |
+    And user "Alice" has a share "testshare" synced
     When user "Brian" copies file "testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/fileInsideShare.txt" should exist
@@ -730,12 +748,14 @@ Feature: copy file
       | sharee          | Alice      |
       | shareType       | user       |
       | permissionsRole | Editor     |
+    And user "Alice" has a share "testshare0" synced
     And user "Carol" has sent the following resource share invitation:
       | resource        | testshare1 |
       | space           | Personal   |
       | sharee          | Alice      |
       | shareType       | user       |
       | permissionsRole | Editor     |
+    And user "Alice" has a share "testshare1" synced
     When user "Alice" copies file "/Shares/testshare0/testshare0.txt" to "/Shares/testshare1/testshare0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "testshare1/testshare0.txt" should exist
@@ -762,12 +782,14 @@ Feature: copy file
       | sharee          | Alice      |
       | shareType       | user       |
       | permissionsRole | Editor     |
+    And user "Alice" has a share "testshare0" synced
     And user "Carol" has sent the following resource share invitation:
       | resource        | testshare1 |
       | space           | Personal   |
       | sharee          | Alice      |
       | shareType       | user       |
       | permissionsRole | Editor     |
+    And user "Alice" has a share "testshare1" synced
     When user "Alice" copies file "/Shares/testshare0/folder_to_copy/" to "/Shares/testshare1/folder_to_copy/" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "testshare1/folder_to_copy/testshare0.txt" should exist
@@ -791,12 +813,14 @@ Feature: copy file
       | sharee          | Brian     |
       | shareType       | user      |
       | permissionsRole | Editor    |
+    And user "Brian" has a share "testshare" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | testshare |
       | space           | Personal  |
       | sharee          | Carol     |
       | shareType       | user      |
       | permissionsRole | Editor    |
+    And user "Carol" has a share "testshare" synced
     When user "Alice" copies file "/textfile0.txt" to "/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/testshare/textfile0.txt" should exist
