@@ -92,46 +92,21 @@ web:
     - external
     - admin-settings
     - epub-reader
+    - preview
     applications: []
-    external_apps:
-    - id: preview
-      path: web-app-preview
-      config:
-        mimeTypes:
-        - image/tiff
-        - image/bmp
-        - image/x-ms-bmp
+    external_apps: []
     options:
-      homeFolder: ""
       openAppsInTab: false
-      disablePreviews: false
-      previewFileMimeTypes:
-      - image/gif
-      - image/png
-      - image/jpeg
-      - text/plain
-      - image/tiff
-      - image/bmp
-      - image/x-ms-bmp
-      - application/vnd.geogebra.slides
       accountEditLink: null
       disableFeedbackLink: false
       feedbackLink: null
-      sharingRecipientsPerPage: 200
-      sidebar:
-        shares:
-          showAllOnLoad: false
       runningOnEos: false
       cernFeatures: false
-      hoverableQuickActions: false
-      routing:
-        idBased: true
       upload: null
       editor: null
       contextHelpersReadMore: true
       logoutUrl: ""
       loginUrl: ""
-      openLinksWithDefaultApp: true
       tokenStorageLocal: true
       disabledExtensions: []
       embed: null
