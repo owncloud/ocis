@@ -82,7 +82,6 @@ func Server(cfg *config.Config) *cli.Command {
 						Str("server", "http").
 						Msg("Shutting down server")
 					cancel()
-					os.Exit(1)
 				})
 			}
 

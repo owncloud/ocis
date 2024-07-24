@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/cs3org/reva/v2/pkg/micro/ocdav"
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
@@ -104,7 +103,6 @@ func Server(cfg *config.Config) *cli.Command {
 					Str("server", c.Command.Name).
 					Msg("Shutting down server")
 				cancel()
-				os.Exit(1)
 			})
 
 			debugServer, err := debug.Server(
