@@ -1,21 +1,23 @@
 package natsjsregistry
 
 import (
+	"encoding/json"
 	"errors"
 
+	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/nats-io/nats.go"
 	"go-micro.dev/v4/registry"
 )
 
 // NatsWatcher is the watcher of the nats interface
 type NatsWatcher interface {
-	Watch(bucket string) (nats.KeyWatcher, error)
+	WatchAll(bucket string, opts ...nats.WatchOpt) (<-chan *natsjskv.StoreUpdate, func() error, error)
 }
 
 // Watcher is used to keep track of changes in the registry
 type Watcher struct {
-	watch   nats.KeyWatcher
-	updates <-chan nats.KeyValueEntry
+	updates <-chan *natsjskv.StoreUpdate
+	stop    func() error
 	reg     *storeregistry
 }
 
@@ -26,14 +28,14 @@ func NewWatcher(s *storeregistry) (*Watcher, error) {
 		return nil, errors.New("store does not implement watcher interface")
 	}
 
-	watcher, err := w.Watch("service-registry")
+	watcher, stop, err := w.WatchAll("service-registry")
 	if err != nil {
 		return nil, err
 	}
 
 	return &Watcher{
-		watch:   watcher,
-		updates: watcher.Updates(),
+		updates: watcher,
+		stop:    stop,
 		reg:     s,
 	}, nil
 }
@@ -45,30 +47,18 @@ func (w *Watcher) Next() (*registry.Result, error) {
 		return nil, errors.New("watcher stopped")
 	}
 
-	service, err := w.reg.getService(kve.Key())
-	if err != nil {
+	var svc *registry.Service
+	if err := json.Unmarshal(kve.Value.Data, svc); err != nil {
 		return nil, err
 	}
 
-	var action string
-	switch kve.Operation() {
-	default:
-		action = "create"
-	case nats.KeyValuePut:
-		action = "create"
-	case nats.KeyValueDelete:
-		action = "delete"
-	case nats.KeyValuePurge:
-		action = "delete"
-	}
-
 	return &registry.Result{
-		Service: service,
-		Action:  action,
+		Service: svc,
+		Action:  kve.Action,
 	}, nil
 }
 
 // Stop stops the watcher
 func (w *Watcher) Stop() {
-	_ = w.watch.Stop()
+	_ = w.stop()
 }
