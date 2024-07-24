@@ -98,41 +98,19 @@ func DefaultConfig() *config.Config {
 					ResponseType: "code",
 					Scope:        "openid profile email",
 				},
-				Apps: []string{"files", "search", "text-editor", "pdf-viewer", "external", "admin-settings", "epub-reader"},
-				ExternalApps: []config.ExternalApp{
-					{
-						ID:   "preview",
-						Path: "web-app-preview",
-						Config: map[string]interface{}{
-							"mimeTypes": []string{
-								"image/tiff",
-								"image/bmp",
-								"image/x-ms-bmp",
-							},
-						},
-					},
-				},
+				Apps: []string{"files", "search", "text-editor", "pdf-viewer", "external", "admin-settings", "epub-reader", "preview"},
 				Options: config.Options{
-					ContextHelpersReadMore:   true,
-					PreviewFileMimeTypes:     []string{"image/gif", "image/png", "image/jpeg", "text/plain", "image/tiff", "image/bmp", "image/x-ms-bmp", "application/vnd.geogebra.slides"},
-					SharingRecipientsPerPage: 200,
-					AccountEditLink:          &config.AccountEditLink{},
-					Editor:                   &config.Editor{},
-					FeedbackLink:             &config.FeedbackLink{},
-					Embed:                    &config.Embed{},
+					ContextHelpersReadMore: true,
+					AccountEditLink:        &config.AccountEditLink{},
+					Editor:                 &config.Editor{},
+					FeedbackLink:           &config.FeedbackLink{},
+					Embed:                  &config.Embed{},
 					ConcurrentRequests: &config.ConcurrentRequests{
 						Shares: &config.ConcurrentRequestsShares{},
 					},
-					Routing: config.Routing{
-						IDBased: true,
-					},
-					Sidebar: config.Sidebar{
-						Shares: config.SidebarShares{},
-					},
-					Upload:                  &config.Upload{},
-					OpenLinksWithDefaultApp: true,
-					TokenStorageLocal:       true,
-					UserListRequiresFilter:  false,
+					Upload:                 &config.Upload{},
+					TokenStorageLocal:      true,
+					UserListRequiresFilter: false,
 				},
 			},
 		},
@@ -208,7 +186,7 @@ func Sanitize(cfg *config.Config) {
 		cfg.Web.Config.Options.FeedbackLink = nil
 	}
 	// remove Upload parent if no value is set
-	if cfg.Web.Config.Options.Upload.XHR.Timeout == 0 && cfg.Web.Config.Options.Upload.CompanionURL == "" {
+	if cfg.Web.Config.Options.Upload.CompanionURL == "" {
 		cfg.Web.Config.Options.Upload = nil
 	}
 	// remove Embed parent if no value is set

@@ -2,30 +2,22 @@ package config
 
 // Options are the option for the web
 type Options struct {
-	HomeFolder               string              `json:"homeFolder,omitempty" yaml:"homeFolder" env:"WEB_OPTION_HOME_FOLDER" desc:"Specifies a folder that is used when the user navigates 'home'. Navigating home gets triggered by clicking on the 'All files' menu item. The user will not be jailed in that directory, it simply serves as a default location. A static location can be provided, or variables of the user object to come up with a user specific home path can be used. This uses the twig template variable style and allows picking a value or a substring of a value of the authenticated user. Examples are '/Shares', '/{{.Id}}' and '/{{substr 0 3 .Id}}/{{.Id}'." introductionVersion:"pre5.0"`
-	OpenAppsInTab            bool                `json:"openAppsInTab,omitempty" yaml:"openAppsInTab" env:"WEB_OPTION_OPEN_APPS_IN_TAB" desc:"Configures whether apps and extensions should generally open in a new tab. Defaults to false." introductionVersion:"pre5.0"`
-	DisablePreviews          bool                `json:"disablePreviews,omitempty" yaml:"disablePreviews" env:"OCIS_DISABLE_PREVIEWS;WEB_OPTION_DISABLE_PREVIEWS" desc:"Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all." introductionVersion:"pre5.0"`
-	PreviewFileMimeTypes     []string            `json:"previewFileMimeTypes,omitempty" yaml:"previewFileMimeTypes" env:"WEB_OPTION_PREVIEW_FILE_MIMETYPES" desc:"A list of mimeTypes to specify which ones will be previewed in the UI. For example, to only preview jpg and text files, set this option to 'image/jpeg,text/plain'. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	AccountEditLink          *AccountEditLink    `json:"accountEditLink,omitempty" yaml:"accountEditLink"`
-	DisableFeedbackLink      bool                `json:"disableFeedbackLink,omitempty" yaml:"disableFeedbackLink" env:"WEB_OPTION_DISABLE_FEEDBACK_LINK" desc:"Set this option to 'true' to disable the feedback link in the top bar. Keeping it enabled by setting the value to 'false' or with the absence of the option, allows ownCloud to get feedback from your user base through a dedicated survey website." introductionVersion:"pre5.0"`
-	FeedbackLink             *FeedbackLink       `json:"feedbackLink,omitempty" yaml:"feedbackLink"`
-	SharingRecipientsPerPage int                 `json:"sharingRecipientsPerPage,omitempty" yaml:"sharingRecipientsPerPage" env:"WEB_OPTION_SHARING_RECIPIENTS_PER_PAGE" desc:"Sets the number of users shown as recipients in the dropdown menu when sharing resources." introductionVersion:"pre5.0"`
-	Sidebar                  Sidebar             `json:"sidebar" yaml:"sidebar"`
-	RunningOnEOS             bool                `json:"runningOnEos,omitempty" yaml:"runningOnEos" env:"WEB_OPTION_RUNNING_ON_EOS" desc:"Set this option to 'true' if running on an EOS storage backend (https://eos-web.web.cern.ch/eos-web/) to enable its specific features. Defaults to 'false'." introductionVersion:"pre5.0"`
-	CernFeatures             bool                `json:"cernFeatures,omitempty" yaml:"cernFeatures"`
-	HoverableQuickActions    bool                `json:"hoverableQuickActions,omitempty" yaml:"hoverableQuickActions" env:"WEB_OPTION_HOVERABLE_QUICK_ACTIONS" desc:"Set this option to 'true' to hide quick actions (buttons appearing on file rows) and only show them when the user hovers over the row with his mouse. Defaults to 'false'." introductionVersion:"pre5.0"`
-	Routing                  Routing             `json:"routing" yaml:"routing"`
-	Upload                   *Upload             `json:"upload,omitempty" yaml:"upload"`
-	Editor                   *Editor             `json:"editor,omitempty" yaml:"editor"`
-	ContextHelpersReadMore   bool                `json:"contextHelpersReadMore,omitempty" yaml:"contextHelpersReadMore" env:"WEB_OPTION_CONTEXTHELPERS_READ_MORE" desc:"Specifies whether the 'Read more' link should be displayed or not." introductionVersion:"pre5.0"`
-	LogoutURL                string              `json:"logoutUrl,omitempty" yaml:"logoutUrl" env:"WEB_OPTION_LOGOUT_URL" desc:"Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default." introductionVersion:"pre5.0"`
-	LoginURL                 string              `json:"loginUrl,omitempty" yaml:"loginUrl" env:"WEB_OPTION_LOGIN_URL" desc:"Specifies the target URL to the login page. This is helpful when an external IdP is used. This option is disabled by default. Example URL like: https://www.myidp.com/login." introductionVersion:"5.0"`
-	OpenLinksWithDefaultApp  bool                `json:"openLinksWithDefaultApp,omitempty" yaml:"openLinksWithDefaultApp" env:"WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP" desc:"Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details." introductionVersion:"pre5.0"`
-	TokenStorageLocal        bool                `json:"tokenStorageLocal" yaml:"tokenStorageLocal" env:"WEB_OPTION_TOKEN_STORAGE_LOCAL" desc:"Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false'. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required." introductionVersion:"pre5.0"`
-	DisabledExtensions       []string            `json:"disabledExtensions,omitempty" yaml:"disabledExtensions" env:"WEB_OPTION_DISABLED_EXTENSIONS" desc:"A list to disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Example: 'com.github.owncloud.web.files.search,com.github.owncloud.web.files.print'. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
-	Embed                    *Embed              `json:"embed,omitempty" yaml:"embed"`
-	UserListRequiresFilter   bool                `json:"userListRequiresFilter,omitempty" yaml:"userListRequiresFilter" env:"WEB_OPTION_USER_LIST_REQUIRES_FILTER" desc:"Defines whether one or more filters must be set in order to list users in the Web admin settings. Set this option to 'true' if running in an environment with a lot of users and listing all users could slow down performance. Defaults to 'false'." introductionVersion:"5.0"`
-	ConcurrentRequests       *ConcurrentRequests `json:"concurrentRequests,omitempty" yaml:"concurrentRequests"`
+	OpenAppsInTab          bool                `json:"openAppsInTab,omitempty" yaml:"openAppsInTab" env:"WEB_OPTION_OPEN_APPS_IN_TAB" desc:"Configures whether apps and extensions should generally open in a new tab. Defaults to false." introductionVersion:"pre5.0"`
+	AccountEditLink        *AccountEditLink    `json:"accountEditLink,omitempty" yaml:"accountEditLink"`
+	DisableFeedbackLink    bool                `json:"disableFeedbackLink,omitempty" yaml:"disableFeedbackLink" env:"WEB_OPTION_DISABLE_FEEDBACK_LINK" desc:"Set this option to 'true' to disable the feedback link in the top bar. Keeping it enabled by setting the value to 'false' or with the absence of the option, allows ownCloud to get feedback from your user base through a dedicated survey website." introductionVersion:"pre5.0"`
+	FeedbackLink           *FeedbackLink       `json:"feedbackLink,omitempty" yaml:"feedbackLink"`
+	RunningOnEOS           bool                `json:"runningOnEos,omitempty" yaml:"runningOnEos" env:"WEB_OPTION_RUNNING_ON_EOS" desc:"Set this option to 'true' if running on an EOS storage backend (https://eos-web.web.cern.ch/eos-web/) to enable its specific features. Defaults to 'false'." introductionVersion:"pre5.0"`
+	CernFeatures           bool                `json:"cernFeatures,omitempty" yaml:"cernFeatures"`
+	Upload                 *Upload             `json:"upload,omitempty" yaml:"upload"`
+	Editor                 *Editor             `json:"editor,omitempty" yaml:"editor"`
+	ContextHelpersReadMore bool                `json:"contextHelpersReadMore,omitempty" yaml:"contextHelpersReadMore" env:"WEB_OPTION_CONTEXTHELPERS_READ_MORE" desc:"Specifies whether the 'Read more' link should be displayed or not." introductionVersion:"pre5.0"`
+	LogoutURL              string              `json:"logoutUrl,omitempty" yaml:"logoutUrl" env:"WEB_OPTION_LOGOUT_URL" desc:"Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default." introductionVersion:"pre5.0"`
+	LoginURL               string              `json:"loginUrl,omitempty" yaml:"loginUrl" env:"WEB_OPTION_LOGIN_URL" desc:"Specifies the target URL to the login page. This is helpful when an external IdP is used. This option is disabled by default. Example URL like: https://www.myidp.com/login." introductionVersion:"5.0"`
+	TokenStorageLocal      bool                `json:"tokenStorageLocal" yaml:"tokenStorageLocal" env:"WEB_OPTION_TOKEN_STORAGE_LOCAL" desc:"Specifies whether the access token will be stored in the local storage when set to 'true' or in the session storage when set to 'false'. If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required." introductionVersion:"pre5.0"`
+	DisabledExtensions     []string            `json:"disabledExtensions,omitempty" yaml:"disabledExtensions" env:"WEB_OPTION_DISABLED_EXTENSIONS" desc:"A list to disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Example: 'com.github.owncloud.web.files.search,com.github.owncloud.web.files.print'. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
+	Embed                  *Embed              `json:"embed,omitempty" yaml:"embed"`
+	UserListRequiresFilter bool                `json:"userListRequiresFilter,omitempty" yaml:"userListRequiresFilter" env:"WEB_OPTION_USER_LIST_REQUIRES_FILTER" desc:"Defines whether one or more filters must be set in order to list users in the Web admin settings. Set this option to 'true' if running in an environment with a lot of users and listing all users could slow down performance. Defaults to 'false'." introductionVersion:"5.0"`
+	ConcurrentRequests     *ConcurrentRequests `json:"concurrentRequests,omitempty" yaml:"concurrentRequests"`
 }
 
 // AccountEditLink are the AccountEditLink options
@@ -40,30 +32,9 @@ type FeedbackLink struct {
 	Description string `json:"description,omitempty" yaml:"description" env:"WEB_OPTION_FEEDBACKLINK_DESCRIPTION" desc:"For feedbacks, provide any description you want to see as tooltip and as accessible description. Defaults to 'Provide your feedback: We'd like to improve the web design and would be happy to hear your feedback. Thank you! Your ownCloud team'." introductionVersion:"pre5.0"`
 }
 
-// Sidebar are the sidebar option
-type Sidebar struct {
-	Shares SidebarShares `json:"shares" yaml:"shares"`
-}
-
-// SidebarShares are the options for the shares sidebar
-type SidebarShares struct {
-	ShowAllOnLoad bool `json:"showAllOnLoad" yaml:"showAllOnLoad" env:"WEB_OPTION_SIDEBAR_SHARES_SHOW_ALL_ON_LOAD" desc:"Sets the list of the (link) shares list in the sidebar to be initially expanded. Default is a collapsed state, only showing the first three shares." introductionVersion:"pre5.0"`
-}
-
-// Routing are the routing options
-type Routing struct {
-	IDBased bool `json:"idBased" yaml:"idBased" env:"WEB_OPTION_ROUTING_ID_BASED" desc:"Enable or disable fileIds being added to the URL. Defaults to 'true', because otherwise spaces with name clashes cannot be resolved correctly. Note: Only disable this if you can guarantee on the server side, that spaces of the same namespace cannot have name clashes." introductionVersion:"pre5.0"`
-}
-
 // Upload are the upload options
 type Upload struct {
-	XHR          XHR    `json:"xhr,omitempty" yaml:"xhr"`
 	CompanionURL string `json:"companionUrl,omitempty" yaml:"companionUrl" env:"WEB_OPTION_UPLOAD_COMPANION_URL" desc:"Sets the URL of Companion which is a service provided by Uppy to import files from external cloud providers. See https://uppy.io/docs/companion/ for instructions on how to set up Companion. This feature is disabled as long as no URL is given." introductionVersion:"pre5.0"`
-}
-
-// XHR are the XHR options
-type XHR struct {
-	Timeout int `json:"timeout,omitempty" yaml:"timeout" env:"WEB_OPTION_UPLOAD_XHR_TIMEOUT" desc:"Specifies the timeout for XHR uploads in milliseconds." introductionVersion:"pre5.0"`
 }
 
 // Editor are the web editor options
