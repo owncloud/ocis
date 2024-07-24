@@ -31,7 +31,7 @@ services:
     restart: always
 
   ocis:
-    image: owncloud/ocis:latest
+    image: owncloud/ocis-rolling:latest
     networks:
       ocis-net:
     entrypoint:
