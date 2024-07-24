@@ -118,8 +118,7 @@ func prepareRoutes(r *chi.Mux, options Options) {
 			r.Use(func(h stdhttp.Handler) stdhttp.Handler {
 				// authentication and wopi context
 				return colabmiddleware.WopiContextAuthMiddleware(options.Config.Wopi.Secret, h)
-			},
-			)
+			})
 
 			r.Get("/", func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 				adapter.CheckFileInfo(w, r)
