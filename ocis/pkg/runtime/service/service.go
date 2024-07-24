@@ -93,7 +93,7 @@ type Service struct {
 // calls are done explicitly to loadFromEnv().
 // Since this is the public constructor, options need to be added, at the moment only logging options
 // are supported in order to match the running OwnCloud services structured log.
-func NewService(options ...Option) (*Service, error) {
+func NewService(ctx context.Context, options ...Option) (*Service, error) {
 	opts := NewOptions()
 
 	for _, f := range options {
@@ -106,7 +106,7 @@ func NewService(options ...Option) (*Service, error) {
 		log.Level(opts.Config.Log.Level),
 	)
 
-	globalCtx, cancelGlobal := context.WithCancel(context.Background())
+	globalCtx, cancelGlobal := context.WithCancel(ctx)
 
 	s := &Service{
 		Services:   make([]serviceFuncMap, len(_waitFuncs)),
@@ -339,12 +339,12 @@ func NewService(options ...Option) (*Service, error) {
 
 // Start a rpc service. By default, the package scope Start will run all default services to provide with a working
 // oCIS instance.
-func Start(o ...Option) error {
+func Start(ctx context.Context, o ...Option) error {
 	// Start the runtime. Most likely this was called ONLY by the `ocis server` subcommand, but since we cannot protect
 	// from the caller, the previous statement holds truth.
 
 	// prepare a new rpc Service struct.
-	s, err := NewService(o...)
+	s, err := NewService(ctx, o...)
 	if err != nil {
 		return err
 	}
