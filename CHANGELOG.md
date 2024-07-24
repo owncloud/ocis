@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Missing invitation in permission responses: [#9652](https://github.com/owncloud/ocis/pull/9652)
 * Bugfix - Repair nats-js-kv registry: [#9662](https://github.com/owncloud/ocis/pull/9662)
 * Bugfix - Fix panic: [#9673](https://github.com/owncloud/ocis/pull/9673)
+* Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
 * Enhancement - Introduce auth-app service: [#9079](https://github.com/owncloud/ocis/pull/9079)
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 * Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
@@ -129,6 +130,16 @@ The following sections list the changes for unreleased.
    Fixes panic occuring when the nats-js-kv is not properly initialized.
 
    https://github.com/owncloud/ocis/pull/9673
+
+* Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
+
+   We've removed config options from the web package, that are no longer available
+   in web. Check the web changelog for more details.
+
+   https://github.com/owncloud/ocis/pull/9679
+   https://github.com/owncloud/web/pull/11256
+   https://github.com/owncloud/web/pull/10122
+   https://github.com/owncloud/web/pull/11260
 
 * Enhancement - Introduce auth-app service: [#9079](https://github.com/owncloud/ocis/pull/9079)
 
