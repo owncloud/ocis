@@ -1,5 +1,10 @@
 package connector
 
+import (
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
+)
+
 // ConnectorResponse represent a response from the FileConnectorService.
 // The ConnectorResponse is oriented to HTTP, so it has the Status, Headers
 // and Body that the actual HTTP response should have. This includes HTTP
@@ -31,6 +36,61 @@ func NewResponseWithLock(status int, lockID string) *ConnectorResponse {
 			HeaderWopiLock: lockID,
 		},
 	}
+}
+
+// NewResponseLockConflict creates a new ConnectorResponse with the status 409
+// and the "X-WOPI-Lock" header having the value in the lockID parameter.
+//
+// This is used for conflict responses where the current lock id needs
+// to be returned, although the `GetLock` method also uses this method for a
+// successful response (with the lock id included)
+// The lockFailureReason parameter will be included in the "X-WOPI-LockFailureReason".
+func NewResponseLockConflict(lockID string, lockFailureReason string) *ConnectorResponse {
+	return &ConnectorResponse{
+		Status: 409,
+		Headers: map[string]string{
+			HeaderWopiLock:              lockID,
+			HeaderWopiLockFailureReason: lockFailureReason,
+		},
+	}
+}
+
+// NewResponseWithVersion creates a new ConnectorResponse with the specified status
+// and the "X-WOPI-ItemVersion" header having the value in the mtime parameter.
+func NewResponseWithVersion(status int, mtime *types.Timestamp) *ConnectorResponse {
+	return &ConnectorResponse{
+		Status: status,
+		Headers: map[string]string{
+			HeaderWopiVersion: helpers.GetVersion(mtime),
+		},
+	}
+}
+
+// NewResponseConflictWithVersion creates a new ConnectorResponse with the status 409
+// and the "X-WOPI-ItemVersion" header having the value in the mtime parameter.
+// The lockFailureReason parameter will be included in the "X-WOPI-LockFailureReason".
+func NewResponseConflictWithVersion(mtime *types.Timestamp, lockFailureReason string) *ConnectorResponse {
+	return &ConnectorResponse{
+		Status: 409,
+		Headers: map[string]string{
+			HeaderWopiVersion:           helpers.GetVersion(mtime),
+			HeaderWopiLockFailureReason: lockFailureReason,
+		},
+	}
+}
+
+// NewResponseWithVersionAndLock creates a new ConnectorResponse with the specified status
+// and the "X-WOPI-ItemVersion" header and the "X-WOPI-Lock" header
+// having the values in the mtime and lockID parameters.
+func NewResponseWithVersionAndLock(status int, mtime *types.Timestamp, lockID string) *ConnectorResponse {
+	r := &ConnectorResponse{
+		Status: status,
+		Headers: map[string]string{
+			HeaderWopiVersion: helpers.GetVersion(mtime),
+			HeaderWopiLock:    lockID,
+		},
+	}
+	return r
 }
 
 // NewResponseSuccessBody creates a new ConnectorResponse with a fixed 200

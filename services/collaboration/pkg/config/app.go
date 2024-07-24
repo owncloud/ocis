@@ -10,7 +10,8 @@ type App struct {
 	Addr     string `yaml:"addr" env:"COLLABORATION_APP_ADDR" desc:"The URL where the WOPI app is located, such as https://127.0.0.1:8080." introductionVersion:"6.0.0"`
 	Insecure bool   `yaml:"insecure" env:"COLLABORATION_APP_INSECURE" desc:"Skip TLS certificate verification when connecting to the WOPI app" introductionVersion:"6.0.0"`
 
-	ProofKeys ProofKeys `yaml:"proofkeys"`
+	ProofKeys          ProofKeys `yaml:"proofkeys"`
+	LicenseCheckEnable bool      `yaml:"licensecheckenable" env:"COLLABORATION_APP_LICENSE_CHECK_ENABLE" desc:"Enable license check for edit" introductionVersion:"%%NEXT%%"`
 }
 
 type ProofKeys struct {

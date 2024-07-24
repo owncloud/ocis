@@ -6,14 +6,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"time"
 
+	"github.com/cs3org/reva/v2/pkg/utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
@@ -52,7 +53,6 @@ var _ = Describe("ContentConnector", func() {
 				},
 				Path: ".",
 			},
-			User:     &userv1beta1.User{}, // Not used for now
 			ViewMode: appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE,
 		}
 
@@ -77,15 +77,28 @@ var _ = Describe("ContentConnector", func() {
 	})
 
 	Describe("GetFile", func() {
+		BeforeEach(func() {
+			gatewayClient.EXPECT().Stat(mock.Anything, mock.Anything).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(context.Background()),
+				Info: &providerv1beta1.ResourceInfo{
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "abc",
+						OpaqueId:  "12345",
+						SpaceId:   "zzz",
+					},
+					Path: ".",
+				},
+			}, nil)
+		})
 		It("No valid context", func() {
-			sb := &strings.Builder{}
+			sb := httptest.NewRecorder()
 			ctx := context.Background()
 			err := cc.GetFile(ctx, sb)
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("Initiate download failed", func() {
-			sb := &strings.Builder{}
+			sb := httptest.NewRecorder()
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
 			targetErr := errors.New("Something went wrong")
@@ -98,7 +111,7 @@ var _ = Describe("ContentConnector", func() {
 		})
 
 		It("Initiate download status not ok", func() {
-			sb := &strings.Builder{}
+			sb := httptest.NewRecorder()
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
 			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileDownloadResponse{
@@ -112,7 +125,7 @@ var _ = Describe("ContentConnector", func() {
 		})
 
 		It("Missing download endpoint", func() {
-			sb := &strings.Builder{}
+			sb := httptest.NewRecorder()
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
 			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileDownloadResponse{
@@ -126,7 +139,7 @@ var _ = Describe("ContentConnector", func() {
 		})
 
 		It("Download request failed", func() {
-			sb := &strings.Builder{}
+			sb := httptest.NewRecorder()
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
 			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileDownloadResponse{
@@ -149,7 +162,7 @@ var _ = Describe("ContentConnector", func() {
 		})
 
 		It("Download request success", func() {
-			sb := &strings.Builder{}
+			sb := httptest.NewRecorder()
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
 			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileDownloadResponse{
@@ -167,11 +180,11 @@ var _ = Describe("ContentConnector", func() {
 			Expect(srvReqHeader.Get("X-Access-Token")).To(Equal(wopiCtx.AccessToken))
 			Expect(srvReqHeader.Get("X-Reva-Transfer")).To(Equal("MyDownloadToken"))
 			Expect(err).To(Succeed())
-			Expect(sb.String()).To(Equal(randomContent))
+			Expect(sb.Body.String()).To(Equal(randomContent))
 		})
 
 		It("ViewOnlyMode Download request success", func() {
-			sb := &strings.Builder{}
+			sb := httptest.NewRecorder()
 
 			wopiCtx = middleware.WopiContext{
 				AccessToken:   "abcdef123456",
@@ -184,7 +197,6 @@ var _ = Describe("ContentConnector", func() {
 					},
 					Path: ".",
 				},
-				User:     &userv1beta1.User{}, // Not used for now
 				ViewMode: appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY,
 			}
 
@@ -208,7 +220,7 @@ var _ = Describe("ContentConnector", func() {
 			Expect(srvReqHeader.Get("X-Access-Token")).To(Equal(wopiCtx.ViewOnlyToken))
 			Expect(srvReqHeader.Get("X-Reva-Transfer")).To(Equal("MyDownloadToken"))
 			Expect(err).To(Succeed())
-			Expect(sb.String()).To(Equal(randomContent))
+			Expect(sb.Body.String()).To(Equal(randomContent))
 		})
 	})
 
@@ -244,7 +256,7 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "notARandomLockId")
-			Expect(err).To(Succeed())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(500))
 			Expect(response.Headers).To(BeNil())
 		})
@@ -264,9 +276,11 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "notARandomLockId")
-			Expect(err).To(Succeed())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(409))
+			Expect(response.Headers).To(HaveLen(2))
 			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("goodAndValidLock"))
+			Expect(response.Headers[connector.HeaderWopiLockFailureReason]).To(Equal("Lock Mismatch"))
 		})
 
 		It("Upload without lockId but on a non empty file", func() {
@@ -282,7 +296,7 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "")
-			Expect(err).To(Succeed())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(409))
 			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal(""))
 		})
@@ -332,7 +346,7 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "goodAndValidLock")
-			Expect(err).To(Succeed())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(500))
 			Expect(response.Headers).To(BeNil())
 		})
@@ -348,7 +362,8 @@ var _ = Describe("ContentConnector", func() {
 						LockId: "goodAndValidLock",
 						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
 					},
-					Size: uint64(123456789),
+					Size:  uint64(123456789),
+					Mtime: utils.TimeToTS(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
 				},
 			}, nil)
 
@@ -357,9 +372,10 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "goodAndValidLock")
-			Expect(err).To(Succeed())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
-			Expect(response.Headers).To(BeNil())
+			Expect(response.Headers).To(HaveLen(1))
+			Expect(response.Headers[connector.HeaderWopiVersion]).To(Equal("v16094592000"))
 		})
 
 		It("Missing upload endpoint", func() {
@@ -382,7 +398,7 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "goodAndValidLock")
-			Expect(err).To(BeNil())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(500))
 			Expect(response.Headers).To(BeNil())
 		})
@@ -414,7 +430,7 @@ var _ = Describe("ContentConnector", func() {
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "goodAndValidLock")
 			Expect(srvReqHeader.Get("X-Access-Token")).To(Equal(wopiCtx.AccessToken))
-			Expect(err).To(Succeed())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(500))
 			Expect(response.Headers).To(BeNil())
 		})
@@ -434,6 +450,23 @@ var _ = Describe("ContentConnector", func() {
 				},
 			}, nil)
 
+			gatewayClient.EXPECT().Stat(mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "goodAndValidLock",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+					Size: uint64(123456789),
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageID",
+						OpaqueId:  "opaqueID",
+						SpaceId:   "spaceID",
+					},
+					Mtime: utils.TimeToTS(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
+			}, nil)
+
 			gatewayClient.On("InitiateFileUpload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileUploadResponse{
 				Status: status.NewOK(ctx),
 				Protocols: []*gateway.FileUploadProtocol{
@@ -446,9 +479,10 @@ var _ = Describe("ContentConnector", func() {
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "goodAndValidLock")
 			Expect(srvReqHeader.Get("X-Access-Token")).To(Equal(wopiCtx.AccessToken))
-			Expect(err).To(Succeed())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
-			Expect(response.Headers).To(BeNil())
+			Expect(response.Headers).To(HaveLen(1))
+			Expect(response.Headers[connector.HeaderWopiVersion]).To(Equal("v16094592000"))
 		})
 	})
 })

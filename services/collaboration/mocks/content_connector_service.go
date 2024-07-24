@@ -7,6 +7,8 @@ import (
 
 	connector "github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
 
+	http "net/http"
+
 	io "io"
 
 	mock "github.com/stretchr/testify/mock"
@@ -25,17 +27,17 @@ func (_m *ContentConnectorService) EXPECT() *ContentConnectorService_Expecter {
 	return &ContentConnectorService_Expecter{mock: &_m.Mock}
 }
 
-// GetFile provides a mock function with given fields: ctx, writer
-func (_m *ContentConnectorService) GetFile(ctx context.Context, writer io.Writer) error {
-	ret := _m.Called(ctx, writer)
+// GetFile provides a mock function with given fields: ctx, w
+func (_m *ContentConnectorService) GetFile(ctx context.Context, w http.ResponseWriter) error {
+	ret := _m.Called(ctx, w)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetFile")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, io.Writer) error); ok {
-		r0 = rf(ctx, writer)
+	if rf, ok := ret.Get(0).(func(context.Context, http.ResponseWriter) error); ok {
+		r0 = rf(ctx, w)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -50,14 +52,14 @@ type ContentConnectorService_GetFile_Call struct {
 
 // GetFile is a helper method to define mock.On call
 //   - ctx context.Context
-//   - writer io.Writer
-func (_e *ContentConnectorService_Expecter) GetFile(ctx interface{}, writer interface{}) *ContentConnectorService_GetFile_Call {
-	return &ContentConnectorService_GetFile_Call{Call: _e.mock.On("GetFile", ctx, writer)}
+//   - w http.ResponseWriter
+func (_e *ContentConnectorService_Expecter) GetFile(ctx interface{}, w interface{}) *ContentConnectorService_GetFile_Call {
+	return &ContentConnectorService_GetFile_Call{Call: _e.mock.On("GetFile", ctx, w)}
 }
 
-func (_c *ContentConnectorService_GetFile_Call) Run(run func(ctx context.Context, writer io.Writer)) *ContentConnectorService_GetFile_Call {
+func (_c *ContentConnectorService_GetFile_Call) Run(run func(ctx context.Context, w http.ResponseWriter)) *ContentConnectorService_GetFile_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(io.Writer))
+		run(args[0].(context.Context), args[1].(http.ResponseWriter))
 	})
 	return _c
 }
@@ -67,7 +69,7 @@ func (_c *ContentConnectorService_GetFile_Call) Return(_a0 error) *ContentConnec
 	return _c
 }
 
-func (_c *ContentConnectorService_GetFile_Call) RunAndReturn(run func(context.Context, io.Writer) error) *ContentConnectorService_GetFile_Call {
+func (_c *ContentConnectorService_GetFile_Call) RunAndReturn(run func(context.Context, http.ResponseWriter) error) *ContentConnectorService_GetFile_Call {
 	_c.Call.Return(run)
 	return _c
 }

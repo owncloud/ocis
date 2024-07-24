@@ -17,6 +17,7 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/propagation"
@@ -29,7 +30,7 @@ import (
 // Target file is within the WOPI context
 type ContentConnectorService interface {
 	// GetFile downloads the file and write its contents in the provider writer
-	GetFile(ctx context.Context, writer io.Writer) error
+	GetFile(ctx context.Context, w http.ResponseWriter) error
 	// PutFile uploads the stream up to the stream length. The file should be
 	// locked beforehand, so the lockID needs to be provided.
 	// The current lockID will be returned ONLY if a conflict happens (the file is
@@ -61,9 +62,11 @@ func NewContentConnector(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config
 // You can pass a pre-configured zerologger instance through the context that
 // will be used to log messages.
 //
-// The contents of the file will be written directly into the writer passed as
+// The contents of the file will be written directly into the http Response writer passed as
 // parameter.
-func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error {
+// Be aware that the body of the response will be written during the execution of this method.
+// Any further modifications to the response headers or body will be ignored.
+func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) error {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
 		return err
@@ -74,6 +77,16 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 		Logger()
 	logger.Debug().Msg("GetFile: start")
 
+	sResp, err := c.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+		Ref: wopiContext.FileReference,
+	})
+	if err != nil {
+		logger.Error().Err(err).Msg("GetFile: Stat Request failed")
+		return err
+	}
+	if sResp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+		return NewConnectorError(500, sResp.GetStatus().GetCode().String()+" "+sResp.GetStatus().GetMessage())
+	}
 	// Initiate download request
 	req := &providerv1beta1.InitiateFileDownloadRequest{
 		Ref: wopiContext.FileReference,
@@ -168,13 +181,14 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 		return NewConnectorError(500, "GetFile: Downloading the file failed")
 	}
 
+	helpers.SetVersionHeader(w, sResp.GetInfo().GetMtime())
+
 	// Copy the download into the writer
-	_, err = io.Copy(writer, httpResp.Body)
+	_, err = io.Copy(w, httpResp.Body)
 	if err != nil {
 		logger.Error().Msg("GetFile: copying the file content to the response body failed")
 		return err
 	}
-
 	logger.Debug().Msg("GetFile: success")
 	return nil
 }
@@ -199,6 +213,8 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 // lock ID that should be used in the X-WOPI-Lock header. In other error
 // cases or if the method is successful, an empty string will be returned
 // (check for err != nil to know if something went wrong)
+//
+// On success, the method will return the new mtime of the file
 func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (*ConnectorResponse, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
@@ -230,13 +246,14 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		return NewResponse(500), nil
 	}
 
+	mtime := statRes.GetInfo().GetMtime()
 	// If there is a lock and it mismatches, return 409
 	if statRes.GetInfo().GetLock() != nil && statRes.GetInfo().GetLock().GetLockId() != lockID {
 		logger.Error().
 			Str("LockID", statRes.GetInfo().GetLock().GetLockId()).
 			Msg("PutFile: wrong lock")
 		// onlyoffice says it's required to send the current lockId, MS doesn't say anything
-		return NewResponseWithLock(409, statRes.GetInfo().GetLock().GetLockId()), nil
+		return NewResponseLockConflict(statRes.GetInfo().GetLock().GetLockId(), "Lock Mismatch"), nil
 	}
 
 	// only unlocked uploads can go through if the target file is empty,
@@ -246,7 +263,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 	if lockID == "" && statRes.GetInfo().GetLock() == nil && statRes.GetInfo().GetSize() > 0 {
 		logger.Error().Msg("PutFile: file must be locked first")
 		// onlyoffice says to send an empty string if the file is unlocked, MS doesn't say anything
-		return NewResponseWithLock(409, ""), nil
+		return NewResponseLockConflict("", "Cannot PutFile on unlocked file"), nil
 	}
 
 	// Prepare the data to initiate the upload
@@ -367,8 +384,25 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 				Msg("UploadHelper: Put request to the upload endpoint failed with unexpected status")
 			return NewResponse(500), nil
 		}
+		// We need a stat call on the target file after the upload to get the
+		// new mtime
+		statResAfter, err := c.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+			Ref: wopiContext.FileReference,
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("PutFile: stat after upload failed")
+			return nil, err
+		}
+		if statResAfter.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+			logger.Error().
+				Str("StatusCode", statRes.GetStatus().GetCode().String()).
+				Str("StatusMsg", statRes.GetStatus().GetMessage()).
+				Msg("PutFile: stat after upload failed with unexpected status")
+			return NewResponse(500), nil
+		}
+		mtime = statResAfter.GetInfo().GetMtime()
 	}
 
 	logger.Debug().Msg("PutFile: success")
-	return NewResponse(200), nil
+	return NewResponseWithVersion(200, mtime), nil
 }

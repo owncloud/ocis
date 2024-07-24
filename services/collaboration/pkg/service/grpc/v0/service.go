@@ -15,6 +15,7 @@ import (
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -109,7 +110,6 @@ func (s *Service) OpenInApp(
 		AccessToken:   req.GetAccessToken(), // it will be encrypted
 		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
 		FileReference: &providerFileRef,
-		User:          user,
 		ViewMode:      req.GetViewMode(),
 	}
 
@@ -201,11 +201,10 @@ func (s *Service) addQueryToURL(baseURL string, req *appproviderv1beta1.OpenInAp
 	// so that all sessions on one file end on the same office server
 	fileRef := helpers.HashResourceId(req.GetResourceInfo().GetId())
 
-	wopiSrcURL, err := url.Parse(s.config.Wopi.WopiSrc)
+	wopiSrcURL, err := wopisrc.GenerateWopiSrc(fileRef, s.config)
 	if err != nil {
 		return "", err
 	}
-	wopiSrcURL.Path = path.Join("wopi", "files", fileRef)
 
 	q := u.Query()
 	q.Add("WOPISrc", wopiSrcURL.String())
@@ -215,6 +214,38 @@ func (s *Service) addQueryToURL(baseURL string, req *appproviderv1beta1.OpenInAp
 	}
 
 	lang := utils.ReadPlainFromOpaque(req.GetOpaque(), "lang")
+
+	// @TODO: this is a temporary solution until we figure out how to send these from oc web
+	switch lang {
+	case "bg":
+		lang = "bg-BG"
+	case "cs":
+		lang = "cs-CZ"
+	case "de":
+		lang = "de-DE"
+	case "en":
+		lang = "en-US"
+	case "es":
+		lang = "es-ES"
+	case "fr":
+		lang = "fr-FR"
+	case "gl":
+		lang = "gl-ES"
+	case "it":
+		lang = "it-IT"
+	case "nl":
+		lang = "nl-NL"
+	case "ko":
+		lang = "ko-KR"
+	case "sq":
+		lang = "sq-AL"
+	case "sv":
+		lang = "sv-SE"
+	case "tr":
+		lang = "tr-TR"
+	case "zh":
+		lang = "zh-CN"
+	}
 
 	if lang != "" {
 		switch strings.ToLower(s.config.App.Name) {
