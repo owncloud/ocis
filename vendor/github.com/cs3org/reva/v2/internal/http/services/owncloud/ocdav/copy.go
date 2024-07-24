@@ -511,6 +511,12 @@ func (s *svc) executeSpacesCopy(ctx context.Context, w http.ResponseWriter, sele
 			return err
 		}
 		defer httpDownloadRes.Body.Close()
+		if httpDownloadRes.StatusCode == http.StatusForbidden {
+			w.WriteHeader(http.StatusForbidden)
+			b, err := errors.Marshal(http.StatusForbidden, http.StatusText(http.StatusForbidden), "", strconv.Itoa(http.StatusForbidden))
+			errors.HandleWebdavError(log, w, b, err)
+			return nil
+		}
 		if httpDownloadRes.StatusCode != http.StatusOK {
 			return fmt.Errorf("status code %d", httpDownloadRes.StatusCode)
 		}
