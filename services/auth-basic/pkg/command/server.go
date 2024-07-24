@@ -39,7 +39,7 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 			gr := run.Group{}
-			ctx, cancel := defineContext(cfg)
+			ctx, cancel := context.WithCancel(c.Context)
 
 			defer cancel()
 
@@ -103,15 +103,4 @@ func Server(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
-}
-
-// defineContext sets the context for the service. If there is a context configured it will create a new child from it,
-// if not, it will create a root context that can be cancelled.
-func defineContext(cfg *config.Config) (context.Context, context.CancelFunc) {
-	return func() (context.Context, context.CancelFunc) {
-		if cfg.Context == nil {
-			return context.WithCancel(context.Background())
-		}
-		return context.WithCancel(cfg.Context)
-	}()
 }
