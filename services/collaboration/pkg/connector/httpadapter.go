@@ -27,9 +27,8 @@ const (
 // All operations are expected to follow the definitions found in
 // https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/endpoints
 type HttpAdapter struct {
-	con    ConnectorService
-	config *config.Config
-	locks  locks.LockParser
+	con   ConnectorService
+	locks locks.LockParser
 }
 
 // NewHttpAdapter will create a new HTTP adapter. A new connector using the

@@ -10,3 +10,8 @@ packages:
             ConnectorService:
             ContentConnectorService:
             FileConnectorService:
+    github.com/owncloud/ocis/v2/services/collaboration/pkg/locks:
+        config:
+            dir: "mocks"
+        interfaces:
+            LockParser:
