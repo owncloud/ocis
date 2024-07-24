@@ -15,9 +15,11 @@ import (
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/rs/zerolog"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 // ContentConnectorService is the interface to implement the "File contents"
@@ -143,6 +145,8 @@ func (c *ContentConnector) GetFile(ctx context.Context, writer io.Writer) error 
 	} else {
 		httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
 	}
+	tracingProp := tracing.GetPropagator()
+	tracingProp.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
 
 	httpResp, err := httpClient.Do(httpReq)
 	if err != nil {
@@ -341,6 +345,8 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		//if lockID, ok := ctxpkg.ContextGetLockID(ctx); ok {
 		//	httpReq.Header.Add("X-Lock-Id", lockID)
 		//}
+		tracingProp := tracing.GetPropagator()
+		tracingProp.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
 
 		httpResp, err := httpClient.Do(httpReq)
 		if err != nil {
