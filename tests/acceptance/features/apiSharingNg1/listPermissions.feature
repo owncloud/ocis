@@ -878,7 +878,7 @@ Feature: List a sharing permissions
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile0.txt"
-    When user "Alice" gets permissions list for folder "textfile0.txt" of the space "new-space" using the Graph API
+    When user "Alice" gets permissions list for file "textfile0.txt" of the space "new-space" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -1883,5 +1883,423 @@ Feature: List a sharing permissions
             }
           }
         }
+      }
+      """
+
+  @issues-8428
+  Scenario: user lists permissions of a shared folder in personal space
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created folder "folder"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And user "Alice" has created the following resource link share:
+      | resource        | folder   |
+      | space           | Personal |
+      | permissionsRole | view     |
+      | password        | %public% |
+    When user "Alice" gets permissions list for folder "folder" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues",
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf":[
+                {
+                  "type": "object",
+                  "required": [
+                    "grantedToV2",
+                    "id",
+                    "invitation",
+                    "roles"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%permissions_id_pattern%$"
+                    },
+                    "invitation": {
+                      "type": "object",
+                      "required": ["invitedBy"],
+                      "properties": {
+                        "invitedBy": {
+                          "type": "object",
+                          "required": ["user"],
+                          "properties": {
+                            "user": {
+                              "type": "object",
+                              "required": ["displayName","id"],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["hasPassword", "id", "link"],
+                  "properties": {
+                    "hasPassword": {
+                      "const": true
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z]{15}$"
+                    },
+                    "link": {
+                      "type": "object",
+                      "required": [
+                        "@libre.graph.displayName",
+                        "@libre.graph.quickLink",
+                        "preventsDownload",
+                        "type",
+                        "webUrl"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+  @issues-8428
+  Scenario: user lists permissions of a shared file in personal space
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile0.txt |
+      | space           | Personal      |
+      | permissionsRole | view          |
+      | password        | %public%      |
+    When user "Alice" gets permissions list for file "textfile0.txt" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues",
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf":[
+                {
+                  "type": "object",
+                  "required": [
+                    "grantedToV2",
+                    "id",
+                    "invitation",
+                    "roles"
+                  ],
+                  "properties": {
+                    "invitation": {
+                      "type": "object",
+                      "required": ["invitedBy"],
+                      "properties": {
+                        "invitedBy": {
+                          "type": "object",
+                          "required": ["user"],
+                          "properties": {
+                            "user": {
+                              "type": "object",
+                              "required": ["displayName","id"],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["hasPassword", "id", "link"],
+                  "properties": {
+                    "hasPassword": {
+                      "const": true
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z]{15}$"
+                    },
+                    "link": {
+                      "type": "object",
+                      "required": [
+                        "@libre.graph.displayName",
+                        "@libre.graph.quickLink",
+                        "preventsDownload",
+                        "type",
+                        "webUrl"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+  @issues-8428
+  Scenario: user lists permissions of a shared folder in project space
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "folder" in space "new-space"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder    |
+      | space           | new-space |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
+    And user "Alice" has created the following resource link share:
+      | resource        | folder    |
+      | space           | new-space |
+      | permissionsRole | view      |
+      | password        | %public%  |
+    When user "Alice" gets permissions list for folder "folder" of the space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+          "required": [
+            "@libre.graph.permissions.actions.allowedValues",
+            "@libre.graph.permissions.roles.allowedValues",
+            "value"
+          ],
+          "properties": {
+            "value": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true,
+              "items": {
+                "oneOf":[
+                  {
+                    "type": "object",
+                    "required": [
+                      "grantedToV2",
+                      "id",
+                      "invitation",
+                      "roles"
+                    ],
+                    "properties": {
+                      "invitation": {
+                        "type": "object",
+                        "required": ["invitedBy"],
+                        "properties": {
+                          "invitedBy": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "required": ["displayName","id"],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "Alice Hansen"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "hasPassword",
+                      "id",
+                      "link"
+                    ],
+                    "properties": {
+                      "hasPassword": {
+                        "const": true
+                      },
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z]{15}$"
+                      },
+                      "link": {
+                        "type": "object",
+                        "required": [
+                          "@libre.graph.displayName",
+                          "@libre.graph.quickLink",
+                          "preventsDownload",
+                          "type",
+                          "webUrl"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+      }
+      """
+
+  @issues-8428
+  Scenario: user lists permissions of a shared file in project space
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile0.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile0.txt |
+      | space           | new-space     |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile0.txt |
+      | space           | new-space     |
+      | permissionsRole | view          |
+      | password        | %public%      |
+    When user "Alice" gets permissions list for file "textfile0.txt" of the space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+          "required": [
+            "@libre.graph.permissions.actions.allowedValues",
+            "@libre.graph.permissions.roles.allowedValues",
+            "value"
+          ],
+          "properties": {
+            "value": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true,
+              "items": {
+                "oneOf":[
+                  {
+                    "type": "object",
+                    "required": [
+                      "grantedToV2",
+                      "id",
+                      "invitation",
+                      "roles"
+                    ],
+                    "properties": {
+                      "invitation": {
+                        "type": "object",
+                        "required": ["invitedBy"],
+                        "properties": {
+                          "invitedBy": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "required": ["displayName","id"],
+                                "properties": {
+                                  "displayName": {
+                                    "const": "Alice Hansen"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^%user_id_pattern%$"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "hasPassword",
+                      "id",
+                      "link"
+                    ],
+                    "properties": {
+                      "hasPassword": {
+                        "const": true
+                      },
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z]{15}$"
+                      },
+                      "link": {
+                        "type": "object",
+                        "required": [
+                          "@libre.graph.displayName",
+                          "@libre.graph.quickLink",
+                          "preventsDownload",
+                          "type",
+                          "webUrl"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
       }
       """
