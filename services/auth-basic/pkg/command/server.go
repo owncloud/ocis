@@ -74,7 +74,6 @@ func Server(cfg *config.Config) *cli.Command {
 					Msg("Shutting down server")
 
 				cancel()
-				os.Exit(1)
 			})
 
 			debugServer, err := debug.Server(
