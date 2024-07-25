@@ -20,6 +20,7 @@ var _ = Describe("HttpAdapter", func() {
 		fc          *mocks.FileConnectorService
 		cc          *mocks.ContentConnectorService
 		con         *mocks.ConnectorService
+		locks       *mocks.LockParser
 		httpAdapter *connector.HttpAdapter
 	)
 
@@ -31,7 +32,12 @@ var _ = Describe("HttpAdapter", func() {
 		con.On("GetContentConnector").Return(cc)
 		con.On("GetFileConnector").Return(fc)
 
-		httpAdapter = connector.NewHttpAdapterWithConnector(con)
+		locks = &mocks.LockParser{}
+		locks.EXPECT().ParseLock(mock.Anything).RunAndReturn(func(id string) string {
+			return id
+		})
+
+		httpAdapter = connector.NewHttpAdapterWithConnector(con, locks)
 	})
 
 	Describe("GetLock", func() {

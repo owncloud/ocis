@@ -5,9 +5,11 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/locks"
 	"github.com/rs/zerolog"
 )
 
@@ -25,25 +27,33 @@ const (
 // All operations are expected to follow the definitions found in
 // https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/endpoints
 type HttpAdapter struct {
-	con ConnectorService
+	con   ConnectorService
+	locks locks.LockParser
 }
 
 // NewHttpAdapter will create a new HTTP adapter. A new connector using the
 // provided gateway API client and configuration will be used in the adapter
 func NewHttpAdapter(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *HttpAdapter {
-	return &HttpAdapter{
+	httpAdapter := &HttpAdapter{
 		con: NewConnector(
 			NewFileConnector(gwc, cfg),
 			NewContentConnector(gwc, cfg),
 		),
 	}
+
+	httpAdapter.locks = &locks.NoopLockParser{}
+	if strings.ToLower(cfg.App.Name) == "microsoftofficeonline" {
+		httpAdapter.locks = &locks.LegacyLockParser{}
+	}
+	return httpAdapter
 }
 
 // NewHttpAdapterWithConnector will create a new HTTP adapter that will use
 // the provided connector service
-func NewHttpAdapterWithConnector(con ConnectorService) *HttpAdapter {
+func NewHttpAdapterWithConnector(con ConnectorService, l locks.LockParser) *HttpAdapter {
 	return &HttpAdapter{
-		con: con,
+		con:   con,
+		locks: l,
 	}
 }
 
@@ -75,8 +85,8 @@ func (h *HttpAdapter) GetLock(w http.ResponseWriter, r *http.Request) {
 // The operation's response will be sent through the response writer and
 // the headers according to the spec
 func (h *HttpAdapter) Lock(w http.ResponseWriter, r *http.Request) {
-	oldLockID := r.Header.Get(HeaderWopiOldLock)
-	lockID := r.Header.Get(HeaderWopiLock)
+	oldLockID := h.locks.ParseLock(r.Header.Get(HeaderWopiOldLock))
+	lockID := h.locks.ParseLock(r.Header.Get(HeaderWopiLock))
 
 	fileCon := h.con.GetFileConnector()
 	newLockID, err := fileCon.Lock(r.Context(), lockID, oldLockID)
@@ -103,7 +113,7 @@ func (h *HttpAdapter) Lock(w http.ResponseWriter, r *http.Request) {
 // The operation's response will be sent through the response writer and
 // the headers according to the spec
 func (h *HttpAdapter) RefreshLock(w http.ResponseWriter, r *http.Request) {
-	lockID := r.Header.Get(HeaderWopiLock)
+	lockID := h.locks.ParseLock(r.Header.Get(HeaderWopiLock))
 
 	fileCon := h.con.GetFileConnector()
 	newLockID, err := fileCon.RefreshLock(r.Context(), lockID)
@@ -128,7 +138,7 @@ func (h *HttpAdapter) RefreshLock(w http.ResponseWriter, r *http.Request) {
 // The operation's response will be sent through the response writer and
 // the headers according to the spec
 func (h *HttpAdapter) UnLock(w http.ResponseWriter, r *http.Request) {
-	lockID := r.Header.Get(HeaderWopiLock)
+	lockID := h.locks.ParseLock(r.Header.Get(HeaderWopiLock))
 
 	fileCon := h.con.GetFileConnector()
 	newLockID, err := fileCon.UnLock(r.Context(), lockID)
@@ -211,7 +221,7 @@ func (h *HttpAdapter) GetFile(w http.ResponseWriter, r *http.Request) {
 // The operation's response will be sent through the response writer and
 // the headers according to the spec
 func (h *HttpAdapter) PutFile(w http.ResponseWriter, r *http.Request) {
-	lockID := r.Header.Get(HeaderWopiLock)
+	lockID := h.locks.ParseLock(r.Header.Get(HeaderWopiLock))
 
 	contentCon := h.con.GetContentConnector()
 	newLockID, err := contentCon.PutFile(r.Context(), r.Body, r.ContentLength, lockID)
