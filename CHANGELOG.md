@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Missing invitation in permission responses: [#9652](https://github.com/owncloud/ocis/pull/9652)
 * Bugfix - Repair nats-js-kv registry: [#9662](https://github.com/owncloud/ocis/pull/9662)
 * Bugfix - Fix panic: [#9673](https://github.com/owncloud/ocis/pull/9673)
+* Bugfix - Fixed the response code when copying the shared from to personal: [#9677](https://github.com/owncloud/ocis/pull/9677)
 * Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
 * Enhancement - Introduce auth-app service: [#9079](https://github.com/owncloud/ocis/pull/9079)
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
@@ -131,6 +132,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9673
 
+* Bugfix - Fixed the response code when copying the shared from to personal: [#9677](https://github.com/owncloud/ocis/pull/9677)
+
+   We fixed the response code when copying the file from shares to personal space
+   with a secure view role.
+
+   https://github.com/owncloud/ocis/issues/9482
+   https://github.com/owncloud/ocis/pull/9677
+
 * Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
 
    We've removed config options from the web package, that are no longer available
@@ -203,6 +212,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9662
    https://github.com/owncloud/ocis/pull/9621
+   https://github.com/owncloud/ocis/pull/9677
 
 * Enhancement - Fix trash command: [#9665](https://github.com/owncloud/ocis/pull/9665)
 
