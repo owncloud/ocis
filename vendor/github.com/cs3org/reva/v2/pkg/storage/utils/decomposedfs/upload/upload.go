@@ -171,7 +171,7 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 	metrics.UploadProcessing.Inc()
 	metrics.UploadSessionsBytesReceived.Inc()
 
-	if session.store.pub != nil {
+	if session.store.pub != nil && session.info.Size > 0 {
 		u, _ := ctxpkg.ContextGetUser(ctx)
 		s, err := session.URL(ctx)
 		if err != nil {
