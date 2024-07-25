@@ -999,6 +999,8 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                     "COLLABORATION_LOG_LEVEL": "debug",
                     "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
                     "COLLABORATION_GRPC_ADDR": "0.0.0.0:9301",
+                    # no proof keys available in the FakeOffice
+                    "COLLABORATION_APP_PROOF_DISABLE": "true",
                     "COLLABORATION_APP_NAME": "FakeOffice",
                     "COLLABORATION_APP_ADDR": "http://fakeoffice:8080",
                     "COLLABORATION_APP_INSECURE": "true",
@@ -1025,7 +1027,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                 "export WOPI_SRC=$(cat wopisrc)",
                 "echo $WOPI_SRC",
                 "cd /app",
-                "/app/Microsoft.Office.WopiValidator -s -t $WOPI_TOKEN -w $WOPI_SRC -l $WOPI_TTL --testgroup %s" % testgroup,
+                "/app/Microsoft.Office.WopiValidator -t $WOPI_TOKEN -w $WOPI_SRC -l $WOPI_TTL --testgroup %s" % testgroup,
             ],
         })
 

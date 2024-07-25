@@ -26,6 +26,10 @@ func DefaultConfig() *config.Config {
 			LockName:    "com.github.owncloud.collaboration",
 			Addr:        "https://127.0.0.1:9980",
 			Insecure:    false,
+			ProofKeys: config.ProofKeys{
+				// they'll be enabled by default
+				Duration: "12h",
+			},
 		},
 		GRPC: config.GRPC{
 			Addr:      "127.0.0.1:9301",

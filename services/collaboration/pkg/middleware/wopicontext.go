@@ -90,6 +90,9 @@ func WopiContextAuthMiddleware(jwtSecret string, next http.Handler) http.Handler
 		logger := zerolog.Ctx(ctx)
 		ctx = logger.With().
 			Str("WopiOverride", r.Header.Get("X-WOPI-Override")).
+			Str("WopiProof", r.Header.Get("X-WOPI-Proof")).
+			Str("WopiProofOld", r.Header.Get("X-WOPI-ProofOld")).
+			Str("WopiStamp", r.Header.Get("X-WOPI-TimeStamp")).
 			Str("FileReference", claims.WopiContext.FileReference.String()).
 			Str("ViewMode", claims.WopiContext.ViewMode.String()).
 			Str("Requester", claims.WopiContext.User.GetId().String()).
