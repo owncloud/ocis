@@ -8,6 +8,9 @@ app:
   lockname: com.github.owncloud.collaboration
   addr: https://127.0.0.1:9980
   insecure: false
+  proofkeys:
+    disable: false
+    duration: 12h
 token_manager:
   jwt_secret: ""
 grpc:

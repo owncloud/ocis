@@ -8,6 +8,8 @@
 | COLLABORATION_APP_LOCKNAME | string | com.github.owncloud.collaboration | Name for the app lock|
 | COLLABORATION_APP_ADDR | string | https://127.0.0.1:9980 | The URL where the WOPI app is located, such as https://127.0.0.1:8080.|
 | COLLABORATION_APP_INSECURE | bool | false | Skip TLS certificate verification when connecting to the WOPI app|
+| COLLABORATION_APP_PROOF_DISABLE | bool | false | Disable the proof keys verification|
+| COLLABORATION_APP_PROOF_DURATION | string | 12h | Duration for the proof keys to be cached in memory, using time.ParseDuration format. If the duration can't be parsed, we'll use the default 12h as duration|
 | OCIS_JWT_SECRET<br/>COLLABORATION_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | COLLABORATION_GRPC_ADDR | string | 127.0.0.1:9301 | The bind address of the GRPC service.|
 | COLLABORATION_HTTP_ADDR | string | 127.0.0.1:9300 | The bind address of the HTTP service.|
