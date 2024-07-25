@@ -253,6 +253,7 @@ var httpStatusCode = map[rpc.Code]int{
 	rpc.Code_CODE_UNIMPLEMENTED:        http.StatusNotImplemented,
 	rpc.Code_CODE_UNKNOWN:              http.StatusInternalServerError,
 	rpc.Code_CODE_LOCKED:               http.StatusLocked,
+	rpc.Code_CODE_TOO_EARLY:            http.StatusTooEarly,
 }
 
 // HTTPStatusFromCode returns an HTTP status code for the rpc code. It returns

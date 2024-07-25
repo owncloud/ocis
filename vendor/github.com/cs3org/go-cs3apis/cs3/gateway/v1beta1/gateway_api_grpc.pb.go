@@ -183,6 +183,7 @@ type GatewayAPIClient interface {
 	// then the entire directory is deleted recursively.
 	// If a resource specifies a reference or symlink type, only the reference is removed (not the target).
 	// MUST return CODE_NOT_FOUND if the reference does not exist.
+	// MUST return CODE_TOO_EARLY if some are not finished job over resource is still in process.
 	Delete(ctx context.Context, in *v1beta11.DeleteRequest, opts ...grpc.CallOption) (*v1beta11.DeleteResponse, error)
 	// Returns the path reference for
 	// the provided resource id reference.
@@ -220,7 +221,8 @@ type GatewayAPIClient interface {
 	ListRecycle(ctx context.Context, in *v1beta11.ListRecycleRequest, opts ...grpc.CallOption) (*v1beta11.ListRecycleResponse, error)
 	// Moves a resource from one reference to another.
 	// MUST return CODE_NOT_FOUND if any of the references do not exist.
-	// MUST return CODE_FAILED_PRECONDITION if the source reference
+	// MUST return CODE_FAILED_PRECONDITION if the source reference.
+	// MUST return CODE_TOO_EARLY if some are not finished job over resource is still in process.
 	// cannot be moved to the destination reference.
 	Move(ctx context.Context, in *v1beta11.MoveRequest, opts ...grpc.CallOption) (*v1beta11.MoveResponse, error)
 	// Permanently removes a recycle item from the recycle.
@@ -1417,6 +1419,7 @@ type GatewayAPIServer interface {
 	// then the entire directory is deleted recursively.
 	// If a resource specifies a reference or symlink type, only the reference is removed (not the target).
 	// MUST return CODE_NOT_FOUND if the reference does not exist.
+	// MUST return CODE_TOO_EARLY if some are not finished job over resource is still in process.
 	Delete(context.Context, *v1beta11.DeleteRequest) (*v1beta11.DeleteResponse, error)
 	// Returns the path reference for
 	// the provided resource id reference.
@@ -1454,7 +1457,8 @@ type GatewayAPIServer interface {
 	ListRecycle(context.Context, *v1beta11.ListRecycleRequest) (*v1beta11.ListRecycleResponse, error)
 	// Moves a resource from one reference to another.
 	// MUST return CODE_NOT_FOUND if any of the references do not exist.
-	// MUST return CODE_FAILED_PRECONDITION if the source reference
+	// MUST return CODE_FAILED_PRECONDITION if the source reference.
+	// MUST return CODE_TOO_EARLY if some are not finished job over resource is still in process.
 	// cannot be moved to the destination reference.
 	Move(context.Context, *v1beta11.MoveRequest) (*v1beta11.MoveResponse, error)
 	// Permanently removes a recycle item from the recycle.

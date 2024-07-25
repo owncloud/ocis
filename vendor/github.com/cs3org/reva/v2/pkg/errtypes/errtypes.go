@@ -195,6 +195,14 @@ func (e InsufficientStorage) Body() []byte {
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/507
 const StatusInsufficientStorage = 507
 
+// TooEarly is the error to use when some are not finished job over resource is still in process.
+type TooEarly string
+
+func (e TooEarly) Error() string { return "error: too early: " + string(e) }
+
+// IsTooEarly implements the IsTooEarly interface.
+func (e TooEarly) IsTooEarly() {}
+
 // IsNotFound is the interface to implement
 // to specify that a resource is not found.
 type IsNotFound interface {
@@ -279,6 +287,12 @@ type IsInsufficientStorage interface {
 	IsInsufficientStorage()
 }
 
+// IsTooEarly is the interface to implement
+// to specify that there is some not finished job over resource is still in process.
+type IsTooEarly interface {
+	IsTooEarly()
+}
+
 // NewErrtypeFromStatus maps a rpc status to an errtype
 func NewErrtypeFromStatus(status *rpc.Status) error {
 	switch status.Code {
@@ -313,6 +327,8 @@ func NewErrtypeFromStatus(status *rpc.Status) error {
 		return InsufficientStorage(status.Message)
 	case rpc.Code_CODE_INVALID_ARGUMENT, rpc.Code_CODE_OUT_OF_RANGE:
 		return BadRequest(status.Message)
+	case rpc.Code_CODE_TOO_EARLY:
+		return TooEarly(status.Message)
 	default:
 		return InternalError(status.Message)
 	}
@@ -345,6 +361,8 @@ func NewErrtypeFromHTTPStatusCode(code int, message string) error {
 		return BadRequest(message)
 	case http.StatusPartialContent:
 		return PartialContent(message)
+	case http.StatusTooEarly:
+		return TooEarly(message)
 	case StatusChecksumMismatch:
 		return ChecksumMismatch(message)
 	default:
@@ -379,6 +397,8 @@ func NewHTTPStatusCodeFromErrtype(err error) int {
 		return http.StatusBadRequest
 	case PartialContent:
 		return http.StatusPartialContent
+	case TooEarly:
+		return http.StatusTooEarly
 	case ChecksumMismatch:
 		return StatusChecksumMismatch
 	default:

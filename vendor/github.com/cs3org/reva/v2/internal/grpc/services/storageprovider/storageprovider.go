@@ -731,7 +731,7 @@ func (s *Service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 	if utils.ReadPlainFromOpaque(md.GetOpaque(), "status") == "processing" {
 		return &provider.DeleteResponse{
 			Status: &rpc.Status{
-				Code:    rpc.Code_CODE_UNAVAILABLE,
+				Code:    rpc.Code_CODE_TOO_EARLY,
 				Message: "file is processing",
 			},
 			Opaque: &typesv1beta1.Opaque{
