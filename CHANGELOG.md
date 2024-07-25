@@ -66,10 +66,10 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump commitID for web: [#9631](https://github.com/owncloud/ocis/pull/9631)
 * Enhancement - Remove oidc-go dependency: [#9641](https://github.com/owncloud/ocis/pull/9641)
 * Enhancement - Improve the collaboration service logging: [#9653](https://github.com/owncloud/ocis/pull/9653)
-* Enhancement - Bump reva: [#9662](https://github.com/owncloud/ocis/pull/9662)
 * Enhancement - Fix trash command: [#9665](https://github.com/owncloud/ocis/pull/9665)
 * Enhancement - Added the debugging to full ocis docker example: [#9666](https://github.com/owncloud/ocis/pull/9666)
 * Enhancement - Add locking support for MS Office Online Server: [#9685](https://github.com/owncloud/ocis/pull/9685)
+* Enhancement - Bump reva: [#9690](https://github.com/owncloud/ocis/pull/9690)
 
 ## Details
 
@@ -218,13 +218,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9653
 
-* Enhancement - Bump reva: [#9662](https://github.com/owncloud/ocis/pull/9662)
-
-   https://github.com/owncloud/ocis/pull/9662
-   https://github.com/owncloud/ocis/pull/9621
-   https://github.com/owncloud/ocis/pull/9677
-   https://github.com/owncloud/ocis/pull/9689
-
 * Enhancement - Fix trash command: [#9665](https://github.com/owncloud/ocis/pull/9665)
 
    The `ocis trash purge-empty-dirs` command should work on any storage provider,
@@ -246,6 +239,14 @@ The following sections list the changes for unreleased.
    `MicrosoftOfficeOnline`.
 
    https://github.com/owncloud/ocis/pull/9685
+
+* Enhancement - Bump reva: [#9690](https://github.com/owncloud/ocis/pull/9690)
+
+   https://github.com/owncloud/ocis/pull/9690
+   https://github.com/owncloud/ocis/pull/9662
+   https://github.com/owncloud/ocis/pull/9621
+   https://github.com/owncloud/ocis/pull/9677
+   https://github.com/owncloud/ocis/pull/9689
 
 # Changelog for [6.1.0] (2024-07-08)
 
