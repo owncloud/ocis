@@ -57,6 +57,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Repair nats-js-kv registry: [#9662](https://github.com/owncloud/ocis/pull/9662)
 * Bugfix - Fix panic: [#9673](https://github.com/owncloud/ocis/pull/9673)
 * Bugfix - Fixed the response code when copying the shared from to personal: [#9677](https://github.com/owncloud/ocis/pull/9677)
+* Bugfix - Fixed response code for DELETE file that is in postprocessing: [#9689](https://github.com/owncloud/ocis/pull/9689)
 * Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
 * Enhancement - Introduce auth-app service: [#9079](https://github.com/owncloud/ocis/pull/9079)
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
@@ -141,6 +142,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/9482
    https://github.com/owncloud/ocis/pull/9677
 
+* Bugfix - Fixed response code for DELETE file that is in postprocessing: [#9689](https://github.com/owncloud/ocis/pull/9689)
+
+   We fixed the response code when DELETE and MOVE requests to the file that is
+   still in post-processing.
+
+   https://github.com/owncloud/ocis/issues/9432
+   https://github.com/owncloud/ocis/pull/9689
+
 * Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
 
    We've removed config options from the web package, that are no longer available
@@ -214,6 +223,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9662
    https://github.com/owncloud/ocis/pull/9621
    https://github.com/owncloud/ocis/pull/9677
+   https://github.com/owncloud/ocis/pull/9689
 
 * Enhancement - Fix trash command: [#9665](https://github.com/owncloud/ocis/pull/9665)
 
