@@ -14,8 +14,8 @@ require (
 	github.com/blevesearch/bleve/v2 v2.4.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.10.0
-	github.com/cs3org/go-cs3apis v0.0.0-20240425114016-d2cb31692b4e
-	github.com/cs3org/reva/v2 v2.21.1-0.20240724074721-53e5aafbfb86
+	github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb
+	github.com/cs3org/reva/v2 v2.21.1-0.20240725083514-19e4d645016b
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
