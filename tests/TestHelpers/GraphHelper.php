@@ -2293,4 +2293,31 @@ class GraphHelper {
 			self::getRequestHeaders()
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $requestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $resourceId
+	 *
+	 * @return ResponseInterface
+	 */
+	public static function getActivities(
+		string $baseUrl,
+		string $requestId,
+		string $user,
+		string $password,
+		string $resourceId
+	): ResponseInterface {
+		// 'kql=itemId' filter is required for the current implementation but it might change in future
+		// See: https://github.com/owncloud/ocis/issues/9194
+		$fullUrl = self::getBetaFullUrl($baseUrl, "extensions/org.libregraph/activities?kql=itemid%3A$resourceId");
+		return HttpRequestHelper::get(
+			$fullUrl,
+			$requestId,
+			$user,
+			$password
+		);
+	}
 }
