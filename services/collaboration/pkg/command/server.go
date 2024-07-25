@@ -63,6 +63,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.AppURLs(appUrls),
 				grpc.Config(cfg),
 				grpc.Logger(logger),
+				grpc.TraceProvider(traceProvider),
 			)
 			defer teardown()
 			if err != nil {
