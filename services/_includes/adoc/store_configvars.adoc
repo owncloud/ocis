@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-24-09-28-17]
+[#deprecation-note-2024-07-25-00-05-37]
 [caption=]
 .Deprecation notes for the store service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -103,7 +103,7 @@ endif::[]
 
 a|`OCIS_TRACING_ENABLED` +
 `STORE_TRACING_ENABLED` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -115,7 +115,7 @@ Activates tracing.
 
 a|`OCIS_TRACING_TYPE` +
 `STORE_TRACING_TYPE` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -127,7 +127,7 @@ The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed trac
 
 a|`OCIS_TRACING_ENDPOINT` +
 `STORE_TRACING_ENDPOINT` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -139,7 +139,7 @@ The endpoint of the tracing agent.
 
 a|`OCIS_TRACING_COLLECTOR` +
 `STORE_TRACING_COLLECTOR` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -151,7 +151,7 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 
 a|`OCIS_LOG_LEVEL` +
 `STORE_LOG_LEVEL` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -163,7 +163,7 @@ The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'deb
 
 a|`OCIS_LOG_PRETTY` +
 `STORE_LOG_PRETTY` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -175,7 +175,7 @@ Activates pretty log output.
 
 a|`OCIS_LOG_COLOR` +
 `STORE_LOG_COLOR` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -187,7 +187,7 @@ Activates colorized log output.
 
 a|`OCIS_LOG_FILE` +
 `STORE_LOG_FILE` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -198,7 +198,7 @@ a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 
 a|`STORE_DEBUG_ADDR` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -209,7 +209,7 @@ a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 a|`STORE_DEBUG_TOKEN` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -220,7 +220,7 @@ a| [subs=-attributes]
 Token to secure the metrics endpoint.
 
 a|`STORE_DEBUG_PPROF` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -231,7 +231,7 @@ a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
 
 a|`STORE_DEBUG_ZPAGES` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -242,7 +242,7 @@ a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`STORE_GRPC_ADDR` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -253,7 +253,7 @@ a| [subs=-attributes]
 The bind address of the GRPC service.
 
 a|`STORE_DATA_PATH` +
-xref:deprecation-note-2024-07-24-09-28-17[Deprecation Note]
+xref:deprecation-note-2024-07-25-00-05-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
