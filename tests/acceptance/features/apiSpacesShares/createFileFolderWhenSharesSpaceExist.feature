@@ -15,6 +15,7 @@ Feature: create file or folder named similar to Shares folder
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "FOLDER" synced
 
 
   Scenario Outline: create a folder with a name similar to Shares

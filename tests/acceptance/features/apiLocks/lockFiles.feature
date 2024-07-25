@@ -173,6 +173,7 @@ Feature: lock files
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textfile.txt" synced
     When user "Brian" locks file "/Shares/textfile.txt" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "200"
@@ -198,6 +199,7 @@ Feature: lock files
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textfile.txt" synced
     When user "Brian" locks file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
@@ -223,6 +225,7 @@ Feature: lock files
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
+    And user "Brian" has a share "textfile.txt" synced
     When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "403"
@@ -241,6 +244,7 @@ Feature: lock files
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textfile.txt" synced
     And user "Alice" has locked file "textfile.txt" setting the following properties
       | lockscope | exclusive |
     When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
@@ -264,6 +268,7 @@ Feature: lock files
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textfile.txt" synced
     And user "Brian" has locked file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" setting the following properties
       | lockscope | exclusive |
     When user "Alice" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
@@ -288,6 +293,7 @@ Feature: lock files
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
+    And user "Brian" has a share "textfile.txt" synced
     And user "Alice" has locked file "textfile0.txt" setting the following properties
       | lockscope | shared |
     And user "Brian" has locked file "Shares/textfile0.txt" setting the following properties
@@ -342,12 +348,14 @@ Feature: lock files
       | sharee          | Carol     |
       | shareType       | user      |
       | permissionsRole | Editor    |
+    And user "Carol" has a share "FromAlice" synced
     And user "Brian" has sent the following resource share invitation:
       | resource        | FromBrian |
       | space           | Personal  |
       | sharee          | Carol     |
       | shareType       | user      |
       | permissionsRole | Editor    |
+    And user "Carol" has a share "FromBrian" synced
     When user "Carol" locks file "/Shares/FromBrian/textfile0.txt" using the WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "200"
@@ -375,12 +383,14 @@ Feature: lock files
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "locked" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | notlocked |
       | space           | Personal  |
       | sharee          | Brian     |
       | shareType       | user      |
       | permissionsRole | Editor    |
+    And user "Brian" has a share "notlocked" synced
     When user "Brian" locks file "/Shares/locked/textfile0.txt" using the WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "200"

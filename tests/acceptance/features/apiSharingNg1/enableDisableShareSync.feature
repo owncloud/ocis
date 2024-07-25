@@ -924,6 +924,7 @@ Feature:  enable or disable sync of incoming shares
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource>" synced
     And user "Brian" has disabled sync of last shared resource
     And user "Brian" disables sync of share "<resource>" using the Graph API
     Then the HTTP status code should be "409"

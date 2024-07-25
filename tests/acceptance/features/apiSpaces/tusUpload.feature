@@ -51,6 +51,7 @@ Feature: upload resources using TUS protocol
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Editor     |
+    And user "Brian" has a share "testFolder" synced
     When user "Brian" uploads file "filesForUpload/zerobyte.txt" to "Shares/testFolder/textfile.txt" using the TUS protocol on the WebDAV API
     Then the content of file "Shares/testFolder/textfile.txt" for user "Brian" should be ""
     And the content of file "testFolder/textfile.txt" for user "Alice" should be ""
@@ -70,6 +71,7 @@ Feature: upload resources using TUS protocol
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Editor     |
+    And user "Brian" has a share "testFolder" synced
     When user "Brian" uploads a file from "filesForUpload/zerobyte.txt" to "testFolder/textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" the content of the file "testFolder/textfile.txt" of the space "Shares" should be ""
     And for user "Alice" the content of the file "testFolder/textfile.txt" of the space "Personal" should be ""
@@ -93,6 +95,7 @@ Feature: upload resources using TUS protocol
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textfile.txt" synced
     When user "Brian" uploads file "filesForUpload/zerobyte.txt" to "Shares/textfile.txt" using the TUS protocol on the WebDAV API
     Then the content of file "Shares/textfile.txt" for user "Brian" should be ""
     And the content of file "textfile.txt" for user "Alice" should be ""
@@ -112,6 +115,7 @@ Feature: upload resources using TUS protocol
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textfile.txt" synced
     When user "Brian" uploads a file from "filesForUpload/zerobyte.txt" to "textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" the content of the file "textfile.txt" of the space "Shares" should be ""
     And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be ""

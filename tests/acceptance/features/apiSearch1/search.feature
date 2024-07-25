@@ -41,6 +41,7 @@ Feature: Search
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "folderMain" synced
     When user "Brian" searches for "*folder*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
@@ -102,6 +103,7 @@ Feature: Search
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "folderMain" synced
     And user "Brian" has disabled sync of last shared resource
     When user "Brian" searches for "*folder*" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -169,6 +171,7 @@ Feature: Search
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "folderMain" synced
     When user "Brian" searches for "*folder*" inside folder "/folderMain" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain only these entries:
@@ -251,6 +254,7 @@ Feature: Search
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "foo" synced
     When user "Brian" searches for "shared*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Brian" should contain these entries:

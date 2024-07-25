@@ -1896,6 +1896,7 @@ Feature: List a sharing permissions
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "folder" synced
     And user "Alice" has created the following resource link share:
       | resource        | folder   |
       | space           | Personal |
@@ -2000,6 +2001,7 @@ Feature: List a sharing permissions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
+    And user "Brian" has a share "textfile0.txt" synced
     And user "Alice" has created the following resource link share:
       | resource        | textfile0.txt |
       | space           | Personal      |
@@ -2103,6 +2105,7 @@ Feature: List a sharing permissions
       | sharee          | Brian     |
       | shareType       | user      |
       | permissionsRole | Viewer    |
+    And user "Brian" has a share "folder" synced
     And user "Alice" has created the following resource link share:
       | resource        | folder    |
       | space           | new-space |
@@ -2210,6 +2213,7 @@ Feature: List a sharing permissions
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
+    And user "Brian" has a share "textfile0.txt" synced
     And user "Alice" has created the following resource link share:
       | resource        | textfile0.txt |
       | space           | new-space     |
