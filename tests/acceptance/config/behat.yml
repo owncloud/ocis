@@ -403,6 +403,7 @@ default:
         - SharingNgContext:
         - SearchContext:
         - TagContext:
+        - TrashbinContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~

@@ -93,6 +93,20 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator deletes the empty trashbin folders using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesEmptyTrashbinFoldersUsingTheCli():void {
+		$path = $this->featureContext->getStorageUsersRoot();
+		$command = "trash purge-empty-dirs -p $path --dry-run=false";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @When the administrator checks the backup consistency using the CLI
 	 *
 	 * @return void
