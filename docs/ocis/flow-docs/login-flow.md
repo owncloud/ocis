@@ -26,7 +26,7 @@ sequenceDiagram
     participant ldap as External User Directory
 
     user->>+client: What is the content of my home?
-        client->>+proxy: PROPFIND\n no (or expired) auth
+        client->>+proxy: PROPFIND no (or expired) auth
         Note over client,proxy: ocis needs to know the IdP that is used to authenticate users. The proxy will redirect unauthenticated requests to that IdP.
         proxy-->>-client: 401 Unauthorized
         client->>+proxy: 1. The client starts a new openIDConnect Flow
