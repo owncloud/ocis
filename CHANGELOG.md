@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fixed response code for DELETE file that is in postprocessing: [#9689](https://github.com/owncloud/ocis/pull/9689)
 * Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
 * Enhancement - Introduce auth-app service: [#9079](https://github.com/owncloud/ocis/pull/9079)
+* Enhancement - Add support for proof keys for the collaboration service: [#9366](https://github.com/owncloud/ocis/pull/9366)
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 * Enhancement - Add missing WOPI features: [#9580](https://github.com/owncloud/ocis/pull/9580)
 * Enhancement - Update web to v9.1.0-alpha.1: [#9585](https://github.com/owncloud/ocis/pull/9585)
@@ -166,6 +167,15 @@ The following sections list the changes for unreleased.
    authorization services for applications.
 
    https://github.com/owncloud/ocis/pull/9079
+
+* Enhancement - Add support for proof keys for the collaboration service: [#9366](https://github.com/owncloud/ocis/pull/9366)
+
+   Proof keys support will be enabled by default in order to ensure that all the
+   requests come from a trusted source. Since proof keys must be set in the WOPI
+   app (OnlyOffice, Collabora...), it's possible to disable the verification of the
+   proof keys via configuration.
+
+   https://github.com/owncloud/ocis/pull/9366
 
 * Enhancement - Log user agent and remote addr on auth errors: [#9475](https://github.com/owncloud/ocis/pull/9475)
 
