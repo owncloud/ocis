@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	configFilename = "ocis.yaml" // TODO: use also a constant for reading this file
+	configFilename = "ocis.yaml"
 	passwordLength = 32
 )
 
@@ -63,6 +63,9 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 			return err
 		}
 		err = yaml.Unmarshal(fp, &oldCfg)
+		if err != nil {
+			return err
+		}
 	}
 
 	var (
@@ -304,6 +307,9 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		}
 		fmt.Println(string(stdout))
 		err = os.Remove(tmpFile)
+		if err != nil {
+			return err
+		}
 		patchPath := path.Join(configPath, "ocis.config.patch")
 		err = os.WriteFile(patchPath, stdout, 0600)
 		if err != nil {
