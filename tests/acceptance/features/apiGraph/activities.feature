@@ -12,82 +12,83 @@ Feature: check activities
     And the JSON data of the response should match
       """
       {
-      "type": "object",
-      "required": ["value"],
-      "properties": {
-        "value": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "object",
-            "required": ["id","template","times"],
-            "properties": {
-              "id": {
-                "type": "string",
-                "pattern": "^%user_id_pattern%$"
-              },
-              "template": {
-                "type": "object",
-                "required": ["message","variables"],
-                "properties": {
-                  "message": {
-                    "const": "{user} added {resource} to {space}"
-                  },
-                  "variables": {
-                    "type": "object",
-                    "required": ["resource","space","user"],
-                    "properties": {
-                      "resource": {
-                        "type": "object",
-                        "required": ["id","name"],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "%file_id_pattern%"
-                          },
-                          "name": {
-                            "const": "textfile0.txt"
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id","template","times"],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "template": {
+                  "type": "object",
+                  "required": ["message","variables"],
+                  "properties": {
+                    "message": {
+                      "const": "{user} added {resource} to {space}"
+                    },
+                    "variables": {
+                      "type": "object",
+                      "required": ["resource","space","user"],
+                      "properties": {
+                        "resource": {
+                          "type": "object",
+                          "required": ["id","name"],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "%file_id_pattern%"
+                            },
+                            "name": {
+                              "const": "textfile0.txt"
+                            }
                           }
-                        }
-                      },
-                      "space": {
-                        "type": "object",
-                        "required": ["id","name"],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "^%user_id_pattern%!%user_id_pattern%$"
-                          },
-                          "name": {
-                            "const": "Alice Hansen"
+                        },
+                        "space": {
+                          "type": "object",
+                          "required": ["id","name"],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%user_id_pattern%!%user_id_pattern%$"
+                            },
+                            "name": {
+                              "const": "Alice Hansen"
+                            }
                           }
-                        }
-                      },
-                      "user": {
-                        "type": "object",
-                        "required": ["id","displayName"],
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "pattern": "%user_id_pattern%"
-                          },
-                          "displayName": {
-                            "const": "Alice"
+                        },
+                        "user": {
+                          "type": "object",
+                          "required": ["id","displayName"],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "%user_id_pattern%"
+                            },
+                            "displayName": {
+                              "const": "Alice"
+                            }
                           }
                         }
                       }
                     }
                   }
-                }
-              },
-              "times": {
-                "type": "object",
-                "required": ["recordedTime"],
-                "properties": {
-                  "recordedTime": {
-                    "type": "string",
-                    "format": "date-time"
+                },
+                "times": {
+                  "type": "object",
+                  "required": ["recordedTime"],
+                  "properties": {
+                    "recordedTime": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
                   }
                 }
               }
@@ -95,5 +96,4 @@ Feature: check activities
           }
         }
       }
-    }
-    """
+      """

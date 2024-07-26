@@ -2785,7 +2785,6 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 * @throws Exception
-	 *
 	 */
 	public function userChecksTheActivitiesForResourceInSpaceUsingTheGraphAPI(string $user, string $resource, string $spaceName): void {
 		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
