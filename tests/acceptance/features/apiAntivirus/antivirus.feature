@@ -154,6 +154,7 @@ Feature: antivirus
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Editor       |
+    And user "Brian" has a share "uploadFolder" synced
     When user "Brian" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/Shares/uploadFolder/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -179,6 +180,7 @@ Feature: antivirus
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Editor       |
+    And user "Brian" has a share "uploadFolder" synced
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -204,6 +206,7 @@ Feature: antivirus
       | sharee          | group1       |
       | shareType       | group        |
       | permissionsRole | Editor       |
+    And user "Brian" has a share "uploadFolder" synced
     When user "Brian" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/Shares/uploadFolder/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -231,6 +234,7 @@ Feature: antivirus
       | sharee          | group1       |
       | shareType       | group        |
       | permissionsRole | Editor       |
+    And user "Brian" has a share "uploadFolder" synced
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -412,6 +416,7 @@ Feature: antivirus
       | sharee          | group1      |
       | shareType       | group       |
       | permissionsRole | File Editor |
+    And user "Brian" has a share "test.txt" synced
     When user "Brian" uploads file with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -438,6 +443,7 @@ Feature: antivirus
       | sharee          | group1      |
       | shareType       | group       |
       | permissionsRole | File Editor |
+    And user "Brian" has a share "test.txt" synced
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/eicar.com" to "/test.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And user "Brian" should get a notification with subject "Virus found" and message:
@@ -458,6 +464,7 @@ Feature: antivirus
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Editor       |
+    And user "Brian" has a share "uploadFolder" synced
     And user "Alice" has uploaded file with content "this is a test file." to "/test.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | test.txt    |
@@ -465,6 +472,7 @@ Feature: antivirus
       | sharee          | Brian       |
       | shareType       | user        |
       | permissionsRole | File Editor |
+    And user "Brian" has a share "test.txt" synced
     When user "Brian" uploads file with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to "Shares/uploadFolder/test.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And user "Brian" should get a notification for resource "test.txt" with subject "Virus found" and message:
@@ -496,6 +504,7 @@ Feature: antivirus
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Editor       |
+    And user "Brian" has a share "uploadFolder" synced
     And user "Alice" has uploaded file with content "this is a test file." to "/test.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | test.txt    |
@@ -503,6 +512,7 @@ Feature: antivirus
       | sharee          | Brian       |
       | shareType       | user        |
       | permissionsRole | File Editor |
+    And user "Brian" has a share "test.txt" synced
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/eicar.com" to "/uploadFolder/test.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And user "Brian" should get a notification for resource "test.txt" with subject "Virus found" and message:

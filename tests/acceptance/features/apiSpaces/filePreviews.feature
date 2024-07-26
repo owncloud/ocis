@@ -52,6 +52,7 @@ Feature: Preview file in project space
       | sharee          | Brian                 |
       | shareType       | user                  |
       | permissionsRole | Viewer                |
+    And user "Brian" has a share "<destination>" synced
     When user "Brian" downloads the preview of shared resource "/Shares/<destination>" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high
@@ -70,6 +71,7 @@ Feature: Preview file in project space
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Secure viewer |
+    And user "Brian" has a share "<destination>" synced
     When user "Brian" downloads the preview of shared resource "/Shares/<destination>" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "403"
     Examples:
@@ -88,6 +90,7 @@ Feature: Preview file in project space
       | sharee          | Brian                 |
       | shareType       | user                  |
       | permissionsRole | Viewer                |
+    And user "Brian" has a share "folder" synced
     When user "Brian" downloads the preview of shared resource "Shares/folder/lorem.txt" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high

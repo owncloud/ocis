@@ -26,6 +26,7 @@ Feature: Report test
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "folderMain" synced
     When user "Brian" searches for "SubFolder1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
@@ -49,6 +50,7 @@ Feature: Report test
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Editor     |
+    And user "Brian" has a share "folderMain" synced
     When user "Brian" searches for "insideTheFolder.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions

@@ -20,6 +20,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/file.txt" inside space "Personal"
@@ -52,6 +53,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/file.txt" inside space "Personal"
@@ -84,6 +86,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/file.txt" on path "/upload/renamed.txt" inside space "Personal"
@@ -112,6 +115,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/file.txt" on path "/upload/renamed.txt" inside space "Personal"
@@ -141,12 +145,14 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | dst      |
       | space           | Personal |
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "dst" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/dst" inside space "Personal"
@@ -175,12 +181,14 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | dst      |
       | space           | Personal |
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "dst" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/dst" inside space "Personal"
@@ -206,6 +214,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -227,6 +236,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -248,6 +258,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -269,6 +280,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -291,6 +303,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -313,6 +326,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Brian" has stored etag of element "/" inside space "Shares"
@@ -336,6 +350,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
@@ -367,6 +382,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
@@ -398,6 +414,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
@@ -429,6 +446,7 @@ Feature: check etag propagation after different file alterations
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "upload" synced
     And user "Alice" has stored etag of element "/" inside space "Personal"
     And user "Alice" has stored etag of element "/upload" inside space "Personal"
     And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"

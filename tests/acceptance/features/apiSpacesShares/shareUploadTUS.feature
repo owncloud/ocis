@@ -19,6 +19,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "toShare" synced
     When user "Brian" uploads a file "filesForUpload/textfile.txt" to "toShare/file.txt" with mtime "Thu, 08 Aug 2012 04:18:13 GMT" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" folder "toShare" of the space "Shares" should contain these entries:
       | file.txt |
@@ -34,6 +35,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "toShare" synced
     When user "Alice" uploads a file "filesForUpload/textfile.txt" to "toShare/file.txt" with mtime "Thu, 08 Aug 2012 04:18:13 GMT" via TUS inside of the space "Personal" using the WebDAV API
     Then for user "Alice" folder "toShare" of the space "Personal" should contain these entries:
       | file.txt |
@@ -49,6 +51,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "toShare" synced
     And user "Alice" has uploaded file with content "uploaded content" to "/toShare/file.txt"
     When user "Brian" uploads a file "filesForUpload/textfile.txt" to "toShare/file.txt" with mtime "Thu, 08 Aug 2012 04:18:13 GMT" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" folder "toShare" of the space "Shares" should contain these entries:
@@ -65,6 +68,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "toShare" synced
     And user "Brian" has uploaded a file inside space "Shares" with content "uploaded content" to "toShare/file.txt"
     When user "Alice" uploads a file "filesForUpload/textfile.txt" to "toShare/file.txt" with mtime "Thu, 08 Aug 2012 04:18:13 GMT" via TUS inside of the space "Personal" using the WebDAV API
     Then for user "Alice" folder "toShare" of the space "Personal" should contain these entries:
@@ -82,6 +86,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "toShare" synced
     When user "Brian" uploads a file with content "uploaded content" to "/toShare/nonExistentFolder/file.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" folder "toShare" of the space "Shares" should not contain these entries:
       | nonExistentFolder |
@@ -96,6 +101,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "toShare" synced
     When user "Brian" uploads a file with content "uploaded content" to "/toShare/nonExistentFolder/file.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" folder "toShare" of the space "Shares" should not contain these entries:
       | nonExistentFolder |
@@ -109,6 +115,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "toShare" synced
     When user "Brian" uploads a file with content "uploaded content" to "/toShare/file.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Alice" folder "toShare" of the space "Personal" should contain these entries:
       | file.txt |
@@ -123,6 +130,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Uploader |
+    And user "Brian" has a share "toShare" synced
     When user "Brian" uploads a file with content "uploaded content" to "/toShare/file.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Alice" folder "toShare" of the space "Personal" should contain these entries:
       | file.txt |
@@ -139,6 +147,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Uploader |
+    And user "Brian" has a share "toShare" synced
     When user "Brian" uploads a file with content "uploaded content" to "/toShare/file.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Alice" folder "toShare" of the space "Personal" should contain these entries:
       | file.txt |
@@ -154,6 +163,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "toShare" synced
     When user "Brian" uploads a file with content "overwritten content" to "/toShare/file.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Alice" folder "toShare" of the space "Personal" should contain these entries:
       | file.txt |
@@ -168,6 +178,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "toShare" synced
     When user "Brian" uploads a file with content "uploaded content" to "/toShare/file.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Brian" folder "toShare" of the space "Shares" should not contain these entries:
       | file.txt |
@@ -181,6 +192,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "FOLDER" synced
     And user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 5                                     |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
@@ -200,6 +212,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "FOLDER" synced
     And user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 5                                     |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
@@ -223,6 +236,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textFile.txt" synced
     When user "Brian" requests the checksum of file "/textFile.txt" in space "Shares" via propfind using the WebDAV API
     Then the HTTP status code should be "207"
     And the webdav checksum should match "SHA1:8cb2237d0679ca88db6464eac60da96345513964 MD5:827ccb0eea8a706c4c34a16891f84e7b ADLER32:02f80100"
@@ -241,6 +255,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textFile.txt" synced
     When user "Brian" downloads the file "/textFile.txt" of the space "Shares" using the WebDAV API
     Then the header checksum should match "SHA1:8cb2237d0679ca88db6464eac60da96345513964"
 
@@ -253,6 +268,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "FOLDER" synced
     When user "Brian" creates a new TUS resource for the space "Shares" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 16                                    |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
@@ -272,6 +288,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "FOLDER" synced
     When user "Brian" creates a new TUS resource for the space "Shares" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 16                                    |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
@@ -291,6 +308,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "FOLDER" synced
     And user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 16                                    |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
@@ -326,6 +344,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "FOLDER" synced
     And user "Brian" has created a new TUS resource for the space "Shares" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 10                                    |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
@@ -352,6 +371,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textFile.txt" synced
     When user "Brian" overwrites recently shared file with offset "0" and data "overwritten content" with checksum "SHA1 fe990d2686a0fc86004efc31f5bf2475a45d4905" via TUS inside of the space "Shares" using the WebDAV API with these headers:
       | Upload-Length   | 19                        |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
@@ -374,6 +394,7 @@ Feature: upload resources on share using TUS protocol
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textFile.txt" synced
     When user "Brian" overwrites recently shared file with offset "0" and data "overwritten content" with checksum "SHA1 fe990d2686a0fc86004efc31f5bf2475a45d4906" via TUS inside of the space "Shares" using the WebDAV API with these headers:
       | Upload-Length   | 19                        |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt

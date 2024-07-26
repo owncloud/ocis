@@ -17,6 +17,7 @@ Feature: REPORT request to Shares space
       | sharee          | Brian       |
       | shareType       | user        |
       | permissionsRole | Viewer      |
+    And user "Brian" has a share "folderMain" synced
 
 
   Scenario Outline: check the REPORT response of the found folder
@@ -94,6 +95,7 @@ Feature: REPORT request to Shares space
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Secure viewer |
+    And user "Brian" has a share "secureFolder" synced
     When user "Brian" searches for "secureFolder" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
@@ -133,6 +135,7 @@ Feature: REPORT request to Shares space
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Secure viewer |
+    And user "Brian" has a share "secure.txt" synced
     When user "Brian" searches for "secure.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions

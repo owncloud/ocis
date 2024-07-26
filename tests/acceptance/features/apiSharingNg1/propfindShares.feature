@@ -23,12 +23,14 @@ Feature: propfind a shares
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource>" synced
     And user "Carol" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource-2>" synced
     When user "Brian" sends PROPFIND request to space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Brian" should contain a space "Shares" with these key and value pairs:
@@ -60,12 +62,14 @@ Feature: propfind a shares
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource>" synced
     And user "Carol" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource-2>" synced
     When user "Brian" sends PROPFIND request from the space "Shares" to the resource "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Brian" should contain a space "Shares" with these key and value pairs:
@@ -102,12 +106,14 @@ Feature: propfind a shares
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
+    And user "Brian" has a share "folderToShare" synced
     And user "Carol" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Viewer        |
+    And user "Brian" has a share "folderToShare (1)" synced
     When user "Brian" sends PROPFIND request from the space "Shares" to the resource "folderToShare (1)" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response to user "Brian" should contain a mountpoint "folderToShare (1)" with these key and value pairs:
@@ -132,6 +138,7 @@ Feature: propfind a shares
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource>" synced
     When user "Brian" sends PROPFIND request to space "Shares" with depth "1" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" the key "oc:fileid" from PROPFIND response should match with shared-with-me drive-item-id of share "<resource>"

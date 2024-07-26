@@ -19,6 +19,7 @@ Feature: favorite
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" favorites element "/PARENT" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" folder "/PARENT" inside space "Shares" should be favorited
@@ -32,6 +33,7 @@ Feature: favorite
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" favorites element "/PARENT/parent.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" file "/PARENT/parent.txt" inside space "Shares" should be favorited
@@ -45,6 +47,7 @@ Feature: favorite
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" favorites element "/PARENT/sub-folder" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" folder "/PARENT/sub-folder" inside space "Shares" should be favorited
@@ -58,6 +61,7 @@ Feature: favorite
       | sharee          | Brian             |
       | shareType       | user              |
       | permissionsRole | File Editor       |
+    And user "Brian" has a share "parent.txt" synced
     When user "Brian" favorites element "/parent.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" file "/parent.txt" inside space "Shares" should be favorited

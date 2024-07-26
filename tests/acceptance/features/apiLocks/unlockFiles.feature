@@ -103,6 +103,7 @@ Feature: unlock locked items
       | sharee          | Brian             |
       | shareType       | user              |
       | permissionsRole | File Editor       |
+    And user "Brian" has a share "parent.txt" synced
     And user "Alice" has locked file "PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Brian" unlocks file "Shares/parent.txt" with the last created lock of file "PARENT/parent.txt" of user "Alice" using the WebDAV API
@@ -132,6 +133,7 @@ Feature: unlock locked items
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     When user "Brian" unlocks file "Shares/PARENT/parent.txt" with the last created lock of file "PARENT/parent.txt" of user "Alice" using the WebDAV API
     Then the HTTP status code should be "403"
     And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
@@ -157,6 +159,7 @@ Feature: unlock locked items
       | sharee          | Brian             |
       | shareType       | user              |
       | permissionsRole | File Editor       |
+    And user "Brian" has a share "parent.txt" synced
     And user "Brian" has locked file "Shares/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Brian" unlocks the last created lock of file "Shares/parent.txt" using the WebDAV API
@@ -184,6 +187,7 @@ Feature: unlock locked items
       | sharee          | Brian             |
       | shareType       | user              |
       | permissionsRole | File Editor       |
+    And user "Brian" has a share "parent.txt" synced
     And user "Brian" has locked file "Shares/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Alice" unlocks file "PARENT/parent.txt" with the last created lock of file "Shares/parent.txt" of user "Brian" using the WebDAV API
@@ -211,6 +215,7 @@ Feature: unlock locked items
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "PARENT" synced
     And user "Brian" has locked file "Shares/PARENT/parent.txt" setting the following properties
       | lockscope | <lock-scope> |
     When user "Alice" unlocks file "PARENT/parent.txt" with the last created lock of file "Shares/PARENT/parent.txt" of user "Brian" using the WebDAV API
@@ -289,6 +294,7 @@ Feature: unlock locked items
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | File Editor  |
+    And user "Brian" has a share "textfile.txt" synced
     And user "Brian" has locked file "textfile.txt" using file-id path "<dav-path>" setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |

@@ -96,6 +96,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | <permissions> |
+    And user "Brian" has a share "folder" synced
     And user "Brian" has uploaded file with content "some data" to "/test.txt"
     And we save it into "FILEID"
     When user "Brian" moves a file "test.txt" into "folder" inside space "Shares" using file-id path "<dav-path>"
@@ -372,6 +373,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | <permissions> |
+    And user "Brian" has a share "testshare" synced
     When user "Brian" moves a file "textfile.txt" into "testshare" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "/" of the space "project-space" should contain these files:
@@ -451,6 +453,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | <permissions> |
+    And user "Brian" has a share "folder" synced
     When user "Brian" moves a file "Shares/folder/test.txt" into "folder/sub-folder" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should contain these files:
@@ -504,6 +507,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "folder" synced
     When user "Brian" moves a file "Shares/folder/test.txt" into "folder/sub-folder" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should not contain these files:
@@ -532,12 +536,14 @@ Feature: moving/renaming file using file id
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <from-permissions> |
+    And user "Brian" has a share "testshare1" synced
     And user "Alice" has sent the following resource share invitation:
       | resource        | testshare2       |
       | space           | Personal         |
       | sharee          | Brian            |
       | shareType       | user             |
       | permissionsRole | <to-permissions> |
+    And user "Brian" has a share "testshare2" synced
     When user "Brian" moves a file "Shares/testshare1/textfile.txt" into "testshare2" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "testshare1" of the space "Shares" should contain these files:
@@ -567,6 +573,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | <permissions> |
+    And user "Brian" has a share "folder" synced
     When user "Brian" moves a file "Shares/folder/test.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:
@@ -599,6 +606,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | <permissions> |
+    And user "Brian" has a share "testshare" synced
     When user "Brian" moves a file "Shares/testshare/textfile.txt" into "/" inside space "project-space" using file-id path "<dav-path>"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "testshare" of the space "Shares" should contain these files:
@@ -714,6 +722,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "folder" synced
     When user "Brian" renames a file "Shares/folder/test.txt" into "folder/sub-folder/renamed.txt" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should contain these files:
@@ -738,6 +747,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Viewer   |
+    And user "Brian" has a share "folder" synced
     When user "Brian" renames a file "Shares/folder/test.txt" into "folder/sub-folder/renamed.txt" inside space "Shares" using file-id path "<dav-path>"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:

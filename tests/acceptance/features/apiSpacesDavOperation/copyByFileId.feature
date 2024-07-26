@@ -218,6 +218,7 @@ Feature: copying file using file id
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
+    And user "Brian" has a share "folder" synced
     And user "Brian" has uploaded file with content "some data" to "/test.txt"
     And we save it into "FILEID"
     And user "Brian" has a share "folder" synced

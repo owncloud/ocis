@@ -23,6 +23,7 @@ Feature: checking file versions using file id
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | <role>   |
+    And user "Brian" has a share "text.txt" synced
     When user "Alice" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
@@ -70,6 +71,7 @@ Feature: checking file versions using file id
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | <role>   |
+    And user "Brian" has a share "text.txt" synced
     And user "Alice" has moved file "text.txt" to "/testFolder/movedText.txt" in space "Project1"
     When user "Alice" gets the number of versions of file "/testFolder/movedText.txt" using file-id path "/meta/<<FILEID>>/v"
     Then the HTTP status code should be "207"
@@ -90,6 +92,7 @@ Feature: checking file versions using file id
       | sharee          | Brian      |
       | shareType       | user       |
       | permissionsRole | Viewer     |
+    And user "Brian" has a share "testFolder" synced
     And user "Alice" has sent the following space share invitation:
       | space           | Project1 |
       | sharee          | Brian    |
