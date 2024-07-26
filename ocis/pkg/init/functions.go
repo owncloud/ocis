@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path"
 	"time"
 )
@@ -60,4 +61,44 @@ func printBanner(targetPath, ocisAdminServicePassword, targetBackupConfig string
 			"An older config file has been backuped to\n %s\n\n",
 			targetBackupConfig)
 	}
+}
+
+// writeConfig writes the config to the target path and prints a banner
+func writeConfig(configPath, ocisAdminServicePassword, targetBackupConfig string, yamlOutput []byte) error {
+	targetPath := path.Join(configPath, configFilename)
+	err := os.WriteFile(targetPath, yamlOutput, 0600)
+	if err != nil {
+		return err
+	}
+	printBanner(targetPath, ocisAdminServicePassword, targetBackupConfig)
+	return nil
+}
+
+// writePatch writes the diff to a file
+func writePatch(configPath string, yamlOutput []byte) error {
+	fmt.Println("running in diff mode")
+	tmpFile := path.Join(configPath, "ocis.yaml.tmp")
+	err := os.WriteFile(tmpFile, yamlOutput, 0600)
+	if err != nil {
+		return err
+	}
+	fmt.Println("diff -u " + path.Join(configPath, configFilename) + " " + tmpFile)
+	cmd := exec.Command("diff", "-u", path.Join(configPath, configFilename), tmpFile)
+	stdout, err := cmd.Output()
+	if err == nil {
+		fmt.Println("no changes, your config is up to date")
+		return nil
+	}
+	fmt.Println(string(stdout))
+	err = os.Remove(tmpFile)
+	if err != nil {
+		return err
+	}
+	patchPath := path.Join(configPath, "ocis.config.patch")
+	err = os.WriteFile(patchPath, stdout, 0600)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("diff written to %s\n", patchPath)
+	return nil
 }

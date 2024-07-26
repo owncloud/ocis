@@ -3,7 +3,6 @@ package init
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path"
 
 	"github.com/gofrs/uuid"
@@ -23,19 +22,15 @@ var (
 
 // CreateConfig creates a config file with random passwords at configPath
 func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword string) error {
-	if diff {
-		if forceOverwrite {
-			return fmt.Errorf("diff and force-overwrite flags are mutually exclusive")
-		}
-		if adminPassword != "" {
-			return fmt.Errorf("diff and admin-password flags are mutually exclusive")
-		}
+	if diff && forceOverwrite {
+		return fmt.Errorf("diff and force-overwrite flags are mutually exclusive")
+	}
+	if diff && adminPassword != "" {
+		return fmt.Errorf("diff and admin-password flags are mutually exclusive")
 	}
 
-	if configExists(configPath) {
-		if !forceOverwrite && !diff {
-			return fmt.Errorf("config file already exists, use --force-overwrite to overwrite or --diff to show diff")
-		}
+	if configExists(configPath) && !forceOverwrite && !diff {
+		return fmt.Errorf("config file already exists, use --force-overwrite to overwrite or --diff to show diff")
 	}
 
 	err := checkConfigPath(configPath)
@@ -292,37 +287,7 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		return fmt.Errorf("could not marshall config into yaml: %s", err)
 	}
 	if diff {
-		fmt.Println("running in diff mode")
-		tmpFile := path.Join(configPath, "ocis.yaml.tmp")
-		err = os.WriteFile(tmpFile, yamlOutput, 0600)
-		if err != nil {
-			return err
-		}
-		fmt.Println("diff -u " + path.Join(configPath, configFilename) + " " + tmpFile)
-		cmd := exec.Command("diff", "-u", path.Join(configPath, configFilename), tmpFile)
-		stdout, err := cmd.Output()
-		if err == nil {
-			fmt.Println("no changes, your config is up to date")
-			return nil
-		}
-		fmt.Println(string(stdout))
-		err = os.Remove(tmpFile)
-		if err != nil {
-			return err
-		}
-		patchPath := path.Join(configPath, "ocis.config.patch")
-		err = os.WriteFile(patchPath, stdout, 0600)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("diff written to %s\n", patchPath)
-	} else {
-		targetPath := path.Join(configPath, configFilename)
-		err = os.WriteFile(targetPath, yamlOutput, 0600)
-		if err != nil {
-			return err
-		}
-		printBanner(targetPath, ocisAdminServicePassword, targetBackupConfig)
+		return writePatch(configPath, yamlOutput)
 	}
-	return nil
+	return writeConfig(configPath, ocisAdminServicePassword, targetBackupConfig, yamlOutput)
 }
