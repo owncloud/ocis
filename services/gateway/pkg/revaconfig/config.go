@@ -6,12 +6,15 @@ import (
 	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/utils"
+	pkgconfig "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/gateway/pkg/config"
 )
 
 // GatewayConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]interface{} {
+	localEndpoint := pkgconfig.LocalEndpoint(cfg.GRPC.Protocol, cfg.GRPC.Addr)
+
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
 			"tracing_enabled":      cfg.Tracing.Enabled,
@@ -39,8 +42,8 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 				"gateway": map[string]interface{}{
 					"applicationauthsvc": cfg.AuthAppEndpoint,
 					// registries are located on the gateway
-					"authregistrysvc":    cfg.Reva.Address,
-					"storageregistrysvc": cfg.Reva.Address,
+					"authregistrysvc":    localEndpoint,
+					"storageregistrysvc": localEndpoint,
 					"appregistrysvc":     cfg.AppRegistryEndpoint,
 					// user metadata is located on the users services
 					"preferencessvc":   cfg.UsersEndpoint,
