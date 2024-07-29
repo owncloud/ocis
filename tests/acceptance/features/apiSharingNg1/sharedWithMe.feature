@@ -5010,3 +5010,120 @@ Feature: an user gets the resources shared to them
       | resource      |
       | testfile.txt  |
       | FolderToShare |
+
+
+  Scenario Outline: sharee lists the shares after unhiding share (Personal space)
+    Given user "Alice" has created folder "folder"
+    And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Brian" has hidden the share "<resource>"
+    When user "Brian" unhides the shared resource "<resource>" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["@UI.Hidden"],
+        "properties": {
+          "@UI.Hidden": {
+            "const": false
+          }
+        }
+      }
+      """
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": false
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource     |
+      | testfile.txt |
+      | folder       |
+
+
+  Scenario Outline: sharee lists the shares after unhiding share (Project space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "testfile.txt"
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | NewSpace   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Brian" has hidden the share "<resource>"
+    When user "Brian" unhides the shared resource "<resource>" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["@UI.Hidden"],
+        "properties": {
+          "@UI.Hidden": {
+            "const": false
+          }
+        }
+      }
+      """
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden"
+              ],
+              "properties": {
+                "@UI.Hidden":{
+                  "const": false
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource      |
+      | testfile.txt  |
+      | FolderToShare |
