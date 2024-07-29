@@ -27,6 +27,12 @@ func InitCommand(cfg *config.Config) *cli.Command {
 				Usage:   "Allow insecure oCIS config",
 			},
 			&cli.BoolFlag{
+				Name:    "diff",
+				Aliases: []string{"d"},
+				Usage:   "Show the difference between the current config and the new one",
+				Value:   false,
+			},
+			&cli.BoolFlag{
 				Name:    "force-overwrite",
 				Aliases: []string{"f"},
 				EnvVars: []string{"OCIS_FORCE_CONFIG_OVERWRITE"},
@@ -57,7 +63,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 			} else if insecureFlag == strings.ToLower("true") || insecureFlag == strings.ToLower("yes") || insecureFlag == strings.ToLower("y") {
 				insecure = true
 			}
-			err := ocisinit.CreateConfig(insecure, c.Bool("force-overwrite"), c.String("config-path"), c.String("admin-password"))
+			err := ocisinit.CreateConfig(insecure, c.Bool("force-overwrite"), c.Bool("diff"), c.String("config-path"), c.String("admin-password"))
 			if err != nil {
 				log.Fatalf("Could not create config: %s", err)
 			}
