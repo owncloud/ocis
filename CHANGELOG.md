@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Added the debugging to full ocis docker example: [#9666](https://github.com/owncloud/ocis/pull/9666)
 * Enhancement - Add locking support for MS Office Online Server: [#9685](https://github.com/owncloud/ocis/pull/9685)
 * Enhancement - Bump reva: [#9690](https://github.com/owncloud/ocis/pull/9690)
+* Enhancement - Add `--diff` to the `ocis init` command: [#9693](https://github.com/owncloud/ocis/pull/9693)
 
 ## Details
 
@@ -257,6 +258,17 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9621
    https://github.com/owncloud/ocis/pull/9677
    https://github.com/owncloud/ocis/pull/9689
+
+* Enhancement - Add `--diff` to the `ocis init` command: [#9693](https://github.com/owncloud/ocis/pull/9693)
+
+   We have added a new flag `--diff` to the `ocis init` command to show the diff of
+   the configuration files. This is useful to see what has changed in the
+   configuration files when you run the `ocis init` command. The diff is stored to
+   the ocispath in the config folder as ocis.config.patch and can be applied using
+   the linux `patch` command.
+
+   https://github.com/owncloud/ocis/issues/3645
+   https://github.com/owncloud/ocis/pull/9693
 
 # Changelog for [6.1.0] (2024-07-08)
 
