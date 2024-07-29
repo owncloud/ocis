@@ -75,8 +75,14 @@ func WatchPath(s *Settings) {
 			}
 		}
 		var eventsEvents []EVENT
+		isDir := false
 
 		for _, eventStr := range eventsStr {
+			if eventStr == FlagIsdir {
+				isDir = true
+				continue
+			}
+
 			eventStr = strings.ToLower(eventStr)
 			event, ok := EVENT_MAP_REVERSE[eventStr]
 			if !ok {
@@ -89,6 +95,7 @@ func WatchPath(s *Settings) {
 		event := FileEvent{
 			Filename: prefix + file,
 			Events:   eventsEvents,
+			IsDir:    isDir,
 		}
 
 		// Send the file name to the channel

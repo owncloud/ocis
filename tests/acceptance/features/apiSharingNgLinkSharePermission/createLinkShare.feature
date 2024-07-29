@@ -1414,7 +1414,6 @@ Feature: Create a link share for a resource
     Examples:
       | drive    | message                                   |
       | Personal | cannot create link on personal space root |
-      | Shares   | no share permission                       |
 
 
   Scenario Outline: try to create an internal link share with password of a Personal and Shares drives using permissions endpoint

@@ -75,6 +75,7 @@ type Watcher interface {
 type scanItem struct {
 	Path        string
 	ForceRescan bool
+	Recurse     bool
 }
 
 // Tree manages a hierarchical tree
@@ -110,7 +111,7 @@ func New(lu node.PathLookup, bs Blobstore, um usermapper.Mapper, o *options.Opti
 		idCache:    cache,
 		propagator: propagator.New(lu, &o.Options),
 		scanQueue:  scanQueue,
-		scanDebouncer: NewScanDebouncer(500*time.Millisecond, func(item scanItem) {
+		scanDebouncer: NewScanDebouncer(1000*time.Millisecond, func(item scanItem) {
 			scanQueue <- item
 		}),
 		es:  es,
@@ -393,6 +394,10 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 	g.Go(func() error {
 		defer close(work)
 		for _, name := range names {
+			if isLockFile(name) {
+				continue
+			}
+
 			select {
 			case work <- name:
 			case <-ctx.Done():
@@ -876,4 +881,8 @@ func (t *Tree) readRecycleItem(ctx context.Context, spaceID, key, path string) (
 	}
 
 	return
+}
+
+func isLockFile(path string) bool {
+	return strings.HasSuffix(path, ".lock") || strings.HasSuffix(path, ".flock") || strings.HasSuffix(path, ".mlock")
 }

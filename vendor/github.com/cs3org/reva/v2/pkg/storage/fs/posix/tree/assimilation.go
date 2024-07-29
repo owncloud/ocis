@@ -46,10 +46,24 @@ import (
 type ScanDebouncer struct {
 	after      time.Duration
 	f          func(item scanItem)
-	pending    map[string]*time.Timer
+	pending    sync.Map
 	inProgress sync.Map
 
 	mutex sync.Mutex
+}
+
+type EventAction int
+
+const (
+	ActionCreate EventAction = iota
+	ActionUpdate
+	ActionMove
+	ActionDelete
+)
+
+type queueItem struct {
+	item  scanItem
+	timer *time.Timer
 }
 
 // NewScanDebouncer returns a new SpaceDebouncer instance
@@ -57,39 +71,62 @@ func NewScanDebouncer(d time.Duration, f func(item scanItem)) *ScanDebouncer {
 	return &ScanDebouncer{
 		after:      d,
 		f:          f,
-		pending:    map[string]*time.Timer{},
+		pending:    sync.Map{},
 		inProgress: sync.Map{},
 	}
 }
 
-// Debounce restars the debounce timer for the given space
+// Debounce restarts the debounce timer for the given space
 func (d *ScanDebouncer) Debounce(item scanItem) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
 	path := item.Path
 	force := item.ForceRescan
-	if t := d.pending[item.Path]; t != nil {
-		force = force || item.ForceRescan
-		t.Stop()
+	recurse := item.Recurse
+	if i, ok := d.pending.Load(item.Path); ok {
+		queueItem := i.(*queueItem)
+		force = force || queueItem.item.ForceRescan
+		recurse = recurse || queueItem.item.Recurse
+		queueItem.timer.Stop()
 	}
 
-	d.pending[item.Path] = time.AfterFunc(d.after, func() {
-		if _, ok := d.inProgress.Load(path); ok {
-			// Reschedule this run for when the previous run has finished
-			d.mutex.Lock()
-			d.pending[path].Reset(d.after)
-			d.mutex.Unlock()
-			return
-		}
+	d.pending.Store(item.Path, &queueItem{
+		item: item,
+		timer: time.AfterFunc(d.after, func() {
+			if _, ok := d.inProgress.Load(path); ok {
+				// Reschedule this run for when the previous run has finished
+				d.mutex.Lock()
+				if i, ok := d.pending.Load(path); ok {
+					i.(*queueItem).timer.Reset(d.after)
+				}
 
-		d.inProgress.Store(path, true)
-		defer d.inProgress.Delete(path)
-		d.f(scanItem{
-			Path:        path,
-			ForceRescan: force,
-		})
+				d.mutex.Unlock()
+				return
+			}
+
+			d.pending.Delete(path)
+			d.inProgress.Store(path, true)
+			defer d.inProgress.Delete(path)
+			d.f(scanItem{
+				Path:        path,
+				ForceRescan: force,
+				Recurse:     recurse,
+			})
+		}),
 	})
+}
+
+// InProgress returns true if the given path is currently being processed
+func (d *ScanDebouncer) InProgress(path string) bool {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+	if _, ok := d.pending.Load(path); ok {
+		return true
+	}
+
+	_, ok := d.inProgress.Load(path)
+	return ok
 }
 
 func (t *Tree) workScanQueue() {
@@ -103,17 +140,73 @@ func (t *Tree) workScanQueue() {
 					log.Error().Err(err).Str("path", item.Path).Msg("failed to assimilate item")
 					continue
 				}
+
+				if item.Recurse {
+					err = t.WarmupIDCache(item.Path, true)
+					if err != nil {
+						log.Error().Err(err).Str("path", item.Path).Msg("failed to warmup id cache")
+					}
+				}
 			}
 		}()
 	}
 }
 
 // Scan scans the given path and updates the id chache
-func (t *Tree) Scan(path string, forceRescan bool) error {
-	t.scanDebouncer.Debounce(scanItem{
-		Path:        path,
-		ForceRescan: forceRescan,
-	})
+func (t *Tree) Scan(path string, action EventAction, isDir bool, recurse bool) error {
+	// cases:
+	switch action {
+	case ActionCreate:
+		if !isDir {
+			// 1. New file (could be emitted as part of a new directory)
+			//	 -> assimilate file
+			//   -> scan parent directory recursively
+			if !t.scanDebouncer.InProgress(filepath.Dir(path)) {
+				t.scanDebouncer.Debounce(scanItem{
+					Path:        path,
+					ForceRescan: false,
+				})
+			}
+			t.scanDebouncer.Debounce(scanItem{
+				Path:        filepath.Dir(path),
+				ForceRescan: true,
+				Recurse:     true,
+			})
+		} else {
+			// 2. New directory
+			//  -> scan directory
+			t.scanDebouncer.Debounce(scanItem{
+				Path:        path,
+				ForceRescan: true,
+				Recurse:     true,
+			})
+		}
+
+	case ActionUpdate:
+		// 3. Updated file
+		//   -> update file unless parent directory is being rescanned
+		if !t.scanDebouncer.InProgress(filepath.Dir(path)) {
+			t.scanDebouncer.Debounce(scanItem{
+				Path:        path,
+				ForceRescan: true,
+			})
+		}
+
+	case ActionMove:
+		// 4. Moved file
+		//   -> update file
+		// 5. Moved directory
+		//   -> update directory and all children
+		t.scanDebouncer.Debounce(scanItem{
+			Path:        path,
+			ForceRescan: isDir,
+			Recurse:     isDir,
+		})
+
+	case ActionDelete:
+		_ = t.HandleFileDelete(path)
+	}
+
 	return nil
 }
 
@@ -183,44 +276,43 @@ func (t *Tree) getOwnerAndIDs(path string) (*userv1beta1.UserId, string, string,
 	return owner, nodeID, spaceID, parentID, nil
 }
 
-func (t *Tree) assimilate(item scanItem) error {
-	var err error
+func (t *Tree) findSpaceId(path string) (string, node.Attributes, error) {
 	// find the space id, scope by the according user
-	spaceID := []byte("")
-	spaceCandidate := item.Path
+	spaceCandidate := path
 	spaceAttrs := node.Attributes{}
 	for strings.HasPrefix(spaceCandidate, t.options.Root) {
-		spaceAttrs, err = t.lookup.MetadataBackend().All(context.Background(), spaceCandidate)
-		if err == nil && len(spaceAttrs[prefixes.SpaceIDAttr]) > 0 {
-			spaceID = spaceAttrs[prefixes.SpaceIDAttr]
+		spaceAttrs, err := t.lookup.MetadataBackend().All(context.Background(), spaceCandidate)
+		spaceID := spaceAttrs[prefixes.SpaceIDAttr]
+		if err == nil && len(spaceID) > 0 {
 			if t.options.UseSpaceGroups {
 				// set the uid and gid for the space
 				fi, err := os.Stat(spaceCandidate)
 				if err != nil {
-					return err
+					return "", spaceAttrs, err
 				}
 				sys := fi.Sys().(*syscall.Stat_t)
 				gid := int(sys.Gid)
 				_, err = t.userMapper.ScopeUserByIds(-1, gid)
 				if err != nil {
-					return err
+					return "", spaceAttrs, err
 				}
 			}
-			break
+
+			return string(spaceID), spaceAttrs, nil
 		}
 		spaceCandidate = filepath.Dir(spaceCandidate)
 	}
-	if len(spaceID) == 0 {
-		return fmt.Errorf("did not find space id for path")
-	}
+	return "", spaceAttrs, fmt.Errorf("could not find space for path %s", path)
+}
 
+func (t *Tree) assimilate(item scanItem) error {
 	var id []byte
-	if !item.ForceRescan {
-		// already assimilated?
-		id, err := t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.IDAttr)
-		if err == nil {
-			return t.lookup.(*lookup.Lookup).CacheID(context.Background(), string(spaceID), string(id), item.Path)
-		}
+	var err error
+
+	// First find the space id
+	spaceID, spaceAttrs, err := t.findSpaceId(item.Path)
+	if err != nil {
+		return err
 	}
 
 	// lock the file for assimilation
@@ -240,64 +332,62 @@ func (t *Tree) assimilate(item scanItem) error {
 	// check for the id attribute again after grabbing the lock, maybe the file was assimilated/created by us in the meantime
 	id, err = t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.IDAttr)
 	if err == nil {
-		previousPath, ok := t.lookup.(*lookup.Lookup).GetCachedID(context.Background(), string(spaceID), string(id))
+		previousPath, ok := t.lookup.(*lookup.Lookup).GetCachedID(context.Background(), spaceID, string(id))
 
-		_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), string(spaceID), string(id), item.Path)
-		if item.ForceRescan {
-			previousParentID, err := t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.ParentidAttr)
-			if err != nil {
-				return err
+		// This item had already been assimilated in the past. Update the path
+		_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), spaceID, string(id), item.Path)
+
+		previousParentID, _ := t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.ParentidAttr)
+
+		fi, err := t.updateFile(item.Path, string(id), spaceID)
+		if err != nil {
+			return err
+		}
+
+		// was it moved?
+		if ok && len(previousParentID) > 0 && previousPath != item.Path {
+			// purge original metadata. Only delete the path entry using DeletePath(reverse lookup), not the whole entry pair.
+			_ = t.lookup.(*lookup.Lookup).IDCache.DeletePath(context.Background(), previousPath)
+			_ = t.lookup.MetadataBackend().Purge(previousPath)
+
+			if fi.IsDir() {
+				// if it was moved and it is a directory we need to propagate the move
+				go func() { _ = t.WarmupIDCache(item.Path, false) }()
 			}
 
-			fi, err := t.updateFile(item.Path, string(id), string(spaceID))
-			if err != nil {
-				return err
-			}
-
-			// was it moved?
-			if ok && previousPath != item.Path {
-				// purge original metadata. Only delete the path entry using DeletePath(reverse lookup), not the whole entry pair.
-				_ = t.lookup.(*lookup.Lookup).IDCache.DeletePath(context.Background(), previousPath)
-				_ = t.lookup.MetadataBackend().Purge(previousPath)
-
-				if fi.IsDir() {
-					// if it was moved and it is a directory we need to propagate the move
-					go func() { _ = t.WarmupIDCache(item.Path, false) }()
+			parentID, err := t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.ParentidAttr)
+			if err == nil && len(parentID) > 0 {
+				ref := &provider.Reference{
+					ResourceId: &provider.ResourceId{
+						StorageId: t.options.MountID,
+						SpaceId:   spaceID,
+						OpaqueId:  string(parentID),
+					},
+					Path: filepath.Base(item.Path),
 				}
-
-				parentID, err := t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.ParentidAttr)
-				if err == nil && len(parentID) > 0 {
-					ref := &provider.Reference{
-						ResourceId: &provider.ResourceId{
-							StorageId: t.options.MountID,
-							SpaceId:   string(spaceID),
-							OpaqueId:  string(parentID),
-						},
-						Path: filepath.Base(item.Path),
-					}
-					oldRef := &provider.Reference{
-						ResourceId: &provider.ResourceId{
-							StorageId: t.options.MountID,
-							SpaceId:   string(spaceID),
-							OpaqueId:  string(previousParentID),
-						},
-						Path: filepath.Base(previousPath),
-					}
-					t.PublishEvent(events.ItemMoved{
-						SpaceOwner:   user,
-						Executant:    user,
-						Owner:        user,
-						Ref:          ref,
-						OldReference: oldRef,
-						Timestamp:    utils.TSNow(),
-					})
+				oldRef := &provider.Reference{
+					ResourceId: &provider.ResourceId{
+						StorageId: t.options.MountID,
+						SpaceId:   spaceID,
+						OpaqueId:  string(previousParentID),
+					},
+					Path: filepath.Base(previousPath),
 				}
+				t.PublishEvent(events.ItemMoved{
+					SpaceOwner:   user,
+					Executant:    user,
+					Owner:        user,
+					Ref:          ref,
+					OldReference: oldRef,
+					Timestamp:    utils.TSNow(),
+				})
 			}
+			// }
 		}
 	} else {
 		// assimilate new file
 		newId := uuid.New().String()
-		fi, err := t.updateFile(item.Path, newId, string(spaceID))
+		fi, err := t.updateFile(item.Path, newId, spaceID)
 		if err != nil {
 			return err
 		}
@@ -305,7 +395,7 @@ func (t *Tree) assimilate(item scanItem) error {
 		ref := &provider.Reference{
 			ResourceId: &provider.ResourceId{
 				StorageId: t.options.MountID,
-				SpaceId:   string(spaceID),
+				SpaceId:   spaceID,
 				OpaqueId:  newId,
 			},
 		}
@@ -455,17 +545,25 @@ func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
 		return err
 	}
 
-	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	sizes := make(map[string]int64)
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if strings.HasSuffix(path, ".flock") || strings.HasSuffix(path, ".mlock") {
+		// skip lock files
+		if isLockFile(path) {
 			return nil
 		}
 
+		// calculate tree sizes
+		if !info.IsDir() {
+			dir := filepath.Dir(path)
+			sizes[dir] += info.Size()
+		}
+
 		attribs, err := t.lookup.MetadataBackend().All(context.Background(), path)
-		if err == nil {
+		if err == nil && len(attribs[prefixes.IDAttr]) > 0 {
 			nodeSpaceID := attribs[prefixes.SpaceIDAttr]
 			if len(nodeSpaceID) > 0 {
 				spaceID = nodeSpaceID
@@ -496,10 +594,18 @@ func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
 			id, ok := attribs[prefixes.IDAttr]
 			if ok {
 				_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), string(spaceID), string(id), path)
-			} else if assimilate {
-				_ = t.Scan(path, false)
 			}
+		} else if assimilate {
+			_ = t.assimilate(scanItem{Path: path, ForceRescan: true})
 		}
 		return nil
 	})
+	if err != nil {
+		return err
+	}
+
+	for dir, size := range sizes {
+		_ = t.lookup.MetadataBackend().Set(context.Background(), dir, prefixes.TreesizeAttr, []byte(fmt.Sprintf("%d", size)))
+	}
+	return nil
 }

@@ -53,7 +53,7 @@ import (
 const getUserCtxErrMsg = "error getting user from context"
 
 func init() {
-	rgrpc.Register("publicshareprovider", New)
+	rgrpc.Register("publicshareprovider", NewDefault)
 }
 
 type config struct {
@@ -127,9 +127,8 @@ func parsePasswordPolicy(m map[string]interface{}) (*passwordPolicy, error) {
 	return p, nil
 }
 
-// New creates a new user share provider svc
-func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
-
+// New creates a new public share provider svc initialized from defaults
+func NewDefault(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err
@@ -146,6 +145,15 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		return nil, err
 	}
 
+	gatewaySelector, err := pool.GatewaySelector(sharedconf.GetGatewaySVC(c.GatewayAddr))
+	if err != nil {
+		return nil, err
+	}
+	return New(gatewaySelector, sm, c, p)
+}
+
+// New creates a new user share provider svc
+func New(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], sm publicshare.Manager, c *config, p *passwordPolicy) (rgrpc.Service, error) {
 	allowedPathsForShares := make([]*regexp.Regexp, 0, len(c.AllowedPathsForShares))
 	for _, s := range c.AllowedPathsForShares {
 		regex, err := regexp.Compile(s)
@@ -153,11 +161,6 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 			return nil, err
 		}
 		allowedPathsForShares = append(allowedPathsForShares, regex)
-	}
-
-	gatewaySelector, err := pool.GatewaySelector(sharedconf.GetGatewaySVC(c.GatewayAddr))
-	if err != nil {
-		return nil, err
 	}
 
 	service := &service{
@@ -233,7 +236,7 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 	}
 
 	// check that user has share permissions
-	if !sRes.GetInfo().GetPermissionSet().AddGrant {
+	if !isInternalLink && !sRes.GetInfo().GetPermissionSet().AddGrant {
 		return &link.CreatePublicShareResponse{
 			Status: status.NewInvalidArg(ctx, "no share permission"),
 		}, nil
@@ -477,14 +480,12 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 
 	isInternalLink := isInternalLink(req, ps)
 
-	// users should always be able to downgrade links to internal links
-	// when they are the creator of the link
-	// all other users should have the WritePublicLink permission
-	if !isInternalLink && !publicshare.IsCreatedByUser(ps, user) {
+	// check if the user has the permission in the user role
+	if !publicshare.IsCreatedByUser(ps, user) {
 		canWriteLink, err := utils.CheckPermission(ctx, permission.WritePublicLink, gatewayClient)
 		if err != nil {
 			return &link.UpdatePublicShareResponse{
-				Status: status.NewInternal(ctx, "error loading public share"),
+				Status: status.NewInternal(ctx, "error checking permission to write public share"),
 			}, err
 		}
 		if !canWriteLink {
@@ -501,8 +502,14 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 			Status: status.NewInternal(ctx, "failed to stat shared resource"),
 		}, err
 	}
+	if sRes.Status.Code != rpc.Code_CODE_OK {
+		return &link.UpdatePublicShareResponse{
+			Status: sRes.GetStatus(),
+		}, nil
 
-	if !publicshare.IsCreatedByUser(ps, user) {
+	}
+
+	if !isInternalLink && !publicshare.IsCreatedByUser(ps, user) {
 		if !sRes.GetInfo().GetPermissionSet().UpdateGrant {
 			return &link.UpdatePublicShareResponse{
 				Status: status.NewPermissionDenied(ctx, nil, "no permission to update public share"),
@@ -547,12 +554,16 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 	}
 
 	// enforce password if needed
-	canOptOut, err := utils.CheckPermission(ctx, permission.DeleteReadOnlyPassword, gatewayClient)
-	if err != nil {
-		return &link.UpdatePublicShareResponse{
-			Status: status.NewInternal(ctx, err.Error()),
-		}, nil
+	var canOptOut bool
+	if !isInternalLink {
+		canOptOut, err = utils.CheckPermission(ctx, permission.DeleteReadOnlyPassword, gatewayClient)
+		if err != nil {
+			return &link.UpdatePublicShareResponse{
+				Status: status.NewInternal(ctx, err.Error()),
+			}, nil
+		}
 	}
+
 	updatePassword := req.GetUpdate().GetType() == link.UpdatePublicShareRequest_Update_TYPE_PASSWORD
 	setPassword := grant.GetPassword()
 
