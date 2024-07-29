@@ -7,10 +7,8 @@ import (
 	"net/http"
 	"net/rpc"
 	"os"
-	"os/signal"
 	"sort"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/cenkalti/backoff"
@@ -349,9 +347,8 @@ func Start(ctx context.Context, o ...Option) error {
 		return err
 	}
 
-	// halt listens for interrupt signals and blocks.
-	halt := make(chan os.Signal, 1)
-	signal.Notify(halt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+	// get a cancel function to stop the service
+	ctx, cancel := context.WithCancel(ctx)
 
 	// tolerance controls backoff cycles from the supervisor.
 	tolerance := 5
@@ -363,7 +360,7 @@ func Start(ctx context.Context, o ...Option) error {
 			if e.Type() == suture.EventTypeBackoff {
 				totalBackoff++
 				if totalBackoff == tolerance {
-					halt <- os.Interrupt
+					cancel()
 				}
 			}
 			s.Log.Info().Str("event", e.String()).Msg(fmt.Sprintf("supervisor: %v", e.Map()["supervisor_name"]))
@@ -411,8 +408,8 @@ func Start(ctx context.Context, o ...Option) error {
 	// https://pkg.go.dev/github.com/thejerf/suture/v4@v4.0.0#Supervisor
 	go s.Supervisor.ServeBackground(s.context)
 
-	// trap will block on halt channel for interruptions.
-	go trap(s, halt)
+	// trap will block on context done channel for interruptions.
+	go trap(s, ctx)
 
 	for i, service := range s.Services {
 		scheduleServiceTokens(s, service)
@@ -495,9 +492,8 @@ func (s *Service) List(_ struct{}, reply *string) error {
 
 // trap blocks on halt channel. When the runtime is interrupted it
 // signals the controller to stop any supervised process.
-func trap(s *Service, halt chan os.Signal) {
-	<-halt
-	s.cancel()
+func trap(s *Service, ctx context.Context) {
+	<-ctx.Done()
 	for sName := range s.serviceToken {
 		for i := range s.serviceToken[sName] {
 			if err := s.Supervisor.Remove(s.serviceToken[sName][i]); err != nil {
