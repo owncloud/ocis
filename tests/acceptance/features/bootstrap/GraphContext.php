@@ -2797,4 +2797,25 @@ class GraphContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * @When user :user checks the activities in space :spaceName using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 *
+	 */
+	public function userChecksTheActivitiesInSpaceUsingTheGraphApi($user, $spaceName): void {
+		$spaceId = ($this->featureContext->spacesContext->getSpaceByName($user, $spaceName))["id"];
+		$response = GraphHelper::getActivities(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId
+		);
+		$this->featureContext->setResponse($response);
+	}
 }
