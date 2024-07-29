@@ -1042,7 +1042,7 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function hideSharedResource(string $sharee, string $shareID, bool $hide = true): ResponseInterface {
+	public function hideOrUnhideSharedResource(string $sharee, string $shareID, bool $hide = true): ResponseInterface {
 		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
 		$itemId = $shareSpaceId . '!' . $shareID;
 		$body['@UI.Hidden'] = $hide;
@@ -1148,7 +1148,7 @@ class SharingNgContext implements Context {
 	 */
 	public function userHidesTheSharedResourceUsingTheGraphApi(string $user):void {
 		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
-		$response = $this->hideSharedResource($user, $shareItemId);
+		$response = $this->hideOrUnhideSharedResource($user, $shareItemId);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -1163,7 +1163,7 @@ class SharingNgContext implements Context {
 	 */
 	public function userHasHiddenTheShare(string $user):void {
 		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
-		$response = $this->hideSharedResource($user, $shareItemId);
+		$response = $this->hideOrUnhideSharedResource($user, $shareItemId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
@@ -1178,7 +1178,7 @@ class SharingNgContext implements Context {
 	 */
 	public function userUnhidesTheSharedResourceUsingTheGraphApi(string $user):void {
 		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
-		$response = $this->hideSharedResource($user, $shareItemId, false);
+		$response = $this->hideOrUnhideSharedResource($user, $shareItemId, false);
 		$this->featureContext->setResponse($response);
 	}
 
