@@ -214,7 +214,7 @@ Feature: copy file
       | new              |
       | spaces           |
 
-  @issue-1239 @skipOnReva
+  @issue-1239 @issue-3874 @skipOnReva
   Scenario Outline: copy a file over the top of an existing folder received as a user share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -238,7 +238,30 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1239 @skipOnReva
+  @skipOnReva
+  Scenario Outline: copy a file over the top of an existing file received as a share
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "file to copy" to "copy.txt"
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has uploaded file with content "file to share" to "lorem.txt"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | lorem.txt   |
+      | space           | Personal    |
+      | sharee          | Alice       |
+      | shareType       | user        |
+      | permissionsRole | File Editor |
+    And user "Alice" has a share "lorem.txt" synced
+    When user "Alice" copies file "copy.txt" to "Shares/lorem.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "Shares/lorem.txt" for user "Alice" should be "file to copy"
+    And the content of file "lorem.txt" for user "Brian" should be "file to copy"
+    And as "Brian" file "lorem.txt" should exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+  @issue-1239 @issue-6999 @skipOnReva
   Scenario Outline: copy a folder over the top of an existing file received as a user share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -256,6 +279,30 @@ Feature: copy file
     And as "Alice" folder "/FOLDER/sample-folder" should exist
     And as "Alice" folder "/Shares/sharedfile1.txt/sample-folder" should exist
     And user "Alice" should not have any received shares
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+
+  @issue-6999 @skipOnReva
+  Scenario Outline: copy a folder over the top of an existing folder received as a share
+    Given using <dav-path-version> DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has created folder "BRIAN-Folder"
+    And user "Brian" has created folder "BRIAN-Folder/brian-folder"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BRIAN-Folder |
+      | space           | Personal     |
+      | sharee          | Alice        |
+      | shareType       | user         |
+      | permissionsRole | Editor       |
+    And user "Alice" has a share "BRIAN-Folder" synced
+    And user "Alice" has created folder "FOLDER/alice-folder"
+    When user "Alice" copies folder "FOLDER" to "Shares/BRIAN-Folder" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "FOLDER/alice-folder" should exist
+    And as "Alice" folder "Shares/BRIAN-Folder/alice-folder" should exist
+    And as "Alice" folder "Shares/BRIAN-Folder/brian-folder" should not exist
     Examples:
       | dav-path-version |
       | old              |

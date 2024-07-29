@@ -6,7 +6,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 Basic file management like up and download, move, copy, properties, trash, versions and chunking.
 
-#### [copy personal space file to shared folder root result share in decline state](https://github.com/owncloud/ocis/issues/6999)
+#### [COPY a folder to received share file/folder seems to work but no change in shares](https://github.com/owncloud/ocis/issues/6999)
 
 - [coreApiWebdavProperties/copyFile.feature:261](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L261)
 - [coreApiWebdavProperties/copyFile.feature:262](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L262)
@@ -15,12 +15,9 @@ Basic file management like up and download, move, copy, properties, trash, versi
 
 _ocdav: double-check the webdav property parsing when custom namespaces are used_
 
-- [coreApiWebdavProperties/setFileProperties.feature:32](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L32)
-- [coreApiWebdavProperties/setFileProperties.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L33)
-- [coreApiWebdavProperties/setFileProperties.feature:34](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L34)
-- [coreApiWebdavProperties/setFileProperties.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L69)
-- [coreApiWebdavProperties/setFileProperties.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L67)
-- [coreApiWebdavProperties/setFileProperties.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L68)
+- [coreApiWebdavProperties/setFileProperties.feature:120](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L120)
+- [coreApiWebdavProperties/setFileProperties.feature:121](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L121)
+- [coreApiWebdavProperties/setFileProperties.feature:122](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L122)
 
 #### [Cannot set custom webDav properties](https://github.com/owncloud/product/issues/264)
 

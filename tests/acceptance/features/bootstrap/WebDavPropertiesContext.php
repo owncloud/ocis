@@ -43,6 +43,18 @@ class WebDavPropertiesContext implements Context {
 	private array $storedETAG = [];
 
 	/**
+	 * @param string $namespaceString
+	 *
+	 * @return object
+	 */
+	public function parseNamespace(string $namespaceString): object {
+		//calculate the namespace prefix and namespace
+		$matches = [];
+		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
+		return (object)["namespace" => $matches[2], "prefix" => $matches[1]];
+	}
+
+	/**
 	 * @When /^user "([^"]*)" gets the properties of (?:file|folder|entry) "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
@@ -184,6 +196,37 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
+	 * @When user :user gets a custom property :propertyName of file :path
+	 *
+	 * @param string $user
+	 * @param string $propertyName
+	 * @param string $path
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userGetsCustomPropertyOfFile(
+		string $user,
+		string $propertyName,
+		string $path
+	):void {
+		$user = $this->featureContext->getActualUsername($user);
+		$properties = [$propertyName];
+		$response = WebDavHelper::propfind(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getUserPassword($user),
+				$path,
+				$properties,
+				$this->featureContext->getStepLineRef(),
+				"0",
+				"files",
+				$this->featureContext->getDavPathVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When user :user gets a custom property :propertyName with namespace :namespace of file :path
 	 *
 	 * @param string $user
@@ -194,7 +237,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsPropertiesOfFile(
+	public function userGetsPropertiesWithNamespaceOfFile(
 		string $user,
 		string $propertyName,
 		string $namespace,
@@ -204,8 +247,7 @@ class WebDavPropertiesContext implements Context {
 		$properties = [
 			$namespace => $propertyName
 		];
-		$this->featureContext->setResponse(
-			WebDavHelper::propfind(
+		$response = WebDavHelper::propfind(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getUserPassword($user),
@@ -215,8 +257,8 @@ class WebDavPropertiesContext implements Context {
 				"0",
 				"files",
 				$this->featureContext->getDavPathVersion()
-			)
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -258,19 +300,19 @@ class WebDavPropertiesContext implements Context {
 	/**
 	 * @param string $user user id who sets the property
 	 * @param string $propertyName name of property in Clark notation
-	 * @param string $namespace namespace in the form of "x1='http://whatever.org/ns'"
 	 * @param string $path path on which to set properties to
 	 * @param string $propertyValue property value
+	 * @param string|null $namespace namespace in the form of "x1='http://whatever.org/ns'"
 	 *
 	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function setPropertyWithNamespaceOfResource(
+	public function setResourceProperty(
 		string $user,
 		string $propertyName,
-		string $namespace,
 		string $path,
-		string $propertyValue
+		string $propertyValue,
+		string $namespace = null,
 	):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		return WebDavHelper::proppatch(
@@ -287,7 +329,33 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" sets property "([^"]*)"  with namespace "([^"]*)" of (?:file|folder|entry) "([^"]*)" to "([^"]*)" using the WebDAV API$/
+	 * @Given /^user "([^"]*)" sets property "([^"]*)" of (?:file|folder|entry) "([^"]*)" to "([^"]*)"$/
+	 *
+	 * @param string $user user id who sets the property
+	 * @param string $propertyName name of property in Clark notation
+	 * @param string $path path on which to set properties to
+	 * @param string $propertyValue property value
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userSetsPropertyOfEntryTo(
+		string $user,
+		string $propertyName,
+		string $path,
+		string $propertyValue
+	):void {
+		$response = $this->setResourceProperty(
+			$user,
+			$propertyName,
+			$path,
+			$propertyValue
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" sets property "([^"]*)" with namespace "([^"]*)" of (?:file|folder|entry) "([^"]*)" to "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user user id who sets the property
 	 * @param string $propertyName name of property in Clark notation
@@ -305,14 +373,40 @@ class WebDavPropertiesContext implements Context {
 		string $path,
 		string $propertyValue
 	):void {
-		$response = $this->setPropertyWithNamespaceOfResource(
+		$response = $this->setResourceProperty(
 			$user,
 			$propertyName,
-			$namespace,
+			$path,
+			$propertyValue,
+			$namespace
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has set property "([^"]*)" of (?:file|folder|entry) "([^"]*)" to "([^"]*)"$/
+	 *
+	 * @param string $user user id who sets the property
+	 * @param string $propertyName name of property in Clark notation
+	 * @param string $path path on which to set properties to
+	 * @param string $propertyValue property value
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userHasSetPropertyOfEntryTo(
+		string $user,
+		string $propertyName,
+		string $path,
+		string $propertyValue
+	):void {
+		$response = $this->setResourceProperty(
+			$user,
+			$propertyName,
 			$path,
 			$propertyValue
 		);
-		$this->featureContext->setResponse($response);
+		$this->featureContext->theHTTPStatusCodeShouldBe(207, "", $response);
 	}
 
 	/**
@@ -334,46 +428,33 @@ class WebDavPropertiesContext implements Context {
 		string $path,
 		string $propertyValue
 	):void {
-		$response = $this->setPropertyWithNamespaceOfResource(
+		$response = $this->setResourceProperty(
 			$user,
 			$propertyName,
-			$namespace,
 			$path,
-			$propertyValue
+			$propertyValue,
+			$namespace
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(207, "", $response);
 	}
 
 	/**
-	 * @Then /^the response should contain a custom "([^"]*)" property with namespace "([^"]*)" and value "([^"]*)"$/
+	 * @Then /^the response should contain a custom "([^"]*)" property with value "(([^"\\]|\\.)*)"$/
 	 *
 	 * @param string $propertyName
-	 * @param string $namespaceString
 	 * @param string $propertyValue
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theResponseShouldContainACustomPropertyWithValue(
-		string $propertyName,
-		string $namespaceString,
-		string $propertyValue
-	):void {
+	public function theResponseShouldContainCustomPropertyWithValue(string $propertyName, string $propertyValue): void {
+		$propertyValue = \str_replace('\"', '"', $propertyValue);
 		$responseXmlObject = $this->featureContext->getResponseXml(
 			$this->featureContext->getResponse(),
 			__METHOD__
 		);
-		//calculate the namespace prefix and namespace
-		$matches = [];
-		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
-		$nameSpace = $matches[2];
-		$nameSpacePrefix = $matches[1];
-		$responseXmlObject->registerXPathNamespace(
-			$nameSpacePrefix,
-			$nameSpace
-		);
 		$xmlPart = $responseXmlObject->xpath(
-			"//d:prop/" . "$nameSpacePrefix:$propertyName"
+			"//d:prop/" . "$propertyName"
 		);
 		Assert::assertArrayHasKey(
 			0,
@@ -389,7 +470,7 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
-	 * @Then /^the response should contain a custom "([^"]*)" property with namespace "([^"]*)" and complex value "(([^"\\]|\\.)*)"$/
+	 * @Then /^the response should contain a custom "([^"]*)" property with namespace "([^"]*)" and value "([^"]*)"$/
 	 *
 	 * @param string $propertyName
 	 * @param string $namespaceString
@@ -398,7 +479,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theResponseShouldContainACustomPropertyWithComplexValue(
+	public function theResponseShouldContainACustomPropertyWithNamespaceAndValue(
 		string $propertyName,
 		string $namespaceString,
 		string $propertyValue
@@ -409,17 +490,13 @@ class WebDavPropertiesContext implements Context {
 			$this->featureContext->getResponse(),
 			__METHOD__
 		);
-		//calculate the namespace prefix and namespace
-		$matches = [];
-		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
-		$nameSpace = $matches[2];
-		$nameSpacePrefix = $matches[1];
+		$ns = $this->parseNamespace($namespaceString);
 		$responseXmlObject->registerXPathNamespace(
-			$nameSpacePrefix,
-			$nameSpace
+			$ns->prefix,
+			$ns->namespace
 		);
 		$xmlPart = $responseXmlObject->xpath(
-			"//d:prop/" . "$nameSpacePrefix:$propertyName" . "/*"
+			"//d:prop/$propertyName"
 		);
 		Assert::assertArrayHasKey(
 			0,
@@ -428,9 +505,9 @@ class WebDavPropertiesContext implements Context {
 		);
 		Assert::assertEquals(
 			$propertyValue,
-			$xmlPart[0]->asXML(),
+			$xmlPart[0]->__toString(),
 			"\"$propertyName\" has a value \"" .
-			$xmlPart[0]->asXML() . "\" but \"$propertyValue\" expected"
+			$xmlPart[0]->__toString() . "\" but \"$propertyValue\" expected"
 		);
 	}
 
@@ -454,6 +531,38 @@ class WebDavPropertiesContext implements Context {
 		Assert::assertTrue(
 			isset($xmlPart[0]),
 			"Cannot find property \"$property/$childProperty\""
+		);
+	}
+
+	/**
+	 * @Then the xml response should contain a property :key
+	 *
+	 * @param string $key
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theResponseShouldContainProperty(string $key): void {
+		$this->checkResponseContainsProperty(
+			$this->featureContext->getResponse(),
+			$key
+		);
+	}
+
+	/**
+	 * @Then the xml response should contain a property :key with namespace :namespace
+	 *
+	 * @param string $key
+	 * @param string $namespace
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theResponseShouldContainPropertyWithNamespace(string $key, string $namespace): void {
+		$this->checkResponseContainsProperty(
+			$this->featureContext->getResponse(),
+			$key,
+			$namespace
 		);
 	}
 
@@ -528,6 +637,40 @@ class WebDavPropertiesContext implements Context {
 	/**
 	 * @param ResponseInterface $response
 	 * @param string $key
+	 * @param string|null $namespaceString
+	 *
+	 * @return SimpleXMLElement
+	 * @throws Exception
+	 */
+	public function checkResponseContainsProperty(ResponseInterface $response, string $key, string $namespaceString = null): SimpleXMLElement {
+		$xmlPart = $this->featureContext->getResponseXml($response);
+
+		$nsPrefix = "";
+		if ($namespaceString !== null) {
+			$ns = $this->parseNamespace($namespaceString);
+			$xmlPart->registerXPathNamespace(
+				$ns->prefix,
+				$ns->namespace
+			);
+			$nsPrefix = $ns->prefix . ":";
+		}
+
+		$match = $xmlPart->xpath("//d:prop/$key");
+
+		Assert::assertTrue(
+			isset($match[0]),
+			"Cannot find property \"$key\""
+		);
+		Assert::assertEquals(
+			$nsPrefix.$match[0]->getName(),
+			$key
+		);
+		return $match[0];
+	}
+
+	/**
+	 * @param ResponseInterface $response
+	 * @param string $key
 	 * @param string $expectedValue
 	 * @param string $altExpectedValue
 	 * @param string|null $user
@@ -542,15 +685,8 @@ class WebDavPropertiesContext implements Context {
 		string $altExpectedValue,
 		?string $user = null
 	):void {
-		$xmlPart = $this->featureContext->getResponseXml($response);
-		$xmlPart = $xmlPart->xpath(
-			"//d:prop/$key"
-		);
-		Assert::assertTrue(
-			isset($xmlPart[0]),
-			"Cannot find property \"$key\""
-		);
-		$value = $xmlPart[0]->__toString();
+		$xmlPart = $this->checkResponseContainsProperty($response, $key);
+		$value = $xmlPart->__toString();
 		$expectedValue = $this->featureContext->substituteInLineCodes(
 			$expectedValue,
 			$user
