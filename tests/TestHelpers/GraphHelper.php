@@ -2021,7 +2021,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function hideShare(
+	public static function hideOrUnhideShare(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,

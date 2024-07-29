@@ -1036,16 +1036,17 @@ class SharingNgContext implements Context {
 	/**
 	 * @param string $sharee
 	 * @param string $shareID
+	 * @param bool $hide
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function hideSharedResource(string $sharee, string $shareID): ResponseInterface {
+	public function hideSharedResource(string $sharee, string $shareID, bool $hide = true): ResponseInterface {
 		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
 		$itemId = $shareSpaceId . '!' . $shareID;
-		$body['@UI.Hidden'] = true;
-		return GraphHelper::hideShare(
+		$body['@UI.Hidden'] = $hide;
+		return GraphHelper::hideOrUnhideShare(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($sharee),
@@ -1164,6 +1165,21 @@ class SharingNgContext implements Context {
 		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		$response = $this->hideSharedResource($user, $shareItemId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+	}
+
+	/**
+	 * @When user :user unhides the shared resource :sharedResource using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userUnhidesTheSharedResourceUsingTheGraphApi(string $user):void {
+		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$response = $this->hideSharedResource($user, $shareItemId, false);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
