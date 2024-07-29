@@ -366,7 +366,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.21.1-0.20240725094850-569a027d5cc6
+# github.com/cs3org/reva/v2 v2.22.0
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -1626,7 +1626,7 @@ github.com/owncloud/libre-graph-api-go
 # github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
 ## explicit; go 1.12
 github.com/oxtoacart/bpool
-# github.com/pablodz/inotifywaitgo v0.0.6
+# github.com/pablodz/inotifywaitgo v0.0.7
 ## explicit; go 1.21
 github.com/pablodz/inotifywaitgo/inotifywaitgo
 # github.com/patrickmn/go-cache v2.1.0+incompatible

@@ -59,6 +59,9 @@ const (
 	EventDeleteSelf = "delete_self"
 	// The  filesystem  on  which  a  watched  file or directory resides was unmounted.  After this event the file or directory is no longer being 	watched.  Note that this event can occur even if it is not explicitly being listened to.
 	EventUnmount = "unmount"
+
+	// The subject of this event is a directory
+	FlagIsdir = "ISDIR"
 )
 
 type EVENT int
@@ -84,6 +87,7 @@ const (
 type FileEvent struct {
 	Filename string
 	Events   []EVENT
+	IsDir    bool
 }
 
 var EVENT_MAP = map[int]string{

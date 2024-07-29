@@ -2,7 +2,6 @@ package tree
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/pablodz/inotifywaitgo/inotifywaitgo"
 )
@@ -43,20 +42,20 @@ func (iw *InotifyWatcher) Watch(path string) {
 		select {
 		case event := <-events:
 			for _, e := range event.Events {
-				if strings.HasSuffix(event.Filename, ".flock") || strings.HasSuffix(event.Filename, ".mlock") {
+				if isLockFile(event.Filename) {
 					continue
 				}
 				switch e {
 				case inotifywaitgo.DELETE:
 					go func() { _ = iw.tree.HandleFileDelete(event.Filename) }()
 				case inotifywaitgo.CREATE:
-					go func() { _ = iw.tree.Scan(event.Filename, false) }()
+					go func() { _ = iw.tree.Scan(event.Filename, ActionCreate, event.IsDir, false) }()
 				case inotifywaitgo.MOVED_TO:
 					go func() {
-						_ = iw.tree.Scan(event.Filename, true)
+						_ = iw.tree.Scan(event.Filename, ActionMove, event.IsDir, true)
 					}()
 				case inotifywaitgo.CLOSE_WRITE:
-					go func() { _ = iw.tree.Scan(event.Filename, true) }()
+					go func() { _ = iw.tree.Scan(event.Filename, ActionUpdate, event.IsDir, true) }()
 				}
 			}
 

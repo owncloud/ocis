@@ -41,21 +41,21 @@ func (w *GpfsWatchFolderWatcher) Watch(topic string) {
 			continue
 		}
 
-		if strings.HasSuffix(lwev.Path, ".flock") || strings.HasSuffix(lwev.Path, ".mlock") {
+		if isLockFile(lwev.Path) {
 			continue
 		}
 
 		switch {
 		case strings.Contains(lwev.Event, "IN_CREATE"):
-			go func() { _ = w.tree.Scan(lwev.Path, false) }()
+			go func() { _ = w.tree.Scan(lwev.Path, ActionCreate, false, false) }()
 		case strings.Contains(lwev.Event, "IN_CLOSE_WRITE"):
 			bytesWritten, err := strconv.Atoi(lwev.BytesWritten)
 			if err == nil && bytesWritten > 0 {
-				go func() { _ = w.tree.Scan(lwev.Path, true) }()
+				go func() { _ = w.tree.Scan(lwev.Path, ActionUpdate, false, true) }()
 			}
 		case strings.Contains(lwev.Event, "IN_MOVED_TO"):
 			go func() {
-				_ = w.tree.Scan(lwev.Path, true)
+				_ = w.tree.Scan(lwev.Path, ActionMove, false, true)
 				_ = w.tree.WarmupIDCache(lwev.Path, false)
 			}()
 		}
