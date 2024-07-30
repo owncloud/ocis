@@ -49,12 +49,21 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Ignore address for kubernetes registry: [#9490](https://github.com/owncloud/ocis/pull/9490)
 * Bugfix - Repair nats-js-kv registry: [#9656](https://github.com/owncloud/ocis/pull/9656)
 * Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Bump reva: [#9715](https://github.com/owncloud/ocis/pull/9715)
 
 ## Details
+
+* Bugfix - Ignore address for kubernetes registry: [#9490](https://github.com/owncloud/ocis/pull/9490)
+
+   We no longer pass an address to the go micro kubernetes registry implementation.
+   This causes the implementation to autodetect the namespace and not hardcode it
+   to `default`.
+
+   https://github.com/owncloud/ocis/pull/9490
 
 * Bugfix - Repair nats-js-kv registry: [#9656](https://github.com/owncloud/ocis/pull/9656)
 
