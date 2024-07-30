@@ -42,6 +42,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -245,6 +246,9 @@ func (s *Server) registerServices() error {
 	if s.conf.TLSSettings.tlsConfig != nil {
 		opts = append(opts, grpc.Creds(credentials.NewTLS(s.conf.TLSSettings.tlsConfig)))
 	}
+	opts = append(opts, grpc.KeepaliveParams(keepalive.ServerParameters{
+		MaxConnectionAge: GetMaxConnectionAge(), // this forces clients to reconnect after 30 seconds, triggering a new DNS lookup to pick up new IPs
+	}))
 
 	grpcServer := grpc.NewServer(opts...)
 

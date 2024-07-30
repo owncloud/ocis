@@ -26,6 +26,7 @@ import (
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/eosgrpc"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/eosgrpchome"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/eoshome"
+	_ "github.com/cs3org/reva/v2/pkg/storage/fs/hello"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/local"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/localhome"
 	_ "github.com/cs3org/reva/v2/pkg/storage/fs/nextcloud"

@@ -44,7 +44,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	tusd "github.com/tus/tusd/pkg/handler"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 )
 
 var defaultFilePerm = os.FileMode(0664)
@@ -388,7 +388,7 @@ func (upload *fileUpload) WriteChunk(ctx context.Context, offset int64, src io.R
 }
 
 // GetReader returns an io.Reader for the upload
-func (upload *fileUpload) GetReader(ctx context.Context) (io.Reader, error) {
+func (upload *fileUpload) GetReader(ctx context.Context) (io.ReadCloser, error) {
 	return os.Open(upload.binPath)
 }
 
