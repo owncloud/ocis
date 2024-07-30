@@ -51,6 +51,8 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Repair nats-js-kv registry: [#9656](https://github.com/owncloud/ocis/pull/9656)
 * Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
+* Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
+* Enhancement - Bump reva: [#9715](https://github.com/owncloud/ocis/pull/9715)
 
 ## Details
 
@@ -65,6 +67,17 @@ The following sections list the changes for unreleased.
 * Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
 
    https://github.com/owncloud/ocis/pull/9692
+
+* Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
+
+   The CS3 gateway can directly to itself when it wants to talk to the registries
+   running in the same reva runtime.
+
+   https://github.com/owncloud/ocis/pull/9714
+
+* Enhancement - Bump reva: [#9715](https://github.com/owncloud/ocis/pull/9715)
+
+   https://github.com/owncloud/ocis/pull/9715
 
 # Changelog for [6.2.0] (2024-07-30)
 
