@@ -261,9 +261,6 @@ github.com/blevesearch/zapx/v16
 # github.com/bluele/gcache v0.0.2
 ## explicit; go 1.15
 github.com/bluele/gcache
-# github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f
-## explicit
-github.com/bmizerany/pat
 # github.com/bombsimon/logrusr/v3 v3.1.0
 ## explicit; go 1.17
 github.com/bombsimon/logrusr/v3
@@ -1100,6 +1097,8 @@ github.com/golang/snappy
 # github.com/gomodule/redigo v1.8.9
 ## explicit; go 1.16
 github.com/gomodule/redigo/redis
+# github.com/google/flatbuffers v2.0.8+incompatible
+## explicit
 # github.com/google/go-cmp v0.6.0
 ## explicit; go 1.13
 github.com/google/go-cmp/cmp
@@ -1882,9 +1881,6 @@ github.com/trustelem/zxcvbn/internal/mathutils
 github.com/trustelem/zxcvbn/match
 github.com/trustelem/zxcvbn/matching
 github.com/trustelem/zxcvbn/scoring
-# github.com/tus/tusd v1.13.0
-## explicit; go 1.16
-github.com/tus/tusd/pkg/handler
 # github.com/tus/tusd/v2 v2.4.0
 ## explicit; go 1.20
 github.com/tus/tusd/v2/pkg/handler
