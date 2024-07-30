@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-30-09-43-34]
+[#deprecation-note-2024-07-30-11-21-37]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -291,7 +291,7 @@ a| [subs=-attributes]
 Allow credentials for CORS. See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 
 a|`WEB_ASSET_PATH` +
-xref:deprecation-note-2024-07-30-09-43-34[Deprecation Note]
+xref:deprecation-note-2024-07-30-11-21-37[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -537,6 +537,61 @@ a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
 A list to disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Example: 'com.github.owncloud.web.files.search,com.github.owncloud.web.files.print'. See the Environment Variable Types description for more details.
+
+a|`WEB_OPTION_EMBED_ENABLED` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Defines whether Web should be running in 'embed' mode. Setting this to 'true' will enable a stripped down version of Web with reduced functionality used to integrate Web into other applications like via iFrame. Setting it to 'false' or not setting it (default) will run Web as usual with all functionality enabled. See the text description for more details.
+
+a|`WEB_OPTION_EMBED_TARGET` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Defines how Web is being integrated when running in 'embed' mode. Currently, the only supported options are '' (empty) and 'location'. With '' which is the default, Web will run regular as defined via the 'embed.enabled' config option. With 'location', Web will run embedded as location picker. Resource selection will be disabled and the selected resources array always includes the current folder as the only item. See the text description for more details.
+
+a|`WEB_OPTION_EMBED_MESSAGES_ORIGIN` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Defines a URL under which Web can be integrated via iFrame in 'embed' mode. Note that setting this is mandatory when running Web in 'embed' mode. Use '*' as value to allow running the iFrame under any URL, although this is not recommended for security reasons. See the text description for more details.
+
+a|`WEB_OPTION_EMBED_DELEGATE_AUTHENTICATION` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Defines whether Web should require authentication to be done by the parent application when running in 'embed' mode. If set to 'true' Web will not try to authenticate the user on its own but will require an access token coming from the parent application. Defaults to being unset.
+
+a|`WEB_OPTION_EMBED_DELEGATE_AUTHENTICATION_ORIGIN` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Defines the host to validate the message event origin against when running Web in 'embed' mode with delegated authentication. Defaults to event message origin validation being omitted, which is only recommended for development setups.
 
 a|`WEB_OPTION_USER_LIST_REQUIRES_FILTER` +
 

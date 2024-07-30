@@ -109,7 +109,12 @@ web:
       loginUrl: ""
       tokenStorageLocal: true
       disabledExtensions: []
-      embed: null
+      embed:
+        enabled: ""
+        target: ""
+        messagesOrigin: ""
+        delegateAuthentication: false
+        delegateAuthenticationOrigin: ""
       userListRequiresFilter: false
       concurrentRequests:
         resourceBatchActions: 0
