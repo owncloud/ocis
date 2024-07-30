@@ -79,22 +79,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 
-a| `_registryAddressEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `_registryEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
 a| `_registryPasswordEnv` +
 a| [subs=-attributes]
 ++ ++
