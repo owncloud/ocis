@@ -15,7 +15,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.10.0
 	github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb
-	github.com/cs3org/reva/v2 v2.22.0
+	github.com/cs3org/reva/v2 v2.22.1-0.20240730105121-548644c31544
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -307,6 +307,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/segmentio/kafka-go v0.4.47 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
+	github.com/sercand/kuberesolver/v5 v5.1.1 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sethvargo/go-password v0.2.0 // indirect
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect

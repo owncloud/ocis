@@ -22,7 +22,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -106,13 +105,11 @@ func DefaultProvider() trace.TracerProvider {
 
 // getOtelTracerProvider returns a new TracerProvider, configure for the specified service
 func getOtlpTracerProvider(options Options) trace.TracerProvider {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 	transportCredentials := options.TransportCredentials
 	if options.Insecure {
 		transportCredentials = insecure.NewCredentials()
 	}
-	conn, err := grpc.DialContext(ctx, options.Endpoint,
+	conn, err := grpc.NewClient(options.Endpoint,
 		grpc.WithTransportCredentials(transportCredentials),
 	)
 	if err != nil {

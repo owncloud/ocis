@@ -325,12 +325,12 @@ func getGRPCConfig(opaque *typespb.Opaque) (bool, bool) {
 
 func getConn(host string, ins, skipverify bool) (*grpc.ClientConn, error) {
 	if ins {
-		return grpc.Dial(host, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		return grpc.NewClient(host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	}
 
 	// TODO(labkode): if in the future we want client-side certificate validation,
 	// we need to load the client cert here
 	tlsconf := &tls.Config{InsecureSkipVerify: skipverify}
 	creds := credentials.NewTLS(tlsconf)
-	return grpc.Dial(host, grpc.WithTransportCredentials(creds))
+	return grpc.NewClient(host, grpc.WithTransportCredentials(creds))
 }

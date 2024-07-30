@@ -20,6 +20,7 @@ package pool
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	appProvider "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
@@ -43,8 +44,15 @@ import (
 	tx "github.com/cs3org/go-cs3apis/cs3/tx/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/registry"
 	"github.com/pkg/errors"
+	"github.com/sercand/kuberesolver/v5"
 	"google.golang.org/grpc"
 )
+
+func init() {
+	// grpc go resolver.Register must only be called during initialization time (i.e. in
+	// an init() function), and is not thread-safe.
+	kuberesolver.RegisterInCluster()
+}
 
 type Selectable[T any] interface {
 	Next(opts ...Option) (T, error)
@@ -93,8 +101,19 @@ func (s *Selector[T]) Next(opts ...Option) (T, error) {
 		opt(&options)
 	}
 
-	address := s.id
-	if options.registry != nil {
+	target := s.id
+	// if the target is given as a recognized gRPC URI, skip registry lookup
+	// see https://github.com/grpc/grpc/blob/master/doc/naming.md#name-syntax
+	prefix := strings.SplitN(s.id, ":", 2)[0]
+	switch {
+	case prefix == "dns":
+		fallthrough
+	case prefix == "unix":
+		fallthrough
+	case prefix == "kubernetes":
+		// use target as is and skip registry lookup
+	case options.registry != nil:
+		// use service registry to look up address
 		services, err := options.registry.GetService(s.id)
 		if err != nil {
 			return *new(T), fmt.Errorf("%s: %w", s.id, err)
@@ -104,22 +123,23 @@ func (s *Selector[T]) Next(opts ...Option) (T, error) {
 		if err != nil {
 			return *new(T), fmt.Errorf("%s: %w", s.id, err)
 		}
-
-		address = nodeAddress
+		target = nodeAddress
+	default:
+		// if no registry is available, use the target as is
 	}
 
-	existingClient, ok := s.clientMap.Load(address)
+	existingClient, ok := s.clientMap.Load(target)
 	if ok {
 		return existingClient.(T), nil
 	}
 
-	conn, err := NewConn(address, allOpts...)
+	conn, err := NewConn(target, allOpts...)
 	if err != nil {
-		return *new(T), errors.Wrap(err, fmt.Sprintf("could not create connection for %s to %s", s.id, address))
+		return *new(T), errors.Wrap(err, fmt.Sprintf("could not create connection for %s to %s", s.id, target))
 	}
 
 	newClient := s.clientFactory(conn)
-	s.clientMap.Store(address, newClient)
+	s.clientMap.Store(target, newClient)
 
 	return newClient, nil
 }
