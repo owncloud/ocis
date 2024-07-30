@@ -213,15 +213,15 @@ class WebDavPropertiesContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$properties = [$propertyName];
 		$response = WebDavHelper::propfind(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getActualUsername($user),
-				$this->featureContext->getUserPassword($user),
-				$path,
-				$properties,
-				$this->featureContext->getStepLineRef(),
-				"0",
-				"files",
-				$this->featureContext->getDavPathVersion()
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getUserPassword($user),
+			$path,
+			$properties,
+			$this->featureContext->getStepLineRef(),
+			"0",
+			"files",
+			$this->featureContext->getDavPathVersion()
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -248,15 +248,15 @@ class WebDavPropertiesContext implements Context {
 			$namespace => $propertyName
 		];
 		$response = WebDavHelper::propfind(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getActualUsername($user),
-				$this->featureContext->getUserPassword($user),
-				$path,
-				$properties,
-				$this->featureContext->getStepLineRef(),
-				"0",
-				"files",
-				$this->featureContext->getDavPathVersion()
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getUserPassword($user),
+			$path,
+			$properties,
+			$this->featureContext->getStepLineRef(),
+			"0",
+			"files",
+			$this->featureContext->getDavPathVersion()
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -645,14 +645,12 @@ class WebDavPropertiesContext implements Context {
 	public function checkResponseContainsProperty(ResponseInterface $response, string $key, string $namespaceString = null): SimpleXMLElement {
 		$xmlPart = $this->featureContext->getResponseXml($response);
 
-		$nsPrefix = "";
 		if ($namespaceString !== null) {
 			$ns = $this->parseNamespace($namespaceString);
 			$xmlPart->registerXPathNamespace(
 				$ns->prefix,
 				$ns->namespace
 			);
-			$nsPrefix = $ns->prefix . ":";
 		}
 
 		$match = $xmlPart->xpath("//d:prop/$key");
@@ -661,9 +659,12 @@ class WebDavPropertiesContext implements Context {
 			isset($match[0]),
 			"Cannot find property \"$key\""
 		);
+
+		$property = \explode(":", $key);
+		$propertyName = $property[\count($property) - 1];
 		Assert::assertEquals(
-			$nsPrefix.$match[0]->getName(),
-			$key
+			$match[0]->getName(),
+			$propertyName
 		);
 		return $match[0];
 	}
@@ -1176,7 +1177,7 @@ class WebDavPropertiesContext implements Context {
 			$storePath = $path;
 		}
 		$user = $this->featureContext->getActualUsername($user);
-		$propertiesTable = new TableNode([['propertyName'],['getetag']]);
+		$propertiesTable = new TableNode([['propertyName'],['d:getetag']]);
 		$response = $this->getPropertiesOfFolder(
 			$user,
 			$path,
@@ -1322,7 +1323,7 @@ class WebDavPropertiesContext implements Context {
 	 */
 	public function getCurrentEtagOfElement(string $path, string $user):string {
 		$user = $this->featureContext->getActualUsername($user);
-		$propertiesTable = new TableNode([['propertyName'],['getetag']]);
+		$propertiesTable = new TableNode([['propertyName'],['d:getetag']]);
 		$response = $this->getPropertiesOfFolder(
 			$user,
 			$path,

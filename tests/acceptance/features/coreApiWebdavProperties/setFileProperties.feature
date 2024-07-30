@@ -14,9 +14,17 @@ Feature: set file properties
     When user "Alice" sets property "very-custom-prop" of file "testcustomprop.txt" to "veryCustomPropValue"
     Then the HTTP status code should be "207"
     And the xml response should contain a property "very-custom-prop"
+    And the content in the response should include the following content:
+      """
+      <d:prop><very-custom-prop></very-custom-prop></d:prop>
+      """
     When user "Alice" gets a custom property "very-custom-prop" of file "testcustomprop.txt"
     Then the HTTP status code should be "207"
     And the response should contain a custom "very-custom-prop" property with value "veryCustomPropValue"
+    And the content in the response should include the following content:
+      """
+      <d:prop><very-custom-prop>veryCustomPropValue</very-custom-prop></d:prop>
+      """
     Examples:
       | dav-path-version |
       | old              |
@@ -101,7 +109,7 @@ Feature: set file properties
   Scenario Outline: setting custom DAV property with custom namespace and reading it
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "testcustomprop.txt"
-    When user "Alice" sets property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "testcustomprop.txt" to "customPropValue" using the WebDAV API
+    When user "Alice" sets property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "testcustomprop.txt" to "veryCustomPropValue" using the WebDAV API
     Then the HTTP status code should be "207"
     And the xml response should contain a property "x1:very-custom-prop" with namespace "x1='http://whatever.org/ns'"
     And the content in the response should include the following content:
@@ -110,10 +118,10 @@ Feature: set file properties
       """
     When user "Alice" gets a custom property "x1:very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "testcustomprop.txt"
     Then the HTTP status code should be "207"
-    And the response should contain a custom "x1:very-custom-prop" property with namespace "x1='http://whatever.org/ns'" and value "customPropValue"
+    And the response should contain a custom "x1:very-custom-prop" property with namespace "x1='http://whatever.org/ns'" and value "veryCustomPropValue"
     And the content in the response should include the following content:
       """
-      <d:prop><x1:very-custom-prop xmlns:x1="http://whatever.org/ns">customPropValue</x1:very-custom-prop></d:prop>
+      <d:prop><x1:very-custom-prop xmlns:x1="http://whatever.org/ns">veryCustomPropValue</x1:very-custom-prop></d:prop>
       """
     Examples:
       | dav-path-version |

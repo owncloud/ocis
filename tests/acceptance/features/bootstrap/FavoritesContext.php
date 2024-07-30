@@ -193,33 +193,6 @@ class FavoritesContext implements Context {
 	}
 
 	/**
-	 * @Then /^as the user (?:file|folder|entry) "([^"]*)" should be favorited$/
-	 *
-	 * @param string $path
-	 * @param integer $expectedValue 0|1
-	 *
-	 * @return void
-	 */
-	public function asTheUserFileOrFolderShouldBeFavorited(string $path, int $expectedValue = 1):void {
-		$this->asUserFileOrFolderShouldBeFavorited(
-			$this->featureContext->getCurrentUser(),
-			$path,
-			$expectedValue
-		);
-	}
-
-	/**
-	 * @Then /^as the user (?:file|folder|entry) "([^"]*)" should not be favorited$/
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function asTheUserFileOrFolderShouldNotBeFavorited(string $path):void {
-		$this->asTheUserFileOrFolderShouldBeFavorited($path, 0);
-	}
-
-	/**
 	 * Set the elements of a proppatch
 	 *
 	 * @param string $user

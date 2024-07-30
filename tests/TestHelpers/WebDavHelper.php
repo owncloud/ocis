@@ -146,7 +146,7 @@ class WebDavHelper {
 				$property = $propertyParts[1];
 			}
 
-			if ($namespacePrefix){
+			if ($namespacePrefix) {
 				$propertyBody .= "<$namespacePrefix:$property/>";
 			} else {
 				$propertyBody .= "<$property/>";
@@ -418,7 +418,7 @@ class WebDavHelper {
 	):ResponseInterface {
 		if (!$properties) {
 			$properties = [
-				'getetag', 'resourcetype'
+				'd:getetag', 'd:resourcetype'
 			];
 		}
 		return self::propfind(
@@ -940,7 +940,7 @@ class WebDavHelper {
 			$user,
 			$password,
 			$resource,
-			["getlastmodified"],
+			["d:getlastmodified"],
 			$xRequestId,
 			"0",
 			"files",
