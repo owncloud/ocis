@@ -128,9 +128,6 @@ The following sections list the changes for unreleased.
    use it.
 
    https://github.com/owncloud/ocis/pull/9656
-   https://github.com/owncloud/ocis/pull/9662
-   https://github.com/owncloud/ocis/pull/9654
-   https://github.com/owncloud/ocis/pull/9620
 
 * Bugfix - Fix panic: [#9673](https://github.com/owncloud/ocis/pull/9673)
 
