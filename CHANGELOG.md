@@ -54,7 +54,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix a missing SecureView permission attribute in the REPORT response: [#9638](https://github.com/owncloud/ocis/pull/9638)
 * Bugfix - Fixed the channel lock in a workers pool: [#9647](https://github.com/owncloud/ocis/pull/9647)
 * Bugfix - Missing invitation in permission responses: [#9652](https://github.com/owncloud/ocis/pull/9652)
-* Bugfix - Repair nats-js-kv registry: [#9662](https://github.com/owncloud/ocis/pull/9662)
+* Bugfix - Repair nats-js-kv registry: [#9656](https://github.com/owncloud/ocis/pull/9656)
 * Bugfix - Fix panic: [#9673](https://github.com/owncloud/ocis/pull/9673)
 * Bugfix - Fixed the response code when copying the shared from to personal: [#9677](https://github.com/owncloud/ocis/pull/9677)
 * Bugfix - Fixed response code for DELETE file that is in postprocessing: [#9689](https://github.com/owncloud/ocis/pull/9689)
@@ -120,12 +120,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/9571
    https://github.com/owncloud/ocis/pull/9652
 
-* Bugfix - Repair nats-js-kv registry: [#9662](https://github.com/owncloud/ocis/pull/9662)
+* Bugfix - Repair nats-js-kv registry: [#9656](https://github.com/owncloud/ocis/pull/9656)
 
    The registry would always send traffic to only one pod. This is now fixed and
    load should be spread evenly. Also implements watcher method so the cache can
    use it.
 
+   https://github.com/owncloud/ocis/pull/9656
    https://github.com/owncloud/ocis/pull/9662
    https://github.com/owncloud/ocis/pull/9654
    https://github.com/owncloud/ocis/pull/9620
