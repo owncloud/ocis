@@ -1,6 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 6.2.0](#changelog-for-620-2024-07-30)
 * [Changelog for 6.1.0](#changelog-for-610-2024-07-08)
 * [Changelog for 6.0.0](#changelog-for-600-2024-06-19)
 * [Changelog for 5.0.3](#changelog-for-503-2024-05-02)
@@ -18,8 +19,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -44,7 +45,32 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v6.1.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v6.2.0...master
+
+## Summary
+
+* Bugfix - Repair nats-js-kv registry: [#9656](https://github.com/owncloud/ocis/pull/9656)
+* Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
+
+## Details
+
+* Bugfix - Repair nats-js-kv registry: [#9656](https://github.com/owncloud/ocis/pull/9656)
+
+   The registry would always send traffic to only one pod. This is now fixed and
+   load should be spread evenly. Also implements watcher method so the cache can
+   use it.
+
+   https://github.com/owncloud/ocis/pull/9656
+
+* Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
+
+   https://github.com/owncloud/ocis/pull/9692
+
+# Changelog for [6.2.0] (2024-07-30)
+
+The following sections list the changes for 6.2.0.
+
+[6.2.0]: https://github.com/owncloud/ocis/compare/v6.1.0...v6.2.0
 
 ## Summary
 
@@ -54,11 +80,10 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix a missing SecureView permission attribute in the REPORT response: [#9638](https://github.com/owncloud/ocis/pull/9638)
 * Bugfix - Fixed the channel lock in a workers pool: [#9647](https://github.com/owncloud/ocis/pull/9647)
 * Bugfix - Missing invitation in permission responses: [#9652](https://github.com/owncloud/ocis/pull/9652)
-* Bugfix - Repair nats-js-kv registry: [#9656](https://github.com/owncloud/ocis/pull/9656)
+* Bugfix - Repair nats-js-kv registry: [#9662](https://github.com/owncloud/ocis/pull/9662)
 * Bugfix - Fix panic: [#9673](https://github.com/owncloud/ocis/pull/9673)
 * Bugfix - Fixed the response code when copying the shared from to personal: [#9677](https://github.com/owncloud/ocis/pull/9677)
 * Bugfix - Fixed response code for DELETE file that is in postprocessing: [#9689](https://github.com/owncloud/ocis/pull/9689)
-* Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
 * Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
 * Enhancement - Introduce auth-app service: [#9079](https://github.com/owncloud/ocis/pull/9079)
 * Enhancement - Add support for proof keys for the collaboration service: [#9366](https://github.com/owncloud/ocis/pull/9366)
@@ -121,13 +146,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/9571
    https://github.com/owncloud/ocis/pull/9652
 
-* Bugfix - Repair nats-js-kv registry: [#9656](https://github.com/owncloud/ocis/pull/9656)
+* Bugfix - Repair nats-js-kv registry: [#9662](https://github.com/owncloud/ocis/pull/9662)
 
    The registry would always send traffic to only one pod. This is now fixed and
    load should be spread evenly. Also implements watcher method so the cache can
    use it.
 
-   https://github.com/owncloud/ocis/pull/9656
+   https://github.com/owncloud/ocis/pull/9662
+   https://github.com/owncloud/ocis/pull/9654
+   https://github.com/owncloud/ocis/pull/9620
 
 * Bugfix - Fix panic: [#9673](https://github.com/owncloud/ocis/pull/9673)
 
@@ -150,10 +177,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9432
    https://github.com/owncloud/ocis/pull/9689
-
-* Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
-
-   https://github.com/owncloud/ocis/pull/9692
 
 * Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
 
@@ -8807,7 +8830,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -8981,29 +9004,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -9176,6 +9181,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
