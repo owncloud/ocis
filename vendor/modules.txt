@@ -366,7 +366,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.22.0
+# github.com/cs3org/reva/v2 v2.22.1-0.20240730105121-548644c31544
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -1785,6 +1785,9 @@ github.com/segmentio/kafka-go/sasl
 # github.com/segmentio/ksuid v1.0.4
 ## explicit; go 1.12
 github.com/segmentio/ksuid
+# github.com/sercand/kuberesolver/v5 v5.1.1
+## explicit; go 1.18
+github.com/sercand/kuberesolver/v5
 # github.com/sergi/go-diff v1.3.1
 ## explicit; go 1.12
 github.com/sergi/go-diff/diffmatchpatch

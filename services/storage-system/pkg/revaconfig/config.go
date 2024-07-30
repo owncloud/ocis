@@ -2,11 +2,14 @@ package revaconfig
 
 import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	pkgconfig "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-system/pkg/config"
 )
 
 // StorageSystemFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
+	localEndpoint := pkgconfig.LocalEndpoint(cfg.GRPC.Protocol, cfg.GRPC.Addr)
+
 	rcfg := map[string]interface{}{
 		"shared": map[string]interface{}{
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
@@ -25,12 +28,12 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 			"services": map[string]interface{}{
 				"gateway": map[string]interface{}{
 					// registries are located on the gateway
-					"authregistrysvc":    "com.owncloud.api.storage-system",
-					"storageregistrysvc": "com.owncloud.api.storage-system",
+					"authregistrysvc":    localEndpoint,
+					"storageregistrysvc": localEndpoint,
 					// user metadata is located on the users services
-					"userprovidersvc":  "com.owncloud.api.storage-system",
-					"groupprovidersvc": "com.owncloud.api.storage-system",
-					"permissionssvc":   "com.owncloud.api.storage-system",
+					"userprovidersvc":  localEndpoint,
+					"groupprovidersvc": localEndpoint,
+					"permissionssvc":   localEndpoint,
 					// other
 					"disable_home_creation_on_login": true, // metadata manually creates a space
 					// metadata always uses the simple upload, so no transfer secret or datagateway needed
@@ -60,7 +63,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"drivers": map[string]interface{}{
 						"static": map[string]interface{}{
 							"rules": map[string]interface{}{
-								"machine": "com.owncloud.api.storage-system",
+								"machine": localEndpoint,
 							},
 						},
 					},
@@ -70,7 +73,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
 							"api_key":      cfg.SystemUserAPIKey,
-							"gateway_addr": "com.owncloud.api.storage-system",
+							"gateway_addr": localEndpoint,
 						},
 					},
 				},
@@ -86,7 +89,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 						"static": map[string]interface{}{
 							"rules": map[string]interface{}{
 								"/": map[string]interface{}{
-									"address": "com.owncloud.api.storage-system",
+									"address": localEndpoint,
 								},
 							},
 						},
@@ -94,7 +97,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 				},
 				"storageprovider": map[string]interface{}{
 					"driver":          cfg.Driver,
-					"drivers":         metadataDrivers(cfg),
+					"drivers":         metadataDrivers(localEndpoint, cfg),
 					"data_server_url": cfg.DataServerURL,
 				},
 			},
@@ -113,7 +116,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 				"dataprovider": map[string]interface{}{
 					"prefix":  "data",
 					"driver":  cfg.Driver,
-					"drivers": metadataDrivers(cfg),
+					"drivers": metadataDrivers(localEndpoint, cfg),
 					"data_txs": map[string]interface{}{
 						"simple": map[string]interface{}{
 							"cache_store":    "noop",
@@ -144,7 +147,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 	return rcfg
 }
 
-func metadataDrivers(cfg *config.Config) map[string]interface{} {
+func metadataDrivers(localEndpoint string, cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"ocis": map[string]interface{}{
 			"metadata_backend":           cfg.Drivers.OCIS.MetadataBackend,
@@ -152,7 +155,7 @@ func metadataDrivers(cfg *config.Config) map[string]interface{} {
 			"user_layout":                "{{.Id.OpaqueId}}",
 			"treetime_accounting":        false,
 			"treesize_accounting":        false,
-			"permissionssvc":             "com.owncloud.api.storage-system",
+			"permissionssvc":             localEndpoint,
 			"max_acquire_lock_cycles":    cfg.Drivers.OCIS.MaxAcquireLockCycles,
 			"lock_cycle_duration_factor": cfg.Drivers.OCIS.LockCycleDurationFactor,
 			"disable_versioning":         true,

@@ -38,7 +38,7 @@ var (
 // NewConn creates a new connection to a grpc server
 // with open census tracing support.
 // TODO(labkode): make grpc tls configurable.
-func NewConn(address string, opts ...Option) (*grpc.ClientConn, error) {
+func NewConn(target string, opts ...Option) (*grpc.ClientConn, error) {
 
 	options := ClientOptions{}
 	if err := options.init(); err != nil {
@@ -84,12 +84,34 @@ func NewConn(address string, opts ...Option) (*grpc.ClientConn, error) {
 		maxRcvMsgSize = s
 	}
 
-	conn, err := grpc.Dial(
-		address,
+	conn, err := grpc.NewClient(
+		target,
 		grpc.WithTransportCredentials(cred),
 		grpc.WithDefaultCallOptions(
 			grpc.MaxCallRecvMsgSize(maxRcvMsgSize),
 		),
+		grpc.WithDefaultServiceConfig(`{
+			"loadBalancingPolicy":"round_robin"
+		}`),
+		/* we may want to retry more often than the default transparent retry, see https://grpc.io/docs/guides/retry/#retry-configuration
+		grpc.WithDefaultServiceConfig(`{
+			"loadBalancingPolicy":"round_robin"
+			"methodConfig": [
+				{
+					"name": [
+						{ "service": "grpc.examples.echo.Echo" }
+					],
+					"retryPolicy": {
+						"maxAttempts": 3,
+						"initialBackoff": "0.1s",
+						"maxBackoff": "1s",
+						"backoffMultiplier": 2,
+						"retryableStatusCodes": ["UNAVAILABLE", "CANCELLED", "RESOURCE_EXHAUSTED", "DEADLINE_EXCEEDED"]
+					}
+				}
+			]
+		}`),
+		*/
 		grpc.WithStatsHandler(otelgrpc.NewClientHandler(
 			otelgrpc.WithTracerProvider(
 				options.tracerProvider,
