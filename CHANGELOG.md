@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix panic: [#9673](https://github.com/owncloud/ocis/pull/9673)
 * Bugfix - Fixed the response code when copying the shared from to personal: [#9677](https://github.com/owncloud/ocis/pull/9677)
 * Bugfix - Fixed response code for DELETE file that is in postprocessing: [#9689](https://github.com/owncloud/ocis/pull/9689)
+* Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
 * Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
 * Enhancement - Introduce auth-app service: [#9079](https://github.com/owncloud/ocis/pull/9079)
 * Enhancement - Add support for proof keys for the collaboration service: [#9366](https://github.com/owncloud/ocis/pull/9366)
@@ -152,6 +153,10 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9432
    https://github.com/owncloud/ocis/pull/9689
+
+* Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
+
+   https://github.com/owncloud/ocis/pull/9692
 
 * Change - Remove unavailable web config options: [#9679](https://github.com/owncloud/ocis/pull/9679)
 
