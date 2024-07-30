@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -44,12 +43,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			servers := run.Group{}
-			ctx, cancel := func() (context.Context, context.CancelFunc) {
-				if cfg.Context == nil {
-					return context.WithCancel(context.Background())
-				}
-				return context.WithCancel(cfg.Context)
-			}()
+			ctx, cancel := context.WithCancel(c.Context)
 			defer cancel()
 
 			mtrcs := metrics.New()
@@ -79,7 +73,6 @@ func Server(cfg *config.Config) *cli.Command {
 					Str("server", "http").
 					Msg("shutting down server")
 				cancel()
-				os.Exit(1)
 			})
 
 			// prepare a gRPC server and add it to the group run.
@@ -98,7 +91,6 @@ func Server(cfg *config.Config) *cli.Command {
 					Str("server", "grpc").
 					Msg("shutting down server")
 				cancel()
-				os.Exit(1)
 			})
 
 			// prepare a debug server and add it to the group run.

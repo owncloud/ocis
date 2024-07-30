@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -120,12 +119,7 @@ func Server(cfg *config.Config) *cli.Command {
 			m := metrics.New()
 
 			gr := run.Group{}
-			ctx, cancel := func() (context.Context, context.CancelFunc) {
-				if cfg.Context == nil {
-					return context.WithCancel(context.Background())
-				}
-				return context.WithCancel(cfg.Context)
-			}()
+			ctx, cancel := context.WithCancel(c.Context)
 
 			defer cancel()
 
@@ -221,7 +215,6 @@ func Server(cfg *config.Config) *cli.Command {
 						Msg("Shutting down server")
 
 					cancel()
-					os.Exit(1)
 				})
 			}
 

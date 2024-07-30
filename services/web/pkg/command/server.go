@@ -27,7 +27,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Before: func(_ *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(_ *cli.Context) error {
+		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
@@ -49,13 +49,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 			var (
 				gr          = run.Group{}
-				ctx, cancel = func() (context.Context, context.CancelFunc) {
-					if cfg.Context == nil {
-						return context.WithCancel(context.Background())
-					}
-					return context.WithCancel(cfg.Context)
-				}()
-				m = metrics.New()
+				ctx, cancel = context.WithCancel(c.Context)
+				m           = metrics.New()
 			)
 
 			defer cancel()
@@ -94,7 +89,6 @@ func Server(cfg *config.Config) *cli.Command {
 						Msg("Shutting down server")
 
 					cancel()
-					os.Exit(1)
 				})
 			}
 
