@@ -13,6 +13,8 @@ import (
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/server"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 )
 
 // Service simply wraps the go-micro grpc service.
@@ -24,6 +26,9 @@ type Service struct {
 func NewServiceWithClient(client client.Client, opts ...Option) (Service, error) {
 	var mServer server.Server
 	sopts := newOptions(opts...)
+	keepaliveParams := grpc.KeepaliveParams(keepalive.ServerParameters{
+		MaxConnectionAge: GetMaxConnectionAge(), // this forces clients to reconnect after 30 seconds, triggering a new DNS lookup to pick up new IPs
+	})
 	tlsConfig := &tls.Config{}
 
 	if sopts.TLSEnabled {
@@ -44,9 +49,9 @@ func NewServiceWithClient(client client.Client, opts ...Option) (Service, error)
 			}
 		}
 		tlsConfig.Certificates = []tls.Certificate{cert}
-		mServer = mgrpcs.NewServer(mgrpcs.AuthTLS(tlsConfig))
+		mServer = mgrpcs.NewServer(mgrpcs.Options(keepaliveParams), mgrpcs.AuthTLS(tlsConfig))
 	} else {
-		mServer = mgrpcs.NewServer()
+		mServer = mgrpcs.NewServer(mgrpcs.Options(keepaliveParams))
 	}
 
 	mopts := []micro.Option{
