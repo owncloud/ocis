@@ -93,67 +93,11 @@ The JSON representation of a Drive, as handled by the Spaces API, looks like thi
 
 ### Create a single space `POST /drives`
 
-Create a new space with properties.
+https://owncloud.dev/libre-graph-api/#/drives/CreateDrive
 
-{{< tabs "create-space" >}}
-{{< tab "Request" >}}
+### Create a space item (Enable sync) `POST /drives/{drive-id}/root/children`
 
-```shell
-curl -L -X POST 'https://localhost:9200/graph/v1.0/drives/' \
--H 'Content-Type: application/json' \
---data-raw '{
-    "name": "Marketing",
-    "description": "Marketing team resources",
-    "quota": {
-        "total": 5368709120
-    }
-}'
-```
-{{< /tab >}}
-{{< tab "Response - 201 Created" >}}
-
-```json {hl_lines=[2,7,15]}
-{
-  "description":"Marketing team resources",
-  "driveAlias":"project/marketing",
-  "driveType":"project",
-  "id":"storage-users-1$535aa42d-a3c7-4329-9eba-5ef48fcaa3ff",
-  "lastModifiedDateTime":"2023-01-18T17:13:48.385204589+01:00",
-  "name":"Marketing",
-  "owner":{
-    "user":{
-      "displayName":"",
-      "id":"535aa42d-a3c7-4329-9eba-5ef48fcaa3ff"
-    }
-  },
-  "quota":{
-    "total":5368709120
-  },
-  "root":{
-    "eTag":"\"f91e56554fd9305db81a93778c0fae96\"",
-    "id":"storage-users-1$535aa42d-a3c7-4329-9eba-5ef48fcaa3ff",
-    "permissions":[
-      {
-        "grantedToIdentities":[
-          {
-            "user":{
-              "displayName":"Admin",
-              "id":"some-admin-user-id-0000-000000000000"
-            }
-          }
-        ],
-        "roles":[
-          "manager"
-        ]
-      }
-    ],
-    "webDavUrl":"https://localhost:9200/dav/spaces/storage-users-1$535aa42d-a3c7-4329-9eba-5ef48fcaa3ff"
-  },
-  "webUrl":"https://localhost:9200/f/storage-users-1$535aa42d-a3c7-4329-9eba-5ef48fcaa3ff"
-}
-```
-{{< /tab >}}
-{{< /tabs >}}
+https://owncloud.dev/libre-graph-api/#/drives.root/CreateDriveItem
 
 ## Reading Spaces
 
@@ -186,127 +130,7 @@ The "Space Manager" is a user which is a regular member of a space because he ha
 
 ### List My Spaces `GET /me/drives`
 
-Returns a list of all spaces where the user is a regular member of.
-
-{{< tabs "list-drives" >}}
-{{< tab "Request" >}}
-`curl -L -k -X GET 'https://localhost:9200/graph/v1.0/me/drives/'`
-{{< /tab >}}
-{{< tab "Response - 200 OK" >}}
-```json
-{
-    "value": [
-        {
-            "driveAlias": "personal/admin",
-            "driveType": "personal",
-            "id": "storage-users-1$some-admin-user-id-0000-000000000000",
-            "lastModifiedDateTime": "2023-01-17T21:37:17.692033183+01:00",
-            "name": "Admin",
-            "owner": {
-                "user": {
-                    "displayName": "",
-                    "id": "some-admin-user-id-0000-000000000000"
-                }
-            },
-            "quota": {
-                "remaining": 4497686528,
-                "state": "normal",
-                "total": 0,
-                "used": 0
-            },
-            "root": {
-                "eTag": "\"4b65d2cbce79b2ecc45f876cc6e460d8\"",
-                "id": "storage-users-1$some-admin-user-id-0000-000000000000",
-                "webDavUrl": "https://localhost:9200/dav/spaces/storage-users-1$some-admin-user-id-0000-000000000000"
-            },
-            "webUrl": "https://localhost:9200/f/storage-users-1$some-admin-user-id-0000-000000000000"
-        },
-        {
-            "driveAlias": "virtual/shares",
-            "driveType": "virtual",
-            "id": "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668",
-            "name": "Shares",
-            "quota": {
-                "remaining": 0,
-                "state": "exceeded",
-                "total": 0,
-                "used": 0
-            },
-            "root": {
-                "eTag": "DECAFC00FEE",
-                "id": "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668",
-                "webDavUrl": "https://localhost:9200/dav/spaces/a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668"
-            },
-            "webUrl": "https://localhost:9200/f/a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668"
-        }
-    ]
-}
-```
-{{< /tab >}}
-{{< /tabs >}}
-
-### List my spaces with filters `GET /me/drives/$filter=<attribute> <comparison operator> <value>`
-
-Returns a list of all project spaces where the user is a regular member of. The filter query parameter supports the `eq`(equals) comparison operator. Possible filter attributes are:
-
-| Attribute | Description                                                                    |
-|-----------|--------------------------------------------------------------------------------|
-| driveType | The space type. Values could be `project`, `personal`, `virtual`, `mountpoint` |
-| id        | The space id. The value needs to be a space ID                                 |
-
-#### Example filters
-
-{{< tabs "filter-drives" >}}
-{{< tab "Filter by space type project" >}}
-
-`curl -L -k -X GET 'https://localhost:9200/graph/v1.0/me/drives/$filter=driveType eq project'`
-
-This returns a list of spaces of type `project`.
-
-{{< /tab >}}
-{{< tab "Filter by space type mountpoint" >}}
-
-`curl -L -k -X GET 'https://localhost:9200/graph/v1.0/me/drives/$filter=driveType eq mountpoint'`
-
-This returns a list of spaces of type `mountpoint`.
-
-{{< /tab >}}
-{{< tab "Filter by space id" >}}
-
-`curl -L -k -X GET 'https://localhost:9200/graph/v1.0/me/drives/$filter=id eq some-space-id'`
-
-This returns one space with the id from the filter if it exists.
-{{< /tab >}}
-{{< /tabs >}}
-
-### List my spaces with ordering `GET /me/drives/$orderby=<key> <order>`
-
-Returns a list of all spaces ordered by the specified key. Possible order keys are
-
-| key                   | Description                                  |
-|-----------------------|----------------------------------------------|
-| name	                 | The space name                               |
-| lastModifiedDateTime	 | The last modified date and time of the space |
-
-Both sort orders are supported, `asc` (ascending) and `desc` (descending).
-
-#### Ordering examples
-
-{{< tabs "sort-drives" >}}
-{{< tab "Sort by name" >}}
-
-`curl -L -k -X GET 'https://localhost:9200/graph/v1.0/me/drives/$orderby=name asc'`
-
-This returns a list of spaces ordered by name ascending.
-
-{{< /tab >}}
-{{< tab "Sort by date" >}}
-
-`curl -L -k -X GET 'https://localhost:9200/graph/v1.0/me/drives/$orderby=lastModifiedDateTime desc'`
-
-This returns a list of spaces ordered by the last modified date starting with the latest one.
-{{< /tab >}}
-{{< /tabs >}}
+https://owncloud.dev/libre-graph-api/#/me.drives/ListMyDrives
 
 ## Modifying Spaces
 
@@ -638,3 +462,33 @@ The space to be deleted was not disabled before.
 ```
 {{< /tab >}}
 {{< /tabs >}}
+
+## Sharing Space
+
+### Add member to space `POST /drives/{drive-id}/root/invite`
+
+https://owncloud.dev/libre-graph-api/#/drives.permissions/Invite
+
+### Sharing space as a link `POST /drives/{drive-id}/root/createLink`
+
+https://owncloud.dev/libre-graph-api/#/drives.root/CreateLinkSpaceRoot
+
+## Reading Space Permissions
+
+### Listing permissions of a space `GET /drives/{drive-id}/root/permissions`
+
+https://owncloud.dev/libre-graph-api/#/drives.root/ListPermissionsSpaceRoot
+
+## Modifying / Deleting Space Permissions
+
+### Update permissions of a drive `PATCH /drives/{drive-id}/root/permissions/{perm-id}`
+
+https://owncloud.dev/libre-graph-api/#/drives.root/UpdatePermissionSpaceRoot
+
+### Set password of a link share `POST /drives/{drive-id}/root/permissions/{perm-id}/setPassword`
+
+https://owncloud.dev/libre-graph-api/#/drives.root/SetPermissionPasswordSpaceRoot
+
+### Removing acess to a space `DELETE /drives/{drive-id}/root/permissions/{perm-id}`
+
+https://owncloud.dev/libre-graph-api/#/drives.root/DeletePermissionSpaceRoot
