@@ -52,6 +52,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Ignore address for kubernetes registry: [#9490](https://github.com/owncloud/ocis/pull/9490)
 * Bugfix - Repair nats-js-kv registry: [#9656](https://github.com/owncloud/ocis/pull/9656)
 * Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
+* Enhancement - Allow configuring grpc max connection age: [#9657](https://github.com/owncloud/ocis/pull/9657)
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Bump reva: [#9715](https://github.com/owncloud/ocis/pull/9715)
 
@@ -76,6 +77,14 @@ The following sections list the changes for unreleased.
 * Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
 
    https://github.com/owncloud/ocis/pull/9692
+
+* Enhancement - Allow configuring grpc max connection age: [#9657](https://github.com/owncloud/ocis/pull/9657)
+
+   We added a GRPC_MAX_CONNECTION_AGE env var that allows limiting the lifespan of
+   connections. A closed connection triggers grpc clients to do a new DNS lookup to
+   pick up new IPs.
+
+   https://github.com/owncloud/ocis/pull/9657
 
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
 
