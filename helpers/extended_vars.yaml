@@ -152,6 +152,14 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
+- rawname: _serverMaxConnectionAgeEnv
+  path: ocis-pkg/service/grpc/keepalive.go:19
+  foundincode: true
+  name: _serverMaxConnectionAgeEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:382
   foundincode: true
