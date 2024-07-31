@@ -59,7 +59,7 @@ type Log struct {
 
 // Service holds general service configuration
 type Service struct {
-	Name string `yaml:"-"`
+	Name string `yaml:"-" env:"STORAGE_USERS_SERVICE_NAME" desc:"Service name to use. Change this when starting an additional storage provider with a custom configuration to prevent it from colliding with the default 'storage-users' service." introductionVersion:"%%NEXT%%"`
 }
 
 // Debug is the configuration for the debug server
