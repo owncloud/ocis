@@ -55,7 +55,12 @@ services:
     environment:
       aliasgroup1: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}:443
       DONT_GEN_SSL_CERT: "YES"
-      extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
+      extra_params: |
+        --o:ssl.enable=${COLLABORA_SSL_ENABLE:-true} \
+        --o:ssl.ssl_verification=${COLLABORA_SSL_VERIFICATION:-true} \
+        --o:ssl.termination=true \
+        --o:welcome.enable=false \
+        --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
       username: ${COLLABORA_ADMIN_USER:-admin}
       password: ${COLLABORA_ADMIN_PASSWORD:-admin}
     cap_add:
