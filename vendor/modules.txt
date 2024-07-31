@@ -366,7 +366,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.22.1-0.20240730105121-548644c31544
+# github.com/cs3org/reva/v2 v2.22.1-0.20240801084757-c10f2aec00f0 => github.com/kobergj/reva/v2 v2.0.0-20240801132620-f5cbc6ceb1d3
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -2426,3 +2426,4 @@ stash.kopano.io/kgol/rndm
 # github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240724102745-4bc93ffd7ab6
+# github.com/cs3org/reva/v2 => github.com/kobergj/reva/v2 v2.0.0-20240801132620-f5cbc6ceb1d3

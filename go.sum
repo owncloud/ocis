@@ -1025,8 +1025,6 @@ github.com/crewjam/saml v0.4.14 h1:g9FBNx62osKusnFzs3QTN5L9CVA/Egfgm+stJShzw/c=
 github.com/crewjam/saml v0.4.14/go.mod h1:UVSZCf18jJkk6GpWNVqcyQJMD5HsRugBPf4I1nl2mME=
 github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb h1:KmYZDReplv/yfwc1LNYpDcVhVujC3Pasv6WjXx1haSU=
 github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb/go.mod h1:yyP8PRo0EZou3nSH7H4qjlzQwaydPeIRNgX50npQHpE=
-github.com/cs3org/reva/v2 v2.22.1-0.20240730105121-548644c31544 h1:cBqx8oou5aXM9SqiG96bYGBD4akYwecPoopsFva51yI=
-github.com/cs3org/reva/v2 v2.22.1-0.20240730105121-548644c31544/go.mod h1:R6OO/ZPMr8MivSiESfk7pUfsdXdr709L8kJErLgqvDI=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
 github.com/cyphar/filepath-securejoin v0.2.4 h1:Ugdm7cg7i6ZK6x3xDF1oEu1nfkyfH53EtKeQYTC3kyg=
 github.com/cyphar/filepath-securejoin v0.2.4/go.mod h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=
@@ -1611,6 +1609,8 @@ github.com/klauspost/cpuid/v2 v2.2.6 h1:ndNyv040zDGIDh8thGkXYjnFtiN02M1PVVF+JE/4
 github.com/klauspost/cpuid/v2 v2.2.6/go.mod h1:Lcz8mBdAVJIBVzewtcLocK12l3Y+JytZYpaMropDUws=
 github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240724102745-4bc93ffd7ab6 h1:NNXx1/XWR6Ryud6qNanwrl/JuRx2KdCW1jS2/Cf/TO8=
 github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240724102745-4bc93ffd7ab6/go.mod h1:pjcozWijkNPbEtX5SIQaxEW/h8VAVZYTLx+70bmB3LY=
+github.com/kobergj/reva/v2 v2.0.0-20240801132620-f5cbc6ceb1d3 h1:3dG6SNIa+mb540qVHuPHXOXfPEb23MPWciY5SWAWLoQ=
+github.com/kobergj/reva/v2 v2.0.0-20240801132620-f5cbc6ceb1d3/go.mod h1:R6OO/ZPMr8MivSiESfk7pUfsdXdr709L8kJErLgqvDI=
 github.com/kolo/xmlrpc v0.0.0-20200310150728-e0350524596b/go.mod h1:o03bZfuBwAXHetKXuInt4S7omeXUu62/A845kiycsSQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=

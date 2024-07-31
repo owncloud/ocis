@@ -127,7 +127,7 @@ func (s *svc) handlePathCopy(w http.ResponseWriter, r *http.Request, ns string) 
 		return
 	}
 
-	cp := s.prepareCopy(ctx, w, r, spacelookup.MakeRelativeReference(srcSpace, src, false), spacelookup.MakeRelativeReference(dstSpace, dst, false), &sublog)
+	cp := s.prepareCopy(ctx, w, r, spacelookup.MakeRelativeReference(srcSpace, src, false), spacelookup.MakeRelativeReference(dstSpace, dst, false), &sublog, dstSpace.GetRoot().GetStorageId() == utils.ShareStorageProviderID)
 	if cp == nil {
 		return
 	}
@@ -362,7 +362,7 @@ func (s *svc) handleSpacesCopy(w http.ResponseWriter, r *http.Request, spaceID s
 		return
 	}
 
-	cp := s.prepareCopy(ctx, w, r, &srcRef, &dstRef, &sublog)
+	cp := s.prepareCopy(ctx, w, r, &srcRef, &dstRef, &sublog, dstRef.GetResourceId().GetStorageId() == utils.ShareStorageProviderID)
 	if cp == nil {
 		return
 	}
@@ -552,7 +552,7 @@ func (s *svc) executeSpacesCopy(ctx context.Context, w http.ResponseWriter, sele
 	return nil
 }
 
-func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Request, srcRef, dstRef *provider.Reference, log *zerolog.Logger) *copy {
+func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Request, srcRef, dstRef *provider.Reference, log *zerolog.Logger, destInShareJail bool) *copy {
 	isChild, err := s.referenceIsChildOf(ctx, s.gatewaySelector, dstRef, srcRef)
 	if err != nil {
 		switch err.(type) {
@@ -675,11 +675,6 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 	if dstStatRes.Status.Code == rpc.Code_CODE_OK {
 		successCode = http.StatusNoContent // 204 if target already existed, see https://tools.ietf.org/html/rfc4918#section-9.8.5
 
-		if utils.IsSpaceRoot(dstStatRes.GetInfo()) {
-			log.Error().Msg("overwriting is not allowed")
-			w.WriteHeader(http.StatusBadRequest)
-			return nil
-		}
 		if !overwrite {
 			log.Warn().Bool("overwrite", overwrite).Msg("dst already exists")
 			w.WriteHeader(http.StatusPreconditionFailed)
@@ -688,6 +683,24 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 			errors.HandleWebdavError(log, w, b, err) // 412, see https://tools.ietf.org/html/rfc4918#section-9.8.5
 			return nil
 		}
+
+		if utils.IsSpaceRoot(dstStatRes.GetInfo()) {
+			log.Error().Msg("overwriting is not allowed")
+			w.WriteHeader(http.StatusBadRequest)
+			return nil
+		}
+
+		// we must not allow to override mountpoints - so we check if we have access to the parent. If not this is a mountpoint
+		if destInShareJail {
+			dir, file := filepath.Split(dstRef.GetPath())
+			if dir == "/" || dir == "" || file == "" {
+				log.Error().Msg("must not overwrite mount points")
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = w.Write([]byte("must not overwrite mount points"))
+				return nil
+			}
+		}
+
 		// delete existing tree when overwriting a directory or replacing a file with a directory
 		if dstStatRes.Info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER ||
 			(dstStatRes.Info.Type == provider.ResourceType_RESOURCE_TYPE_FILE &&
