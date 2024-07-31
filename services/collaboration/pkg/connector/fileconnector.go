@@ -809,13 +809,37 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 		Str("RequestedLockID", lockID).
 		Logger()
 
-	deleteRes, err := f.gwc.Delete(ctx, &providerv1beta1.DeleteRequest{
+	var deleteRes *providerv1beta1.DeleteResponse
+	deleteReq := &providerv1beta1.DeleteRequest{
 		Ref:    wopiContext.FileReference,
 		LockId: lockID,
-	})
-	if err != nil {
-		logger.Error().Err(err).Msg("DeleteFile: stat failed")
-		return "", err
+	}
+
+	// we'll retry the request after a while if we get a "TOO_EARLY" code
+	for retries := 0; deleteRes == nil || deleteRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_TOO_EARLY; retries++ {
+		deleteRes, err = f.gwc.Delete(ctx, deleteReq)
+		if err != nil {
+			logger.Error().Err(err).Msg("DeleteFile: stat failed")
+			return "", err
+		}
+
+		if deleteRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_TOO_EARLY {
+			// starting from 20ms, double the waiting time for each retry
+			// capping at 5 secs
+			waitingTime := (20 * time.Millisecond) << retries
+			if waitingTime.Seconds() > 5 {
+				waitingTime = 5 * time.Second
+			}
+
+			logger.Warn().
+				Str("StatusCode", deleteRes.GetStatus().GetCode().String()).
+				Str("StatusMsg", deleteRes.GetStatus().GetMessage()).
+				Dur("WaitingTime", waitingTime).
+				Int("Retries", retries).
+				Msg("DeleteFile: file isn't ready yet. Retrying")
+
+			time.Sleep(waitingTime)
+		}
 	}
 
 	if deleteRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
