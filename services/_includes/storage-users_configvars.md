@@ -2,6 +2,7 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| STORAGE_USERS_SERVICE_NAME | string | storage-users | Service name to use. Change this when starting an additional storage provider with a custom configuration to prevent it from colliding with the default 'storage-users' service.|
 | OCIS_TRACING_ENABLED<br/>STORAGE_USERS_TRACING_ENABLED | bool | false | Activates tracing.|
 | OCIS_TRACING_TYPE<br/>STORAGE_USERS_TRACING_TYPE | string |  | The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.|
 | OCIS_TRACING_ENDPOINT<br/>STORAGE_USERS_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|

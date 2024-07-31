@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-07-31-06-58-06]
+[#deprecation-note-2024-07-31-12-52-26]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -30,6 +30,17 @@ endif::[]
 | Type
 | Default Value
 | Description
+
+a|`STORAGE_USERS_SERVICE_NAME` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++storage-users ++
+a| [subs=-attributes]
+Service name to use. Change this when starting an additional storage provider with a custom configuration to prevent it from colliding with the default 'storage-users' service.
 
 a|`OCIS_TRACING_ENABLED` +
 `STORAGE_USERS_TRACING_ENABLED` +
