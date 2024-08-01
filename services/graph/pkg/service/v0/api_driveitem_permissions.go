@@ -25,6 +25,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+	l10n2 "github.com/owncloud/ocis/v2/services/graph/pkg/l10n"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -632,6 +634,22 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 		return
 	}
 
+	loc := r.Header.Get(l10n.HeaderAcceptLanguage)
+	w.Header().Add("Content-Language", loc)
+	if loc != "" && loc != "en" {
+		trf := l10n2.NewTranslateLocation(loc, "en")
+		for i, role := range permissions.LibreGraphPermissionsRolesAllowedValues {
+			err := l10n.TranslateEntity(&role, trf,
+				l10n.TranslateField("Description"),
+				l10n.TranslateField("DisplayName"))
+			if err != nil {
+				api.logger.Warn().Err(err).Msg("tranlation error")
+				continue
+			}
+			permissions.LibreGraphPermissionsRolesAllowedValues[i] = role
+		}
+	}
+
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, permissions)
 }
@@ -651,6 +669,22 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
+	}
+
+	loc := r.Header.Get(l10n.HeaderAcceptLanguage)
+	w.Header().Add("Content-Language", loc)
+	if loc != "" && loc != "en" {
+		trf := l10n2.NewTranslateLocation(loc, "en")
+		for i, role := range permissions.LibreGraphPermissionsRolesAllowedValues {
+			err := l10n.TranslateEntity(&role, trf,
+				l10n.TranslateField("Description"),
+				l10n.TranslateField("DisplayName"))
+			if err != nil {
+				api.logger.Warn().Err(err).Msg("tranlation error")
+				continue
+			}
+			permissions.LibreGraphPermissionsRolesAllowedValues[i] = role
+		}
 	}
 
 	render.Status(r, http.StatusOK)

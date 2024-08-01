@@ -7,6 +7,7 @@ import (
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/cs3org/reva/v2/pkg/conversions"
@@ -71,12 +72,54 @@ var legacyNames map[string]string = map[string]string{
 	UnifiedRoleSecureViewerID: conversions.RoleSecureViewer,
 }
 
+var (
+	// UnifiedRole Viewer, Role Description (resolves directly)
+	_viewerUnifiedRoleDescription = l10n.Template("View and download.")
+	// UnifiedRole Viewer, Role DisplayName (resolves directly)
+	_viewerUnifiedRoleDisplayName = l10n.Template("Can view")
+
+	// UnifiedRole SpaceViewer, Role Description (resolves directly)
+	_spaceViewerUnifiedRoleDescription = l10n.Template("View and download.")
+	// UnifiedRole SpaseViewer, Role DisplayName (resolves directly)
+	_spaceViewerUnifiedRoleDisplayName = l10n.Template("Can view")
+
+	// UnifiedRole Editor, Role Description (resolves directly)
+	_editorUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and delete.")
+	// UnifiedRole Editor, Role DisplayName (resolves directly)
+	_editorUnifiedRoleDisplayName = l10n.Template("Can edit")
+
+	// UnifiedRole SpaseEditor, Role Description (resolves directly)
+	_spaceEditorUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and delete.")
+	// UnifiedRole SpaseEditor, Role DisplayName (resolves directly)
+	_spaceEditorUnifiedRoleDisplayName = l10n.Template("Can edit")
+
+	// UnifiedRole FileEditor, Role Description (resolves directly)
+	_fileEditorUnifiedRoleDescription = l10n.Template("View, download and edit.")
+	// UnifiedRole FileEditor, Role DisplayName (resolves directly)
+	_fileEditorUnifiedRoleDisplayName = l10n.Template("Can edit")
+
+	// UnifiedRole EditorLite, Role Description (resolves directly)
+	_editorLiteUnifiedRoleDescription = l10n.Template("View, download and upload.")
+	// UnifiedRole EditorLite, Role DisplayName (resolves directly)
+	_editorLiteUnifiedRoleDisplayName = l10n.Template("Can upload")
+
+	// UnifiedRole Manager, Role Description (resolves directly)
+	_managerUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, delete and manage members.")
+	// UnifiedRole Manager, Role DisplayName (resolves directly)
+	_managerUnifiedRoleDisplayName = l10n.Template("Can manage")
+
+	// UnifiedRole SecureViewer, Role Description (resolves directly)
+	_secureViewerUnifiedRoleDescription = l10n.Template("View only documents, images and PDFs. Watermarks will be applied.")
+	// UnifiedRole SecureViewer, Role DisplayName (resolves directly)
+	_secureViewerUnifiedRoleDisplayName = l10n.Template("Can view (secure)")
+)
+
 // NewViewerUnifiedRole creates a viewer role.
 func NewViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewViewerRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleViewerID),
-		Description: proto.String("View and download."),
+		Description: proto.String(_viewerUnifiedRoleDescription),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -97,7 +140,7 @@ func NewSpaceViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewSpaceViewerRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleSpaceViewerID),
-		Description: proto.String("View and download."),
+		Description: proto.String(_spaceViewerUnifiedRoleDescription),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -114,7 +157,7 @@ func NewEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewEditorRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleEditorID),
-		Description: proto.String("View, download, upload, edit, add and delete."),
+		Description: proto.String(_editorUnifiedRoleDescription),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -131,7 +174,7 @@ func NewSpaceEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewSpaceEditorRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleSpaceEditorID),
-		Description: proto.String("View, download, upload, edit, add and delete."),
+		Description: proto.String(_spaceEditorUnifiedRoleDescription),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -148,7 +191,7 @@ func NewFileEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewFileEditorRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleFileEditorID),
-		Description: proto.String("View, download and edit."),
+		Description: proto.String(_fileEditorUnifiedRoleDescription),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -165,7 +208,7 @@ func NewEditorLiteUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewEditorLiteRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleEditorLiteID),
-		Description: proto.String("View, download and upload."),
+		Description: proto.String(_editorLiteUnifiedRoleDescription),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -182,7 +225,7 @@ func NewManagerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewManagerRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleManagerID),
-		Description: proto.String("View, download, upload, edit, add, delete and manage members."),
+		Description: proto.String(_managerUnifiedRoleDescription),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -199,7 +242,7 @@ func NewSecureViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	r := conversions.NewSecureViewerRole()
 	return &libregraph.UnifiedRoleDefinition{
 		Id:          proto.String(UnifiedRoleSecureViewerID),
-		Description: proto.String("View only documents, images and PDFs. Watermarks will be applied."),
+		Description: proto.String(_secureViewerUnifiedRoleDescription),
 		DisplayName: displayName(r),
 		RolePermissions: []libregraph.UnifiedRolePermission{
 			{
@@ -482,27 +525,24 @@ func displayName(role *conversions.Role) *string {
 		return nil
 	}
 
-	// linter wants this to be a var
-	canEdit := "Can edit"
-
 	var displayName string
 	switch role.Name {
 	case conversions.RoleViewer:
-		displayName = "Can view"
+		displayName = _viewerUnifiedRoleDisplayName
 	case conversions.RoleSpaceViewer:
-		displayName = "Can view"
+		displayName = _spaceViewerUnifiedRoleDisplayName
 	case conversions.RoleEditor:
-		displayName = canEdit
+		displayName = _editorUnifiedRoleDisplayName
 	case conversions.RoleSpaceEditor:
-		displayName = canEdit
+		displayName = _spaceEditorUnifiedRoleDisplayName
 	case conversions.RoleFileEditor:
-		displayName = canEdit
+		displayName = _fileEditorUnifiedRoleDisplayName
 	case conversions.RoleEditorLite:
-		displayName = "Can upload"
+		displayName = _editorLiteUnifiedRoleDisplayName
 	case conversions.RoleManager:
-		displayName = "Can manage"
+		displayName = _managerUnifiedRoleDisplayName
 	case conversions.RoleSecureViewer:
-		displayName = "Can view (secure)"
+		displayName = _secureViewerUnifiedRoleDisplayName
 	default:
 		return nil
 	}
