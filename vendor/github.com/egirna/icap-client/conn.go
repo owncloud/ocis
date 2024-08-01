@@ -102,13 +102,12 @@ func (c *ICAPConn) Send(in []byte) ([]byte, error) {
 			data = append(data, tmp[:n]...)
 
 			// explicitly breaking because the Read blocks for 100 continue message
-			// fixMe: still unclear why this is happening, find out and fix it
 			if bytes.Equal(data, []byte(icap100ContinueMsg)) {
 				break
 			}
 
-			// EOF detected, 0 Double crlf indicates the end of the message
-			if bytes.HasSuffix(data, []byte("0\r\n\r\n")) {
+			// EOF detected, double crlf indicates the end of the message
+			if bytes.HasSuffix(data, []byte(doubleCRLF)) {
 				break
 			}
 

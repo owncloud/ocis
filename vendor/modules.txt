@@ -774,7 +774,7 @@ github.com/dutchcoders/go-clamd
 # github.com/egirna/icap v0.0.0-20181108071049-d5ee18bd70bc
 ## explicit
 github.com/egirna/icap
-# github.com/egirna/icap-client v0.1.1 => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf
+# github.com/egirna/icap-client v0.1.1 => github.com/fschade/icap-client v0.0.0-20240802074440-aade4a234387
 ## explicit; go 1.21
 github.com/egirna/icap-client
 # github.com/emirpasic/gods v1.18.1
@@ -2423,6 +2423,6 @@ sigs.k8s.io/yaml/goyaml.v2
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
 # github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
-# github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240123094924-5af178158eaf
+# github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240802074440-aade4a234387
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240724102745-4bc93ffd7ab6
