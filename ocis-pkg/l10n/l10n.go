@@ -65,7 +65,9 @@ func TranslateLocation(t Translator, locale string) func(string, ...any) string 
 	return t.Locale(locale).Get
 }
 
-// TranslateEntity function tranlate all described fields in the struct in the given locale including nested structs
+// TranslateEntity function provides the generic way to translate the necessary fields in composite entities.
+// The function takes the entity, translation function and fields to translate
+// that are described by the TranslateField function. The function supports nested structs and slices of structs.
 //
 //		type InnreStruct struct {
 //			Description string
@@ -86,12 +88,29 @@ func TranslateLocation(t Translator, locale string) func(string, ...any) string 
 //							TranslateField("DisplayName")))
 func TranslateEntity(entity any, tr func(string, ...any) string, fields ...any) error {
 	value := reflect.ValueOf(entity)
-	if value.Kind() != reflect.Ptr || !value.IsNil() && value.Elem().Kind() != reflect.Struct {
-		// must be a pointer to a struct
-		return ErrStructPointer
+	// Indirect through pointers and interfaces
+	if value.Kind() == reflect.Ptr || value.Kind() == reflect.Interface {
+		if value.IsNil() {
+			// treat a nil struct pointer as valid
+			return nil
+		}
+		value = value.Elem()
 	}
-	if value.IsNil() {
-		// treat a nil struct pointer as valid
+
+	switch value.Kind() {
+	case reflect.Slice, reflect.Map:
+		for i := 0; i < value.Len(); i++ {
+			nextValue := value.Index(i)
+			// Indirect through pointers and interfaces
+			if nextValue.Kind() == reflect.Ptr || nextValue.Kind() == reflect.Interface {
+				if nextValue.IsNil() {
+					// treat a nil struct pointer as valid
+					continue
+				}
+				nextValue = value.Index(i).Elem()
+			}
+			translateInner(nextValue, tr, fields...)
+		}
 		return nil
 	}
 	translateInner(value, tr, fields...)
@@ -111,8 +130,8 @@ func translateField(value reflect.Value, tr func(string, ...any) string, fl fiel
 		return
 	}
 	fieldName, fields := fl()
-	// exported field
-	if value.Kind() == reflect.Ptr {
+	// Indirect through pointers and interfaces
+	if value.Kind() == reflect.Ptr || value.Kind() == reflect.Interface {
 		if value.IsNil() {
 			return
 		}
@@ -121,6 +140,12 @@ func translateField(value reflect.Value, tr func(string, ...any) string, fl fiel
 	innerValue := value.FieldByName(fieldName)
 	if !innerValue.IsValid() {
 		return
+	}
+	switch innerValue.Kind() {
+	case reflect.Slice, reflect.Map:
+		for i := 0; i < innerValue.Len(); i++ {
+			translateInner(innerValue.Index(i), tr, fields...)
+		}
 	}
 	if isStruct(innerValue) {
 		translateInner(innerValue, tr, fields...)
@@ -169,8 +194,6 @@ func isStruct(r reflect.Value) bool {
 }
 
 var (
-	// ErrStructPointer is the error that a struct being validated is not specified as a pointer.
-	ErrStructPointer   = errors.New("only a pointer to a struct can be validated")
 	ErrUnsupportedType = errors.New("unsupported type")
 )
 

@@ -25,38 +25,3 @@ msgstr ""
 #: pkg/service/v0/spacetemplates.go:37
 msgid "Here you can add a description for this Space."
 msgstr "Здесь вы можете добавить описание этого пространства."
-
-#: pkg/unifiedrole/unifiedrole.go:87
-msgid   "Can edit"
-msgstr  ""
-
-#. UnifiedRole Viewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/unifiedrole.go:79
-msgid   "Can view"
-msgstr  ""
-
-#. default description for new spaces
-#: pkg/service/v0/spacetemplates.go:31
-msgid   "Here you can add a description for this Space."
-msgstr  ""
-
-#. UnifiedRole Viewer, Role Description (resolves directly)
-#. UnifiedRole SpaceViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/unifiedrole.go:77 pkg/unifiedrole/unifiedrole.go:82
-msgid   "View and download."
-msgstr  ""
-
-#: pkg/unifiedrole/unifiedrole.go:91
-msgid   "View, download and edit."
-msgstr  ""
-
-#: pkg/unifiedrole/unifiedrole.go:92
-msgid   "View, download and upload."
-msgstr  ""
-
-#. canEdit := "Can edit"
-#. UnifiedRole Editor, Role Description (resolves directly)
-#. UnifiedRole SpaseEditor, Role Description (resolves directly)
-#: pkg/unifiedrole/unifiedrole.go:86 pkg/unifiedrole/unifiedrole.go:90
-msgid   "View, download, upload, edit, add and delete."
-msgstr  ""

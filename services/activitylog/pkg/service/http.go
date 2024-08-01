@@ -85,10 +85,6 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
-	// FIXME: configurable default locale?
-	loc := l10n.MustGetUserLocale(r.Context(), activeUser.GetId().GetOpaqueId(), r.Header.Get(l10n.HeaderAcceptLanguage), s.valService)
-	t := l10n.NewTranslatorFromCommonConfig("en", _domain, "", _localeFS, _localeSubPath)
-
 	resp := GetActivitiesResponse{Activities: make([]libregraph.Activity, 0, len(evRes.GetEvents()))}
 	for _, e := range evRes.GetEvents() {
 		delete(toDelete, e.GetId())
@@ -167,6 +163,10 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			s.log.Error().Err(err).Msg("error getting response data")
 			continue
 		}
+
+		// FIXME: configurable default locale?
+		loc := l10n.MustGetUserLocale(r.Context(), activeUser.GetId().GetOpaqueId(), r.Header.Get(l10n.HeaderAcceptLanguage), s.valService)
+		t := l10n.NewTranslatorFromCommonConfig("en", _domain, "", _localeFS, _localeSubPath)
 
 		resp.Activities = append(resp.Activities, NewActivity(t.Translate(message, loc), ts, e.GetId(), vars))
 	}

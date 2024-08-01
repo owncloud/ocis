@@ -19,6 +19,10 @@ func TestTranslateStruct(t *testing.T) {
 		SubStruct   *InnreStruct
 	}
 
+	type WrapperStruct struct {
+		StructList []*InnreStruct
+	}
+
 	toStrPointer := func(str string) *string {
 		return &str
 	}
@@ -34,7 +38,68 @@ func TestTranslateStruct(t *testing.T) {
 		wantErr  bool
 	}{
 		{
-			name: "empty struct",
+			name: "top level slice of struct",
+			args: args{
+				structPtr: []*InnreStruct{
+					{
+						Description: "inner 1",
+						DisplayName: toStrPointer("innerDisplayName 1"),
+					},
+					{
+						Description: "inner 2",
+						DisplayName: toStrPointer("innerDisplayName 2"),
+					},
+				},
+				request: []any{
+					TranslateField("Description"),
+					TranslateField("DisplayName")},
+			},
+			expected: []*InnreStruct{
+				{
+					Description: "new Inner 1",
+					DisplayName: toStrPointer("new InnerDisplayName 1"),
+				},
+				{
+					Description: "new Inner 2",
+					DisplayName: toStrPointer("new InnerDisplayName 2"),
+				},
+			},
+		},
+		{
+			name: "wrapped struct full",
+			args: args{
+				structPtr: &WrapperStruct{
+					StructList: []*InnreStruct{
+						{
+							Description: "inner 1",
+							DisplayName: toStrPointer("innerDisplayName 1"),
+						},
+						{
+							Description: "inner 2",
+							DisplayName: toStrPointer("innerDisplayName 2"),
+						},
+					},
+				},
+				request: []any{
+					TranslateField("StructList",
+						TranslateField("Description"),
+						TranslateField("DisplayName"))},
+			},
+			expected: &WrapperStruct{
+				StructList: []*InnreStruct{
+					{
+						Description: "new Inner 1",
+						DisplayName: toStrPointer("new InnerDisplayName 1"),
+					},
+					{
+						Description: "new Inner 2",
+						DisplayName: toStrPointer("new InnerDisplayName 2"),
+					},
+				},
+			},
+		},
+		{
+			name: "empty struct, NotExistingSubStructName",
 			args: args{
 				structPtr: &TopLevelStruct{},
 				request: []any{
@@ -140,6 +205,14 @@ func TestTranslateStruct(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "nil",
+			args: args{
+				structPtr: nil,
+				request:   []any{TranslateField("Description")},
+			},
+			expected: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -163,6 +236,14 @@ func mock() func(string, ...interface{}) string {
 			return "new Inner"
 		case "innerDisplayName":
 			return "new InnerDisplayName"
+		case "inner 1":
+			return "new Inner 1"
+		case "innerDisplayName 1":
+			return "new InnerDisplayName 1"
+		case "inner 2":
+			return "new Inner 2"
+		case "innerDisplayName 2":
+			return "new InnerDisplayName 2"
 		}
 		return s
 	}
