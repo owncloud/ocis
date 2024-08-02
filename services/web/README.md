@@ -88,7 +88,7 @@ applications from the WebUI.
 Everything else is skipped and not considered as an application.
    *   Each application must be in its own directory accessed via `WEB_ASSET_APPS_PATH`.
    *   Each application directory must contain a `manifest.json` file.
-  *   Each application directory can contain a `config.json` file.
+   *   Each application directory can contain a `config.json` file.
 
 * The `manifest.json` file contains the following fields:
    *   `entrypoint` - required\
