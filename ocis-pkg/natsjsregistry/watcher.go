@@ -47,13 +47,14 @@ func (w *Watcher) Next() (*registry.Result, error) {
 		return nil, errors.New("watcher stopped")
 	}
 
-	var svc *registry.Service
-	if err := json.Unmarshal(kve.Value.Data, svc); err != nil {
+	var svc registry.Service
+	if err := json.Unmarshal(kve.Value.Data, &svc); err != nil {
+		_ = w.stop()
 		return nil, err
 	}
 
 	return &registry.Result{
-		Service: svc,
+		Service: &svc,
 		Action:  kve.Action,
 	}, nil
 }
