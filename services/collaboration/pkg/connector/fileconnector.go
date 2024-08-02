@@ -21,6 +21,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -35,11 +36,15 @@ const (
 	lockDuration time.Duration = 30 * time.Minute
 )
 
+// PutRelativeHeaders contains the values for headers used in a
+// "PutRelative" WOPI response
 type PutRelativeHeaders struct {
 	ValidTarget string
 	LockID      string
 }
 
+// PutRelativeResponse contains the values for the body used in a
+// "PutRelative" WOPI response
 type PutRelativeResponse struct {
 	Name string
 	Url  string
@@ -49,6 +54,8 @@ type PutRelativeResponse struct {
 	HostEdit string
 }
 
+// RenameResponse contains the values for the body used in a
+// "RenameFile" WOPI response
 type RenameResponse struct {
 	Name string
 }
@@ -717,7 +724,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 	newCtx := middleware.WopiContextToCtx(newLogger.WithContext(ctx), wopiContext)
 
 	var conError *ConnectorError
-	// try to put the file. It mustn't return a 400 or 409
+	// try to put the file
 	lockID, err := ccs.PutFile(newCtx, stream, streamLength, "")
 	if err != nil {
 		// if the error isn't a connectorError, fail the request
@@ -757,8 +764,6 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 				Msg("PutRelativeFileRelative: error conflict")
 			return response, headers, err
 		} else {
-			// TODO: code 400 might happen, what to do?
-			// in other cases, just return the error
 			newLogger.Error().
 				Err(err).
 				Str("LockID", lockID).
@@ -1203,7 +1208,7 @@ func (f *FileConnector) generateWOPISrc(ctx context.Context, wopiContext middlew
 	// get the reference
 	resourceId := wopiContext.FileReference.GetResourceId()
 	c := sha256.New()
-	c.Write([]byte(resourceId.GetStorageId() + "$" + resourceId.GetSpaceId() + "!" + resourceId.GetOpaqueId()))
+	c.Write([]byte(storagespace.FormatResourceID(resourceId)))
 	fileRef := hex.EncodeToString(c.Sum(nil))
 
 	// generate the URL for the WOPI app to access the new created file

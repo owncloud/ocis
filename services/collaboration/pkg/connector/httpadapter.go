@@ -259,6 +259,10 @@ func (h *HttpAdapter) PutFile(w http.ResponseWriter, r *http.Request) {
 // It has 2 mutually exclusive operation methods that are used based on the
 // provided headers in the request.
 // Note that this method won't used locks (not documented).
+//
+// The file name must be encoded in utf7. This method will decode the utf7 name
+// into utf8. The utf8 (not utf7) name must have less than 512 bytes, otherwise
+// the request will fail.
 func (h *HttpAdapter) PutRelativeFile(w http.ResponseWriter, r *http.Request) {
 	relativeTarget := r.Header.Get(HeaderWopiRT)
 	suggestedTarget := r.Header.Get(HeaderWopiST)
@@ -354,6 +358,13 @@ func (h *HttpAdapter) DeleteFile(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// RenameFile will rename the file. The name might be automatically adjusted.
+// Note that this method will also send a json body in the response. The
+// adjusted file name will be returned in the body.
+//
+// The file name must be encoded in utf7. This method will decode the utf7 name
+// into utf8. The utf8 (not utf7) name must have less than 495 bytes, otherwise
+// the request will fail.
 func (h *HttpAdapter) RenameFile(w http.ResponseWriter, r *http.Request) {
 	lockID := r.Header.Get(HeaderWopiLock)
 	requestedName := r.Header.Get(HeaderWopiRequestedName)
