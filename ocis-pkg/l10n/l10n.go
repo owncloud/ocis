@@ -166,13 +166,13 @@ func translateInner(value reflect.Value, tr func(string, ...any) string, fields 
 		return
 	}
 	for _, fl := range fields {
-		switch fl.(type) {
+		switch fl := fl.(type) {
 		case field:
-			translateStringField(value, tr, fl.(field))
+			translateStringField(value, tr, fl)
 		case each:
-			translateEach(value, tr, fl.(each))
+			translateEach(value, tr, fl)
 		case structs:
-			translateStruct(value, tr, fl.(structs))
+			translateStruct(value, tr, fl)
 		}
 	}
 }
