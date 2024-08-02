@@ -31,6 +31,7 @@ services:
       COLLABORATION_APP_INSECURE: "${INSECURE:-true}"
       COLLABORATION_CS3API_DATAGATEWAY_INSECURE: "${INSECURE:-true}"
       COLLABORATION_LOG_LEVEL: ${LOG_LEVEL:-info}
+      COLLABORATION_APP_PROOF_DISABLE: "true"
     volumes:
       - ocis-config:/etc/ocis
     labels:
