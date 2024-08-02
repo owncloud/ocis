@@ -315,7 +315,7 @@ class FilesVersionsContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
-		$response = $this->listVersionFolder($user, $fileId, 1, ['getcontentlength']);
+		$response = $this->listVersionFolder($user, $fileId, 1, ['d:getcontentlength']);
 		$responseXml = HttpRequestHelper::getResponseXml(
 			$response,
 			__METHOD__
@@ -504,7 +504,7 @@ class FilesVersionsContext implements Context {
 	):ResponseInterface {
 		if (!$properties) {
 			$properties = [
-				'getetag'
+				'd:getetag'
 			];
 		}
 		$user = $this->featureContext->getActualUsername($user);

@@ -30,7 +30,7 @@ Feature: using trashbin together with sharing
       | new              |
       | spaces           |
 
-  @issue-7555
+  @issue-1224 @issue-7555
   Scenario Outline: deleting a file in a received folder moves it to trashbin of both users
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -53,7 +53,7 @@ Feature: using trashbin together with sharing
       | new              |
       | spaces           |
 
-
+  @issue-1124
   Scenario Outline: sharee deleting a file in a group-shared folder moves it to the trashbin of sharee and sharer only
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -109,7 +109,7 @@ Feature: using trashbin together with sharing
       | new              |
       | spaces           |
 
-
+  @issue-1124
   Scenario Outline: sharee deleting a folder in a group-shared folder moves it to the trashbin of sharee and sharer only
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -128,11 +128,11 @@ Feature: using trashbin together with sharing
       | permissionsRole | Editor   |
     And user "Brian" has a share "shared" synced
     And user "Carol" has a share "shared" synced
-    When user "Brian" deletes file "/Shares/shared/sub/shared_file.txt" using the WebDAV API
+    When user "Brian" deletes folder "/Shares/shared/sub" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Brian" the file with original path "/Shares/shared/sub/shared_file.txt" should exist in the trashbin
     And as "Alice" the file with original path "/shared/sub/shared_file.txt" should exist in the trashbin
-    And as "Carol" the file with original path "/Shares/sub/shared/shared_file.txt" should not exist in the trashbin
+    And as "Carol" the file with original path "/Shares/shared/sub/shared_file.txt" should not exist in the trashbin
     Examples:
       | dav-path-version |
       | new              |
@@ -157,7 +157,7 @@ Feature: using trashbin together with sharing
       | permissionsRole | Editor   |
     And user "Brian" has a share "shared" synced
     And user "Carol" has a share "shared" synced
-    When user "Alice" deletes file "/shared/sub/shared_file.txt" using the WebDAV API
+    When user "Alice" deletes folder "/shared/sub" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" the file with original path "/shared/sub/shared_file.txt" should exist in the trashbin
     And as "Brian" the file with original path "/Shares/shared/sub/shared_file.txt" should not exist in the trashbin
@@ -167,7 +167,7 @@ Feature: using trashbin together with sharing
       | new              |
       | spaces           |
 
-  @issue-7555
+  @issue-1124 @issue-7555
   Scenario Outline: deleting a file in a received folder when restored it comes back to the original path
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

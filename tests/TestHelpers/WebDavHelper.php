@@ -130,7 +130,7 @@ class WebDavHelper {
 			if (\is_int($namespaceString)) {
 				//default namespace prefix if the property has no array key
 				//also used if no prefix is given in the property value
-				$namespacePrefix = "d";
+				$namespacePrefix = null;
 			} else {
 				//calculate the namespace prefix and namespace from the array key
 				$matches = [];
@@ -145,7 +145,12 @@ class WebDavHelper {
 				$namespacePrefix = $propertyParts[0];
 				$property = $propertyParts[1];
 			}
-			$propertyBody .= "<$namespacePrefix:$property/>";
+
+			if ($namespacePrefix) {
+				$propertyBody .= "<$namespacePrefix:$property/>";
+			} else {
+				$propertyBody .= "<$property/>";
+			}
 		}
 		$body = "<?xml version=\"1.0\"?>
 				<d:propfind
@@ -253,18 +258,22 @@ class WebDavHelper {
 		?string $propertyName,
 		?string $propertyValue,
 		?string $xRequestId = '',
-		?string $namespaceString = "oc='http://owncloud.org/ns'",
+		?string $namespaceString = null,
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 		?string $type="files"
 	):ResponseInterface {
-		$matches = [];
-		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
-		$namespace = $matches[2];
-		$namespacePrefix = $matches[1];
-		$propertyBody = "<$namespacePrefix:$propertyName" .
-			" xmlns:$namespacePrefix=\"$namespace\">" .
-			"$propertyValue" .
-			"</$namespacePrefix:$propertyName>";
+		if ($namespaceString !== null) {
+			$matches = [];
+			\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
+			$namespace = $matches[2];
+			$namespacePrefix = $matches[1];
+			$propertyBody = "<$namespacePrefix:$propertyName" .
+				" xmlns:$namespacePrefix=\"$namespace\">" .
+				"$propertyValue" .
+				"</$namespacePrefix:$propertyName>";
+		} else {
+			$propertyBody = "<$propertyName>$propertyValue</$propertyName>";
+		}
 		$body = "<?xml version=\"1.0\"?>
 				<d:propertyupdate xmlns:d=\"DAV:\"
 				   xmlns:oc=\"http://owncloud.org/ns\">
@@ -409,7 +418,7 @@ class WebDavHelper {
 	):ResponseInterface {
 		if (!$properties) {
 			$properties = [
-				'getetag', 'resourcetype'
+				'd:getetag', 'd:resourcetype'
 			];
 		}
 		return self::propfind(
@@ -931,7 +940,7 @@ class WebDavHelper {
 			$user,
 			$password,
 			$resource,
-			["getlastmodified"],
+			["d:getlastmodified"],
 			$xRequestId,
 			"0",
 			"files",

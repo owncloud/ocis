@@ -946,7 +946,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function downloadedContentShouldBe(string $content):void {
-		$this->checkDownloadedContentMatches($content);
+		$this->checkDownloadedContentMatches($content, '', $this->getResponse());
 	}
 
 	/**
@@ -986,7 +986,21 @@ trait WebDav {
 	 * @return void
 	 */
 	public function theContentInTheResponseShouldMatchTheFollowingContent(PyStringNode $content): void {
-		$this->checkDownloadedContentMatches($content->getRaw());
+		$this->checkDownloadedContentMatches($content->getRaw(), '', $this->getResponse());
+	}
+
+	/**
+	 * @Then the content in the response should include the following content:
+	 *
+	 * @param PyStringNode $content
+	 *
+	 * @return void
+	 */
+	public function theContentInTheResponseShouldIncludeTheFollowingContent(PyStringNode $content): void {
+		Assert::assertStringContainsString(
+			$content->getRaw(),
+			(string) $this->response->getBody()
+		);
 	}
 
 	/**
@@ -1024,7 +1038,7 @@ trait WebDav {
 	public function checkStatusCodeForDownloadedContentShouldBe(int $statusCode, string $content):void {
 		$actualStatusCode = $this->response->getStatusCode();
 		if ($actualStatusCode === $statusCode) {
-			$this->checkDownloadedContentMatches($content);
+			$this->checkDownloadedContentMatches($content, '', $this->getResponse());
 		}
 	}
 
