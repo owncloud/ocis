@@ -9,6 +9,13 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
+)
+
+var (
+	// _disabledByDefaultUnifiedRoleRoleIDs contains all roles that are not enabled by default,
+	// but can be enabled by the user.
+	_disabledByDefaultUnifiedRoleRoleIDs = []string{unifiedrole.UnifiedRoleSecureViewerID}
 )
 
 // FullDefaultConfig returns a fully initialized default configuration
@@ -163,6 +170,16 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Identity.LDAP.GroupCreateBaseDN == "" {
 		cfg.Identity.LDAP.GroupCreateBaseDN = cfg.Identity.LDAP.GroupBaseDN
+	}
+
+	// set default roles, if no roles are defined, we need to take care and provide all the default roles
+	if len(cfg.UnifiedRoles.AvailableRoles) == 0 {
+		for _, definition := range unifiedrole.GetBuiltinRoleDefinitionList(
+			// filter out the roles that are disabled by default
+			unifiedrole.RoleFilterInvert(unifiedrole.RoleFilterIDs(_disabledByDefaultUnifiedRoleRoleIDs...)),
+		) {
+			cfg.UnifiedRoles.AvailableRoles = append(cfg.UnifiedRoles.AvailableRoles, definition.GetId())
+		}
 	}
 }
 

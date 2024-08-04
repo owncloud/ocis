@@ -5,13 +5,14 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/clihelper"
 
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/urfave/cli/v2"
+
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 )
 
 // GetCommands provides all commands for this service
 func GetCommands(cfg *config.Config) cli.Commands {
-	return []*cli.Command{
+	return append([]*cli.Command{
 		// start this service
 		Server(cfg),
 
@@ -20,7 +21,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 		// infos about this service
 		Health(cfg),
 		Version(cfg),
-	}
+	}, UnifiedRoles(cfg)...)
 }
 
 // Execute is the entry point for the ocis-graph command.

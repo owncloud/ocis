@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
@@ -15,6 +16,7 @@ import (
 // GetRoleDefinitions a list of permission roles than can be used when sharing with users or groups
 func (g Graph) GetRoleDefinitions(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
+	// fixMe: should we consider all roles or only the ones that are enabled?
 	render.JSON(w, r, unifiedrole.GetBuiltinRoleDefinitionList())
 }
 
@@ -38,6 +40,7 @@ func (g Graph) GetRoleDefinition(w http.ResponseWriter, r *http.Request) {
 }
 
 func getRoleDefinition(roleID string) (*libregraph.UnifiedRoleDefinition, error) {
+	// fixMe: should we consider all roles or only the ones that are enabled?
 	roleList := unifiedrole.GetBuiltinRoleDefinitionList()
 	for _, role := range roleList {
 		if role != nil && role.Id != nil && *role.Id == roleID {

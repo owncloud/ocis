@@ -12,6 +12,31 @@ import (
 	"github.com/cs3org/reva/v2/pkg/conversions"
 )
 
+// roleFilter is used to filter role collections
+type roleFilter func(r *libregraph.UnifiedRoleDefinition) bool
+
+var (
+	// RoleFilterInvert inverts the provided role filter
+	RoleFilterInvert = func(f roleFilter) roleFilter {
+		return func(r *libregraph.UnifiedRoleDefinition) bool {
+			return !f(r)
+		}
+	}
+
+	// RoleFilterIDs returns a role filter that matches the provided ids
+	RoleFilterIDs = func(ids ...string) roleFilter {
+		return func(r *libregraph.UnifiedRoleDefinition) bool {
+			for _, id := range ids {
+				if r.GetId() == id {
+					return true
+				}
+			}
+
+			return false
+		}
+	}
+)
+
 const (
 	// UnifiedRoleViewerID Unified role viewer id.
 	UnifiedRoleViewerID = "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
@@ -58,7 +83,7 @@ const (
 	DriveItemPermissionsDeny   = "libre.graph/driveItem/permissions/deny"
 )
 
-var legacyNames map[string]string = map[string]string{
+var legacyNames = map[string]string{
 	UnifiedRoleViewerID: conversions.RoleViewer,
 	// one V1 api the "spaceviewer" role was call "viewer" and the "spaceeditor" was "editor",
 	// we need to stay compatible with that
@@ -217,6 +242,7 @@ func NewSecureViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 
 // NewUnifiedRoleFromID returns a unified role definition from the provided id
 func NewUnifiedRoleFromID(id string) (*libregraph.UnifiedRoleDefinition, error) {
+	// fixMe: should we consider all roles or only the ones that are enabled?
 	for _, definition := range GetBuiltinRoleDefinitionList() {
 		if definition.GetId() != id {
 			continue
@@ -228,8 +254,8 @@ func NewUnifiedRoleFromID(id string) (*libregraph.UnifiedRoleDefinition, error) 
 	return nil, errors.New("role not found")
 }
 
-func GetBuiltinRoleDefinitionList() []*libregraph.UnifiedRoleDefinition {
-	return []*libregraph.UnifiedRoleDefinition{
+func GetBuiltinRoleDefinitionList(filter ...roleFilter) []*libregraph.UnifiedRoleDefinition {
+	roles := []*libregraph.UnifiedRoleDefinition{
 		NewViewerUnifiedRole(),
 		NewSpaceViewerUnifiedRole(),
 		NewEditorUnifiedRole(),
@@ -239,11 +265,20 @@ func GetBuiltinRoleDefinitionList() []*libregraph.UnifiedRoleDefinition {
 		NewManagerUnifiedRole(),
 		NewSecureViewerUnifiedRole(),
 	}
+
+	for _, f := range filter {
+		roles = slices.DeleteFunc(roles, func(r *libregraph.UnifiedRoleDefinition) bool {
+			return !f(r)
+		})
+	}
+
+	return roles
 }
 
 // GetApplicableRoleDefinitionsForActions returns a list of role definitions
 // that match the provided actions and constraints
 func GetApplicableRoleDefinitionsForActions(actions []string, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
+	// fixMe: should we consider all roles or only the ones that are enabled?
 	builtin := GetBuiltinRoleDefinitionList()
 	definitions := make([]*libregraph.UnifiedRoleDefinition, 0, len(builtin))
 
@@ -442,6 +477,7 @@ func CS3ResourcePermissionsToUnifiedRole(p *provider.ResourcePermissions, constr
 	}
 
 	var res *libregraph.UnifiedRoleDefinition
+	// fixMe: should we consider all roles or only the ones that are enabled?
 	for _, uRole := range GetBuiltinRoleDefinitionList() {
 		matchFound := false
 		for _, uPerm := range uRole.GetRolePermissions() {

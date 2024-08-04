@@ -84,6 +84,8 @@ func rolesAndActions(sl validator.StructLevel, roles, actions []string, allowEmp
 	var availableRoles []string
 	var availableActions []string
 	for _, definition := range append(
+		// fixMe: why twice!?
+		// fixMe: should we consider all roles or only the ones that are enabled?
 		unifiedrole.GetBuiltinRoleDefinitionList(),
 		unifiedrole.GetBuiltinRoleDefinitionList()...,
 	) {
