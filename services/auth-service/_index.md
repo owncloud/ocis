@@ -1,6 +1,6 @@
 ---
 title: Auth-Service
-date: 2024-08-02T11:31:11.613867208Z
+date: 2024-08-04T00:05:44.925958561Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-service
