@@ -30,6 +30,7 @@ type Config struct {
 	Identity          Identity    `yaml:"identity"`
 	IncludeOCMSharees bool        `yaml:"include_ocm_sharees" env:"OCIS_ENABLE_OCM;GRAPH_INCLUDE_OCM_SHAREES" desc:"Include OCM sharees when listing users." introductionVersion:"5.0"`
 	Events            Events      `yaml:"events"`
+	UnifiedRoles      UnifiedRoles `yaml:"unified_roles"`
 
 	Keycloak       Keycloak       `yaml:"keycloak"`
 	ServiceAccount ServiceAccount `yaml:"service_account"`

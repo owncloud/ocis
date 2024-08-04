@@ -4,7 +4,6 @@ import (
 	"cmp"
 	"errors"
 	"slices"
-	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -12,6 +11,31 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/cs3org/reva/v2/pkg/conversions"
+)
+
+// roleFilter is used to filter role collections
+type roleFilter func(r *libregraph.UnifiedRoleDefinition) bool
+
+var (
+	// RoleFilterInvert inverts the provided role filter
+	RoleFilterInvert = func(f roleFilter) roleFilter {
+		return func(r *libregraph.UnifiedRoleDefinition) bool {
+			return !f(r)
+		}
+	}
+
+	// RoleFilterIDs returns a role filter that matches the provided ids
+	RoleFilterIDs = func(ids ...string) roleFilter {
+		return func(r *libregraph.UnifiedRoleDefinition) bool {
+			for _, id := range ids {
+				if r.GetId() == id {
+					return true
+				}
+			}
+
+			return false
+		}
+	}
 )
 
 const (
@@ -31,18 +55,6 @@ const (
 	UnifiedRoleManagerID = "312c0871-5ef7-4b3a-85b6-0e4074c64049"
 	// UnifiedRoleSecureViewerID Unified role secure viewer id.
 	UnifiedRoleSecureViewerID = "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-	// UnifiedRoleFederatedViewerID Unified role federated viewer id.
-	UnifiedRoleFederatedViewerID = "be531789-063c-48bf-a9fe-857e6fbee7da"
-	// UnifiedRoleFederatedEditorID Unified role federated editor id.
-	UnifiedRoleFederatedEditorID = "36279a93-e4e3-4bbb-8a23-53b05b560963"
-
-	// Wile the below conditions follow the SDDL syntax, they are not parsed anywhere. We use them as strings to
-	// represent the constraints that a role definition applies to. For the actual syntax, see the SDDL documentation
-	// at https://learn.microsoft.com/en-us/windows/win32/secauthz/security-descriptor-definition-language-for-conditional-aces-#conditional-expressions
-
-	// Some roles apply to a specific type of resource, for example, a role that applies to a file or a folder.
-	// @Resource is the placeholder for the resource that the role is applied to
-	// .Root, .Folder and .File are facets of the driveItem resource that indicate the type of the resource if they are present.
 
 	// UnifiedRoleConditionDrive defines constraint that matches a Driveroot/Spaceroot
 	UnifiedRoleConditionDrive = "exists @Resource.Root"
@@ -50,19 +62,6 @@ const (
 	UnifiedRoleConditionFolder = "exists @Resource.Folder"
 	// UnifiedRoleConditionFile defines a constraint that matches a DriveItem representing a File
 	UnifiedRoleConditionFile = "exists @Resource.File"
-
-	// Some roles apply to a specific type of user, for example, a role that applies to a federated user.
-	// @Subject is the placeholder for the subject that the role is applied to. For sharing roles this is the user that the resource is shared with.
-	// .UserType is the type of the user: 'Member' for a member of the organization, 'Guest' for a guest user, 'Federated' for a federated user.
-
-	// UnifiedRoleConditionFederatedUser defines a constraint that matches a federated user
-	UnifiedRoleConditionFederatedUser = "@Subject.UserType==\"Federated\""
-
-	// For federated sharing we need roles that combine the constraints for the resource and the user.
-	// UnifiedRoleConditionFileFederatedUser defines a constraint that matches a File and a federated user
-	UnifiedRoleConditionFileFederatedUser = UnifiedRoleConditionFile + " && " + UnifiedRoleConditionFederatedUser
-	// UnifiedRoleConditionFolderFederatedUser defines a constraint that matches a Folder and a federated user
-	UnifiedRoleConditionFolderFederatedUser = UnifiedRoleConditionFolder + " && " + UnifiedRoleConditionFederatedUser
 
 	DriveItemPermissionsCreate = "libre.graph/driveItem/permissions/create"
 	DriveItemChildrenCreate    = "libre.graph/driveItem/children/create"
@@ -85,7 +84,7 @@ const (
 	DriveItemPermissionsDeny   = "libre.graph/driveItem/permissions/deny"
 )
 
-var legacyNames map[string]string = map[string]string{
+var legacyNames = map[string]string{
 	UnifiedRoleViewerID: conversions.RoleViewer,
 	// one V1 api the "spaceviewer" role was call "viewer" and the "spaceeditor" was "editor",
 	// we need to stay compatible with that
@@ -156,14 +155,6 @@ func NewViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 				AllowedResourceActions: convert(r),
 				Condition:              proto.String(UnifiedRoleConditionFolder),
 			},
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionFileFederatedUser),
-			},
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionFolderFederatedUser),
-			},
 		},
 		LibreGraphWeight: proto.Int32(0),
 	}
@@ -198,10 +189,6 @@ func NewEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 				AllowedResourceActions: convert(r),
 				Condition:              proto.String(UnifiedRoleConditionFolder),
 			},
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionFolderFederatedUser),
-			},
 		},
 		LibreGraphWeight: proto.Int32(0),
 	}
@@ -235,10 +222,6 @@ func NewFileEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 			{
 				AllowedResourceActions: convert(r),
 				Condition:              proto.String(UnifiedRoleConditionFile),
-			},
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionFileFederatedUser),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
@@ -302,6 +285,7 @@ func NewSecureViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 
 // NewUnifiedRoleFromID returns a unified role definition from the provided id
 func NewUnifiedRoleFromID(id string) (*libregraph.UnifiedRoleDefinition, error) {
+	// fixMe: should we consider all roles or only the ones that are enabled?
 	for _, definition := range GetBuiltinRoleDefinitionList() {
 		if definition.GetId() != id {
 			continue
@@ -313,8 +297,8 @@ func NewUnifiedRoleFromID(id string) (*libregraph.UnifiedRoleDefinition, error) 
 	return nil, errors.New("role not found")
 }
 
-func GetBuiltinRoleDefinitionList() []*libregraph.UnifiedRoleDefinition {
-	return []*libregraph.UnifiedRoleDefinition{
+func GetBuiltinRoleDefinitionList(filter ...roleFilter) []*libregraph.UnifiedRoleDefinition {
+	roles := []*libregraph.UnifiedRoleDefinition{
 		NewViewerUnifiedRole(),
 		NewSpaceViewerUnifiedRole(),
 		NewEditorUnifiedRole(),
@@ -324,11 +308,20 @@ func GetBuiltinRoleDefinitionList() []*libregraph.UnifiedRoleDefinition {
 		NewManagerUnifiedRole(),
 		NewSecureViewerUnifiedRole(),
 	}
+
+	for _, f := range filter {
+		roles = slices.DeleteFunc(roles, func(r *libregraph.UnifiedRoleDefinition) bool {
+			return !f(r)
+		})
+	}
+
+	return roles
 }
 
 // GetApplicableRoleDefinitionsForActions returns a list of role definitions
 // that match the provided actions and constraints
-func GetApplicableRoleDefinitionsForActions(actions []string, constraints string, listFederatedRoles, descending bool) []*libregraph.UnifiedRoleDefinition {
+func GetApplicableRoleDefinitionsForActions(actions []string, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
+	// fixMe: should we consider all roles or only the ones that are enabled?
 	builtin := GetBuiltinRoleDefinitionList()
 	definitions := make([]*libregraph.UnifiedRoleDefinition, 0, len(builtin))
 
@@ -336,14 +329,7 @@ func GetApplicableRoleDefinitionsForActions(actions []string, constraints string
 		var definitionMatch bool
 
 		for _, permission := range definition.GetRolePermissions() {
-			// this is a dirty comparison because we are not really parsing the SDDL, but as long as we && the conditions we are good
-			isFederatedRole := strings.Contains(permission.GetCondition(), UnifiedRoleConditionFederatedUser)
-			switch {
-			case !strings.Contains(permission.GetCondition(), constraints):
-				continue
-			case listFederatedRoles && !isFederatedRole:
-				continue
-			case !listFederatedRoles && isFederatedRole:
+			if permission.GetCondition() != constraints {
 				continue
 			}
 
@@ -534,6 +520,7 @@ func CS3ResourcePermissionsToUnifiedRole(p *provider.ResourcePermissions, constr
 	}
 
 	var res *libregraph.UnifiedRoleDefinition
+	// fixMe: should we consider all roles or only the ones that are enabled?
 	for _, uRole := range GetBuiltinRoleDefinitionList() {
 		matchFound := false
 		for _, uPerm := range uRole.GetRolePermissions() {

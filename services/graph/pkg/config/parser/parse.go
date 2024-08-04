@@ -5,11 +5,13 @@ import (
 	"fmt"
 
 	"github.com/go-ldap/ldap/v3"
+
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	defaults2 "github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )
@@ -70,6 +72,23 @@ func Validate(cfg *config.Config) error {
 	}
 	if cfg.ServiceAccount.ServiceAccountSecret == "" {
 		return shared.MissingServiceAccountSecret(cfg.Service.Name)
+	}
+
+	// validate unified roles
+	{
+		var err error
+
+		for _, uid := range cfg.UnifiedRoles.AvailableRoles {
+			// check if the role is known
+			if len(unifiedrole.GetBuiltinRoleDefinitionList(unifiedrole.RoleFilterIDs(uid))) == 0 {
+				// collect all possible errors to return them all at once
+				err = errors.Join(err, fmt.Errorf("%w: %s", unifiedrole.ErrUnknownUnifiedRole, uid))
+			}
+		}
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
