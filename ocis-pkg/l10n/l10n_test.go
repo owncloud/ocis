@@ -8,7 +8,7 @@ import (
 
 func TestTranslateStruct(t *testing.T) {
 
-	type InnreStruct struct {
+	type InnerStruct struct {
 		Description string
 		DisplayName *string
 	}
@@ -16,12 +16,12 @@ func TestTranslateStruct(t *testing.T) {
 	type TopLevelStruct struct {
 		Description string
 		DisplayName *string
-		SubStruct   *InnreStruct
+		SubStruct   *InnerStruct
 	}
 
 	type WrapperStruct struct {
 		Description string
-		StructList  []*InnreStruct
+		StructList  []*InnerStruct
 	}
 
 	toStrPointer := func(str string) *string {
@@ -30,7 +30,7 @@ func TestTranslateStruct(t *testing.T) {
 
 	type args struct {
 		structPtr interface{}
-		request   []any
+		//request   []any
 	}
 	tests := []struct {
 		name     string
@@ -41,21 +41,21 @@ func TestTranslateStruct(t *testing.T) {
 		{
 			name: "top level slice of struct",
 			args: args{
-				structPtr: []*InnreStruct{
-					{
-						Description: "inner 1",
-						DisplayName: toStrPointer("innerDisplayName 1"),
+				structPtr: TranslateEach(
+					[]*InnerStruct{
+						{
+							Description: "inner 1",
+							DisplayName: toStrPointer("innerDisplayName 1"),
+						},
+						{
+							Description: "inner 2",
+							DisplayName: toStrPointer("innerDisplayName 2"),
+						},
 					},
-					{
-						Description: "inner 2",
-						DisplayName: toStrPointer("innerDisplayName 2"),
-					},
-				},
-				request: []any{
 					TranslateField("Description"),
-					TranslateField("DisplayName")},
+					TranslateField("DisplayName")),
 			},
-			expected: []*InnreStruct{
+			expected: []*InnerStruct{
 				{
 					Description: "new Inner 1",
 					DisplayName: toStrPointer("new InnerDisplayName 1"),
@@ -67,34 +67,48 @@ func TestTranslateStruct(t *testing.T) {
 			},
 		},
 		{
+			name: "top level slice of string",
+			args: args{
+				structPtr: TranslateEach(
+					[]string{
+						"inner 1",
+						"inner 2",
+					}),
+			},
+			expected: []string{
+				"new Inner 1",
+				"new Inner 2",
+			},
+		},
+		{
 			name: "top level slice of struct",
 			args: args{
-				structPtr: []*TopLevelStruct{
-					{
-						Description: "inner 1",
-						DisplayName: toStrPointer("innerDisplayName 1"),
-						SubStruct: &InnreStruct{
-							Description: "inner",
-							DisplayName: toStrPointer("innerDisplayName"),
+				structPtr: TranslateEach(
+					[]*TopLevelStruct{
+						{
+							Description: "inner 1",
+							DisplayName: toStrPointer("innerDisplayName 1"),
+							SubStruct: &InnerStruct{
+								Description: "inner",
+								DisplayName: toStrPointer("innerDisplayName"),
+							},
+						},
+						{
+							Description: "inner 2",
+							DisplayName: toStrPointer("innerDisplayName 2"),
 						},
 					},
-					{
-						Description: "inner 2",
-						DisplayName: toStrPointer("innerDisplayName 2"),
-					},
-				},
-				request: []any{
 					TranslateField("Description"),
 					TranslateField("DisplayName"),
 					TranslateStruct("SubStruct",
 						TranslateField("Description"),
-						TranslateField("DisplayName"))},
+						TranslateField("DisplayName"))),
 			},
 			expected: []*TopLevelStruct{
 				{
 					Description: "new Inner 1",
 					DisplayName: toStrPointer("new InnerDisplayName 1"),
-					SubStruct: &InnreStruct{
+					SubStruct: &InnerStruct{
 						Description: "new Inner",
 						DisplayName: toStrPointer("new InnerDisplayName"),
 					},
@@ -108,25 +122,26 @@ func TestTranslateStruct(t *testing.T) {
 		{
 			name: "wrapped struct full",
 			args: args{
-				structPtr: &WrapperStruct{
-					StructList: []*InnreStruct{
-						{
-							Description: "inner 1",
-							DisplayName: toStrPointer("innerDisplayName 1"),
-						},
-						{
-							Description: "inner 2",
-							DisplayName: toStrPointer("innerDisplayName 2"),
+				structPtr: TranslateStruct(
+					&WrapperStruct{
+						StructList: []*InnerStruct{
+							{
+								Description: "inner 1",
+								DisplayName: toStrPointer("innerDisplayName 1"),
+							},
+							{
+								Description: "inner 2",
+								DisplayName: toStrPointer("innerDisplayName 2"),
+							},
 						},
 					},
-				},
-				request: []any{
 					TranslateEach("StructList",
 						TranslateField("Description"),
-						TranslateField("DisplayName"))},
+						TranslateField("DisplayName")),
+				),
 			},
 			expected: &WrapperStruct{
-				StructList: []*InnreStruct{
+				StructList: []*InnerStruct{
 					{
 						Description: "new Inner 1",
 						DisplayName: toStrPointer("new InnerDisplayName 1"),
@@ -141,41 +156,39 @@ func TestTranslateStruct(t *testing.T) {
 		{
 			name: "empty struct, NotExistingSubStructName",
 			args: args{
-				structPtr: &TopLevelStruct{},
-				request: []any{
+				structPtr: TranslateStruct(
+					&TopLevelStruct{},
 					TranslateField("Description"),
 					TranslateField("DisplayName"),
 					TranslateStruct("NotExistingSubStructName",
 						TranslateField("Description"),
-						TranslateField("DisplayName")),
-				},
+						TranslateField("DisplayName"))),
 			},
 			expected: &TopLevelStruct{},
 		},
 		{
 			name: "empty struct",
 			args: args{
-				structPtr: &TopLevelStruct{},
-				request: []any{
+				structPtr: TranslateStruct(
+					&TopLevelStruct{},
 					TranslateField("Description"),
 					TranslateField("DisplayName"),
 					TranslateStruct("SubStruct",
 						TranslateField("Description"),
-						TranslateField("DisplayName"))},
+						TranslateField("DisplayName"))),
 			},
 			expected: &TopLevelStruct{},
 		},
 		{
 			name: "empty struct, not existing field",
 			args: args{
-				structPtr: &TopLevelStruct{
-					Description: "description",
-					DisplayName: toStrPointer("displayName"),
-				},
-				request: []any{
-					TranslateField("NotExistingFieldName"),
+				structPtr: TranslateStruct(
+					&TopLevelStruct{
+						Description: "description",
+						DisplayName: toStrPointer("displayName"),
+					}, TranslateField("NotExistingFieldName"),
 					TranslateStruct("SubStruct",
-						TranslateField("NotExistingFieldName"))},
+						TranslateField("NotExistingFieldName"))),
 			},
 			expected: &TopLevelStruct{
 				Description: "description",
@@ -185,15 +198,16 @@ func TestTranslateStruct(t *testing.T) {
 		{
 			name: "inner struct DisplayName empy",
 			args: args{
-				structPtr: &TopLevelStruct{
-					Description: "description",
-					DisplayName: toStrPointer("displayName"),
-				},
-				request: []any{TranslateField("Description"),
+				structPtr: TranslateStruct(
+					&TopLevelStruct{
+						Description: "description",
+						DisplayName: toStrPointer("displayName"),
+					},
+					TranslateField("Description"),
 					TranslateField("DisplayName"),
 					TranslateStruct("SubStruct",
 						TranslateField("Description"),
-						TranslateField("DisplayName"))},
+						TranslateField("DisplayName"))),
 			},
 			expected: &TopLevelStruct{
 				Description: "new Description",
@@ -203,15 +217,17 @@ func TestTranslateStruct(t *testing.T) {
 		{
 			name: "inner struct full",
 			args: args{
-				structPtr: &TopLevelStruct{
-					Description: "description",
-					DisplayName: toStrPointer("displayName"),
-				},
-				request: []any{TranslateField("Description"),
+				structPtr: TranslateStruct(
+					&TopLevelStruct{
+						Description: "description",
+						DisplayName: toStrPointer("displayName"),
+					},
+					TranslateField("Description"),
 					TranslateField("DisplayName"),
 					TranslateStruct("SubStruct",
 						TranslateField("Description"),
-						TranslateField("DisplayName"))},
+						TranslateField("DisplayName")),
+				),
 			},
 			expected: &TopLevelStruct{
 				Description: "new Description",
@@ -221,25 +237,25 @@ func TestTranslateStruct(t *testing.T) {
 		{
 			name: "full struct",
 			args: args{
-				structPtr: &TopLevelStruct{
-					Description: "description",
-					DisplayName: toStrPointer("displayName"),
-					SubStruct: &InnreStruct{
-						Description: "inner",
-						DisplayName: toStrPointer("innerDisplayName"),
-					},
-				},
-				request: []any{
+				structPtr: TranslateStruct(
+					&TopLevelStruct{
+						Description: "description",
+						DisplayName: toStrPointer("displayName"),
+						SubStruct: &InnerStruct{
+							Description: "inner",
+							DisplayName: toStrPointer("innerDisplayName"),
+						}},
 					TranslateField("Description"),
 					TranslateField("DisplayName"),
 					TranslateStruct("SubStruct",
 						TranslateField("Description"),
-						TranslateField("DisplayName"))},
+						TranslateField("DisplayName")),
+				),
 			},
 			expected: &TopLevelStruct{
 				Description: "new Description",
 				DisplayName: toStrPointer("new DisplayName"),
-				SubStruct: &InnreStruct{
+				SubStruct: &InnerStruct{
 					Description: "new Inner",
 					DisplayName: toStrPointer("new InnerDisplayName"),
 				},
@@ -249,26 +265,31 @@ func TestTranslateStruct(t *testing.T) {
 			name: "nil",
 			args: args{
 				structPtr: nil,
-				request:   []any{TranslateField("Description")},
 			},
-			expected: nil,
+			wantErr: true,
 		},
 		{
 			name: "empty slice",
 			args: args{
-				structPtr: []string{},
-				request:   []any{TranslateField("Description")},
+				structPtr: []any{TranslateEach([]string{})},
 			},
-			expected: []string{},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := TranslateEntity(tt.args.structPtr, mock(), tt.args.request...)
+			err := TranslateEntity(mock(), tt.args.structPtr)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TranslateEntity() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			assert.Equal(t, tt.expected, tt.args.structPtr)
+			switch a := tt.args.structPtr.(type) {
+			case structs:
+				assert.Equal(t, tt.expected, a()[0])
+			case maps:
+				assert.Equal(t, tt.expected, a()[0])
+			case each:
+				assert.Equal(t, tt.expected, a()[0])
+			}
 		})
 	}
 }

@@ -4,6 +4,7 @@ package l10n
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"reflect"
@@ -57,9 +58,10 @@ func TranslateLocation(t Translator, locale string) func(string, ...any) string 
 	return t.Locale(locale).Get
 }
 
+type structs func() []any
+type maps func() []any
+type each func() []any
 type field func() string
-type structs func() (string, []any)
-type each func() (string, []any)
 
 func TranslateField(fieldName string) field {
 	return func() string {
@@ -67,94 +69,90 @@ func TranslateField(fieldName string) field {
 	}
 }
 
-func TranslateStruct(fieldName string, fn ...any) structs {
-	return func() (string, []any) {
-		return fieldName, fn
+func TranslateStruct(args ...any) structs {
+	return func() []any {
+		return args
 	}
 }
 
-func TranslateEach(fieldName string, fn ...any) each {
-	return func() (string, []any) {
-		return fieldName, fn
+func TranslateMap(args ...any) maps {
+	return func() []any {
+		return args
+	}
+}
+
+func TranslateEach(args ...any) each {
+	return func() []any {
+		return args
 	}
 }
 
 // TranslateEntity function provides the generic way to translate the necessary fields in composite entities.
-// The function takes the entity, translation function and fields to translate
-// that are described by the TranslateField function. The function supports nested structs and slices of structs.
+// The function takes TranslateLocation function and entity with fields to translate.
+// The function supports nested structs and slices of structs.
+// Depending on entity type it should be wrapped to the appropriate function TranslateStruct, TranslateEach, TranslateField.
 //
-//				type InnreStruct struct {
-//					Description string
-//					DisplayName *string
-//				}
+//		type InnerStruct struct {
+//			Description string
+//			DisplayName *string
+//		}
 //
-//				type TopLevelStruct struct {
-//					Description string
-//					DisplayName *string
-//					SubStruct   *InnreStruct
-//	             StructList []*InnreStruct
-//				}
-//		    s:=  &TopLevelStruct{
-//							Description: "description",
-//							DisplayName: toStrPointer("displayName"),
-//							SubStruct: &InnreStruct{
-//								Description: "inner",
-//								DisplayName: toStrPointer("innerDisplayName"),
-//							},
-//	                     StructList: []*InnreStruct{
-//	             			{
-//	             				Description: "inner 1",
-//	             				DisplayName: toStrPointer("innerDisplayName 1"),
-//	             			},
-//	             			{
-//	             				Description: "inner 2",
-//	             				DisplayName: toStrPointer("innerDisplayName 2"),
-//	             	 		},
-//	             	   	},
-//	                  }
-//			 TranslateEntity(s, translateFunc(),
-//			                    TranslateField("Description"),
-//								TranslateField("DisplayName"),
-//								TranslateStruct("SubStruct",
-//									TranslateField("Description"),
-//									TranslateField("DisplayName")),
-//			                    TranslateEach("StructList",
-//							        TranslateField("Description"),
-//							        TranslateField("DisplayName")))
-func TranslateEntity(entity any, tr func(string, ...any) string, fields ...any) error {
-	value := reflect.ValueOf(entity)
-	// Indirect through pointers and interfaces
-	if value.Kind() == reflect.Ptr || value.Kind() == reflect.Interface {
-		if value.IsNil() {
-			return nil
+//		type WrapperStruct struct {
+//	     StructList []*InnerStruct
+//		}
+//		s:= &WrapperStruct{
+//			StructList: []*InnerStruct{
+//					{
+//						Description: "innerDescription 1",
+//						DisplayName: toStrPointer("innerDisplayName 1"),
+//					},
+//					{
+//						Description: "innerDescription 2",
+//						DisplayName: toStrPointer("innerDisplayName 2"),
+//					},
+//				},
+//			}
+//		tr := l10n_pkg.NewTranslateLocation(loc, "en")
+//		err := l10n.TranslateEntity(tr,
+//			l10n.TranslateStruct(s,
+//				l10n.TranslateEach("StructList",
+//					l10n.TranslateField("Description"),
+//					l10n.TranslateField("DisplayName"))),
+//		)
+func TranslateEntity(tr func(string, ...any) string, arg any) error {
+	switch a := arg.(type) {
+	case structs:
+		args := a()
+		if len(args) < 2 {
+			return fmt.Errorf("the TranslateStruct function expects at least 2 arguments, sructure and fields to translate")
 		}
-		value = value.Elem()
-	}
-
-	switch value.Kind() {
-	case reflect.Slice, reflect.Map:
-		for i := 0; i < value.Len(); i++ {
-			nextValue := value.Index(i)
-			// Indirect through pointers and interfaces
-			if nextValue.Kind() == reflect.Ptr || nextValue.Kind() == reflect.Interface {
-				if nextValue.IsNil() {
-					// treat a nil struct pointer as valid
-					continue
-				}
-				nextValue = value.Index(i).Elem()
-			}
-			translateInner(nextValue, tr, fields...)
+		entity := args[0]
+		value := reflect.ValueOf(entity)
+		if !isStruct(value) {
+			return fmt.Errorf("the root entity must be a struct, got %v", value.Kind())
+		}
+		rangeOverArgs(tr, value, args[1:]...)
+		return nil
+	case each:
+		args := a()
+		if len(args) < 1 {
+			return fmt.Errorf("the translateEach function expects at least 1 argument, slice")
+		}
+		entity := args[0]
+		value := reflect.ValueOf(entity)
+		if len(args) > 1 {
+			translateEach(tr, value, args[1:]...)
+		} else {
+			translateEach(tr, value)
 		}
 		return nil
+	case maps:
+		// TODO implement
 	}
-	translateInner(value, tr, fields...)
-	return nil
+	return ErrUnsupportedType
 }
 
-func translateInner(value reflect.Value, tr func(string, ...any) string, fields ...any) {
-	if !value.IsValid() {
-		return
-	}
+func translateEach(tr func(string, ...any) string, value reflect.Value, args ...any) {
 	// Indirect through pointers and interfaces
 	if value.Kind() == reflect.Ptr || value.Kind() == reflect.Interface {
 		if value.IsNil() {
@@ -165,50 +163,76 @@ func translateInner(value reflect.Value, tr func(string, ...any) string, fields 
 	if !value.IsValid() {
 		return
 	}
-	for _, fl := range fields {
-		switch fl := fl.(type) {
+	switch value.Kind() {
+	case reflect.Array, reflect.Slice:
+		for i := 0; i < value.Len(); i++ {
+			v := value.Index(i)
+			if args != nil {
+				rangeOverArgs(tr, v, args...)
+				continue
+			}
+			translateField(tr, v)
+		}
+	case reflect.Map:
+		for _, k := range value.MapKeys() {
+			rangeOverArgs(tr, value.MapIndex(k), args...)
+		}
+	}
+}
+
+func rangeOverArgs(tr func(string, ...any) string, value reflect.Value, args ...any) {
+	// Indirect through pointers and interfaces
+	if value.Kind() == reflect.Ptr || value.Kind() == reflect.Interface {
+		if value.IsNil() {
+			return
+		}
+		value = value.Elem()
+	}
+	if !value.IsValid() {
+		return
+	}
+	for _, arg := range args {
+		switch a := arg.(type) {
 		case field:
-			translateStringField(value, tr, fl)
-		case each:
-			translateEach(value, tr, fl)
+			fieldName := a()
+			// exported field
+			f := value.FieldByName(fieldName)
+			translateField(tr, f)
 		case structs:
-			translateStruct(value, tr, fl)
+			args := a()
+			if len(args) > 2 {
+				if fieldName, ok := args[0].(string); ok {
+					// exported field
+					innerValue := value.FieldByName(fieldName)
+					if !innerValue.IsValid() {
+						return
+					}
+					if isStruct(innerValue) {
+						rangeOverArgs(tr, innerValue, args[1:]...)
+						return
+					}
+				}
+			}
+		case each:
+			args := a()
+			if len(args) > 2 {
+				if fieldName, ok := args[0].(string); ok {
+					// exported field
+					innerValue := value.FieldByName(fieldName)
+					if !innerValue.IsValid() {
+						return
+					}
+					switch innerValue.Kind() {
+					case reflect.Array, reflect.Slice:
+						translateEach(tr, innerValue, args[1:]...)
+					}
+				}
+			}
 		}
 	}
 }
 
-func translateEach(value reflect.Value, tr func(string, ...any) string, fl each) {
-	fieldName, fields := fl()
-	// exported field
-	innerValue := value.FieldByName(fieldName)
-	if !innerValue.IsValid() {
-		return
-	}
-	switch innerValue.Kind() {
-	case reflect.Slice, reflect.Map:
-		for i := 0; i < innerValue.Len(); i++ {
-			translateInner(innerValue.Index(i), tr, fields...)
-		}
-	}
-}
-
-func translateStruct(value reflect.Value, tr func(string, ...any) string, fl structs) {
-	fieldName, fields := fl()
-	// exported field
-	innerValue := value.FieldByName(fieldName)
-	if !innerValue.IsValid() {
-		return
-	}
-	if isStruct(innerValue) {
-		translateInner(innerValue, tr, fields...)
-		return
-	}
-}
-
-func translateStringField(value reflect.Value, tr func(string, ...any) string, fl field) {
-	fieldName := fl()
-	// exported field
-	f := value.FieldByName(fieldName)
+func translateField(tr func(string, ...any) string, f reflect.Value) {
 	if f.IsValid() {
 		if f.Kind() == reflect.Ptr {
 			if f.IsNil() {
