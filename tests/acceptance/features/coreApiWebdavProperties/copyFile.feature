@@ -951,3 +951,31 @@ Feature: copy file
       | spaces           | "'single'"  | "folder-'single'"  | "folder-'single'/'single'"   |
       | spaces           | "question?" | "folder-question?" | "folder-question?/question?" |
       | spaces           | "&and#hash" | "folder-&and#hash" | "folder-&and#hash/&and#hash" |
+
+  @issue-8711
+  Scenario Outline: copying a file to itself
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "lorem epsum" to "textfile.txt"
+    When user "Alice" copies file "textfile.txt" to "textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "textfile.txt" for user "Alice" should be "lorem epsum"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @issue-8711
+  Scenario Outline: copying a folder to itself
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "FOLDER1"
+    And user "Alice" has uploaded file with content "Folder 1 text" to "FOLDER1/textfile.txt"
+    When user "Alice" copies folder "FOLDER1" to "FOLDER1" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "FOLDER1" should exist
+    And the content of file "FOLDER1/textfile.txt" for user "Alice" should be "lorem epsum"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |

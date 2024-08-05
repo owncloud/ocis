@@ -57,7 +57,7 @@ Feature: copying from public link share
     And the content of file "/PARENT/testFolder/copy1.txt" for user "Alice" should be "some data"
 
 
-  Scenario: copy file within a public link folder to same file name as already existing one
+  Scenario: copy file within a public link folder to existing file
     Given user "Alice" has uploaded file with content "some data 0" to "/PARENT/testfile.txt"
     And user "Alice" has uploaded file with content "some data 1" to "/PARENT/copy1.txt"
     And using SharingNG
@@ -72,7 +72,7 @@ Feature: copying from public link share
     And the content of file "/PARENT/copy1.txt" for user "Alice" should be "some data 0"
 
   @issue-1232
-  Scenario: copy folder within a public link folder to the same folder name as an already existing file
+  Scenario: copy folder within a public link folder to existing file
     Given user "Alice" has created folder "/PARENT/testFolder"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/testFolder/testfile.txt"
     And user "Alice" has uploaded file with content "some data 1" to "/PARENT/copy1.txt"
@@ -82,11 +82,11 @@ Feature: copying from public link share
       | space           | Personal |
       | permissionsRole | edit     |
     When the public copies folder "/testFolder" to "/copy1.txt" using the new public WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "204"
     And as "Alice" folder "/PARENT/testFolder" should exist
-    And as "Alice" folder "/PARENT/copy1.txt" should exist
-    And as "Alice" file "/PARENT/copy1.txt/testfile.txt" should not exist
-    And the content of file "/PARENT/testFolder/testfile.txt" for user "Alice" should be "some data"
+    And the content of file "/PARENT/copy1.txt/testfile.txt" for user "Alice" should be "some data"
+    But as "Alice" file "/PARENT/copy1.txt" should not exist
+    And as "Alice" file "/copy1.txt" should exist in the trashbin
 
 
   Scenario: copy file within a public link folder and delete file
@@ -102,7 +102,7 @@ Feature: copying from public link share
     And as "Alice" file "/PARENT/copy1.txt" should not exist
 
   @issue-1232
-  Scenario: copy file within a public link folder to a file with name same as an existing folder
+  Scenario: copy file within a public link folder to existing folder
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And user "Alice" has created folder "/PARENT/new-folder"
     And user "Alice" has uploaded file with content "some data 1" to "/PARENT/new-folder/testfile1.txt"
@@ -112,11 +112,11 @@ Feature: copying from public link share
       | space           | Personal |
       | permissionsRole | edit     |
     When the public copies file "/testfile.txt" to "/new-folder" using the new public WebDAV API
-    Then the HTTP status code should be "403"
-    And as "Alice" file "/PARENT/testfile.txt" should exist
-    And as "Alice" folder "/PARENT/new-folder" should exist
+    Then the HTTP status code should be "204"
     And the content of file "/PARENT/testfile.txt" for user "Alice" should be "some data"
-    And the content of file "/PARENT/new-folder/testfile.txt" for user "Alice" should be "some data"
+    And the content of file "/PARENT/new-folder" for user "Alice" should be "some data"
+    And as "Alice" folder "/PARENT/new-folder" should not exist
+    And as "Alice" folder "new-folder" should exist in the trashbin
 
 
   Scenario Outline: copy file with special characters in it's name within a public link folder
@@ -182,25 +182,20 @@ Feature: copying from public link share
       | C++ file.cpp            |
       | sample,1.txt            |
 
-  @issue-1230
-  Scenario Outline: copy file within a public link folder to a file with unusual destination names
+  @issue-8711
+  Scenario: copy file within a public link folder to a same file
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And using SharingNG
     And user "Alice" has created the following resource link share:
       | resource        | PARENT   |
       | space           | Personal |
       | permissionsRole | edit     |
-    When the public copies file "/testfile.txt" to "/<destination-file-name>" using the new public WebDAV API
-    Then the HTTP status code should be "403"
-    And as "Alice" file "/PARENT/testfile.txt" should exist
+    When the public copies file "/testfile.txt" to "/testfile.txt" using the new public WebDAV API
+    Then the HTTP status code should be "204"
     And the content of file "/PARENT/testfile.txt" for user "Alice" should be "some data"
-    Examples:
-      | destination-file-name |
-      | testfile.txt          |
-      |                       |
 
-  @issue-1230
-  Scenario Outline: copy folder within a public link folder to a folder with unusual destination names
+  @issue-8711
+  Scenario: copy folder within a public link folder to a same folder
     Given user "Alice" has created folder "/PARENT/testFolder"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/testFolder/testfile.txt"
     And using SharingNG
@@ -208,11 +203,34 @@ Feature: copying from public link share
       | resource        | PARENT   |
       | space           | Personal |
       | permissionsRole | edit     |
-    When the public copies folder "/testFolder" to "/<destination-file-name>" using the new public WebDAV API
-    Then the HTTP status code should be "403"
+    When the public copies folder "/testFolder" to "/testFolder" using the new public WebDAV API
+    Then the HTTP status code should be "204"
     And as "Alice" folder "/PARENT/testFolder" should exist
     And the content of file "/PARENT/testFolder/testfile.txt" for user "Alice" should be "some data"
-    Examples:
-      | destination-file-name |
-      | testFolder            |
-      |                       |
+
+  @issue-1230
+  Scenario: copy file within a public link folder to a share item root
+    Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+    When the public copies file "/testfile.txt" to "/" using the new public WebDAV API
+    Then the HTTP status code should be "409"
+    And as "Alice" file "/PARENT/testfile.txt" should exist
+    And the content of file "/PARENT/testfile.txt" for user "Alice" should be "some data"
+
+  @issue-1230
+  Scenario: copy folder within a public link folder to a share item root
+    Given user "Alice" has created folder "/PARENT/testFolder"
+    And user "Alice" has uploaded file with content "some data" to "/PARENT/testFolder/testfile.txt"
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | PARENT   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+    When the public copies folder "/testFolder" to "/" using the new public WebDAV API
+    Then the HTTP status code should be "409"
+    And as "Alice" folder "/PARENT/testFolder" should exist
+    And the content of file "/PARENT/testFolder/testfile.txt" for user "Alice" should be "some data"
