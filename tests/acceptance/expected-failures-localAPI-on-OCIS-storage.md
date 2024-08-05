@@ -262,14 +262,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg1/removeAccessToDrive.feature:206](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg1/removeAccessToDrive.feature#L206)
 - [apiSharingNg1/removeAccessToDrive.feature:236](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg1/removeAccessToDrive.feature#L236)
 
-### [sharee (editor role) MOVE a file by file-id into same shared folder returns 403](https://github.com/owncloud/ocis/issues/7617)
+### [sharee (editor role) MOVE a file by file-id into shared sub-folder returns 502](https://github.com/owncloud/ocis/issues/7617)
 
 - [apiSpacesDavOperation/moveByFileId.feature:469](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L469)
 - [apiSpacesDavOperation/moveByFileId.feature:470](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L470)
-- [apiSpacesDavOperation/moveByFileId.feature:492](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L492)
-- [apiSpacesDavOperation/moveByFileId.feature:493](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L493)
-- [apiSpacesDavOperation/moveByFileId.feature:734](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L734)
-- [apiSpacesDavOperation/moveByFileId.feature:735](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L735)
+- [apiSpacesDavOperation/moveByFileId.feature:732](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L732)
+- [apiSpacesDavOperation/moveByFileId.feature:733](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L733)
 
 ### [MOVE a file into same folder with same name returns 404 instead of 403](https://github.com/owncloud/ocis/issues/1976)
 
