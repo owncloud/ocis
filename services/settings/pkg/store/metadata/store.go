@@ -15,17 +15,19 @@ import (
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/metadata/assignmentscache"
 )
 
 var (
 	// Name is the default name for the settings store
-	Name                   = "ocis-settings"
-	managerName            = "metadata"
-	settingsSpaceID        = "f1bdd61a-da7c-49fc-8203-0558109d1b4f" // uuid.Must(uuid.NewV4()).String()
-	rootFolderLocation     = "settings"
-	bundleFolderLocation   = "settings/bundles"
-	accountsFolderLocation = "settings/accounts"
-	valuesFolderLocation   = "settings/values"
+	Name                          = "ocis-settings"
+	managerName                   = "metadata"
+	settingsSpaceID               = "f1bdd61a-da7c-49fc-8203-0558109d1b4f" // uuid.Must(uuid.NewV4()).String()
+	rootFolderLocation            = "settings"
+	assignmentCacheFolderLocation = "settings/assignments-cache"
+	bundleFolderLocation          = "settings/bundles"
+	accountsFolderLocation        = "settings/accounts"
+	valuesFolderLocation          = "settings/values"
 )
 
 // MetadataClient is the interface to talk to metadata service
@@ -40,10 +42,10 @@ type MetadataClient interface {
 
 // Store interacts with the filesystem to manage settings information
 type Store struct {
-	Logger olog.Logger
-
-	mdc MetadataClient
-	cfg *config.Config
+	Logger           olog.Logger
+	assignmentsCache assignmentscache.Cache
+	mdc              MetadataClient
+	cfg              *config.Config
 
 	l *sync.Mutex
 }
@@ -69,6 +71,21 @@ func (s *Store) Init() {
 	if err := s.initMetadataClient(mdc); err != nil {
 		s.Logger.Error().Err(err).Msg("error initializing metadata client")
 	}
+	client, err := metadata.NewCS3Storage(
+		s.cfg.Metadata.GatewayAddress,
+		s.cfg.Metadata.StorageAddress,
+		s.cfg.Metadata.SystemUserID,
+		s.cfg.Metadata.SystemUserIDP,
+		s.cfg.Metadata.SystemUserAPIKey,
+	)
+	if err != nil {
+		panic(err)
+	}
+	if err = client.Init(context.Background(), settingsSpaceID); err != nil {
+		panic(err)
+	}
+	s.assignmentsCache = assignmentscache.New(client, assignmentCacheFolderLocation, "assignments.json")
+
 }
 
 // New creates a new store
@@ -107,6 +124,7 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 
 	for _, p := range []string{
 		rootFolderLocation,
+		assignmentCacheFolderLocation,
 		accountsFolderLocation,
 		bundleFolderLocation,
 		valuesFolderLocation,

@@ -66,7 +66,7 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 func (s *Store) ListRoleAssignmentsByRole(roleID string) ([]*settingsmsg.UserRoleAssignment, error) {
 	s.Init()
 	ctx := context.TODO()
-	accountIDs, err := s.mdc.ReadDir(ctx, accountsFolderLocation)
+	cachedAssignments, err := s.assignmentsCache.List(ctx, roleID)
 	switch err.(type) {
 	case nil:
 		// continue
@@ -75,43 +75,17 @@ func (s *Store) ListRoleAssignmentsByRole(roleID string) ([]*settingsmsg.UserRol
 	default:
 		return nil, err
 	}
-	assignments := make([]*settingsmsg.UserRoleAssignment, 0, len(accountIDs))
-
-	// This is very inefficient, with the current layout we need to iterated through all
-	// account folders and read each assignment file in there to check if that contains
-	// the give role ID.
-	for _, account := range accountIDs {
-		assignmentIDs, err := s.mdc.ReadDir(ctx, accountPath(account))
-		switch err.(type) {
-		case nil:
-			// continue
-		case errtypes.NotFound:
-			return make([]*settingsmsg.UserRoleAssignment, 0), nil
-		default:
-			return nil, err
-		}
-
-		for _, assignmentID := range assignmentIDs {
-			b, err := s.mdc.SimpleDownload(ctx, assignmentPath(account, assignmentID))
-			switch err.(type) {
-			case nil:
-				// continue
-			case errtypes.NotFound:
-				continue
-			default:
-				return nil, err
-			}
-
-			a := &settingsmsg.UserRoleAssignment{}
-			err = json.Unmarshal(b, a)
-			if err != nil {
-				return nil, err
-			}
-			if a.GetRoleId() == roleID {
-				assignments = append(assignments, a)
-			}
-		}
+	assignments := make([]*settingsmsg.UserRoleAssignment, 0, len(cachedAssignments))
+	for id, v := range cachedAssignments {
+		assignments = append(assignments,
+			&settingsmsg.UserRoleAssignment{
+				Id:          v.AssignmentID,
+				AccountUuid: id,
+				RoleId:      roleID,
+			},
+		)
 	}
+
 	return assignments, nil
 }
 
@@ -130,21 +104,42 @@ func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.Us
 		return nil, err
 	}
 
+	// remove from cache
+	r, err := s.ListBundles(settingsmsg.Bundle_TYPE_ROLE, []string{})
+	if err != nil {
+		return nil, err
+	}
+	for _, role := range r {
+		err = s.assignmentsCache.Remove(ctx, role.GetId(), accountUUID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	err = s.mdc.MakeDirIfNotExist(ctx, accountPath(accountUUID))
 	if err != nil {
 		return nil, err
 	}
 
-	ass := &settingsmsg.UserRoleAssignment{
+	assignment := &settingsmsg.UserRoleAssignment{
 		Id:          uuid.Must(uuid.NewV4()).String(),
 		AccountUuid: accountUUID,
 		RoleId:      roleID,
 	}
-	b, err := json.Marshal(ass)
+	b, err := json.Marshal(assignment)
 	if err != nil {
 		return nil, err
 	}
-	return ass, s.mdc.SimpleUpload(ctx, assignmentPath(accountUUID, ass.Id), b)
+	err = s.mdc.SimpleUpload(ctx, assignmentPath(accountUUID, assignment.Id), b)
+	if err != nil {
+		return assignment, err
+	}
+
+	err = s.assignmentsCache.Add(ctx, roleID, assignment)
+	if err != nil {
+		return assignment, err
+	}
+	return assignment, err
 }
 
 // RemoveRoleAssignment deletes the given role assignment from the existing assignments of the respective account.
@@ -163,14 +158,33 @@ func (s *Store) RemoveRoleAssignment(assignmentID string) error {
 
 	// TODO: use indexer to avoid spamming Metadata service
 	for _, accID := range accounts {
-		assIDs, err := s.mdc.ReadDir(ctx, accountPath(accID))
+		assignmentIDs, err := s.mdc.ReadDir(ctx, accountPath(accID))
 		if err != nil {
 			// TODO: error?
 			continue
 		}
 
-		for _, assID := range assIDs {
-			if assID == assignmentID {
+		for _, id := range assignmentIDs {
+			if id == assignmentID {
+				b, err := s.mdc.SimpleDownload(ctx, assignmentPath(accID, id))
+				switch err.(type) {
+				case nil:
+					a := &settingsmsg.UserRoleAssignment{}
+					if err = json.Unmarshal(b, a); err != nil {
+						s.Logger.Error().Err(err).Str("assignmentid", id).Msg("failed to unmarshall assignment")
+						// no return here, as we still want to delete the assignment
+					} else if err = s.assignmentsCache.Remove(ctx, a.RoleId, accID); err != nil {
+						s.Logger.Error().Err(err).Str("assignmentid", id).Msg("failed to remove assignment from cache")
+						// no return here, as we still want to delete the assignment
+					}
+					// continue
+				case errtypes.NotFound:
+					continue
+				default:
+					s.Logger.Error().Err(err).Str("assignmentid", id).Msg("could not download assignment, for cache cleanup")
+					// We're not returning here, as we still want to delete the assignment
+				}
+
 				// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
 				// we also have to delete the cached dir listing
 				return s.mdc.Delete(ctx, accountPath(accID))
