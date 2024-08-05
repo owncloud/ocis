@@ -1771,7 +1771,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" (?:moves|renames) (?:file|folder) "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $fileSource
