@@ -491,8 +491,6 @@ Feature: moving/renaming file using file id
       | permissions | dav-path                          |
       | Editor      | /remote.php/dav/spaces/<<FILEID>> |
       | Editor      | /dav/spaces/<<FILEID>>            |
-      | Viewer      | /remote.php/dav/spaces/<<FILEID>> |
-      | Viewer      | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: try to move a file into a folder within a shared folder (read permissions)

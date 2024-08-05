@@ -64,6 +64,18 @@ class WebDavHelper {
 	}
 
 	/**
+	 * @param string $namespaceString
+	 *
+	 * @return object
+	 */
+	public static function parseNamespace(string $namespaceString): object {
+		//calculate the namespace prefix and namespace
+		$matches = [];
+		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
+		return (object)["namespace" => $matches[2], "prefix" => $matches[1]];
+	}
+
+	/**
 	 * returns the id of a file
 	 *
 	 * @param string|null $baseUrl
@@ -132,12 +144,9 @@ class WebDavHelper {
 				//also used if no prefix is given in the property value
 				$namespacePrefix = null;
 			} else {
-				//calculate the namespace prefix and namespace from the array key
-				$matches = [];
-				\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
-				$nameSpace = $matches[2];
-				$namespacePrefix = $matches[1];
-				$extraNamespaces .= " xmlns:$namespacePrefix=\"$nameSpace\" ";
+				$ns = self::parseNamespace($namespaceString);
+				$namespacePrefix = $ns->prefix;
+				$extraNamespaces .= " xmlns:$namespacePrefix=\"$ns->namespace\" ";
 			}
 			//if a namespace prefix is given in the property value use that
 			if (\strpos($property, ":") !== false) {
@@ -263,14 +272,11 @@ class WebDavHelper {
 		?string $type="files"
 	):ResponseInterface {
 		if ($namespaceString !== null) {
-			$matches = [];
-			\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
-			$namespace = $matches[2];
-			$namespacePrefix = $matches[1];
-			$propertyBody = "<$namespacePrefix:$propertyName" .
-				" xmlns:$namespacePrefix=\"$namespace\">" .
+			$ns = self::parseNamespace($namespaceString);
+			$propertyBody = "<$ns->prefix:$propertyName" .
+				" xmlns:$ns->prefix=\"$ns->namespace\">" .
 				"$propertyValue" .
-				"</$namespacePrefix:$propertyName>";
+				"</$ns->prefix:$propertyName>";
 		} else {
 			$propertyBody = "<$propertyName>$propertyValue</$propertyName>";
 		}
@@ -299,12 +305,12 @@ class WebDavHelper {
 	 * gets namespace-prefix, namespace url and propName from provided namespaceString or property
 	 * or otherwise use default
 	 *
-	 * @param string|null $namespaceString
-	 * @param string|null $property
+	 * @param string $namespaceString
+	 * @param string $property
 	 *
 	 * @return array
 	 */
-	public static function getPropertyWithNamespaceInfo(?string $namespaceString = "", ?string $property = ""):array {
+	public static function getPropertyWithNamespaceInfo(string $namespaceString = "", string $property = ""):array {
 		$namespace = "";
 		$namespacePrefix = "";
 		if (\is_int($namespaceString)) {
@@ -313,11 +319,9 @@ class WebDavHelper {
 			$namespacePrefix = "d";
 			$namespace = "DAV:";
 		} elseif ($namespaceString) {
-			//calculate the namespace prefix and namespace from the array key
-			$matches = [];
-			\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
-			$namespacePrefix = $matches[1];
-			$namespace = $matches[2];
+			$ns = self::parseNamespace($namespaceString);
+			$namespacePrefix = $ns->prefix;
+			$namespace = $ns->namespace;
 		}
 		//if a namespace prefix is given in the property value use that
 		if ($property && \strpos($property, ":")) {
@@ -352,20 +356,26 @@ class WebDavHelper {
 		?array $propertiesArray,
 		?string $xRequestId = '',
 		?int  $davPathVersion = null,
-		?string  $namespaceString = "oc='http://owncloud.org/ns'",
+		?string  $namespaceString = null,
 		?string  $type="files"
 	):ResponseInterface {
 		$propertyBody = "";
 		foreach ($propertiesArray as $propertyArray) {
 			$property = $propertyArray["propertyName"];
 			$value = $propertyArray["propertyValue"];
-			[$namespacePrefix, $namespace, $property] = self::getPropertyWithNamespaceInfo(
-				$namespaceString,
-				$property
-			);
-			$propertyBody .= "\n\t<$namespacePrefix:$property>" .
-				"$value" .
-				"</$namespacePrefix:$property>";
+
+			if ($namespaceString !== null) {
+				$matches = [];
+				[$namespacePrefix, $namespace, $property] = self::getPropertyWithNamespaceInfo(
+					$namespaceString,
+					$property
+				);
+				$propertyBody .= "\n\t<$namespacePrefix:$property>" .
+					"$value" .
+					"</$namespacePrefix:$property>";
+			} else {
+				$propertyBody .= "<$property>$value</$property>";
+			}
 		}
 		$body = "<?xml version=\"1.0\"?>
 				<d:propertyupdate xmlns:d=\"DAV:\"

@@ -43,18 +43,6 @@ class WebDavPropertiesContext implements Context {
 	private array $storedETAG = [];
 
 	/**
-	 * @param string $namespaceString
-	 *
-	 * @return object
-	 */
-	public function parseNamespace(string $namespaceString): object {
-		//calculate the namespace prefix and namespace
-		$matches = [];
-		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
-		return (object)["namespace" => $matches[2], "prefix" => $matches[1]];
-	}
-
-	/**
 	 * @When /^user "([^"]*)" gets the properties of (?:file|folder|entry) "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
@@ -165,10 +153,7 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has set the following properties of (?:file|folder|entry) "([^"]*)" using the WebDav API$/
-	 *
-	 * if no namespace prefix is provided before property, default `oc:` prefix is set for added props
-	 * only and everything rest on xml is set to prefix `d:`
+	 * @Given /^user "([^"]*)" has set the following properties to (?:file|folder|entry) "([^"]*)" using the WebDav API$/
 	 *
 	 * @param string $username
 	 * @param string $path
@@ -490,7 +475,7 @@ class WebDavPropertiesContext implements Context {
 			$this->featureContext->getResponse(),
 			__METHOD__
 		);
-		$ns = $this->parseNamespace($namespaceString);
+		$ns = WebDavHelper::parseNamespace($namespaceString);
 		$responseXmlObject->registerXPathNamespace(
 			$ns->prefix,
 			$ns->namespace
@@ -646,7 +631,7 @@ class WebDavPropertiesContext implements Context {
 		$xmlPart = $this->featureContext->getResponseXml($response);
 
 		if ($namespaceString !== null) {
-			$ns = $this->parseNamespace($namespaceString);
+			$ns = WebDavHelper::parseNamespace($namespaceString);
 			$xmlPart->registerXPathNamespace(
 				$ns->prefix,
 				$ns->namespace
@@ -1265,6 +1250,23 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
+	 * @param string $href
+	 *
+	 * @return string
+	 */
+	public function parseBaseDavPathFromXMLHref(string $href): string {
+		$hrefArr = \explode('/', $href);
+		if (\in_array("webdav", $hrefArr)) {
+			$hrefArr = \array_slice($hrefArr, 0, \array_search("webdav", $hrefArr) + 1);
+		} elseif (\in_array("files", $hrefArr)) {
+			$hrefArr = \array_slice($hrefArr, 0, \array_search("files", $hrefArr) + 2);
+		} elseif (\in_array("spaces", $hrefArr)) {
+			$hrefArr = \array_slice($hrefArr, 0, \array_search("spaces", $hrefArr) + 2);
+		}
+		return \implode('/', $hrefArr);
+	}
+
+	/**
 	 * @Then as user :username the last response should have the following properties
 	 *
 	 * only supports new DAV version
@@ -1283,28 +1285,14 @@ class WebDavPropertiesContext implements Context {
 		$this->featureContext->verifyTableNodeColumns($expectedPropTable, ['resource', 'propertyName', 'propertyValue']);
 		$responseXmlObject = $this->featureContext->getResponseXml();
 
-		$hrefSplitUptoUsername = \explode("/", (string)$responseXmlObject->xpath("//d:href")[0]);
-		$xmlHrefSplitArray = \array_slice(
-			$hrefSplitUptoUsername,
-			0,
-			\array_search($username, $hrefSplitUptoUsername) + 1
-		);
-		$xmlHref = \implode("/", $xmlHrefSplitArray);
+		$href = (string)$responseXmlObject->xpath("//d:href")[0];
+		$hrefBase = $this->parseBaseDavPathFromXMLHref($href);
+
 		foreach ($expectedPropTable->getColumnsHash() as $col) {
-			if ($col["propertyName"] === "status") {
-				$xmlPart = $responseXmlObject->xpath(
-					"//d:href[.='" .
-					$xmlHref . $col["resource"] .
-					"']/following-sibling::d:propstat//d:" .
-					$col["propertyName"]
-				);
-			} else {
-				$xmlPart = $responseXmlObject->xpath(
-					"//d:href[.= '" .
-					$xmlHref . $col["resource"] .
-					"']/..//oc:" . $col["propertyName"]
-				);
-			}
+			$xpath = "//d:href[.='$hrefBase" . $col["resource"] . "']" .
+				"/following-sibling::d:propstat//" . $col["propertyName"];
+			$xmlPart = $responseXmlObject->xpath($xpath);
+
 			Assert::assertEquals(
 				$col["propertyValue"],
 				$xmlPart[0],

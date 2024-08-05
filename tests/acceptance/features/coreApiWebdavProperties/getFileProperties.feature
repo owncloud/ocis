@@ -297,20 +297,20 @@ Feature: get file properties
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/TestFolder"
     And user "Alice" has uploaded file with content "test data one" to "/TestFolder/test1.txt"
-    And user "Alice" has set the following properties of file "/TestFolder/test1.txt" using the WebDav API
+    And user "Alice" has set the following properties to file "/TestFolder/test1.txt" using the WebDav API
       | propertyName | propertyValue |
       | testprop1    | AAAAA         |
       | testprop2    | BBBBB         |
     When user "Alice" gets the following properties of file "/TestFolder/test1.txt" using the WebDAV API
       | propertyName |
-      | oc:testprop1 |
-      | oc:testprop2 |
+      | testprop1    |
+      | testprop2    |
     Then the HTTP status code should be "207"
     And as user "Alice" the last response should have the following properties
       | resource              | propertyName | propertyValue   |
       | /TestFolder/test1.txt | testprop1    | AAAAA           |
       | /TestFolder/test1.txt | testprop2    | BBBBB           |
-      | /TestFolder/test1.txt | status       | HTTP/1.1 200 OK |
+      | /TestFolder/test1.txt | d:status     | HTTP/1.1 200 OK |
     Examples:
       | dav-path-version |
       | new              |
@@ -323,18 +323,18 @@ Feature: get file properties
     And user "Alice" has created folder "/TestFolder"
     And user "Alice" has uploaded file with content "test data one" to "/TestFolder/test1.txt"
     And user "Alice" has uploaded file with content "test data two" to "/TestFolder/test2.txt"
-    And user "Alice" has set the following properties of file "/TestFolder/test1.txt" using the WebDav API
+    And user "Alice" has set the following properties to file "/TestFolder/test1.txt" using the WebDav API
       | propertyName | propertyValue |
       | testprop1    | AAAAA         |
       | testprop2    | BBBBB         |
-    And user "Alice" has set the following properties of file "/TestFolder/test2.txt" using the WebDav API
+    And user "Alice" has set the following properties to file "/TestFolder/test2.txt" using the WebDav API
       | propertyName | propertyValue |
       | testprop1    | CCCCC         |
       | testprop2    | DDDDD         |
     When user "Alice" gets the following properties of folder "/TestFolder" using the WebDAV API
       | propertyName |
-      | oc:testprop1 |
-      | oc:testprop2 |
+      | testprop1    |
+      | testprop2    |
     Then the HTTP status code should be "207"
     And as user "Alice" the last response should have the following properties
       | resource              | propertyName | propertyValue          |
@@ -342,7 +342,7 @@ Feature: get file properties
       | /TestFolder/test1.txt | testprop2    | BBBBB                  |
       | /TestFolder/test2.txt | testprop1    | CCCCC                  |
       | /TestFolder/test2.txt | testprop2    | DDDDD                  |
-      | /TestFolder/          | status       | HTTP/1.1 404 Not Found |
+      | /TestFolder/          | d:status     | HTTP/1.1 404 Not Found |
     Examples:
       | dav-path-version |
       | new              |

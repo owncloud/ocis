@@ -200,7 +200,7 @@ Feature: move (rename) file
     And for user "Alice" the space "Personal" should contain these entries:
       | personal.txt |
     But for user "Alice" folder "testshare" of the space "Shares" should not contain these entries:
-      | project.txt |
+      | personal.txt |
     Examples:
       | permissions-role |
       | Editor           |
