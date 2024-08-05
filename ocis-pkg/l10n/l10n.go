@@ -54,33 +54,38 @@ func (t Translator) Translate(str, locale string) string {
 	return t.Locale(locale).Get(str)
 }
 
-func TranslateLocation(t Translator, locale string) func(string, ...any) string {
-	return t.Locale(locale).Get
-}
-
 type structs func() []any
 type maps func() []any
 type each func() []any
 type field func() string
 
+// TranslateField function provides the generic way to translate the necessary field in composite entities.
 func TranslateField(fieldName string) field {
 	return func() string {
 		return fieldName
 	}
 }
 
+// TranslateStruct function provides the generic way to translate the nested fields in composite entities.
+// When the TranslateStruct function is used right after the TranslateEntity, the first argument must be the entity itself,
+// the rest of the arguments are the fields to translate or nested function.
 func TranslateStruct(args ...any) structs {
 	return func() []any {
 		return args
 	}
 }
 
+// TranslateMap function provides the generic way to translate the necessary fields in maps.
+// It's not implemented yet.
 func TranslateMap(args ...any) maps {
 	return func() []any {
 		return args
 	}
 }
 
+// TranslateEach function provides the generic way to translate the necessary fields in slices or nested entities.
+// When the TranslateEach function is used right after the TranslateEntity, the first argument must be the slice itself,
+// the rest of the arguments are nested function or no arguments if the slice contains only strings.
 func TranslateEach(args ...any) each {
 	return func() []any {
 		return args
