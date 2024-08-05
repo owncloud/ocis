@@ -218,7 +218,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		return "", err
 	}
 
-	if statRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+	if statRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK && statRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_NOT_FOUND {
 		logger.Error().
 			Str("StatusCode", statRes.GetStatus().GetCode().String()).
 			Str("StatusMsg", statRes.GetStatus().GetMessage()).

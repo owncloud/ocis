@@ -117,7 +117,7 @@ func prepareRoutes(r *chi.Mux, options Options) {
 
 			r.Use(func(h stdhttp.Handler) stdhttp.Handler {
 				// authentication and wopi context
-				return colabmiddleware.WopiContextAuthMiddleware(options.Config.Wopi.Secret, h)
+				return colabmiddleware.WopiContextAuthMiddleware(options.Config, h)
 			})
 
 			// check whether we should check for proof keys
@@ -149,14 +149,11 @@ func prepareRoutes(r *chi.Mux, options Options) {
 					// https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/putuserinfo
 					stdhttp.Error(w, stdhttp.StatusText(stdhttp.StatusNotImplemented), stdhttp.StatusNotImplemented)
 				case "PUT_RELATIVE":
-					// https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/putrelativefile
-					stdhttp.Error(w, stdhttp.StatusText(stdhttp.StatusNotImplemented), stdhttp.StatusNotImplemented)
+					adapter.PutRelativeFile(w, r)
 				case "RENAME_FILE":
-					// https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/renamefile
-					stdhttp.Error(w, stdhttp.StatusText(stdhttp.StatusNotImplemented), stdhttp.StatusNotImplemented)
+					adapter.RenameFile(w, r)
 				case "DELETE":
-					// https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/deletefile
-					stdhttp.Error(w, stdhttp.StatusText(stdhttp.StatusNotImplemented), stdhttp.StatusNotImplemented)
+					adapter.DeleteFile(w, r)
 
 				default:
 					stdhttp.Error(w, stdhttp.StatusText(stdhttp.StatusInternalServerError), stdhttp.StatusInternalServerError)

@@ -9,13 +9,22 @@ import (
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/utf7"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/locks"
 	"github.com/rs/zerolog"
 )
 
 const (
-	HeaderWopiLock    string = "X-WOPI-Lock"
-	HeaderWopiOldLock string = "X-WOPI-OldLock"
+	HeaderWopiLock          string = "X-WOPI-Lock"
+	HeaderWopiOldLock       string = "X-WOPI-OldLock"
+	HeaderWopiST            string = "X-WOPI-SuggestedTarget"
+	HeaderWopiRT            string = "X-WOPI-RelativeTarget"
+	HeaderWopiOverwriteRT   string = "X-WOPI-OverwriteRelativeTarget"
+	HeaderWopiSize          string = "X-WOPI-Size"
+	HeaderWopiValidRT       string = "X-WOPI-ValidRelativeTarget"
+	HeaderWopiRequestedName string = "X-WOPI-RequestedName"
+	HeaderContentLength     string = "Content-Length"
+	HeaderContentType       string = "Content-Type"
 )
 
 // HttpAdapter will adapt the responses from the connector to HTTP.
@@ -164,8 +173,8 @@ func (h *HttpAdapter) UnLock(w http.ResponseWriter, r *http.Request) {
 func (h *HttpAdapter) CheckFileInfo(w http.ResponseWriter, r *http.Request) {
 	fileCon := h.con.GetFileConnector()
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", "0")
+	w.Header().Set(HeaderContentType, "application/json")
+	w.Header().Set(HeaderContentLength, "0")
 
 	fileInfo, err := fileCon.CheckFileInfo(r.Context())
 	if err != nil {
@@ -183,10 +192,11 @@ func (h *HttpAdapter) CheckFileInfo(w http.ResponseWriter, r *http.Request) {
 	jsonFileInfo, err := json.Marshal(fileInfo)
 	if err != nil {
 		logger.Error().Err(err).Msg("CheckFileInfo: failed to marshal fileinfo")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Length", strconv.Itoa(len(jsonFileInfo)))
+	w.Header().Set(HeaderContentLength, strconv.Itoa(len(jsonFileInfo)))
 	w.WriteHeader(http.StatusOK)
 	bytes, err := w.Write(jsonFileInfo)
 
@@ -213,6 +223,9 @@ func (h *HttpAdapter) GetFile(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 	}
+	// status might have been already sent if the file is big enough, but for
+	// small files, the content might still be buffered.
+	w.WriteHeader(http.StatusOK)
 }
 
 // PutFile will upload the file
@@ -238,4 +251,165 @@ func (h *HttpAdapter) PutFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+// PutRelativeFile will upload the file with a specific name. The name might be
+// automatically adjusted depending on the request headers.
+// Note that this method will also send a json body in the response.
+// It has 2 mutually exclusive operation methods that are used based on the
+// provided headers in the request.
+// Note that this method won't used locks (not documented).
+//
+// The file name must be encoded in utf7. This method will decode the utf7 name
+// into utf8. The utf8 (not utf7) name must have less than 512 bytes, otherwise
+// the request will fail.
+func (h *HttpAdapter) PutRelativeFile(w http.ResponseWriter, r *http.Request) {
+	relativeTarget := r.Header.Get(HeaderWopiRT)
+	suggestedTarget := r.Header.Get(HeaderWopiST)
+
+	w.Header().Set(HeaderContentType, "application/json")
+	w.Header().Set(HeaderContentLength, "0")
+
+	if relativeTarget != "" && suggestedTarget != "" {
+		// headers are mutually exclusive
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var response *PutRelativeResponse
+	var headers *PutRelativeHeaders
+	var putErr error
+	fileCon := h.con.GetFileConnector()
+
+	if suggestedTarget != "" {
+		utf8Target, decErr := utf7.DecodeString(suggestedTarget)
+		if decErr != nil || len(utf8Target) > 512 {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		response, putErr = fileCon.PutRelativeFileSuggested(r.Context(), h.con.GetContentConnector(), r.Body, r.ContentLength, utf8Target)
+	}
+
+	if relativeTarget != "" {
+		utf8Target, decErr := utf7.DecodeString(relativeTarget)
+		if decErr != nil || len(utf8Target) > 512 {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		response, headers, putErr = fileCon.PutRelativeFileRelative(r.Context(), h.con.GetContentConnector(), r.Body, r.ContentLength, utf8Target)
+	}
+
+	var conError *ConnectorError
+	if putErr != nil && !errors.As(putErr, &conError) {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	logger := zerolog.Ctx(r.Context())
+
+	jsonFileInfo, err := json.Marshal(response)
+	if err != nil {
+		logger.Error().Err(err).Msg("PutRelativeFile: failed to marshal response")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set(HeaderContentLength, strconv.Itoa(len(jsonFileInfo)))
+	if conError != nil {
+		if headers != nil {
+			w.Header().Set(HeaderWopiValidRT, utf7.EncodeString(headers.ValidTarget))
+			w.Header().Set(HeaderWopiLock, headers.LockID)
+		}
+		w.WriteHeader(conError.HttpCodeOut)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+	bytes, err := w.Write(jsonFileInfo)
+
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Int("TotalBytes", len(jsonFileInfo)).
+			Int("WrittenBytes", bytes).
+			Msg("PutRelativeFile: failed to write contents in the HTTP response")
+	}
+}
+
+// DeleteFile will delete the provided file. If the file is locked and can't
+// be deleted, a 409 conflict error will be returned with its corresponding
+// lock.
+func (h *HttpAdapter) DeleteFile(w http.ResponseWriter, r *http.Request) {
+	lockID := r.Header.Get(HeaderWopiLock)
+
+	fileCon := h.con.GetFileConnector()
+	newLockID, err := fileCon.DeleteFile(r.Context(), lockID)
+	if err != nil {
+		var conError *ConnectorError
+		if errors.As(err, &conError) {
+			if conError.HttpCodeOut == 409 {
+				w.Header().Set(HeaderWopiLock, newLockID)
+			}
+			http.Error(w, http.StatusText(conError.HttpCodeOut), conError.HttpCodeOut)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+// RenameFile will rename the file. The name might be automatically adjusted.
+// Note that this method will also send a json body in the response. The
+// adjusted file name will be returned in the body.
+//
+// The file name must be encoded in utf7. This method will decode the utf7 name
+// into utf8. The utf8 (not utf7) name must have less than 495 bytes, otherwise
+// the request will fail.
+func (h *HttpAdapter) RenameFile(w http.ResponseWriter, r *http.Request) {
+	lockID := r.Header.Get(HeaderWopiLock)
+	requestedName := r.Header.Get(HeaderWopiRequestedName)
+
+	utf8Target, decErr := utf7.DecodeString(requestedName)
+	if decErr != nil || len(utf8Target) > 495 { // need space for the possible prefix and the extension
+		w.Header().Set("X-WOPI-InvalidFileNameError", "Filename too long")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	fileCon := h.con.GetFileConnector()
+	response, newLockID, err := fileCon.RenameFile(r.Context(), lockID, utf8Target)
+	if err != nil {
+		var conError *ConnectorError
+		if errors.As(err, &conError) {
+			if conError.HttpCodeOut == 409 {
+				w.Header().Set(HeaderWopiLock, newLockID)
+			}
+			http.Error(w, http.StatusText(conError.HttpCodeOut), conError.HttpCodeOut)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// need to return a JSON response with the name if this is successful
+	logger := zerolog.Ctx(r.Context())
+
+	jsonFileInfo, err := json.Marshal(response)
+	if err != nil {
+		logger.Error().Err(err).Msg("RenameFile: failed to marshal response")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set(HeaderContentLength, strconv.Itoa(len(jsonFileInfo)))
+	w.WriteHeader(http.StatusOK)
+	bytes, err := w.Write(jsonFileInfo)
+
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Int("TotalBytes", len(jsonFileInfo)).
+			Int("WrittenBytes", bytes).
+			Msg("RenameFile: failed to write contents in the HTTP response")
+	}
 }

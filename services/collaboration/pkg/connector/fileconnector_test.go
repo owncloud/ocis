@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"path"
+	"regexp"
+	"strings"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -13,6 +16,8 @@ import (
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	collabmocks "github.com/owncloud/ocis/v2/services/collaboration/mocks"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
@@ -23,6 +28,7 @@ import (
 var _ = Describe("FileConnector", func() {
 	var (
 		fc            *connector.FileConnector
+		ccs           *collabmocks.ContentConnectorService
 		gatewayClient *cs3mocks.GatewayAPIClient
 		cfg           *config.Config
 		wopiCtx       middleware.WopiContext
@@ -30,15 +36,25 @@ var _ = Describe("FileConnector", func() {
 
 	BeforeEach(func() {
 		cfg = &config.Config{
+			Commons: &shared.Commons{
+				OcisURL: "https://ocis.example.prv",
+			},
 			App: config.App{
 				LockName: "testName_for_unittests", // Only the LockName is used
 			},
+			Wopi: config.Wopi{
+				WopiSrc: "https://ocis.server.prv",
+				Secret:  "topsecret",
+			},
 		}
+		ccs = &collabmocks.ContentConnectorService{}
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
 		fc = connector.NewFileConnector(gatewayClient, cfg)
 
 		wopiCtx = middleware.WopiContext{
-			AccessToken: "abcdef123456",
+			// a real token is needed for the PutRelativeFileSuggested tests
+			// although we aren't checking anything inside the token
+			AccessToken: "eyJhbGciOiJQUzI1NiIsImtpZCI6InByaXZhdGUta2V5IiwidHlwIjoiSldUIn0.eyJhdWQiOiJ3ZWIiLCJleHAiOjE3MjAwOTIyODAsImlhdCI6MTcyMDA5MTk4MCwiaXNzIjoiaHR0cHM6Ly9vY2lzLmpwLnNvbGlkZ2Vhci5wcnYiLCJqdGkiOiJmQldpN0FYaFFQdUhhaDJDV0VQVFFLcENmZ3BGbEFpTCIsImxnLmkiOnsiZG4iOiJicm8iLCJpZCI6Im93bkNsb3VkVVVJRD1mYWYxMTY0Ny03NDUxLTRiOWEtYmZmZS0zYjVkZGNjNTk3MmIiLCJ1biI6ImJyb3RhdG8ifSwibGcucCI6ImlkZW50aWZpZXItbGRhcCIsImxnLnQiOiIxIiwic2NwIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJzdWIiOiJjQXZ1elg4Z1hMWmRpWHgtQDFOV1RKdENQRHFVSjQ0bnQ0NkZ0RDlwNUw3dGplUEZkWk1WSjlFMzBOeDItZHVpN0hLQ0x4QWlXYUNUdGJYNTExSmNkSHcifQ.StpQpE4ipxk8Nhk6xgob1Tovbk6bcUVs5-fkej2hIoKoJKfR2OY-CiFQ3wwgEcFro8notxeVfOmxs36z_ezFeJBZRbxpSggcr77LFtQwlsWvD5AuAgLZN1otdvULehunXE_DtxRJZ1rqnsOBT03zKOZLx8Q7QTy6DeRuf1KQtCIowa9D4ymPM4TTmtQdiW2XjByO3OCLFEMVBfDFGPibR6gMnftGQ5kfiZGDTUVCauEXwE-msZVZ42QY-wFRppX_RIL1Z0p6T4dr_6_y-VM1lNYJ5-dB5c5rg_c03Xu1y_TIxs31-8--dtUyZmBVOZFk8bB9msNk-iaOEjzKeUZLymo_-2qVYvXxzNrkq1QA8luaLR6jec_CRT2P8wsB2nyebFU6_myKe34m6f8uqGhOzcOwPB4TpoxPx4ucQgo1CQJwQZHZsZ7Q6TVYZUXJdWwzzMuvJXmnn36iybw0Ub6On4sGKj3gHetjoJg8VnL-TQkBvf1iHX2ktRG3Nq2rnPrB2OTpi2rLpleWg_s8Y8FXxIgYqM0JG8kO1n5RPGMeYQG7qd6f9wdcaPIvgxCa_HsZtMr7eGcDzZtxp-NivgJOS6ode0ZAJ3wGU-AVhmyshpds3DFECcvkBcP_4dD52AXiAq9X3UVkVdNsxs_yB9P7zBcdsKsD6QDJv5gf-6DEu34",
 			FileReference: &providerv1beta1.Reference{
 				ResourceId: &providerv1beta1.ResourceId{
 					StorageId: "abc",
@@ -728,6 +744,753 @@ var _ = Describe("FileConnector", func() {
 		})
 	})
 
+	Describe("PutRelativeFileSuggested", func() {
+		It("No valid context", func() {
+			ctx := context.Background()
+			stream := strings.NewReader("This is the content of a file")
+			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
+			Expect(err).To(HaveOccurred())
+			Expect(response).To(BeNil())
+		})
+
+		It("Stat fails", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			targetErr := errors.New("Something went wrong")
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, targetErr)
+
+			stream := strings.NewReader("This is the content of a file")
+			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(targetErr))
+			Expect(response).To(BeNil())
+		})
+
+		It("Stat fails status not ok", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			stream := strings.NewReader("This is the content of a file")
+			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(500))
+			Expect(response).To(BeNil())
+		})
+
+		It("PutRelativeFileSuggested success", func() {
+			// requested filename is "newDocument.docx" so we'll write that
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			stream := strings.NewReader("This is the content of a file")
+
+			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/file.docx",
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", nil)
+
+			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId.StorageId == "storageid" &&
+					statReq.Ref.ResourceId.OpaqueId == "opaqueid" &&
+					statReq.Ref.ResourceId.SpaceId == "spaceid" &&
+					statReq.Ref.Path == "./newDocument.docx" {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat2ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/newDocument.docx",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid_newDoc",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), "newDocument.docx")
+			Expect(err).To(Succeed())
+			Expect(response.Name).To(Equal("newDocument.docx"))
+			Expect(response.Url).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+		})
+
+		It("PutRelativeFileSuggested success only extension", func() {
+			// requested file is ".pdf" so we'll change the "file.docx" to "file.pdf"
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			stream := strings.NewReader("This is the content of a file")
+
+			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/file.docx",
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", nil)
+
+			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId.StorageId == "storageid" &&
+					statReq.Ref.ResourceId.OpaqueId == "opaqueid" &&
+					statReq.Ref.ResourceId.SpaceId == "spaceid" &&
+					statReq.Ref.Path == "./file.pdf" {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat2ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/file.pdf",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid_newDoc",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), ".pdf")
+			Expect(err).To(Succeed())
+			Expect(response.Name).To(Equal("file.pdf"))
+			Expect(response.Url).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+		})
+
+		It("PutRelativeFileSuggested success conflict", func() {
+			// requested file is ".pdf", but "file.pdf" exists as target file (we get a conflict)
+			// so we change the "file.docx" to "<base64> file.pdf" file, where the <base64> is a
+			// sequence of base64 chars containing alphanumeric chars plus "-" and "_" (the char
+			// sequence is based on time, so we can't be too specific)
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			stream := strings.NewReader("This is the content of a file")
+
+			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/file.docx",
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// first call will fail with conflict, second call succeeds
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", connector.NewConnectorError(409, "file conflict")).Once()
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", nil).Once()
+
+			newFilePath := new(string)
+			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				r := regexp.MustCompile(`^\./[a-zA-Z0-9_-]+ file\.pdf$`)
+				if statReq.Ref.ResourceId.StorageId == "storageid" &&
+					statReq.Ref.ResourceId.OpaqueId == "opaqueid" &&
+					statReq.Ref.ResourceId.SpaceId == "spaceid" &&
+					r.MatchString(statReq.Ref.Path) {
+					*newFilePath = statReq.Ref.Path
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat2ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: path.Join("/personal/path/to", *newFilePath),
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid_newDoc",
+						SpaceId:   "spaceid",
+					},
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), ".pdf")
+			Expect(err).To(Succeed())
+			Expect(response.Name).To(MatchRegexp(`[a-zA-Z0-9_-] file\.pdf`))
+			Expect(response.Url).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+		})
+
+		It("PutRelativeFileSuggested put file fails", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			stream := strings.NewReader("This is the content of a file")
+
+			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/file.docx",
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", connector.NewConnectorError(500, "something bad happened"))
+
+			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), ".pdf")
+			Expect(err).To(HaveOccurred())
+			Expect(response).To(BeNil())
+		})
+	})
+
+	Describe("PutRelativeFileRelative", func() {
+		It("No valid context", func() {
+			ctx := context.Background()
+			stream := strings.NewReader("This is the content of a file")
+			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
+			Expect(err).To(HaveOccurred())
+			Expect(response).To(BeNil())
+			Expect(headers).To(BeNil())
+		})
+
+		It("Stat fails", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			targetErr := errors.New("Something went wrong")
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, targetErr)
+
+			stream := strings.NewReader("This is the content of a file")
+			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(targetErr))
+			Expect(response).To(BeNil())
+			Expect(headers).To(BeNil())
+		})
+
+		It("Stat fails status not ok", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			stream := strings.NewReader("This is the content of a file")
+			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(500))
+			Expect(response).To(BeNil())
+			Expect(headers).To(BeNil())
+		})
+
+		It("PutRelativeFileRelative success", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			stream := strings.NewReader("This is the content of a file")
+
+			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/file.docx",
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", nil)
+
+			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId.StorageId == "storageid" &&
+					statReq.Ref.ResourceId.OpaqueId == "opaqueid" &&
+					statReq.Ref.ResourceId.SpaceId == "spaceid" &&
+					statReq.Ref.Path == "./newDocument.docx" {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat2ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/newDocument.docx",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid_newDoc",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newDocument.docx")
+			Expect(err).To(Succeed())
+			Expect(response.Name).To(Equal("newDocument.docx"))
+			Expect(response.Url).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+			Expect(headers).To(BeNil())
+		})
+
+		It("PutRelativeFileRelative conflict", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			stream := strings.NewReader("This is the content of a file")
+
+			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/file.docx",
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("zzz999", connector.NewConnectorError(409, "file conflict"))
+
+			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId.StorageId == "storageid" &&
+					statReq.Ref.ResourceId.OpaqueId == "opaqueid" &&
+					statReq.Ref.ResourceId.SpaceId == "spaceid" &&
+					statReq.Ref.Path == "./convFile.pdf" {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat2ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/convFile.pdf",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid_newDoc",
+						SpaceId:   "spaceid",
+					},
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "convFile.pdf")
+			Expect(err).To(HaveOccurred())
+			Expect(response.Name).To(Equal("convFile.pdf"))
+			Expect(response.Url).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+			Expect(headers.ValidTarget).To(MatchRegexp(`[a-zA-Z0-9_-] convFile\.pdf`))
+			Expect(headers.LockID).To(Equal("zzz999"))
+		})
+
+		It("PutRelativeFileRelative put file fails", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			stream := strings.NewReader("This is the content of a file")
+
+			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
+				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Path: "/personal/path/to/file.docx",
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", connector.NewConnectorError(500, "something bad happened"))
+
+			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "convFile.pdf")
+			Expect(err).To(HaveOccurred())
+			Expect(response).To(BeNil())
+			Expect(headers).To(BeNil())
+		})
+	})
+
+	Describe("DeleteFile", func() {
+		It("No valid context", func() {
+			ctx := context.Background()
+			newLockId, err := fc.DeleteFile(ctx, "lock")
+			Expect(err).To(HaveOccurred())
+			Expect(newLockId).To(Equal(""))
+		})
+
+		It("Delete fails", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			targetErr := errors.New("Something went wrong")
+			gatewayClient.On("Delete", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.DeleteResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, targetErr)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, targetErr)
+
+			lockID, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(targetErr))
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Delete fails status not ok, get lock fails", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			targetErr := errors.New("Something went wrong")
+			gatewayClient.On("Delete", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.DeleteResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			gatewayClient.On("GetLock", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.GetLockResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, targetErr)
+
+			lockID, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(targetErr))
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Delete fails file missing", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			targetErr := errors.New("Something went wrong")
+			gatewayClient.On("Delete", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.DeleteResponse{
+				Status: status.NewNotFound(ctx, "something failed"),
+			}, nil)
+
+			gatewayClient.On("GetLock", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.GetLockResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, targetErr)
+
+			lockID, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(404))
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Delete fails status not ok, get lock not ok", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Delete", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.DeleteResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			gatewayClient.On("GetLock", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.GetLockResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			lockID, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(500))
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Delete fails, file locked", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Delete", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.DeleteResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			gatewayClient.On("GetLock", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.GetLockResponse{
+				Status: status.NewOK(ctx),
+				Lock: &providerv1beta1.Lock{
+					LockId: "zzz999",
+					Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+				},
+			}, nil)
+
+			lockID, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(409))
+			Expect(lockID).To(Equal("zzz999"))
+		})
+
+		It("Delete fails, file not locked", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Delete", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.DeleteResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			gatewayClient.On("GetLock", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.GetLockResponse{
+				Status: status.NewOK(ctx),
+			}, nil)
+
+			lockID, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(500))
+			Expect(lockID).To(Equal(""))
+		})
+
+		It("Delete success", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Delete", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.DeleteResponse{
+				Status: status.NewOK(ctx),
+			}, nil)
+
+			lockID, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(Succeed())
+			Expect(lockID).To(Equal(""))
+		})
+	})
+
+	Describe("RenameFile", func() {
+		It("No valid context", func() {
+			ctx := context.Background()
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
+		})
+
+		It("Stat fails", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			targetErr := errors.New("Something went wrong")
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, targetErr)
+
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(targetErr))
+			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
+		})
+
+		It("Stat fails status not ok", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(500))
+			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
+		})
+
+		It("Rename failed", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			targetErr := errors.New("Something went wrong")
+			gatewayClient.On("Move", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, targetErr)
+
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(targetErr))
+			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
+		})
+
+		It("Rename failed status not ok", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			gatewayClient.On("Move", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewInternal(ctx, "something failed"),
+			}, nil)
+
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(500))
+			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
+		})
+
+		It("Rename conflict", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			gatewayClient.On("Move", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewLocked(ctx, "lock mismatch"),
+			}, nil)
+
+			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(409))
+			Expect(lockID).To(Equal("zzz999"))
+			Expect(response).To(BeNil())
+		})
+
+		It("Rename already exists", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			moveParamMatcher := mock.MatchedBy(func(moveReq *providerv1beta1.MoveRequest) bool {
+				if moveReq.Destination.Path == "./newFile.doc" &&
+					moveReq.LockId == "zzz999" {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Move", mock.Anything, moveParamMatcher).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewAlreadyExists(ctx, nil, "target already exists"),
+			}, nil).Once()
+
+			move2ParamMatcher := mock.MatchedBy(func(moveReq *providerv1beta1.MoveRequest) bool {
+				r := regexp.MustCompile(`^\./[a-zA-Z0-9_-]+ newFile\.doc$`)
+				if r.MatchString(moveReq.Destination.Path) &&
+					moveReq.LockId == "zzz999" {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Move", mock.Anything, move2ParamMatcher).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewOK(ctx),
+			}, nil).Once()
+
+			response, lockID, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
+			Expect(err).To(Succeed())
+			Expect(lockID).To(Equal(""))
+			Expect(response.Name).To(MatchRegexp(`^[a-zA-Z0-9_-]+ newFile$`))
+		})
+
+		It("Success", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			moveParamMatcher := mock.MatchedBy(func(moveReq *providerv1beta1.MoveRequest) bool {
+				if moveReq.Destination.Path == "./newFile.doc" &&
+					moveReq.LockId == "zzz999" {
+					return true
+				}
+				return false
+			})
+			gatewayClient.On("Move", mock.Anything, moveParamMatcher).Times(1).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewOK(ctx),
+			}, nil).Once()
+
+			response, lockID, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
+			Expect(err).To(Succeed())
+			Expect(lockID).To(Equal(""))
+			Expect(response.Name).To(Equal("newFile"))
+		})
+	})
+
 	Describe("CheckFileInfo", func() {
 		It("No valid context", func() {
 			ctx := context.Background()
@@ -790,14 +1553,17 @@ var _ = Describe("FileConnector", func() {
 				Version:                    "16273849.0",
 				BaseFileName:               "test.txt",
 				BreadcrumbDocName:          "test.txt",
-				UserCanNotWriteRelative:    true,
+				UserCanNotWriteRelative:    false,
 				HostViewURL:                "http://test.ex.prv/view",
 				HostEditURL:                "http://test.ex.prv/edit",
 				SupportsExtendedLockLength: true,
 				SupportsGetLock:            true,
 				SupportsLocks:              true,
 				SupportsUpdate:             true,
+				SupportsDeleteFile:         true,
+				SupportsRename:             true,
 				UserCanWrite:               true,
+				UserCanRename:              true,
 				UserID:                     "6f7061717565496440696e6d656d6f7279", // hex of opaqueId@inmemory
 				UserFriendlyName:           "Pet Shaft",
 			}
@@ -846,7 +1612,7 @@ var _ = Describe("FileConnector", func() {
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                    int64(998877),
 				BaseFileName:            "test.txt",
-				UserCanNotWriteRelative: true,
+				UserCanNotWriteRelative: false,
 				DisableExport:           true,
 				DisableCopy:             true,
 				DisablePrint:            true,
@@ -854,7 +1620,10 @@ var _ = Describe("FileConnector", func() {
 				UserFriendlyName:        "guest zzz000",
 				EnableOwnerTermination:  true,
 				SupportsLocks:           true,
+				SupportsRename:          true,
+				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
+				PostMessageOrigin:       "https://ocis.example.prv",
 			}
 
 			newFileInfo, err := fc.CheckFileInfo(ctx)
@@ -901,7 +1670,7 @@ var _ = Describe("FileConnector", func() {
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                    int64(998877),
 				BaseFileName:            "test.txt",
-				UserCanNotWriteRelative: true,
+				UserCanNotWriteRelative: false,
 				DisableExport:           true,
 				DisableCopy:             true,
 				DisablePrint:            true,
@@ -910,7 +1679,10 @@ var _ = Describe("FileConnector", func() {
 				EnableOwnerTermination:  true,
 				WatermarkText:           "Pet Shaft shaft@example.com",
 				SupportsLocks:           true,
+				SupportsRename:          true,
+				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
+				PostMessageOrigin:       "https://ocis.example.prv",
 			}
 
 			newFileInfo, err := fc.CheckFileInfo(ctx)
