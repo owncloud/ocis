@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Local WEB App configuration: [#9691](https://github.com/owncloud/ocis/pull/9691)
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Bump reva: [#9715](https://github.com/owncloud/ocis/pull/9715)
+* Enhancement - Support Skyhigh Security ICAP as an ICAP server: [#9720](https://github.com/owncloud/ocis/issues/9720)
 
 ## Details
 
@@ -130,6 +131,16 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#9715](https://github.com/owncloud/ocis/pull/9715)
 
    https://github.com/owncloud/ocis/pull/9715
+
+* Enhancement - Support Skyhigh Security ICAP as an ICAP server: [#9720](https://github.com/owncloud/ocis/issues/9720)
+
+   We have upgraded the antivirus ICAP client library, bringing enhanced
+   performance and reliability to our antivirus scanning service. With this update,
+   the Skyhigh Security ICAP can now be used as an ICAP server, providing robust
+   and scalable antivirus solutions.
+
+   https://github.com/owncloud/ocis/issues/9720
+   https://github.com/fschade/icap-client/pull/6
 
 # Changelog for [6.2.0] (2024-07-30)
 
