@@ -28,14 +28,10 @@ func TestTranslateStruct(t *testing.T) {
 		return &str
 	}
 
-	type args struct {
-		structPtr []TranslateOption
-		//request   []any
-	}
 	tests := []struct {
 		name     string
 		entity   any
-		args     args
+		args     []TranslateOption
 		expected any
 		wantErr  bool
 	}{
@@ -51,11 +47,9 @@ func TestTranslateStruct(t *testing.T) {
 					DisplayName: toStrPointer("innerDisplayName 2"),
 				},
 			},
-			args: args{
-				structPtr: []TranslateOption{
-					TranslateField("Description"),
-					TranslateField("DisplayName"),
-				},
+			args: []TranslateOption{
+				TranslateField("Description"),
+				TranslateField("DisplayName"),
 			},
 			expected: []*InnerStruct{
 				{
@@ -74,7 +68,6 @@ func TestTranslateStruct(t *testing.T) {
 				"inner 1",
 				"inner 2",
 			},
-			args: args{},
 			expected: []string{
 				"new Inner 1",
 				"new Inner 2",
@@ -96,15 +89,13 @@ func TestTranslateStruct(t *testing.T) {
 					DisplayName: toStrPointer("innerDisplayName 2"),
 				},
 			},
-			args: args{
-				structPtr: []TranslateOption{
+			args: []TranslateOption{
+				TranslateField("Description"),
+				TranslateField("DisplayName"),
+				TranslateStruct("SubStruct",
 					TranslateField("Description"),
 					TranslateField("DisplayName"),
-					TranslateStruct("SubStruct",
-						TranslateField("Description"),
-						TranslateField("DisplayName"),
-					),
-				},
+				),
 			},
 			expected: []*TopLevelStruct{
 				{
@@ -135,13 +126,11 @@ func TestTranslateStruct(t *testing.T) {
 					},
 				},
 			},
-			args: args{
-				structPtr: []TranslateOption{
-					TranslateEach("StructList",
-						TranslateField("Description"),
-						TranslateField("DisplayName"),
-					),
-				},
+			args: []TranslateOption{
+				TranslateEach("StructList",
+					TranslateField("Description"),
+					TranslateField("DisplayName"),
+				),
 			},
 			expected: &WrapperStruct{
 				StructList: []*InnerStruct{
@@ -159,30 +148,26 @@ func TestTranslateStruct(t *testing.T) {
 		{
 			name:   "empty struct, NotExistingSubStructName",
 			entity: &TopLevelStruct{},
-			args: args{
-				structPtr: []TranslateOption{
+			args: []TranslateOption{
+				TranslateField("Description"),
+				TranslateField("DisplayName"),
+				TranslateStruct("NotExistingSubStructName",
 					TranslateField("Description"),
 					TranslateField("DisplayName"),
-					TranslateStruct("NotExistingSubStructName",
-						TranslateField("Description"),
-						TranslateField("DisplayName"),
-					),
-				},
+				),
 			},
 			expected: &TopLevelStruct{},
 		},
 		{
 			name:   "empty struct",
 			entity: &TopLevelStruct{},
-			args: args{
-				structPtr: []TranslateOption{
+			args: []TranslateOption{
+				TranslateField("Description"),
+				TranslateField("DisplayName"),
+				TranslateStruct("SubStruct",
 					TranslateField("Description"),
 					TranslateField("DisplayName"),
-					TranslateStruct("SubStruct",
-						TranslateField("Description"),
-						TranslateField("DisplayName"),
-					),
-				},
+				),
 			},
 			expected: &TopLevelStruct{},
 		},
@@ -192,13 +177,11 @@ func TestTranslateStruct(t *testing.T) {
 				Description: "description",
 				DisplayName: toStrPointer("displayName"),
 			},
-			args: args{
-				structPtr: []TranslateOption{
+			args: []TranslateOption{
+				TranslateField("NotExistingFieldName"),
+				TranslateStruct("SubStruct",
 					TranslateField("NotExistingFieldName"),
-					TranslateStruct("SubStruct",
-						TranslateField("NotExistingFieldName"),
-					),
-				},
+				),
 			},
 			expected: &TopLevelStruct{
 				Description: "description",
@@ -211,15 +194,13 @@ func TestTranslateStruct(t *testing.T) {
 				Description: "description",
 				DisplayName: toStrPointer("displayName"),
 			},
-			args: args{
-				structPtr: []TranslateOption{
+			args: []TranslateOption{
+				TranslateField("Description"),
+				TranslateField("DisplayName"),
+				TranslateStruct("SubStruct",
 					TranslateField("Description"),
 					TranslateField("DisplayName"),
-					TranslateStruct("SubStruct",
-						TranslateField("Description"),
-						TranslateField("DisplayName"),
-					),
-				},
+				),
 			},
 			expected: &TopLevelStruct{
 				Description: "new Description",
@@ -232,15 +213,13 @@ func TestTranslateStruct(t *testing.T) {
 				Description: "description",
 				DisplayName: toStrPointer("displayName"),
 			},
-			args: args{
-				structPtr: []TranslateOption{
+			args: []TranslateOption{
+				TranslateField("Description"),
+				TranslateField("DisplayName"),
+				TranslateStruct("SubStruct",
 					TranslateField("Description"),
 					TranslateField("DisplayName"),
-					TranslateStruct("SubStruct",
-						TranslateField("Description"),
-						TranslateField("DisplayName"),
-					),
-				},
+				),
 			},
 			expected: &TopLevelStruct{
 				Description: "new Description",
@@ -257,15 +236,13 @@ func TestTranslateStruct(t *testing.T) {
 					DisplayName: toStrPointer("innerDisplayName"),
 				},
 			},
-			args: args{
-				structPtr: []TranslateOption{
+			args: []TranslateOption{
+				TranslateField("Description"),
+				TranslateField("DisplayName"),
+				TranslateStruct("SubStruct",
 					TranslateField("Description"),
 					TranslateField("DisplayName"),
-					TranslateStruct("SubStruct",
-						TranslateField("Description"),
-						TranslateField("DisplayName"),
-					),
-				},
+				),
 			},
 			expected: &TopLevelStruct{
 				Description: "new Description",
@@ -277,23 +254,133 @@ func TestTranslateStruct(t *testing.T) {
 			},
 		},
 		{
-			name: "nil",
-			args: args{
-				structPtr: nil,
-			},
+			name:    "nil",
 			wantErr: true,
 		},
 		{
-			name: "empty slice",
-			args: args{
-				structPtr: []TranslateOption{},
-			},
+			name:    "empty slice",
 			wantErr: true,
+		},
+		{
+			name:     "string slice",
+			entity:   []string{"description", "inner"},
+			expected: []string{"new Description", "new Inner"},
+		},
+		{
+			name: "string map",
+			entity: map[string]string{
+				"entryOne": "description",
+				"entryTwo": "inner",
+			},
+			expected: map[string]string{
+				"entryOne": "new Description",
+				"entryTwo": "new Inner",
+			},
+		},
+		{
+			name: "pointer struct map",
+			entity: map[string]*InnerStruct{
+				"entryOne": {Description: "description", DisplayName: toStrPointer("displayName")},
+				"entryTwo": {Description: "inner", DisplayName: toStrPointer("innerDisplayName")},
+			},
+			args: []TranslateOption{
+				TranslateField("Description"),
+				TranslateField("DisplayName"),
+			},
+			expected: map[string]*InnerStruct{
+				"entryOne": {Description: "new Description", DisplayName: toStrPointer("new DisplayName")},
+				"entryTwo": {Description: "new Inner", DisplayName: toStrPointer("new InnerDisplayName")},
+			},
+		},
+		/* FIXME: non pointer maps are currently not working
+		{
+			name: "struct map",
+			entity: map[string]InnerStruct{
+				"entryOne": {Description: "description", DisplayName: toStrPointer("displayName")},
+				"entryTwo": {Description: "inner", DisplayName: toStrPointer("innerDisplayName")},
+			},
+			args: []TranslateOption{
+				TranslateField("Description"),
+				TranslateField("DisplayName"),
+			},
+			expected: map[string]InnerStruct{
+				"entryOne": {Description: "new Description", DisplayName: toStrPointer("new DisplayName")},
+				"entryTwo": {Description: "new Inner", DisplayName: toStrPointer("new InnerDisplayName")},
+			},
+		},
+		*/
+		{
+			name: "slice map",
+			entity: map[string][]string{
+				"entryOne": {"description", "inner"},
+				"entryTwo": {"inner 2", "innerDisplayName 2"},
+			},
+			expected: map[string][]string{
+				"entryOne": {"new Description", "new Inner"},
+				"entryTwo": {"new Inner 2", "new InnerDisplayName 2"},
+			},
+		},
+		{
+			name: "double slice",
+			entity: [][]string{
+				{"description", "inner"},
+				{"inner 2", "innerDisplayName 2"},
+			},
+			expected: [][]string{
+				{"new Description", "new Inner"},
+				{"new Inner 2", "new InnerDisplayName 2"},
+			},
+		},
+		{
+			name: "nested structs",
+			entity: [][]*InnerStruct{
+				{
+					&InnerStruct{Description: "description", DisplayName: toStrPointer("displayName")},
+					&InnerStruct{Description: "inner", DisplayName: toStrPointer("innerDisplayName")},
+				},
+				{
+					&InnerStruct{Description: "inner 2", DisplayName: toStrPointer("innerDisplayName 2")},
+				},
+			},
+			args: []TranslateOption{
+				TranslateField("Description"),
+				TranslateField("DisplayName"),
+			},
+			expected: [][]*InnerStruct{
+				{
+					&InnerStruct{Description: "new Description", DisplayName: toStrPointer("new DisplayName")},
+					&InnerStruct{Description: "new Inner", DisplayName: toStrPointer("new InnerDisplayName")},
+				},
+				{
+					&InnerStruct{Description: "new Inner 2", DisplayName: toStrPointer("new InnerDisplayName 2")},
+				},
+			},
+		},
+		{
+			name: "double mapslices",
+			entity: []map[string][]string{
+				{
+					"entryOne": {"inner 1", "innerDisplayName 1"},
+					"entryTwo": {"inner 2", "innerDisplayName 2"},
+				},
+				{
+					"entryOne": {"description", "displayName"},
+				},
+			},
+			expected: []map[string][]string{
+				{
+					"entryOne": {"new Inner 1", "new InnerDisplayName 1"},
+					"entryTwo": {"new Inner 2", "new InnerDisplayName 2"},
+				},
+				{
+					"entryOne": {"new Description", "new DisplayName"},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := TranslateEntity(mock(), tt.entity, tt.args.structPtr...)
+			err := TranslateEntity(mock(), tt.entity, tt.args...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TranslateEntity() error = %v, wantErr %v", err, tt.wantErr)
 			}

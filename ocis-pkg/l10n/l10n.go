@@ -4,7 +4,6 @@ package l10n
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io/fs"
 	"os"
 	"reflect"
@@ -70,7 +69,57 @@ func (t Translator) Locale(locale string) *gotext.Locale {
 	return l
 }
 
-// TranslateEntity translates a slice, array or struct
+// TranslateEntity function provides the generic way to translate a struct, array or slice.
+// Support for maps is also provided, but non-pointer values will not work.
+// The function also takes the entity with fields to translate.
+// The function supports nested structs and slices of structs.
+/*
+tr := NewTranslator("en", _domain, _fsys)
+
+// a slice of translatables can	be passed directly
+val := []string{"description", "display name"}
+err := tr.TranslateEntity(tr, s, val)
+
+// string maps work the same way
+val := map[string]string{
+	"entryOne": "description",
+	"entryTwo": "display name",
+}
+err := TranslateEntity(tr, val)
+
+// struct fields need to be specified
+type Struct struct {
+	Description string
+	DisplayName string
+	MetaInformation string
+}
+val := Struct{}
+err := TranslateEntity(tr, val,
+	l10n.TranslateField("Description"),
+	l10n.TranslateField("DisplayName"),
+)
+
+// nested structures are supported
+type InnerStruct struct {
+	Description string
+	Roles []string
+}
+type OuterStruct struct {
+	DisplayName string
+	First InnerStruct
+	Others map[string]InnerStruct
+}
+val := OuterStruct{}
+err := TranslateEntity(tr, val,
+	l10n.TranslateField("DisplayName"),
+	l10n.TranslateStruct("First",
+		l10n.TranslateField("Description"),
+		l10n.TranslateEach("Roles"),
+	),
+	l10n.TranslateMap("Others",
+		l10n.TranslateField("Description"),
+	},
+*/
 func (t Translator) TranslateEntity(locale string, entity any, opts ...TranslateOption) error {
 	return TranslateEntity(t.Locale(locale).Get, entity, opts...)
 }
@@ -104,7 +153,7 @@ func GetUserLocale(ctx context.Context, userID string, vc settingssvc.ValueServi
 	return val[0].GetStringValue(), nil
 }
 
-// TranslateOption is used to specify fields in structs or slices to translate
+// TranslateOption is used to specify fields in structs to translate
 type TranslateOption func() (string, FieldType, []TranslateOption)
 
 // FieldType is used to specify the type of field to translate
@@ -143,44 +192,14 @@ func TranslateEach(fieldName string, args ...TranslateOption) TranslateOption {
 }
 
 // TranslateMap function provides the generic way to translate the necessary fields in maps.
-// It's not implemented yet.
 func TranslateMap(fieldName string, args ...TranslateOption) TranslateOption {
 	return func() (string, FieldType, []TranslateOption) {
 		return fieldName, FieldTypeMap, args
 	}
 }
 
-// TranslateEntity function provides the generic way to translate the necessary fields in composite entities.
-// The function takes a translation function that has the locale already set, see Translator.TranslateEntity
-// The function also takes the entity with fields to translate.
-// The function supports nested structs and slices of structs.
-//
-//		type InnerStruct struct {
-//			Description string
-//			DisplayName *string
-//		}
-//
-//		type WrapperStruct struct {
-//	     StructList []*InnerStruct
-//		}
-//		s:= &WrapperStruct{
-//			StructList: []*InnerStruct{
-//					{
-//						Description: "innerDescription 1",
-//						DisplayName: toStrPointer("innerDisplayName 1"),
-//					},
-//					{
-//						Description: "innerDescription 2",
-//						DisplayName: toStrPointer("innerDisplayName 2"),
-//					},
-//				},
-//			}
-//		tr := l10n_pkg.NewTranslateLocation(loc, "en")
-//		err := l10n.TranslateEntity(tr, s,
-//					l10n.TranslateEach("StructList",
-//						l10n.TranslateField("Description"),
-//						l10n.TranslateField("DisplayName"),
-//				))
+// TranslateEntity translates a slice, array or struct
+// See Translator.TranslateEntity for more information
 func TranslateEntity(tr func(string, ...any) string, entity any, opts ...TranslateOption) error {
 	value := reflect.ValueOf(entity)
 
@@ -191,25 +210,15 @@ func TranslateEntity(tr func(string, ...any) string, entity any, opts ...Transla
 
 	switch value.Kind() {
 	case reflect.Struct:
-		if !isStruct(value) {
-			return fmt.Errorf("the root entity must be a struct, got %v", value.Kind())
-		}
 		rangeOverArgs(tr, value, opts...)
-		return nil
-	case reflect.Slice, reflect.Array:
-		if len(opts) > 0 {
-			translateEach(tr, value, opts...)
-		} else {
-			translateEach(tr, value)
-		}
-		return nil
-	case reflect.Map:
-		// TODO implement
+	case reflect.Slice, reflect.Array, reflect.Map:
+		translateEach(tr, value, opts...)
 	case reflect.String:
 		translateField(tr, value)
-		return nil
+	default:
+		return ErrUnsupportedType
 	}
-	return ErrUnsupportedType
+	return nil
 }
 
 func translateEach(tr func(string, ...any) string, value reflect.Value, args ...TranslateOption) {
@@ -222,15 +231,30 @@ func translateEach(tr func(string, ...any) string, value reflect.Value, args ...
 	case reflect.Array, reflect.Slice:
 		for i := 0; i < value.Len(); i++ {
 			v := value.Index(i)
-			if args != nil {
+			switch v.Kind() {
+			case reflect.Struct, reflect.Ptr:
 				rangeOverArgs(tr, v, args...)
-				continue
+			case reflect.String:
+				translateField(tr, v)
+			case reflect.Slice, reflect.Array, reflect.Map:
+				translateEach(tr, v, args...)
 			}
-			translateField(tr, v)
 		}
 	case reflect.Map:
 		for _, k := range value.MapKeys() {
-			rangeOverArgs(tr, value.MapIndex(k), args...)
+			v := value.MapIndex(k)
+			switch v.Kind() {
+			case reflect.Struct:
+				// FIXME: add support for non-pointer values
+			case reflect.Pointer:
+				rangeOverArgs(tr, v, args...)
+			case reflect.String:
+				if nv := tr(v.String()); nv != "" {
+					value.SetMapIndex(k, reflect.ValueOf(nv))
+				}
+			case reflect.Slice, reflect.Array, reflect.Map:
+				translateEach(tr, v, args...)
+			}
 		}
 	}
 }
@@ -246,23 +270,29 @@ func rangeOverArgs(tr func(string, ...any) string, value reflect.Value, args ...
 
 		switch fieldType {
 		case FieldTypeString:
-			// exported field
 			f := value.FieldByName(fieldName)
 			translateField(tr, f)
 		case FieldTypeStruct:
-			// exported field
 			innerValue := value.FieldByName(fieldName)
 			if !innerValue.IsValid() || !isStruct(innerValue) {
 				return
 			}
 			rangeOverArgs(tr, innerValue, opts...)
 		case FieldTypeIterable:
-			// exported field
 			innerValue := value.FieldByName(fieldName)
 			if !innerValue.IsValid() {
 				return
 			}
 			if kind := innerValue.Kind(); kind != reflect.Array && kind != reflect.Slice {
+				return
+			}
+			translateEach(tr, innerValue, opts...)
+		case FieldTypeMap:
+			innerValue := value.FieldByName(fieldName)
+			if !innerValue.IsValid() {
+				return
+			}
+			if kind := innerValue.Kind(); kind != reflect.Map {
 				return
 			}
 			translateEach(tr, innerValue, opts...)
