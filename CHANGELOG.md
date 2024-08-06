@@ -54,6 +54,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Repair nats-js-kv registry: [#9726](https://github.com/owncloud/ocis/pull/9726)
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 * Enhancement - Allow configuring grpc max connection age: [#9657](https://github.com/owncloud/ocis/pull/9657)
+* Enhancement - Local WEB App configuration: [#9691](https://github.com/owncloud/ocis/pull/9691)
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Bump reva: [#9715](https://github.com/owncloud/ocis/pull/9715)
 
@@ -95,6 +96,22 @@ The following sections list the changes for unreleased.
    pick up new IPs.
 
    https://github.com/owncloud/ocis/pull/9657
+
+* Enhancement - Local WEB App configuration: [#9691](https://github.com/owncloud/ocis/pull/9691)
+
+   We've added a new feature which allows configuring applications individually
+   instead of using the global apps.yaml file. With that, each application can have
+   its own configuration file, which will be loaded by the WEB service.
+
+   The local configuration has the highest priority and will override the global
+   configuration. The Following order of precedence is used: local.config >
+   global.config > manifest.config.
+
+   Besides the configuration, the application now be disabled by setting the
+   `disabled` field to `true` in one of the configuration files.
+
+   https://github.com/owncloud/ocis/issues/9687
+   https://github.com/owncloud/ocis/pull/9691
 
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
 
