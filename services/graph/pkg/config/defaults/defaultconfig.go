@@ -114,6 +114,9 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
+		UnifiedRoles: config.UnifiedRoles{
+			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
+		},
 	}
 }
 

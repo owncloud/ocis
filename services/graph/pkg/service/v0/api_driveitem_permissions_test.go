@@ -245,12 +245,19 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permission.GetLibreGraphPermissionsActions()).To(HaveLen(1))
 			Expect(permission.GetLibreGraphPermissionsActions()[0]).To(Equal(unifiedrole.DriveItemContentRead))
 		})
+
 		It("fails with a missing driveritem", func() {
 			statResponse.Status = status.NewNotFound(context.Background(), "not found")
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, "not found").WithOrigin(errorcode.ErrorOriginCS3)))
 			Expect(permission).To(BeZero())
+		})
+
+		It("fails with unknown or disable role", func() {
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}
+			_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).To(MatchError(unifiedrole.ErrUnknownUnifiedRole))
 		})
 	})
 	Describe("SpaceRootInvite", func() {
@@ -1015,7 +1022,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 		logger := log.NewLogger()
 
 		mockProvider = mocks.NewDriveItemPermissionsProvider(GinkgoT())
-		api, err := svc.NewDriveItemPermissionsApi(mockProvider, logger)
+		api, err := svc.NewDriveItemPermissionsApi(mockProvider, logger, defaults.FullDefaultConfig())
 		Expect(err).ToNot(HaveOccurred())
 
 		httpAPI = api
@@ -1097,6 +1104,22 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 
 			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
 		})
+
+		It("fails with unknown or disable role", func() {
+			rCTX.URLParams.Add("itemID", "1$2!3")
+			responseRecorder := httptest.NewRecorder()
+			invite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}
+			inviteJson, err := json.Marshal(invite)
+			Expect(err).ToNot(HaveOccurred())
+
+			request := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(inviteJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+			httpAPI.Invite(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
+		})
 	})
 	Describe("SpaceRootInvite", func() {
 		It("call the Invite provider with the correct arguments", func() {
@@ -1131,6 +1154,21 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			httpAPI.SpaceRootInvite(responseRecorder, request)
 
 			Expect(responseRecorder.Code).To(Equal(http.StatusUnprocessableEntity))
+		})
+
+		It("fails with unknown or disable role", func() {
+			responseRecorder := httptest.NewRecorder()
+			invite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}
+			inviteJson, err := json.Marshal(invite)
+			Expect(err).ToNot(HaveOccurred())
+
+			request := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(inviteJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+			httpAPI.SpaceRootInvite(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
 		})
 	})
 	Describe("ListPermissions", func() {

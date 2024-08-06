@@ -1,12 +1,17 @@
 package validate
 
 import (
+	"context"
 	"slices"
 
 	"github.com/go-playground/validator/v10"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
+)
+
+var (
+	_contextRoleIDsValueKey = "roleFilterIDs"
 )
 
 // initLibregraph initializes libregraph validation
@@ -30,10 +35,9 @@ func libregraphDriveItemInvite(v *validator.Validate) {
 		"ExpirationDateTime": "omitnil,gt",
 	}, s)
 
-	v.RegisterStructValidation(func(sl validator.StructLevel) {
+	v.RegisterStructValidationCtx(func(ctx context.Context, sl validator.StructLevel) {
 		driveItemInvite := sl.Current().Interface().(libregraph.DriveItemInvite)
-
-		rolesAndActions(sl, driveItemInvite.Roles, driveItemInvite.LibreGraphPermissionsActions, false)
+		rolesAndActions(ctx, sl, driveItemInvite.Roles, driveItemInvite.LibreGraphPermissionsActions, false)
 	}, s)
 }
 
@@ -52,7 +56,7 @@ func libregraphPermission(v *validator.Validate) {
 	v.RegisterStructValidationMapRules(map[string]string{
 		"Roles": "max=1",
 	}, s)
-	v.RegisterStructValidation(func(sl validator.StructLevel) {
+	v.RegisterStructValidationCtx(func(ctx context.Context, sl validator.StructLevel) {
 		permission := sl.Current().Interface().(libregraph.Permission)
 
 		if _, ok := permission.GetIdOk(); ok {
@@ -63,14 +67,13 @@ func libregraphPermission(v *validator.Validate) {
 			sl.ReportError(permission.HasPassword, "hasPassword", "HasPassword", "readonly", "")
 		}
 
-		rolesAndActions(sl, permission.Roles, permission.LibreGraphPermissionsActions, true)
+		rolesAndActions(ctx, sl, permission.Roles, permission.LibreGraphPermissionsActions, true)
 	}, s)
 }
 
-func rolesAndActions(sl validator.StructLevel, roles, actions []string, allowEmpty bool) {
+func rolesAndActions(ctx context.Context, sl validator.StructLevel, roles, actions []string, allowEmpty bool) {
 	totalRoles := len(roles)
 	totalActions := len(actions)
-
 	switch {
 	case allowEmpty && totalRoles == 0 && totalActions == 0:
 		break
@@ -83,12 +86,16 @@ func rolesAndActions(sl validator.StructLevel, roles, actions []string, allowEmp
 
 	var availableRoles []string
 	var availableActions []string
-	for _, definition := range append(
-		// fixMe: why twice!?
-		// fixMe: should we consider all roles or only the ones that are enabled?
-		unifiedrole.GetBuiltinRoleDefinitionList(),
-		unifiedrole.GetBuiltinRoleDefinitionList()...,
-	) {
+	var definitions []*libregraph.UnifiedRoleDefinition
+
+	switch roles, ok := ctx.Value(_contextRoleIDsValueKey).([]string); {
+	case ok:
+		definitions = unifiedrole.GetBuiltinRoleDefinitionList(unifiedrole.RoleFilterIDs(roles...))
+	default:
+		definitions = unifiedrole.GetBuiltinRoleDefinitionList()
+	}
+
+	for _, definition := range definitions {
 		if slices.Contains(availableRoles, definition.GetId()) {
 			continue
 		}
@@ -121,4 +128,9 @@ func rolesAndActions(sl validator.StructLevel, roles, actions []string, allowEmp
 
 		sl.ReportError(actions, "LibreGraphPermissionsActions", "LibreGraphPermissionsActions", "available_action", "")
 	}
+}
+
+// ContextWithAllowedRoleIDs returns a new context which includes the allowed role IDs.
+func ContextWithAllowedRoleIDs(ctx context.Context, rolesIds []string) context.Context {
+	return context.WithValue(ctx, _contextRoleIDsValueKey, rolesIds)
 }

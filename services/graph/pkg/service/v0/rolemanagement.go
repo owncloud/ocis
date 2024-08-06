@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 
@@ -16,8 +15,7 @@ import (
 // GetRoleDefinitions a list of permission roles than can be used when sharing with users or groups
 func (g Graph) GetRoleDefinitions(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
-	// fixMe: should we consider all roles or only the ones that are enabled?
-	render.JSON(w, r, unifiedrole.GetBuiltinRoleDefinitionList())
+	render.JSON(w, r, unifiedrole.GetBuiltinRoleDefinitionList(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...)))
 }
 
 // GetRoleDefinition a permission role than can be used when sharing with users or groups
@@ -29,7 +27,7 @@ func (g Graph) GetRoleDefinition(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping role id failed")
 		return
 	}
-	role, err := getRoleDefinition(roleID)
+	role, err := getRoleDefinition(roleID, g.config.UnifiedRoles.AvailableRoles)
 	if err != nil {
 		logger.Debug().Str("roleID", roleID).Msg("could not get role: not found")
 		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, err.Error())
@@ -39,13 +37,11 @@ func (g Graph) GetRoleDefinition(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, role)
 }
 
-func getRoleDefinition(roleID string) (*libregraph.UnifiedRoleDefinition, error) {
-	// fixMe: should we consider all roles or only the ones that are enabled?
-	roleList := unifiedrole.GetBuiltinRoleDefinitionList()
-	for _, role := range roleList {
+func getRoleDefinition(roleID string, availableRoles []string) (*libregraph.UnifiedRoleDefinition, error) {
+	for _, role := range unifiedrole.GetBuiltinRoleDefinitionList(unifiedrole.RoleFilterIDs(availableRoles...)) {
 		if role != nil && role.Id != nil && *role.Id == roleID {
 			return role, nil
 		}
 	}
-	return nil, fmt.Errorf("role not found")
+	return nil, unifiedrole.ErrUnknownUnifiedRole
 }
