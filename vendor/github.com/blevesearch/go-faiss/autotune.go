@@ -6,7 +6,6 @@ package faiss
 */
 import "C"
 import (
-	"runtime"
 	"unsafe"
 )
 
@@ -16,9 +15,6 @@ type ParameterSpace struct {
 
 // NewParameterSpace creates a new ParameterSpace.
 func NewParameterSpace() (*ParameterSpace, error) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	var ps *C.FaissParameterSpace
 	if c := C.faiss_ParameterSpace_new(&ps); c != 0 {
 		return nil, getLastError()
@@ -28,12 +24,10 @@ func NewParameterSpace() (*ParameterSpace, error) {
 
 // SetIndexParameter sets one of the parameters.
 func (p *ParameterSpace) SetIndexParameter(idx Index, name string, val float64) error {
-	runtime.LockOSThread()
 	cname := C.CString(name)
 
 	defer func() {
 		C.free(unsafe.Pointer(cname))
-		runtime.UnlockOSThread()
 	}()
 
 	c := C.faiss_ParameterSpace_set_index_parameter(

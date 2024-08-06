@@ -549,11 +549,14 @@ func prepareBoltSnapshot(snapshot *IndexSnapshot, tx *bolt.Tx, path string,
 		val := make([]byte, 8)
 		bytesWritten := atomic.LoadUint64(&snapshot.parent.stats.TotBytesWrittenAtIndexTime)
 		binary.LittleEndian.PutUint64(val, bytesWritten)
-		internalBucket.Put(TotBytesWrittenKey, val)
+		err = internalBucket.Put(TotBytesWrittenKey, val)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
-	var filenames []string
-	newSegmentPaths := make(map[uint64]string)
+	filenames := make([]string, 0, len(snapshot.segment))
+	newSegmentPaths := make(map[uint64]string, len(snapshot.segment))
 
 	// first ensure that each segment in this snapshot has been persisted
 	for _, segmentSnapshot := range snapshot.segment {
@@ -826,6 +829,10 @@ func (s *Scorch) loadSnapshot(snapshot *bolt.Bucket) (*IndexSnapshot, error) {
 	for k, _ := c.First(); k != nil; k, _ = c.Next() {
 		if k[0] == boltInternalKey[0] {
 			internalBucket := snapshot.Bucket(k)
+			if internalBucket == nil {
+				_ = rv.DecRef()
+				return nil, fmt.Errorf("internal bucket missing")
+			}
 			err := internalBucket.ForEach(func(key []byte, val []byte) error {
 				copiedVal := append([]byte(nil), val...)
 				rv.internal[string(key)] = copiedVal
@@ -982,7 +989,7 @@ func getTimeSeriesSnapshots(maxDataPoints int, interval time.Duration,
 	return ptr, rv
 }
 
-// getProtectedEpochs aims to fetch the epochs keep based on a timestamp basis.
+// getProtectedSnapshots aims to fetch the epochs keep based on a timestamp basis.
 // It tries to get NumSnapshotsToKeep snapshots, each of which are separated
 // by a time duration of RollbackSamplingInterval.
 func getProtectedSnapshots(rollbackSamplingInterval time.Duration,
@@ -1133,7 +1140,7 @@ func (s *Scorch) removeOldZapFiles() error {
 	for _, f := range files {
 		fname := f.Name()
 		if filepath.Ext(fname) == ".zap" {
-			if _, exists := liveFileNames[fname]; !exists && !s.ineligibleForRemoval[fname] {
+			if _, exists := liveFileNames[fname]; !exists && !s.ineligibleForRemoval[fname] && (s.copyScheduled[fname] <= 0) {
 				err := os.Remove(s.path + string(os.PathSeparator) + fname)
 				if err != nil {
 					log.Printf("got err removing file: %s, err: %v", fname, err)
@@ -1198,6 +1205,9 @@ func (s *Scorch) rootBoltSnapshotMetaData() ([]*snapshotMetaData, error) {
 			}
 
 			snapshot := snapshots.Bucket(sk)
+			if snapshot == nil {
+				continue
+			}
 			metaBucket := snapshot.Bucket(boltMetaDataKey)
 			if metaBucket == nil {
 				continue

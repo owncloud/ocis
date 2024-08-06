@@ -31,6 +31,8 @@ import (
 	seg "github.com/blevesearch/scorch_segment_api/v2"
 )
 
+const defaultFaissOMPThreads = 1
+
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	registerSegmentSection(SectionFaissVectorIndex, &faissVectorIndexSection{})
@@ -38,6 +40,7 @@ func init() {
 		_, ok := field.(index.VectorField)
 		return ok
 	}
+	faiss.SetOMPThreads(defaultFaissOMPThreads)
 }
 
 type faissVectorIndexSection struct {
@@ -73,7 +76,7 @@ type vecIndexMeta struct {
 	indexOptimizedFor string
 }
 
-// keep in mind with respect to update and delete operations with resepct to vectors
+// keep in mind with respect to update and delete operations with respect to vectors
 func (v *faissVectorIndexSection) Merge(opaque map[int]resetable, segments []*SegmentBase,
 	drops []*roaring.Bitmap, fieldsInv []string,
 	newDocNumsIn [][]uint64, w *CountHashWriter, closeCh chan struct{}) error {
@@ -275,7 +278,7 @@ func (v *vectorIndexOpaque) mergeAndWriteVectorIndexes(sbs []*SegmentBase,
 	indexes []*vecIndexMeta, w *CountHashWriter, closeCh chan struct{}) error {
 
 	vecIndexes := make([]*faiss.IndexImpl, 0, len(sbs))
-	reconsCap := 0
+	var finalVecIDCap, indexDataCap, reconsCap int
 	for segI, segBase := range sbs {
 		// Considering merge operations on vector indexes are expensive, it is
 		// worth including an early exit if the merge is aborted, saving us
@@ -286,14 +289,18 @@ func (v *vectorIndexOpaque) mergeAndWriteVectorIndexes(sbs []*SegmentBase,
 		}
 		// read the index bytes. todo: parallelize this
 		indexBytes := segBase.mem[indexes[segI].startOffset : indexes[segI].startOffset+int(indexes[segI].indexSize)]
-		index, err := faiss.ReadIndexFromBuffer(indexBytes, faiss.IOFlagReadOnly)
+		index, err := faiss.ReadIndexFromBuffer(indexBytes, faissIOFlags)
 		if err != nil {
 			freeReconstructedIndexes(vecIndexes)
 			return err
 		}
-		indexReconsLen := len(indexes[segI].vecIds) * index.D()
-		if indexReconsLen > reconsCap {
-			reconsCap = indexReconsLen
+		if len(indexes[segI].vecIds) > 0 {
+			indexReconsLen := len(indexes[segI].vecIds) * index.D()
+			if indexReconsLen > reconsCap {
+				reconsCap = indexReconsLen
+			}
+			indexDataCap += indexReconsLen
+			finalVecIDCap += len(indexes[segI].vecIds)
 		}
 		vecIndexes = append(vecIndexes, index)
 	}
@@ -302,13 +309,6 @@ func (v *vectorIndexOpaque) mergeAndWriteVectorIndexes(sbs []*SegmentBase,
 	if len(vecIndexes) == 0 {
 		return nil
 	}
-
-	var mergedIndexBytes []byte
-
-	// capacities for the finalVecIDs and indexData slices
-	// to avoid multiple allocations, via append.
-	finalVecIDCap := len(indexes[0].vecIds) * len(vecIndexes)
-	indexDataCap := finalVecIDCap * vecIndexes[0].D()
 
 	finalVecIDs := make([]int64, 0, finalVecIDCap)
 	// merging of indexes with reconstruction method.
@@ -347,13 +347,9 @@ func (v *vectorIndexOpaque) mergeAndWriteVectorIndexes(sbs []*SegmentBase,
 		freeReconstructedIndexes(vecIndexes)
 		return nil
 	}
+	recons = nil
 
 	nvecs := len(finalVecIDs)
-
-	// index type to be created after merge based on the number of vectors in
-	// indexData added into the index.
-	nlist := determineCentroids(nvecs)
-	indexDescription, indexClass := determineIndexToUse(nvecs, nlist)
 
 	// safe to assume that all the indexes are of the same config values, given
 	// that they are extracted from the field mapping info.
@@ -361,11 +357,17 @@ func (v *vectorIndexOpaque) mergeAndWriteVectorIndexes(sbs []*SegmentBase,
 	metric := vecIndexes[0].MetricType()
 	indexOptimizedFor := indexes[0].indexOptimizedFor
 
+	// index type to be created after merge based on the number of vectors
+	// in indexData added into the index.
+	nlist := determineCentroids(nvecs)
+	indexDescription, indexClass := determineIndexToUse(nvecs, nlist, indexOptimizedFor)
+
 	// freeing the reconstructed indexes immediately - waiting till the end
 	// to do the same is not needed because the following operations don't need
 	// the reconstructed ones anymore and doing so will hold up memory which can
 	// be detrimental while creating indexes during introduction.
 	freeReconstructedIndexes(vecIndexes)
+	vecIndexes = nil
 
 	faissIndex, err := faiss.IndexFactory(dims, indexDescription, metric)
 	if err != nil {
@@ -400,6 +402,9 @@ func (v *vectorIndexOpaque) mergeAndWriteVectorIndexes(sbs []*SegmentBase,
 		return err
 	}
 
+	indexData = nil
+	finalVecIDs = nil
+	var mergedIndexBytes []byte
 	mergedIndexBytes, err = faiss.WriteIndexIntoBuffer(faissIndex)
 	if err != nil {
 		return err
@@ -435,10 +440,7 @@ func determineCentroids(nvecs int) int {
 	var nlist int
 
 	switch {
-	// At 1M vectors, nlist = 4k gave a reasonably high recall with the right nprobe,
-	// whereas 1M/100 = 10000 centroids would increase training time without
-	// corresponding increase in recall
-	case nvecs >= 1000000:
+	case nvecs >= 200000:
 		nlist = int(4 * math.Sqrt(float64(nvecs)))
 	case nvecs >= 1000:
 		// 100 points per cluster is a reasonable default, considering the default
@@ -457,7 +459,16 @@ const (
 
 // Returns a description string for the index and quantizer type
 // and an index type.
-func determineIndexToUse(nvecs, nlist int) (string, int) {
+func determineIndexToUse(nvecs, nlist int, indexOptimizedFor string) (string, int) {
+	if indexOptimizedFor == index.IndexOptimizedForMemoryEfficient {
+		switch {
+		case nvecs >= 1000:
+			return fmt.Sprintf("IVF%d,SQ4", nlist), IndexTypeIVF
+		default:
+			return "IDMap2,Flat", IndexTypeFlat
+		}
+	}
+
 	switch {
 	case nvecs >= 10000:
 		return fmt.Sprintf("IVF%d,SQ8", nlist), IndexTypeIVF
@@ -476,11 +487,11 @@ func (vo *vectorIndexOpaque) writeVectorIndexes(w *CountHashWriter) (offset uint
 	for fieldID, content := range vo.vecFieldMap {
 		// calculate the capacity of the vecs and ids slices
 		// to avoid multiple allocations.
-		vecs := make([]float32, 0, uint16(len(content.vecs))*content.dim)
+		vecs := make([]float32, 0, len(content.vecs)*int(content.dim))
 		ids := make([]int64, 0, len(content.vecs))
 		for hash, vecInfo := range content.vecs {
 			vecs = append(vecs, vecInfo.vec...)
-			ids = append(ids, int64(hash))
+			ids = append(ids, hash)
 		}
 
 		var metric = faiss.MetricL2
@@ -490,7 +501,8 @@ func (vo *vectorIndexOpaque) writeVectorIndexes(w *CountHashWriter) (offset uint
 
 		nvecs := len(ids)
 		nlist := determineCentroids(nvecs)
-		indexDescription, indexClass := determineIndexToUse(nvecs, nlist)
+		indexDescription, indexClass := determineIndexToUse(nvecs, nlist,
+			content.indexOptimizedFor)
 		faissIndex, err := faiss.IndexFactory(int(content.dim), indexDescription, metric)
 		if err != nil {
 			return 0, err
@@ -514,12 +526,6 @@ func (vo *vectorIndexOpaque) writeVectorIndexes(w *CountHashWriter) (offset uint
 		}
 
 		err = faissIndex.AddWithIDs(vecs, ids)
-		if err != nil {
-			return 0, err
-		}
-
-		// serialize the built index into a byte slice
-		buf, err := faiss.WriteIndexIntoBuffer(faissIndex)
 		if err != nil {
 			return 0, err
 		}
@@ -557,7 +563,7 @@ func (vo *vectorIndexOpaque) writeVectorIndexes(w *CountHashWriter) (offset uint
 		// section would be help avoiding in paging in this data as part of a page
 		// (which is to load a non-cacheable info like index). this could help the
 		// paging costs
-		for vecID, _ := range content.vecs {
+		for vecID := range content.vecs {
 			docID := vo.vecIDMap[vecID].docID
 			// write the vecID
 			n = binary.PutVarint(tempBuf, vecID)
@@ -571,6 +577,12 @@ func (vo *vectorIndexOpaque) writeVectorIndexes(w *CountHashWriter) (offset uint
 			if err != nil {
 				return 0, err
 			}
+		}
+
+		// serialize the built index into a byte slice
+		buf, err := faiss.WriteIndexIntoBuffer(faissIndex)
+		if err != nil {
+			return 0, err
 		}
 
 		// record the fieldStart value for this section.

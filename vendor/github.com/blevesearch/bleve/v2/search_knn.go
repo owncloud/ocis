@@ -23,11 +23,14 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/blevesearch/bleve/v2/document"
 	"github.com/blevesearch/bleve/v2/search"
 	"github.com/blevesearch/bleve/v2/search/collector"
 	"github.com/blevesearch/bleve/v2/search/query"
 	index "github.com/blevesearch/bleve_index_api"
 )
+
+const supportForVectorSearch = true
 
 type knnOperator string
 
@@ -35,6 +38,7 @@ type knnOperator string
 var BleveMaxK = int64(10000)
 
 type SearchRequest struct {
+	ClientContextID  string            `json:"client_context_id,omitempty"`
 	Query            query.Query       `json:"query"`
 	Size             int               `json:"size"`
 	From             int               `json:"from"`
@@ -66,11 +70,23 @@ type SearchRequest struct {
 	sortFunc func(sort.Interface)
 }
 
+// Vector takes precedence over vectorBase64 in case both fields are given
 type KNNRequest struct {
-	Field  string       `json:"field"`
-	Vector []float32    `json:"vector"`
-	K      int64        `json:"k"`
-	Boost  *query.Boost `json:"boost,omitempty"`
+	Field        string       `json:"field"`
+	Vector       []float32    `json:"vector"`
+	VectorBase64 string       `json:"vector_base64"`
+	K            int64        `json:"k"`
+	Boost        *query.Boost `json:"boost,omitempty"`
+
+	// Search parameters for the field's vector index part of the segment.
+	// Value of it depends on the field's backing vector index implementation.
+	//
+	// For Faiss IVF index, supported search params are:
+	//  - ivf_nprobe_pct    : int  // percentage of total clusters to search
+	//  - ivf_max_codes_pct : float // percentage of total vectors to visit to do a query (across all clusters)
+	//
+	// Consult go-faiss to know all supported search params
+	Params json.RawMessage `json:"params"`
 }
 
 func (r *SearchRequest) AddKNN(field string, vector []float32, k int64, boost float64) {
@@ -208,6 +224,7 @@ func createKNNQuery(req *SearchRequest) (query.Query, []int64, int64, error) {
 			knnQuery.SetFieldVal(knn.Field)
 			knnQuery.SetK(knn.K)
 			knnQuery.SetBoost(knn.Boost.Value())
+			knnQuery.SetParams(knn.Params)
 			subQueries = append(subQueries, knnQuery)
 			kArray = append(kArray, knn.K)
 			sumOfK += knn.K
@@ -229,6 +246,15 @@ func validateKNN(req *SearchRequest) error {
 	for _, q := range req.KNN {
 		if q == nil {
 			return fmt.Errorf("knn query cannot be nil")
+		}
+		if len(q.Vector) == 0 && q.VectorBase64 != "" {
+			// consider vector_base64 only if vector is not provided
+			decodedVector, err := document.DecodeVector(q.VectorBase64)
+			if err != nil {
+				return err
+			}
+
+			q.Vector = decodedVector
 		}
 		if q.K <= 0 || len(q.Vector) == 0 {
 			return fmt.Errorf("k must be greater than 0 and vector must be non-empty")

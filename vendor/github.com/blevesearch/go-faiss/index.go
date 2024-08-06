@@ -12,8 +12,8 @@ package faiss
 */
 import "C"
 import (
+	"encoding/json"
 	"fmt"
-	"runtime"
 	"unsafe"
 )
 
@@ -49,7 +49,7 @@ type Index interface {
 	// corresponding distances.
 	Search(x []float32, k int64) (distances []float32, labels []int64, err error)
 
-	SearchWithoutIDs(x []float32, k int64, exclude []int64) (distances []float32,
+	SearchWithoutIDs(x []float32, k int64, exclude []int64, params json.RawMessage) (distances []float32,
 		labels []int64, err error)
 
 	Reconstruct(key int64) ([]float32, error)
@@ -108,9 +108,6 @@ func (idx *faissIndex) MetricType() int {
 }
 
 func (idx *faissIndex) Train(x []float32) error {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	n := len(x) / idx.D()
 	if c := C.faiss_Index_train(idx.idx, C.idx_t(n), (*C.float)(&x[0])); c != 0 {
 		return getLastError()
@@ -119,9 +116,6 @@ func (idx *faissIndex) Train(x []float32) error {
 }
 
 func (idx *faissIndex) Add(x []float32) error {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	n := len(x) / idx.D()
 	if c := C.faiss_Index_add(idx.idx, C.idx_t(n), (*C.float)(&x[0])); c != 0 {
 		return getLastError()
@@ -130,9 +124,6 @@ func (idx *faissIndex) Add(x []float32) error {
 }
 
 func (idx *faissIndex) AddWithIDs(x []float32, xids []int64) error {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	n := len(x) / idx.D()
 	if c := C.faiss_Index_add_with_ids(
 		idx.idx,
@@ -148,8 +139,6 @@ func (idx *faissIndex) AddWithIDs(x []float32, xids []int64) error {
 func (idx *faissIndex) Search(x []float32, k int64) (
 	distances []float32, labels []int64, err error,
 ) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
 
 	n := len(x) / idx.D()
 	distances = make([]float32, int64(n)*k)
@@ -168,52 +157,35 @@ func (idx *faissIndex) Search(x []float32, k int64) (
 	return
 }
 
-func (idx *faissIndex) SearchWithoutIDs(x []float32, k int64, exclude []int64) (
+func (idx *faissIndex) SearchWithoutIDs(x []float32, k int64, exclude []int64, params json.RawMessage) (
 	distances []float32, labels []int64, err error,
 ) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
-	if len(exclude) <= 0 {
+	if params == nil && len(exclude) == 0 {
 		return idx.Search(x, k)
 	}
 
-	excludeSelector, err := NewIDSelectorNot(exclude)
+	var selector *C.FaissIDSelector
+	if len(exclude) > 0 {
+		excludeSelector, err := NewIDSelectorNot(exclude)
+		if err != nil {
+			return nil, nil, err
+		}
+		selector = excludeSelector.sel
+		defer excludeSelector.Delete()
+	}
+
+	searchParams, err := NewSearchParams(idx, params, selector)
+	defer searchParams.Delete()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var sp *C.FaissSearchParameters
-	C.faiss_SearchParameters_new(&sp, (*C.FaissIDSelector)(excludeSelector.sel))
-	ivfPtr := C.faiss_IndexIVF_cast(idx.cPtr())
-	if ivfPtr != nil {
-		sp = C.faiss_SearchParametersIVF_cast(sp)
-		C.faiss_SearchParametersIVF_new_with_sel(&sp, (*C.FaissIDSelector)(excludeSelector.sel))
-	}
+	distances, labels, err = idx.searchWithParams(x, k, searchParams.sp)
 
-	n := len(x) / idx.D()
-	distances = make([]float32, int64(n)*k)
-	labels = make([]int64, int64(n)*k)
-
-	if c := C.faiss_Index_search_with_params(
-		idx.idx,
-		C.idx_t(n),
-		(*C.float)(&x[0]),
-		C.idx_t(k), sp,
-		(*C.float)(&distances[0]),
-		(*C.idx_t)(&labels[0]),
-	); c != 0 {
-		err = getLastError()
-	}
-	excludeSelector.Delete()
-	C.faiss_SearchParameters_free(sp)
 	return
 }
 
 func (idx *faissIndex) Reconstruct(key int64) (recons []float32, err error) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	rv := make([]float32, idx.D())
 	if c := C.faiss_Index_reconstruct(
 		idx.idx,
@@ -227,9 +199,6 @@ func (idx *faissIndex) Reconstruct(key int64) (recons []float32, err error) {
 }
 
 func (idx *faissIndex) ReconstructBatch(keys []int64, recons []float32) ([]float32, error) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	var err error
 	n := int64(len(keys))
 	if c := C.faiss_Index_reconstruct_batch(
@@ -252,9 +221,6 @@ func (i *IndexImpl) MergeFrom(other Index, add_id int64) error {
 }
 
 func (idx *faissIndex) MergeFrom(other Index, add_id int64) (err error) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	otherIdx, ok := other.(*faissIndex)
 	if !ok {
 		return fmt.Errorf("merge api not supported")
@@ -274,9 +240,6 @@ func (idx *faissIndex) MergeFrom(other Index, add_id int64) (err error) {
 func (idx *faissIndex) RangeSearch(x []float32, radius float32) (
 	*RangeSearchResult, error,
 ) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	n := len(x) / idx.D()
 	var rsr *C.FaissRangeSearchResult
 	if c := C.faiss_RangeSearchResult_new(&rsr, C.idx_t(n)); c != 0 {
@@ -295,9 +258,6 @@ func (idx *faissIndex) RangeSearch(x []float32, radius float32) (
 }
 
 func (idx *faissIndex) Reset() error {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	if c := C.faiss_Index_reset(idx.idx); c != 0 {
 		return getLastError()
 	}
@@ -305,9 +265,6 @@ func (idx *faissIndex) Reset() error {
 }
 
 func (idx *faissIndex) RemoveIDs(sel *IDSelector) (int, error) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	var nRemoved C.size_t
 	if c := C.faiss_Index_remove_ids(idx.idx, sel.sel, &nRemoved); c != 0 {
 		return 0, getLastError()
@@ -318,6 +275,30 @@ func (idx *faissIndex) RemoveIDs(sel *IDSelector) (int, error) {
 func (idx *faissIndex) Close() {
 	C.faiss_Index_free(idx.idx)
 }
+
+func (idx *faissIndex) searchWithParams(x []float32, k int64, searchParams *C.FaissSearchParameters) (
+	distances []float32, labels []int64, err error,
+) {
+	n := len(x) / idx.D()
+	distances = make([]float32, int64(n)*k)
+	labels = make([]int64, int64(n)*k)
+
+	if c := C.faiss_Index_search_with_params(
+		idx.idx,
+		C.idx_t(n),
+		(*C.float)(&x[0]),
+		C.idx_t(k),
+		searchParams,
+		(*C.float)(&distances[0]),
+		(*C.idx_t)(&labels[0]),
+	); c != 0 {
+		err = getLastError()
+	}
+
+	return
+}
+
+// -----------------------------------------------------------------------------
 
 // RangeSearchResult is the result of a range search.
 type RangeSearchResult struct {
@@ -364,9 +345,6 @@ type IndexImpl struct {
 // IndexFactory builds a composite index.
 // description is a comma-separated list of components.
 func IndexFactory(d int, description string, metric int) (*IndexImpl, error) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	cdesc := C.CString(description)
 	defer C.free(unsafe.Pointer(cdesc))
 	var idx faissIndex
@@ -375,4 +353,8 @@ func IndexFactory(d int, description string, metric int) (*IndexImpl, error) {
 		return nil, getLastError()
 	}
 	return &IndexImpl{&idx}, nil
+}
+
+func SetOMPThreads(n uint) {
+	C.faiss_set_omp_threads(C.uint(n))
 }

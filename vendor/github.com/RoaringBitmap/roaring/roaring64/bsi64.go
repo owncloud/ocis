@@ -2,6 +2,7 @@ package roaring64
 
 import (
 	"fmt"
+	"io"
 	"math/bits"
 	"runtime"
 	"sync"
@@ -24,8 +25,8 @@ const (
 // It depends upon the bitmap libraries.  It is not thread safe, so
 // upstream concurrency guards must be provided.
 type BSI struct {
-	bA           []*Bitmap
-	eBM          *Bitmap // Existence BitMap
+	bA           []Bitmap
+	eBM          Bitmap // Existence BitMap
 	MaxValue     int64
 	MinValue     int64
 	runOptimized bool
@@ -39,11 +40,8 @@ func NewBSI(maxValue int64, minValue int64) *BSI {
 	if bits.Len64(uint64(maxValue)) > bitsz {
 		bitsz = bits.Len64(uint64(maxValue))
 	}
-	ba := make([]*Bitmap, bitsz)
-	for i := 0; i < len(ba); i++ {
-		ba[i] = NewBitmap()
-	}
-	return &BSI{bA: ba, eBM: NewBitmap(), MaxValue: maxValue, MinValue: minValue}
+	ba := make([]Bitmap, bitsz)
+	return &BSI{bA: ba, MaxValue: maxValue, MinValue: minValue}
 }
 
 // NewDefaultBSI constructs an auto-sized BSI
@@ -67,7 +65,7 @@ func (b *BSI) HasRunCompression() bool {
 
 // GetExistenceBitmap returns a pointer to the underlying existence bitmap of the BSI
 func (b *BSI) GetExistenceBitmap() *Bitmap {
-	return b.eBM
+	return &b.eBM
 }
 
 // ValueExists tests whether the value exists.
@@ -83,54 +81,41 @@ func (b *BSI) GetCardinality() uint64 {
 
 // BitCount returns the number of bits needed to represent values.
 func (b *BSI) BitCount() int {
-
 	return len(b.bA)
 }
 
 // SetValue sets a value for a given columnID.
 func (b *BSI) SetValue(columnID uint64, value int64) {
-
 	// If max/min values are set to zero then automatically determine bit array size
 	if b.MaxValue == 0 && b.MinValue == 0 {
-		ba := make([]*Bitmap, bits.Len64(uint64(value)))
-		for i := len(ba) - b.BitCount(); i > 0; i-- {
-			b.bA = append(b.bA, NewBitmap())
-			if b.runOptimized {
-				b.bA[i].RunOptimize()
-			}
+		minBits := bits.Len64(uint64(value))
+		for len(b.bA) < minBits {
+			b.bA = append(b.bA, Bitmap{})
 		}
 	}
 
-	var wg sync.WaitGroup
-
 	for i := 0; i < b.BitCount(); i++ {
-		wg.Add(1)
-		go func(j int) {
-			defer wg.Done()
-			if uint64(value)&(1<<uint64(j)) > 0 {
-				b.bA[j].Add(uint64(columnID))
-			} else {
-				b.bA[j].Remove(uint64(columnID))
-			}
-		}(i)
+		if uint64(value)&(1<<uint64(i)) > 0 {
+			b.bA[i].Add(columnID)
+		} else {
+			b.bA[i].Remove(columnID)
+		}
 	}
-	wg.Wait()
-	b.eBM.Add(uint64(columnID))
+	b.eBM.Add(columnID)
 }
 
-// GetValue gets the value at the column ID.  Second param will be false for non-existant values.
-func (b *BSI) GetValue(columnID uint64) (int64, bool) {
-	value := int64(0)
-	exists := b.eBM.Contains(uint64(columnID))
+// GetValue gets the value at the column ID. Second param will be false for non-existent values.
+func (b *BSI) GetValue(columnID uint64) (value int64, exists bool) {
+	exists = b.eBM.Contains(columnID)
 	if !exists {
-		return value, exists
+		return
 	}
 	for i := 0; i < b.BitCount(); i++ {
-		if b.bA[i].Contains(uint64(columnID)) {
-			value |= (1 << uint64(i))
+		if b.bA[i].Contains(columnID) {
+			value |= 1 << i
 		}
 	}
-	return int64(value), exists
+	return
 }
 
 type action func(t *task, batch []uint64, resultsChan chan *Bitmap, wg *sync.WaitGroup)
@@ -261,13 +246,12 @@ type task struct {
 // For the RANGE parameter the comparison criteria is >= valueOrStart and <= end.
 // The parallelism parameter indicates the number of CPU threads to be applied for processing.  A value
 // of zero indicates that all available CPU resources will be potentially utilized.
-//
 func (b *BSI) CompareValue(parallelism int, op Operation, valueOrStart, end int64,
 	foundSet *Bitmap) *Bitmap {
 
 	comp := &task{bsi: b, op: op, valueOrStart: valueOrStart, end: end}
 	if foundSet == nil {
-		return parallelExecutor(parallelism, comp, compareValue, b.eBM)
+		return parallelExecutor(parallelism, comp, compareValue, &b.eBM)
 	}
 	return parallelExecutor(parallelism, comp, compareValue, foundSet)
 }
@@ -522,7 +506,6 @@ func (b *BSI) minOrMax(op Operation, batch []uint64, resultsChan chan int64, wg 
 
 // Sum all values contained within the foundSet.   As a convenience, the cardinality of the foundSet
 // is also returned (for calculating the average).
-//
 func (b *BSI) Sum(foundSet *Bitmap) (sum int64, count uint64) {
 
 	count = foundSet.GetCardinality()
@@ -531,7 +514,7 @@ func (b *BSI) Sum(foundSet *Bitmap) (sum int64, count uint64) {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			atomic.AddInt64(&sum, int64(foundSet.AndCardinality(b.bA[j])<<uint(j)))
+			atomic.AddInt64(&sum, int64(foundSet.AndCardinality(&b.bA[j])<<uint(j)))
 		}(i)
 	}
 	wg.Wait()
@@ -540,7 +523,7 @@ func (b *BSI) Sum(foundSet *Bitmap) (sum int64, count uint64) {
 
 // Transpose calls b.IntersectAndTranspose(0, b.eBM)
 func (b *BSI) Transpose() *Bitmap {
-	return b.IntersectAndTranspose(0, b.eBM)
+	return b.IntersectAndTranspose(0, &b.eBM)
 }
 
 // IntersectAndTranspose is a matrix transpose function.  Return a bitmap such that the values are represented as column IDs
@@ -549,7 +532,6 @@ func (b *BSI) Transpose() *Bitmap {
 // vectoring one set of integers to another.
 //
 // TODO: This implementation is functional but not performant, needs to be re-written perhaps using SIMD SSE2 instructions.
-//
 func (b *BSI) IntersectAndTranspose(parallelism int, foundSet *Bitmap) *Bitmap {
 
 	trans := &task{bsi: b}
@@ -587,11 +569,9 @@ func (b *BSI) ParOr(parallelism int, bsis ...*BSI) {
 
 	// Make sure we have enough bit slices
 	for bits > b.BitCount() {
-		newBm := NewBitmap()
-		if b.runOptimized {
-			newBm.RunOptimize()
-		}
-		b.bA = append(b.bA, newBm)
+		bm := Bitmap{}
+		bm.RunOptimize()
+		b.bA = append(b.bA, bm)
 	}
 
 	a := make([][]*Bitmap, bits)
@@ -599,9 +579,8 @@ func (b *BSI) ParOr(parallelism int, bsis ...*BSI) {
 		a[i] = make([]*Bitmap, 0)
 		for _, x := range bsis {
 			if len(x.bA) > i {
-				a[i] = append(a[i], x.bA[i])
+				a[i] = append(a[i], &x.bA[i])
 			} else {
-				a[i] = []*Bitmap{NewBitmap()}
 				if b.runOptimized {
 					a[i][0].RunOptimize()
 				}
@@ -612,7 +591,7 @@ func (b *BSI) ParOr(parallelism int, bsis ...*BSI) {
 	// Consolidate existence bit maps
 	ebms := make([]*Bitmap, len(bsis))
 	for i := range ebms {
-		ebms[i] = bsis[i].eBM
+		ebms[i] = &bsis[i].eBM
 	}
 
 	// First merge all the bit slices from all bsi maps that exist in target
@@ -621,17 +600,17 @@ func (b *BSI) ParOr(parallelism int, bsis ...*BSI) {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			x := []*Bitmap{b.bA[j]}
+			x := []*Bitmap{&b.bA[j]}
 			x = append(x, a[j]...)
-			b.bA[j] = ParOr(parallelism, x...)
+			b.bA[j] = *ParOr(parallelism, x...)
 		}(i)
 	}
 	wg.Wait()
 
 	// merge all the EBM maps
-	x := []*Bitmap{b.eBM}
+	x := []*Bitmap{&b.eBM}
 	x = append(x, ebms...)
-	b.eBM = ParOr(parallelism, x...)
+	b.eBM = *ParOr(parallelism, x...)
 }
 
 // UnmarshalBinary de-serialize a BSI.  The value at bitData[0] is the EBM.  Other indices are in least to most
@@ -643,7 +622,7 @@ func (b *BSI) UnmarshalBinary(bitData [][]byte) error {
 			continue
 		}
 		if b.BitCount() < i {
-			newBm := NewBitmap()
+			newBm := Bitmap{}
 			if b.runOptimized {
 				newBm.RunOptimize()
 			}
@@ -659,7 +638,7 @@ func (b *BSI) UnmarshalBinary(bitData [][]byte) error {
 	}
 	// First element of bitData is the EBM
 	if bitData[0] == nil {
-		b.eBM = NewBitmap()
+		b.eBM = Bitmap{}
 		if b.runOptimized {
 			b.eBM.RunOptimize()
 		}
@@ -672,6 +651,39 @@ func (b *BSI) UnmarshalBinary(bitData [][]byte) error {
 		b.eBM.RunOptimize()
 	}
 	return nil
+}
+
+// ReadFrom reads a serialized version of this BSI from stream.
+func (b *BSI) ReadFrom(stream io.Reader) (p int64, err error) {
+	bm, n, err := readBSIContainerFromStream(stream)
+	p += n
+	if err != nil {
+		err = fmt.Errorf("reading existence bitmap: %w", err)
+		return
+	}
+	b.eBM = bm
+	b.bA = b.bA[:0]
+	for {
+		// This forces a new memory location to be allocated and if we're lucky it only escapes if
+		// there's no error.
+		var bm Bitmap
+		bm, n, err = readBSIContainerFromStream(stream)
+		p += n
+		if err == io.EOF {
+			err = nil
+			return
+		}
+		if err != nil {
+			err = fmt.Errorf("reading bit slice index %v: %w", len(b.bA), err)
+			return
+		}
+		b.bA = append(b.bA, bm)
+	}
+}
+
+func readBSIContainerFromStream(r io.Reader) (bm Bitmap, p int64, err error) {
+	p, err = bm.ReadFrom(r)
+	return
 }
 
 // MarshalBinary serializes a BSI
@@ -694,6 +706,23 @@ func (b *BSI) MarshalBinary() ([][]byte, error) {
 	return data, nil
 }
 
+// WriteTo writes a serialized version of this BSI to stream.
+func (b *BSI) WriteTo(w io.Writer) (n int64, err error) {
+	n1, err := b.eBM.WriteTo(w)
+	n += n1
+	if err != nil {
+		return
+	}
+	for _, bm := range b.bA {
+		n1, err = bm.WriteTo(w)
+		n += n1
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
 // BatchEqual returns a bitmap containing the column IDs where the values are contained within the list of values provided.
 func (b *BSI) BatchEqual(parallelism int, values []int64) *Bitmap {
 
@@ -702,7 +731,7 @@ func (b *BSI) BatchEqual(parallelism int, values []int64) *Bitmap {
 		valMap[values[i]] = struct{}{}
 	}
 	comp := &task{bsi: b, values: valMap}
-	return parallelExecutor(parallelism, comp, batchEqual, b.eBM)
+	return parallelExecutor(parallelism, comp, batchEqual, &b.eBM)
 }
 
 func batchEqual(e *task, batch []uint64, resultsChan chan *Bitmap,
@@ -742,13 +771,13 @@ func (b *BSI) ClearValues(foundSet *Bitmap) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		ClearBits(foundSet, b.eBM)
+		ClearBits(foundSet, &b.eBM)
 	}()
 	for i := 0; i < b.BitCount(); i++ {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			ClearBits(foundSet, b.bA[j])
+			ClearBits(foundSet, &b.bA[j])
 		}(i)
 	}
 	wg.Wait()
@@ -758,19 +787,19 @@ func (b *BSI) ClearValues(foundSet *Bitmap) {
 func (b *BSI) NewBSIRetainSet(foundSet *Bitmap) *BSI {
 
 	newBSI := NewBSI(b.MaxValue, b.MinValue)
-	newBSI.bA = make([]*Bitmap, b.BitCount())
+	newBSI.bA = make([]Bitmap, b.BitCount())
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		newBSI.eBM = b.eBM.Clone()
+		newBSI.eBM = *b.eBM.Clone()
 		newBSI.eBM.And(foundSet)
 	}()
 	for i := 0; i < b.BitCount(); i++ {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			newBSI.bA[j] = b.bA[j].Clone()
+			newBSI.bA[j] = *b.bA[j].Clone()
 			newBSI.bA[j].And(foundSet)
 		}(i)
 	}
@@ -780,28 +809,28 @@ func (b *BSI) NewBSIRetainSet(foundSet *Bitmap) *BSI {
 
 // Clone performs a deep copy of BSI contents.
 func (b *BSI) Clone() *BSI {
-	return b.NewBSIRetainSet(b.eBM)
+	return b.NewBSIRetainSet(&b.eBM)
 }
 
 // Add - In-place sum the contents of another BSI with this BSI, column wise.
 func (b *BSI) Add(other *BSI) {
 
-	b.eBM.Or(other.eBM)
+	b.eBM.Or(&other.eBM)
 	for i := 0; i < len(other.bA); i++ {
-		b.addDigit(other.bA[i], i)
+		b.addDigit(&other.bA[i], i)
 	}
 }
 
 func (b *BSI) addDigit(foundSet *Bitmap, i int) {
 
 	if i >= len(b.bA) {
-		b.bA = append(b.bA, NewBitmap())
+		b.bA = append(b.bA, Bitmap{})
 	}
-	carry := And(b.bA[i], foundSet)
+	carry := And(&b.bA[i], foundSet)
 	b.bA[i].Xor(foundSet)
 	if !carry.IsEmpty() {
 		if i+1 >= len(b.bA) {
-			b.bA = append(b.bA, NewBitmap())
+			b.bA = append(b.bA, Bitmap{})
 		}
 		b.addDigit(carry, i+1)
 	}
@@ -811,7 +840,6 @@ func (b *BSI) addDigit(foundSet *Bitmap, i int) {
 // contained within the input BSI.   Given that for BSIs, different columnIDs can have the same value.  TransposeWithCounts
 // is useful for situations where there is a one-to-many relationship between the vectored integer sets.  The resulting BSI
 // contains the number of times a particular value appeared in the input BSI.
-//
 func (b *BSI) TransposeWithCounts(parallelism int, foundSet, filterSet *Bitmap) *BSI {
 
 	return parallelExecutorBSIResults(parallelism, b, transposeWithCounts, foundSet, filterSet, true)
@@ -844,9 +872,42 @@ func transposeWithCounts(input *BSI, filterSet *Bitmap, batch []uint64, resultsC
 // Increment - In-place increment of values in a BSI.  Found set select columns for incrementing.
 func (b *BSI) Increment(foundSet *Bitmap) {
 	b.addDigit(foundSet, 0)
+	b.eBM.Or(foundSet)
 }
 
 // IncrementAll - In-place increment of all values in a BSI.
 func (b *BSI) IncrementAll() {
 	b.Increment(b.GetExistenceBitmap())
+}
+
+// Equals - Check for semantic equality of two BSIs.
+func (b *BSI) Equals(other *BSI) bool {
+	if !b.eBM.Equals(&other.eBM) {
+		return false
+	}
+	for i := 0; i < len(b.bA) || i < len(other.bA); i++ {
+		if i >= len(b.bA) {
+			if !other.bA[i].IsEmpty() {
+				return false
+			}
+		} else if i >= len(other.bA) {
+			if !b.bA[i].IsEmpty() {
+				return false
+			}
+		} else {
+			if !b.bA[i].Equals(&other.bA[i]) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// GetSizeInBytes - the size in bytes of the data structure
+func (b *BSI) GetSizeInBytes() int {
+	size := b.eBM.GetSizeInBytes()
+	for _, bm := range b.bA {
+		size += bm.GetSizeInBytes()
+	}
+	return int(size)
 }
