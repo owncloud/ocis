@@ -25,7 +25,7 @@ To enable a role, include the UID of the role in the list of available roles.
 
 A new command has been introduced to simplify the process of finding out which UID belongs to which role. The command is:
 
-```bash
+```
 $ ocis graph list-unified-roles
 ```
 

@@ -70,5 +70,5 @@ func TestService_Get(t *testing.T) {
 	// brandingTheme
 	assert.Equal(t, jsonData.Get("_branding").String(), "_branding")
 	// themeDefaults
-	assert.Equal(t, jsonData.Get("common.shareRoles."+unifiedrole.UnifiedRoleViewerID+".name").String(), "UnifiedRoleViewer")
+	assert.Equal(t, jsonData.Get("common.shareRoles."+role.UnifiedRoleViewerID+".name").String(), "UnifiedRoleViewer")
 }

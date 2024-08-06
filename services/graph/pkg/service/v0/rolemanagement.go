@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
@@ -15,7 +14,7 @@ import (
 // GetRoleDefinitions a list of permission roles than can be used when sharing with users or groups
 func (g Graph) GetRoleDefinitions(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, unifiedrole.GetBuiltinRoleDefinitionList(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...)))
+	render.JSON(w, r, unifiedrole.GetDefinitions(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...)))
 }
 
 // GetRoleDefinition a permission role than can be used when sharing with users or groups
@@ -27,7 +26,7 @@ func (g Graph) GetRoleDefinition(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping role id failed")
 		return
 	}
-	role, err := getRoleDefinition(roleID, g.config.UnifiedRoles.AvailableRoles)
+	role, err := unifiedrole.GetDefinition(unifiedrole.RoleFilterIDs(roleID))
 	if err != nil {
 		logger.Debug().Str("roleID", roleID).Msg("could not get role: not found")
 		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, err.Error())
@@ -35,13 +34,4 @@ func (g Graph) GetRoleDefinition(w http.ResponseWriter, r *http.Request) {
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, role)
-}
-
-func getRoleDefinition(roleID string, availableRoles []string) (*libregraph.UnifiedRoleDefinition, error) {
-	for _, role := range unifiedrole.GetBuiltinRoleDefinitionList(unifiedrole.RoleFilterIDs(availableRoles...)) {
-		if role != nil && role.Id != nil && *role.Id == roleID {
-			return role, nil
-		}
-	}
-	return nil, unifiedrole.ErrUnknownUnifiedRole
 }
