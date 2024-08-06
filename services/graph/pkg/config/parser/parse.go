@@ -8,12 +8,11 @@ import (
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	defaults2 "github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
-
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )
 
 // ParseConfig loads configuration from known paths.
@@ -80,7 +79,7 @@ func Validate(cfg *config.Config) error {
 
 		for _, uid := range cfg.UnifiedRoles.AvailableRoles {
 			// check if the role is known
-			if len(unifiedrole.GetBuiltinRoleDefinitionList(unifiedrole.RoleFilterIDs(uid))) == 0 {
+			if len(unifiedrole.GetDefinitions(unifiedrole.RoleFilterIDs(uid))) == 0 {
 				// collect all possible errors to return them all at once
 				err = errors.Join(err, fmt.Errorf("%w: %s", unifiedrole.ErrUnknownUnifiedRole, uid))
 			}

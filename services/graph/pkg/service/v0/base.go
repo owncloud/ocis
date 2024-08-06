@@ -191,10 +191,10 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
 		}
 
-		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(perm, unifiedrole.UnifiedRoleConditionDrive); role != nil {
+		if role := unifiedrole.CS3ResourcePermissionsToDefinition(perm, unifiedrole.UnifiedRoleConditionDrive); role != nil {
 			switch apiVersion {
 			case APIVersion_1:
-				if r := unifiedrole.GetLegacyName(*role); r != "" {
+				if r := unifiedrole.GetLegacyDefinitionName(*role); r != "" {
 					p.SetRoles([]string{r})
 				}
 			case APIVersion_1_Beta_1:
@@ -392,7 +392,7 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 	if share.GetCtime() != nil {
 		perm.SetCreatedDateTime(cs3TimestampToTime(share.GetCtime()))
 	}
-	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+	role := unifiedrole.CS3ResourcePermissionsToDefinition(
 		share.GetPermissions().GetPermissions(),
 		roleCondition,
 	)
@@ -695,7 +695,7 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 	var permissionsUpdated, ok bool
 	if roles, ok = newPermission.GetRolesOk(); ok && len(roles) > 0 {
 		for _, roleID := range roles {
-			role, err := unifiedrole.NewUnifiedRoleFromID(roleID)
+			role, err := unifiedrole.GetDefinition(unifiedrole.RoleFilterIDs(roleID))
 			if err != nil {
 				g.logger.Debug().Err(err).Interface("role", role).Msg("unable to convert requested role")
 				return nil, err

@@ -169,13 +169,13 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewViewerUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID}
 
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(permission.GetRoles()).To(HaveLen(1))
-			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.NewViewerUnifiedRole().GetId()))
+			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.UnifiedRoleViewerID))
 		})
 
 		It("succeeds with folder roles (happy path)", func() {
@@ -185,20 +185,20 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewEditorUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleEditorID}
 
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(permission.GetRoles()).To(HaveLen(1))
-			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.NewEditorUnifiedRole().GetId()))
+			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.UnifiedRoleEditorID))
 		})
 
 		It("fails with when trying to set a space role on a file", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewManagerUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleManagerID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 
 			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
@@ -209,7 +209,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewEditorUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleEditorID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 
 			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
@@ -221,7 +221,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewFileEditorUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleFileEditorID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 
 			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
@@ -836,7 +836,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 
-			driveItemPermission.SetRoles([]string{unifiedrole.NewSpaceViewerUnifiedRole().GetId()})
+			driveItemPermission.SetRoles([]string{unifiedrole.UnifiedRoleSpaceViewerID})
 			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
 			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
 			Expect(res).To(BeZero())
@@ -853,7 +853,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 
-			driveItemPermission.SetRoles([]string{unifiedrole.NewFileEditorUnifiedRole().GetId()})
+			driveItemPermission.SetRoles([]string{unifiedrole.UnifiedRoleFileEditorID})
 			spaceId := &provider.ResourceId{
 				StorageId: "1",
 				SpaceId:   "2",
@@ -1036,7 +1036,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 					ObjectId:                libregraph.PtrString("1"),
 					LibreGraphRecipientType: libregraph.PtrString("user")},
 			},
-			Roles: []string{unifiedrole.NewViewerUnifiedRole().GetId()},
+			Roles: []string{unifiedrole.UnifiedRoleViewerID},
 		}
 	})
 

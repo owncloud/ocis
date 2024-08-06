@@ -90,9 +90,9 @@ func rolesAndActions(ctx context.Context, sl validator.StructLevel, roles, actio
 
 	switch roles, ok := ctx.Value(_contextRoleIDsValueKey).([]string); {
 	case ok:
-		definitions = unifiedrole.GetBuiltinRoleDefinitionList(unifiedrole.RoleFilterIDs(roles...))
+		definitions = unifiedrole.GetDefinitions(unifiedrole.RoleFilterIDs(roles...))
 	default:
-		definitions = unifiedrole.GetBuiltinRoleDefinitionList()
+		definitions = unifiedrole.GetDefinitions(unifiedrole.RoleFilterAll())
 	}
 
 	for _, definition := range definitions {

@@ -44,7 +44,7 @@ func unifiedRolesStatus(cfg *config.Config) *cli.Command {
 
 			var data [][]string
 
-			for _, definition := range unifiedrole.GetBuiltinRoleDefinitionList() {
+			for _, definition := range unifiedrole.GetDefinitions(unifiedrole.RoleFilterAll()) {
 				data = append(data, []string{"", definition.GetId(), definition.GetDescription()})
 			}
 

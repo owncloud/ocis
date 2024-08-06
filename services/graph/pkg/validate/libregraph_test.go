@@ -27,8 +27,8 @@ var _ = Describe("libregraph", func() {
 
 		driveItemInvite = libregraph.DriveItemInvite{
 			Recipients:                   []libregraph.DriveRecipient{driveRecipient},
-			Roles:                        []string{unifiedrole.UnifiedRoleEditorID},
-			LibreGraphPermissionsActions: []string{unifiedrole.DriveItemVersionsUpdate},
+			Roles:                        []string{role.UnifiedRoleEditorID},
+			LibreGraphPermissionsActions: []string{role.DriveItemVersionsUpdate},
 			ExpirationDateTime:           libregraph.PtrTime(time.Now().Add(time.Hour)),
 		}
 
@@ -61,8 +61,8 @@ var _ = Describe("libregraph", func() {
 		}),
 		Entry("fail: multiple role assignment", func() (libregraph.DriveItemInvite, bool) {
 			driveItemInvite.Roles = []string{
-				unifiedrole.UnifiedRoleEditorID,
-				unifiedrole.UnifiedRoleManagerID,
+				role.UnifiedRoleEditorID,
+				role.UnifiedRoleManagerID,
 			}
 			driveItemInvite.LibreGraphPermissionsActions = nil
 			return driveItemInvite, false
@@ -84,8 +84,8 @@ var _ = Describe("libregraph", func() {
 		}),
 		Entry("fail: different number of roles and actions", func() (libregraph.DriveItemInvite, bool) {
 			driveItemInvite.LibreGraphPermissionsActions = []string{
-				unifiedrole.DriveItemVersionsUpdate,
-				unifiedrole.DriveItemChildrenCreate,
+				role.DriveItemVersionsUpdate,
+				role.DriveItemChildrenCreate,
 			}
 			return driveItemInvite, false
 		}),
