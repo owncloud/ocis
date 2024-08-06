@@ -1,6 +1,6 @@
 ---
 title: Proxy
-date: 2024-08-06T04:07:33.615646191Z
+date: 2024-08-06T06:27:32.455427445Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/proxy
@@ -97,12 +97,13 @@ A number of prerequisites must be met for automatic user provisioning to work:
 * ownCloud Infinite Scale must be configured to use an external OpenID Connect IDP
 * The `graph` service must be configured to allow updating users and groups
   (`GRAPH_LDAP_SERVER_WRITE_ENABLED`).
-* The IDP must return a unique value in the user's claims (as part of the
-  userinfo response and/or the access tokens) that can be used to identify
-  the user. This claim needs to be stable and cannot be changed for the whole
-  lifetime of the user. That means, if a claim like `email` or
-  `preferred_username` is used, you must ensure that the user's email address or
-  username never changes.
+* One of the claim values returned by the IDP as part of the userinfo response
+  or the access token must be unique and stable for the user. I.e. the value
+  must not change for the whole lifetime of the user. This claim is configured
+  via the `PROXY_USER_OIDC_CLAIM` environment variable (see below). A natural
+  choice would e.g. be the `sub` claim which is guaranteed to be unique and
+  stable per IDP. If a claim like `email` or `preferred_username` is used, you
+  have to ensure that the user's email address or username never changes.
 
 ### Configuration
 
@@ -146,8 +147,12 @@ service using the claim values configured in
 `PROXY_AUTOPROVISION_CLAIM_USERNAME`, `PROXY_AUTOPROVISION_CLAIM_EMAIL` and
 `PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME`.
 
-If the user does already exist, the proxy will check if the user's email or
-displayname has changed and updates those accordingly via `graph` service.
+If the user does already exist, the proxy checks if the displayname has changed
+and updates that accordingly via `graph` service.
+
+Unless the claim configured via `PROXY_AUTOPROVISION_CLAIM_EMAIL` is the same
+as the one set via `PROXY_USER_OIDC_CLAIM` the proxy will also check if the
+email address has changed and update that as well.
 
 Next, the proxy will check if the user is a member of the groups configured in
 `PROXY_AUTOPROVISION_CLAIM_GROUPS`. It will add the user to the groups listed
