@@ -51,19 +51,22 @@ var SupportedSimilarityMetrics = map[string]struct{}{
 // -----------------------------------------------------------------------------
 
 const (
-	IndexOptimizedForRecall  = "recall"
-	IndexOptimizedForLatency = "latency"
+	IndexOptimizedForRecall          = "recall"
+	IndexOptimizedForLatency         = "latency"
+	IndexOptimizedForMemoryEfficient = "memory-efficient"
 )
 
 const DefaultIndexOptimization = IndexOptimizedForRecall
 
 var SupportedVectorIndexOptimizations = map[string]int{
-	IndexOptimizedForRecall:  0,
-	IndexOptimizedForLatency: 1,
+	IndexOptimizedForRecall:          0,
+	IndexOptimizedForLatency:         1,
+	IndexOptimizedForMemoryEfficient: 2,
 }
 
 // Reverse maps vector index optimizations': int -> string
 var VectorIndexOptimizationsReverseLookup = map[int]string{
 	0: IndexOptimizedForRecall,
 	1: IndexOptimizedForLatency,
+	2: IndexOptimizedForMemoryEfficient,
 }

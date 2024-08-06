@@ -8,7 +8,6 @@ package faiss
 */
 import "C"
 import (
-	"runtime"
 	"unsafe"
 )
 
@@ -23,11 +22,8 @@ func WriteIndex(idx Index, filename string) error {
 }
 
 func WriteIndexIntoBuffer(idx Index) ([]byte, error) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	// the values to be returned by the faiss APIs
-	tempBuf := (*C.uchar)(C.malloc(C.size_t(0)))
+	tempBuf := (*C.uchar)(nil)
 	bufSize := C.size_t(0)
 
 	if c := C.faiss_write_index_buf(
@@ -35,7 +31,7 @@ func WriteIndexIntoBuffer(idx Index) ([]byte, error) {
 		&bufSize,
 		&tempBuf,
 	); c != 0 {
-		C.free(unsafe.Pointer(tempBuf))
+		C.faiss_free_buf(&tempBuf)
 		return nil, getLastError()
 	}
 
@@ -72,9 +68,11 @@ func WriteIndexIntoBuffer(idx Index) ([]byte, error) {
 	// cheaper.
 	copy(rv, val)
 
-	// safe to free the c memory allocated while serializing the index;
+	// safe to free the c memory allocated (tempBuf) while serializing the index (must be done
+	// within C runtime for it was allocated there);
 	// rv is from go runtime - so different address space altogether
-	C.free(unsafe.Pointer(tempBuf))
+	C.faiss_free_buf(&tempBuf)
+
 	// p.s: no need to free "val" since the underlying memory is same as tempBuf (deferred free)
 	val = nil
 
@@ -82,9 +80,6 @@ func WriteIndexIntoBuffer(idx Index) ([]byte, error) {
 }
 
 func ReadIndexFromBuffer(buf []byte, ioflags int) (*IndexImpl, error) {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	ptr := (*C.uchar)(unsafe.Pointer(&buf[0]))
 	size := C.size_t(len(buf))
 
@@ -107,8 +102,10 @@ func ReadIndexFromBuffer(buf []byte, ioflags int) (*IndexImpl, error) {
 }
 
 const (
-	IOFlagMmap     = C.FAISS_IO_FLAG_MMAP
-	IOFlagReadOnly = C.FAISS_IO_FLAG_READ_ONLY
+	IOFlagMmap         = C.FAISS_IO_FLAG_MMAP
+	IOFlagReadOnly     = C.FAISS_IO_FLAG_READ_ONLY
+	IOFlagReadMmap     = C.FAISS_IO_FLAG_READ_MMAP | C.FAISS_IO_FLAG_ONDISK_IVF
+	IOFlagSkipPrefetch = C.FAISS_IO_FLAG_SKIP_PREFETCH
 )
 
 // ReadIndex reads an index from a file.

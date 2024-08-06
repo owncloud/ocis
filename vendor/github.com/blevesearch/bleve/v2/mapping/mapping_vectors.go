@@ -26,15 +26,27 @@ import (
 	index "github.com/blevesearch/bleve_index_api"
 )
 
-// Min and Max allowed dimensions for a vector field
-const (
+// Min and Max allowed dimensions for a vector field;
+// p.s must be set/updated at process init() _only_
+var (
 	MinVectorDims = 1
-	MaxVectorDims = 2048
+	MaxVectorDims = 4096
 )
 
 func NewVectorFieldMapping() *FieldMapping {
 	return &FieldMapping{
 		Type:         "vector",
+		Store:        false,
+		Index:        true,
+		IncludeInAll: false,
+		DocValues:    false,
+		SkipFreqNorm: true,
+	}
+}
+
+func NewVectorBase64FieldMapping() *FieldMapping {
+	return &FieldMapping{
+		Type:         "vector_base64",
 		Store:        false,
 		Index:        true,
 		IncludeInAll: false,
@@ -140,13 +152,35 @@ func (fm *FieldMapping) processVector(propertyMightBeVector interface{},
 	return true
 }
 
+func (fm *FieldMapping) processVectorBase64(propertyMightBeVectorBase64 interface{},
+	pathString string, path []string, indexes []uint64, context *walkContext) {
+	encodedString, ok := propertyMightBeVectorBase64.(string)
+	if !ok {
+		return
+	}
+
+	decodedVector, err := document.DecodeVector(encodedString)
+	if err != nil || len(decodedVector) != fm.Dims {
+		return
+	}
+
+	fieldName := getFieldName(pathString, path, fm)
+	options := fm.Options()
+	field := document.NewVectorFieldWithIndexingOptions(fieldName, indexes, decodedVector,
+		fm.Dims, fm.Similarity, fm.VectorIndexOptimizedFor, options)
+	context.doc.AddField(field)
+
+	// "_all" composite field is not applicable for vector_base64 field
+	context.excludedFromAll = append(context.excludedFromAll, fieldName)
+}
+
 // -----------------------------------------------------------------------------
 // document validation functions
 
 func validateFieldMapping(field *FieldMapping, parentName string,
 	fieldAliasCtx map[string]*FieldMapping) error {
 	switch field.Type {
-	case "vector":
+	case "vector", "vector_base64":
 		return validateVectorFieldAlias(field, parentName, fieldAliasCtx)
 	default: // non-vector field
 		return validateFieldType(field)

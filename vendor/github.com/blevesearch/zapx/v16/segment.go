@@ -55,6 +55,7 @@ func (*ZapPlugin) Open(path string) (segment.Segment, error) {
 		SegmentBase: SegmentBase{
 			fieldsMap:      make(map[string]uint16),
 			fieldFSTs:      make(map[uint16]*vellum.FST),
+			vecIndexCache:  newVectorIndexCache(),
 			fieldDvReaders: make([]map[uint16]*docValueReader, len(segmentSections)),
 		},
 		f:    f,
@@ -81,7 +82,6 @@ func (*ZapPlugin) Open(path string) (segment.Segment, error) {
 		_ = rv.Close()
 		return nil, err
 	}
-
 	return rv, nil
 }
 
@@ -110,6 +110,9 @@ type SegmentBase struct {
 
 	m         sync.Mutex
 	fieldFSTs map[uint16]*vellum.FST
+
+	// this cache comes into play when vectors are supported in builds.
+	vecIndexCache *vectorIndexCache
 }
 
 func (sb *SegmentBase) Size() int {
@@ -146,7 +149,7 @@ func (sb *SegmentBase) updateSize() {
 
 func (sb *SegmentBase) AddRef()             {}
 func (sb *SegmentBase) DecRef() (err error) { return nil }
-func (sb *SegmentBase) Close() (err error)  { return nil }
+func (sb *SegmentBase) Close() (err error)  { sb.vecIndexCache.Clear(); return nil }
 
 // Segment implements a persisted segment.Segment interface, by
 // embedding an mmap()'ed SegmentBase.
@@ -319,13 +322,29 @@ func (s *SegmentBase) loadFieldsNew() error {
 		return s.loadFields()
 	}
 
+	seek := pos + binary.MaxVarintLen64
+	if seek > uint64(len(s.mem)) {
+		// handling a buffer overflow case.
+		// a rare case where the backing buffer is not large enough to be read directly via
+		// a pos+binary.MaxVarinLen64 seek. For eg, this can happen when there is only
+		// one field to be indexed in the entire batch of data and while writing out
+		// these fields metadata, you write 1 + 8 bytes whereas the MaxVarintLen64 = 10.
+		seek = uint64(len(s.mem))
+	}
+
 	// read the number of fields
-	numFields, sz := binary.Uvarint(s.mem[pos : pos+binary.MaxVarintLen64])
+	numFields, sz := binary.Uvarint(s.mem[pos:seek])
+	// here, the pos is incremented by the valid number bytes read from the buffer
+	// so in the edge case pointed out above the numFields = 1, the sz = 1 as well.
 	pos += uint64(sz)
 	s.incrementBytesRead(uint64(sz))
 
+	// the following loop will be executed only once in the edge case pointed out above
+	// since there is only field's offset store which occupies 8 bytes.
+	// the pointer then seeks to a position preceding the sectionsIndexOffset, at
+	// which point the responbility of handling the out-of-bounds cases shifts to
+	// the specific section's parsing logic.
 	var fieldID uint64
-
 	for fieldID < numFields {
 		addr := binary.BigEndian.Uint64(s.mem[pos : pos+8])
 		s.incrementBytesRead(8)
@@ -629,6 +648,9 @@ func (s *Segment) Close() (err error) {
 }
 
 func (s *Segment) closeActual() (err error) {
+	// clear contents from the vector index cache before un-mmapping
+	s.vecIndexCache.Clear()
+
 	if s.mm != nil {
 		err = s.mm.Unmap()
 	}
@@ -640,6 +662,7 @@ func (s *Segment) closeActual() (err error) {
 			err = err2
 		}
 	}
+
 	return
 }
 

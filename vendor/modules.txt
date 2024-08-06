@@ -64,7 +64,7 @@ github.com/ProtonMail/go-crypto/openpgp/internal/ecc
 github.com/ProtonMail/go-crypto/openpgp/internal/encoding
 github.com/ProtonMail/go-crypto/openpgp/packet
 github.com/ProtonMail/go-crypto/openpgp/s2k
-# github.com/RoaringBitmap/roaring v1.2.3
+# github.com/RoaringBitmap/roaring v1.9.3
 ## explicit; go 1.14
 github.com/RoaringBitmap/roaring
 github.com/RoaringBitmap/roaring/internal
@@ -157,11 +157,11 @@ github.com/beorn7/perks/quantile
 # github.com/bitly/go-simplejson v0.5.0
 ## explicit
 github.com/bitly/go-simplejson
-# github.com/bits-and-blooms/bitset v1.2.1
-## explicit; go 1.14
+# github.com/bits-and-blooms/bitset v1.12.0
+## explicit; go 1.16
 github.com/bits-and-blooms/bitset
-# github.com/blevesearch/bleve/v2 v2.4.0
-## explicit; go 1.20
+# github.com/blevesearch/bleve/v2 v2.4.2
+## explicit; go 1.21
 github.com/blevesearch/bleve/v2
 github.com/blevesearch/bleve/v2/analysis
 github.com/blevesearch/bleve/v2/analysis/analyzer/custom
@@ -169,6 +169,10 @@ github.com/blevesearch/bleve/v2/analysis/analyzer/keyword
 github.com/blevesearch/bleve/v2/analysis/analyzer/standard
 github.com/blevesearch/bleve/v2/analysis/datetime/flexible
 github.com/blevesearch/bleve/v2/analysis/datetime/optional
+github.com/blevesearch/bleve/v2/analysis/datetime/timestamp/microseconds
+github.com/blevesearch/bleve/v2/analysis/datetime/timestamp/milliseconds
+github.com/blevesearch/bleve/v2/analysis/datetime/timestamp/nanoseconds
+github.com/blevesearch/bleve/v2/analysis/datetime/timestamp/seconds
 github.com/blevesearch/bleve/v2/analysis/lang/en
 github.com/blevesearch/bleve/v2/analysis/token/lowercase
 github.com/blevesearch/bleve/v2/analysis/token/porter
@@ -198,14 +202,14 @@ github.com/blevesearch/bleve/v2/search/scorer
 github.com/blevesearch/bleve/v2/search/searcher
 github.com/blevesearch/bleve/v2/size
 github.com/blevesearch/bleve/v2/util
-# github.com/blevesearch/bleve_index_api v1.1.6
+# github.com/blevesearch/bleve_index_api v1.1.10
 ## explicit; go 1.20
 github.com/blevesearch/bleve_index_api
 # github.com/blevesearch/geo v0.1.20
 ## explicit; go 1.18
 github.com/blevesearch/geo/geojson
 github.com/blevesearch/geo/s2
-# github.com/blevesearch/go-faiss v1.0.13
+# github.com/blevesearch/go-faiss v1.0.20
 ## explicit; go 1.19
 github.com/blevesearch/go-faiss
 # github.com/blevesearch/go-porterstemmer v1.0.3
@@ -217,7 +221,7 @@ github.com/blevesearch/gtreap
 # github.com/blevesearch/mmap-go v1.0.4
 ## explicit; go 1.13
 github.com/blevesearch/mmap-go
-# github.com/blevesearch/scorch_segment_api/v2 v2.2.9
+# github.com/blevesearch/scorch_segment_api/v2 v2.2.15
 ## explicit; go 1.20
 github.com/blevesearch/scorch_segment_api/v2
 # github.com/blevesearch/segment v0.9.1
@@ -251,7 +255,7 @@ github.com/blevesearch/zapx/v14
 # github.com/blevesearch/zapx/v15 v15.3.13
 ## explicit; go 1.19
 github.com/blevesearch/zapx/v15
-# github.com/blevesearch/zapx/v16 v16.0.12
+# github.com/blevesearch/zapx/v16 v16.1.5
 ## explicit; go 1.20
 github.com/blevesearch/zapx/v16
 # github.com/bluele/gcache v0.0.2

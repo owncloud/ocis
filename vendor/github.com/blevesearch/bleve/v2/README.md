@@ -9,21 +9,21 @@
 [![Sourcegraph](https://sourcegraph.com/github.com/blevesearch/bleve/-/badge.svg)](https://sourcegraph.com/github.com/blevesearch/bleve?badge)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-A modern text indexing library in go
+A modern indexing library in GO
 
 ## Features
 
 * Index any go data structure (including JSON)
 * Intelligent defaults backed up by powerful configuration
 * Supported field types:
-    * Text, Numeric, Datetime, Boolean
+    * `text`, `number`, `datetime`, `boolean`, `geopoint`, `geoshape`, `IP`, `vector`
 * Supported query types:
     * Term, Phrase, Match, Match Phrase, Prefix, Fuzzy
-    * Conjunction, Disjunction, Boolean (must/should/must_not)
+    * Conjunction, Disjunction, Boolean (`must`/`should`/`must_not`)
     * Term Range, Numeric Range, Date Range
     * [Geo Spatial](https://github.com/blevesearch/bleve/blob/master/geo/README.md)
     * Simple [query string syntax](http://www.blevesearch.com/docs/Query-String-Query/)
-    * [Vector Search](https://github.com/blevesearch/bleve/blob/master/docs/vectors.md)
+    * Approximate k-nearest neighbors over [vectors](https://github.com/blevesearch/bleve/blob/master/docs/vectors.md)
 * [tf-idf](https://en.wikipedia.org/wiki/Tf-idf) Scoring
 * Query time boosting
 * Search result match highlighting with document fragments

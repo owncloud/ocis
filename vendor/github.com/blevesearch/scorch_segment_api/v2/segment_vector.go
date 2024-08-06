@@ -18,6 +18,8 @@
 package segment
 
 import (
+	"encoding/json"
+
 	"github.com/RoaringBitmap/roaring"
 )
 
@@ -55,14 +57,15 @@ type VecPostingsIterator interface {
 }
 
 type VectorIndex interface {
-	Search(qVector []float32, k int64, except *roaring.Bitmap) (VecPostingsList, error)
+	// @params: Search params for backing vector index (like IVF, HNSW, etc.)
+	Search(qVector []float32, k int64, params json.RawMessage) (VecPostingsList, error)
 	Close()
 	Size() uint64
 }
 
 type VectorSegment interface {
 	Segment
-	InterpretVectorIndex(field string) (VectorIndex, error)
+	InterpretVectorIndex(field string, except *roaring.Bitmap) (VectorIndex, error)
 }
 
 type VecPosting interface {
