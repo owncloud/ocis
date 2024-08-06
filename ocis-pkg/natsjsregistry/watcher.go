@@ -3,6 +3,7 @@ package natsjsregistry
 import (
 	"encoding/json"
 	"errors"
+	"strings"
 
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/nats-io/nats.go"
@@ -48,9 +49,21 @@ func (w *Watcher) Next() (*registry.Result, error) {
 	}
 
 	var svc registry.Service
-	if err := json.Unmarshal(kve.Value.Data, &svc); err != nil {
-		_ = w.stop()
-		return nil, err
+	if kve.Value.Data == nil {
+		// fake a service
+		parts := strings.SplitN(kve.Value.Key, _serviceDelimiter, 3)
+		if len(parts) != 3 {
+			return nil, errors.New("invalid service key")
+		}
+		svc.Name = parts[0]
+		// ocis registers nodes with a - seperator
+		svc.Nodes = []*registry.Node{{Id: parts[0] + "-" + parts[1]}}
+		svc.Version = parts[2]
+	} else {
+		if err := json.Unmarshal(kve.Value.Data, &svc); err != nil {
+			_ = w.stop()
+			return nil, err
+		}
 	}
 
 	return &registry.Result{
