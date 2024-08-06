@@ -90,6 +90,7 @@ func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handl
 		// although some headers might not be sent depending on the client.
 		logger := zerolog.Ctx(ctx)
 		ctx = logger.With().
+			Str("WopiSessionId", r.Header.Get("X-WOPI-SessionId")).
 			Str("WopiOverride", r.Header.Get("X-WOPI-Override")).
 			Str("WopiProof", r.Header.Get("X-WOPI-Proof")).
 			Str("WopiProofOld", r.Header.Get("X-WOPI-ProofOld")).

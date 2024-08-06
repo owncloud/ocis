@@ -23,6 +23,7 @@ func CollaborationTracingMiddleware(next http.Handler) http.Handler {
 		wopiUser := wopiContext.User.GetId()
 
 		attrs := []attribute.KeyValue{
+			attribute.String("ocis.wopi.sessionid", r.Header.Get("X-WOPI-SessionId")),
 			attribute.String("ocis.wopi.method", wopiMethod),
 			attribute.String("ocis.wopi.resource.id.storage", wopiFile.GetResourceId().GetStorageId()),
 			attribute.String("ocis.wopi.resource.id.opaque", wopiFile.GetResourceId().GetOpaqueId()),
