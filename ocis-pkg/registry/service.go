@@ -65,6 +65,7 @@ func BuildHTTPService(serviceID, address string, version string) *mRegistry.Serv
 	}
 
 	node := &mRegistry.Node{
+		// This id is read by the registry watcher
 		Id:       serviceID + "-" + server.DefaultId,
 		Address:  net.JoinHostPort(addr, fmt.Sprint(port)),
 		Metadata: make(map[string]string),
