@@ -55,7 +55,7 @@ const (
 	schemeHTTPReq                   = "http_request"
 	schemeHTTPResp                  = "http_response"
 	crlf                            = "\r\n"
-	doubleCRLF                      = "\r\n\r\n"
+	doubleCRLF                      = crlf + crlf
 	lf                              = "\n"
 	bodyEndIndicator                = crlf + "0" + crlf
 	fullBodyEndIndicatorPreviewMode = "; ieof" + doubleCRLF
