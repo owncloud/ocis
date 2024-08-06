@@ -268,7 +268,7 @@ Feature: copy file
       | Editor           |
       | Viewer           |
 
-  @issue-9334
+  @issue-9482
   Scenario: user copies a file from share space with secure viewer role to personal space
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created folder "/testshare"
@@ -314,7 +314,7 @@ Feature: copy file
       | Space Editor | Editor           |
       | Space Editor | Viewer           |
 
-
+  @issue-9482
   Scenario Outline: user copies a file from share space with secure viewer role to project space with different role
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
@@ -399,7 +399,7 @@ Feature: copy file
       | Editor           |
       | Viewer           |
 
-
+  @issue-9482
   Scenario Outline: user copies a file from share space with different role to share space with role viewer or Secure viewer
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"

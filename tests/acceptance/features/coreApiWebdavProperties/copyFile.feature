@@ -979,3 +979,26 @@ Feature: copy file
       | old              |
       | new              |
       | spaces           |
+
+  @issue-9482
+  Scenario Outline: try to copy a file from shares space with secure viewer role to personal space
+    Given using <dav-path-version> DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | testshare     |
+      | space           | Personal      |
+      | sharee          | Alice         |
+      | shareType       | user          |
+      | permissionsRole | Secure viewer |
+    And user "Alice" has a share "testshare" synced
+    When user "Alice" copies file "/Shares/testshare/testshare.txt" to "/testshare.txt" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And for user "Alice" the space "Personal" should not contain these entries:
+      | /testshare.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
