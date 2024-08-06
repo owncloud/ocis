@@ -88,6 +88,7 @@ applications from the WebUI.
 Everything else is skipped and not considered as an application.
    *   Each application must be in its own directory accessed via `WEB_ASSET_APPS_PATH`.
    *   Each application directory must contain a `manifest.json` file.
+   *   Each application directory can contain a `config.json` file.
 
 * The `manifest.json` file contains the following fields:
    *   `entrypoint` - required\
@@ -122,7 +123,18 @@ image-viewer-obj:
     maxSize: 512
 ```
 
-The final configuration for web will be:
+optional each application can have its own configuration file, which will be loaded by the WEB service.
+
+```json
+{
+  "config": {
+    "maxWidth": 320
+  }
+}
+```
+
+The Merge order is as follows: local.config overwrites > global.config overwrites > manifest.config.
+The result will be:
 
 ```json
 {
@@ -131,7 +143,7 @@ The final configuration for web will be:
       "id": "image-viewer-obj",
       "path": "index.js",
       "config": {
-        "maxWidth": 1280,
+        "maxWidth": 320,
         "maxHeight": 640,
         "maxSize": 512
       }
@@ -140,7 +152,8 @@ The final configuration for web will be:
 }
 ```
 
-Besides the configuration from the `manifest.json` file, the `apps.yaml` file can also contain the following fields:
+Besides the configuration from the `manifest.json` file,
+the `apps.yaml` or the `config.json` file can also contain the following fields:
 
 *   `disabled` - optional\
     Defaults to `false`. If set to `true`, the application will not be loaded.
@@ -149,7 +162,7 @@ Besides the configuration from the `manifest.json` file, the `apps.yaml` file ca
 
 Besides the configuration and application registration, in the process of loading the application assets, the system uses a mechanism to load custom assets.
 
-This is very useful for cases where just a single asset should be overwritten, like a logo or similar.
+This is useful for cases where just a single asset should be overwritten, like a logo or similar.
 
 Consider the following: Infinite Scale is shipped with a default web app named `image-viewer-dfx` which contains a logo,
 but the administrator wants to provide a custom logo for that application.
