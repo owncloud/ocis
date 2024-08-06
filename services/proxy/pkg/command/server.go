@@ -15,11 +15,6 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
-	"github.com/urfave/cli/v2"
-	microstore "go-micro.dev/v4/store"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/trace"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -43,6 +38,11 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	ocisstore "github.com/owncloud/ocis/v2/services/store/pkg/store"
+	"github.com/urfave/cli/v2"
+	"go-micro.dev/v4/selector"
+	microstore "go-micro.dev/v4/store"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Server is the entrypoint for the server command.
@@ -133,16 +133,20 @@ func Server(cfg *config.Config) *cli.Command {
 				return fmt.Errorf("failed to initialize reverse proxy: %w", err)
 			}
 
+			reg := registry.GetRegistry()
+
 			gatewaySelector, err := pool.GatewaySelector(
 				cfg.Reva.Address,
 				append(
 					cfg.Reva.GetRevaOptions(),
-					pool.WithRegistry(registry.GetRegistry()),
+					pool.WithRegistry(reg),
 					pool.WithTracerProvider(traceProvider),
 				)...)
 			if err != nil {
 				logger.Fatal().Err(err).Msg("Failed to get gateway selector")
 			}
+
+			serviceSelector := selector.NewSelector(selector.Registry(reg))
 
 			var userProvider backend.UserBackend
 			switch cfg.AccountBackend {
@@ -150,6 +154,7 @@ func Server(cfg *config.Config) *cli.Command {
 				userProvider = backend.NewCS3UserBackend(
 					backend.WithLogger(logger),
 					backend.WithRevaGatewaySelector(gatewaySelector),
+					backend.WithSelector(serviceSelector),
 					backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
 					backend.WithOIDCissuer(cfg.OIDC.Issuer),
 					backend.WithServiceAccount(cfg.ServiceAccount),
@@ -187,7 +192,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				middlewares := loadMiddlewares(logger, cfg, userInfoCache, signingKeyStore, traceProvider, *m, userProvider, gatewaySelector)
+				middlewares := loadMiddlewares(logger, cfg, userInfoCache, signingKeyStore, traceProvider, *m, userProvider, gatewaySelector, serviceSelector)
 
 				server, err := proxyHTTP.Server(
 					proxyHTTP.Handler(lh.Handler()),
@@ -242,7 +247,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 func loadMiddlewares(logger log.Logger, cfg *config.Config,
 	userInfoCache, signingKeyStore microstore.Store, traceProvider trace.TracerProvider, metrics metrics.Metrics,
-	userProvider backend.UserBackend, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) alice.Chain {
+	userProvider backend.UserBackend, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], serviceSelector selector.Selector) alice.Chain {
 
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
 	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
@@ -342,7 +347,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		middleware.AccessLog(logger),
 		middleware.HTTPSRedirect,
 		middleware.Security(cspConfig),
-		router.Middleware(cfg.PolicySelector, cfg.Policies, logger),
+		router.Middleware(serviceSelector, cfg.PolicySelector, cfg.Policies, logger),
 		middleware.Authentication(
 			authenticators,
 			middleware.CredentialsByUserAgent(cfg.AuthMiddleware.CredentialsByUserAgent),
