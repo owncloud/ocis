@@ -52,6 +52,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Ignore address for kubernetes registry: [#9490](https://github.com/owncloud/ocis/pull/9490)
 * Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
 * Bugfix - Repair nats-js-kv registry: [#9726](https://github.com/owncloud/ocis/pull/9726)
+* Bugfix - Use less selectors that watch the registry: [#9741](https://github.com/owncloud/ocis/pull/9741)
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 * Enhancement - Allow configuring grpc max connection age: [#9657](https://github.com/owncloud/ocis/pull/9657)
 * Enhancement - Local WEB App configuration: [#9691](https://github.com/owncloud/ocis/pull/9691)
@@ -80,6 +81,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9726
    https://github.com/owncloud/ocis/pull/9656
+
+* Bugfix - Use less selectors that watch the registry: [#9741](https://github.com/owncloud/ocis/pull/9741)
+
+   The proxy now shares the service selector for all host lookups.
+
+   https://github.com/owncloud/ocis/pull/9741
 
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 
