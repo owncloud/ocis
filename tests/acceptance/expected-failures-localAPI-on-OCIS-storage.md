@@ -20,8 +20,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [Shared mount folder gets deleted when overwritten by a file from personal space](https://github.com/owncloud/ocis/issues/7208)
 
-- [apiSpacesShares/copySpaces.feature:652](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L652)
-- [apiSpacesShares/copySpaces.feature:671](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L671)
+- [apiSpacesShares/copySpaces.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L696)
+- [apiSpacesShares/copySpaces.feature:715](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L715)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 
