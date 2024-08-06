@@ -16,8 +16,13 @@ import (
 	micrometadata "go-micro.dev/v4/metadata"
 )
 
-// HeaderAcceptLanguage is the header key for the accept-language header
-var HeaderAcceptLanguage = "Accept-Language"
+var (
+	// HeaderAcceptLanguage is the header key for the accept-language header
+	HeaderAcceptLanguage = "Accept-Language"
+
+	// ErrUnsupportedType is returned when the type is not supported
+	ErrUnsupportedType = errors.New("unsupported type")
+)
 
 // Template marks a string as translatable
 func Template(s string) string { return s }
@@ -54,48 +59,101 @@ func (t Translator) Translate(str, locale string) string {
 	return t.Locale(locale).Get(str)
 }
 
-type structs func() []any
-type maps func() []any
-type each func() []any
-type field func() string
+// Locale returns the gotext.Locale, use `.Get` method to translate strings
+func (t Translator) Locale(locale string) *gotext.Locale {
+	l := gotext.NewLocaleFS(locale, t.fs)
+	l.AddDomain(t.domain) // make domain configurable only if needed
+	if locale != "en" && len(l.GetTranslations()) == 0 {
+		l = gotext.NewLocaleFS(t.defaultLocale, t.fs)
+		l.AddDomain(t.domain) // make domain configurable only if needed
+	}
+	return l
+}
+
+// TranslateEntity translates a slice, array or struct
+func (t Translator) TranslateEntity(locale string, entity any, opts ...TranslateOption) error {
+	return TranslateEntity(t.Locale(locale).Get, entity, opts...)
+}
+
+// MustGetUserLocale returns the locale the user wants to use, omitting errors
+func MustGetUserLocale(ctx context.Context, userID string, preferedLang string, vc settingssvc.ValueService) string {
+	if preferedLang != "" {
+		return preferedLang
+	}
+
+	locale, _ := GetUserLocale(ctx, userID, vc)
+	return locale
+}
+
+// GetUserLocale returns the locale of the user
+func GetUserLocale(ctx context.Context, userID string, vc settingssvc.ValueService) (string, error) {
+	resp, err := vc.GetValueByUniqueIdentifiers(
+		micrometadata.Set(ctx, middleware.AccountID, userID),
+		&settingssvc.GetValueByUniqueIdentifiersRequest{
+			AccountUuid: userID,
+			SettingId:   defaults.SettingUUIDProfileLanguage,
+		},
+	)
+	if err != nil {
+		return "", err
+	}
+	val := resp.GetValue().GetValue().GetListValue().GetValues()
+	if len(val) == 0 {
+		return "", errors.New("no language setting found")
+	}
+	return val[0].GetStringValue(), nil
+}
+
+// TranslateOption is used to specify fields in structs or slices to translate
+type TranslateOption func() (string, FieldType, []TranslateOption)
+
+// FieldType is used to specify the type of field to translate
+type FieldType int
+
+const (
+	// FieldTypeString is a string field
+	FieldTypeString FieldType = iota
+	// FieldTypeStruct is a struct field
+	FieldTypeStruct
+	// FieldTypeIterable is a slice or array field
+	FieldTypeIterable
+	// FieldTypeMap is a map field
+	FieldTypeMap
+)
 
 // TranslateField function provides the generic way to translate the necessary field in composite entities.
-func TranslateField(fieldName string) field {
-	return func() string {
-		return fieldName
+func TranslateField(fieldName string) TranslateOption {
+	return func() (string, FieldType, []TranslateOption) {
+		return fieldName, FieldTypeString, nil
 	}
 }
 
 // TranslateStruct function provides the generic way to translate the nested fields in composite entities.
-// When the TranslateStruct function is used right after the TranslateEntity, the first argument must be the entity itself,
-// the rest of the arguments are the fields to translate or nested function.
-func TranslateStruct(args ...any) structs {
-	return func() []any {
-		return args
+func TranslateStruct(fieldName string, args ...TranslateOption) TranslateOption {
+	return func() (string, FieldType, []TranslateOption) {
+		return fieldName, FieldTypeStruct, args
+	}
+}
+
+// TranslateEach function provides the generic way to translate the necessary fields in slices or nested entities.
+func TranslateEach(fieldName string, args ...TranslateOption) TranslateOption {
+	return func() (string, FieldType, []TranslateOption) {
+		return fieldName, FieldTypeIterable, args
 	}
 }
 
 // TranslateMap function provides the generic way to translate the necessary fields in maps.
 // It's not implemented yet.
-func TranslateMap(args ...any) maps {
-	return func() []any {
-		return args
-	}
-}
-
-// TranslateEach function provides the generic way to translate the necessary fields in slices or nested entities.
-// When the TranslateEach function is used right after the TranslateEntity, the first argument must be the slice itself,
-// the rest of the arguments are nested function or no arguments if the slice contains only strings.
-func TranslateEach(args ...any) each {
-	return func() []any {
-		return args
+func TranslateMap(fieldName string, args ...TranslateOption) TranslateOption {
+	return func() (string, FieldType, []TranslateOption) {
+		return fieldName, FieldTypeMap, args
 	}
 }
 
 // TranslateEntity function provides the generic way to translate the necessary fields in composite entities.
-// The function takes TranslateLocation function and entity with fields to translate.
+// The function takes a translation function that has the locale already set, see Translator.TranslateEntity
+// The function also takes the entity with fields to translate.
 // The function supports nested structs and slices of structs.
-// Depending on entity type it should be wrapped to the appropriate function TranslateStruct, TranslateEach, TranslateField.
 //
 //		type InnerStruct struct {
 //			Description string
@@ -118,56 +176,48 @@ func TranslateEach(args ...any) each {
 //				},
 //			}
 //		tr := l10n_pkg.NewTranslateLocation(loc, "en")
-//		err := l10n.TranslateEntity(tr,
-//			l10n.TranslateStruct(s,
-//				l10n.TranslateEach("StructList",
-//					l10n.TranslateField("Description"),
-//					l10n.TranslateField("DisplayName"))),
-//		)
-func TranslateEntity(tr func(string, ...any) string, arg any) error {
-	switch a := arg.(type) {
-	case structs:
-		args := a()
-		if len(args) < 2 {
-			return fmt.Errorf("the TranslateStruct function expects at least 2 arguments, sructure and fields to translate")
-		}
-		entity := args[0]
-		value := reflect.ValueOf(entity)
+//		err := l10n.TranslateEntity(tr, s,
+//					l10n.TranslateEach("StructList",
+//						l10n.TranslateField("Description"),
+//						l10n.TranslateField("DisplayName"),
+//				))
+func TranslateEntity(tr func(string, ...any) string, entity any, opts ...TranslateOption) error {
+	value := reflect.ValueOf(entity)
+
+	value, ok := cleanValue(value)
+	if !ok {
+		return errors.New("entity is not valid")
+	}
+
+	switch value.Kind() {
+	case reflect.Struct:
 		if !isStruct(value) {
 			return fmt.Errorf("the root entity must be a struct, got %v", value.Kind())
 		}
-		rangeOverArgs(tr, value, args[1:]...)
+		rangeOverArgs(tr, value, opts...)
 		return nil
-	case each:
-		args := a()
-		if len(args) < 1 {
-			return fmt.Errorf("the translateEach function expects at least 1 argument, slice")
-		}
-		entity := args[0]
-		value := reflect.ValueOf(entity)
-		if len(args) > 1 {
-			translateEach(tr, value, args[1:]...)
+	case reflect.Slice, reflect.Array:
+		if len(opts) > 0 {
+			translateEach(tr, value, opts...)
 		} else {
 			translateEach(tr, value)
 		}
 		return nil
-	case maps:
+	case reflect.Map:
 		// TODO implement
+	case reflect.String:
+		translateField(tr, value)
+		return nil
 	}
 	return ErrUnsupportedType
 }
 
-func translateEach(tr func(string, ...any) string, value reflect.Value, args ...any) {
-	// Indirect through pointers and interfaces
-	if value.Kind() == reflect.Ptr || value.Kind() == reflect.Interface {
-		if value.IsNil() {
-			return
-		}
-		value = value.Elem()
-	}
-	if !value.IsValid() {
+func translateEach(tr func(string, ...any) string, value reflect.Value, args ...TranslateOption) {
+	value, ok := cleanValue(value)
+	if !ok {
 		return
 	}
+
 	switch value.Kind() {
 	case reflect.Array, reflect.Slice:
 		for i := 0; i < value.Len(); i++ {
@@ -185,54 +235,37 @@ func translateEach(tr func(string, ...any) string, value reflect.Value, args ...
 	}
 }
 
-func rangeOverArgs(tr func(string, ...any) string, value reflect.Value, args ...any) {
-	// Indirect through pointers and interfaces
-	if value.Kind() == reflect.Ptr || value.Kind() == reflect.Interface {
-		if value.IsNil() {
-			return
-		}
-		value = value.Elem()
-	}
-	if !value.IsValid() {
+func rangeOverArgs(tr func(string, ...any) string, value reflect.Value, args ...TranslateOption) {
+	value, ok := cleanValue(value)
+	if !ok {
 		return
 	}
+
 	for _, arg := range args {
-		switch a := arg.(type) {
-		case field:
-			fieldName := a()
+		fieldName, fieldType, opts := arg()
+
+		switch fieldType {
+		case FieldTypeString:
 			// exported field
 			f := value.FieldByName(fieldName)
 			translateField(tr, f)
-		case structs:
-			args := a()
-			if len(args) > 2 {
-				if fieldName, ok := args[0].(string); ok {
-					// exported field
-					innerValue := value.FieldByName(fieldName)
-					if !innerValue.IsValid() {
-						return
-					}
-					if isStruct(innerValue) {
-						rangeOverArgs(tr, innerValue, args[1:]...)
-						return
-					}
-				}
+		case FieldTypeStruct:
+			// exported field
+			innerValue := value.FieldByName(fieldName)
+			if !innerValue.IsValid() || !isStruct(innerValue) {
+				return
 			}
-		case each:
-			args := a()
-			if len(args) > 2 {
-				if fieldName, ok := args[0].(string); ok {
-					// exported field
-					innerValue := value.FieldByName(fieldName)
-					if !innerValue.IsValid() {
-						return
-					}
-					switch innerValue.Kind() {
-					case reflect.Array, reflect.Slice:
-						translateEach(tr, innerValue, args[1:]...)
-					}
-				}
+			rangeOverArgs(tr, innerValue, opts...)
+		case FieldTypeIterable:
+			// exported field
+			innerValue := value.FieldByName(fieldName)
+			if !innerValue.IsValid() {
+				return
 			}
+			if kind := innerValue.Kind(); kind != reflect.Array && kind != reflect.Slice {
+				return
+			}
+			translateEach(tr, innerValue, opts...)
 		}
 	}
 }
@@ -268,46 +301,15 @@ func isStruct(r reflect.Value) bool {
 	return r.Kind() == reflect.Struct
 }
 
-var (
-	ErrUnsupportedType = errors.New("unsupported type")
-)
-
-// Locale returns the gotext.Locale, use `.Get` method to translate strings
-func (t Translator) Locale(locale string) *gotext.Locale {
-	l := gotext.NewLocaleFS(locale, t.fs)
-	l.AddDomain(t.domain) // make domain configurable only if needed
-	if locale != "en" && len(l.GetTranslations()) == 0 {
-		l = gotext.NewLocaleFS(t.defaultLocale, t.fs)
-		l.AddDomain(t.domain) // make domain configurable only if needed
+func cleanValue(v reflect.Value) (reflect.Value, bool) {
+	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+		if v.IsNil() {
+			return v, false
+		}
+		v = v.Elem()
 	}
-	return l
-}
-
-// MustGetUserLocale returns the locale the user wants to use, omitting errors
-func MustGetUserLocale(ctx context.Context, userID string, preferedLang string, vc settingssvc.ValueService) string {
-	if preferedLang != "" {
-		return preferedLang
+	if !v.IsValid() {
+		return v, false
 	}
-
-	locale, _ := GetUserLocale(ctx, userID, vc)
-	return locale
-}
-
-// GetUserLocale returns the locale of the user
-func GetUserLocale(ctx context.Context, userID string, vc settingssvc.ValueService) (string, error) {
-	resp, err := vc.GetValueByUniqueIdentifiers(
-		micrometadata.Set(ctx, middleware.AccountID, userID),
-		&settingssvc.GetValueByUniqueIdentifiersRequest{
-			AccountUuid: userID,
-			SettingId:   defaults.SettingUUIDProfileLanguage,
-		},
-	)
-	if err != nil {
-		return "", err
-	}
-	val := resp.GetValue().GetValue().GetListValue().GetValues()
-	if len(val) == 0 {
-		return "", errors.New("no language setting found")
-	}
-	return val[0].GetStringValue(), nil
+	return v, true
 }
