@@ -95,7 +95,7 @@ func (n *storeregistry) Register(s *registry.Service, opts ...registry.RegisterO
 		return err
 	}
 	return n.store.Write(&store.Record{
-		Key:    s.Name + _serviceDelimiter + server.DefaultId,
+		Key:    s.Name + _serviceDelimiter + server.DefaultId + _serviceDelimiter + s.Version,
 		Value:  b,
 		Expiry: options.TTL,
 	})
@@ -105,7 +105,7 @@ func (n *storeregistry) Register(s *registry.Service, opts ...registry.RegisterO
 func (n *storeregistry) Deregister(s *registry.Service, _ ...registry.DeregisterOption) error {
 	n.lock.RLock()
 	defer n.lock.RUnlock()
-	return n.store.Delete(s.Name + _serviceDelimiter + server.DefaultId)
+	return n.store.Delete(s.Name + _serviceDelimiter + server.DefaultId + _serviceDelimiter + s.Version)
 }
 
 // GetService gets a specific service from the registry
