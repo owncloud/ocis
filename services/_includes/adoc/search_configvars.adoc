@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-06-09-34-13]
+[#deprecation-note-2024-08-06-09-34-50]
 [caption=]
 .Deprecation notes for the search service
 [width="100%",cols="~,~,~,~",options="header"]
