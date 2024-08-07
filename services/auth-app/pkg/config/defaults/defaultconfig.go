@@ -28,6 +28,17 @@ func DefaultConfig() *config.Config {
 			Namespace: "com.owncloud.api",
 			Protocol:  "tcp",
 		},
+		HTTP: config.HTTP{
+			Addr:      "127.0.0.1:0",
+			Namespace: "com.owncloud.api",
+			Root:      "/",
+			CORS: config.CORS{
+				AllowedOrigins:   []string{"*"},
+				AllowedMethods:   []string{"POST"},
+				AllowedHeaders:   []string{"Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With", "X-Request-Id", "Ocs-Apirequest"},
+				AllowCredentials: true,
+			},
+		},
 		Service: config.Service{
 			Name: "auth-app",
 		},

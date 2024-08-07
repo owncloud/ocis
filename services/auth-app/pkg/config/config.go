@@ -15,6 +15,7 @@ type Config struct {
 	Debug   Debug           `yaml:"debug"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
+	HTTP HTTP       `yaml:"http"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *shared.Reva  `yaml:"reva"`
@@ -54,4 +55,21 @@ type GRPCConfig struct {
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
 	Protocol  string                 `yaml:"protocol" env:"AUTH_APP_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"%%NEXT%%"`
+}
+
+// HTTP defines the available http configuration.
+type HTTP struct {
+	Addr      string                `yaml:"addr" env:"AUTH_APP_HTTP_ADDR" desc:"The bind address of the HTTP service." introductionVersion:"pre5.0"`
+	Namespace string                `yaml:"-"`
+	Root      string                `yaml:"root" env:"AUTH_APP_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service." introductionVersion:"pre5.0"`
+	CORS      CORS                  `yaml:"cors"`
+	TLS       shared.HTTPServiceTLS `yaml:"tls"`
+}
+
+// CORS defines the available cors configuration.
+type CORS struct {
+	AllowedOrigins   []string `yaml:"allow_origins" env:"OCIS_CORS_ALLOW_ORIGINS;AUTH_APP_CORS_ALLOW_ORIGINS" desc:"A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	AllowedMethods   []string `yaml:"allow_methods" env:"OCIS_CORS_ALLOW_METHODS;AUTH_APP_CORS_ALLOW_METHODS" desc:"A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	AllowedHeaders   []string `yaml:"allow_headers" env:"OCIS_CORS_ALLOW_HEADERS;AUTH_APP_CORS_ALLOW_HEADERS" desc:"A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	AllowCredentials bool     `yaml:"allow_credentials" env:"OCIS_CORS_ALLOW_CREDENTIALS;AUTH_APP_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials." introductionVersion:"pre5.0"`
 }

@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -19,6 +20,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/revaconfig"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/server/debug"
+	"github.com/owncloud/ocis/v2/services/auth-app/pkg/server/http"
 	"github.com/urfave/cli/v2"
 )
 
@@ -85,6 +87,32 @@ func Server(cfg *config.Config) *cli.Command {
 			if err := registry.RegisterService(ctx, grpcSvc, logger); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc service")
 			}
+
+			gatewaySelector, err := pool.GatewaySelector(
+				cfg.Reva.Address,
+				append(
+					cfg.Reva.GetRevaOptions(),
+					pool.WithRegistry(registry.GetRegistry()),
+					pool.WithTracerProvider(traceProvider),
+				)...)
+			if err != nil {
+				return err
+			}
+
+			server, err := http.Server(
+				http.Logger(logger),
+				http.Context(ctx),
+				http.Config(cfg),
+				http.GatewaySelector(gatewaySelector),
+				http.TracerProvider(traceProvider),
+			)
+			if err != nil {
+				logger.Fatal().Err(err).Msg("failed to initialize http server")
+			}
+
+			gr.Add(server.Run, func(err error) {
+				logger.Error().Err(err).Str("server", "http").Msg("shutting down server")
+			})
 
 			return gr.Run()
 		},
