@@ -290,6 +290,11 @@ endif
 	mkdir -p ocis/dist
 	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
 
+.PHONY: changelog-csv
+changelog-csv: $(CALENS)
+	mkdir -p ocis/dist
+	$(CALENS) -t changelog/changelog-csv.tmpl -o ocis/dist/changelog.csv
+
 .PHONY: govulncheck
 govulncheck: $(GOVULNCHECK)
 	$(GOVULNCHECK) ./...
