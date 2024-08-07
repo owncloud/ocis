@@ -137,3 +137,16 @@ Feature: delete file
     When user "Alice" deletes file "/zerobyte.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" file "/zerobyte.txt" should not exist
+
+  @issue-9619
+  Scenario Outline: delete a file using file-id
+    Given using spaces DAV path
+    And user "Alice" has uploaded file with content "special file" to "/textfile.txt"
+    And we save it into "FILEID"
+    When user "Alice" deletes file "/textfile.txt" from space "Personal" using file-id path "<dav-path>"
+    Then the HTTP status code should be "204"
+    And as "Alice" file "/textfile.txt" should not exist
+    Examples:
+      | dav-path                          |
+      | /remote.php/dav/spaces/<<FILEID>> |
+      | /dav/spaces/<<FILEID>>            |

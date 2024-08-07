@@ -2701,6 +2701,31 @@ trait WebDav {
 	}
 
 	/**
+	 * @When user :user deletes file :filename from space :space using file-id path :davPath
+	 *
+	 * @param string $user
+	 * @param string $filename
+	 * @param string $space
+	 * @param string $davPath
+	 *
+	 * @return void
+	 */
+	public function userDeletesFileFromSpaceUsingFileIdPath(string $user, string $filename, string $space, string $davPath):void {
+		$requestUrl = $this->getBaseUrl() . $davPath;
+		$user = $this->getActualUsername($user);
+		$password =  $this->getPasswordForUser($user);
+		$response = HttpRequestHelper::sendRequest(
+			$requestUrl,
+			null,
+			'DELETE',
+			$user,
+			$password
+		);
+		$this->setResponse($response);
+		$this->pushToLastStatusCodesArrays();
+	}
+
+	/**
 	 * @Given /^user "([^"]*)" has deleted (?:file|folder|entity) "([^"]*)"$/
 	 *
 	 * @param string $user
