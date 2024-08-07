@@ -40,7 +40,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/golang-jwt/jwt"
 	"github.com/pkg/errors"
-	tusd "github.com/tus/tusd/pkg/handler"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -94,7 +94,7 @@ func (session *OcisSession) GetInfo(_ context.Context) (tusd.FileInfo, error) {
 }
 
 // GetReader returns an io.Reader for the upload
-func (session *OcisSession) GetReader(ctx context.Context) (io.Reader, error) {
+func (session *OcisSession) GetReader(ctx context.Context) (io.ReadCloser, error) {
 	_, span := tracer.Start(session.Context(ctx), "GetReader")
 	defer span.End()
 	return os.Open(session.binPath())

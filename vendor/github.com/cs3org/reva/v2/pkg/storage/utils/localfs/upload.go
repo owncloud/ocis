@@ -35,7 +35,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	tusd "github.com/tus/tusd/pkg/handler"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 )
 
 var defaultFilePerm = os.FileMode(0664)
@@ -296,7 +296,7 @@ func (upload *fileUpload) GetInfo(ctx context.Context) (tusd.FileInfo, error) {
 }
 
 // GetReader returns an io.Reader for the upload
-func (upload *fileUpload) GetReader(ctx context.Context) (io.Reader, error) {
+func (upload *fileUpload) GetReader(ctx context.Context) (io.ReadCloser, error) {
 	return os.Open(upload.binPath)
 }
 

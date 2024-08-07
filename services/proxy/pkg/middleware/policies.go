@@ -10,7 +10,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
-	tusd "github.com/tus/tusd/pkg/handler"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 	"google.golang.org/grpc/metadata"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"

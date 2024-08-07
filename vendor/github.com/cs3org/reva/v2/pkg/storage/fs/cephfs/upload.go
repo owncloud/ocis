@@ -39,7 +39,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	tusd "github.com/tus/tusd/pkg/handler"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 )
 
 func (fs *cephfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
@@ -299,7 +299,7 @@ func (upload *fileUpload) GetInfo(ctx context.Context) (tusd.FileInfo, error) {
 }
 
 // GetReader returns an io.Reader for the upload
-func (upload *fileUpload) GetReader(ctx context.Context) (file io.Reader, err error) {
+func (upload *fileUpload) GetReader(ctx context.Context) (file io.ReadCloser, err error) {
 	user := upload.fs.makeUser(upload.ctx)
 	user.op(func(cv *cacheVal) {
 		file, err = cv.mount.Open(upload.binPath, os.O_RDONLY, 0)

@@ -15,7 +15,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb
-	github.com/cs3org/reva/v2 v2.22.1-0.20240730105121-548644c31544
+	github.com/cs3org/reva/v2 v2.22.1-0.20240806075425-8bcdd93dfa20
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -88,7 +88,7 @@ require (
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.5
 	github.com/tidwall/gjson v1.17.1
-	github.com/tus/tusd v1.13.0
+	github.com/tus/tusd/v2 v2.4.0
 	github.com/unrolled/secure v1.14.0
 	github.com/urfave/cli/v2 v2.27.2
 	github.com/xhit/go-simple-mail/v2 v2.16.0
@@ -156,7 +156,6 @@ require (
 	github.com/blevesearch/zapx/v15 v15.3.13 // indirect
 	github.com/blevesearch/zapx/v16 v16.1.5 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
-	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
 	github.com/bombsimon/logrusr/v3 v3.1.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/ceph/go-ceph v0.18.0 // indirect
@@ -226,6 +225,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v1.8.9 // indirect
+	github.com/google/flatbuffers v2.0.8+incompatible // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/pprof v0.0.0-20240424215950-a892ee059fd6 // indirect
 	github.com/google/renameio/v2 v2.0.0 // indirect

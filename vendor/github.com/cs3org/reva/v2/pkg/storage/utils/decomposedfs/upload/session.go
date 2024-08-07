@@ -26,7 +26,7 @@ import (
 	"strconv"
 	"time"
 
-	tusd "github.com/tus/tusd/pkg/handler"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"

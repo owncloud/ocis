@@ -44,7 +44,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/rogpeppe/go-internal/lockedfile"
-	tusd "github.com/tus/tusd/pkg/handler"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 )
 
 var _idRegexp = regexp.MustCompile(".*/([^/]+).info")

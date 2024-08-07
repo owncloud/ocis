@@ -59,7 +59,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/jellydator/ttlcache/v2"
 	"github.com/pkg/errors"
-	tusd "github.com/tus/tusd/pkg/handler"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"

@@ -42,7 +42,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/rs/zerolog"
-	tusd "github.com/tus/tusd/pkg/handler"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 	"go.opentelemetry.io/otel/propagation"
 )
 

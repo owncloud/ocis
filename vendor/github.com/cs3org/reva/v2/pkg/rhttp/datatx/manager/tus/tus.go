@@ -20,13 +20,13 @@ package tus
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"path"
 	"regexp"
 
 	"github.com/pkg/errors"
-	tusd "github.com/tus/tusd/pkg/handler"
+	"github.com/rs/zerolog"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
@@ -39,6 +39,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/mitchellh/mapstructure"
+	"golang.org/x/exp/slog"
 )
 
 func init() {
@@ -99,7 +100,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 	config := tusd.Config{
 		StoreComposer:         composer,
 		NotifyCompleteUploads: true,
-		Logger:                log.New(appctx.GetLogger(context.Background()), "", 0),
+		Logger:                slog.New(tusdLogger{log: appctx.GetLogger(context.Background())}), // Note: this is a noop logger
 	}
 
 	if m.conf.CorsEnabled {
@@ -222,3 +223,32 @@ func setHeaders(fs storage.FS, w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(resourceid))
 }
+
+// tusdLogger is a logger implementation (slog) for tusd that uses zerolog.
+type tusdLogger struct {
+	log *zerolog.Logger
+}
+
+// Handle handles the record
+func (l tusdLogger) Handle(_ context.Context, r slog.Record) error {
+	switch r.Level {
+	case slog.LevelDebug:
+		l.log.Debug().Msg(r.Message)
+	case slog.LevelInfo:
+		l.log.Info().Msg(r.Message)
+	case slog.LevelWarn:
+		l.log.Warn().Msg(r.Message)
+	case slog.LevelError:
+		l.log.Error().Msg(r.Message)
+	}
+	return nil
+}
+
+// Enabled returns true
+func (l tusdLogger) Enabled(_ context.Context, _ slog.Level) bool { return true }
+
+// WithAttrs is not implemented
+func (l tusdLogger) WithAttrs(_ []slog.Attr) slog.Handler { return l }
+
+// WithGroup is not implemented
+func (l tusdLogger) WithGroup(_ string) slog.Handler { return l }
