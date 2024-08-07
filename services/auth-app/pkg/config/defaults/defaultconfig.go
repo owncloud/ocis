@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"strings"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/config"
@@ -29,8 +31,8 @@ func DefaultConfig() *config.Config {
 			Protocol:  "tcp",
 		},
 		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:0",
-			Namespace: "com.owncloud.api",
+			Addr:      "127.0.0.1:9247",
+			Namespace: "com.owncloud.web",
 			Root:      "/",
 			CORS: config.CORS{
 				AllowedOrigins:   []string{"*"},
@@ -90,9 +92,16 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.GRPC.TLS == nil && cfg.Commons != nil {
 		cfg.GRPC.TLS = structs.CopyOrZeroValue(cfg.Commons.GRPCServiceTLS)
 	}
+
+	if cfg.Commons != nil {
+		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
+	}
 }
 
 // Sanitize sanitized the configuration
-func Sanitize(_ *config.Config) {
-	// nothing to sanitize here atm
+func Sanitize(cfg *config.Config) {
+	// sanitize config
+	if cfg.HTTP.Root != "/" {
+		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
+	}
 }

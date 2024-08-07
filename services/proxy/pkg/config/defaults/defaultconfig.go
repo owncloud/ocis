@@ -260,7 +260,7 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint: "/auth-app/tokens",
-					Service:  "com.owncloud.api.auth-app",
+					Service:  "com.owncloud.web.auth-app",
 				},
 			},
 		},
