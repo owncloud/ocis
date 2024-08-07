@@ -810,9 +810,14 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 			Id:                       &id,
 			GivenName:                pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)),
 			Surname:                  &surname,
-			UserType:                 pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.userType)),
 			AccountEnabled:           booleanOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)),
 		}
+
+		userType := e.GetEqualFoldAttributeValue(i.userAttributeMap.userType)
+		if userType == "" {
+			userType = UserTypeMember
+		}
+		user.SetUserType(userType)
 		var identities []libregraph.ObjectIdentity
 		for _, identityStr := range e.GetEqualFoldAttributeValues(i.userAttributeMap.identities) {
 			parts := strings.SplitN(identityStr, "$", 3)
