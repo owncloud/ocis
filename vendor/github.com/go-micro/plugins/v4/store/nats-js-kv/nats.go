@@ -369,21 +369,22 @@ func (n *natsStore) WatchAll(bucket string, opts ...nats.WatchOpt) (<-chan *Stor
 			}
 
 			var action string
+			var kv KeyValueEnvelope
 			switch u.Operation() {
-			default:
-				action = u.Operation().String()
 			case nats.KeyValuePut:
 				action = "create"
+				if err := json.Unmarshal(u.Value(), &kv); err != nil {
+					continue
+				}
 			case nats.KeyValueDelete:
-				action = "delete"
+				fallthrough
 			case nats.KeyValuePurge:
 				action = "delete"
+				kv = KeyValueEnvelope{
+					Key: n.NewKey(n.opts.Table, "", u.Key()).MicroKey(),
+				}
 			}
 
-			var kv KeyValueEnvelope
-			if err := json.Unmarshal(u.Value(), &kv); err != nil {
-				continue
-			}
 			ch <- &StoreUpdate{
 				Value:  kv,
 				Action: action,
