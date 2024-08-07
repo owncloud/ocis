@@ -113,7 +113,7 @@ variables:
   description: ""
   do_ignore: true
 - rawname: _registryAddressEnv
-  path: ocis-pkg/natsjsregistry/registry.go:184
+  path: ocis-pkg/natsjsregistry/registry.go:192
   foundincode: true
   name: _registryAddressEnv
   type: ""
@@ -121,7 +121,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: _registryPasswordEnv
-  path: ocis-pkg/natsjsregistry/registry.go:212
+  path: ocis-pkg/natsjsregistry/registry.go:220
   foundincode: true
   name: _registryPasswordEnv
   type: ""
@@ -145,7 +145,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: _registryUsernameEnv
-  path: ocis-pkg/natsjsregistry/registry.go:212
+  path: ocis-pkg/natsjsregistry/registry.go:220
   foundincode: true
   name: _registryUsernameEnv
   type: ""
