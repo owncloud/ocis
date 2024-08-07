@@ -2,8 +2,11 @@
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 6.2.0](#changelog-for-620-2024-07-30)
+* [Changelog for 5.0.6](#changelog-for-506-2024-07-17)
 * [Changelog for 6.1.0](#changelog-for-610-2024-07-08)
 * [Changelog for 6.0.0](#changelog-for-600-2024-06-19)
+* [Changelog for 5.0.5](#changelog-for-505-2024-05-22)
+* [Changelog for 5.0.4](#changelog-for-504-2024-05-13)
 * [Changelog for 5.0.3](#changelog-for-503-2024-05-02)
 * [Changelog for 5.0.2](#changelog-for-502-2024-04-17)
 * [Changelog for 5.0.1](#changelog-for-501-2024-04-10)
@@ -19,8 +22,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -164,7 +167,7 @@ The following sections list the changes for unreleased.
 
 The following sections list the changes for 6.2.0.
 
-[6.2.0]: https://github.com/owncloud/ocis/compare/v6.1.0...v6.2.0
+[6.2.0]: https://github.com/owncloud/ocis/compare/v5.0.6...v6.2.0
 
 ## Summary
 
@@ -425,6 +428,80 @@ The following sections list the changes for 6.2.0.
    https://github.com/owncloud/ocis/pull/9707
    https://github.com/owncloud/web/releases/tag/v10.0.0
 
+# Changelog for [5.0.6] (2024-07-17)
+
+The following sections list the changes for 5.0.6.
+
+[5.0.6]: https://github.com/owncloud/ocis/compare/v6.1.0...v5.0.6
+
+## Summary
+
+* Bugfix - Allow all uploads to restart: [#9506](https://github.com/owncloud/ocis/pull/9506)
+* Bugfix - Fix the email notification service: [#9514](https://github.com/owncloud/ocis/pull/9514)
+* Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
+* Enhancement - Update web to v8.0.4: [#9429](https://github.com/owncloud/ocis/pull/9429)
+* Enhancement - Add cli to purge revisions: [#9497](https://github.com/owncloud/ocis/pull/9497)
+
+## Details
+
+* Bugfix - Allow all uploads to restart: [#9506](https://github.com/owncloud/ocis/pull/9506)
+
+   On postprocessing-restart, allow all uploads to restart even if one fails.
+
+   https://github.com/owncloud/ocis/pull/9506
+
+* Bugfix - Fix the email notification service: [#9514](https://github.com/owncloud/ocis/pull/9514)
+
+   We fixed an error in the notification service that caused the email notification
+   to fail when the user's display name contained special characters.
+
+   https://github.com/owncloud/ocis/issues/9402
+   https://github.com/owncloud/ocis/pull/9514
+
+* Enhancement - Limit concurrent thumbnail requests: [#9199](https://github.com/owncloud/ocis/pull/9199)
+
+   The number of concurrent requests to the thumbnail service can be limited now to
+   have more control over the consumed system resources.
+
+   https://github.com/owncloud/ocis/pull/9199
+
+* Enhancement - Update web to v8.0.4: [#9429](https://github.com/owncloud/ocis/pull/9429)
+
+   Tags: web
+
+   We updated ownCloud Web to v8.0.4. Please refer to the changelog (linked) for
+   details on the web release.
+
+   - Bugfix [owncloud/web#10814](https://github.com/owncloud/web/issues/10814):
+   Vertical scroll for OcModal on small screens - Bugfix
+   [owncloud/web#10918](https://github.com/owncloud/web/issues/10918): Resource
+   deselection on right-click - Bugfix
+   [owncloud/web#10920](https://github.com/owncloud/web/pull/10920): Resources with
+   name consist of number won't show up in trash bin - Bugfix
+   [owncloud/web#10941](https://github.com/owncloud/web/issues/10941): Space not
+   updating on navigation - Bugfix
+   [owncloud/web#11063](https://github.com/owncloud/web/issues/11063): Enforce
+   shortcut URL protocol - Bugfix
+   [owncloud/web#11092](https://github.com/owncloud/web/issues/11092): Browser
+   confirmation dialog after closing editor - Bugfix
+   [owncloud/web#11091](https://github.com/owncloud/web/issues/11091): Button focus
+   when closing editor - Bugfix
+   [owncloud/web#10942](https://github.com/owncloud/web/issues/10942): Keyboard
+   navigation breaking - Bugfix
+   [owncloud/web#11086](https://github.com/owncloud/web/pull/11086): Opening public
+   links with an expired token
+
+   https://github.com/owncloud/ocis/pull/9429
+   https://github.com/owncloud/ocis/pull/9510
+   https://github.com/owncloud/web/releases/tag/v8.0.3
+   https://github.com/owncloud/web/releases/tag/v8.0.4
+
+* Enhancement - Add cli to purge revisions: [#9497](https://github.com/owncloud/ocis/pull/9497)
+
+   Adds a cli that allows removing all revisions for a storage-provider.
+
+   https://github.com/owncloud/ocis/pull/9497
+
 # Changelog for [6.1.0] (2024-07-08)
 
 The following sections list the changes for 6.1.0.
@@ -638,7 +715,7 @@ The following sections list the changes for 6.1.0.
 
 The following sections list the changes for 6.0.0.
 
-[6.0.0]: https://github.com/owncloud/ocis/compare/v5.0.3...v6.0.0
+[6.0.0]: https://github.com/owncloud/ocis/compare/v5.0.5...v6.0.0
 
 ## Summary
 
@@ -1536,6 +1613,72 @@ The following sections list the changes for 6.0.0.
    https://github.com/owncloud/ocis/pull/8701
    https://github.com/owncloud/ocis/pull/8606
    https://github.com/owncloud/ocis/pull/8937
+
+# Changelog for [5.0.5] (2024-05-22)
+
+The following sections list the changes for 5.0.5.
+
+[5.0.5]: https://github.com/owncloud/ocis/compare/v5.0.4...v5.0.5
+
+## Summary
+
+* Enhancement - Update web to v8.0.2: [#9153](https://github.com/owncloud/ocis/pull/9153)
+
+## Details
+
+* Enhancement - Update web to v8.0.2: [#9153](https://github.com/owncloud/ocis/pull/9153)
+
+   Tags: web
+
+   We updated ownCloud Web to v8.0.2. Please refer to the changelog (linked) for
+   details on the web release.
+
+  * Bugfix [owncloud/web#10515](https://github.com/owncloud/web/issues/10515): Folder replace
+  * Bugfix [owncloud/web#10598](https://github.com/owncloud/web/issues/10598): Hidden right sidebar on small screens
+  * Bugfix [owncloud/web#10634](https://github.com/owncloud/web/issues/10634): Scope loss when showing search results
+  * Bugfix [owncloud/web#10657](https://github.com/owncloud/web/issues/10657): Theme loading without matching theme
+  * Bugfix [owncloud/web#10763](https://github.com/owncloud/web/pull/10763): Flickering loading indicator
+  * Bugfix [owncloud/web#10810](https://github.com/owncloud/web/issues/10810): Download files with special chars in name
+  * Bugfix [owncloud/web#10881](https://github.com/owncloud/web/pull/10881): IDP logout issues
+
+   https://github.com/owncloud/ocis/pull/9153
+   https://github.com/owncloud/web/releases/tag/v8.0.2
+
+# Changelog for [5.0.4] (2024-05-13)
+
+The following sections list the changes for 5.0.4.
+
+[5.0.4]: https://github.com/owncloud/ocis/compare/v5.0.3...v5.0.4
+
+## Summary
+
+* Bugfix - Update reva to v2.19.7: [#9011](https://github.com/owncloud/ocis/pull/9011)
+* Bugfix - Service startup of WOPI example: [#9127](https://github.com/owncloud/ocis/pull/9127)
+* Bugfix - Nats reconnects: [#9139](https://github.com/owncloud/ocis/pull/9139)
+
+## Details
+
+* Bugfix - Update reva to v2.19.7: [#9011](https://github.com/owncloud/ocis/pull/9011)
+
+   We updated reva to v2.19.7
+
+  *   Enhancement [cs3org/reva#4673](https://github.com/cs3org/reva/pull/4673): Add virus filter to list uploads sessions
+
+   https://github.com/owncloud/ocis/pull/9011
+
+* Bugfix - Service startup of WOPI example: [#9127](https://github.com/owncloud/ocis/pull/9127)
+
+   We fixed a bug in the service startup of the appprovider-onlyoffice in the
+   ocis_wopi deployment example.
+
+   https://github.com/owncloud/ocis/pull/9127
+
+* Bugfix - Nats reconnects: [#9139](https://github.com/owncloud/ocis/pull/9139)
+
+   We fixed the reconnect handling of the natjs kv registry.
+
+   https://github.com/owncloud/ocis/pull/9139
+   https://github.com/owncloud/ocis/pull/8880
 
 # Changelog for [5.0.3] (2024-05-02)
 
@@ -8924,7 +9067,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -9098,11 +9241,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -9275,24 +9436,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
