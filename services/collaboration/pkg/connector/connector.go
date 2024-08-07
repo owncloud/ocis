@@ -1,5 +1,17 @@
 package connector
 
+// ConnectorResponse represent a response from the FileConnectorService.
+// The ConnectorResponse is oriented to HTTP, so it has the Status, Headers
+// and Body that the actual HTTP response should have. This includes HTTP
+// errors with status 4xx and 5xx, which will also represent some error
+// conditions for the FileConnectorService.
+// Note that the Body is expected to be JSON-encoded outside before sending.
+type ConnectorResponse struct {
+	Status  int
+	Headers map[string]string
+	Body    interface{}
+}
+
 // ConnectorError defines an error in the connector. It contains an error code
 // and a message.
 // For convenience, the error code can be used as HTTP error code, although

@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
-	"errors"
 	"io"
 	"net/url"
 	"path"
@@ -36,30 +35,6 @@ const (
 	lockDuration time.Duration = 30 * time.Minute
 )
 
-// PutRelativeHeaders contains the values for headers used in a
-// "PutRelative" WOPI response
-type PutRelativeHeaders struct {
-	ValidTarget string
-	LockID      string
-}
-
-// PutRelativeResponse contains the values for the body used in a
-// "PutRelative" WOPI response
-type PutRelativeResponse struct {
-	Name string
-	Url  string
-
-	// These are optional and not used for now
-	HostView string
-	HostEdit string
-}
-
-// RenameResponse contains the values for the body used in a
-// "RenameFile" WOPI response
-type RenameResponse struct {
-	Name string
-}
-
 // FileConnectorService is the interface to implement the "Files"
 // endpoint. Basically lock operations on the file plus the CheckFileInfo.
 // All operations need a context containing a WOPI context and, optionally,
@@ -67,23 +42,23 @@ type RenameResponse struct {
 // Target file is within the WOPI context
 type FileConnectorService interface {
 	// GetLock will return the lockID present in the target file.
-	GetLock(ctx context.Context) (string, error)
+	GetLock(ctx context.Context) (*ConnectorResponse, error)
 	// Lock will lock the target file with the provided lockID. If the oldLockID
 	// is provided (not empty), the method will perform an unlockAndRelock
 	// operation (unlock the file with the oldLockID and immediately relock
 	// the file with the new lockID).
 	// The current lockID will be returned if a conflict happens
-	Lock(ctx context.Context, lockID, oldLockID string) (string, error)
+	Lock(ctx context.Context, lockID, oldLockID string) (*ConnectorResponse, error)
 	// RefreshLock will extend the lock time 30 minutes. The current lockID
 	// needs to be provided.
 	// The current lockID will be returned if a conflict happens
-	RefreshLock(ctx context.Context, lockID string) (string, error)
+	RefreshLock(ctx context.Context, lockID string) (*ConnectorResponse, error)
 	// Unlock will unlock the target file. The current lockID needs to be
 	// provided.
 	// The current lockID will be returned if a conflict happens
-	UnLock(ctx context.Context, lockID string) (string, error)
+	UnLock(ctx context.Context, lockID string) (*ConnectorResponse, error)
 	// CheckFileInfo will return the file information of the target file
-	CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, error)
+	CheckFileInfo(ctx context.Context) (*ConnectorResponse, error)
 	// PutRelativeFileSuggested will create a new file based on the contents of the
 	// current file. Target is the filename that will be used for this
 	// new file.
@@ -91,7 +66,7 @@ type FileConnectorService interface {
 	// Since we need to upload contents, it will be done through the provided
 	// The target must be UTF8-encoded.
 	// ContentConnectorService
-	PutRelativeFileSuggested(ctx context.Context, ccs ContentConnectorService, stream io.Reader, streamLength int64, target string) (*PutRelativeResponse, error)
+	PutRelativeFileSuggested(ctx context.Context, ccs ContentConnectorService, stream io.Reader, streamLength int64, target string) (*ConnectorResponse, error)
 	// PutRelativeFileRelative will create a new file based on the contents of the
 	// current file. Target is the filename that will be used for this
 	// new file.
@@ -101,17 +76,17 @@ type FileConnectorService interface {
 	// The target must be UTF8-encoded.
 	// Since we need to upload contents, it will be done through the provided
 	// ContentConnectorService
-	PutRelativeFileRelative(ctx context.Context, ccs ContentConnectorService, stream io.Reader, streamLength int64, target string) (*PutRelativeResponse, *PutRelativeHeaders, error)
+	PutRelativeFileRelative(ctx context.Context, ccs ContentConnectorService, stream io.Reader, streamLength int64, target string) (*ConnectorResponse, error)
 	// DeleteFile will delete the provided file in the context. Although
 	// not documented, a lockID can be used to try to delete a locked file
 	// assuming the lock matches.
 	// The current lockID will be returned if the file is locked.
-	DeleteFile(ctx context.Context, lockID string) (string, error)
+	DeleteFile(ctx context.Context, lockID string) (*ConnectorResponse, error)
 	// RenameFile will rename the provided file in the context to the requested
 	// filename. The filename must be UTF8-encoded.
 	// In case of conflict, this method will return the actual lockId in
 	// the file as second return value.
-	RenameFile(ctx context.Context, lockID, target string) (*RenameResponse, string, error)
+	RenameFile(ctx context.Context, lockID, target string) (*ConnectorResponse, error)
 }
 
 // FileConnector implements the "File" endpoint.
@@ -140,10 +115,10 @@ func NewFileConnector(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *
 // The lock ID applied to the file reference in the context will be returned
 // (if any). An error will be returned if something goes wrong. The error
 // could be a ConnectorError
-func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
+func (f *FileConnector) GetLock(ctx context.Context) (*ConnectorResponse, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	logger := zerolog.Ctx(ctx)
@@ -155,7 +130,7 @@ func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
 	resp, err := f.gwc.GetLock(ctx, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("GetLock failed")
-		return "", err
+		return nil, err
 	}
 
 	if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
@@ -164,7 +139,7 @@ func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
 			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("GetLock failed with unexpected status")
 		// TODO: Should we be more strict? There could be more causes for the failure
-		return "", NewConnectorError(404, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
+		return &ConnectorResponse{Status: 404}, nil
 	}
 
 	lockID := ""
@@ -177,7 +152,12 @@ func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
 		Str("LockID", lockID).
 		Msg("GetLock success")
 
-	return lockID, nil
+	return &ConnectorResponse{
+		Status: 200,
+		Headers: map[string]string{
+			HeaderWopiLock: lockID,
+		},
+	}, nil
 }
 
 // Lock returns a WOPI lock or performs an unlock and relock
@@ -198,10 +178,10 @@ func (f *FileConnector) GetLock(ctx context.Context) (string, error) {
 // the method will return an empty lock id.
 //
 // For the "unlock and relock" operation, the behavior will be the same.
-func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (string, error) {
+func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (*ConnectorResponse, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	logger := zerolog.Ctx(ctx).With().
@@ -212,7 +192,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 
 	if lockID == "" {
 		logger.Error().Msg("Lock failed due to empty lockID")
-		return "", NewConnectorError(400, "Requested lockID is empty")
+		return &ConnectorResponse{Status: 400}, nil
 	}
 
 	var setOrRefreshStatus *rpcv1beta1.Status
@@ -234,7 +214,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 		resp, err := f.gwc.SetLock(ctx, req)
 		if err != nil {
 			logger.Error().Err(err).Msg("SetLock failed")
-			return "", err
+			return nil, err
 		}
 		setOrRefreshStatus = resp.GetStatus()
 	} else {
@@ -257,7 +237,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 		resp, err := f.gwc.RefreshLock(ctx, req)
 		if err != nil {
 			logger.Error().Err(err).Msg("UnlockAndRefresh failed")
-			return "", err
+			return nil, err
 		}
 		setOrRefreshStatus = resp.GetStatus()
 	}
@@ -266,7 +246,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 	switch setOrRefreshStatus.GetCode() {
 	case rpcv1beta1.Code_CODE_OK:
 		logger.Debug().Msg("SetLock successful")
-		return "", nil
+		return &ConnectorResponse{Status: 200}, nil
 
 	case rpcv1beta1.Code_CODE_FAILED_PRECONDITION, rpcv1beta1.Code_CODE_ABORTED:
 		// Code_CODE_FAILED_PRECONDITION -> Lock operation mismatched lock
@@ -280,7 +260,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 		resp, err := f.gwc.GetLock(ctx, req)
 		if err != nil {
 			logger.Error().Err(err).Msg("SetLock failed, fallback to GetLock failed too")
-			return "", err
+			return nil, err
 		}
 
 		if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
@@ -296,7 +276,12 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 				logger.Warn().
 					Str("LockID", resp.GetLock().GetLockId()).
 					Msg("SetLock conflict")
-				return resp.GetLock().GetLockId(), NewConnectorError(409, "Lock conflict")
+				return &ConnectorResponse{
+					Status: 409,
+					Headers: map[string]string{
+						HeaderWopiLock: resp.GetLock().GetLockId(),
+					},
+				}, nil
 			}
 
 			// TODO: according to the spec we need to treat this as a RefreshLock
@@ -307,22 +292,22 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 			logger.Warn().
 				Str("LockID", resp.GetLock().GetLockId()).
 				Msg("SetLock lock refreshed instead")
-			return resp.GetLock().GetLockId(), nil
+			return &ConnectorResponse{Status: 200}, nil // no need to send the lockID for a 200 code
 		}
 
 		logger.Error().Msg("SetLock failed and could not refresh")
-		return "", NewConnectorError(500, "Could not refresh the lock")
+		return &ConnectorResponse{Status: 500}, nil
 
 	case rpcv1beta1.Code_CODE_NOT_FOUND:
 		logger.Error().Msg("SetLock failed, file not found")
-		return "", NewConnectorError(404, "File not found")
+		return &ConnectorResponse{Status: 404}, nil
 
 	default:
 		logger.Error().
 			Str("StatusCode", setOrRefreshStatus.GetCode().String()).
 			Str("StatusMsg", setOrRefreshStatus.GetMessage()).
 			Msg("SetLock failed with unexpected status")
-		return "", NewConnectorError(500, setOrRefreshStatus.GetCode().String()+" "+setOrRefreshStatus.GetMessage())
+		return &ConnectorResponse{Status: 500}, nil
 	}
 }
 
@@ -339,10 +324,10 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (str
 // return an empty lock id.
 // The conflict happens if the provided lockID doesn't match the one actually
 // applied in the target file.
-func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string, error) {
+func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (*ConnectorResponse, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	logger := zerolog.Ctx(ctx).With().
@@ -352,7 +337,7 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 
 	if lockID == "" {
 		logger.Error().Msg("RefreshLock failed due to empty lockID")
-		return "", NewConnectorError(400, "Requested lockID is empty")
+		return &ConnectorResponse{Status: 400}, nil
 	}
 
 	req := &providerv1beta1.RefreshLockRequest{
@@ -370,20 +355,20 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 	resp, err := f.gwc.RefreshLock(ctx, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("RefreshLock failed")
-		return "", err
+		return nil, err
 	}
 
 	switch resp.GetStatus().GetCode() {
 	case rpcv1beta1.Code_CODE_OK:
 		logger.Debug().Msg("RefreshLock successful")
-		return "", nil
+		return &ConnectorResponse{Status: 200}, nil
 
 	case rpcv1beta1.Code_CODE_NOT_FOUND:
 		logger.Error().
 			Str("StatusCode", resp.GetStatus().GetCode().String()).
 			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("RefreshLock failed, file reference not found")
-		return "", NewConnectorError(404, "File reference not found")
+		return &ConnectorResponse{Status: 404}, nil
 
 	case rpcv1beta1.Code_CODE_ABORTED:
 		logger.Error().
@@ -400,7 +385,7 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 		resp, err := f.gwc.GetLock(ctx, req)
 		if err != nil {
 			logger.Error().Err(err).Msg("RefreshLock failed trying to get the current lock")
-			return "", err
+			return nil, err
 		}
 
 		if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
@@ -408,7 +393,7 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 				Str("StatusCode", resp.GetStatus().GetCode().String()).
 				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("RefreshLock failed, tried to get the current lock failed with unexpected status")
-			return "", NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
+			return &ConnectorResponse{Status: 500}, nil
 		}
 
 		if resp.GetLock() == nil {
@@ -416,7 +401,12 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 				Str("StatusCode", resp.GetStatus().GetCode().String()).
 				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("RefreshLock failed, no lock on file")
-			return "", NewConnectorError(409, "No lock on file")
+			return &ConnectorResponse{
+				Status: 409,
+				Headers: map[string]string{
+					HeaderWopiLock: "",
+				},
+			}, nil
 		} else {
 			// lock is different than the one requested, otherwise we wouldn't reached this point
 			logger.Error().
@@ -424,14 +414,19 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 				Str("StatusCode", resp.GetStatus().GetCode().String()).
 				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("RefreshLock failed, lock mismatch")
-			return resp.GetLock().GetLockId(), NewConnectorError(409, "Lock mismatch")
+			return &ConnectorResponse{
+				Status: 409,
+				Headers: map[string]string{
+					HeaderWopiLock: resp.GetLock().GetLockId(),
+				},
+			}, nil
 		}
 	default:
 		logger.Error().
 			Str("StatusCode", resp.GetStatus().GetCode().String()).
 			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("RefreshLock failed with unexpected status")
-		return "", NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
+		return &ConnectorResponse{Status: 500}, nil
 	}
 }
 
@@ -448,10 +443,10 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (string,
 // return an empty lock id.
 // The conflict happens if the provided lockID doesn't match the one actually
 // applied in the target file.
-func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, error) {
+func (f *FileConnector) UnLock(ctx context.Context, lockID string) (*ConnectorResponse, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	logger := zerolog.Ctx(ctx).With().
@@ -461,7 +456,7 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 
 	if lockID == "" {
 		logger.Error().Msg("Unlock failed due to empty lockID")
-		return "", NewConnectorError(400, "Requested lockID is empty")
+		return &ConnectorResponse{Status: 400}, nil
 	}
 
 	req := &providerv1beta1.UnlockRequest{
@@ -475,17 +470,22 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 	resp, err := f.gwc.Unlock(ctx, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("Unlock failed")
-		return "", err
+		return nil, err
 	}
 
 	switch resp.GetStatus().GetCode() {
 	case rpcv1beta1.Code_CODE_OK:
 		logger.Debug().Msg("Unlock successful")
-		return "", nil
+		return &ConnectorResponse{Status: 200}, nil
 	case rpcv1beta1.Code_CODE_ABORTED:
 		// File isn't locked. Need to return 409 with empty lock
 		logger.Error().Err(err).Msg("Unlock failed, file isn't locked")
-		return "", NewConnectorError(409, "File is not locked")
+		return &ConnectorResponse{
+			Status: 409,
+			Headers: map[string]string{
+				HeaderWopiLock: "",
+			},
+		}, nil
 	case rpcv1beta1.Code_CODE_LOCKED:
 		// We need to return 409 with the current lock
 		req := &providerv1beta1.GetLockRequest{
@@ -495,7 +495,7 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 		resp, err := f.gwc.GetLock(ctx, req)
 		if err != nil {
 			logger.Error().Err(err).Msg("Unlock failed trying to get the current lock")
-			return "", err
+			return nil, err
 		}
 
 		if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
@@ -503,7 +503,7 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 				Str("StatusCode", resp.GetStatus().GetCode().String()).
 				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("Unlock failed, tried to get the current lock failed with unexpected status")
-			return "", NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
+			return &ConnectorResponse{Status: 500}, nil
 		}
 
 		var outLockId string
@@ -522,13 +522,18 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 				Msg("Unlock failed, lock mismatch")
 			outLockId = resp.GetLock().GetLockId()
 		}
-		return outLockId, NewConnectorError(409, "Lock mismatch")
+		return &ConnectorResponse{
+			Status: 409,
+			Headers: map[string]string{
+				HeaderWopiLock: outLockId,
+			},
+		}, nil
 	default:
 		logger.Error().
 			Str("StatusCode", resp.GetStatus().GetCode().String()).
 			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("Unlock failed with unexpected status")
-		return "", NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
+		return &ConnectorResponse{Status: 500}, nil
 	}
 }
 
@@ -558,7 +563,7 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (string, erro
 // Since the upload won't use any lock, the upload will fail if the target file
 // already exists and it isn't empty. This means that, this method can only
 // generate new files.
-func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs ContentConnectorService, stream io.Reader, streamLength int64, target string) (*PutRelativeResponse, error) {
+func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs ContentConnectorService, stream io.Reader, streamLength int64, target string) (*ConnectorResponse, error) {
 	// assume the target is a full name
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
@@ -583,7 +588,7 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 			Str("StatusCode", oldStatRes.GetStatus().GetCode().String()).
 			Str("StatusMsg", oldStatRes.GetStatus().GetMessage()).
 			Msg("PutRelativeFileSuggested: stat failed with unexpected status")
-		return nil, NewConnectorError(500, oldStatRes.GetStatus().GetCode().String()+" "+oldStatRes.GetStatus().GetMessage())
+		return &ConnectorResponse{Status: 500}, nil
 	}
 
 	if strings.HasPrefix(target, ".") {
@@ -597,8 +602,6 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 	finalTarget := target
 	newLogger := logger
 	for isDone := false; !isDone; {
-		var conError *ConnectorError
-
 		targetPath := utils.MakeRelativePath(finalTarget)
 		// need to change the file reference of the wopicontext to point to the new path
 		wopiContext.FileReference = &providerv1beta1.Reference{
@@ -611,29 +614,27 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		newCtx := middleware.WopiContextToCtx(newLogger.WithContext(ctx), wopiContext)
 
 		// try to put the file. It mustn't return a 400 or 409
-		_, err := ccs.PutFile(newCtx, stream, streamLength, "")
+		putResponse, err := ccs.PutFile(newCtx, stream, streamLength, "")
 		if err != nil {
-			// if the error isn't a connectorError, fail the request
-			if !errors.As(err, &conError) {
-				newLogger.Error().Err(err).Msg("PutRelativeFileSuggested: put file failed")
-				return nil, err
-			}
+			newLogger.Error().Err(err).Msg("PutRelativeFileSuggested: put file failed")
+			return nil, err
+		}
 
-			if conError.HttpCodeOut == 409 {
-				// if conflict generate a different name and retry.
-				// this should happen only once
-				actualFilename, _ := f.extractFilenameAndPrefix(target)
-				finalTarget = f.generatePrefix() + " " + actualFilename
-			} else {
-				// TODO: code 400 might happen, what to do?
-				// in other cases, just return the error
-				newLogger.Error().Err(err).Msg("PutRelativeFileSuggested: put file failed with unhandled status")
-				return nil, err
-			}
-		} else {
+		switch putResponse.Status {
+		case 200:
 			// if the put is successful, exit the loop and move on
 			isDone = true
 			logger = newLogger
+		case 409:
+			// if conflict generate a different name and retry.
+			// this should happen only once
+			actualFilename, _ := f.extractFilenameAndPrefix(target)
+			finalTarget = f.generatePrefix() + " " + actualFilename
+		default:
+			// TODO: code 400 might happen, what to do?
+			// in other cases, just return the error
+			newLogger.Error().Msg("PutRelativeFileSuggested: put file failed with unhandled status")
+			return &ConnectorResponse{Status: 500}, nil
 		}
 	}
 
@@ -648,16 +649,17 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		return nil, err
 	}
 
-	// send the info
-	result := &PutRelativeResponse{
-		Name: finalTarget,
-		Url:  wopiSrcURL.String(),
-	}
-
 	logger.Debug().
 		Str("FinalReference", wopiContext.FileReference.String()).
 		Msg("PutRelativeFileSuggested: success")
-	return result, nil
+
+	return &ConnectorResponse{
+		Status: 200,
+		Body: map[string]interface{}{
+			"Name": finalTarget,
+			"Url":  wopiSrcURL.String(),
+		},
+	}, nil
 }
 
 // PutRelativeFileRelative upload a file using the provided target name
@@ -684,11 +686,11 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 // Since the upload won't use any lock, the upload will fail if the target file
 // already exists and it isn't empty. This means that, this method can only
 // generate new files.
-func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs ContentConnectorService, stream io.Reader, streamLength int64, target string) (*PutRelativeResponse, *PutRelativeHeaders, error) {
+func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs ContentConnectorService, stream io.Reader, streamLength int64, target string) (*ConnectorResponse, error) {
 	// assume the target is a full name
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	logger := zerolog.Ctx(ctx).With().
@@ -701,7 +703,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("PutRelativeFileRelative: stat failed")
-		return nil, nil, err
+		return nil, err
 	}
 
 	if oldStatRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
@@ -709,7 +711,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 			Str("StatusCode", oldStatRes.GetStatus().GetCode().String()).
 			Str("StatusMsg", oldStatRes.GetStatus().GetMessage()).
 			Msg("PutRelativeFileRelative: stat failed with unexpected status")
-		return nil, nil, NewConnectorError(500, oldStatRes.GetStatus().GetCode().String()+" "+oldStatRes.GetStatus().GetMessage())
+		return &ConnectorResponse{Status: 500}, nil
 	}
 
 	targetPath := utils.MakeRelativePath(target)
@@ -723,72 +725,79 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 	newLogger := logger.With().Str("NewFileReference", wopiContext.FileReference.String()).Logger()
 	newCtx := middleware.WopiContextToCtx(newLogger.WithContext(ctx), wopiContext)
 
-	var conError *ConnectorError
 	// try to put the file
-	lockID, err := ccs.PutFile(newCtx, stream, streamLength, "")
+	putResponse, err := ccs.PutFile(newCtx, stream, streamLength, "")
 	if err != nil {
-		// if the error isn't a connectorError, fail the request
-		if !errors.As(err, &conError) {
-			newLogger.Error().Err(err).Msg("PutRelativeFileRelative: put file failed")
-			return nil, nil, err
+		newLogger.Error().Err(err).Msg("PutRelativeFileRelative: put file failed")
+		return nil, err
+	}
+
+	lockID := ""
+	if putResponse.Headers != nil {
+		lockID = putResponse.Headers[HeaderWopiLock]
+	}
+
+	switch putResponse.Status {
+	case 200: // success case, so don't do anything
+	case 409:
+		if err := f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
+			return nil, err
+		}
+		// if conflict generate a different name and retry.
+		// this should happen only once
+		wopiSrcURL, err2 := f.generateWOPISrc(ctx, wopiContext, newLogger)
+		if err2 != nil {
+			newLogger.Error().
+				Err(err2).
+				Str("LockID", lockID).
+				Msg("PutRelativeFileRelative: error generating the WOPISrc parameter for conflict response")
+			return nil, err2
 		}
 
-		if conError.HttpCodeOut == 409 {
-			if err := f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
-				return nil, nil, err
-			}
-			// if conflict generate a different name and retry.
-			// this should happen only once
-			wopiSrcURL, err2 := f.generateWOPISrc(ctx, wopiContext, newLogger)
-			if err2 != nil {
-				newLogger.Error().
-					Err(err2).
-					Str("LockID", lockID).
-					Msg("PutRelativeFileRelative: error generating the WOPISrc parameter for conflict response")
-				return nil, nil, err
-			}
+		actualFilename, _ := f.extractFilenameAndPrefix(target)
+		finalTarget := f.generatePrefix() + " " + actualFilename
 
-			actualFilename, _ := f.extractFilenameAndPrefix(target)
-			finalTarget := f.generatePrefix() + " " + actualFilename
-			headers := &PutRelativeHeaders{
-				ValidTarget: finalTarget,
-				LockID:      lockID,
-			}
-			response := &PutRelativeResponse{
-				Name: target,
-				Url:  wopiSrcURL.String(),
-			}
-			newLogger.Error().
-				Err(err).
-				Str("LockID", lockID).
-				Msg("PutRelativeFileRelative: error conflict")
-			return response, headers, err
-		} else {
-			newLogger.Error().
-				Err(err).
-				Str("LockID", lockID).
-				Msg("PutRelativeFileRelative: put file failed with unhandled status")
-			return nil, nil, err
-		}
+		newLogger.Error().
+			Str("LockID", lockID).
+			Msg("PutRelativeFileRelative: error conflict")
+
+		return &ConnectorResponse{
+			Status: 409,
+			Headers: map[string]string{
+				HeaderWopiValidRT: finalTarget,
+				HeaderWopiLock:    lockID,
+			},
+			Body: map[string]interface{}{
+				"Name": target,
+				"Url":  wopiSrcURL.String(),
+			},
+		}, nil
+	default:
+		newLogger.Error().
+			Str("LockID", lockID).
+			Msg("PutRelativeFileRelative: put file failed with unhandled status")
+		return &ConnectorResponse{Status: 500}, nil
 	}
 
 	if err := f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	wopiSrcURL, err := f.generateWOPISrc(ctx, wopiContext, newLogger)
 	if err != nil {
 		newLogger.Error().Err(err).Msg("PutRelativeFileRelative: error generating the WOPISrc parameter")
-		return nil, nil, err
-	}
-	// send the info
-	result := &PutRelativeResponse{
-		Name: target,
-		Url:  wopiSrcURL.String(),
+		return nil, err
 	}
 
 	newLogger.Debug().Msg("PutRelativeFileRelative: success")
-	return result, nil, nil
+
+	return &ConnectorResponse{
+		Status: 200,
+		Body: map[string]interface{}{
+			"Name": target,
+			"Url":  wopiSrcURL.String(),
+		},
+	}, nil
 }
 
 // DeleteFile will delete the requested file
@@ -804,10 +813,10 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 //
 // Note that this method isn't required and it's likely used just for the
 // WOPI validator
-func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, error) {
+func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (*ConnectorResponse, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	logger := zerolog.Ctx(ctx).With().
@@ -825,7 +834,7 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 		deleteRes, err = f.gwc.Delete(ctx, deleteReq)
 		if err != nil {
 			logger.Error().Err(err).Msg("DeleteFile: stat failed")
-			return "", err
+			return nil, err
 		}
 
 		if deleteRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_TOO_EARLY {
@@ -856,7 +865,7 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 		if deleteRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_NOT_FOUND {
 			// don't bother to check for locks of a missing file
 			logger.Error().Msg("DeleteFile: tried to delete a missing file")
-			return "", NewConnectorError(404, deleteRes.GetStatus().GetCode().String()+" "+deleteRes.GetStatus().GetMessage())
+			return &ConnectorResponse{Status: 404}, nil
 		}
 
 		// check if the file is locked to return a proper lockID
@@ -867,7 +876,7 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 		resp, err2 := f.gwc.GetLock(ctx, req)
 		if err2 != nil {
 			logger.Error().Err(err2).Msg("DeleteFile: GetLock failed")
-			return "", err2
+			return nil, err2
 		}
 
 		if resp.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
@@ -875,22 +884,27 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 				Str("StatusCode", resp.GetStatus().GetCode().String()).
 				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("DeleteFile: GetLock failed with unexpected status")
-			return "", NewConnectorError(500, resp.GetStatus().GetCode().String()+" "+resp.GetStatus().GetMessage())
+			return &ConnectorResponse{Status: 500}, nil
 		}
 
 		if resp.GetLock() != nil {
 			logger.Error().
 				Str("LockID", resp.GetLock().GetLockId()).
 				Msg("DeleteFile: file is locked")
-			return resp.GetLock().GetLockId(), NewConnectorError(409, "file is locked")
+			return &ConnectorResponse{
+				Status: 409,
+				Headers: map[string]string{
+					HeaderWopiLock: resp.GetLock().GetLockId(),
+				},
+			}, nil
 		} else {
 			// return the original error since the file isn't locked
 			logger.Error().Msg("DeleteFile: delete failed on unlocked file")
-			return "", NewConnectorError(500, deleteRes.GetStatus().GetCode().String()+" "+deleteRes.GetStatus().GetMessage())
+			return &ConnectorResponse{Status: 500}, nil
 		}
 	}
 	logger.Debug().Msg("DeleteFile: success")
-	return "", nil
+	return &ConnectorResponse{Status: 200}, nil
 }
 
 // RenameFile will rename the requested file
@@ -907,10 +921,10 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (string, 
 // is just a suggestion, so it could have changed) and the actual lockId in
 // case of conflict as second return value, otherwise the returned lockId will
 // be empty.
-func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (*RenameResponse, string, error) {
+func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (*ConnectorResponse, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 
 	logger := zerolog.Ctx(ctx).With().
@@ -924,19 +938,19 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("RenameFile: stat failed")
-		return nil, "", err
+		return nil, err
 	}
 
 	if oldStatRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
 		if oldStatRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_NOT_FOUND {
 			logger.Error().Msg("RenameFile: file not found")
-			return nil, "", NewConnectorError(404, oldStatRes.GetStatus().GetCode().String()+" "+oldStatRes.GetStatus().GetMessage())
+			return &ConnectorResponse{Status: 404}, nil
 		} else {
 			logger.Error().
 				Str("StatusCode", oldStatRes.GetStatus().GetCode().String()).
 				Str("StatusMsg", oldStatRes.GetStatus().GetMessage()).
 				Msg("RenameFile: stat failed with unexpected status")
-			return nil, "", NewConnectorError(500, oldStatRes.GetStatus().GetCode().String()+" "+oldStatRes.GetStatus().GetMessage())
+			return &ConnectorResponse{Status: 500}, nil
 		}
 	}
 
@@ -962,7 +976,7 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 		})
 		if err != nil {
 			newLogger.Error().Err(err).Msg("RenameFile: move failed")
-			return nil, "", err
+			return nil, err
 		}
 		if moveRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
 			if moveRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_LOCKED || moveRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_ABORTED {
@@ -975,7 +989,12 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 					Str("StatusCode", moveRes.GetStatus().GetCode().String()).
 					Str("StatusMsg", moveRes.GetStatus().GetMessage()).
 					Msg("RenameFile: conflict")
-				return nil, currentLockID, NewConnectorError(409, "file is locked")
+				return &ConnectorResponse{
+					Status: 409,
+					Headers: map[string]string{
+						HeaderWopiLock: currentLockID,
+					},
+				}, nil
 			}
 
 			if moveRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_ALREADY_EXISTS {
@@ -990,7 +1009,7 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 					Str("StatusMsg", moveRes.GetStatus().GetMessage()).
 					Msg("RenameFile: move failed with unexpected status")
 
-				return nil, "", NewConnectorError(500, moveRes.GetStatus().GetCode().String()+" "+moveRes.GetStatus().GetMessage())
+				return &ConnectorResponse{Status: 500}, nil
 			}
 		} else {
 			// if the put is successful, exit the loop and move on
@@ -1000,9 +1019,12 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 	}
 
 	logger.Debug().Msg("RenameFile: success")
-	return &RenameResponse{
-		Name: strings.TrimSuffix(path.Base(finalTarget), path.Ext(finalTarget)), // return the final filename without extension
-	}, "", nil
+	return &ConnectorResponse{
+		Status: 200,
+		Body: map[string]interface{}{
+			"Name": strings.TrimSuffix(path.Base(finalTarget), path.Ext(finalTarget)), // return the final filename without extension
+		},
+	}, nil
 
 }
 
@@ -1015,7 +1037,7 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 //
 // If the operation is successful, a "FileInfo" instance will be returned,
 // otherwise the "FileInfo" will be empty and an error will be returned.
-func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, error) {
+func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
 		return nil, err
@@ -1036,7 +1058,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 			Str("StatusCode", statRes.GetStatus().GetCode().String()).
 			Str("StatusMsg", statRes.GetStatus().GetMessage()).
 			Msg("CheckFileInfo: stat failed with unexpected status")
-		return nil, NewConnectorError(500, statRes.GetStatus().GetCode().String()+" "+statRes.GetStatus().GetMessage())
+		return &ConnectorResponse{Status: 500}, nil
 	}
 
 	// If a not known app name is used, consider "Microsoft" as default.
@@ -1124,7 +1146,10 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, e
 	info.SetProperties(infoMap)
 
 	logger.Debug().Interface("FileInfo", info).Msg("CheckFileInfo: success")
-	return info, nil
+	return &ConnectorResponse{
+		Status: 200,
+		Body:   info,
+	}, nil
 }
 
 func (f *FileConnector) watermarkText(user *userv1beta1.User) string {
