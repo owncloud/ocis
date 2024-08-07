@@ -95,7 +95,7 @@ func (n *storeregistry) Register(s *registry.Service, opts ...registry.RegisterO
 		return err
 	}
 	return n.store.Write(&store.Record{
-		Key:    s.Name + _serviceDelimiter + server.DefaultId,
+		Key:    s.Name + _serviceDelimiter + server.DefaultId + _serviceDelimiter + s.Version,
 		Value:  b,
 		Expiry: options.TTL,
 	})
@@ -105,7 +105,7 @@ func (n *storeregistry) Register(s *registry.Service, opts ...registry.RegisterO
 func (n *storeregistry) Deregister(s *registry.Service, _ ...registry.DeregisterOption) error {
 	n.lock.RLock()
 	defer n.lock.RUnlock()
-	return n.store.Delete(s.Name + _serviceDelimiter + server.DefaultId)
+	return n.store.Delete(s.Name + _serviceDelimiter + server.DefaultId + _serviceDelimiter + s.Version)
 }
 
 // GetService gets a specific service from the registry
@@ -138,20 +138,28 @@ func (n *storeregistry) listServices(opts ...store.ListOption) ([]*registry.Serv
 		return nil, err
 	}
 
-	svcs := make([]*registry.Service, 0, len(keys))
+	versions := map[string]*registry.Service{}
 	for _, k := range keys {
-		s, err := n.getService(k)
+		s, err := n.getNode(k)
 		if err != nil {
 			// TODO: continue ?
 			return nil, err
 		}
+		if versions[s.Version] == nil {
+			versions[s.Version] = s
+		} else {
+			versions[s.Version].Nodes = append(versions[s.Version].Nodes, s.Nodes...)
+		}
+	}
+	svcs := make([]*registry.Service, 0, len(versions))
+	for _, s := range versions {
 		svcs = append(svcs, s)
-
 	}
 	return svcs, nil
 }
 
-func (n *storeregistry) getService(s string) (*registry.Service, error) {
+// getNode retrieves a node from the store. It returns a service to also keep track of the version.
+func (n *storeregistry) getNode(s string) (*registry.Service, error) {
 	recs, err := n.store.Read(s)
 	if err != nil {
 		return nil, err
