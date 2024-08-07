@@ -25,6 +25,14 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// AuthAppToken represents an app token.
+type AuthAppToken struct {
+	Token          string    `json:"token"`
+	ExpirationDate time.Time `json:"expiration_date"`
+	CreatedDate    time.Time `json:"created_date"`
+	Label          string    `json:"label"`
+}
+
 // AuthAppService defines the service interface.
 type AuthAppService struct {
 	log log.Logger
@@ -42,7 +50,6 @@ func NewAuthAppService(opts ...Option) (*AuthAppService, error) {
 	}
 
 	r := roles.NewManager(
-		// TODO: caching?
 		roles.Logger(o.Logger),
 		roles.RoleService(o.RoleClient),
 	)
@@ -71,120 +78,129 @@ func (a *AuthAppService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // HandleCreate handles the creation of app tokens
 func (a *AuthAppService) HandleCreate(w http.ResponseWriter, r *http.Request) {
+	ctx := getContext(r)
+	sublog := a.log.With().Str("actor", ctxpkg.ContextMustGetUser(ctx).GetId().GetOpaqueId()).Logger()
+
 	gwc, err := a.gws.Next()
 	if err != nil {
-		http.Error(w, "error getting gateway client", http.StatusInternalServerError)
+		sublog.Error().Err(err).Msg("error getting gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	ctx := getContext(r)
 
 	q := r.URL.Query()
 	expiry, err := time.ParseDuration(q.Get("expiry"))
 	if err != nil {
-		a.log.Info().Err(err).Msg("error parsing expiry")
+		sublog.Info().Err(err).Str("duration", q.Get("expiry")).Msg("error parsing expiry")
 		http.Error(w, "error parsing expiry. Use e.g. 30m or 72h", http.StatusBadRequest)
 		return
 	}
 
+	label := "Generated via API"
 	cid := buildClientID(q.Get("userID"), q.Get("userName"))
 	if cid != "" {
 		if !a.cfg.AllowImpersonation {
-			a.log.Error().Msg("impersonation is not allowed")
+			sublog.Error().Msg("impersonation is not allowed")
 			http.Error(w, "impersonation is not allowed", http.StatusForbidden)
 			return
 		}
 		ok, err := isAdmin(ctx, a.r)
 		if err != nil {
-			a.log.Error().Err(err).Msg("error checking if user is admin")
-			http.Error(w, "internal server error", http.StatusInternalServerError)
+			sublog.Error().Err(err).Msg("error checking if user is admin")
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		if !ok {
-			a.log.Error().Msg("user is not admin")
-			http.Error(w, "forbidden", http.StatusForbidden)
+			sublog.Error().Msg("user is not admin")
+			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 		ctx, err = a.authenticateUser(cid, gwc)
 		if err != nil {
-			a.log.Error().Err(err).Msg("error authenticating user")
-			http.Error(w, "error authenticating user", http.StatusInternalServerError)
+			sublog.Error().Err(err).Msg("error authenticating user")
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		label = "Generated via Impersonation API"
 	}
 
 	scopes, err := scope.AddOwnerScope(map[string]*authpb.Scope{})
 	if err != nil {
-		a.log.Error().Err(err).Msg("error adding owner scope")
-		http.Error(w, "error adding owner scope", http.StatusInternalServerError)
+		sublog.Error().Err(err).Msg("error adding owner scope")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	res, err := gwc.GenerateAppPassword(ctx, &applications.GenerateAppPasswordRequest{
 		TokenScope: scopes,
-		Label:      "Generated via API",
+		Label:      label,
 		Expiration: utils.TimeToTS(time.Now().Add(expiry)),
 	})
 	if err != nil {
-		a.log.Error().Err(err).Msg("error generating app password")
-		http.Error(w, "error generating app password", http.StatusInternalServerError)
+		sublog.Error().Err(err).Msg("error generating app password")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		a.log.Error().Str("status", res.GetStatus().GetCode().String()).Msg("error generating app password")
-		http.Error(w, "error generating app password: "+res.GetStatus().GetMessage(), http.StatusInternalServerError)
+		sublog.Error().Str("status", res.GetStatus().GetCode().String()).Msg("error generating app password")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	b, err := json.Marshal(res.GetAppPassword())
+	b, err := json.Marshal(convert(res.GetAppPassword()))
 	if err != nil {
-		a.log.Error().Err(err).Msg("error marshaling app password")
-		http.Error(w, "error marshaling app password", http.StatusInternalServerError)
+		sublog.Error().Err(err).Msg("error marshaling app password")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if _, err := w.Write(b); err != nil {
-		a.log.Error().Err(err).Msg("error writing response")
-		http.Error(w, "error writing response", http.StatusInternalServerError)
-		return
+		sublog.Error().Err(err).Msg("error writing response")
 	}
 	w.WriteHeader(http.StatusOK)
 }
 
 // HandleList handles listing of app tokens
 func (a *AuthAppService) HandleList(w http.ResponseWriter, r *http.Request) {
+	ctx := getContext(r)
+	sublog := a.log.With().Str("actor", ctxpkg.ContextMustGetUser(ctx).GetId().GetOpaqueId()).Logger()
+
 	gwc, err := a.gws.Next()
 	if err != nil {
-		a.log.Error().Err(err).Msg("error getting gateway client")
-		http.Error(w, "error getting gateway client", http.StatusInternalServerError)
+		sublog.Error().Err(err).Msg("error getting gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	ctx := getContext(r)
-
 	res, err := gwc.ListAppPasswords(ctx, &applications.ListAppPasswordsRequest{})
 	if err != nil {
-		a.log.Error().Err(err).Msg("error listing app passwords")
-		http.Error(w, "error listing app passwords", http.StatusInternalServerError)
+		sublog.Error().Err(err).Msg("error listing app passwords")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		a.log.Error().Str("status", res.GetStatus().GetCode().String()).Msg("error listing app passwords")
-		http.Error(w, "error listing app passwords: "+res.GetStatus().GetMessage(), http.StatusInternalServerError)
+		sublog.Error().Str("status", res.GetStatus().GetCode().String()).Msg("error listing app passwords")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	b, err := json.Marshal(res.GetAppPasswords())
+	tokens := make([]AuthAppToken, 0, len(res.GetAppPasswords()))
+	for _, ap := range res.GetAppPasswords() {
+		tokens = append(tokens, convert(ap))
+	}
+
+	b, err := json.Marshal(tokens)
 	if err != nil {
-		a.log.Error().Err(err).Msg("error marshaling app passwords")
-		http.Error(w, "error marshaling app passwords", http.StatusInternalServerError)
+		sublog.Error().Err(err).Msg("error marshaling app passwords")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if _, err := w.Write(b); err != nil {
-		a.log.Error().Err(err).Msg("error writing response")
-		http.Error(w, "error writing response", http.StatusInternalServerError)
+		sublog.Error().Err(err).Msg("error writing response")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -192,32 +208,33 @@ func (a *AuthAppService) HandleList(w http.ResponseWriter, r *http.Request) {
 
 // HandleDelete handles deletion of app tokens
 func (a *AuthAppService) HandleDelete(w http.ResponseWriter, r *http.Request) {
+	ctx := getContext(r)
+	sublog := a.log.With().Str("actor", ctxpkg.ContextMustGetUser(ctx).GetId().GetOpaqueId()).Logger()
+
 	gwc, err := a.gws.Next()
 	if err != nil {
-		a.log.Error().Err(err).Msg("error getting gateway client")
-		http.Error(w, "error getting gateway client", http.StatusInternalServerError)
+		sublog.Error().Err(err).Msg("error getting gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	ctx := getContext(r)
-
 	pw := r.URL.Query().Get("token")
 	if pw == "" {
-		a.log.Info().Msg("missing token")
-		http.Error(w, "missing token", http.StatusBadRequest)
+		sublog.Info().Msg("missing token")
+		http.Error(w, "missing auth-app token. Set 'token' parameter", http.StatusBadRequest)
 		return
 	}
 
 	res, err := gwc.InvalidateAppPassword(ctx, &applications.InvalidateAppPasswordRequest{Password: pw})
 	if err != nil {
-		a.log.Error().Err(err).Msg("error invalidating app password")
-		http.Error(w, "error invalidating app password", http.StatusInternalServerError)
+		sublog.Error().Err(err).Msg("error invalidating app password")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		a.log.Error().Str("status", res.GetStatus().GetCode().String()).Msg("error invalidating app password")
-		http.Error(w, "error invalidating app password: "+res.GetStatus().GetMessage(), http.StatusInternalServerError)
+		sublog.Error().Str("status", res.GetStatus().GetCode().String()).Msg("error invalidating app password")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -288,4 +305,13 @@ func isAdmin(ctx context.Context, rm *roles.Manager) (bool, error) {
 
 	// check if permission is present in roles of the authenticated account
 	return rm.FindPermissionByID(ctx, roleIDs, settings.AccountManagementPermissionID) != nil, nil
+}
+
+func convert(ap *applications.AppPassword) AuthAppToken {
+	return AuthAppToken{
+		Token:          ap.GetPassword(),
+		ExpirationDate: utils.TSToTime(ap.GetExpiration()),
+		CreatedDate:    utils.TSToTime(ap.GetCtime()),
+		Label:          ap.GetLabel(),
+	}
 }

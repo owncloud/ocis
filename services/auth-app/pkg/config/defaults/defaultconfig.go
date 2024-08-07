@@ -36,7 +36,7 @@ func DefaultConfig() *config.Config {
 			Root:      "/",
 			CORS: config.CORS{
 				AllowedOrigins:   []string{"*"},
-				AllowedMethods:   []string{"POST"},
+				AllowedMethods:   []string{"GET", "POST", "DELETE"},
 				AllowedHeaders:   []string{"Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With", "X-Request-Id", "Ocs-Apirequest"},
 				AllowCredentials: true,
 			},
