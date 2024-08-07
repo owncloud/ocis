@@ -7,6 +7,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/config"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -22,6 +23,7 @@ type Options struct {
 	GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	Mux             *chi.Mux
 	TracerProvider  trace.TracerProvider
+	RoleClient      settingssvc.RoleService
 }
 
 // Logger provides a function to set the logger option.
@@ -63,5 +65,12 @@ func TraceProvider(val trace.TracerProvider) Option {
 func Mux(m *chi.Mux) Option {
 	return func(o *Options) {
 		o.Mux = m
+	}
+}
+
+// RoleClient adds a grpc client for the role service
+func RoleClient(rs settingssvc.RoleService) Option {
+	return func(o *Options) {
+		o.RoleClient = rs
 	}
 }

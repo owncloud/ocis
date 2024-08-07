@@ -12,9 +12,11 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/config"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/logging"
@@ -34,6 +36,10 @@ func Server(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
+			if cfg.AllowImpersonation {
+				fmt.Println("WARNING: Impersonation is enabled. Admins can impersonate all users.")
+			}
+
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
@@ -88,10 +94,16 @@ func Server(cfg *config.Config) *cli.Command {
 				logger.Fatal().Err(err).Msg("failed to register the grpc service")
 			}
 
+			tm, err := pool.StringToTLSMode(cfg.GRPCClientTLS.Mode)
+			if err != nil {
+				return err
+			}
 			gatewaySelector, err := pool.GatewaySelector(
 				cfg.Reva.Address,
 				append(
 					cfg.Reva.GetRevaOptions(),
+					pool.WithTLSCACert(cfg.GRPCClientTLS.CACert),
+					pool.WithTLSMode(tm),
 					pool.WithRegistry(registry.GetRegistry()),
 					pool.WithTracerProvider(traceProvider),
 				)...)
@@ -99,11 +111,20 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
+			grpcClient, err := ogrpc.NewClient(
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(traceProvider))...,
+			)
+			if err != nil {
+				return err
+			}
+
+			rClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
 			server, err := http.Server(
 				http.Logger(logger),
 				http.Context(ctx),
 				http.Config(cfg),
 				http.GatewaySelector(gatewaySelector),
+				http.RoleClient(rClient),
 				http.TracerProvider(traceProvider),
 			)
 			if err != nil {

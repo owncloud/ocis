@@ -6,6 +6,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/config"
 	"github.com/urfave/cli/v2"
 	"go.opentelemetry.io/otel/trace"
@@ -22,6 +23,7 @@ type Options struct {
 	Flags           []cli.Flag
 	Namespace       string
 	GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	RoleClient      settingssvc.RoleService
 	TracerProvider  trace.TracerProvider
 }
 
@@ -75,6 +77,13 @@ func Namespace(val string) Option {
 func GatewaySelector(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
 		o.GatewaySelector = gatewaySelector
+	}
+}
+
+// RoleClient adds a grpc client for the role service
+func RoleClient(rs settingssvc.RoleService) Option {
+	return func(o *Options) {
+		o.RoleClient = rs
 	}
 }
 

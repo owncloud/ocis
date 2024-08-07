@@ -82,6 +82,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Mux(mux),
 		svc.Config(options.Config),
 		svc.GatewaySelector(options.GatewaySelector),
+		svc.RoleClient(options.RoleClient),
 		svc.TraceProvider(options.TracerProvider),
 	)
 	if err != nil {
