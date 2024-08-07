@@ -56,8 +56,9 @@ The following sections list the changes for unreleased.
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 * Enhancement - Allow configuring grpc max connection age: [#9657](https://github.com/owncloud/ocis/pull/9657)
 * Enhancement - Local WEB App configuration: [#9691](https://github.com/owncloud/ocis/pull/9691)
+* Enhancement - Bump reva: [#9714](https://github.com/owncloud/ocis/pull/9714)
+* Enhancement - Bump tusd pkg to v2: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
-* Enhancement - Bump reva: [#9715](https://github.com/owncloud/ocis/pull/9715)
 * Enhancement - Support Skyhigh Security ICAP as an ICAP server: [#9720](https://github.com/owncloud/ocis/issues/9720)
 
 ## Details
@@ -121,16 +122,23 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/9687
    https://github.com/owncloud/ocis/pull/9691
 
+* Enhancement - Bump reva: [#9714](https://github.com/owncloud/ocis/pull/9714)
+
+   https://github.com/owncloud/ocis/pull/9714
+   https://github.com/owncloud/ocis/pull/9715
+
+* Enhancement - Bump tusd pkg to v2: [#9714](https://github.com/owncloud/ocis/pull/9714)
+
+   Bumps the tusd pkg to v2.4.0
+
+   https://github.com/owncloud/ocis/pull/9714
+
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
 
    The CS3 gateway can directly to itself when it wants to talk to the registries
    running in the same reva runtime.
 
    https://github.com/owncloud/ocis/pull/9714
-
-* Enhancement - Bump reva: [#9715](https://github.com/owncloud/ocis/pull/9715)
-
-   https://github.com/owncloud/ocis/pull/9715
 
 * Enhancement - Support Skyhigh Security ICAP as an ICAP server: [#9720](https://github.com/owncloud/ocis/issues/9720)
 
