@@ -72,6 +72,11 @@ func GetDriveAndItemIDParam(r *http.Request, logger *log.Logger) (storageprovide
 	return driveID, itemID, nil
 }
 
+// GetFilterParam returns the $filter query parameter from the request. If you need to parse the filter use godata.ParseRequest
+func GetFilterParam(r *http.Request) string {
+	return r.URL.Query().Get("$filter")
+}
+
 // GetGatewayClient returns a gateway client from the gatewaySelector.
 func (g Graph) GetGatewayClient(w http.ResponseWriter, r *http.Request) (gateway.GatewayAPIClient, bool) {
 	gatewayClient, err := g.gatewaySelector.Next()

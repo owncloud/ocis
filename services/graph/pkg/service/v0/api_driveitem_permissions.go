@@ -46,7 +46,7 @@ const (
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	SpaceRootInvite(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
-	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	DeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) error
 	DeleteSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string) error
@@ -283,7 +283,7 @@ func createShareRequestToFederatedUser(user libregraph.User, resourceId *storage
 			Id: &storageprovider.Grantee_UserId{UserId: &userpb.UserId{
 				Type:     userpb.UserType_USER_TYPE_FEDERATED,
 				OpaqueId: user.GetId(),
-				Idp:      providerInfo.Domain, // the domain is persisted in the grant as u:{opaqueid}:{domain}
+				Idp:      *user.GetIdentities()[0].Issuer, // the domain is persisted in the grant as u:{opaqueid}:{domain}
 			}},
 		},
 		RecipientMeshProvider: providerInfo,
@@ -320,7 +320,7 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 }
 
 // ListPermissions lists the permissions of a driveItem
-func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{}
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -347,6 +347,7 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 			unifiedrole.GetApplicableRoleDefinitionsForActions(
 				allowedActions,
 				condition,
+				listFederatedRoles,
 				false,
 			),
 		),
@@ -408,7 +409,7 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 	}
 
 	rootResourceID := space.GetRoot()
-	return s.ListPermissions(ctx, rootResourceID)
+	return s.ListPermissions(ctx, rootResourceID, false) // federated roles are not supported for spaces
 }
 
 // DeletePermission deletes a permission from a drive item
@@ -626,9 +627,14 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 		return
 	}
 
+	var listFederatedRoles bool
+	if GetFilterParam(r) == "@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition, '@Subject.UserType==\"Federated\"'))" {
+		listFederatedRoles = true
+	}
+
 	ctx := r.Context()
 
-	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, &itemID)
+	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, &itemID, listFederatedRoles)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
