@@ -1387,6 +1387,8 @@ func (s *Server) HandleRoot(w http.ResponseWriter, r *http.Request) {
 	var srcUrl string
 	if gitCommit == _EMPTY_ {
 		srcUrl = "https://github.com/nats-io/nats-server"
+	} else if serverVersion != _EMPTY_ {
+		srcUrl = fmt.Sprintf("https://github.com/nats-io/nats-server/tree/%s", serverVersion)
 	} else {
 		srcUrl = fmt.Sprintf("https://github.com/nats-io/nats-server/tree/%s", gitCommit)
 	}
@@ -1421,6 +1423,7 @@ func (s *Server) HandleRoot(w http.ResponseWriter, r *http.Request) {
 	<a href=.%s>Routes</a>
 	<a href=.%s>LeafNodes</a>
 	<a href=.%s>Gateways</a>
+	<a href=.%s>Raft Groups</a>
 	<a href=.%s class=last>Health Probe</a>
     <a href=https://docs.nats.io/running-a-nats-service/nats_admin/monitoring class="help">Help</a>
   </body>
@@ -1436,6 +1439,7 @@ func (s *Server) HandleRoot(w http.ResponseWriter, r *http.Request) {
 		s.basePath(RoutezPath),
 		s.basePath(LeafzPath),
 		s.basePath(GatewayzPath),
+		s.basePath(RaftzPath),
 		s.basePath(HealthzPath),
 	)
 }
@@ -3490,6 +3494,23 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 		return health
 	}
 
+	// Are we still recovering meta layer?
+	if js.isMetaRecovering() {
+		if !details {
+			health.Status = na
+			health.Error = "JetStream is still recovering meta layer"
+
+		} else {
+			health.Errors = []HealthzError{
+				{
+					Type:  HealthzErrorJetStream,
+					Error: "JetStream is still recovering meta layer",
+				},
+			}
+		}
+		return health
+	}
+
 	// Range across all accounts, the streams assigned to them, and the consumers.
 	// If they are assigned to this server check their status.
 	ourID := meta.ID()
@@ -3723,4 +3744,139 @@ func (s *Server) profilez(opts *ProfilezOptions) *ProfilezStatus {
 	return &ProfilezStatus{
 		Profile: buffer.Bytes(),
 	}
+}
+
+type RaftzGroup struct {
+	ID            string                    `json:"id"`
+	State         string                    `json:"state"`
+	Size          int                       `json:"size"`
+	QuorumNeeded  int                       `json:"quorum_needed"`
+	Observer      bool                      `json:"observer,omitempty"`
+	Paused        bool                      `json:"paused,omitempty"`
+	Committed     uint64                    `json:"committed"`
+	Applied       uint64                    `json:"applied"`
+	CatchingUp    bool                      `json:"catching_up,omitempty"`
+	Leader        string                    `json:"leader,omitempty"`
+	EverHadLeader bool                      `json:"ever_had_leader"`
+	Term          uint64                    `json:"term"`
+	Vote          string                    `json:"voted_for,omitempty"`
+	PTerm         uint64                    `json:"pterm"`
+	PIndex        uint64                    `json:"pindex"`
+	IPQPropLen    int                       `json:"ipq_proposal_len"`
+	IPQEntryLen   int                       `json:"ipq_entry_len"`
+	IPQRespLen    int                       `json:"ipq_resp_len"`
+	IPQApplyLen   int                       `json:"ipq_apply_len"`
+	WAL           StreamState               `json:"wal"`
+	WALError      error                     `json:"wal_error,omitempty"`
+	Peers         map[string]RaftzGroupPeer `json:"peers"`
+}
+
+type RaftzGroupPeer struct {
+	Name                string `json:"name"`
+	Known               bool   `json:"known"`
+	LastReplicatedIndex uint64 `json:"last_replicated_index,omitempty"`
+	LastSeen            string `json:"last_seen,omitempty"`
+}
+
+func (s *Server) HandleRaftz(w http.ResponseWriter, r *http.Request) {
+	if s.raftNodes == nil {
+		w.WriteHeader(404)
+		w.Write([]byte("No Raft nodes registered"))
+		return
+	}
+
+	gfilter := r.URL.Query().Get("group")
+	afilter := r.URL.Query().Get("acc")
+	if afilter == "" {
+		afilter = s.SystemAccount().Name
+	}
+
+	groups := map[string]RaftNode{}
+	infos := map[string]map[string]RaftzGroup{} // account -> group ID
+
+	s.rnMu.RLock()
+	if gfilter != _EMPTY_ {
+		if rg, ok := s.raftNodes[gfilter]; ok && rg != nil {
+			if n, ok := rg.(*raft); ok {
+				if n.accName == afilter {
+					groups[gfilter] = rg
+				}
+			}
+		}
+	} else {
+		for name, rg := range s.raftNodes {
+			if rg == nil {
+				continue
+			}
+			if n, ok := rg.(*raft); ok {
+				if n.accName != afilter {
+					continue
+				}
+				groups[name] = rg
+			}
+		}
+	}
+	s.rnMu.RUnlock()
+
+	if len(groups) == 0 {
+		w.WriteHeader(404)
+		w.Write([]byte("No Raft nodes found, does the specified account/group exist?"))
+		return
+	}
+
+	for name, rg := range groups {
+		n, ok := rg.(*raft)
+		if n == nil || !ok {
+			continue
+		}
+		if _, ok := infos[n.accName]; !ok {
+			infos[n.accName] = map[string]RaftzGroup{}
+		}
+		// Only take the lock once, using the public RaftNode functions would
+		// cause us to take and release the locks over and over again.
+		n.RLock()
+		info := RaftzGroup{
+			ID:            n.id,
+			State:         RaftState(n.state.Load()).String(),
+			Size:          n.csz,
+			QuorumNeeded:  n.qn,
+			Observer:      n.observer,
+			Paused:        n.paused,
+			Committed:     n.commit,
+			Applied:       n.applied,
+			CatchingUp:    n.catchup != nil,
+			Leader:        n.leader,
+			EverHadLeader: n.pleader,
+			Term:          n.term,
+			Vote:          n.vote,
+			PTerm:         n.pterm,
+			PIndex:        n.pindex,
+			IPQPropLen:    n.prop.len(),
+			IPQEntryLen:   n.entry.len(),
+			IPQRespLen:    n.resp.len(),
+			IPQApplyLen:   n.apply.len(),
+			WALError:      n.werr,
+			Peers:         map[string]RaftzGroupPeer{},
+		}
+		n.wal.FastState(&info.WAL)
+		for id, p := range n.peers {
+			if id == n.id {
+				continue
+			}
+			peer := RaftzGroupPeer{
+				Name:                s.serverNameForNode(id),
+				Known:               p.kp,
+				LastReplicatedIndex: p.li,
+			}
+			if p.ts > 0 {
+				peer.LastSeen = time.Since(time.Unix(0, p.ts)).String()
+			}
+			info.Peers[id] = peer
+		}
+		n.RUnlock()
+		infos[n.accName][name] = info
+	}
+
+	b, _ := json.MarshalIndent(infos, "", "   ")
+	ResponseHandler(w, r, b)
 }

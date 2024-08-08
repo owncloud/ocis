@@ -600,6 +600,8 @@ func New(opts *Options) *Server {
 
 // NewServer will setup a new server struct after parsing the options.
 // Could return an error if options can not be validated.
+// The provided Options type should not be re-used afterwards.
+// Either use Options.Clone() to pass a copy, or make a new one.
 func NewServer(opts *Options) (*Server, error) {
 	setBaselineOptions(opts)
 
@@ -1095,11 +1097,11 @@ func (s *Server) configureAccounts(reloading bool) (map[string]struct{}, error) 
 		if reloading && acc.Name != globalAccountName {
 			if ai, ok := s.accounts.Load(acc.Name); ok {
 				a = ai.(*Account)
-				a.mu.Lock()
 				// Before updating the account, check if stream imports have changed.
 				if !a.checkStreamImportsEqual(acc) {
 					awcsti[acc.Name] = struct{}{}
 				}
+				a.mu.Lock()
 				// Collect the sids for the service imports since we are going to
 				// replace with new ones.
 				var sids [][]byte
@@ -2062,7 +2064,6 @@ func (s *Server) fetchAccount(name string) (*Account, error) {
 		return nil, err
 	}
 	acc := s.buildInternalAccount(accClaims)
-	acc.claimJWT = claimJWT
 	// Due to possible race, if registerAccount() returns a non
 	// nil account, it means the same account was already
 	// registered and we should use this one.
@@ -2078,6 +2079,7 @@ func (s *Server) fetchAccount(name string) (*Account, error) {
 	var needImportSubs bool
 
 	acc.mu.Lock()
+	acc.claimJWT = claimJWT
 	if len(acc.imports.services) > 0 {
 		if acc.ic == nil {
 			acc.ic = s.createInternalAccountClient()
@@ -2847,6 +2849,7 @@ const (
 	JszPath          = "/jsz"
 	HealthzPath      = "/healthz"
 	IPQueuesPath     = "/ipqueuesz"
+	RaftzPath        = "/raftz"
 )
 
 func (s *Server) basePath(p string) string {
@@ -2961,6 +2964,8 @@ func (s *Server) startMonitoring(secure bool) error {
 	mux.HandleFunc(s.basePath(HealthzPath), s.HandleHealthz)
 	// IPQueuesz
 	mux.HandleFunc(s.basePath(IPQueuesPath), s.HandleIPQueuesz)
+	// Raftz
+	mux.HandleFunc(s.basePath(RaftzPath), s.HandleRaftz)
 
 	// Do not set a WriteTimeout because it could cause cURL/browser
 	// to return empty response or unable to display page if the
@@ -4093,6 +4098,16 @@ func (s *Server) isLameDuckMode() bool {
 	return s.ldm
 }
 
+// LameDuckShutdown will perform a lame duck shutdown of NATS, whereby
+// the client listener is closed, existing client connections are
+// kicked, Raft leaderships are transferred, JetStream is shutdown
+// and then finally shutdown the the NATS Server itself.
+// This function blocks and will not return until the NATS Server
+// has completed the entire shutdown operation.
+func (s *Server) LameDuckShutdown() {
+	s.lameDuckMode()
+}
+
 // This function will close the client listener then close the clients
 // at some interval to avoid a reconnect storm.
 // We will also transfer any raft leaders and shutdown JetStream.
@@ -4222,6 +4237,7 @@ func (s *Server) lameDuckMode() {
 		}
 	}
 	s.Shutdown()
+	s.WaitForShutdown()
 }
 
 // Send an INFO update to routes with the indication that this server is in LDM mode.
@@ -4416,8 +4432,11 @@ func (s *Server) DisconnectClientByID(id uint64) error {
 	if client := s.getClient(id); client != nil {
 		client.closeConnection(Kicked)
 		return nil
+	} else if client = s.GetLeafNode(id); client != nil {
+		client.closeConnection(Kicked)
+		return nil
 	}
-	return errors.New("no such client id")
+	return errors.New("no such client or leafnode id")
 }
 
 // LDMClientByID sends a Lame Duck Mode info message to a client by connection ID

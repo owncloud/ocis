@@ -152,10 +152,20 @@ type Mapping map[Subject][]WeightedMapping
 func (m *Mapping) Validate(vr *ValidationResults) {
 	for ubFrom, wm := range (map[Subject][]WeightedMapping)(*m) {
 		ubFrom.Validate(vr)
+		perCluster := make(map[string]uint8)
 		total := uint8(0)
-		for _, wm := range wm {
-			wm.Subject.Validate(vr)
-			total += wm.GetWeight()
+		for _, e := range wm {
+			e.Subject.Validate(vr)
+			if e.Cluster != "" {
+				t := perCluster[e.Cluster]
+				t += e.Weight
+				perCluster[e.Cluster] = t
+				if t > 100 {
+					vr.AddError("Mapping %q in cluster %q exceeds 100%% among all of it's weighted to mappings", ubFrom, e.Cluster)
+				}
+			} else {
+				total += e.GetWeight()
+			}
 		}
 		if total > 100 {
 			vr.AddError("Mapping %q exceeds 100%% among all of it's weighted to mappings", ubFrom)

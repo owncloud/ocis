@@ -462,7 +462,7 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 		}
 	}
 	jsa.usageMu.RLock()
-	selected, tier, hasTier := jsa.selectLimits(&cfg)
+	selected, tier, hasTier := jsa.selectLimits(cfg.Replicas)
 	jsa.usageMu.RUnlock()
 	reserved := int64(0)
 	if !isClustered {
@@ -858,7 +858,11 @@ func (mset *stream) setLeader(isLeader bool) error {
 		if mset.sourcesConsumerSetup != nil {
 			mset.sourcesConsumerSetup.Stop()
 			mset.sourcesConsumerSetup = nil
+		} else {
+			// Stop any source consumers
+			mset.stopSourceConsumers()
 		}
+
 		// Stop responding to sync requests.
 		mset.stopClusterSubs()
 		// Unsubscribe from direct stream.
@@ -1482,19 +1486,38 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 		}
 
 		// Check for literal duplication of subject interest in config
-		// and no overlap with any JS API subject space
+		// and no overlap with any JS or SYS API subject space.
 		dset := make(map[string]struct{}, len(cfg.Subjects))
 		for _, subj := range cfg.Subjects {
+			// Make sure the subject is valid. Check this first.
+			if !IsValidSubject(subj) {
+				return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("invalid subject"))
+			}
 			if _, ok := dset[subj]; ok {
 				return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("duplicate subjects detected"))
 			}
-			// Also check to make sure we do not overlap with our $JS API subjects.
-			if subjectIsSubsetMatch(subj, "$JS.API.>") {
-				return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("subjects overlap with jetstream api"))
+			// Check for trying to capture everything.
+			if subj == fwcs {
+				if !cfg.NoAck {
+					return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("capturing all subjects requires no-ack to be true"))
+				}
+				// Capturing everything also will require R1.
+				if cfg.Replicas != 1 {
+					return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("capturing all subjects requires replicas of 1"))
+				}
 			}
-			// Make sure the subject is valid.
-			if !IsValidSubject(subj) {
-				return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("invalid subject"))
+			// Also check to make sure we do not overlap with our $JS API subjects.
+			if !cfg.NoAck && (subjectIsSubsetMatch(subj, "$JS.>") || subjectIsSubsetMatch(subj, "$JSC.>")) {
+				// We allow an exception for $JS.EVENT.> since these could have been created in the past.
+				if !subjectIsSubsetMatch(subj, "$JS.EVENT.>") {
+					return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("subjects that overlap with jetstream api require no-ack to be true"))
+				}
+			}
+			// And the $SYS subjects.
+			if !cfg.NoAck && subjectIsSubsetMatch(subj, "$SYS.>") {
+				if !subjectIsSubsetMatch(subj, "$SYS.ACCOUNT.>") {
+					return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("subjects that overlap with system api require no-ack to be true"))
+				}
 			}
 			// Mark for duplicate check.
 			dset[subj] = struct{}{}
@@ -1662,9 +1685,9 @@ func (jsa *jsAccount) configUpdateCheck(old, new *StreamConfig, s *Server) (*Str
 	jsa.mu.RLock()
 	acc := jsa.account
 	jsa.usageMu.RLock()
-	selected, tier, hasTier := jsa.selectLimits(&cfg)
+	selected, tier, hasTier := jsa.selectLimits(cfg.Replicas)
 	if !hasTier && old.Replicas != cfg.Replicas {
-		selected, tier, hasTier = jsa.selectLimits(old)
+		selected, tier, hasTier = jsa.selectLimits(old.Replicas)
 	}
 	jsa.usageMu.RUnlock()
 	reserved := int64(0)
@@ -1818,7 +1841,7 @@ func (mset *stream) updateWithAdvisory(config *StreamConfig, sendAdvisory bool) 
 							si.trs[i], err = NewSubjectTransform(s.SubjectTransforms[i].Source, s.SubjectTransforms[i].Destination)
 							if err != nil {
 								mset.mu.Unlock()
-								mset.srv.Errorf("Unable to get subject transform for source: %v", err)
+								return fmt.Errorf("unable to get subject transform for source: %v", err)
 							}
 						}
 					}
@@ -1899,7 +1922,7 @@ func (mset *stream) updateWithAdvisory(config *StreamConfig, sendAdvisory bool) 
 
 	js := mset.js
 
-	if targetTier := tierName(cfg); mset.tier != targetTier {
+	if targetTier := tierName(cfg.Replicas); mset.tier != targetTier {
 		// In cases such as R1->R3, only one update is needed
 		jsa.usageMu.RLock()
 		_, ok := jsa.limits[targetTier]
@@ -2187,9 +2210,11 @@ func (mset *stream) processMirrorMsgs(mirror *sourceInfo, ready *sync.WaitGroup)
 			msgs.recycle(&ims)
 		case <-t.C:
 			mset.mu.RLock()
+			var stalled bool
+			if mset.mirror != nil {
+				stalled = time.Since(time.Unix(0, mset.mirror.last.Load())) > sourceHealthCheckInterval
+			}
 			isLeader := mset.isLeader()
-			last := time.Unix(0, mset.mirror.last.Load())
-			stalled := mset.mirror != nil && time.Since(last) > sourceHealthCheckInterval
 			mset.mu.RUnlock()
 			// No longer leader.
 			if !isLeader {
@@ -2406,14 +2431,14 @@ func (mset *stream) skipMsgs(start, end uint64) {
 		return
 	}
 
-	// FIXME (dlc) - We should allow proposals of DeleteEange, but would need to make sure all peers support.
+	// FIXME (dlc) - We should allow proposals of DeleteRange, but would need to make sure all peers support.
 	// With syncRequest was easy to add bool into request.
 	var entries []*Entry
 	for seq := start; seq <= end; seq++ {
-		entries = append(entries, &Entry{EntryNormal, encodeStreamMsg(_EMPTY_, _EMPTY_, nil, nil, seq-1, 0)})
+		entries = append(entries, newEntry(EntryNormal, encodeStreamMsg(_EMPTY_, _EMPTY_, nil, nil, seq-1, 0)))
 		// So a single message does not get too big.
 		if len(entries) > 10_000 {
-			node.ProposeDirect(entries)
+			node.ProposeMulti(entries)
 			// We need to re-create `entries` because there is a reference
 			// to it in the node's pae map.
 			entries = entries[:0]
@@ -2421,7 +2446,7 @@ func (mset *stream) skipMsgs(start, end uint64) {
 	}
 	// Send all at once.
 	if len(entries) > 0 {
-		node.ProposeDirect(entries)
+		node.ProposeMulti(entries)
 	}
 }
 
@@ -5249,9 +5274,8 @@ func (mset *stream) checkInterestState() {
 
 	var zeroAcks []*consumer
 	var lowAckFloor uint64 = math.MaxUint64
-	consumers := mset.getConsumers()
 
-	for _, o := range consumers {
+	for _, o := range mset.getConsumers() {
 		o.checkStateForInterestStream()
 
 		o.mu.Lock()
@@ -5290,39 +5314,45 @@ func (mset *stream) checkInterestState() {
 		return
 	}
 
-	// Hold stream write lock in case we need to purge.
-	mset.mu.Lock()
-	defer mset.mu.Unlock()
-
 	// Capture our current state.
+	// ok to do so without lock.
 	var state StreamState
 	mset.store.FastState(&state)
 
-	if lowAckFloor < math.MaxUint64 && lowAckFloor > state.FirstSeq {
-		// Check if we had any zeroAcks, we will need to check them.
-		for _, o := range zeroAcks {
-			var np uint64
-			o.mu.RLock()
-			if o.isLeader() {
-				np = uint64(o.numPending())
-			} else {
-				np, _ = o.calculateNumPending()
-			}
-			o.mu.RUnlock()
-			// This means we have pending and can not remove anything at this time.
-			if np > 0 {
-				return
-			}
-		}
-		if lowAckFloor <= state.LastSeq {
-			// Purge the stream to lowest ack floor + 1
-			mset.store.PurgeEx(_EMPTY_, lowAckFloor+1, 0)
+	if lowAckFloor <= state.FirstSeq {
+		return
+	}
+
+	// Do not want to hold stream lock if calculating numPending.
+	// Check if we had any zeroAcks, we will need to check them.
+	for _, o := range zeroAcks {
+		var np uint64
+		o.mu.RLock()
+		if o.isLeader() {
+			np = uint64(o.numPending())
 		} else {
-			// Here we have a low ack floor higher then our last seq.
-			// So we will just do normal purge.
-			mset.store.Purge()
+			np, _ = o.calculateNumPending()
+		}
+		o.mu.RUnlock()
+		// This means we have pending and can not remove anything at this time.
+		if np > 0 {
+			return
 		}
 	}
+
+	mset.mu.Lock()
+	defer mset.mu.Unlock()
+
+	// Check which purge we need to perform.
+	if lowAckFloor <= state.LastSeq || state.Msgs == 0 {
+		// Purge the stream to lowest ack floor + 1
+		mset.store.PurgeEx(_EMPTY_, lowAckFloor+1, 0)
+	} else {
+		// Here we have a low ack floor higher then our last seq.
+		// So we will just do normal purge.
+		mset.store.Purge()
+	}
+
 	// Make sure to reset our local lseq.
 	mset.store.FastState(&state)
 	mset.lseq = state.LastSeq
@@ -5840,6 +5870,8 @@ func (a *Account) RestoreStream(ncfg *StreamConfig, r io.Reader) (*stream, error
 	}
 	mset, err := a.addStream(&cfg)
 	if err != nil {
+		// Make sure to clean up after ourselves here.
+		os.RemoveAll(ndir)
 		return nil, err
 	}
 	if !fcfg.Created.IsZero() {
@@ -5974,4 +6006,11 @@ func (mset *stream) clearMonitorRunning() {
 	mset.mu.Lock()
 	defer mset.mu.Unlock()
 	mset.inMonitor = false
+}
+
+// Check if our monitor is running.
+func (mset *stream) isMonitorRunning() bool {
+	mset.mu.RLock()
+	defer mset.mu.RUnlock()
+	return mset.inMonitor
 }
