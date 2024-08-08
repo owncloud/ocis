@@ -294,9 +294,9 @@ func (_c *DriveItemPermissionsProvider_Invite_Call) RunAndReturn(run func(contex
 	return _c
 }
 
-// ListPermissions provides a mock function with given fields: ctx, itemID
-func (_m *DriveItemPermissionsProvider) ListPermissions(ctx context.Context, itemID *providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
-	ret := _m.Called(ctx, itemID)
+// ListPermissions provides a mock function with given fields: ctx, itemID, listFederatedRoles, selectRoles
+func (_m *DriveItemPermissionsProvider) ListPermissions(ctx context.Context, itemID *providerv1beta1.ResourceId, listFederatedRoles bool, selectRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+	ret := _m.Called(ctx, itemID, listFederatedRoles, selectRoles)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListPermissions")
@@ -304,17 +304,17 @@ func (_m *DriveItemPermissionsProvider) ListPermissions(ctx context.Context, ite
 
 	var r0 libregraph.CollectionOfPermissionsWithAllowedValues
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
-		return rf(ctx, itemID)
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, bool, bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
+		return rf(ctx, itemID, listFederatedRoles, selectRoles)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
-		r0 = rf(ctx, itemID)
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, bool, bool) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
+		r0 = rf(ctx, itemID, listFederatedRoles, selectRoles)
 	} else {
 		r0 = ret.Get(0).(libregraph.CollectionOfPermissionsWithAllowedValues)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId) error); ok {
-		r1 = rf(ctx, itemID)
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, bool, bool) error); ok {
+		r1 = rf(ctx, itemID, listFederatedRoles, selectRoles)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -330,13 +330,15 @@ type DriveItemPermissionsProvider_ListPermissions_Call struct {
 // ListPermissions is a helper method to define mock.On call
 //   - ctx context.Context
 //   - itemID *providerv1beta1.ResourceId
-func (_e *DriveItemPermissionsProvider_Expecter) ListPermissions(ctx interface{}, itemID interface{}) *DriveItemPermissionsProvider_ListPermissions_Call {
-	return &DriveItemPermissionsProvider_ListPermissions_Call{Call: _e.mock.On("ListPermissions", ctx, itemID)}
+//   - listFederatedRoles bool
+//   - selectRoles bool
+func (_e *DriveItemPermissionsProvider_Expecter) ListPermissions(ctx interface{}, itemID interface{}, listFederatedRoles interface{}, selectRoles interface{}) *DriveItemPermissionsProvider_ListPermissions_Call {
+	return &DriveItemPermissionsProvider_ListPermissions_Call{Call: _e.mock.On("ListPermissions", ctx, itemID, listFederatedRoles, selectRoles)}
 }
 
-func (_c *DriveItemPermissionsProvider_ListPermissions_Call) Run(run func(ctx context.Context, itemID *providerv1beta1.ResourceId)) *DriveItemPermissionsProvider_ListPermissions_Call {
+func (_c *DriveItemPermissionsProvider_ListPermissions_Call) Run(run func(ctx context.Context, itemID *providerv1beta1.ResourceId, listFederatedRoles bool, selectRoles bool)) *DriveItemPermissionsProvider_ListPermissions_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(bool), args[3].(bool))
 	})
 	return _c
 }
@@ -346,7 +348,7 @@ func (_c *DriveItemPermissionsProvider_ListPermissions_Call) Return(_a0 libregra
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_ListPermissions_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)) *DriveItemPermissionsProvider_ListPermissions_Call {
+func (_c *DriveItemPermissionsProvider_ListPermissions_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, bool, bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error)) *DriveItemPermissionsProvider_ListPermissions_Call {
 	_c.Call.Return(run)
 	return _c
 }

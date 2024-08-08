@@ -49,6 +49,14 @@ var themeDefaults = KV{
 				"label":    "UnifiedRoleSecureView",
 				"iconName": "shield",
 			},
+			unifiedrole.UnifiedRoleFederatedViewerID: KV{
+				"label":    "UnifiedRoleFederatedViewer",
+				"iconName": "eye",
+			},
+			unifiedrole.UnifiedRoleFederatedEditorID: KV{
+				"label":    "UnifiedRoleFederatedEditor",
+				"iconName": "pencil",
+			},
 		},
 	},
 }

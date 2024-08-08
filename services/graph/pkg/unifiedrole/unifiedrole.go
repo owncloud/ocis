@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"errors"
 	"slices"
+	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -30,6 +31,18 @@ const (
 	UnifiedRoleManagerID = "312c0871-5ef7-4b3a-85b6-0e4074c64049"
 	// UnifiedRoleSecureViewerID Unified role secure viewer id.
 	UnifiedRoleSecureViewerID = "aa97fe03-7980-45ac-9e50-b325749fd7e6"
+	// UnifiedRoleFederatedViewerID Unified role federated viewer id.
+	UnifiedRoleFederatedViewerID = "be531789-063c-48bf-a9fe-857e6fbee7da"
+	// UnifiedRoleFederatedEditorID Unified role federated editor id.
+	UnifiedRoleFederatedEditorID = "36279a93-e4e3-4bbb-8a23-53b05b560963"
+
+	// Wile the below conditions follow the SDDL syntax, they are not parsed anywhere. We use them as strings to
+	// represent the constraints that a role definition applies to. Fer the actual syntax, see the SDDL documentation
+	// at https://learn.microsoft.com/en-us/windows/win32/secauthz/security-descriptor-definition-language-for-conditional-aces-#conditional-expressions
+
+	// Some roles apply to a specific type of resource, for example, a role that applies to a file or a folder.
+	// @Resource is the placeholder for the resource that the role is applied to
+	// .Root, .Folder and .File are facets of the driveItem resource that indicate the type of the resource if they are present.
 
 	// UnifiedRoleConditionDrive defines constraint that matches a Driveroot/Spaceroot
 	UnifiedRoleConditionDrive = "exists @Resource.Root"
@@ -37,6 +50,19 @@ const (
 	UnifiedRoleConditionFolder = "exists @Resource.Folder"
 	// UnifiedRoleConditionFile defines a constraint that matches a DriveItem representing a File
 	UnifiedRoleConditionFile = "exists @Resource.File"
+
+	// Some roles apply to a specific type of user, for example, a role that applies to a federated user.
+	// @Subject is the placeholder for the subject that the role is applied to. For sharing roles this is the user that the resource is shared with.
+	// .UserType is the type of the user: 'Member' for a member of the organization, 'Guest' for a guest user, 'Federated' for a federated user.
+
+	// UnifiedRoleConditionFederatedUser defines a constraint that matches a federated user
+	UnifiedRoleConditionFederatedUser = "@Subject.UserType==\"Federated\""
+
+	// For federated sharing we need roles that combine the constraints for the resource and the user.
+	// UnifiedRoleConditionFileFederatedUser defines a constraint that matches a File and a federated user
+	UnifiedRoleConditionFileFederatedUser = UnifiedRoleConditionFile + " && " + UnifiedRoleConditionFederatedUser
+	// UnifiedRoleConditionFolderFederatedUser defines a constraint that matches a Folder and a federated user
+	UnifiedRoleConditionFolderFederatedUser = UnifiedRoleConditionFolder + " && " + UnifiedRoleConditionFederatedUser
 
 	DriveItemPermissionsCreate = "libre.graph/driveItem/permissions/create"
 	DriveItemChildrenCreate    = "libre.graph/driveItem/children/create"
@@ -258,6 +284,48 @@ func NewSecureViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	}
 }
 
+// NewFederatedViewerUnifiedRole creates a federated viewer role
+func NewFederatedViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
+	r := conversions.NewViewerRole()
+	return &libregraph.UnifiedRoleDefinition{
+		Id:          proto.String(UnifiedRoleFederatedViewerID),
+		Description: proto.String("View and download."),
+		DisplayName: displayName(r),
+		RolePermissions: []libregraph.UnifiedRolePermission{
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFileFederatedUser),
+			},
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFolderFederatedUser),
+			},
+		},
+		LibreGraphWeight: proto.Int32(0),
+	}
+}
+
+// NewFederatedEditorUnifiedRole creates a federated editor role
+func NewFederatedEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
+	r := conversions.NewEditorRole()
+	return &libregraph.UnifiedRoleDefinition{
+		Id:          proto.String(UnifiedRoleFederatedEditorID),
+		Description: proto.String("View, download and edit."),
+		DisplayName: displayName(r),
+		RolePermissions: []libregraph.UnifiedRolePermission{
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFileFederatedUser),
+			},
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFolderFederatedUser),
+			},
+		},
+		LibreGraphWeight: proto.Int32(0),
+	}
+}
+
 // NewUnifiedRoleFromID returns a unified role definition from the provided id
 func NewUnifiedRoleFromID(id string) (*libregraph.UnifiedRoleDefinition, error) {
 	for _, definition := range GetBuiltinRoleDefinitionList() {
@@ -281,12 +349,14 @@ func GetBuiltinRoleDefinitionList() []*libregraph.UnifiedRoleDefinition {
 		NewEditorLiteUnifiedRole(),
 		NewManagerUnifiedRole(),
 		NewSecureViewerUnifiedRole(),
+		NewFederatedViewerUnifiedRole(),
+		NewFederatedEditorUnifiedRole(),
 	}
 }
 
 // GetApplicableRoleDefinitionsForActions returns a list of role definitions
 // that match the provided actions and constraints
-func GetApplicableRoleDefinitionsForActions(actions []string, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
+func GetApplicableRoleDefinitionsForActions(actions []string, constraints string, listFederatedRoles, descending bool) []*libregraph.UnifiedRoleDefinition {
 	builtin := GetBuiltinRoleDefinitionList()
 	definitions := make([]*libregraph.UnifiedRoleDefinition, 0, len(builtin))
 
@@ -294,7 +364,14 @@ func GetApplicableRoleDefinitionsForActions(actions []string, constraints string
 		var definitionMatch bool
 
 		for _, permission := range definition.GetRolePermissions() {
-			if permission.GetCondition() != constraints {
+			// this is a dirty comparison because we are not really parsing the SDDL, but as long as we && the conditions we are good
+			isFederatedRole := strings.Contains(permission.GetCondition(), UnifiedRoleConditionFederatedUser)
+			switch {
+			case !strings.Contains(permission.GetCondition(), constraints):
+				continue
+			case listFederatedRoles && !isFederatedRole:
+				continue
+			case !listFederatedRoles && isFederatedRole:
 				continue
 			}
 
