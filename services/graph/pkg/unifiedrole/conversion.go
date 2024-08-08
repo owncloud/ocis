@@ -142,17 +142,15 @@ func CS3ResourcePermissionsToLibregraphActions(p *provider.ResourcePermissions) 
 	return actions
 }
 
-// CS3ResourcePermissionsToDefinition tries to find the UnifiedRoleDefinition that matches the supplied
-// CS3 ResourcePermissions and constraints.
-func _CS3ResourcePermissionsToDefinition(p *provider.ResourcePermissions, constraints string) *libregraph.UnifiedRoleDefinition {
-	a := CS3ResourcePermissionsToLibregraphActions(p)
+// CS3ResourcePermissionsToRole converts the provided cs3 ResourcePermissions to a libregraph UnifiedRoleDefinition
+func CS3ResourcePermissionsToRole(roleSet []*libregraph.UnifiedRoleDefinition, p *provider.ResourcePermissions, constraints string) *libregraph.UnifiedRoleDefinition {
 	actionSet := map[string]struct{}{}
-	for _, action := range a {
+	for _, action := range CS3ResourcePermissionsToLibregraphActions(p) {
 		actionSet[action] = struct{}{}
 	}
 
 	var res *libregraph.UnifiedRoleDefinition
-	for _, uRole := range GetDefinitions(RoleFilterAll()) {
+	for _, uRole := range roleSet {
 		matchFound := false
 		for _, uPerm := range uRole.GetRolePermissions() {
 			if uPerm.GetCondition() != constraints {
@@ -174,6 +172,7 @@ func _CS3ResourcePermissionsToDefinition(p *provider.ResourcePermissions, constr
 	return res
 }
 
+// resourceActionsEqual checks if the provided actions are equal to the actions defined for a resource
 func resourceActionsEqual(targetActionSet map[string]struct{}, actions []string) bool {
 	if len(targetActionSet) != len(actions) {
 		return false
@@ -185,16 +184,6 @@ func resourceActionsEqual(targetActionSet map[string]struct{}, actions []string)
 		}
 	}
 	return true
-}
-
-func CS3ResourcePermissionsToDefinition(p *provider.ResourcePermissions, constraints string) *libregraph.UnifiedRoleDefinition {
-	var res *libregraph.UnifiedRoleDefinition
-	matches := GetDefinitions(RoleFilterPermission(RoleFilterMatchExact, constraints, CS3ResourcePermissionsToLibregraphActions(p)...))
-	if len(matches) >= 1 {
-		res = matches[0]
-	}
-
-	return res
 }
 
 // cs3RoleToDisplayName converts a CS3 role to a human-readable display name

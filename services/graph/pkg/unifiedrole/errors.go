@@ -5,9 +5,6 @@ import (
 )
 
 var (
-	// ErrUnknownUnifiedRole is returned when an unknown unified role is requested.
-	ErrUnknownUnifiedRole = errors.New("unknown unified role, check if the role is enabled")
-
-	// ErrTooManyResults is returned when a filter returns too many results.
-	ErrTooManyResults = errors.New("too many results, consider using a more specific filter")
+	// ErrUnknownRole is returned when an unknown unified role is requested.
+	ErrUnknownRole = errors.New("unknown role, check if the role is enabled")
 )

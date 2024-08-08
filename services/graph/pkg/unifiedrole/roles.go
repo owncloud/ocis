@@ -278,41 +278,68 @@ var (
 	}()
 )
 
-// GetDefinitions returns a role filter that matches the provided resources
-func GetDefinitions(filter RoleFilter) []*libregraph.UnifiedRoleDefinition {
-	return filterRoles(buildInRoles, filter)
+// GetRoles returns a role filter that matches the provided resources
+func GetRoles(f RoleFilter) []*libregraph.UnifiedRoleDefinition {
+	return filterRoles(buildInRoles, f)
 }
 
-// GetDefinition returns a role filter that matches the provided resources
-func GetDefinition(filter RoleFilter) (*libregraph.UnifiedRoleDefinition, error) {
-	definitions := filterRoles(buildInRoles, filter)
-	if len(definitions) == 0 {
-		return nil, ErrUnknownUnifiedRole
+// GetRole returns a role filter that matches the provided resources
+func GetRole(f RoleFilter) (*libregraph.UnifiedRoleDefinition, error) {
+	roles := filterRoles(buildInRoles, f)
+	if len(roles) == 0 {
+		return nil, ErrUnknownRole
 	}
 
-	return definitions[0], nil
+	return roles[0], nil
 }
 
 // GetRolesByPermissions returns a list of role definitions
 // that match the provided actions and constraints
-func GetRolesByPermissions(actions []string, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
-	roles := GetDefinitions(RoleFilterPermission(RoleFilterMatchSome, constraints, actions...))
-	roles = weightDefinitions(roles, constraints, descending)
+func GetRolesByPermissions(roleSet []*libregraph.UnifiedRoleDefinition, actions []string, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
+	roles := make([]*libregraph.UnifiedRoleDefinition, 0, len(roleSet))
 
-	return roles
+	for _, role := range roleSet {
+		var match bool
+
+		for _, permission := range role.GetRolePermissions() {
+			if permission.GetCondition() != constraints {
+				continue
+			}
+
+			for i, action := range permission.GetAllowedResourceActions() {
+				if !slices.Contains(actions, action) {
+					break
+				}
+				if i == len(permission.GetAllowedResourceActions())-1 {
+					match = true
+				}
+			}
+
+			if match {
+				break
+			}
+		}
+
+		if match {
+			roles = append(roles, role)
+		}
+
+	}
+
+	return weightRoles(roles, constraints, descending)
 }
 
-// GetLegacyDefinitionName returns the legacy role name for the provided role
-func GetLegacyDefinitionName(definition libregraph.UnifiedRoleDefinition) string {
-	return legacyNames[definition.GetId()]
+// GetLegacyRoleName returns the legacy role name for the provided role
+func GetLegacyRoleName(role libregraph.UnifiedRoleDefinition) string {
+	return legacyNames[role.GetId()]
 }
 
-// weightDefinitions sorts the provided role definitions by the number of permissions[n].actions they grant,
+// weightRoles sorts the provided role definitions by the number of permissions[n].actions they grant,
 // the implementation is optimistic and assumes that the weight relies on the number of available actions.
 // descending - false - sorts the roles from least to most permissions
 // descending - true - sorts the roles from most to least permissions
-func weightDefinitions(definitions []*libregraph.UnifiedRoleDefinition, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
-	slices.SortFunc(definitions, func(i, j *libregraph.UnifiedRoleDefinition) int {
+func weightRoles(roleSet []*libregraph.UnifiedRoleDefinition, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
+	slices.SortFunc(roleSet, func(i, j *libregraph.UnifiedRoleDefinition) int {
 		var ia []string
 		for _, rp := range i.GetRolePermissions() {
 			if rp.GetCondition() == constraints {
@@ -335,12 +362,12 @@ func weightDefinitions(definitions []*libregraph.UnifiedRoleDefinition, constrai
 		}
 	})
 
-	for i, definition := range definitions {
-		definition.LibreGraphWeight = libregraph.PtrInt32(int32(i) + 1)
+	for i, role := range roleSet {
+		role.LibreGraphWeight = libregraph.PtrInt32(int32(i) + 1)
 	}
 
 	// return for the sake of consistency, optional because the slice is modified in place
-	return definitions
+	return roleSet
 }
 
 // GetAllowedResourceActions returns the allowed resource actions for the provided role by condition

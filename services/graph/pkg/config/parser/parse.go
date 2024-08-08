@@ -79,9 +79,9 @@ func Validate(cfg *config.Config) error {
 
 		for _, uid := range cfg.UnifiedRoles.AvailableRoles {
 			// check if the role is known
-			if len(unifiedrole.GetDefinitions(unifiedrole.RoleFilterIDs(uid))) == 0 {
+			if len(unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(uid))) == 0 {
 				// collect all possible errors to return them all at once
-				err = errors.Join(err, fmt.Errorf("%w: %s", unifiedrole.ErrUnknownUnifiedRole, uid))
+				err = errors.Join(err, fmt.Errorf("%w: %s", unifiedrole.ErrUnknownRole, uid))
 			}
 		}
 

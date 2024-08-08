@@ -6,7 +6,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
-func rolesToAction(definitions ...*libregraph.UnifiedRoleDefinition) []string {
+func getRoleActions(definitions ...*libregraph.UnifiedRoleDefinition) []string {
 	var actions []string
 
 	for _, definition := range definitions {

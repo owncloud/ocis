@@ -85,7 +85,8 @@ func (g BaseGraphService) CS3ReceivedSharesToDriveItems(ctx context.Context, rec
 		return nil, err
 	}
 
-	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares)
+	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
+	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares, availableRoles)
 }
 
 func (g BaseGraphService) CS3ReceivedOCMSharesToDriveItems(ctx context.Context, receivedShares []*ocm.ReceivedShare) ([]libregraph.DriveItem, error) {
@@ -183,7 +184,7 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			} else {
 				identitySet.SetUser(identity)
 			}
-			p.SetId(identitySetToSpacePermissionID(identitySet))
+			p.SetId(identitySetToSpacePermissionID(identitySet, g.config.UnifiedRoles.AvailableRoles))
 			p.SetGrantedToV2(identitySet)
 		}
 
@@ -191,10 +192,15 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
 		}
 
-		if role := unifiedrole.CS3ResourcePermissionsToDefinition(perm, unifiedrole.UnifiedRoleConditionDrive); role != nil {
+		availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
+		if role := unifiedrole.CS3ResourcePermissionsToRole(
+			availableRoles,
+			perm,
+			unifiedrole.UnifiedRoleConditionDrive,
+		); role != nil {
 			switch apiVersion {
 			case APIVersion_1:
-				if r := unifiedrole.GetLegacyDefinitionName(*role); r != "" {
+				if r := unifiedrole.GetLegacyRoleName(*role); r != "" {
 					p.SetRoles([]string{r})
 				}
 			case APIVersion_1_Beta_1:
@@ -392,7 +398,9 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 	if share.GetCtime() != nil {
 		perm.SetCreatedDateTime(cs3TimestampToTime(share.GetCtime()))
 	}
-	role := unifiedrole.CS3ResourcePermissionsToDefinition(
+	// fixMe: should we use all roles?
+	role := unifiedrole.CS3ResourcePermissionsToRole(
+		unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...)),
 		share.GetPermissions().GetPermissions(),
 		roleCondition,
 	)
@@ -695,7 +703,7 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 	var permissionsUpdated, ok bool
 	if roles, ok = newPermission.GetRolesOk(); ok && len(roles) > 0 {
 		for _, roleID := range roles {
-			role, err := unifiedrole.GetDefinition(unifiedrole.RoleFilterIDs(roleID))
+			role, err := unifiedrole.GetRole(unifiedrole.RoleFilterIDs(roleID))
 			if err != nil {
 				g.logger.Debug().Err(err).Interface("role", role).Msg("unable to convert requested role")
 				return nil, err

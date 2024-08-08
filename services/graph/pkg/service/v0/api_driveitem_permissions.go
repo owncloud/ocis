@@ -106,10 +106,10 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	for _, roleID := range invite.GetRoles() {
 		// only allow roles that are enabled in the config
 		if !slices.Contains(s.config.UnifiedRoles.AvailableRoles, roleID) {
-			return libregraph.Permission{}, unifiedrole.ErrUnknownUnifiedRole
+			return libregraph.Permission{}, unifiedrole.ErrUnknownRole
 		}
 
-		role, err := unifiedrole.GetDefinition(unifiedrole.RoleFilterIDs(roleID))
+		role, err := unifiedrole.GetRole(unifiedrole.RoleFilterIDs(roleID))
 		if err != nil {
 			s.logger.Debug().Err(err).Interface("role", invite.GetRoles()[0]).Msg("unable to convert requested role")
 			return libregraph.Permission{}, err
@@ -129,7 +129,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(unifiedRolePermissions)
 
 	permission := &libregraph.Permission{}
-	if role := unifiedrole.CS3ResourcePermissionsToDefinition(cs3ResourcePermissions, condition); role != nil {
+	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(s.config.UnifiedRoles.AvailableRoles...))
+	if role := unifiedrole.CS3ResourcePermissionsToRole(availableRoles, cs3ResourcePermissions, condition); role != nil {
 		permission.Roles = []string{role.GetId()}
 	}
 
@@ -226,7 +227,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	} else if IsSpaceRoot(statResponse.GetInfo().GetId()) {
 		// permissions on a space root are not handled by a share manager so
 		// they don't get a share-id
-		permission.SetId(identitySetToSpacePermissionID(permission.GetGrantedToV2()))
+		permission.SetId(identitySetToSpacePermissionID(permission.GetGrantedToV2(), s.config.UnifiedRoles.AvailableRoles))
 	}
 
 	if expiration != nil {
@@ -351,6 +352,7 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 		LibreGraphPermissionsActionsAllowedValues: allowedActions,
 		LibreGraphPermissionsRolesAllowedValues: conversions.ToValueSlice(
 			unifiedrole.GetRolesByPermissions(
+				unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(s.config.UnifiedRoles.AvailableRoles...)),
 				allowedActions,
 				condition,
 				listFederatedRoles,

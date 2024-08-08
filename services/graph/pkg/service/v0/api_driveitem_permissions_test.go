@@ -7,6 +7,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -54,6 +55,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				OpaqueId: "user",
 			},
 		}
+		cache        identity.IdentityCache
 		statResponse *provider.StatResponse
 		driveItemId  *provider.ResourceId
 		ctx          context.Context
@@ -66,7 +68,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
 		gatewaySelector.On("Next").Return(gatewayClient, nil)
 
-		cache := identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
+		cache = identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
 		cfg := defaults.FullDefaultConfig()
 		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg)
@@ -255,9 +257,17 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		})
 
 		It("fails with unknown or disable role", func() {
+			cfg := defaults.FullDefaultConfig()
+			slices.DeleteFunc(cfg.UnifiedRoles.AvailableRoles, func(s string) bool {
+				// SecureViewer is enabled in ci, we need to remove it in the unit test
+				return s != unifiedrole.UnifiedRoleSecureViewerID
+			})
+			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg)
+			Expect(err).ToNot(HaveOccurred())
+
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}
-			_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
-			Expect(err).To(MatchError(unifiedrole.ErrUnknownUnifiedRole))
+			_, err = service.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).To(MatchError(unifiedrole.ErrUnknownRole))
 		})
 	})
 	Describe("SpaceRootInvite", func() {

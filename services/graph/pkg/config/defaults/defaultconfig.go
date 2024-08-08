@@ -177,7 +177,7 @@ func EnsureDefaults(cfg *config.Config) {
 
 	// set default roles, if no roles are defined, we need to take care and provide all the default roles
 	if len(cfg.UnifiedRoles.AvailableRoles) == 0 {
-		for _, definition := range unifiedrole.GetDefinitions(
+		for _, definition := range unifiedrole.GetRoles(
 			// filter out the roles that are disabled by default
 			unifiedrole.RoleFilterInvert(unifiedrole.RoleFilterIDs(_disabledByDefaultUnifiedRoleRoleIDs...)),
 		) {

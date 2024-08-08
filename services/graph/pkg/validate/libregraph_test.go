@@ -16,10 +16,12 @@ import (
 type validatableFactory[T any] func() (T, bool)
 
 var _ = Describe("libregraph", func() {
+	var ctx context.Context
 	var driveItemInvite libregraph.DriveItemInvite
 	var driveRecipient libregraph.DriveRecipient
 
 	BeforeEach(func() {
+		ctx = context.Background()
 		driveRecipient = libregraph.DriveRecipient{
 			ObjectId:                conversions.ToPointer("1"),
 			LibreGraphRecipientType: conversions.ToPointer("user"),
@@ -27,18 +29,17 @@ var _ = Describe("libregraph", func() {
 
 		driveItemInvite = libregraph.DriveItemInvite{
 			Recipients:                   []libregraph.DriveRecipient{driveRecipient},
-			Roles:                        []string{role.UnifiedRoleEditorID},
-			LibreGraphPermissionsActions: []string{role.DriveItemVersionsUpdate},
+			Roles:                        []string{unifiedrole.UnifiedRoleEditorID},
+			LibreGraphPermissionsActions: []string{unifiedrole.DriveItemVersionsUpdate},
 			ExpirationDateTime:           libregraph.PtrTime(time.Now().Add(time.Hour)),
 		}
-
 	})
 
 	DescribeTable("DriveItemInvite",
 		func(factories ...validatableFactory[libregraph.DriveItemInvite]) {
 			for _, factory := range factories {
 				s, pass := factory()
-				switch err := validate.StructCtx(context.Background(), s); pass {
+				switch err := validate.StructCtx(ctx, s); pass {
 				case false:
 					Expect(err).To(HaveOccurred())
 				default:
@@ -61,14 +62,22 @@ var _ = Describe("libregraph", func() {
 		}),
 		Entry("fail: multiple role assignment", func() (libregraph.DriveItemInvite, bool) {
 			driveItemInvite.Roles = []string{
-				role.UnifiedRoleEditorID,
-				role.UnifiedRoleManagerID,
+				unifiedrole.UnifiedRoleEditorID,
+				unifiedrole.UnifiedRoleManagerID,
 			}
 			driveItemInvite.LibreGraphPermissionsActions = nil
 			return driveItemInvite, false
 		}),
 		Entry("fail: unknown role", func() (libregraph.DriveItemInvite, bool) {
 			driveItemInvite.Roles = []string{"foo"}
+			driveItemInvite.LibreGraphPermissionsActions = nil
+			return driveItemInvite, false
+		}),
+		Entry("fail: disabled role", func() (libregraph.DriveItemInvite, bool) {
+			ctx = validate.ContextWithAllowedRoleIDs(ctx, []string{unifiedrole.UnifiedRoleEditorID})
+			driveItemInvite.Roles = []string{
+				unifiedrole.UnifiedRoleSecureViewerID,
+			}
 			driveItemInvite.LibreGraphPermissionsActions = nil
 			return driveItemInvite, false
 		}),
@@ -84,8 +93,8 @@ var _ = Describe("libregraph", func() {
 		}),
 		Entry("fail: different number of roles and actions", func() (libregraph.DriveItemInvite, bool) {
 			driveItemInvite.LibreGraphPermissionsActions = []string{
-				role.DriveItemVersionsUpdate,
-				role.DriveItemChildrenCreate,
+				unifiedrole.DriveItemVersionsUpdate,
+				unifiedrole.DriveItemChildrenCreate,
 			}
 			return driveItemInvite, false
 		}),
