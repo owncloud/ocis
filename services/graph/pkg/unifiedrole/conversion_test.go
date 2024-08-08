@@ -48,7 +48,7 @@ func TestPermissionsToCS3ResourcePermissions(t *testing.T) {
 	}
 }
 
-func TestCS3ResourcePermissionsToDefinition(t *testing.T) {
+func TestCS3ResourcePermissionsToRole(t *testing.T) {
 	tests := map[string]struct {
 		cs3ResourcePermissions *provider.ResourcePermissions
 		unifiedRoleDefinition  *libregraph.UnifiedRoleDefinition
@@ -69,7 +69,7 @@ func TestCS3ResourcePermissionsToDefinition(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			NewWithT(t).Expect(
-				unifiedrole.CS3ResourcePermissionsToDefinition(tc.cs3ResourcePermissions, tc.constraints),
+				unifiedrole.CS3ResourcePermissionsToRole(unifiedrole.BuildInRoles, tc.cs3ResourcePermissions, tc.constraints),
 			).To(Equal(tc.unifiedRoleDefinition))
 		})
 	}

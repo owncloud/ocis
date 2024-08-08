@@ -90,9 +90,10 @@ func rolesAndActions(ctx context.Context, sl validator.StructLevel, roles, actio
 
 	switch roles, ok := ctx.Value(_contextRoleIDsValueKey).([]string); {
 	case ok:
-		definitions = unifiedrole.GetDefinitions(unifiedrole.RoleFilterIDs(roles...))
+		definitions = unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(roles...))
 	default:
-		definitions = unifiedrole.GetDefinitions(unifiedrole.RoleFilterAll())
+		// it the ctx does not contain the allowed role IDs, we need to fall back to all roles
+		definitions = unifiedrole.GetRoles(unifiedrole.RoleFilterAll())
 	}
 
 	for _, definition := range definitions {
@@ -121,8 +122,8 @@ func rolesAndActions(ctx context.Context, sl validator.StructLevel, roles, actio
 		sl.ReportError(roles, "Roles", "Roles", "available_role", "")
 	}
 
-	for _, role := range actions {
-		if slices.Contains(availableActions, role) {
+	for _, action := range actions {
+		if slices.Contains(availableActions, action) {
 			continue
 		}
 

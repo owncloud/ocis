@@ -1,7 +1,6 @@
 package unifiedrole
 
 var (
-	// roles
 	RoleViewer       = roleViewer
 	RoleSpaceViewer  = roleSpaceViewer
 	RoleEditor       = roleEditor
@@ -11,6 +10,7 @@ var (
 	RoleManager      = roleManager
 	RoleSecureViewer = roleSecureViewer
 
-	// functions
-	WeightDefinitions = weightDefinitions
+	BuildInRoles = buildInRoles
+
+	WeightDefinitions = weightRoles
 )

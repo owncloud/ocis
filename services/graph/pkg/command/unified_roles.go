@@ -44,7 +44,8 @@ func unifiedRolesStatus(cfg *config.Config) *cli.Command {
 
 			var data [][]string
 
-			for _, definition := range unifiedrole.GetDefinitions(unifiedrole.RoleFilterAll()) {
+			// fixMe: should we use all definitions?
+			for _, definition := range unifiedrole.GetRoles(unifiedrole.RoleFilterAll()) {
 				data = append(data, []string{"", definition.GetId(), definition.GetDescription()})
 			}
 

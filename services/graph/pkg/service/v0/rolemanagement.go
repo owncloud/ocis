@@ -14,7 +14,7 @@ import (
 // GetRoleDefinitions a list of permission roles than can be used when sharing with users or groups
 func (g Graph) GetRoleDefinitions(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, unifiedrole.GetDefinitions(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...)))
+	render.JSON(w, r, unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...)))
 }
 
 // GetRoleDefinition a permission role than can be used when sharing with users or groups
@@ -26,7 +26,7 @@ func (g Graph) GetRoleDefinition(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping role id failed")
 		return
 	}
-	role, err := unifiedrole.GetDefinition(unifiedrole.RoleFilterIDs(roleID))
+	role, err := unifiedrole.GetRole(unifiedrole.RoleFilterIDs(roleID))
 	if err != nil {
 		logger.Debug().Str("roleID", roleID).Msg("could not get role: not found")
 		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, err.Error())

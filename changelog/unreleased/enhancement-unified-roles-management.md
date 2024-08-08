@@ -1,6 +1,8 @@
 Enhancement: Unified Roles Management
 
 Improved management of unified roles with the introduction of default enabled/disabled states and a new command for listing available roles.
+It is important to note that a disabled role does not lose previously assigned permissions;
+it only means that the role is not available for new assignments.
 
 The following roles are now enabled by default:
 
