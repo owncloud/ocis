@@ -7,8 +7,6 @@ import (
 
 	connector "github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
 
-	fileinfo "github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
-
 	io "io"
 
 	mock "github.com/stretchr/testify/mock"
@@ -28,23 +26,23 @@ func (_m *FileConnectorService) EXPECT() *FileConnectorService_Expecter {
 }
 
 // CheckFileInfo provides a mock function with given fields: ctx
-func (_m *FileConnectorService) CheckFileInfo(ctx context.Context) (fileinfo.FileInfo, error) {
+func (_m *FileConnectorService) CheckFileInfo(ctx context.Context) (*connector.ConnectorResponse, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CheckFileInfo")
 	}
 
-	var r0 fileinfo.FileInfo
+	var r0 *connector.ConnectorResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (fileinfo.FileInfo, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) (*connector.ConnectorResponse, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) fileinfo.FileInfo); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) *connector.ConnectorResponse); ok {
 		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(fileinfo.FileInfo)
+			r0 = ret.Get(0).(*connector.ConnectorResponse)
 		}
 	}
 
@@ -75,33 +73,35 @@ func (_c *FileConnectorService_CheckFileInfo_Call) Run(run func(ctx context.Cont
 	return _c
 }
 
-func (_c *FileConnectorService_CheckFileInfo_Call) Return(_a0 fileinfo.FileInfo, _a1 error) *FileConnectorService_CheckFileInfo_Call {
+func (_c *FileConnectorService_CheckFileInfo_Call) Return(_a0 *connector.ConnectorResponse, _a1 error) *FileConnectorService_CheckFileInfo_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FileConnectorService_CheckFileInfo_Call) RunAndReturn(run func(context.Context) (fileinfo.FileInfo, error)) *FileConnectorService_CheckFileInfo_Call {
+func (_c *FileConnectorService_CheckFileInfo_Call) RunAndReturn(run func(context.Context) (*connector.ConnectorResponse, error)) *FileConnectorService_CheckFileInfo_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // DeleteFile provides a mock function with given fields: ctx, lockID
-func (_m *FileConnectorService) DeleteFile(ctx context.Context, lockID string) (string, error) {
+func (_m *FileConnectorService) DeleteFile(ctx context.Context, lockID string) (*connector.ConnectorResponse, error) {
 	ret := _m.Called(ctx, lockID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeleteFile")
 	}
 
-	var r0 string
+	var r0 *connector.ConnectorResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*connector.ConnectorResponse, error)); ok {
 		return rf(ctx, lockID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) *connector.ConnectorResponse); ok {
 		r0 = rf(ctx, lockID)
 	} else {
-		r0 = ret.Get(0).(string)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connector.ConnectorResponse)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
@@ -132,33 +132,35 @@ func (_c *FileConnectorService_DeleteFile_Call) Run(run func(ctx context.Context
 	return _c
 }
 
-func (_c *FileConnectorService_DeleteFile_Call) Return(_a0 string, _a1 error) *FileConnectorService_DeleteFile_Call {
+func (_c *FileConnectorService_DeleteFile_Call) Return(_a0 *connector.ConnectorResponse, _a1 error) *FileConnectorService_DeleteFile_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FileConnectorService_DeleteFile_Call) RunAndReturn(run func(context.Context, string) (string, error)) *FileConnectorService_DeleteFile_Call {
+func (_c *FileConnectorService_DeleteFile_Call) RunAndReturn(run func(context.Context, string) (*connector.ConnectorResponse, error)) *FileConnectorService_DeleteFile_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetLock provides a mock function with given fields: ctx
-func (_m *FileConnectorService) GetLock(ctx context.Context) (string, error) {
+func (_m *FileConnectorService) GetLock(ctx context.Context) (*connector.ConnectorResponse, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetLock")
 	}
 
-	var r0 string
+	var r0 *connector.ConnectorResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (string, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) (*connector.ConnectorResponse, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) *connector.ConnectorResponse); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(string)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connector.ConnectorResponse)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -188,33 +190,35 @@ func (_c *FileConnectorService_GetLock_Call) Run(run func(ctx context.Context)) 
 	return _c
 }
 
-func (_c *FileConnectorService_GetLock_Call) Return(_a0 string, _a1 error) *FileConnectorService_GetLock_Call {
+func (_c *FileConnectorService_GetLock_Call) Return(_a0 *connector.ConnectorResponse, _a1 error) *FileConnectorService_GetLock_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FileConnectorService_GetLock_Call) RunAndReturn(run func(context.Context) (string, error)) *FileConnectorService_GetLock_Call {
+func (_c *FileConnectorService_GetLock_Call) RunAndReturn(run func(context.Context) (*connector.ConnectorResponse, error)) *FileConnectorService_GetLock_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Lock provides a mock function with given fields: ctx, lockID, oldLockID
-func (_m *FileConnectorService) Lock(ctx context.Context, lockID string, oldLockID string) (string, error) {
+func (_m *FileConnectorService) Lock(ctx context.Context, lockID string, oldLockID string) (*connector.ConnectorResponse, error) {
 	ret := _m.Called(ctx, lockID, oldLockID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Lock")
 	}
 
-	var r0 string
+	var r0 *connector.ConnectorResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (string, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*connector.ConnectorResponse, error)); ok {
 		return rf(ctx, lockID, oldLockID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) *connector.ConnectorResponse); ok {
 		r0 = rf(ctx, lockID, oldLockID)
 	} else {
-		r0 = ret.Get(0).(string)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connector.ConnectorResponse)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
@@ -246,53 +250,44 @@ func (_c *FileConnectorService_Lock_Call) Run(run func(ctx context.Context, lock
 	return _c
 }
 
-func (_c *FileConnectorService_Lock_Call) Return(_a0 string, _a1 error) *FileConnectorService_Lock_Call {
+func (_c *FileConnectorService_Lock_Call) Return(_a0 *connector.ConnectorResponse, _a1 error) *FileConnectorService_Lock_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FileConnectorService_Lock_Call) RunAndReturn(run func(context.Context, string, string) (string, error)) *FileConnectorService_Lock_Call {
+func (_c *FileConnectorService_Lock_Call) RunAndReturn(run func(context.Context, string, string) (*connector.ConnectorResponse, error)) *FileConnectorService_Lock_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // PutRelativeFileRelative provides a mock function with given fields: ctx, ccs, stream, streamLength, target
-func (_m *FileConnectorService) PutRelativeFileRelative(ctx context.Context, ccs connector.ContentConnectorService, stream io.Reader, streamLength int64, target string) (*connector.PutRelativeResponse, *connector.PutRelativeHeaders, error) {
+func (_m *FileConnectorService) PutRelativeFileRelative(ctx context.Context, ccs connector.ContentConnectorService, stream io.Reader, streamLength int64, target string) (*connector.ConnectorResponse, error) {
 	ret := _m.Called(ctx, ccs, stream, streamLength, target)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PutRelativeFileRelative")
 	}
 
-	var r0 *connector.PutRelativeResponse
-	var r1 *connector.PutRelativeHeaders
-	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.PutRelativeResponse, *connector.PutRelativeHeaders, error)); ok {
+	var r0 *connector.ConnectorResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.ConnectorResponse, error)); ok {
 		return rf(ctx, ccs, stream, streamLength, target)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) *connector.PutRelativeResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) *connector.ConnectorResponse); ok {
 		r0 = rf(ctx, ccs, stream, streamLength, target)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connector.PutRelativeResponse)
+			r0 = ret.Get(0).(*connector.ConnectorResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) *connector.PutRelativeHeaders); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) error); ok {
 		r1 = rf(ctx, ccs, stream, streamLength, target)
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(*connector.PutRelativeHeaders)
-		}
+		r1 = ret.Error(1)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) error); ok {
-		r2 = rf(ctx, ccs, stream, streamLength, target)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
+	return r0, r1
 }
 
 // FileConnectorService_PutRelativeFileRelative_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PutRelativeFileRelative'
@@ -317,34 +312,34 @@ func (_c *FileConnectorService_PutRelativeFileRelative_Call) Run(run func(ctx co
 	return _c
 }
 
-func (_c *FileConnectorService_PutRelativeFileRelative_Call) Return(_a0 *connector.PutRelativeResponse, _a1 *connector.PutRelativeHeaders, _a2 error) *FileConnectorService_PutRelativeFileRelative_Call {
-	_c.Call.Return(_a0, _a1, _a2)
+func (_c *FileConnectorService_PutRelativeFileRelative_Call) Return(_a0 *connector.ConnectorResponse, _a1 error) *FileConnectorService_PutRelativeFileRelative_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FileConnectorService_PutRelativeFileRelative_Call) RunAndReturn(run func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.PutRelativeResponse, *connector.PutRelativeHeaders, error)) *FileConnectorService_PutRelativeFileRelative_Call {
+func (_c *FileConnectorService_PutRelativeFileRelative_Call) RunAndReturn(run func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.ConnectorResponse, error)) *FileConnectorService_PutRelativeFileRelative_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // PutRelativeFileSuggested provides a mock function with given fields: ctx, ccs, stream, streamLength, target
-func (_m *FileConnectorService) PutRelativeFileSuggested(ctx context.Context, ccs connector.ContentConnectorService, stream io.Reader, streamLength int64, target string) (*connector.PutRelativeResponse, error) {
+func (_m *FileConnectorService) PutRelativeFileSuggested(ctx context.Context, ccs connector.ContentConnectorService, stream io.Reader, streamLength int64, target string) (*connector.ConnectorResponse, error) {
 	ret := _m.Called(ctx, ccs, stream, streamLength, target)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PutRelativeFileSuggested")
 	}
 
-	var r0 *connector.PutRelativeResponse
+	var r0 *connector.ConnectorResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.PutRelativeResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.ConnectorResponse, error)); ok {
 		return rf(ctx, ccs, stream, streamLength, target)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) *connector.PutRelativeResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) *connector.ConnectorResponse); ok {
 		r0 = rf(ctx, ccs, stream, streamLength, target)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connector.PutRelativeResponse)
+			r0 = ret.Get(0).(*connector.ConnectorResponse)
 		}
 	}
 
@@ -379,33 +374,35 @@ func (_c *FileConnectorService_PutRelativeFileSuggested_Call) Run(run func(ctx c
 	return _c
 }
 
-func (_c *FileConnectorService_PutRelativeFileSuggested_Call) Return(_a0 *connector.PutRelativeResponse, _a1 error) *FileConnectorService_PutRelativeFileSuggested_Call {
+func (_c *FileConnectorService_PutRelativeFileSuggested_Call) Return(_a0 *connector.ConnectorResponse, _a1 error) *FileConnectorService_PutRelativeFileSuggested_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FileConnectorService_PutRelativeFileSuggested_Call) RunAndReturn(run func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.PutRelativeResponse, error)) *FileConnectorService_PutRelativeFileSuggested_Call {
+func (_c *FileConnectorService_PutRelativeFileSuggested_Call) RunAndReturn(run func(context.Context, connector.ContentConnectorService, io.Reader, int64, string) (*connector.ConnectorResponse, error)) *FileConnectorService_PutRelativeFileSuggested_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // RefreshLock provides a mock function with given fields: ctx, lockID
-func (_m *FileConnectorService) RefreshLock(ctx context.Context, lockID string) (string, error) {
+func (_m *FileConnectorService) RefreshLock(ctx context.Context, lockID string) (*connector.ConnectorResponse, error) {
 	ret := _m.Called(ctx, lockID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for RefreshLock")
 	}
 
-	var r0 string
+	var r0 *connector.ConnectorResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*connector.ConnectorResponse, error)); ok {
 		return rf(ctx, lockID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) *connector.ConnectorResponse); ok {
 		r0 = rf(ctx, lockID)
 	} else {
-		r0 = ret.Get(0).(string)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connector.ConnectorResponse)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
@@ -436,51 +433,44 @@ func (_c *FileConnectorService_RefreshLock_Call) Run(run func(ctx context.Contex
 	return _c
 }
 
-func (_c *FileConnectorService_RefreshLock_Call) Return(_a0 string, _a1 error) *FileConnectorService_RefreshLock_Call {
+func (_c *FileConnectorService_RefreshLock_Call) Return(_a0 *connector.ConnectorResponse, _a1 error) *FileConnectorService_RefreshLock_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FileConnectorService_RefreshLock_Call) RunAndReturn(run func(context.Context, string) (string, error)) *FileConnectorService_RefreshLock_Call {
+func (_c *FileConnectorService_RefreshLock_Call) RunAndReturn(run func(context.Context, string) (*connector.ConnectorResponse, error)) *FileConnectorService_RefreshLock_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // RenameFile provides a mock function with given fields: ctx, lockID, target
-func (_m *FileConnectorService) RenameFile(ctx context.Context, lockID string, target string) (*connector.RenameResponse, string, error) {
+func (_m *FileConnectorService) RenameFile(ctx context.Context, lockID string, target string) (*connector.ConnectorResponse, error) {
 	ret := _m.Called(ctx, lockID, target)
 
 	if len(ret) == 0 {
 		panic("no return value specified for RenameFile")
 	}
 
-	var r0 *connector.RenameResponse
-	var r1 string
-	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*connector.RenameResponse, string, error)); ok {
+	var r0 *connector.ConnectorResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*connector.ConnectorResponse, error)); ok {
 		return rf(ctx, lockID, target)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) *connector.RenameResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) *connector.ConnectorResponse); ok {
 		r0 = rf(ctx, lockID, target)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connector.RenameResponse)
+			r0 = ret.Get(0).(*connector.ConnectorResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) string); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
 		r1 = rf(ctx, lockID, target)
 	} else {
-		r1 = ret.Get(1).(string)
+		r1 = ret.Error(1)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context, string, string) error); ok {
-		r2 = rf(ctx, lockID, target)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
+	return r0, r1
 }
 
 // FileConnectorService_RenameFile_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RenameFile'
@@ -503,33 +493,35 @@ func (_c *FileConnectorService_RenameFile_Call) Run(run func(ctx context.Context
 	return _c
 }
 
-func (_c *FileConnectorService_RenameFile_Call) Return(_a0 *connector.RenameResponse, _a1 string, _a2 error) *FileConnectorService_RenameFile_Call {
-	_c.Call.Return(_a0, _a1, _a2)
+func (_c *FileConnectorService_RenameFile_Call) Return(_a0 *connector.ConnectorResponse, _a1 error) *FileConnectorService_RenameFile_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FileConnectorService_RenameFile_Call) RunAndReturn(run func(context.Context, string, string) (*connector.RenameResponse, string, error)) *FileConnectorService_RenameFile_Call {
+func (_c *FileConnectorService_RenameFile_Call) RunAndReturn(run func(context.Context, string, string) (*connector.ConnectorResponse, error)) *FileConnectorService_RenameFile_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UnLock provides a mock function with given fields: ctx, lockID
-func (_m *FileConnectorService) UnLock(ctx context.Context, lockID string) (string, error) {
+func (_m *FileConnectorService) UnLock(ctx context.Context, lockID string) (*connector.ConnectorResponse, error) {
 	ret := _m.Called(ctx, lockID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UnLock")
 	}
 
-	var r0 string
+	var r0 *connector.ConnectorResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*connector.ConnectorResponse, error)); ok {
 		return rf(ctx, lockID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) *connector.ConnectorResponse); ok {
 		r0 = rf(ctx, lockID)
 	} else {
-		r0 = ret.Get(0).(string)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connector.ConnectorResponse)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
@@ -560,12 +552,12 @@ func (_c *FileConnectorService_UnLock_Call) Run(run func(ctx context.Context, lo
 	return _c
 }
 
-func (_c *FileConnectorService_UnLock_Call) Return(_a0 string, _a1 error) *FileConnectorService_UnLock_Call {
+func (_c *FileConnectorService_UnLock_Call) Return(_a0 *connector.ConnectorResponse, _a1 error) *FileConnectorService_UnLock_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FileConnectorService_UnLock_Call) RunAndReturn(run func(context.Context, string) (string, error)) *FileConnectorService_UnLock_Call {
+func (_c *FileConnectorService_UnLock_Call) RunAndReturn(run func(context.Context, string) (*connector.ConnectorResponse, error)) *FileConnectorService_UnLock_Call {
 	_c.Call.Return(run)
 	return _c
 }

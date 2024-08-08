@@ -91,9 +91,9 @@ var _ = Describe("FileConnector", func() {
 	Describe("GetLock", func() {
 		It("No valid context", func() {
 			ctx := context.Background()
-			newLockId, err := fc.GetLock(ctx)
+			response, err := fc.GetLock(ctx)
 			Expect(err).To(HaveOccurred())
-			Expect(newLockId).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Get lock failed", func() {
@@ -104,9 +104,9 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "Something failed"),
 			}, targetErr)
 
-			newLockId, err := fc.GetLock(ctx)
+			response, err := fc.GetLock(ctx)
 			Expect(err).To(Equal(targetErr))
-			Expect(newLockId).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Get lock failed status not ok", func() {
@@ -117,11 +117,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewNotFound(ctx, "File is missing"),
 			}, nil)
 
-			newLockId, err := fc.GetLock(ctx)
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(404))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.GetLock(ctx)
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(404))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Get lock success", func() {
@@ -136,9 +135,10 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			newLockId, err := fc.GetLock(ctx)
+			response, err := fc.GetLock(ctx)
 			Expect(err).To(Succeed())
-			Expect(newLockId).To(Equal("zzz999"))
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("zzz999"))
 		})
 	})
 
@@ -146,19 +146,18 @@ var _ = Describe("FileConnector", func() {
 		Describe("Lock", func() {
 			It("No valid context", func() {
 				ctx := context.Background()
-				newLockId, err := fc.Lock(ctx, "newLock", "")
+				response, err := fc.Lock(ctx, "newLock", "")
 				Expect(err).To(HaveOccurred())
-				Expect(newLockId).To(Equal(""))
+				Expect(response).To(BeNil())
 			})
 
 			It("Empty lockId", func() {
 				ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
-				newLockId, err := fc.Lock(ctx, "", "")
-				Expect(err).To(HaveOccurred())
-				conErr := err.(*connector.ConnectorError)
-				Expect(conErr.HttpCodeOut).To(Equal(400))
-				Expect(newLockId).To(Equal(""))
+				response, err := fc.Lock(ctx, "", "")
+				Expect(err).To(Succeed())
+				Expect(response.Status).To(Equal(400))
+				Expect(response.Headers).To(BeNil())
 			})
 
 			It("Set lock failed", func() {
@@ -169,10 +168,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewInternal(ctx, "Something failed"),
 				}, targetErr)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "")
+				response, err := fc.Lock(ctx, "abcdef123", "")
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(targetErr))
-				Expect(newLockId).To(Equal(""))
+				Expect(response).To(BeNil())
 			})
 
 			It("Set lock success", func() {
@@ -182,9 +181,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewOK(ctx),
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "")
+				response, err := fc.Lock(ctx, "abcdef123", "")
 				Expect(err).To(Succeed())
-				Expect(newLockId).To(Equal(""))
+				Expect(response.Status).To(Equal(200))
+				Expect(response.Headers).To(BeNil())
 			})
 
 			It("Set lock mismatches error getting lock", func() {
@@ -199,10 +199,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewInternal(ctx, "lock mismatch"),
 				}, targetErr)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "")
+				response, err := fc.Lock(ctx, "abcdef123", "")
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(targetErr))
-				Expect(newLockId).To(Equal(""))
+				Expect(response).To(BeNil())
 			})
 
 			It("Set lock mismatches", func() {
@@ -220,11 +220,10 @@ var _ = Describe("FileConnector", func() {
 					},
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "")
-				Expect(err).To(HaveOccurred())
-				conErr := err.(*connector.ConnectorError)
-				Expect(conErr.HttpCodeOut).To(Equal(409))
-				Expect(newLockId).To(Equal("zzz999"))
+				response, err := fc.Lock(ctx, "abcdef123", "")
+				Expect(err).To(Succeed())
+				Expect(response.Status).To(Equal(409))
+				Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("zzz999"))
 			})
 
 			It("Set lock mismatches but get lock matches", func() {
@@ -242,9 +241,10 @@ var _ = Describe("FileConnector", func() {
 					},
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "")
+				response, err := fc.Lock(ctx, "abcdef123", "")
 				Expect(err).To(Succeed())
-				Expect(newLockId).To(Equal("abcdef123"))
+				Expect(response.Status).To(Equal(200))
+				Expect(response.Headers).To(BeNil())
 			})
 
 			It("Set lock mismatches but get lock doesn't return lockId", func() {
@@ -258,11 +258,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewOK(ctx),
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "")
-				Expect(err).To(HaveOccurred())
-				conErr := err.(*connector.ConnectorError)
-				Expect(conErr.HttpCodeOut).To(Equal(500))
-				Expect(newLockId).To(Equal(""))
+				response, err := fc.Lock(ctx, "abcdef123", "")
+				Expect(err).To(Succeed())
+				Expect(response.Status).To(Equal(500))
+				Expect(response.Headers).To(BeNil())
 			})
 
 			It("File not found", func() {
@@ -272,11 +271,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewNotFound(ctx, "file not found"),
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "")
-				Expect(err).To(HaveOccurred())
-				conErr := err.(*connector.ConnectorError)
-				Expect(conErr.HttpCodeOut).To(Equal(404))
-				Expect(newLockId).To(Equal(""))
+				response, err := fc.Lock(ctx, "abcdef123", "")
+				Expect(err).To(Succeed())
+				Expect(response.Status).To(Equal(404))
+				Expect(response.Headers).To(BeNil())
 			})
 
 			It("Default error handling (insufficient storage)", func() {
@@ -286,30 +284,28 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewInsufficientStorage(ctx, nil, "file too big"),
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "")
-				Expect(err).To(HaveOccurred())
-				conErr := err.(*connector.ConnectorError)
-				Expect(conErr.HttpCodeOut).To(Equal(500))
-				Expect(newLockId).To(Equal(""))
+				response, err := fc.Lock(ctx, "abcdef123", "")
+				Expect(err).To(Succeed())
+				Expect(response.Status).To(Equal(500))
+				Expect(response.Headers).To(BeNil())
 			})
 		})
 
 		Describe("Unlock and relock", func() {
 			It("No valid context", func() {
 				ctx := context.Background()
-				newLockId, err := fc.Lock(ctx, "newLock", "oldLock")
+				response, err := fc.Lock(ctx, "newLock", "oldLock")
 				Expect(err).To(HaveOccurred())
-				Expect(newLockId).To(Equal(""))
+				Expect(response).To(BeNil())
 			})
 
 			It("Empty lockId", func() {
 				ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
-				newLockId, err := fc.Lock(ctx, "", "oldLock")
-				Expect(err).To(HaveOccurred())
-				conErr := err.(*connector.ConnectorError)
-				Expect(conErr.HttpCodeOut).To(Equal(400))
-				Expect(newLockId).To(Equal(""))
+				response, err := fc.Lock(ctx, "", "oldLock")
+				Expect(err).To(Succeed())
+				Expect(response.Status).To(Equal(400))
+				Expect(response.Headers).To(BeNil())
 			})
 
 			It("Refresh lock failed", func() {
@@ -320,10 +316,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewInternal(ctx, "Something failed"),
 				}, targetErr)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "oldLock")
+				response, err := fc.Lock(ctx, "abcdef123", "oldLock")
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(targetErr))
-				Expect(newLockId).To(Equal(""))
+				Expect(response).To(BeNil())
 			})
 
 			It("Refresh lock success", func() {
@@ -333,9 +329,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewOK(ctx),
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "oldLock")
+				response, err := fc.Lock(ctx, "abcdef123", "oldLock")
 				Expect(err).To(Succeed())
-				Expect(newLockId).To(Equal(""))
+				Expect(response.Status).To(Equal(200))
+				Expect(response.Headers).To(BeNil())
 			})
 
 			It("Refresh lock mismatches error getting lock", func() {
@@ -350,10 +347,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewInternal(ctx, "lock mismatch"),
 				}, targetErr)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "112233")
+				response, err := fc.Lock(ctx, "abcdef123", "112233")
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(targetErr))
-				Expect(newLockId).To(Equal(""))
+				Expect(response).To(BeNil())
 			})
 
 			It("Refresh lock mismatches", func() {
@@ -371,11 +368,10 @@ var _ = Describe("FileConnector", func() {
 					},
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "112233")
-				Expect(err).To(HaveOccurred())
-				conErr := err.(*connector.ConnectorError)
-				Expect(conErr.HttpCodeOut).To(Equal(409))
-				Expect(newLockId).To(Equal("zzz999"))
+				response, err := fc.Lock(ctx, "abcdef123", "112233")
+				Expect(err).To(Succeed())
+				Expect(response.Status).To(Equal(409))
+				Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("zzz999"))
 			})
 
 			It("Refresh lock mismatches but get lock matches", func() {
@@ -393,9 +389,10 @@ var _ = Describe("FileConnector", func() {
 					},
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "112233")
+				response, err := fc.Lock(ctx, "abcdef123", "112233")
 				Expect(err).To(Succeed())
-				Expect(newLockId).To(Equal("abcdef123"))
+				Expect(response.Status).To(Equal(200))
+				Expect(response.Headers).To(BeNil())
 			})
 
 			It("Refresh lock mismatches but get lock doesn't return lockId", func() {
@@ -409,11 +406,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewOK(ctx),
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "112233")
-				Expect(err).To(HaveOccurred())
-				conErr := err.(*connector.ConnectorError)
-				Expect(conErr.HttpCodeOut).To(Equal(500))
-				Expect(newLockId).To(Equal(""))
+				response, err := fc.Lock(ctx, "abcdef123", "112233")
+				Expect(err).To(Succeed())
+				Expect(response.Status).To(Equal(500))
+				Expect(response.Headers).To(BeNil())
 			})
 
 			It("File not found", func() {
@@ -423,11 +419,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewNotFound(ctx, "file not found"),
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "112233")
-				Expect(err).To(HaveOccurred())
-				conErr := err.(*connector.ConnectorError)
-				Expect(conErr.HttpCodeOut).To(Equal(404))
-				Expect(newLockId).To(Equal(""))
+				response, err := fc.Lock(ctx, "abcdef123", "112233")
+				Expect(err).To(Succeed())
+				Expect(response.Status).To(Equal(404))
+				Expect(response.Headers).To(BeNil())
 			})
 
 			It("Default error handling (insufficient storage)", func() {
@@ -437,11 +432,10 @@ var _ = Describe("FileConnector", func() {
 					Status: status.NewInsufficientStorage(ctx, nil, "file too big"),
 				}, nil)
 
-				newLockId, err := fc.Lock(ctx, "abcdef123", "112233")
-				Expect(err).To(HaveOccurred())
-				conErr := err.(*connector.ConnectorError)
-				Expect(conErr.HttpCodeOut).To(Equal(500))
-				Expect(newLockId).To(Equal(""))
+				response, err := fc.Lock(ctx, "abcdef123", "112233")
+				Expect(err).To(Succeed())
+				Expect(response.Status).To(Equal(500))
+				Expect(response.Headers).To(BeNil())
 			})
 		})
 	})
@@ -449,19 +443,18 @@ var _ = Describe("FileConnector", func() {
 	Describe("RefreshLock", func() {
 		It("No valid context", func() {
 			ctx := context.Background()
-			newLockId, err := fc.RefreshLock(ctx, "newLock")
+			response, err := fc.RefreshLock(ctx, "newLock")
 			Expect(err).To(HaveOccurred())
-			Expect(newLockId).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Empty lockId", func() {
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
-			newLockId, err := fc.RefreshLock(ctx, "")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(400))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.RefreshLock(ctx, "")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(400))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Refresh lock fails", func() {
@@ -472,10 +465,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewConflict(ctx, nil, "lock mismatch"),
 			}, targetErr)
 
-			newLockId, err := fc.RefreshLock(ctx, "abcdef123")
+			response, err := fc.RefreshLock(ctx, "abcdef123")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
-			Expect(newLockId).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Refresh lock success", func() {
@@ -485,9 +478,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewOK(ctx),
 			}, nil)
 
-			newLockId, err := fc.RefreshLock(ctx, "abcdef123")
+			response, err := fc.RefreshLock(ctx, "abcdef123")
 			Expect(err).To(Succeed())
-			Expect(newLockId).To(Equal(""))
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Refresh lock file not found", func() {
@@ -497,11 +491,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewNotFound(ctx, "file not found"),
 			}, nil)
 
-			newLockId, err := fc.RefreshLock(ctx, "abcdef123")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(404))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.RefreshLock(ctx, "abcdef123")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(404))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Refresh lock mismatch and get lock fails", func() {
@@ -516,10 +509,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewConflict(ctx, nil, "lock mismatch"),
 			}, targetErr)
 
-			newLockId, err := fc.RefreshLock(ctx, "abcdef123")
+			response, err := fc.RefreshLock(ctx, "abcdef123")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
-			Expect(newLockId).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Refresh lock mismatch and get lock status not ok", func() {
@@ -533,11 +526,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "lock mismatch"),
 			}, nil)
 
-			newLockId, err := fc.RefreshLock(ctx, "abcdef123")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.RefreshLock(ctx, "abcdef123")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Refresh lock mismatch and no lock", func() {
@@ -551,11 +543,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewOK(ctx),
 			}, nil)
 
-			newLockId, err := fc.RefreshLock(ctx, "abcdef123")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(409))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.RefreshLock(ctx, "abcdef123")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(409))
+			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal(""))
 		})
 
 		It("Refresh lock mismatch", func() {
@@ -573,11 +564,10 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			newLockId, err := fc.RefreshLock(ctx, "abcdef123")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(409))
-			Expect(newLockId).To(Equal("zzz999"))
+			response, err := fc.RefreshLock(ctx, "abcdef123")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(409))
+			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("zzz999"))
 		})
 
 		It("Default error handling (insufficient storage)", func() {
@@ -587,30 +577,28 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInsufficientStorage(ctx, nil, "file too big"),
 			}, nil)
 
-			newLockId, err := fc.RefreshLock(ctx, "abcdef123")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.RefreshLock(ctx, "abcdef123")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
 		})
 	})
 
 	Describe("Unlock", func() {
 		It("No valid context", func() {
 			ctx := context.Background()
-			newLockId, err := fc.UnLock(ctx, "newLock")
+			response, err := fc.UnLock(ctx, "newLock")
 			Expect(err).To(HaveOccurred())
-			Expect(newLockId).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Empty lockId", func() {
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
-			newLockId, err := fc.UnLock(ctx, "")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(400))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.UnLock(ctx, "")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(400))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Unlock fails", func() {
@@ -621,10 +609,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			newLockId, err := fc.UnLock(ctx, "abcdef123")
+			response, err := fc.UnLock(ctx, "abcdef123")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
-			Expect(newLockId).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Unlock success", func() {
@@ -634,9 +622,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewOK(ctx),
 			}, nil)
 
-			newLockId, err := fc.UnLock(ctx, "abcdef123")
+			response, err := fc.UnLock(ctx, "abcdef123")
 			Expect(err).To(Succeed())
-			Expect(newLockId).To(Equal(""))
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Unlock file isn't locked", func() {
@@ -646,11 +635,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewConflict(ctx, nil, "lock mismatch"),
 			}, nil)
 
-			newLockId, err := fc.UnLock(ctx, "abcdef123")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(409))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.UnLock(ctx, "abcdef123")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(409))
+			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal(""))
 		})
 
 		It("Unlock mismatch get lock fails", func() {
@@ -665,10 +653,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			newLockId, err := fc.UnLock(ctx, "abcdef123")
+			response, err := fc.UnLock(ctx, "abcdef123")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
-			Expect(newLockId).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Unlock mismatch get lock status not ok", func() {
@@ -682,11 +670,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, nil)
 
-			newLockId, err := fc.UnLock(ctx, "abcdef123")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.UnLock(ctx, "abcdef123")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Unlock mismatch get lock doesn't return lock", func() {
@@ -700,11 +687,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewOK(ctx),
 			}, nil)
 
-			newLockId, err := fc.UnLock(ctx, "abcdef123")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(409))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.UnLock(ctx, "abcdef123")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(409))
+			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal(""))
 		})
 
 		It("Unlock mismatch", func() {
@@ -722,11 +708,10 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			newLockId, err := fc.UnLock(ctx, "abcdef123")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(409))
-			Expect(newLockId).To(Equal("zzz999"))
+			response, err := fc.UnLock(ctx, "abcdef123")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(409))
+			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("zzz999"))
 		})
 
 		It("Default error handling (insufficient storage)", func() {
@@ -736,11 +721,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInsufficientStorage(ctx, nil, "file too big"),
 			}, nil)
 
-			newLockId, err := fc.UnLock(ctx, "abcdef123")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(newLockId).To(Equal(""))
+			response, err := fc.UnLock(ctx, "abcdef123")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
 		})
 	})
 
@@ -777,10 +761,10 @@ var _ = Describe("FileConnector", func() {
 
 			stream := strings.NewReader("This is the content of a file")
 			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(response).To(BeNil())
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
+			Expect(response.Body).To(BeNil())
 		})
 
 		It("PutRelativeFileSuggested success", func() {
@@ -807,7 +791,7 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", nil)
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
 
 			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
 				if statReq.Ref.ResourceId.StorageId == "storageid" &&
@@ -832,8 +816,11 @@ var _ = Describe("FileConnector", func() {
 
 			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), "newDocument.docx")
 			Expect(err).To(Succeed())
-			Expect(response.Name).To(Equal("newDocument.docx"))
-			Expect(response.Url).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Headers).To(BeNil())
+			rBody := response.Body.(map[string]interface{})
+			Expect(rBody["Name"]).To(Equal("newDocument.docx"))
+			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
 		})
 
 		It("PutRelativeFileSuggested success only extension", func() {
@@ -860,7 +847,7 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", nil)
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
 
 			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
 				if statReq.Ref.ResourceId.StorageId == "storageid" &&
@@ -885,8 +872,11 @@ var _ = Describe("FileConnector", func() {
 
 			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), ".pdf")
 			Expect(err).To(Succeed())
-			Expect(response.Name).To(Equal("file.pdf"))
-			Expect(response.Url).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Headers).To(BeNil())
+			rBody := response.Body.(map[string]interface{})
+			Expect(rBody["Name"]).To(Equal("file.pdf"))
+			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
 		})
 
 		It("PutRelativeFileSuggested success conflict", func() {
@@ -916,9 +906,10 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			// first call will fail with conflict, second call succeeds
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", connector.NewConnectorError(409, "file conflict")).Once()
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", nil).Once()
+			// first call will fail with conflict, second call succeeds.
+			// we're only interested on whether the file is locked or not, the actual lockID is irrelevant
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 409}, nil).Once()
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil).Once()
 
 			newFilePath := new(string)
 			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
@@ -950,8 +941,11 @@ var _ = Describe("FileConnector", func() {
 
 			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), ".pdf")
 			Expect(err).To(Succeed())
-			Expect(response.Name).To(MatchRegexp(`[a-zA-Z0-9_-] file\.pdf`))
-			Expect(response.Url).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Headers).To(BeNil())
+			rBody := response.Body.(map[string]interface{})
+			Expect(rBody["Name"]).To(MatchRegexp(`[a-zA-Z0-9_-] file\.pdf`))
+			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
 		})
 
 		It("PutRelativeFileSuggested put file fails", func() {
@@ -977,11 +971,13 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", connector.NewConnectorError(500, "something bad happened"))
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 500}, nil)
 
 			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), ".pdf")
-			Expect(err).To(HaveOccurred())
-			Expect(response).To(BeNil())
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
+			Expect(response.Body).To(BeNil())
 		})
 	})
 
@@ -989,10 +985,9 @@ var _ = Describe("FileConnector", func() {
 		It("No valid context", func() {
 			ctx := context.Background()
 			stream := strings.NewReader("This is the content of a file")
-			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
+			response, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
 			Expect(err).To(HaveOccurred())
 			Expect(response).To(BeNil())
-			Expect(headers).To(BeNil())
 		})
 
 		It("Stat fails", func() {
@@ -1004,11 +999,10 @@ var _ = Describe("FileConnector", func() {
 			}, targetErr)
 
 			stream := strings.NewReader("This is the content of a file")
-			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
+			response, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
 			Expect(response).To(BeNil())
-			Expect(headers).To(BeNil())
 		})
 
 		It("Stat fails status not ok", func() {
@@ -1019,12 +1013,11 @@ var _ = Describe("FileConnector", func() {
 			}, nil)
 
 			stream := strings.NewReader("This is the content of a file")
-			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(response).To(BeNil())
-			Expect(headers).To(BeNil())
+			response, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
+			Expect(response.Body).To(BeNil())
 		})
 
 		It("PutRelativeFileRelative success", func() {
@@ -1050,7 +1043,7 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", nil)
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
 
 			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
 				if statReq.Ref.ResourceId.StorageId == "storageid" &&
@@ -1073,11 +1066,13 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newDocument.docx")
+			response, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newDocument.docx")
 			Expect(err).To(Succeed())
-			Expect(response.Name).To(Equal("newDocument.docx"))
-			Expect(response.Url).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
-			Expect(headers).To(BeNil())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Headers).To(BeNil())
+			rBody := response.Body.(map[string]interface{})
+			Expect(rBody["Name"]).To(Equal("newDocument.docx"))
+			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
 		})
 
 		It("PutRelativeFileRelative conflict", func() {
@@ -1103,7 +1098,7 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("zzz999", connector.NewConnectorError(409, "file conflict"))
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 409, Headers: map[string]string{connector.HeaderWopiLock: "zzz999"}}, nil)
 
 			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
 				if statReq.Ref.ResourceId.StorageId == "storageid" &&
@@ -1130,12 +1125,14 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "convFile.pdf")
-			Expect(err).To(HaveOccurred())
-			Expect(response.Name).To(Equal("convFile.pdf"))
-			Expect(response.Url).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
-			Expect(headers.ValidTarget).To(MatchRegexp(`[a-zA-Z0-9_-] convFile\.pdf`))
-			Expect(headers.LockID).To(Equal("zzz999"))
+			response, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "convFile.pdf")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(409))
+			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("zzz999"))
+			Expect(response.Headers[connector.HeaderWopiValidRT]).To(MatchRegexp(`[a-zA-Z0-9_-] convFile\.pdf`))
+			rBody := response.Body.(map[string]interface{})
+			Expect(rBody["Name"]).To(Equal("convFile.pdf"))
+			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
 		})
 
 		It("PutRelativeFileRelative put file fails", func() {
@@ -1161,21 +1158,22 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return("", connector.NewConnectorError(500, "something bad happened"))
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 500}, nil)
 
-			response, headers, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "convFile.pdf")
-			Expect(err).To(HaveOccurred())
-			Expect(response).To(BeNil())
-			Expect(headers).To(BeNil())
+			response, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "convFile.pdf")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
+			Expect(response.Body).To(BeNil())
 		})
 	})
 
 	Describe("DeleteFile", func() {
 		It("No valid context", func() {
 			ctx := context.Background()
-			newLockId, err := fc.DeleteFile(ctx, "lock")
+			response, err := fc.DeleteFile(ctx, "lock")
 			Expect(err).To(HaveOccurred())
-			Expect(newLockId).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Delete fails", func() {
@@ -1190,10 +1188,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			lockID, err := fc.DeleteFile(ctx, "newlock")
+			response, err := fc.DeleteFile(ctx, "newlock")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
-			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Delete fails status not ok, get lock fails", func() {
@@ -1208,10 +1206,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			lockID, err := fc.DeleteFile(ctx, "newlock")
+			response, err := fc.DeleteFile(ctx, "newlock")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
-			Expect(lockID).To(Equal(""))
+			Expect(response).To(BeNil())
 		})
 
 		It("Delete fails file missing", func() {
@@ -1226,11 +1224,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			lockID, err := fc.DeleteFile(ctx, "newlock")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(404))
-			Expect(lockID).To(Equal(""))
+			response, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(404))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Delete fails status not ok, get lock not ok", func() {
@@ -1244,11 +1241,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, nil)
 
-			lockID, err := fc.DeleteFile(ctx, "newlock")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(lockID).To(Equal(""))
+			response, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Delete fails, file locked", func() {
@@ -1266,11 +1262,10 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			lockID, err := fc.DeleteFile(ctx, "newlock")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(409))
-			Expect(lockID).To(Equal("zzz999"))
+			response, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(409))
+			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("zzz999"))
 		})
 
 		It("Delete fails, file not locked", func() {
@@ -1284,11 +1279,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewOK(ctx),
 			}, nil)
 
-			lockID, err := fc.DeleteFile(ctx, "newlock")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(lockID).To(Equal(""))
+			response, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
 		})
 
 		It("Delete success", func() {
@@ -1298,18 +1292,18 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewOK(ctx),
 			}, nil)
 
-			lockID, err := fc.DeleteFile(ctx, "newlock")
+			response, err := fc.DeleteFile(ctx, "newlock")
 			Expect(err).To(Succeed())
-			Expect(lockID).To(Equal(""))
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Headers).To(BeNil())
 		})
 	})
 
 	Describe("RenameFile", func() {
 		It("No valid context", func() {
 			ctx := context.Background()
-			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			response, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
 			Expect(err).To(HaveOccurred())
-			Expect(lockID).To(Equal(""))
 			Expect(response).To(BeNil())
 		})
 
@@ -1321,10 +1315,9 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			response, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
-			Expect(lockID).To(Equal(""))
 			Expect(response).To(BeNil())
 		})
 
@@ -1335,12 +1328,11 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, nil)
 
-			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(lockID).To(Equal(""))
-			Expect(response).To(BeNil())
+			response, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
+			Expect(response.Body).To(BeNil())
 		})
 
 		It("Rename failed", func() {
@@ -1361,10 +1353,9 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			response, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
-			Expect(lockID).To(Equal(""))
 			Expect(response).To(BeNil())
 		})
 
@@ -1385,12 +1376,11 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, nil)
 
-			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(lockID).To(Equal(""))
-			Expect(response).To(BeNil())
+			response, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Headers).To(BeNil())
+			Expect(response.Body).To(BeNil())
 		})
 
 		It("Rename conflict", func() {
@@ -1410,12 +1400,11 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewLocked(ctx, "lock mismatch"),
 			}, nil)
 
-			response, lockID, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(409))
-			Expect(lockID).To(Equal("zzz999"))
-			Expect(response).To(BeNil())
+			response, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(409))
+			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("zzz999"))
+			Expect(response.Body).To(BeNil())
 		})
 
 		It("Rename already exists", func() {
@@ -1454,10 +1443,12 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewOK(ctx),
 			}, nil).Once()
 
-			response, lockID, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
+			response, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
 			Expect(err).To(Succeed())
-			Expect(lockID).To(Equal(""))
-			Expect(response.Name).To(MatchRegexp(`^[a-zA-Z0-9_-]+ newFile$`))
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Headers).To(BeNil())
+			rBody := response.Body.(map[string]interface{})
+			Expect(rBody["Name"]).To(MatchRegexp(`^[a-zA-Z0-9_-]+ newFile$`))
 		})
 
 		It("Success", func() {
@@ -1484,19 +1475,21 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewOK(ctx),
 			}, nil).Once()
 
-			response, lockID, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
+			response, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
 			Expect(err).To(Succeed())
-			Expect(lockID).To(Equal(""))
-			Expect(response.Name).To(Equal("newFile"))
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Headers).To(BeNil())
+			rBody := response.Body.(map[string]interface{})
+			Expect(rBody["Name"]).To(Equal("newFile"))
 		})
 	})
 
 	Describe("CheckFileInfo", func() {
 		It("No valid context", func() {
 			ctx := context.Background()
-			newFileInfo, err := fc.CheckFileInfo(ctx)
+			response, err := fc.CheckFileInfo(ctx)
 			Expect(err).To(HaveOccurred())
-			Expect(newFileInfo).To(BeNil())
+			Expect(response).To(BeNil())
 		})
 
 		It("Stat fails", func() {
@@ -1507,10 +1500,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			newFileInfo, err := fc.CheckFileInfo(ctx)
+			response, err := fc.CheckFileInfo(ctx)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(targetErr))
-			Expect(newFileInfo).To(BeNil())
+			Expect(response).To(BeNil())
 		})
 
 		It("Stat fails status not ok", func() {
@@ -1520,11 +1513,10 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, nil)
 
-			newFileInfo, err := fc.CheckFileInfo(ctx)
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
-			Expect(newFileInfo).To(BeNil())
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).To(Succeed())
+			Expect(response.Status).To(Equal(500))
+			Expect(response.Body).To(BeNil())
 		})
 
 		It("Stat success", func() {
@@ -1568,9 +1560,10 @@ var _ = Describe("FileConnector", func() {
 				UserFriendlyName:           "Pet Shaft",
 			}
 
-			newFileInfo, err := fc.CheckFileInfo(ctx)
+			response, err := fc.CheckFileInfo(ctx)
 			Expect(err).To(Succeed())
-			Expect(newFileInfo.(*fileinfo.Microsoft)).To(Equal(expectedFileInfo))
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Microsoft)).To(Equal(expectedFileInfo))
 		})
 
 		It("Stat success guests", func() {
@@ -1626,18 +1619,19 @@ var _ = Describe("FileConnector", func() {
 				PostMessageOrigin:       "https://ocis.example.prv",
 			}
 
-			newFileInfo, err := fc.CheckFileInfo(ctx)
+			response, err := fc.CheckFileInfo(ctx)
 
 			// UserID and UserFriendlyName have random Ids generated which are impossible to guess
 			// Check both separately
-			Expect(newFileInfo.(*fileinfo.Collabora).UserID).To(HavePrefix(hex.EncodeToString([]byte("guest-"))))
-			Expect(newFileInfo.(*fileinfo.Collabora).UserFriendlyName).To(HavePrefix("Guest "))
+			Expect(response.Body.(*fileinfo.Collabora).UserID).To(HavePrefix(hex.EncodeToString([]byte("guest-"))))
+			Expect(response.Body.(*fileinfo.Collabora).UserFriendlyName).To(HavePrefix("Guest "))
 			// overwrite UserID and UserFriendlyName here for easier matching
-			newFileInfo.(*fileinfo.Collabora).UserID = "guest-zzz000"
-			newFileInfo.(*fileinfo.Collabora).UserFriendlyName = "guest zzz000"
+			response.Body.(*fileinfo.Collabora).UserID = "guest-zzz000"
+			response.Body.(*fileinfo.Collabora).UserFriendlyName = "guest zzz000"
 
 			Expect(err).To(Succeed())
-			Expect(newFileInfo.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
 		})
 
 		It("Stat success authenticated user", func() {
@@ -1685,10 +1679,11 @@ var _ = Describe("FileConnector", func() {
 				PostMessageOrigin:       "https://ocis.example.prv",
 			}
 
-			newFileInfo, err := fc.CheckFileInfo(ctx)
+			response, err := fc.CheckFileInfo(ctx)
 
 			Expect(err).To(Succeed())
-			Expect(newFileInfo.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
 		})
 	})
 })

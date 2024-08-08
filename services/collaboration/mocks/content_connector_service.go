@@ -4,6 +4,9 @@ package mocks
 
 import (
 	context "context"
+
+	connector "github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
+
 	io "io"
 
 	mock "github.com/stretchr/testify/mock"
@@ -70,22 +73,24 @@ func (_c *ContentConnectorService_GetFile_Call) RunAndReturn(run func(context.Co
 }
 
 // PutFile provides a mock function with given fields: ctx, stream, streamLength, lockID
-func (_m *ContentConnectorService) PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (string, error) {
+func (_m *ContentConnectorService) PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (*connector.ConnectorResponse, error) {
 	ret := _m.Called(ctx, stream, streamLength, lockID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PutFile")
 	}
 
-	var r0 string
+	var r0 *connector.ConnectorResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, io.Reader, int64, string) (string, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, io.Reader, int64, string) (*connector.ConnectorResponse, error)); ok {
 		return rf(ctx, stream, streamLength, lockID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, io.Reader, int64, string) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, io.Reader, int64, string) *connector.ConnectorResponse); ok {
 		r0 = rf(ctx, stream, streamLength, lockID)
 	} else {
-		r0 = ret.Get(0).(string)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connector.ConnectorResponse)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, io.Reader, int64, string) error); ok {
@@ -118,12 +123,12 @@ func (_c *ContentConnectorService_PutFile_Call) Run(run func(ctx context.Context
 	return _c
 }
 
-func (_c *ContentConnectorService_PutFile_Call) Return(_a0 string, _a1 error) *ContentConnectorService_PutFile_Call {
+func (_c *ContentConnectorService_PutFile_Call) Return(_a0 *connector.ConnectorResponse, _a1 error) *ContentConnectorService_PutFile_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ContentConnectorService_PutFile_Call) RunAndReturn(run func(context.Context, io.Reader, int64, string) (string, error)) *ContentConnectorService_PutFile_Call {
+func (_c *ContentConnectorService_PutFile_Call) RunAndReturn(run func(context.Context, io.Reader, int64, string) (*connector.ConnectorResponse, error)) *ContentConnectorService_PutFile_Call {
 	_c.Call.Return(run)
 	return _c
 }
