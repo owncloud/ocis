@@ -152,7 +152,7 @@ type filter interface {
 // a Path object.  It collects and deduplicates all elements matching
 // the path query.
 type pather struct {
-	queue      fifo
+	queue      queue[node]
 	results    []*Element
 	inResults  map[*Element]bool
 	candidates []*Element
@@ -180,7 +180,7 @@ func newPather() *pather {
 // and filters.
 func (p *pather) traverse(e *Element, path Path) []*Element {
 	for p.queue.add(node{e, path.segments}); p.queue.len() > 0; {
-		p.eval(p.queue.remove().(node))
+		p.eval(p.queue.remove())
 	}
 	return p.results
 }
@@ -406,9 +406,9 @@ func (s *selectChildren) apply(e *Element, p *pather) {
 type selectDescendants struct{}
 
 func (s *selectDescendants) apply(e *Element, p *pather) {
-	var queue fifo
+	var queue queue[*Element]
 	for queue.add(e); queue.len() > 0; {
-		e := queue.remove().(*Element)
+		e := queue.remove()
 		p.candidates = append(p.candidates, e)
 		for _, c := range e.Child {
 			if c, ok := c.(*Element); ok {
