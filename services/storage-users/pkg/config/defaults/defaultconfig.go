@@ -147,6 +147,7 @@ func DefaultConfig() *config.Config {
 				GeneralSpacePathTemplate:  "projects/{{.SpaceId}}",
 				PermissionsEndpoint:       "com.owncloud.api.settings",
 				AsyncUploads:              true,
+				ScanDebounceDelay:         1 * time.Second,
 			},
 		},
 		Events: config.Events{
