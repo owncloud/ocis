@@ -1,3 +1,12 @@
+Release 1.4.1
+=============
+
+**Changes**
+
+* Minimal go version updated to 1.21.
+* Default-initialized CharsetReader causes same result as NewDocument().
+* When reading an XML document, attributes are parsed more efficiently.
+
 Release v1.4.0
 ==============
 
