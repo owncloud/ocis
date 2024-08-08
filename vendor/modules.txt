@@ -1255,7 +1255,7 @@ github.com/justinas/alice
 # github.com/kevinburke/ssh_config v1.2.0
 ## explicit
 github.com/kevinburke/ssh_config
-# github.com/klauspost/compress v1.17.8
+# github.com/klauspost/compress v1.17.9
 ## explicit; go 1.20
 github.com/klauspost/compress
 github.com/klauspost/compress/flate
@@ -1363,7 +1363,7 @@ github.com/miekg/dns
 # github.com/mileusna/useragent v1.3.4
 ## explicit; go 1.14
 github.com/mileusna/useragent
-# github.com/minio/highwayhash v1.0.2
+# github.com/minio/highwayhash v1.0.3
 ## explicit; go 1.15
 github.com/minio/highwayhash
 # github.com/minio/md5-simd v1.1.2
@@ -1420,11 +1420,11 @@ github.com/mohae/deepcopy
 # github.com/mschoch/smat v0.2.0
 ## explicit; go 1.13
 github.com/mschoch/smat
-# github.com/nats-io/jwt/v2 v2.5.7
+# github.com/nats-io/jwt/v2 v2.5.8
 ## explicit; go 1.18
 github.com/nats-io/jwt/v2
-# github.com/nats-io/nats-server/v2 v2.10.16
-## explicit; go 1.20
+# github.com/nats-io/nats-server/v2 v2.10.18
+## explicit; go 1.21
 github.com/nats-io/nats-server/v2/conf
 github.com/nats-io/nats-server/v2/internal/fastrand
 github.com/nats-io/nats-server/v2/internal/ldap

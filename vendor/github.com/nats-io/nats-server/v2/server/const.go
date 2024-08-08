@@ -14,6 +14,7 @@
 package server
 
 import (
+	"runtime/debug"
 	"time"
 )
 
@@ -33,15 +34,28 @@ const (
 )
 
 var (
-	// gitCommit injected at build
-	gitCommit string
+	// gitCommit and serverVersion injected at build.
+	gitCommit, serverVersion string
 	// trustedKeys is a whitespace separated array of trusted operator's public nkeys.
 	trustedKeys string
 )
 
+func init() {
+	// Use build info if present, it would be if building using 'go build .'
+	// or when using a release.
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			switch setting.Key {
+			case "vcs.revision":
+				gitCommit = setting.Value[:7]
+			}
+		}
+	}
+}
+
 const (
 	// VERSION is the current version for the server.
-	VERSION = "2.10.16"
+	VERSION = "2.10.18"
 
 	// PROTO is the currently supported protocol.
 	// 0 was the original

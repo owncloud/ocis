@@ -98,6 +98,12 @@ const (
 // FIXME(dlc) - make configurable.
 var eventsHBInterval = 30 * time.Second
 
+// Default minimum wait time for sending statsz
+const defaultStatszRateLimit = 1 * time.Second
+
+// Variable version so we can set in tests.
+var statszRateLimit = defaultStatszRateLimit
+
 type sysMsgHandler func(sub *subscription, client *client, acc *Account, subject, reply string, hdr, msg []byte)
 
 // Used if we have to queue things internally to avoid the route/gw path.
@@ -134,6 +140,7 @@ type internal struct {
 	shash          string
 	inboxPre       string
 	remoteStatsSub *subscription
+	lastStatsz     time.Time
 }
 
 // ServerStatsMsg is sent periodically with stats updates.
@@ -807,6 +814,10 @@ func (s *Server) sendStatsz(subj string) {
 	var m ServerStatsMsg
 	s.updateServerUsage(&m.Stats)
 
+	if s.limitStatsz(subj) {
+		return
+	}
+
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -948,6 +959,35 @@ func (s *Server) sendStatsz(subj string) {
 	s.sendInternalMsg(subj, _EMPTY_, &m.Server, &m)
 }
 
+// Limit updates to the heartbeat interval, max one second by default.
+func (s *Server) limitStatsz(subj string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if s.sys == nil {
+		return true
+	}
+
+	// Only limit the normal broadcast subject.
+	if subj != fmt.Sprintf(serverStatsSubj, s.ID()) {
+		return false
+	}
+
+	interval := statszRateLimit
+	if s.sys.cstatsz < interval {
+		interval = s.sys.cstatsz
+	}
+	if time.Since(s.sys.lastStatsz) < interval {
+		// Reschedule heartbeat for the next interval.
+		if s.sys.stmr != nil {
+			s.sys.stmr.Reset(time.Until(s.sys.lastStatsz.Add(interval)))
+		}
+		return true
+	}
+	s.sys.lastStatsz = time.Now()
+	return false
+}
+
 // Send out our statz update.
 // This should be wrapChk() to setup common locking.
 func (s *Server) heartbeatStatsz() {
@@ -963,6 +1003,12 @@ func (s *Server) heartbeatStatsz() {
 	}
 	// Do in separate Go routine.
 	go s.sendStatszUpdate()
+}
+
+// Reset statsz rate limit for the next broadcast.
+// This should be wrapChk() to setup common locking.
+func (s *Server) resetLastStatsz() {
+	s.sys.lastStatsz = time.Time{}
 }
 
 func (s *Server) sendStatszUpdate() {
@@ -1019,44 +1065,56 @@ func (s *Server) Node() string {
 // Tradeoff is subscription and interest graph events vs connect and
 // disconnect events, etc.
 func (s *Server) initEventTracking() {
-	if !s.EventsEnabled() {
+	// Capture sys in case we are shutdown while setting up.
+	s.mu.RLock()
+	sys := s.sys
+	s.mu.RUnlock()
+
+	if sys == nil || sys.client == nil || sys.account == nil {
 		return
 	}
 	// Create a system hash which we use for other servers to target us specifically.
-	s.sys.shash = getHash(s.info.Name)
+	sys.shash = getHash(s.info.Name)
 
 	// This will be for all inbox responses.
-	subject := fmt.Sprintf(inboxRespSubj, s.sys.shash, "*")
+	subject := fmt.Sprintf(inboxRespSubj, sys.shash, "*")
 	if _, err := s.sysSubscribe(subject, s.inboxReply); err != nil {
 		s.Errorf("Error setting up internal tracking: %v", err)
+		return
 	}
-	s.sys.inboxPre = subject
+	sys.inboxPre = subject
 	// This is for remote updates for connection accounting.
 	subject = fmt.Sprintf(accConnsEventSubjOld, "*")
 	if _, err := s.sysSubscribe(subject, s.noInlineCallback(s.remoteConnsUpdate)); err != nil {
 		s.Errorf("Error setting up internal tracking for %s: %v", subject, err)
+		return
 	}
 	// This will be for responses for account info that we send out.
 	subject = fmt.Sprintf(connsRespSubj, s.info.ID)
 	if _, err := s.sysSubscribe(subject, s.noInlineCallback(s.remoteConnsUpdate)); err != nil {
 		s.Errorf("Error setting up internal tracking: %v", err)
+		return
 	}
 	// Listen for broad requests to respond with number of subscriptions for a given subject.
 	if _, err := s.sysSubscribe(accNumSubsReqSubj, s.noInlineCallback(s.nsubsRequest)); err != nil {
 		s.Errorf("Error setting up internal tracking: %v", err)
+		return
 	}
 	// Listen for statsz from others.
 	subject = fmt.Sprintf(serverStatsSubj, "*")
 	if sub, err := s.sysSubscribe(subject, s.noInlineCallback(s.remoteServerUpdate)); err != nil {
 		s.Errorf("Error setting up internal tracking: %v", err)
+		return
 	} else {
 		// Keep track of this one.
-		s.sys.remoteStatsSub = sub
+		sys.remoteStatsSub = sub
 	}
+
 	// Listen for all server shutdowns.
 	subject = fmt.Sprintf(shutdownEventSubj, "*")
 	if _, err := s.sysSubscribe(subject, s.noInlineCallback(s.remoteServerShutdown)); err != nil {
 		s.Errorf("Error setting up internal tracking: %v", err)
+		return
 	}
 	// Listen for servers entering lame-duck mode.
 	// NOTE: This currently is handled in the same way as a server shutdown, but has
@@ -1064,6 +1122,7 @@ func (s *Server) initEventTracking() {
 	subject = fmt.Sprintf(lameDuckEventSubj, "*")
 	if _, err := s.sysSubscribe(subject, s.noInlineCallback(s.remoteServerShutdown)); err != nil {
 		s.Errorf("Error setting up internal tracking: %v", err)
+		return
 	}
 	// Listen for account claims updates.
 	subscribeToUpdate := true
@@ -1074,6 +1133,7 @@ func (s *Server) initEventTracking() {
 		for _, sub := range []string{accUpdateEventSubjOld, accUpdateEventSubjNew} {
 			if _, err := s.sysSubscribe(fmt.Sprintf(sub, "*"), s.noInlineCallback(s.accountClaimUpdate)); err != nil {
 				s.Errorf("Error setting up internal tracking: %v", err)
+				return
 			}
 		}
 	}
@@ -1081,6 +1141,7 @@ func (s *Server) initEventTracking() {
 	// This subscription is kept for backwards compatibility. Got replaced by ...PING.STATZ from below
 	if _, err := s.sysSubscribe(serverStatsPingReqSubj, s.noInlineCallback(s.statszReq)); err != nil {
 		s.Errorf("Error setting up internal tracking: %v", err)
+		return
 	}
 	monSrvc := map[string]sysMsgHandler{
 		"IDZ":    s.idzReq,
@@ -1134,10 +1195,12 @@ func (s *Server) initEventTracking() {
 		subject = fmt.Sprintf(serverDirectReqSubj, s.info.ID, name)
 		if _, err := s.sysSubscribe(subject, s.noInlineCallback(req)); err != nil {
 			s.Errorf("Error setting up internal tracking: %v", err)
+			return
 		}
 		subject = fmt.Sprintf(serverPingReqSubj, name)
 		if _, err := s.sysSubscribe(subject, s.noInlineCallback(req)); err != nil {
 			s.Errorf("Error setting up internal tracking: %v", err)
+			return
 		}
 	}
 	extractAccount := func(subject string) (string, error) {
@@ -1230,6 +1293,7 @@ func (s *Server) initEventTracking() {
 	for name, req := range monAccSrvc {
 		if _, err := s.sysSubscribe(fmt.Sprintf(accDirectReqSubj, "*", name), s.noInlineCallback(req)); err != nil {
 			s.Errorf("Error setting up internal tracking: %v", err)
+			return
 		}
 	}
 
@@ -1238,6 +1302,7 @@ func (s *Server) initEventTracking() {
 	// is only one that will answer. This breaks tests since we still forward on remote server connect.
 	if _, err := s.sysSubscribe(fmt.Sprintf(userDirectReqSubj, "*"), s.userInfoReq); err != nil {
 		s.Errorf("Error setting up internal tracking: %v", err)
+		return
 	}
 
 	// For now only the STATZ subject has an account specific ping equivalent.
@@ -1255,6 +1320,7 @@ func (s *Server) initEventTracking() {
 			})
 		})); err != nil {
 		s.Errorf("Error setting up internal tracking: %v", err)
+		return
 	}
 
 	// Listen for updates when leaf nodes connect for a given account. This will
@@ -1262,32 +1328,38 @@ func (s *Server) initEventTracking() {
 	subject = fmt.Sprintf(leafNodeConnectEventSubj, "*")
 	if _, err := s.sysSubscribe(subject, s.noInlineCallback(s.leafNodeConnected)); err != nil {
 		s.Errorf("Error setting up internal tracking: %v", err)
+		return
 	}
 	// For tracking remote latency measurements.
-	subject = fmt.Sprintf(remoteLatencyEventSubj, s.sys.shash)
+	subject = fmt.Sprintf(remoteLatencyEventSubj, sys.shash)
 	if _, err := s.sysSubscribe(subject, s.noInlineCallback(s.remoteLatencyUpdate)); err != nil {
 		s.Errorf("Error setting up internal latency tracking: %v", err)
+		return
 	}
 	// This is for simple debugging of number of subscribers that exist in the system.
 	if _, err := s.sysSubscribeInternal(accSubsSubj, s.noInlineCallback(s.debugSubscribers)); err != nil {
 		s.Errorf("Error setting up internal debug service for subscribers: %v", err)
+		return
 	}
 
 	// Listen for requests to reload the server configuration.
 	subject = fmt.Sprintf(serverReloadReqSubj, s.info.ID)
 	if _, err := s.sysSubscribe(subject, s.noInlineCallback(s.reloadConfig)); err != nil {
 		s.Errorf("Error setting up server reload handler: %v", err)
+		return
 	}
 
 	// Client connection kick
 	subject = fmt.Sprintf(clientKickReqSubj, s.info.ID)
 	if _, err := s.sysSubscribe(subject, s.noInlineCallback(s.kickClient)); err != nil {
 		s.Errorf("Error setting up client kick service: %v", err)
+		return
 	}
 	// Client connection LDM
 	subject = fmt.Sprintf(clientLDMReqSubj, s.info.ID)
 	if _, err := s.sysSubscribe(subject, s.noInlineCallback(s.ldmClient)); err != nil {
 		s.Errorf("Error setting up client LDM service: %v", err)
+		return
 	}
 }
 
@@ -1868,6 +1940,7 @@ func (s *Server) statszReq(sub *subscription, c *client, _ *Account, subject, re
 	// No reply is a signal that we should use our normal broadcast subject.
 	if reply == _EMPTY_ {
 		reply = fmt.Sprintf(serverStatsSubj, s.info.ID)
+		s.wrapChk(s.resetLastStatsz)
 	}
 
 	opts := StatszEventOptions{}
