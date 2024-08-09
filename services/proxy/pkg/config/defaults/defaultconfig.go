@@ -258,6 +258,10 @@ func DefaultPolicies() []config.Policy {
 					Endpoint: "/api/v0/settings",
 					Service:  "com.owncloud.web.settings",
 				},
+				{
+					Endpoint: "/auth-app/tokens",
+					Service:  "com.owncloud.web.auth-app",
+				},
 			},
 		},
 	}

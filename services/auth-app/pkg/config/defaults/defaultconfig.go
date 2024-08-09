@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"strings"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/config"
@@ -27,6 +29,17 @@ func DefaultConfig() *config.Config {
 			Addr:      "127.0.0.1:9246",
 			Namespace: "com.owncloud.api",
 			Protocol:  "tcp",
+		},
+		HTTP: config.HTTP{
+			Addr:      "127.0.0.1:9247",
+			Namespace: "com.owncloud.web",
+			Root:      "/",
+			CORS: config.CORS{
+				AllowedOrigins:   []string{"*"},
+				AllowedMethods:   []string{"GET", "POST", "DELETE"},
+				AllowedHeaders:   []string{"Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With", "X-Request-Id", "Ocs-Apirequest"},
+				AllowCredentials: true,
+			},
 		},
 		Service: config.Service{
 			Name: "auth-app",
@@ -60,6 +73,10 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
+	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
+		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
+	}
+
 	if cfg.Reva == nil && cfg.Commons != nil {
 		cfg.Reva = structs.CopyOrZeroValue(cfg.Commons.Reva)
 	}
@@ -79,9 +96,16 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.GRPC.TLS == nil && cfg.Commons != nil {
 		cfg.GRPC.TLS = structs.CopyOrZeroValue(cfg.Commons.GRPCServiceTLS)
 	}
+
+	if cfg.Commons != nil {
+		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
+	}
 }
 
 // Sanitize sanitized the configuration
-func Sanitize(_ *config.Config) {
-	// nothing to sanitize here atm
+func Sanitize(cfg *config.Config) {
+	// sanitize config
+	if cfg.HTTP.Root != "/" {
+		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
+	}
 }
