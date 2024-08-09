@@ -697,7 +697,14 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 
 			// we must not allow to override mountpoints - so we check if we have access to the parent. If not this is a mountpoint
 			if destInShareJail {
-				dir, file := filepath.Split(dstRef.GetPath())
+				res, err := client.GetPath(ctx, &provider.GetPathRequest{ResourceId: dstStatRes.GetInfo().GetId()})
+				if err != nil || res.GetStatus().GetCode() != rpc.Code_CODE_OK {
+					log.Error().Err(err).Msg("error sending grpc get path request")
+					w.WriteHeader(http.StatusInternalServerError)
+					return nil
+				}
+
+				dir, file := filepath.Split(filepath.Clean(res.GetPath()))
 				if dir == "/" || dir == "" || file == "" {
 					log.Error().Msg("must not overwrite mount points")
 					w.WriteHeader(http.StatusBadRequest)

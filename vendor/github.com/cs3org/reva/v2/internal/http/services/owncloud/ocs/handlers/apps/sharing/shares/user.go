@@ -132,10 +132,10 @@ func (h *Handler) createUserShare(w http.ResponseWriter, r *http.Request, statIn
 }
 
 func (h *Handler) isUserShare(r *http.Request, oid string) (*collaboration.Share, bool) {
-	logger := appctx.GetLogger(r.Context())
+	log := appctx.GetLogger(r.Context())
 	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
 	if err != nil {
-		logger.Err(err)
+		log.Err(err).Send()
 	}
 
 	getShareRes, err := client.GetShare(r.Context(), &collaboration.GetShareRequest{
@@ -147,12 +147,17 @@ func (h *Handler) isUserShare(r *http.Request, oid string) (*collaboration.Share
 			},
 		},
 	})
-	if err != nil {
-		logger.Err(err)
-		return nil, false
+	switch {
+	case err != nil:
+		log.Err(err).Send()
+	case getShareRes.Status.Code == rpc.Code_CODE_OK:
+		return getShareRes.GetShare(), true
+	case getShareRes.Status.Code == rpc.Code_CODE_INTERNAL:
+		log.Error().Str("message", getShareRes.GetStatus().GetMessage()).Str("code", getShareRes.GetStatus().GetCode().String()).Msg("isUserShare received internal error")
+	default:
+		log.Debug().Str("message", getShareRes.GetStatus().GetMessage()).Str("code", getShareRes.GetStatus().GetCode().String()).Msg("isUserShare received unexpected status")
 	}
-
-	return getShareRes.GetShare(), getShareRes.GetShare() != nil
+	return nil, false
 }
 
 func (h *Handler) isFederatedShare(r *http.Request, shareID string) bool {
@@ -172,12 +177,17 @@ func (h *Handler) isFederatedShare(r *http.Request, shareID string) bool {
 			},
 		},
 	})
-	if err != nil {
+	switch {
+	case err != nil:
 		log.Err(err).Send()
-		return false
+	case getShareRes.Status.Code == rpc.Code_CODE_OK:
+		return true
+	case getShareRes.Status.Code == rpc.Code_CODE_INTERNAL:
+		log.Error().Str("message", getShareRes.GetStatus().GetMessage()).Str("code", getShareRes.GetStatus().GetCode().String()).Msg("isFederatedShare received internal error")
+	default:
+		log.Debug().Str("message", getShareRes.GetStatus().GetMessage()).Str("code", getShareRes.GetStatus().GetCode().String()).Msg("isFederatedShare received unexpected status")
 	}
-
-	return getShareRes.GetShare() != nil
+	return false
 }
 
 func (h *Handler) removeFederatedShare(w http.ResponseWriter, r *http.Request, shareID string) {
@@ -247,12 +257,17 @@ func (h *Handler) isFederatedReceivedShare(r *http.Request, shareID string) bool
 			},
 		},
 	})
-	if err != nil {
+	switch {
+	case err != nil:
 		log.Err(err).Send()
-		return false
+	case getShareRes.Status.Code == rpc.Code_CODE_OK:
+		return true
+	case getShareRes.Status.Code == rpc.Code_CODE_INTERNAL:
+		log.Error().Str("message", getShareRes.GetStatus().GetMessage()).Str("code", getShareRes.GetStatus().GetCode().String()).Msg("isFederatedReceivedShare received internal error")
+	default:
+		log.Debug().Str("message", getShareRes.GetStatus().GetMessage()).Str("code", getShareRes.GetStatus().GetCode().String()).Msg("isFederatedReceivedShare received unexpected status")
 	}
-
-	return getShareRes.GetShare() != nil
+	return false
 }
 
 func (h *Handler) removeUserShare(w http.ResponseWriter, r *http.Request, share *collaboration.Share) {

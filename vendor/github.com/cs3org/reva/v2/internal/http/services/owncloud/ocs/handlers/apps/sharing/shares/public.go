@@ -295,12 +295,17 @@ func (h *Handler) isPublicShare(r *http.Request, oid string) (*link.PublicShare,
 			},
 		},
 	})
-	if err != nil {
-		logger.Err(err)
-		return nil, false
+	switch {
+	case err != nil:
+		log.Err(err).Send()
+	case psRes.Status.Code == rpc.Code_CODE_OK:
+		return psRes.GetShare(), psRes.GetShare() != nil
+	case psRes.Status.Code == rpc.Code_CODE_INTERNAL:
+		log.Error().Str("message", psRes.GetStatus().GetMessage()).Str("code", psRes.GetStatus().GetCode().String()).Msg("isPublicShare received internal error")
+	default:
+		log.Debug().Str("message", psRes.GetStatus().GetMessage()).Str("code", psRes.GetStatus().GetCode().String()).Msg("isPublicShare received unexpected status")
 	}
-
-	return psRes.GetShare(), psRes.GetShare() != nil
+	return nil, false
 }
 
 func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, share *link.PublicShare) {
