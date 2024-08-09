@@ -2988,7 +2988,7 @@ def k6LoadTests(ctx):
                 "name": "open-grafana-dashboard",
                 "image": OC_CI_ALPINE,
                 "commands": [
-                    "echo 'Grafana Dashboard: https://grafana.k6.infra.owncloud.works/d/P4D1D31A5B69203FF'",
+                    "echo 'Grafana Dashboard: https://grafana.k6.infra.owncloud.works'",
                 ],
             },
         ],
