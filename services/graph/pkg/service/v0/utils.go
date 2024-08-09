@@ -16,11 +16,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
-	"golang.org/x/sync/errgroup"
 )
 
 // StrictJSONUnmarshal is a wrapper around json.Unmarshal that returns an error if the json contains unknown fields.
@@ -129,7 +130,7 @@ func groupIdToIdentity(ctx context.Context, cache identity.IdentityCache, groupI
 // As permissions on space to not map to a cs3 share we need something else of the ids. So we just
 // construct the id for the id of the user or group that the permission applies to and prefix that
 // with a "u:" for userids and "g:" for group ids.
-func identitySetToSpacePermissionID(identitySet libregraph.SharePointIdentitySet) (id string) {
+func identitySetToSpacePermissionID(identitySet libregraph.SharePointIdentitySet, allowedRoleIDs []string) (id string) {
 	switch {
 	case identitySet.HasUser():
 		id = "u:" + identitySet.User.GetId()
@@ -143,7 +144,9 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 	logger *log.Logger,
 	gatewayClient gateway.GatewayAPIClient,
 	identityCache identity.IdentityCache,
-	receivedShares []*collaboration.ReceivedShare) ([]libregraph.DriveItem, error) {
+	receivedShares []*collaboration.ReceivedShare,
+	availableRoles []*libregraph.UnifiedRoleDefinition,
+) ([]libregraph.DriveItem, error) {
 
 	group := new(errgroup.Group)
 	// Set max concurrency
@@ -185,7 +188,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 				return errCode
 			}
 
-			driveItem, err := fillDriveItemPropertiesFromReceivedShare(ctx, logger, identityCache, receivedShares, shareStat.GetInfo())
+			driveItem, err := fillDriveItemPropertiesFromReceivedShare(ctx, logger, identityCache, receivedShares, shareStat.GetInfo(), availableRoles)
 			if err != nil {
 				return err
 			}
@@ -322,7 +325,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 
 func fillDriveItemPropertiesFromReceivedShare(ctx context.Context, logger *log.Logger,
 	identityCache identity.IdentityCache, receivedShares []*collaboration.ReceivedShare,
-	resourceInfo *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
+	resourceInfo *storageprovider.ResourceInfo, availableRoles []*libregraph.UnifiedRoleDefinition) (*libregraph.DriveItem, error) {
 
 	driveItem := libregraph.NewDriveItem()
 	permissions := make([]libregraph.Permission, 0, len(receivedShares))
@@ -336,7 +339,7 @@ func fillDriveItemPropertiesFromReceivedShare(ctx context.Context, logger *log.L
 			oldestReceivedShare = receivedShare
 		}
 
-		permission, err := cs3ReceivedShareToLibreGraphPermissions(ctx, logger, identityCache, receivedShare, resourceInfo)
+		permission, err := cs3ReceivedShareToLibreGraphPermissions(ctx, logger, identityCache, receivedShare, resourceInfo, availableRoles)
 		if err != nil {
 			return driveItem, err
 		}
@@ -397,7 +400,7 @@ func fillDriveItemPropertiesFromReceivedShare(ctx context.Context, logger *log.L
 
 func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Logger,
 	identityCache identity.IdentityCache, receivedShare *collaboration.ReceivedShare,
-	resourceInfo *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
+	resourceInfo *storageprovider.ResourceInfo, availableRoles []*libregraph.UnifiedRoleDefinition) (*libregraph.Permission, error) {
 	permission := libregraph.NewPermission()
 	if id := receivedShare.GetShare().GetId().GetOpaqueId(); id != "" {
 		permission.SetId(id)
@@ -416,8 +419,12 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 		if err != nil {
 			return nil, err
 		}
-		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(permissionSet, condition)
 
+		role := unifiedrole.CS3ResourcePermissionsToRole(
+			availableRoles,
+			permissionSet,
+			condition,
+		)
 		if role != nil {
 			permission.SetRoles([]string{role.GetId()})
 		}

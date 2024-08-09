@@ -10,6 +10,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
 // ListSharedWithMe lists the files shared with the current user.
@@ -39,7 +40,8 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 		g.logger.Error().Err(err).Msg("listing shares failed")
 		return nil, err
 	}
-	driveItems, err := cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedSharesResponse.GetShares())
+	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
+	driveItems, err := cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedSharesResponse.GetShares(), availableRoles)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("could not convert received shares to drive items")
 		return nil, err

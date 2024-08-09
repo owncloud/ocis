@@ -1,0 +1,336 @@
+package unifiedrole
+
+import (
+	"cmp"
+	"slices"
+
+	libregraph "github.com/owncloud/libre-graph-api-go"
+	"google.golang.org/protobuf/proto"
+
+	"github.com/cs3org/reva/v2/pkg/conversions"
+)
+
+const (
+	// UnifiedRoleViewerID Unified role viewer id.
+	UnifiedRoleViewerID = "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
+	// UnifiedRoleSpaceViewerID Unified role space viewer id.
+	UnifiedRoleSpaceViewerID = "a8d5fe5e-96e3-418d-825b-534dbdf22b99"
+	// UnifiedRoleEditorID Unified role editor id.
+	UnifiedRoleEditorID = "fb6c3e19-e378-47e5-b277-9732f9de6e21"
+	// UnifiedRoleSpaceEditorID Unified role space editor id.
+	UnifiedRoleSpaceEditorID = "58c63c02-1d89-4572-916a-870abc5a1b7d"
+	// UnifiedRoleFileEditorID Unified role file editor id.
+	UnifiedRoleFileEditorID = "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
+	// UnifiedRoleEditorLiteID Unified role editor-lite id.
+	UnifiedRoleEditorLiteID = "1c996275-f1c9-4e71-abdf-a42f6495e960"
+	// UnifiedRoleManagerID Unified role manager id.
+	UnifiedRoleManagerID = "312c0871-5ef7-4b3a-85b6-0e4074c64049"
+	// UnifiedRoleSecureViewerID Unified role secure viewer id.
+	UnifiedRoleSecureViewerID = "aa97fe03-7980-45ac-9e50-b325749fd7e6"
+
+	// UnifiedRoleConditionDrive defines constraint that matches a Driveroot/Spaceroot
+	UnifiedRoleConditionDrive = "exists @Resource.Root"
+	// UnifiedRoleConditionFolder defines constraints that matches a DriveItem representing a Folder
+	UnifiedRoleConditionFolder = "exists @Resource.Folder"
+	// UnifiedRoleConditionFile defines a constraint that matches a DriveItem representing a File
+	UnifiedRoleConditionFile = "exists @Resource.File"
+
+	DriveItemPermissionsCreate = "libre.graph/driveItem/permissions/create"
+	DriveItemChildrenCreate    = "libre.graph/driveItem/children/create"
+	DriveItemStandardDelete    = "libre.graph/driveItem/standard/delete"
+	DriveItemPathRead          = "libre.graph/driveItem/path/read"
+	DriveItemQuotaRead         = "libre.graph/driveItem/quota/read"
+	DriveItemContentRead       = "libre.graph/driveItem/content/read"
+	DriveItemUploadCreate      = "libre.graph/driveItem/upload/create"
+	DriveItemPermissionsRead   = "libre.graph/driveItem/permissions/read"
+	DriveItemChildrenRead      = "libre.graph/driveItem/children/read"
+	DriveItemVersionsRead      = "libre.graph/driveItem/versions/read"
+	DriveItemDeletedRead       = "libre.graph/driveItem/deleted/read"
+	DriveItemPathUpdate        = "libre.graph/driveItem/path/update"
+	DriveItemPermissionsDelete = "libre.graph/driveItem/permissions/delete"
+	DriveItemDeletedDelete     = "libre.graph/driveItem/deleted/delete"
+	DriveItemVersionsUpdate    = "libre.graph/driveItem/versions/update"
+	DriveItemDeletedUpdate     = "libre.graph/driveItem/deleted/update"
+	DriveItemBasicRead         = "libre.graph/driveItem/basic/read"
+	DriveItemPermissionsUpdate = "libre.graph/driveItem/permissions/update"
+	DriveItemPermissionsDeny   = "libre.graph/driveItem/permissions/deny"
+)
+
+var (
+	// legacyNames contains the legacy role names.
+	legacyNames = map[string]string{
+		UnifiedRoleViewerID: conversions.RoleViewer,
+		// one V1 api the "spaceviewer" role was call "viewer" and the "spaceeditor" was "editor",
+		// we need to stay compatible with that
+		UnifiedRoleSpaceViewerID:  "viewer",
+		UnifiedRoleSpaceEditorID:  "editor",
+		UnifiedRoleEditorID:       conversions.RoleEditor,
+		UnifiedRoleFileEditorID:   conversions.RoleFileEditor,
+		UnifiedRoleEditorLiteID:   conversions.RoleEditorLite,
+		UnifiedRoleManagerID:      conversions.RoleManager,
+		UnifiedRoleSecureViewerID: conversions.RoleSecureViewer,
+	}
+
+	// buildInRoles contains the built-in roles.
+	buildInRoles = []*libregraph.UnifiedRoleDefinition{
+		roleViewer,
+		roleSpaceViewer,
+		roleEditor,
+		roleSpaceEditor,
+		roleFileEditor,
+		roleEditorLite,
+		roleManager,
+		roleSecureViewer,
+	}
+
+	// roleViewer creates a viewer role.
+	roleViewer = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewViewerRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleViewerID),
+			Description: proto.String("View and download."),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFile),
+				},
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFolder),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}()
+
+	// roleSpaceViewer creates a spaceviewer role
+	roleSpaceViewer = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewSpaceViewerRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleSpaceViewerID),
+			Description: proto.String("View and download."),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionDrive),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}()
+
+	// roleEditor creates an editor role.
+	roleEditor = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewEditorRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleEditorID),
+			Description: proto.String("View, download, upload, edit, add and delete."),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFolder),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}()
+
+	// roleSpaceEditor creates an editor role
+	roleSpaceEditor = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewSpaceEditorRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleSpaceEditorID),
+			Description: proto.String("View, download, upload, edit, add and delete."),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionDrive),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}()
+
+	// roleFileEditor creates a file-editor role
+	roleFileEditor = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewFileEditorRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleFileEditorID),
+			Description: proto.String("View, download and edit."),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFile),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}()
+
+	// roleEditorLite creates an editor-lite role
+	roleEditorLite = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewEditorLiteRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleEditorLiteID),
+			Description: proto.String("View, download and upload."),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFolder),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}()
+
+	// roleManager creates a manager role
+	roleManager = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewManagerRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleManagerID),
+			Description: proto.String("View, download, upload, edit, add, delete and manage members."),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionDrive),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}()
+
+	// roleSecureViewer creates a secure viewer role
+	roleSecureViewer = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewSecureViewerRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleSecureViewerID),
+			Description: proto.String("View only documents, images and PDFs. Watermarks will be applied."),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFile),
+				},
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFolder),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}()
+)
+
+// GetRoles returns a role filter that matches the provided resources
+func GetRoles(f RoleFilter) []*libregraph.UnifiedRoleDefinition {
+	return filterRoles(buildInRoles, f)
+}
+
+// GetRole returns a role filter that matches the provided resources
+func GetRole(f RoleFilter) (*libregraph.UnifiedRoleDefinition, error) {
+	roles := filterRoles(buildInRoles, f)
+	if len(roles) == 0 {
+		return nil, ErrUnknownRole
+	}
+
+	return roles[0], nil
+}
+
+// GetRolesByPermissions returns a list of role definitions
+// that match the provided actions and constraints
+func GetRolesByPermissions(roleSet []*libregraph.UnifiedRoleDefinition, actions []string, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
+	roles := make([]*libregraph.UnifiedRoleDefinition, 0, len(roleSet))
+
+	for _, role := range roleSet {
+		var match bool
+
+		for _, permission := range role.GetRolePermissions() {
+			if permission.GetCondition() != constraints {
+				continue
+			}
+
+			for i, action := range permission.GetAllowedResourceActions() {
+				if !slices.Contains(actions, action) {
+					break
+				}
+				if i == len(permission.GetAllowedResourceActions())-1 {
+					match = true
+				}
+			}
+
+			if match {
+				break
+			}
+		}
+
+		if match {
+			roles = append(roles, role)
+		}
+
+	}
+
+	return weightRoles(roles, constraints, descending)
+}
+
+// GetLegacyRoleName returns the legacy role name for the provided role
+func GetLegacyRoleName(role libregraph.UnifiedRoleDefinition) string {
+	return legacyNames[role.GetId()]
+}
+
+// weightRoles sorts the provided role definitions by the number of permissions[n].actions they grant,
+// the implementation is optimistic and assumes that the weight relies on the number of available actions.
+// descending - false - sorts the roles from least to most permissions
+// descending - true - sorts the roles from most to least permissions
+func weightRoles(roleSet []*libregraph.UnifiedRoleDefinition, constraints string, descending bool) []*libregraph.UnifiedRoleDefinition {
+	slices.SortFunc(roleSet, func(i, j *libregraph.UnifiedRoleDefinition) int {
+		var ia []string
+		for _, rp := range i.GetRolePermissions() {
+			if rp.GetCondition() == constraints {
+				ia = append(ia, rp.GetAllowedResourceActions()...)
+			}
+		}
+
+		var ja []string
+		for _, rp := range j.GetRolePermissions() {
+			if rp.GetCondition() == constraints {
+				ja = append(ja, rp.GetAllowedResourceActions()...)
+			}
+		}
+
+		switch descending {
+		case true:
+			return cmp.Compare(len(ja), len(ia))
+		default:
+			return cmp.Compare(len(ia), len(ja))
+		}
+	})
+
+	for i, role := range roleSet {
+		role.LibreGraphWeight = libregraph.PtrInt32(int32(i) + 1)
+	}
+
+	// return for the sake of consistency, optional because the slice is modified in place
+	return roleSet
+}
+
+// GetAllowedResourceActions returns the allowed resource actions for the provided role by condition
+func GetAllowedResourceActions(role *libregraph.UnifiedRoleDefinition, condition string) []string {
+	if role == nil {
+		return []string{}
+	}
+
+	for _, p := range role.GetRolePermissions() {
+		if p.GetCondition() == condition {
+			return p.GetAllowedResourceActions()
+		}
+	}
+
+	return []string{}
+}

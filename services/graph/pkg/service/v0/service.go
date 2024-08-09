@@ -214,7 +214,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		return svc, err
 	}
 
-	driveItemPermissionsApi, err := NewDriveItemPermissionsApi(driveItemPermissionsService, options.Logger)
+	driveItemPermissionsApi, err := NewDriveItemPermissionsApi(driveItemPermissionsService, options.Logger, options.Config)
 	if err != nil {
 		return svc, err
 	}
