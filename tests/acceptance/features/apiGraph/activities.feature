@@ -6,7 +6,7 @@ Feature: check activities
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
-
+  @issue-9712
   Scenario: check activities after uploading a file
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" checks the activities for file "textfile0.txt" in space "Personal" using the Graph API
@@ -100,7 +100,7 @@ Feature: check activities
       }
       """
 
-
+  @issue-9712
   Scenario: check activities after deleting a file
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" deletes file "/textfile0.txt" using the WebDAV API
@@ -234,7 +234,7 @@ Feature: check activities
       }
       """
 
-
+  @issue-9712
   Scenario: check activities after deleting a folder
     Given user "Alice" has created folder "/FOLDER"
     When user "Alice" deletes folder "/FOLDER" using the WebDAV API
