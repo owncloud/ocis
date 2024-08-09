@@ -1437,7 +1437,7 @@ def dockerRelease(ctx, arch, repo, build_type):
                 },
             },
             {
-                "name": "docker",
+                "name": "docker.io",
                 "image": PLUGINS_DOCKER,
                 "settings": {
                     "username": {
@@ -1446,6 +1446,33 @@ def dockerRelease(ctx, arch, repo, build_type):
                     "password": {
                         "from_secret": "docker_password",
                     },
+                    "registry": "docker.io",
+                    "auto_tag": True,
+                    "context": "ocis",
+                    "auto_tag_suffix": "linux-%s" % (arch),
+                    "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
+                    "repo": repo,
+                    "build_args": build_args,
+                },
+                "when": {
+                    "ref": {
+                        "exclude": [
+                            "refs/pull/**",
+                        ],
+                    },
+                },
+            },
+            {
+                "name": "quay.io",
+                "image": PLUGINS_DOCKER,
+                "settings": {
+                    "username": {
+                        "from_secret": "quay_username",
+                    },
+                    "password": {
+                        "from_secret": "quay_password",
+                    },
+                    "registry": "quay.io",
                     "auto_tag": True,
                     "context": "ocis",
                     "auto_tag_suffix": "linux-%s" % (arch),
@@ -1913,7 +1940,7 @@ def releaseDockerReadme(ctx, repo, build_type):
         },
         "steps": [
             {
-                "name": "execute",
+                "name": "execute docker.io",
                 "image": CHKO_DOCKER_PUSHRM,
                 "environment": {
                     "DOCKER_USER": {
@@ -1925,6 +1952,22 @@ def releaseDockerReadme(ctx, repo, build_type):
                     "PUSHRM_TARGET": repo,
                     "PUSHRM_SHORT": "Docker images for %s" % (ctx.repo.name),
                     "PUSHRM_FILE": "README.md",
+                },
+            },
+            {
+                "name": "execute quay.io",
+                "image": CHKO_DOCKER_PUSHRM,
+                "environment": {
+                    "DOCKER_USER": {
+                        "from_secret": "quay_username",
+                    },
+                    "DOCKER_PASS": {
+                        "from_secret": "quay_password",
+                    },
+                    "PUSHRM_TARGET": repo,
+                    "PUSHRM_SHORT": "Docker images for %s" % (ctx.repo.name),
+                    "PUSHRM_FILE": "README.md",
+                    "PUSHRM_PROVIDER": "quay",
                 },
             },
         ],
