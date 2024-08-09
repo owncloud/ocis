@@ -158,7 +158,7 @@ func (a *AuthAppService) HandleCreate(w http.ResponseWriter, r *http.Request) {
 	if _, err := w.Write(b); err != nil {
 		sublog.Error().Err(err).Msg("error writing response")
 	}
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 }
 
 // HandleList handles listing of app tokens
