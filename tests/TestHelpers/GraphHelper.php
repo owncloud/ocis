@@ -953,7 +953,7 @@ class GraphHelper {
 		array  $body = [],
 		array  $headers = []
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'me/drives/' . $urlArguments);
+		$url = self::getFullUrl($baseUrl, 'me/drives' . $urlArguments);
 
 		return HttpRequestHelper::get($url, $xRequestId, $user, $password, $headers, $body);
 	}
