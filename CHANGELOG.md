@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump tusd pkg to v2: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Support Skyhigh Security ICAP as an ICAP server: [#9720](https://github.com/owncloud/ocis/issues/9720)
+* Enhancement - Add an API to auth-app service: [#9755](https://github.com/owncloud/ocis/pull/9755)
 * Enhancement - Bump go-micro plugins pkg: [#9756](https://github.com/owncloud/ocis/pull/9756)
 
 ## Details
@@ -156,6 +157,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9720
    https://github.com/fschade/icap-client/pull/6
+
+* Enhancement - Add an API to auth-app service: [#9755](https://github.com/owncloud/ocis/pull/9755)
+
+   Adds an API to create, list and delete app tokens. Includes an impersonification
+   feature for migration scenarios.
+
+   https://github.com/owncloud/ocis/pull/9755
 
 * Enhancement - Bump go-micro plugins pkg: [#9756](https://github.com/owncloud/ocis/pull/9756)
 
