@@ -48,7 +48,7 @@ func NewService(opts ...Option) Service {
 
 	if err := createTemporaryClientsConfig(
 		options.Config.IDP.IdentifierRegistrationConf,
-		options.Config.IDP.Iss,
+		options.Config.Commons.OcisURL,
 		options.Config.Clients,
 	); err != nil {
 		logger.Fatal().Err(err).Msg("could not create default config")
