@@ -5127,3 +5127,61 @@ Feature: an user gets the resources shared to them
       | resource      |
       | testfile.txt  |
       | FolderToShare |
+
+  @issue-9642
+  Scenario: list multiple shares (> 10 shares)
+    Given using spaces DAV path
+    And user "Alice" has created the following folders
+      | path     |
+      | folder1  |
+      | folder2  |
+      | folder3  |
+      | folder4  |
+      | folder5  |
+      | folder6  |
+      | folder7  |
+      | folder8  |
+      | folder9  |
+      | folder10 |
+    And user "Alice" has uploaded the following files with content "lorem epsum"
+      | path          |
+      | textfile1.txt |
+      | textfile2.txt |
+      | textfile3.txt |
+      | textfile4.txt |
+      | textfile5.txt |
+    And user "Alice" has shared the following files from space "Personal" with user "Brian" and role "Viewer":
+      | textfile1.txt |
+      | textfile2.txt |
+      | textfile3.txt |
+      | textfile4.txt |
+      | textfile5.txt |
+    And user "Alice" has shared the following folders from space "Personal" with user "Brian" and role "Editor":
+      | folder1  |
+      | folder2  |
+      | folder3  |
+      | folder4  |
+      | folder5  |
+      | folder6  |
+      | folder7  |
+      | folder8  |
+      | folder9  |
+      | folder10 |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the json response should contain the following shares:
+      | folder1       |
+      | folder2       |
+      | folder3       |
+      | folder4       |
+      | folder5       |
+      | folder6       |
+      | folder7       |
+      | folder8       |
+      | folder9       |
+      | folder10      |
+      | textfile1.txt |
+      | textfile2.txt |
+      | textfile3.txt |
+      | textfile4.txt |
+      | textfile5.txt |
