@@ -791,7 +791,7 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(connector.NewResponse(200), nil)
 
 			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
 				if statReq.Ref.ResourceId.StorageId == "storageid" &&
@@ -847,7 +847,7 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(connector.NewResponse(200), nil)
 
 			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
 				if statReq.Ref.ResourceId.StorageId == "storageid" &&
@@ -908,8 +908,8 @@ var _ = Describe("FileConnector", func() {
 
 			// first call will fail with conflict, second call succeeds.
 			// we're only interested on whether the file is locked or not, the actual lockID is irrelevant
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 409}, nil).Once()
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil).Once()
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(connector.NewResponse(409), nil).Once()
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(connector.NewResponse(200), nil).Once()
 
 			newFilePath := new(string)
 			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
@@ -971,7 +971,7 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 500}, nil)
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(connector.NewResponse(500), nil)
 
 			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), ".pdf")
 			Expect(err).To(Succeed())
@@ -1043,7 +1043,7 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(connector.NewResponse(200), nil)
 
 			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
 				if statReq.Ref.ResourceId.StorageId == "storageid" &&
@@ -1098,7 +1098,7 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 409, Headers: map[string]string{connector.HeaderWopiLock: "zzz999"}}, nil)
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(connector.NewResponseWithLock(409, "zzz999"), nil)
 
 			stat2ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
 				if statReq.Ref.ResourceId.StorageId == "storageid" &&
@@ -1158,7 +1158,7 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(&connector.ConnectorResponse{Status: 500}, nil)
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(connector.NewResponse(500), nil)
 
 			response, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "convFile.pdf")
 			Expect(err).To(Succeed())

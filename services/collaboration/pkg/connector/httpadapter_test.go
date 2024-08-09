@@ -60,7 +60,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("GetLock", mock.Anything).Times(1).Return(&connector.ConnectorResponse{Status: 404}, nil)
+			fc.On("GetLock", mock.Anything).Times(1).Return(connector.NewResponse(404), nil)
 
 			httpAdapter.GetLock(w, req)
 			resp := w.Result()
@@ -73,7 +73,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("GetLock", mock.Anything).Times(1).Return(&connector.ConnectorResponse{Status: 200, Headers: map[string]string{connector.HeaderWopiLock: "zzz111"}}, nil)
+			fc.On("GetLock", mock.Anything).Times(1).Return(connector.NewResponseWithLock(200, "zzz111"), nil)
 
 			httpAdapter.GetLock(w, req)
 			resp := w.Result()
@@ -87,7 +87,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("GetLock", mock.Anything).Times(1).Return(&connector.ConnectorResponse{Status: 200, Headers: map[string]string{connector.HeaderWopiLock: ""}}, nil)
+			fc.On("GetLock", mock.Anything).Times(1).Return(connector.NewResponseWithLock(200, ""), nil)
 
 			httpAdapter.GetLock(w, req)
 			resp := w.Result()
@@ -119,7 +119,7 @@ var _ = Describe("HttpAdapter", func() {
 
 				w := httptest.NewRecorder()
 
-				fc.On("Lock", mock.Anything, "", "").Times(1).Return(&connector.ConnectorResponse{Status: 400}, nil)
+				fc.On("Lock", mock.Anything, "", "").Times(1).Return(connector.NewResponse(400), nil)
 
 				httpAdapter.Lock(w, req)
 				resp := w.Result()
@@ -133,7 +133,7 @@ var _ = Describe("HttpAdapter", func() {
 
 				w := httptest.NewRecorder()
 
-				fc.On("Lock", mock.Anything, "abc123", "").Times(1).Return(&connector.ConnectorResponse{Status: 409, Headers: map[string]string{connector.HeaderWopiLock: "zzz111"}}, nil)
+				fc.On("Lock", mock.Anything, "abc123", "").Times(1).Return(connector.NewResponseWithLock(409, "zzz111"), nil)
 
 				httpAdapter.Lock(w, req)
 				resp := w.Result()
@@ -148,7 +148,7 @@ var _ = Describe("HttpAdapter", func() {
 
 				w := httptest.NewRecorder()
 
-				fc.On("Lock", mock.Anything, "abc123", "").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
+				fc.On("Lock", mock.Anything, "abc123", "").Times(1).Return(connector.NewResponse(200), nil)
 
 				httpAdapter.Lock(w, req)
 				resp := w.Result()
@@ -180,7 +180,7 @@ var _ = Describe("HttpAdapter", func() {
 
 				w := httptest.NewRecorder()
 
-				fc.On("Lock", mock.Anything, "", "").Times(1).Return(&connector.ConnectorResponse{Status: 400}, nil)
+				fc.On("Lock", mock.Anything, "", "").Times(1).Return(connector.NewResponse(400), nil)
 
 				httpAdapter.Lock(w, req)
 				resp := w.Result()
@@ -195,7 +195,7 @@ var _ = Describe("HttpAdapter", func() {
 
 				w := httptest.NewRecorder()
 
-				fc.On("Lock", mock.Anything, "abc123", "qwerty").Times(1).Return(&connector.ConnectorResponse{Status: 409, Headers: map[string]string{connector.HeaderWopiLock: "zzz111"}}, nil)
+				fc.On("Lock", mock.Anything, "abc123", "qwerty").Times(1).Return(connector.NewResponseWithLock(409, "zzz111"), nil)
 
 				httpAdapter.Lock(w, req)
 				resp := w.Result()
@@ -211,7 +211,7 @@ var _ = Describe("HttpAdapter", func() {
 
 				w := httptest.NewRecorder()
 
-				fc.On("Lock", mock.Anything, "abc123", "qwerty").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
+				fc.On("Lock", mock.Anything, "abc123", "qwerty").Times(1).Return(connector.NewResponse(200), nil)
 
 				httpAdapter.Lock(w, req)
 				resp := w.Result()
@@ -242,7 +242,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("RefreshLock", mock.Anything, "").Times(1).Return(&connector.ConnectorResponse{Status: 400}, nil)
+			fc.On("RefreshLock", mock.Anything, "").Times(1).Return(connector.NewResponse(400), nil)
 
 			httpAdapter.RefreshLock(w, req)
 			resp := w.Result()
@@ -256,7 +256,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("RefreshLock", mock.Anything, "abc123").Times(1).Return(&connector.ConnectorResponse{Status: 409, Headers: map[string]string{connector.HeaderWopiLock: "zzz111"}}, nil)
+			fc.On("RefreshLock", mock.Anything, "abc123").Times(1).Return(connector.NewResponseWithLock(409, "zzz111"), nil)
 
 			httpAdapter.RefreshLock(w, req)
 			resp := w.Result()
@@ -271,7 +271,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("RefreshLock", mock.Anything, "abc123").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
+			fc.On("RefreshLock", mock.Anything, "abc123").Times(1).Return(connector.NewResponse(200), nil)
 
 			httpAdapter.RefreshLock(w, req)
 			resp := w.Result()
@@ -301,7 +301,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("UnLock", mock.Anything, "").Times(1).Return(&connector.ConnectorResponse{Status: 400}, nil)
+			fc.On("UnLock", mock.Anything, "").Times(1).Return(connector.NewResponse(400), nil)
 
 			httpAdapter.UnLock(w, req)
 			resp := w.Result()
@@ -315,7 +315,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("UnLock", mock.Anything, "abc123").Times(1).Return(&connector.ConnectorResponse{Status: 409, Headers: map[string]string{connector.HeaderWopiLock: "zzz111"}}, nil)
+			fc.On("UnLock", mock.Anything, "abc123").Times(1).Return(connector.NewResponseWithLock(409, "zzz111"), nil)
 
 			httpAdapter.UnLock(w, req)
 			resp := w.Result()
@@ -330,7 +330,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("UnLock", mock.Anything, "abc123").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
+			fc.On("UnLock", mock.Anything, "abc123").Times(1).Return(connector.NewResponse(200), nil)
 
 			httpAdapter.UnLock(w, req)
 			resp := w.Result()
@@ -358,7 +358,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			fc.On("CheckFileInfo", mock.Anything).Times(1).Return(&connector.ConnectorResponse{Status: 404}, nil)
+			fc.On("CheckFileInfo", mock.Anything).Times(1).Return(connector.NewResponse(404), nil)
 
 			httpAdapter.CheckFileInfo(w, req)
 			resp := w.Result()
@@ -375,7 +375,7 @@ var _ = Describe("HttpAdapter", func() {
 				Size:              123456789,
 				BreadcrumbDocName: "testy.docx",
 			}
-			fc.On("CheckFileInfo", mock.Anything).Times(1).Return(&connector.ConnectorResponse{Status: 200, Body: finfo}, nil)
+			fc.On("CheckFileInfo", mock.Anything).Times(1).Return(connector.NewResponseSuccessBody(finfo), nil)
 
 			httpAdapter.CheckFileInfo(w, req)
 			resp := w.Result()
@@ -458,7 +458,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(&connector.ConnectorResponse{Status: 409, Headers: map[string]string{connector.HeaderWopiLock: "zzz111"}}, nil)
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(connector.NewResponseWithLock(409, "zzz111"), nil)
 
 			httpAdapter.PutFile(w, req)
 			resp := w.Result()
@@ -473,7 +473,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(&connector.ConnectorResponse{Status: 200}, nil)
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(connector.NewResponse(200), nil)
 
 			httpAdapter.PutFile(w, req)
 			resp := w.Result()

@@ -223,7 +223,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 			Str("StatusCode", statRes.GetStatus().GetCode().String()).
 			Str("StatusMsg", statRes.GetStatus().GetMessage()).
 			Msg("PutFile: stat failed with unexpected status")
-		return &ConnectorResponse{Status: 500}, nil
+		return NewResponse(500), nil
 	}
 
 	// If there is a lock and it mismatches, return 409
@@ -232,12 +232,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 			Str("LockID", statRes.GetInfo().GetLock().GetLockId()).
 			Msg("PutFile: wrong lock")
 		// onlyoffice says it's required to send the current lockId, MS doesn't say anything
-		return &ConnectorResponse{
-			Status: 409,
-			Headers: map[string]string{
-				HeaderWopiLock: statRes.GetInfo().GetLock().GetLockId(),
-			},
-		}, nil
+		return NewResponseWithLock(409, statRes.GetInfo().GetLock().GetLockId()), nil
 	}
 
 	// only unlocked uploads can go through if the target file is empty,
@@ -247,12 +242,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 	if lockID == "" && statRes.GetInfo().GetLock() == nil && statRes.GetInfo().GetSize() > 0 {
 		logger.Error().Msg("PutFile: file must be locked first")
 		// onlyoffice says to send an empty string if the file is unlocked, MS doesn't say anything
-		return &ConnectorResponse{
-			Status: 409,
-			Headers: map[string]string{
-				HeaderWopiLock: "",
-			},
-		}, nil
+		return NewResponseWithLock(409, ""), nil
 	}
 
 	// Prepare the data to initiate the upload
@@ -288,7 +278,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 			Str("StatusCode", resp.GetStatus().GetCode().String()).
 			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("UploadHelper: InitiateFileUpload failed with wrong status")
-		return &ConnectorResponse{Status: 500}, nil
+		return NewResponse(500), nil
 	}
 
 	// if the content length is greater than 0, we need to upload the content to the
@@ -313,7 +303,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 				Str("Endpoint", uploadEndpoint).
 				Bool("HasUploadToken", hasUploadToken).
 				Msg("UploadHelper: Upload endpoint or token is missing")
-			return &ConnectorResponse{Status: 500}, nil
+			return NewResponse(500), nil
 		}
 
 		httpClient := http.Client{
@@ -369,10 +359,10 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 				Bool("HasUploadToken", hasUploadToken).
 				Int("HttpCode", httpResp.StatusCode).
 				Msg("UploadHelper: Put request to the upload endpoint failed with unexpected status")
-			return &ConnectorResponse{Status: 500}, nil
+			return NewResponse(500), nil
 		}
 	}
 
 	logger.Debug().Msg("PutFile: success")
-	return &ConnectorResponse{Status: 200}, nil
+	return NewResponse(200), nil
 }
