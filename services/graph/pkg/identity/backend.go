@@ -19,6 +19,12 @@ var (
 	ErrNotFound = errorcode.New(errorcode.ItemNotFound, "not found")
 )
 
+const (
+	UserTypeMember    = "Member"
+	UserTypeGuest     = "Guest"
+	UserTypeFederated = "Federated"
+)
+
 // Backend defines the Interface for an IdentityBackend implementation
 type Backend interface {
 	// CreateUser creates a given user in the identity backend.
@@ -106,9 +112,10 @@ type EducationBackend interface {
 
 // CreateUserModelFromCS3 converts a cs3 User object into a libregraph.User
 func CreateUserModelFromCS3(u *cs3user.User) *libregraph.User {
-	if u.Id == nil {
+	if u.GetId() == nil {
 		u.Id = &cs3user.UserId{}
 	}
+	userType := cs3UserTypeToGraph(u.GetId().GetType())
 	return &libregraph.User{
 		Identities: []libregraph.ObjectIdentity{
 			{
@@ -116,6 +123,7 @@ func CreateUserModelFromCS3(u *cs3user.User) *libregraph.User {
 				IssuerAssignedId: &u.GetId().OpaqueId,
 			},
 		},
+		UserType:                 &userType,
 		DisplayName:              &u.DisplayName,
 		Mail:                     &u.Mail,
 		OnPremisesSamAccountName: &u.Username,
@@ -123,9 +131,21 @@ func CreateUserModelFromCS3(u *cs3user.User) *libregraph.User {
 	}
 }
 
+func cs3UserTypeToGraph(cs3type cs3user.UserType) string {
+	switch cs3type {
+	case cs3user.UserType_USER_TYPE_PRIMARY:
+		return UserTypeMember
+	case cs3user.UserType_USER_TYPE_FEDERATED:
+		return UserTypeFederated
+	case cs3user.UserType_USER_TYPE_GUEST:
+		return UserTypeGuest
+	}
+	return "unknown"
+}
+
 // CreateGroupModelFromCS3 converts a cs3 Group object into a libregraph.Group
 func CreateGroupModelFromCS3(g *cs3group.Group) *libregraph.Group {
-	if g.Id == nil {
+	if g.GetId() == nil {
 		g.Id = &cs3group.GroupId{}
 	}
 	return &libregraph.Group{

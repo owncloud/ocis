@@ -397,6 +397,7 @@ func TestUpdateUser(t *testing.T) {
 				displayName:              "testUser",
 				onPremisesSamAccountName: "testUser",
 				accountEnabled:           nil,
+				userType:                 &memberType,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
@@ -526,6 +527,7 @@ func TestUpdateUser(t *testing.T) {
 				displayName:              "newName",
 				onPremisesSamAccountName: "testUser",
 				accountEnabled:           nil,
+				userType:                 &memberType,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
@@ -655,6 +657,7 @@ func TestUpdateUser(t *testing.T) {
 				displayName:              "newName",
 				onPremisesSamAccountName: "newName",
 				accountEnabled:           nil,
+				userType:                 &memberType,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
@@ -844,6 +847,7 @@ func TestUpdateUser(t *testing.T) {
 				displayName:              "testUser",
 				onPremisesSamAccountName: "testUser",
 				accountEnabled:           &falseBool,
+				userType:                 &memberType,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
@@ -974,6 +978,7 @@ func TestUpdateUser(t *testing.T) {
 				displayName:              "testUser",
 				onPremisesSamAccountName: "testUser",
 				accountEnabled:           &falseBool,
+				userType:                 &memberType,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
@@ -1140,6 +1145,7 @@ func TestUpdateUser(t *testing.T) {
 				displayName:              "testUser",
 				onPremisesSamAccountName: "testUser",
 				accountEnabled:           &trueBool,
+				userType:                 &memberType,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
