@@ -3198,3 +3198,39 @@ Feature: Send a sharing invitations
     Then the HTTP status code should be "200"
     And for user "Brian" the space Shares should contain these entries:
       | textfile.txt |
+
+  @issue-9642
+  Scenario Outline: list multiple shares
+    Given using spaces DAV path
+    And user "Alice" has created folder "<resource>"
+    And user "Alice" has uploaded file with content "lorem" to "textfile1.txt"
+    And user "Alice" has uploaded file with content "lorem" to "textfile2.txt"
+    And user "Alice" has uploaded file with content "lorem" to "textfile3.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource>    |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Brian" has a share "<resource>" synced
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then for user "Brian" the space Shares should contain these entries:
+      | <resource> |
+    Examples:
+      | resource      |
+      | /folder1      |
+      | /folder2      |
+      | /folder3      |
+      | /folder4      |
+      | /folder5      |
+      | /folder6      |
+      | /folder7      |
+      | /folder8      |
+      | /folder9      |
+      | /folder10     |
+      | /folder11     |
+      | textfile1.txt |
+      | textfile2.txt |
+      | textfile3.txt |
+
+
