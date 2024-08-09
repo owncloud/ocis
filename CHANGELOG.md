@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Use bool type for web embed delegatedAuthentication: [#9692](https://github.com/owncloud/ocis/pull/9692)
 * Bugfix - Repair nats-js-kv registry: [#9734](https://github.com/owncloud/ocis/pull/9734)
 * Bugfix - Use less selectors that watch the registry: [#9741](https://github.com/owncloud/ocis/pull/9741)
+* Bugfix - We fixed the client config generation for the built in IDP: [#9770](https://github.com/owncloud/ocis/pull/9770)
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 * Enhancement - Allow configuring grpc max connection age: [#9657](https://github.com/owncloud/ocis/pull/9657)
 * Enhancement - Local WEB App configuration: [#9691](https://github.com/owncloud/ocis/pull/9691)
@@ -98,6 +99,14 @@ The following sections list the changes for unreleased.
    The proxy now shares the service selector for all host lookups.
 
    https://github.com/owncloud/ocis/pull/9741
+
+* Bugfix - We fixed the client config generation for the built in IDP: [#9770](https://github.com/owncloud/ocis/pull/9770)
+
+   We now use the OCIS_URL to generate the web client registration configuration.
+   It does not make sense use the OCIS_ISSUER_URL if the idp was configured to run
+   on a different domain.
+
+   https://github.com/owncloud/ocis/pull/9770
 
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 
