@@ -32,6 +32,8 @@ func (m tracer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		span trace.Span
 	)
 
+	ctx = pkgtrace.Propagator.Extract(ctx, propagation.HeaderCarrier(r.Header))
+
 	tracer := m.traceProvider.Tracer("proxy")
 	spanOpts := []trace.SpanStartOption{
 		trace.WithSpanKind(trace.SpanKindServer),

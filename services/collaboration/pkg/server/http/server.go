@@ -73,6 +73,7 @@ func Server(opts ...Option) (http.Service, error) {
 			otelchi.WithChiRoutes(mux),
 			otelchi.WithTracerProvider(options.TracerProvider),
 			otelchi.WithPropagators(tracing.GetPropagator()),
+			otelchi.WithRequestMethodInSpanName(true),
 		),
 	)
 
@@ -115,10 +116,13 @@ func prepareRoutes(r *chi.Mux, options Options) {
 
 		r.Route("/files/{fileid}", func(r chi.Router) {
 
-			r.Use(func(h stdhttp.Handler) stdhttp.Handler {
-				// authentication and wopi context
-				return colabmiddleware.WopiContextAuthMiddleware(options.Config, h)
-			})
+			r.Use(
+				func(h stdhttp.Handler) stdhttp.Handler {
+					// authentication and wopi context
+					return colabmiddleware.WopiContextAuthMiddleware(options.Config, h)
+				},
+				colabmiddleware.CollaborationTracingMiddleware,
+			)
 
 			// check whether we should check for proof keys
 			if !options.Config.App.ProofKeys.Disable {
