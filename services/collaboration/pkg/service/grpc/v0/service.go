@@ -16,6 +16,7 @@ import (
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -139,11 +140,10 @@ func (s *Service) OpenInApp(
 			editAppURL = viewCommentAppURL
 		}
 	}
-	wopiSrcURL, err := url.Parse(s.config.Wopi.WopiSrc)
+	wopiSrcURL, err := wopisrc.GenerateWopiSrc(fileRef, s.config)
 	if err != nil {
 		return nil, err
 	}
-	wopiSrcURL.Path = path.Join("wopi", "files", fileRef)
 
 	addWopiSrcQueryParam := func(baseURL string) (string, error) {
 		u, err := url.Parse(baseURL)
@@ -159,6 +159,38 @@ func (s *Service) OpenInApp(
 		}
 
 		lang := utils.ReadPlainFromOpaque(req.GetOpaque(), "lang")
+
+		// @TODO: this is a temporary solution until we figure out how to send these from oc web
+		switch lang {
+		case "bg":
+			lang = "bg-BG"
+		case "cs":
+			lang = "cs-CZ"
+		case "de":
+			lang = "de-DE"
+		case "en":
+			lang = "en-US"
+		case "es":
+			lang = "es-ES"
+		case "fr":
+			lang = "fr-FR"
+		case "gl":
+			lang = "gl-ES"
+		case "it":
+			lang = "it-IT"
+		case "nl":
+			lang = "nl-NL"
+		case "ko":
+			lang = "ko-KR"
+		case "sq":
+			lang = "sq-AL"
+		case "sv":
+			lang = "sv-SE"
+		case "tr":
+			lang = "tr-TR"
+		case "zh":
+			lang = "zh-CN"
+		}
 
 		if lang != "" {
 			q.Add("ui", lang)      // OnlyOffice
@@ -201,10 +233,7 @@ func (s *Service) OpenInApp(
 		AccessToken:   req.GetAccessToken(), // it will be encrypted
 		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
 		FileReference: &providerFileRef,
-		User:          user,
 		ViewMode:      req.GetViewMode(),
-		EditAppUrl:    editAppURL,
-		ViewAppUrl:    viewAppURL,
 	}
 
 	accessToken, accessExpiration, err := middleware.GenerateWopiToken(wopiContext, s.config)
@@ -224,6 +253,7 @@ func (s *Service) OpenInApp(
 		Str("FileReference", providerFileRef.String()).
 		Str("ViewMode", req.GetViewMode().String()).
 		Str("Requester", user.GetId().String()).
+		Str("AppUrl", appURL).
 		Msg("OpenInApp: success")
 
 	return &appproviderv1beta1.OpenInAppResponse{

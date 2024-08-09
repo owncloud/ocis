@@ -60,7 +60,7 @@ type Microsoft struct {
 	// A Boolean value indicating whether the user is an education user or not.
 	IsEduUser bool `json:"IsEduUser,omitempty"`
 	// A Boolean value indicating whether the user is a business user or not.
-	LicenseCheckForEditIsEnabled bool `json:"LicenseCheckForEditIsEnabled,omitempty"`
+	LicenseCheckForEditIsEnabled bool `json:"LicenseCheckForEditIsEnabled"`
 	// A string that is the name of the user, suitable for displaying in UI.
 	UserFriendlyName string `json:"UserFriendlyName,omitempty"`
 	// A string value containing information about the user. This string can be passed from a WOPI client to the host by means of a PutUserInfo operation. If the host has a UserInfo string for the user, they must include it in this property. See the PutUserInfo documentation for more details.
