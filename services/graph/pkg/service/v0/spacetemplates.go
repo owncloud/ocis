@@ -15,17 +15,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+	l10n_pkg "github.com/owncloud/ocis/v2/services/graph/pkg/l10n"
 )
 
 var (
 	//go:embed spacetemplate/*
 	_spaceTemplateFS embed.FS
-
-	//go:embed l10n/locale
-	_localeFS embed.FS
-
-	// subfolder where the translation files are stored
-	_localeSubPath = "l10n/locale"
 
 	// name of the secret space folder
 	_spaceFolderName = ".space"
@@ -38,9 +33,6 @@ var (
 
 	// name of the readme.md file
 	_readmeName = "readme.md"
-
-	// domain of the graph service (transifex)
-	_domain = "graph"
 
 	// HeaderAcceptLanguage is the header key for the accept-language header
 	HeaderAcceptLanguage = "Accept-Language"
@@ -121,10 +113,9 @@ func imageUpload(ctx context.Context, mdc *metadata.CS3) (string, error) {
 }
 
 func readmeUpload(ctx context.Context, mdc *metadata.CS3, locale string, defaultLocale string) (string, error) {
-	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, "", _localeFS, _localeSubPath)
 	res, err := mdc.Upload(ctx, metadata.UploadRequest{
 		Path:    filepath.Join(_spaceFolderName, _readmeName),
-		Content: []byte(t.Translate(_readmeText, locale)),
+		Content: []byte(l10n_pkg.Translate(_readmeText, locale, defaultLocale)),
 	})
 	if err != nil {
 		return "", err
