@@ -105,7 +105,7 @@ require (
 	golang.org/x/exp v0.0.0-20240205201215-2c58cdc269a3
 	golang.org/x/image v0.18.0
 	golang.org/x/net v0.27.0
-	golang.org/x/oauth2 v0.21.0
+	golang.org/x/oauth2 v0.22.0
 	golang.org/x/sync v0.7.0
 	golang.org/x/term v0.22.0
 	golang.org/x/text v0.16.0
