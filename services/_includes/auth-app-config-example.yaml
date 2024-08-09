@@ -20,6 +20,30 @@ grpc:
   addr: 127.0.0.1:9246
   tls: null
   protocol: tcp
+http:
+  addr: 127.0.0.1:9247
+  root: /
+  cors:
+    allow_origins:
+    - '*'
+    allow_methods:
+    - GET
+    - POST
+    - DELETE
+    allow_headers:
+    - Authorization
+    - Origin
+    - Content-Type
+    - Accept
+    - X-Requested-With
+    - X-Request-Id
+    - Ocs-Apirequest
+    allow_credentials: true
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
+grpc_client_tls: null
 token_manager:
   jwt_secret: ""
 reva:
@@ -29,3 +53,4 @@ reva:
     cacert: ""
 skip_user_groups_in_token: false
 machine_auth_api_key: ""
+allow_impersonation: false

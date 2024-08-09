@@ -1,6 +1,6 @@
 ---
 title: Auth-App
-date: 2024-08-09T07:41:15.641303441Z
+date: 2024-08-09T11:08:24.05903973Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-app
@@ -21,6 +21,9 @@ The auth-app service provides authentication for 3rd party apps.
 * [The `auth` Service Family](#the-`auth`-service-family)
 * [Service Startup](#service-startup)
 * [App Tokens](#app-tokens)
+  * [Via CLI (dev only)](#via-cli-(dev-only))
+  * [Via API](#via-api)
+  * [Via Impersonation API](#via-impersonation-api)
 * [Example Yaml Config](#example-yaml-config)
 
 ## The `auth` Service Family
@@ -42,13 +45,26 @@ PROXY_ENABLE_APP_AUTH=true      # mandatory, allow app authentication. In case o
 
 ## App Tokens
 
-App Tokens are used to authenticate 3rd party access via https like when using curl (apps) to access an API endpoint. These apps need to authenticate themselves as no logged in user authenticates the request. To be able to use an app token, one must first create a token via the cli. Replace the `user-name` with an existing user. For the `token-expiration`, you can use any time abbreviation from the following list: `h, m, s`. Examples: `72h` or `1h` or `1m` or `1s.` Default is `72h`.
+App Tokens are used to authenticate 3rd party access via https like when using curl (apps) to access an API endpoint. These apps need to authenticate themselves as no logged in user authenticates the request. To be able to use an app token, one must first create a token. There are different options of creating a token.
+
+### Via CLI (dev only)
+
+Replace the `user-name` with an existing user. For the `token-expiration`, you can use any time abbreviation from the following list: `h, m, s`. Examples: `72h` or `1h` or `1m` or `1s.` Default is `72h`.
 
 ```bash
 ocis auth-app create --user-name={user-name} --expiration={token-expiration}
 ```
 
 Once generated, these tokens can be used to authenticate requests to ocis. They are passed as part of the request as `Basic Auth` header.
+
+### Via API
+
+The `auth-app` service provides an API to create (POST), list (GET) and delete (DELETE) tokens at `/auth-app/tokens`.
+
+### Via Impersonation API
+
+When setting the environment variable `AUTH_APP_ENABLE_IMPERSONATION` to `true`, admins will be able to use the `/auth-app/tokens` endpoint to create tokens for other users. This is crucial for migration scenarios,
+but should not be used on a productive system.
 ## Example Yaml Config
 {{< include file="services/_includes/auth-app-config-example.yaml"  language="yaml" >}}
 

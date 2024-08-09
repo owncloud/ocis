@@ -113,6 +113,8 @@ policies:
     service: com.owncloud.web.graph
   - endpoint: /api/v0/settings
     service: com.owncloud.web.settings
+  - endpoint: /auth-app/tokens
+    service: com.owncloud.web.auth-app
 additional_policies: []
 oidc:
   issuer: https://localhost:9200

@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-09-07-41-11]
+[#deprecation-note-2024-08-09-11-08-21]
 [caption=]
 .Deprecation notes for the auth-app service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -193,6 +193,109 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The transport protocol of the GRPC service.
 
+a|`AUTH_APP_HTTP_ADDR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9247 ++
+a| [subs=-attributes]
+The bind address of the HTTP service.
+
+a|`AUTH_APP_HTTP_ROOT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/ ++
+a| [subs=-attributes]
+Subdirectory that serves as the root for this HTTP service.
+
+a|`OCIS_CORS_ALLOW_ORIGINS` +
+`AUTH_APP_CORS_ALLOW_ORIGINS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[*] ++
+a| [subs=-attributes]
+A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_METHODS` +
+`AUTH_APP_CORS_ALLOW_METHODS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[GET POST DELETE] ++
+a| [subs=-attributes]
+A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_HEADERS` +
+`AUTH_APP_CORS_ALLOW_HEADERS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
+a| [subs=-attributes]
+A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_CREDENTIALS` +
+`AUTH_APP_CORS_ALLOW_CREDENTIALS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
+
+a|`OCIS_HTTP_TLS_ENABLED` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.
+
+a|`OCIS_HTTP_TLS_CERTIFICATE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the http services.
+
+a|`OCIS_HTTP_TLS_KEY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
+
 a|`OCIS_JWT_SECRET` +
 `AUTH_APP_JWT_SECRET` +
 
@@ -260,5 +363,16 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The machine auth API key used to validate internal requests necessary to access resources from other services.
+
+a|`AUTH_APP_ENABLE_IMPERSONATION` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Allows admins to create app tokens for other users. Used for migration. Do NOT use in productive deployments.
 |===
 
