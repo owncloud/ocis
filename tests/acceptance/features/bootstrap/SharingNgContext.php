@@ -1666,4 +1666,62 @@ class SharingNgContext implements Context {
 	public function userRemovesTheLastLinkShareOfSpaceUsingPermissionsEndpointOfGraphApi(string $user, string $space):void {
 		$this->featureContext->setResponse($this->removeAccessToSpaceItem($user, 'link', $space, ''));
 	}
+
+	/**
+	 * @param string $share
+	 * @param string $sharee
+	 * @param string $sharer
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 * @throws Exception
+	 */
+	public function checkIfShareExists(string $share, string $sharee, string $sharer): void {
+		// check share mountpoint
+		$response = GraphHelper::getMySpaces(
+			$this->featureContext->getBaseUrl(),
+			$sharee,
+			$this->featureContext->getPasswordForUser($sharee),
+			"",
+			$this->featureContext->getStepLineRef()
+		);
+		$driveList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
+		$foundShareMountpoint = false;
+		foreach ($driveList as $drive) {
+			if ($drive->driveType === "mountpoint" && $drive->name === $share && $drive->root->remoteItem->driveAlias === "personal/" . \strtolower($sharer)) {
+				$foundShareMountpoint = true;
+			}
+		}
+		Assert::assertTrue($foundShareMountpoint, "Share mountpoint '$share' was not found in the drives list.");
+
+		// check share in shared-with-me list
+		$response = GraphHelper::getSharesSharedWithMe(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$sharee,
+			$this->featureContext->getPasswordForUser($sharee)
+		);
+		$sharedWithMeList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
+		$foundShareInSharedWithMe = false;
+		foreach ($sharedWithMeList as $item) {
+			if ($item->name === $share && $item->createdBy->user->displayName === $this->featureContext->getDisplayNameForUser($sharer)) {
+				$foundShareInSharedWithMe = true;
+			}
+		}
+		Assert::assertTrue($foundShareInSharedWithMe, "Share '$share' was not found in the shared-with-me list");
+	}
+
+	/**
+	 * @Then user :sharee should have a share :share shared by user :sharer
+	 *
+	 * @param string $sharee
+	 * @param string $share
+	 * @param string $sharer
+	 *
+	 * @return void
+	 */
+	public function userShouldHaveShare(string $sharee, string $share, string $sharer): void {
+		$this->checkIfShareExists($share, $sharee, $sharer);
+	}
 }
