@@ -68,6 +68,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add an API to auth-app service: [#9755](https://github.com/owncloud/ocis/pull/9755)
 * Enhancement - Bump go-micro plugins pkg: [#9756](https://github.com/owncloud/ocis/pull/9756)
 * Enhancement - Bump reva: [#9763](https://github.com/owncloud/ocis/pull/9763)
+* Enhancement - Add OCIS_ENABLE_OCM env var: [#9784](https://github.com/owncloud/ocis/pull/9784)
 
 ## Details
 
@@ -199,6 +200,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9763
    https://github.com/owncloud/ocis/pull/9714
    https://github.com/owncloud/ocis/pull/9715
+
+* Enhancement - Add OCIS_ENABLE_OCM env var: [#9784](https://github.com/owncloud/ocis/pull/9784)
+
+   We added a new `OCIS_ENABLE_OCM` env var that will enable all ocm flags.
+
+   https://github.com/owncloud/ocis/pull/9784
 
 # Changelog for [6.2.0] (2024-07-30)
 
