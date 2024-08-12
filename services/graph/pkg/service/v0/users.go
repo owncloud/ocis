@@ -269,25 +269,6 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if g.config.IncludeOCMSharees {
-		ocmUsers, err := g.searchOCMAcceptedUsers(r.Context(), odataReq)
-		var errcode errorcode.Error
-		var godataerr *godata.GoDataError
-		switch {
-		case err == nil:
-			users = append(users, ocmUsers...)
-		case errors.As(err, &errcode):
-			errcode.Render(w, r)
-			return
-		case errors.As(err, &godataerr):
-			errorcode.GeneralException.Render(w, r, godataerr.ResponseCode, err.Error())
-			return
-		default:
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			return
-		}
-	}
-
 	// If the user isn't admin, we'll show just the minimum user attibutes
 	if !ctxHasFullPerms {
 		finalUsers := make([]*libregraph.User, len(users))
@@ -1008,6 +989,13 @@ func isValidUserType(userType string) bool {
 
 func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDataRequest) ([]*libregraph.User, error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
+	users := []*libregraph.User{}
+
+	if !g.config.IncludeOCMSharees {
+		logger.Debug().Msg("OCM sharing is disabled")
+		return users, nil
+	}
+
 	gwc, err := g.gatewaySelector.Next()
 	if err != nil {
 		return nil, errorcode.New(errorcode.GeneralException, err.Error())
@@ -1027,7 +1015,7 @@ func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDa
 	}
 
 	cs3Users := remoteUsersRes.GetAcceptedUsers()
-	users := make([]*libregraph.User, 0, len(cs3Users))
+	users = make([]*libregraph.User, 0, len(cs3Users))
 	for _, user := range cs3Users {
 		users = append(users, identity.CreateUserModelFromCS3(user))
 	}
