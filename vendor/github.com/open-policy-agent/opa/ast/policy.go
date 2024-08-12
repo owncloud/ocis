@@ -100,7 +100,9 @@ var Wildcard = &Term{Value: Var("_")}
 var WildcardPrefix = "$"
 
 // Keywords contains strings that map to language keywords.
-var Keywords = [...]string{
+var Keywords = KeywordsV0
+
+var KeywordsV0 = [...]string{
 	"not",
 	"package",
 	"import",
@@ -114,6 +116,24 @@ var Keywords = [...]string{
 	"some",
 }
 
+var KeywordsV1 = [...]string{
+	"not",
+	"package",
+	"import",
+	"as",
+	"default",
+	"else",
+	"with",
+	"null",
+	"true",
+	"false",
+	"some",
+	"if",
+	"contains",
+	"in",
+	"every",
+}
+
 // IsKeyword returns true if s is a language keyword.
 func IsKeyword(s string) bool {
 	for _, x := range Keywords {
@@ -121,6 +141,26 @@ func IsKeyword(s string) bool {
 			return true
 		}
 	}
+	return false
+}
+
+// IsKeywordInRegoVersion returns true if s is a language keyword.
+func IsKeywordInRegoVersion(s string, regoVersion RegoVersion) bool {
+	switch regoVersion {
+	case RegoV0:
+		for _, x := range KeywordsV0 {
+			if x == s {
+				return true
+			}
+		}
+	case RegoV1, RegoV0CompatV1:
+		for _, x := range KeywordsV1 {
+			if x == s {
+				return true
+			}
+		}
+	}
+
 	return false
 }
 
@@ -233,7 +273,9 @@ type (
 		Negated   bool        `json:"negated,omitempty"`
 		Location  *Location   `json:"location,omitempty"`
 
-		jsonOptions astJSON.Options
+		jsonOptions   astJSON.Options
+		generatedFrom *Expr
+		generates     []*Expr
 	}
 
 	// SomeDecl represents a variable declaration statement. The symbols are variables.
@@ -1591,6 +1633,46 @@ func (expr *Expr) Vars(params VarVisitorParams) VarSet {
 // The builtin operator must be the first term.
 func NewBuiltinExpr(terms ...*Term) *Expr {
 	return &Expr{Terms: terms}
+}
+
+func (expr *Expr) CogeneratedExprs() []*Expr {
+	visited := map[*Expr]struct{}{}
+	visitCogeneratedExprs(expr, func(e *Expr) bool {
+		if expr.Equal(e) {
+			return true
+		}
+		if _, ok := visited[e]; ok {
+			return true
+		}
+		visited[e] = struct{}{}
+		return false
+	})
+
+	result := make([]*Expr, 0, len(visited))
+	for e := range visited {
+		result = append(result, e)
+	}
+	return result
+}
+
+func (expr *Expr) BaseCogeneratedExpr() *Expr {
+	if expr.generatedFrom == nil {
+		return expr
+	}
+	return expr.generatedFrom.BaseCogeneratedExpr()
+}
+
+func visitCogeneratedExprs(expr *Expr, f func(*Expr) bool) {
+	if parent := expr.generatedFrom; parent != nil {
+		if stop := f(parent); !stop {
+			visitCogeneratedExprs(parent, f)
+		}
+	}
+	for _, child := range expr.generates {
+		if stop := f(child); !stop {
+			visitCogeneratedExprs(child, f)
+		}
+	}
 }
 
 func (d *SomeDecl) String() string {

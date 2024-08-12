@@ -1525,7 +1525,7 @@ github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
-# github.com/open-policy-agent/opa v0.65.0
+# github.com/open-policy-agent/opa v0.67.1
 ## explicit; go 1.21
 github.com/open-policy-agent/opa/ast
 github.com/open-policy-agent/opa/ast/internal/scanner
@@ -1613,6 +1613,7 @@ github.com/open-policy-agent/opa/topdown/print
 github.com/open-policy-agent/opa/tracing
 github.com/open-policy-agent/opa/types
 github.com/open-policy-agent/opa/util
+github.com/open-policy-agent/opa/util/decoding
 github.com/open-policy-agent/opa/version
 # github.com/opencontainers/runtime-spec v1.1.0
 ## explicit
@@ -2071,11 +2072,11 @@ go.opentelemetry.io/otel/exporters/jaeger/internal/gen-go/agent
 go.opentelemetry.io/otel/exporters/jaeger/internal/gen-go/jaeger
 go.opentelemetry.io/otel/exporters/jaeger/internal/gen-go/zipkincore
 go.opentelemetry.io/otel/exporters/jaeger/internal/third_party/thrift/lib/go/thrift
-# go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.27.0
+# go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.28.0
 ## explicit; go 1.21
 go.opentelemetry.io/otel/exporters/otlp/otlptrace
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/internal/tracetransform
-# go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.27.0
+# go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.28.0
 ## explicit; go 1.21
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal
@@ -2100,7 +2101,7 @@ go.opentelemetry.io/otel/sdk/trace
 go.opentelemetry.io/otel/trace
 go.opentelemetry.io/otel/trace/embedded
 go.opentelemetry.io/otel/trace/noop
-# go.opentelemetry.io/proto/otlp v1.2.0
+# go.opentelemetry.io/proto/otlp v1.3.1
 ## explicit; go 1.17
 go.opentelemetry.io/proto/otlp/collector/trace/v1
 go.opentelemetry.io/proto/otlp/common/v1
