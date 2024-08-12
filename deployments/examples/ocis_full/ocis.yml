@@ -16,12 +16,16 @@ services:
     # therefore we ignore the error and then start the ocis server
     command: ["-c", "ocis init || true; ocis server"]
     environment:
+      # enable the notifications service as it is not started automatically
+      OCIS_ADD_RUN_SERVICES": "notifications"
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${LOG_LEVEL:-info}
       OCIS_LOG_COLOR: "${LOG_PRETTY:-false}"
       OCIS_LOG_PRETTY: "${LOG_PRETTY:-false}"
-      PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
-      GATEWAY_GRPC_ADDR: 0.0.0.0:9142 # make the REVA gateway accessible to the app drivers
+      # do not use SSL between Traefik and oCIS
+      PROXY_TLS: "false"
+      # make the REVA gateway accessible to the app drivers
+      GATEWAY_GRPC_ADDR: 0.0.0.0:9142
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)

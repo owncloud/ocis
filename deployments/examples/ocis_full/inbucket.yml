@@ -2,13 +2,12 @@
 services:
   ocis:
     environment:
-      # enable the notifications service
-      OCIS_ADD_RUN_SERVICES": "notifications"
       NOTIFICATIONS_SMTP_HOST: inbucket
       NOTIFICATIONS_SMTP_PORT: 2500
       NOTIFICATIONS_SMTP_SENDER: oCIS notifications <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>
       NOTIFICATIONS_SMTP_USERNAME: notifications@${OCIS_DOMAIN:-ocis.owncloud.test}
-      NOTIFICATIONS_SMTP_INSECURE: "true" # the mail catcher uses self signed certificates
+      # the mail catcher uses self signed certificates
+      NOTIFICATIONS_SMTP_INSECURE: "true"
 
   inbucket:
     image: inbucket/inbucket
