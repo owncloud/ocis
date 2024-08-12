@@ -2777,7 +2777,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" checks the activities for (?:folder|file) "([^"]*)" in space "([^"]*)" using the Graph API/
+	 * @When /^user "([^"]*)" lists the activities for (?:folder|file) "([^"]*)" of space "([^"]*)" using the Graph API/
 	 *
 	 * @param string $user
 	 * @param string $resource
@@ -2786,7 +2786,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userChecksTheActivitiesForResourceInSpaceUsingTheGraphAPI(string $user, string $resource, string $spaceName): void {
+	public function userListsTheActivitiesForResourceOfSpaceUsingTheGraphAPI(string $user, string $resource, string $spaceName): void {
 		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
@@ -2806,7 +2806,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userListsTheActivitiesInSpaceUsingTheGraphApi(string $user, string $spaceName): void {
+	public function userListsTheActivitiesOfSpaceUsingTheGraphApi(string $user, string $spaceName): void {
 		$spaceId = ($this->featureContext->spacesContext->getSpaceByName($user, $spaceName))["id"];
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
