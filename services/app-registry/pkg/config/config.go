@@ -47,7 +47,7 @@ type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"APP_REGISTRY_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"pre5.0"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
-	Protocol  string                 `yaml:"protocol" env:"APP_REGISTRY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"pre5.0"`
+	Protocol  string                 `yaml:"protocol" env:"OCIS_GRPC_PROTOCOL;APP_REGISTRY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"pre5.0"`
 }
 
 type AppRegistry struct {

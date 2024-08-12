@@ -77,7 +77,7 @@ type GRPCConfig struct {
 	Addr      string                 `ocisConfig:"addr" env:"OCM_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"5.0"`
 	Namespace string                 `ocisConfig:"-" yaml:"-"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
-	Protocol  string                 `yaml:"protocol" env:"OCM_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"5.0"`
+	Protocol  string                 `yaml:"protocol" env:"OCIS_GRPC_PROTOCOL;OCM_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"5.0"`
 }
 
 type ScienceMesh struct {

@@ -31,20 +31,20 @@ type Config struct {
 
 	FrontendPublicURL string `yaml:"frontend_public_url" env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL" desc:"The public facing URL of the oCIS frontend." introductionVersion:"pre5.0"`
 
-	UsersEndpoint             string `yaml:"users_endpoint" env:"GATEWAY_USERS_ENDPOINT" desc:"The USERS API endpoint." introductionVersion:"%%NEXT%%"`
-	GroupsEndpoint            string `yaml:"groups_endpoint" env:"GATEWAY_GROUPS_ENDPOINT" desc:"The GROUPS API endpoint." introductionVersion:"%%NEXT%%"`
-	PermissionsEndpoint       string `yaml:"permissions_endpoint" env:"GATEWAY_PERMISSIONS_ENDPOINT" desc:"The SETTINGS API endpoint." introductionVersion:"%%NEXT%%"`
-	SharingEndpoint           string `yaml:"sharing_endpoint" env:"GATEWAY_SHARING_ENDPOINT" desc:"The SHARE API endpoint." introductionVersion:"%%NEXT%%"`
-	AuthAppEndpoint           string `yaml:"auth_app_endpoint" env:"GATEWAY_AUTH_APP_ENDPOINT" desc:"The AUTH APP API endpoint." introductionVersion:"%%NEXT%%"`
-	AuthBasicEndpoint         string `yaml:"auth_basic_endpoint" env:"GATEWAY_AUTH_BASIC_ENDPOINT" desc:"The AUTH BASIC API endpoint." introductionVersion:"%%NEXT%%"`
-	AuthBearerEndpoint        string `yaml:"auth_bearer_endpoint" env:"GATEWAY_AUTH_BEARER_ENDPOINT" desc:"The AUTH BEARER API endpoint." introductionVersion:"%%NEXT%%"`
-	AuthMachineEndpoint       string `yaml:"auth_machine_endpoint" env:"GATEWAY_AUTH_MACHINE_ENDPOINT" desc:"The AUTH MACHINE API endpoint." introductionVersion:"%%NEXT%%"`
-	AuthServiceEndpoint       string `yaml:"auth_service_endpoint" env:"GATEWAY_AUTH_SERVICE_ENDPOINT" desc:"The AUTH SERVICE API endpoint." introductionVersion:"%%NEXT%%"`
-	StoragePublicLinkEndpoint string `yaml:"storage_public_link_endpoint" env:"GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT" desc:"The STORAGE PUBLICLINK API endpoint." introductionVersion:"%%NEXT%%"`
-	StorageUsersEndpoint      string `yaml:"storage_users_endpoint" env:"GATEWAY_STORAGE_USERS_ENDPOINT" desc:"The STORAGE USERS API endpoint." introductionVersion:"%%NEXT%%"`
-	StorageSharesEndpoint     string `yaml:"storage_shares_endpoint" env:"GATEWAY_STORAGE_SHARES_ENDPOINT" desc:"The STORAGE SHARES API endpoint." introductionVersion:"%%NEXT%%"`
-	AppRegistryEndpoint       string `yaml:"app_registry_endpoint" env:"GATEWAY_APP_REGISTRY_ENDPOINT" desc:"The APP REGISTRY API endpoint." introductionVersion:"%%NEXT%%"`
-	OCMEndpoint               string `yaml:"ocm_endpoint" env:"GATEWAY_OCM_ENDPOINT" desc:"The OCM API endpoint." introductionVersion:"%%NEXT%%"`
+	UsersEndpoint             string `yaml:"users_endpoint" env:"GATEWAY_USERS_ENDPOINT" desc:"The endpoint of the users service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	GroupsEndpoint            string `yaml:"groups_endpoint" env:"GATEWAY_GROUPS_ENDPOINT" desc:"The endpoint of the groups service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	PermissionsEndpoint       string `yaml:"permissions_endpoint" env:"GATEWAY_PERMISSIONS_ENDPOINT" desc:"The endpoint of the permissions service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	SharingEndpoint           string `yaml:"sharing_endpoint" env:"GATEWAY_SHARING_ENDPOINT" desc:"The endpoint of the shares service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	AuthAppEndpoint           string `yaml:"auth_app_endpoint" env:"GATEWAY_AUTH_APP_ENDPOINT" desc:"The endpoint of the auth-app service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	AuthBasicEndpoint         string `yaml:"auth_basic_endpoint" env:"GATEWAY_AUTH_BASIC_ENDPOINT" desc:"The endpoint of the auth-basic service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	AuthBearerEndpoint        string `yaml:"auth_bearer_endpoint" env:"GATEWAY_AUTH_BEARER_ENDPOINT" desc:"The endpoint of the auth-bearer service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	AuthMachineEndpoint       string `yaml:"auth_machine_endpoint" env:"GATEWAY_AUTH_MACHINE_ENDPOINT" desc:"The endpoint of the auth-machine service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	AuthServiceEndpoint       string `yaml:"auth_service_endpoint" env:"GATEWAY_AUTH_SERVICE_ENDPOINT" desc:"The endpoint of the auth-service service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	StoragePublicLinkEndpoint string `yaml:"storage_public_link_endpoint" env:"GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT" desc:"The endpoint of the storage-publiclink service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	StorageUsersEndpoint      string `yaml:"storage_users_endpoint" env:"GATEWAY_STORAGE_USERS_ENDPOINT" desc:"The endpoint of the storage-users service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	StorageSharesEndpoint     string `yaml:"storage_shares_endpoint" env:"GATEWAY_STORAGE_SHARES_ENDPOINT" desc:"The endpoint of the storag-shares service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	AppRegistryEndpoint       string `yaml:"app_registry_endpoint" env:"GATEWAY_APP_REGISTRY_ENDPOINT" desc:"The endpoint of the app-registry service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
+	OCMEndpoint               string `yaml:"ocm_endpoint" env:"GATEWAY_OCM_ENDPOINT" desc:"The endpoint of the ocm service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"%%NEXT%%"`
 
 	StorageRegistry StorageRegistry `yaml:"storage_registry"` // TODO: should we even support switching this?
 
@@ -74,7 +74,7 @@ type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"OCIS_GATEWAY_GRPC_ADDR;GATEWAY_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"pre5.0"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
-	Protocol  string                 `yaml:"protocol" env:"GATEWAY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"pre5.0"`
+	Protocol  string                 `yaml:"protocol" env:"OCIS_GRPC_PROTOCOL;GATEWAY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"pre5.0"`
 }
 
 type StorageRegistry struct {

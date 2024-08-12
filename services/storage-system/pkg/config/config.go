@@ -61,7 +61,7 @@ type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"STORAGE_SYSTEM_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"pre5.0"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
-	Protocol  string                 `yaml:"protocol" env:"STORAGE_SYSTEM_GRPC_PROTOCOL" desc:"The transport protocol of the GPRC service." introductionVersion:"pre5.0"`
+	Protocol  string                 `yaml:"protocol" env:"OCIS_GRPC_PROTOCOL;STORAGE_SYSTEM_GRPC_PROTOCOL" desc:"The transport protocol of the GPRC service." introductionVersion:"pre5.0"`
 }
 
 // HTTPConfig holds HTTPConfig config
