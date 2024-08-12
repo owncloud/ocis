@@ -57,6 +57,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Repair nats-js-kv registry: [#9734](https://github.com/owncloud/ocis/pull/9734)
 * Bugfix - Use less selectors that watch the registry: [#9741](https://github.com/owncloud/ocis/pull/9741)
 * Bugfix - We fixed the client config generation for the built in IDP: [#9770](https://github.com/owncloud/ocis/pull/9770)
+* Bugfix - Change ocmproviders config defaultpath: [#9778](https://github.com/owncloud/ocis/pull/9778)
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 * Enhancement - Allow configuring grpc max connection age: [#9657](https://github.com/owncloud/ocis/pull/9657)
 * Enhancement - Local WEB App configuration: [#9691](https://github.com/owncloud/ocis/pull/9691)
@@ -107,6 +108,13 @@ The following sections list the changes for unreleased.
    on a different domain.
 
    https://github.com/owncloud/ocis/pull/9770
+
+* Bugfix - Change ocmproviders config defaultpath: [#9778](https://github.com/owncloud/ocis/pull/9778)
+
+   We moved the default location of the `ocmproviders.json` config file out of the
+   data directory of the ocm service to the ocis config directory.
+
+   https://github.com/owncloud/ocis/pull/9778
 
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 
