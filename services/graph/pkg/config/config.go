@@ -28,7 +28,7 @@ type Config struct {
 	Application       Application `yaml:"application"`
 	Spaces            Spaces      `yaml:"spaces"`
 	Identity          Identity    `yaml:"identity"`
-	IncludeOCMSharees bool        `yaml:"include_ocm_sharees" env:"GRAPH_INCLUDE_OCM_SHAREES" desc:"Include OCM sharees when listing users." introductionVersion:"5.0"`
+	IncludeOCMSharees bool        `yaml:"include_ocm_sharees" env:"OCIS_ENABLE_OCM;GRAPH_INCLUDE_OCM_SHAREES" desc:"Include OCM sharees when listing users." introductionVersion:"5.0"`
 	Events            Events      `yaml:"events"`
 
 	Keycloak       Keycloak       `yaml:"keycloak"`

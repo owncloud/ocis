@@ -145,8 +145,7 @@ config = {
             "skip": False,
             "federationServer": True,
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm",
-                "GRAPH_INCLUDE_OCM_SHAREES": True,
+                "OCIS_ENABLE_OCM": True,
                 "OCM_OCM_INVITE_MANAGER_INSECURE": True,
                 "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
                 "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,

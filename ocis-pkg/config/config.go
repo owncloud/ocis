@@ -56,6 +56,7 @@ type Runtime struct {
 	Services   []string `yaml:"services" env:"OCIS_RUN_EXTENSIONS;OCIS_RUN_SERVICES" desc:"A comma-separated list of service names. Will start only the listed services." introductionVersion:"pre5.0"`
 	Disabled   []string `yaml:"disabled_services" env:"OCIS_EXCLUDE_RUN_SERVICES" desc:"A comma-separated list of service names. Will start all default services except of the ones listed. Has no effect when OCIS_RUN_SERVICES is set." introductionVersion:"pre5.0"`
 	Additional []string `yaml:"add_services" env:"OCIS_ADD_RUN_SERVICES" desc:"A comma-separated list of service names. Will add the listed services to the default configuration. Has no effect when OCIS_RUN_SERVICES is set. Note that one can add services not started by the default list and exclude services from the default list by using both envvars at the same time." introductionVersion:"pre5.0"`
+	EnableOCM  bool     `yaml:"enable_ocm" env:"OCIS_ENABLE_OCM" desc:"Enable all OCM config flags and start the ocm service." introductionVersion:"%%NEXT%%"`
 }
 
 // Config combines all available configuration parts.
