@@ -60,13 +60,13 @@ The following sections list the changes for unreleased.
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 * Enhancement - Allow configuring grpc max connection age: [#9657](https://github.com/owncloud/ocis/pull/9657)
 * Enhancement - Local WEB App configuration: [#9691](https://github.com/owncloud/ocis/pull/9691)
-* Enhancement - Bump reva: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Bump tusd pkg to v2: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Support Skyhigh Security ICAP as an ICAP server: [#9720](https://github.com/owncloud/ocis/issues/9720)
 * Enhancement - Added generic way to translate composite entities: [#9722](https://github.com/owncloud/ocis/pull/9722)
 * Enhancement - Add an API to auth-app service: [#9755](https://github.com/owncloud/ocis/pull/9755)
 * Enhancement - Bump go-micro plugins pkg: [#9756](https://github.com/owncloud/ocis/pull/9756)
+* Enhancement - Bump reva: [#9763](https://github.com/owncloud/ocis/pull/9763)
 
 ## Details
 
@@ -140,11 +140,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/9687
    https://github.com/owncloud/ocis/pull/9691
 
-* Enhancement - Bump reva: [#9714](https://github.com/owncloud/ocis/pull/9714)
-
-   https://github.com/owncloud/ocis/pull/9714
-   https://github.com/owncloud/ocis/pull/9715
-
 * Enhancement - Bump tusd pkg to v2: [#9714](https://github.com/owncloud/ocis/pull/9714)
 
    Bumps the tusd pkg to v2.4.0
@@ -190,6 +185,12 @@ The following sections list the changes for unreleased.
    Bump plugins pkg to include fix for cache delete
 
    https://github.com/owncloud/ocis/pull/9756
+
+* Enhancement - Bump reva: [#9763](https://github.com/owncloud/ocis/pull/9763)
+
+   https://github.com/owncloud/ocis/pull/9763
+   https://github.com/owncloud/ocis/pull/9714
+   https://github.com/owncloud/ocis/pull/9715
 
 # Changelog for [6.2.0] (2024-07-30)
 
