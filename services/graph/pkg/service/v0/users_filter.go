@@ -124,18 +124,16 @@ func (g Graph) applyFilterLogical(ctx context.Context, req *godata.GoDataRequest
 		return users, invalidFilterError()
 	}
 
+	// As we currently don't suppport the 'has' or 'in' operator, all our
+	// currently supported user filters of the ExpressionTokenLogical type
+	// require exactly two operands.
+	if len(root.Children) != 2 {
+		return users, invalidFilterError()
+	}
 	switch root.Token.Value {
 	case "and":
-		// 'and' needs 2 operands
-		if len(root.Children) != 2 {
-			return users, invalidFilterError()
-		}
 		return g.applyFilterLogicalAnd(ctx, req, root.Children[0], root.Children[1])
 	case "or":
-		// 'or' needs 2 operands
-		if len(root.Children) != 2 {
-			return users, invalidFilterError()
-		}
 		return g.applyFilterLogicalOr(ctx, req, root.Children[0], root.Children[1])
 	}
 	logger.Debug().Str("Token", root.Token.Value).Msg("unsupported logical filter")
