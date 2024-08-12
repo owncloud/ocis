@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-12-12-11-57]
+[#deprecation-note-2024-08-12-15-21-16]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -387,7 +387,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The default upload protocol to use in clients. Currently only 'tus' is available. See the developer API documentation for more details about TUS.
 
-a|`FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING` +
+a|`OCIS_ENABLE_OCM` +
+`FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING` +
 
 a| [subs=-attributes]
 ++pre5.0 ++
@@ -398,7 +399,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.
 
-a|`FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING` +
+a|`OCIS_ENABLE_OCM` +
+`FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING` +
 
 a| [subs=-attributes]
 ++pre5.0 ++
@@ -696,7 +698,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 EXPERIMENTAL: enable the feature to deny access on folders.
 
-a|`FRONTEND_OCS_LIST_OCM_SHARES` +
+a|`OCIS_ENABLE_OCM` +
+`FRONTEND_OCS_LIST_OCM_SHARES` +
 
 a| [subs=-attributes]
 ++5.0 ++
@@ -706,6 +709,18 @@ a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
 Include OCM shares when listing shares. See the OCM service documentation for more details.
+
+a|`OCIS_ENABLE_OCM` +
+`FRONTEND_OCS_INCLUDE_OCM_SHAREES` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Include OCM sharees when listing sharees.
 
 a|`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
 `FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
@@ -730,17 +745,6 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false.
-
-a|`FRONTEND_OCS_INCLUDE_OCM_SHAREES` +
-
-a| [subs=-attributes]
-++5.0 ++
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++false ++
-a| [subs=-attributes]
-Include OCM sharees when listing sharees.
 
 a|`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
 

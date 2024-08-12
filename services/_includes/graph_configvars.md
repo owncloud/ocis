@@ -93,7 +93,7 @@
 | GRAPH_LDAP_SCHOOL_NUMBER_ATTRIBUTE | string |  | LDAP Attribute to use for the number of a school.|
 | GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE | string |  | LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID.|
 | GRAPH_LDAP_SCHOOL_TERMINATION_MIN_GRACE_DAYS | int | 0 | When setting a 'terminationDate' for a school, require the date to be at least this number of days in the future.|
-| GRAPH_INCLUDE_OCM_SHAREES | bool | false | Include OCM sharees when listing users.|
+| OCIS_ENABLE_OCM<br/>GRAPH_INCLUDE_OCM_SHAREES | bool | false | Include OCM sharees when listing users.|
 | OCIS_EVENTS_ENDPOINT<br/>GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.|
 | OCIS_EVENTS_CLUSTER<br/>GRAPH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_INSECURE<br/>GRAPH_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|

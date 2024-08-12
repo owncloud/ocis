@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-12-12-11-57]
+[#deprecation-note-2024-08-12-15-21-16]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -1080,7 +1080,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 When setting a 'terminationDate' for a school, require the date to be at least this number of days in the future.
 
-a|`GRAPH_INCLUDE_OCM_SHAREES` +
+a|`OCIS_ENABLE_OCM` +
+`GRAPH_INCLUDE_OCM_SHAREES` +
 
 a| [subs=-attributes]
 ++5.0 ++

@@ -33,8 +33,8 @@
 | FRONTEND_UPLOAD_MAX_CHUNK_SIZE | int | 10000000 | Sets the max chunk sizes in bytes for uploads via the clients.|
 | FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE | string |  | Advise TUS to replace PATCH requests by POST requests.|
 | FRONTEND_DEFAULT_UPLOAD_PROTOCOL | string | tus | The default upload protocol to use in clients. Currently only 'tus' is available. See the developer API documentation for more details about TUS.|
-| FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING | bool | false | Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.|
-| FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING | bool | false | Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed.|
+| OCIS_ENABLE_OCM<br/>FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING | bool | false | Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.|
+| OCIS_ENABLE_OCM<br/>FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING | bool | false | Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed.|
 | FRONTEND_SEARCH_MIN_LENGTH | int | 3 | Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed.|
 | OCIS_EDITION<br/>FRONTEND_EDITION | string | Community | Edition of oCIS. Used for branding purposes.|
 | OCIS_DISABLE_SSE<br/>FRONTEND_DISABLE_SSE | bool | false | When set to true, clients are informed that the Server-Sent Events endpoint is not accessible.|
@@ -60,10 +60,10 @@
 | OCIS_CACHE_AUTH_USERNAME<br/>FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME | string |  | The username to use for authentication. Only applies when using the 'nats-js-kv' store type.|
 | OCIS_CACHE_AUTH_PASSWORD<br/>FRONTEND_OCS_STAT_CACHE_AUTH_PASSWORD | string |  | The password to use for authentication. Only applies when using the 'nats-js-kv' store type.|
 | FRONTEND_OCS_ENABLE_DENIALS | bool | false | EXPERIMENTAL: enable the feature to deny access on folders.|
-| FRONTEND_OCS_LIST_OCM_SHARES | bool | true | Include OCM shares when listing shares. See the OCM service documentation for more details.|
+| OCIS_ENABLE_OCM<br/>FRONTEND_OCS_LIST_OCM_SHARES | bool | true | Include OCM shares when listing shares. See the OCM service documentation for more details.|
+| OCIS_ENABLE_OCM<br/>FRONTEND_OCS_INCLUDE_OCM_SHAREES | bool | false | Include OCM sharees when listing sharees.|
 | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD | bool | true | Set this to true if you want to enforce passwords on all public shares.|
 | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | bool | false | Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false.|
-| FRONTEND_OCS_INCLUDE_OCM_SHAREES | bool | false | Include OCM sharees when listing sharees.|
 | OCIS_SHOW_USER_EMAIL_IN_RESULTS | bool | false | Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses.|
 | FRONTEND_CHECKSUMS_SUPPORTED_TYPES | []string | [sha1 md5 adler32] | A list of checksum types that indicate to clients which hashes the server can use to verify upload integrity. Supported types are 'sha1', 'md5' and 'adler32'. See the Environment Variable Types description for more details.|
 | FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE | string | sha1 | The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES.|

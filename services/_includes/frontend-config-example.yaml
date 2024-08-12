@@ -111,9 +111,9 @@ ocs:
   stat_cache_auth_password: ""
   enable_denials: false
   list_ocm_shares: true
+  include_ocm_sharees: false
   public_sharing_share_must_have_password: true
   public_sharing_writeableshare_must_have_password: false
-  include_ocm_sharees: false
   show_email_in_results: false
 checksums:
   supported_types:
