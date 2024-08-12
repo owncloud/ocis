@@ -1,13 +1,11 @@
 package command
 
 import (
-	"fmt"
 	"os"
 	"slices"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
+	"github.com/olekukonko/tablewriter"
 	"github.com/urfave/cli/v2"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -19,7 +17,7 @@ import (
 // UnifiedRoles bundles available commands for unified roles
 func UnifiedRoles(cfg *config.Config) cli.Commands {
 	cmds := cli.Commands{
-		unifiedRolesStatus(cfg),
+		listUnifiedRoles(cfg),
 	}
 
 	for _, cmd := range cmds {
@@ -34,47 +32,48 @@ func UnifiedRoles(cfg *config.Config) cli.Commands {
 }
 
 // unifiedRolesStatus lists available unified roles, it contains an indicator to show if the role is enabled or not
-func unifiedRolesStatus(cfg *config.Config) *cli.Command {
+func listUnifiedRoles(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "list",
 		Usage: "list available unified roles",
 		Action: func(c *cli.Context) error {
-			re := lipgloss.NewRenderer(os.Stdout)
-			baseStyle := re.NewStyle().Padding(0, 1)
+			tbl := tablewriter.NewWriter(os.Stdout)
+			tbl.SetRowLine(true)
+			tbl.SetAutoMergeCellsByColumnIndex([]int{0}) // rowspan should only affect the first column
 
-			var data [][]string
+			headers := []string{"UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
+			tbl.SetHeader(headers)
 
-			// fixMe: should we use all definitions?
 			for _, definition := range unifiedrole.GetRoles(unifiedrole.RoleFilterAll()) {
-				data = append(data, []string{"", definition.GetId(), definition.GetDescription()})
+				const enabled = "enabled"
+				const disabled = "disabled"
+
+				rows := [][]string{
+					{definition.GetId(), disabled, definition.GetDescription()},
+				}
+				if slices.Contains(cfg.UnifiedRoles.AvailableRoles, definition.GetId()) {
+					rows[0][1] = enabled
+				}
+
+				for i, rolePermission := range definition.GetRolePermissions() {
+					actions := strings.Join(rolePermission.GetAllowedResourceActions(), "\n")
+					row := []string{rolePermission.GetCondition(), actions}
+					switch i {
+					case 0:
+						rows[0] = append(rows[0], row...)
+					default:
+						rows = append(rows, append(slices.Clone(rows[0][:len(rows[0])-len(row)]), row...))
+					}
+				}
+
+				for _, row := range rows {
+					// balance the row before adding it to the table,
+					// this prevents the row from having empty columns.
+					tbl.Append(append(row, make([]string, len(headers)-len(row))...))
+				}
 			}
 
-			t := table.New().
-				Border(lipgloss.NormalBorder()).
-				Headers("Enabled", "UID", "Description").
-				Rows(data...).
-				StyleFunc(func(row, col int) lipgloss.Style {
-					if row == 0 {
-						return baseStyle.Foreground(lipgloss.Color("252")).Bold(true)
-					}
-
-					if row != 0 && col == 0 {
-						indicatorStyle := baseStyle.Align(lipgloss.Center)
-
-						// Check if the role is enabled, header takes up the first row
-						switch slices.Contains(cfg.UnifiedRoles.AvailableRoles, data[row-1][1]) {
-						case true:
-							return indicatorStyle.Background(lipgloss.Color("34")) // ANSI green
-						default:
-							return indicatorStyle.Background(lipgloss.Color("9")) // ANSI red
-						}
-					}
-
-					return baseStyle
-				})
-
-			fmt.Println(t)
-
+			tbl.Render()
 			return nil
 		},
 	}
