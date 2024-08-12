@@ -100,7 +100,7 @@ class FavoritesContext implements Context {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" should (not|)\s?have favorited the following elements$/
+	 * @Then /^user "([^"]*)" should (not|)\s?have the following favorited items$/
 	 *
 	 * @param string $user
 	 * @param string $shouldOrNot (not|)
