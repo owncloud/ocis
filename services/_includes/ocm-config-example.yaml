@@ -95,7 +95,7 @@ ocm_invite_manager:
 ocm_provider_authorizer_driver: json
 ocm_provider_authorizer_drivers:
   json:
-    providers: /var/lib/ocis/storage/ocm/ocmproviders.json
+    providers: /etc/ocis/ocmproviders.json
     verify_request_hostname: false
 ocm_share_provider:
   driver: json

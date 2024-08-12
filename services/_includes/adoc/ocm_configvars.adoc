@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-12-11-31-46]
+[#deprecation-note-2024-08-12-12-11-57]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -448,7 +448,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++/var/lib/ocis/storage/ocm/ocmproviders.json ++
+++/etc/ocis/ocmproviders.json ++
 a| [subs=-attributes]
 Path to the JSON file where ocm invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
