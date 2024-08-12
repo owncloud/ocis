@@ -15,6 +15,32 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
+- rawname: _registryRegisterIntervalEnv
+  path: ocis-pkg/registry/expiry.go:19
+  foundincode: true
+  name: EXPERIMENTAL_REGISTER_INTERVAL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _registryRegisterTTLEnv
+  path: ocis-pkg/registry/expiry.go:28
+  foundincode: true
+  name: EXPERIMENTAL_REGISTER_TTL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _serverMaxConnectionAgeEnv
+  path: ocis-pkg/service/grpc/keepalive.go:19
+  foundincode: true
+  name: GRPC_MAX_CONNECTION_AGE
+  type: Duration
+  default_value: "9223372036854775807"
+  description: Timeout for GRPC connections. After timeout, a new connection will
+    be established automatically. The default value is in ns and is about 2.5 mio
+    h.
+  do_ignore: false
 - rawname: MICRO_LOG_LEVEL
   path: ocis-pkg/log/log.go:34
   foundincode: true
@@ -52,8 +78,8 @@ variables:
     on supervision of ownCloud Support.'
   do_ignore: false
 - rawname: _registryAddressEnv
-  path: ocis-pkg/natsjsregistry/registry.go:186
-  foundincode: false
+  path: ocis-pkg/natsjsregistry/registry.go:192
+  foundincode: true
   name: MICRO_REGISTRY_ADDRESS
   type: string
   default_value: 127.0.0.1:9233
@@ -69,16 +95,16 @@ variables:
   description: ""
   do_ignore: true
 - rawname: _registryPasswordEnv
-  path: ocis-pkg/natsjsregistry/registry.go:214
-  foundincode: false
+  path: ocis-pkg/natsjsregistry/registry.go:220
+  foundincode: true
   name: MICRO_REGISTRY_AUTH_PASSWORD
   type: string
   default_value: ""
   description: Optional when using nats to authenticate with the nats cluster.
   do_ignore: false
 - rawname: _registryUsernameEnv
-  path: ocis-pkg/natsjsregistry/registry.go:214
-  foundincode: false
+  path: ocis-pkg/natsjsregistry/registry.go:220
+  foundincode: true
   name: MICRO_REGISTRY_AUTH_USERNAME
   type: string
   default_value: ""
@@ -112,54 +138,6 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
-- rawname: _registryAddressEnv
-  path: ocis-pkg/natsjsregistry/registry.go:192
-  foundincode: true
-  name: _registryAddressEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: _registryPasswordEnv
-  path: ocis-pkg/natsjsregistry/registry.go:220
-  foundincode: true
-  name: _registryPasswordEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: _registryRegisterIntervalEnv
-  path: ocis-pkg/registry/expiry.go:19
-  foundincode: true
-  name: _registryRegisterIntervalEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: _registryRegisterTTLEnv
-  path: ocis-pkg/registry/expiry.go:28
-  foundincode: true
-  name: _registryRegisterTTLEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: _registryUsernameEnv
-  path: ocis-pkg/natsjsregistry/registry.go:220
-  foundincode: true
-  name: _registryUsernameEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: _serverMaxConnectionAgeEnv
-  path: ocis-pkg/service/grpc/keepalive.go:19
-  foundincode: true
-  name: _serverMaxConnectionAgeEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:382
   foundincode: true

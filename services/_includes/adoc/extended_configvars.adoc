@@ -11,6 +11,16 @@
     
     
     
+    
+
+a| `GRPC_MAX_CONNECTION_AGE` +
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++9223372036854775807 ++
+a| [subs=-attributes]
+++Timeout for GRPC connections. After timeout, a new connection will be established automatically. The default value is in ns and is about 2.5 mio h. ++
+    
 
 a| `MICRO_LOG_LEVEL` +
 a| [subs=-attributes]
@@ -70,53 +80,5 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++The default directory location for config files. See the General Info section in the documentation for more details on defaults. ++
     
-
-a| `_registryAddressEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `_registryPasswordEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `_registryRegisterIntervalEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `_registryRegisterTTLEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `_registryUsernameEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `_serverMaxConnectionAgeEnv` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
     
 |===
