@@ -7,6 +7,13 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// CollaborationTracingMiddleware adds a new middleware in order to include
+// more attributes in the traced span.
+//
+// In order not to mess with the expected responses, this middleware won't do
+// anything if there is no available WOPI context set in the request (there is
+// nothing to report). This means that the WopiContextAuthMiddleware should be
+// set before this middleware.
 func CollaborationTracingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		wopiContext, err := WopiContextFromCtx(r.Context())
