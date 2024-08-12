@@ -92,18 +92,14 @@ Feature: copy file
       | old              |
       | new              |
 
-  @issue-1345
+  @issue-1345 @issue-2177
   Scenario Outline: copying file to a path with extension .part should not be possible
     Given using <dav-path-version> DAV path
     When user "Alice" copies file "/textfile1.txt" to "/textfile1.part" using the WebDAV API
-    Then the HTTP status code should be "400"
-    And the DAV exception should be "OCA\DAV\Connector\Sabre\Exception\InvalidPath"
-    And the DAV message should be "Can`t upload files with extension .part because these extensions are reserved for internal use."
-    And the DAV reason should be "Can`t upload files with extension .part because these extensions are reserved for internal use."
+    Then the HTTP status code should be "201"
     And user "Alice" should see the following elements
-      | /textfile1.txt |
-    But user "Alice" should not see the following elements
       | /textfile1.part |
+      | /textfile1.txt  |
     Examples:
       | dav-path-version |
       | old              |

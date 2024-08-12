@@ -21,7 +21,7 @@ Feature: move (rename) folder
       | new              |
       | spaces           |
 
-
+  @issue-3099
   Scenario Outline: renaming a folder to a backslash should return an error
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/testshare"
@@ -35,7 +35,7 @@ Feature: move (rename) folder
       | new              |
       | spaces           |
 
-
+  @issue-3099
   Scenario Outline: renaming a folder beginning with a backslash should return an error
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/testshare"
@@ -49,7 +49,7 @@ Feature: move (rename) folder
       | new              |
       | spaces           |
 
-
+  @issue-3099
   Scenario Outline: renaming a folder including a backslash encoded should return an error
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/testshare"

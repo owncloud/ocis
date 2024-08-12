@@ -130,7 +130,7 @@ Feature: move (rename) file
       | new              |
       | spaces           |
 
-  @issue-1295
+  @issue-1295 @issue-2177 @issue-3099
   Scenario Outline: rename a file into an invalid filename
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToRename.txt"
@@ -159,19 +159,16 @@ Feature: move (rename) file
       | new              |
       | spaces           |
 
-  @issue-1295
+  @issue-1295 @issue-2177
   Scenario Outline: renaming a file to a path with extension .part should not be possible
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToRename.txt"
     When user "Alice" moves file "/fileToRename.txt" to "/welcome.part" using the WebDAV API
-    Then the HTTP status code should be "400"
-    And the DAV exception should be "OCA\DAV\Connector\Sabre\Exception\InvalidPath"
-    And the DAV message should be "Can`t upload files with extension .part because these extensions are reserved for internal use."
-    And the DAV reason should be "Can`t upload files with extension .part because these extensions are reserved for internal use."
+    Then the HTTP status code should be "201"
     And user "Alice" should see the following elements
-      | /fileToRename.txt |
+      | /welcome.part |
     But user "Alice" should not see the following elements
-      | /fileToRename.part |
+      | /fileToRename.txt |
     Examples:
       | dav-path-version |
       | old              |
