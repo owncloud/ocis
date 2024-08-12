@@ -254,34 +254,6 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		users, err = g.identityBackend.GetUsers(r.Context(), odataReq)
 	}
 
-	if g.config.IncludeOCMSharees {
-		gwc, err := g.gatewaySelector.Next()
-		if err != nil {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			return
-		}
-		term, err := identity.GetSearchValues(odataReq.Query)
-		if err != nil {
-			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		remoteUsersRes, err := gwc.FindAcceptedUsers(r.Context(), &invitepb.FindAcceptedUsersRequest{Filter: term})
-		if err != nil {
-			// TODO grpc FindAcceptedUsers call failed
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			return
-		}
-		if remoteUsersRes.Status.Code != cs3rpc.Code_CODE_OK {
-			// TODO "error searching remote users"
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, remoteUsersRes.Status.Message)
-			return
-		}
-		for _, user := range remoteUsersRes.GetAcceptedUsers() {
-			users = append(users, identity.CreateUserModelFromCS3(user))
-		}
-	}
-
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users from backend")
 		var errcode errorcode.Error
@@ -295,6 +267,25 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
 		return
+	}
+
+	if g.config.IncludeOCMSharees {
+		ocmUsers, err := g.searchOCMAcceptedUsers(r.Context(), odataReq)
+		var errcode errorcode.Error
+		var godataerr *godata.GoDataError
+		switch {
+		case err == nil:
+			users = append(users, ocmUsers...)
+		case errors.As(err, &errcode):
+			errcode.Render(w, r)
+			return
+		case errors.As(err, &godataerr):
+			errorcode.GeneralException.Render(w, r, godataerr.ResponseCode, err.Error())
+			return
+		default:
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
 
 	// If the user isn't admin, we'll show just the minimum user attibutes
@@ -1013,4 +1004,32 @@ func isValidUserType(userType string) bool {
 	}
 
 	return false
+}
+
+func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDataRequest) ([]*libregraph.User, error) {
+	logger := g.logger.SubloggerWithRequestID(ctx)
+	gwc, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+	term, err := identity.GetSearchValues(odataReq.Query)
+	if err != nil {
+		return nil, errorcode.New(errorcode.InvalidRequest, err.Error())
+	}
+
+	remoteUsersRes, err := gwc.FindAcceptedUsers(ctx, &invitepb.FindAcceptedUsersRequest{Filter: term})
+	if err != nil {
+		logger.Error().Err(err).Msg("FindAcceptedUsers call failed")
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+	if remoteUsersRes.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
+		return nil, errorcode.FromCS3Status(remoteUsersRes.Status, nil)
+	}
+
+	cs3Users := remoteUsersRes.GetAcceptedUsers()
+	users := make([]*libregraph.User, 0, len(cs3Users))
+	for _, user := range cs3Users {
+		users = append(users, identity.CreateUserModelFromCS3(user))
+	}
+	return users, nil
 }
