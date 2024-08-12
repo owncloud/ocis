@@ -558,6 +558,7 @@ OCIS_URL="https://ocis-server:9200" \
 PROXY_ENABLE_BASIC_AUTH=true \
 OCIS_ENABLE_OCM=true \
 OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE="${workspaceFolder}/tests/config/drone/providers.json" \
+OCIS_ADD_RUN_SERVICES="ocm" \
 ocis/bin/ocis server
 ```
 
@@ -579,7 +580,9 @@ ocis/bin/ocis server
 The second oCIS instance should be available at: https://federation-ocis-server:10200/
 
 {{< hint info >}}
-To enable ocm in the web interface, you need to set `OCIS_ENABLE_OCM=true`. It will enable all ocm flags and start the ocm service when running `ocis server`.
+To enable ocm in the web interface, you need to set the following envs:
+`OCIS_ENABLE_OCM="true"`
+`OCIS_ADD_RUN_SERVICES="ocm"`
 {{< /hint>}}
 
 #### Run the Acceptance Test

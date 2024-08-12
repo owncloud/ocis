@@ -94,6 +94,7 @@
             "OCIS_LDAP_URI": "ldaps://localhost:10235",
             "OCIS_RUNTIME_PORT": "10250",
             "OCIS_URL": "https://federation-ocis-server:10200",
+            "OCIS_ADD_RUN_SERVICES": "ocm",
             "OCIS_ENABLE_OCM": "true",
             "APP_PROVIDER_DEBUG_ADDR": "127.0.0.1:10165",
             "APP_PROVIDER_GRPC_ADDR": "127.0.0.1:10164",

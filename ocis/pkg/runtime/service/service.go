@@ -473,11 +473,6 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 		runset[name] = struct{}{}
 	}
 
-	// add ocm service if explicitly enabled by config
-	if cfg.Runtime.EnableOCM {
-		runset[cfg.OCM.Service.Name] = struct{}{}
-	}
-
 	// remove services if explicitly excluded by config
 	for _, name := range cfg.Runtime.Disabled {
 		delete(runset, name)
