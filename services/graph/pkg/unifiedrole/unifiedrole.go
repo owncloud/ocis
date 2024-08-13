@@ -37,7 +37,7 @@ const (
 	UnifiedRoleFederatedEditorID = "36279a93-e4e3-4bbb-8a23-53b05b560963"
 
 	// Wile the below conditions follow the SDDL syntax, they are not parsed anywhere. We use them as strings to
-	// represent the constraints that a role definition applies to. Fer the actual syntax, see the SDDL documentation
+	// represent the constraints that a role definition applies to. For the actual syntax, see the SDDL documentation
 	// at https://learn.microsoft.com/en-us/windows/win32/secauthz/security-descriptor-definition-language-for-conditional-aces-#conditional-expressions
 
 	// Some roles apply to a specific type of resource, for example, a role that applies to a file or a folder.
