@@ -72,16 +72,19 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   The file by default looks like this:
 
-  ```shell {linenos=table,hl_lines=[7,21,42,44,120,123]}
+  ```shell {linenos=table,hl_lines=[8,24,46,48,133,136]}
+  ## Basic Settings ##
   # Define the docker compose log driver used.
   # Defaults to local
   LOG_DRIVER=
-  # If you're on an internet facing server. comment out following line.
+  # If you're on an internet facing server, comment out following line.
   # It skips certificate validation for various parts of Infinite Scale and is
   # needed when self signed certificates are used.
   INSECURE=true
 
-  ### Traefik Settings ###
+
+  ## Traefik Settings ##
+  # Note: Traefik is always enabled and can't be disabled.
   # Serve Traefik dashboard.
   # Defaults to "false".
   TRAEFIK_DASHBOARD=
@@ -102,9 +105,10 @@ See also [example server setup]({{< ref "preparing_server" >}})
   TRAEFIK_ACME_CASERVER=
 
 
-  ### Infinite Scale Settings ###
+  ## Infinite Scale Settings ##
   # Beside Traefik, this service must stay enabled.
   # Disable only for testing purposes.
+  # Note: the leading colon is required to enable the service.
   OCIS=:ocis.yml
   # The oCIS container image.
   # Defaults to "owncloud/ocis" which contains the production releases.
@@ -121,24 +125,31 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # because their passwords are public. Defaults to "false".
   # Also see: https://doc.owncloud.com/ocis/latest/deployment/general/general-info.html#demo-users-and-groups
   DEMO_USERS=
-  # Define the loglevel used.
+  # Define the oCIS loglevel used.
   # For more details see:
   # https://doc.owncloud.com/ocis/latest/deployment/services/env-vars-special-scope.html
   LOG_LEVEL=
   # Define the kind of logging.
   # The default log can be read by machines.
-  # Set this to true to make the log human readable
+  # Set this to true to make the log human readable.
   # LOG_PRETTY=true
+  #
+  # Define the oCIS storage location. Set the paths for config and data to a local path.
+  # Note that especially the data directory can grow big.
+  # Leaving it default stores data in docker internal volumes.
+  # For more details see:
+  # https://doc.owncloud.com/ocis/next/deployment/general/general-info.html#default-paths
+  # OCIS_CONFIG_DIR=/your/local/ocis/config
+  # OCIS_DATA_DIR=/your/local/ocis/data
 
-  # S3 Storage configuration
-  #
-  # - optional
-  #
+  # S3 Storage configuration - optional
   # Infinite Scale supports S3 storage as primary storage.
-  # Per default, S3 storage is disabled and we use the local filesystem.
-  # To enable S3 storage, uncomment the following lines and configure the S3 storage.
-  # The leading colon is required to enable the service.
-  # S3NG=:s3ng.yml
+  # Per default, S3 storage is disabled and the local filesystem is used.
+  # To enable S3 storage, uncomment the following line and configure the S3 storage.
+  # For more details see:
+  # https://doc.owncloud.com/ocis/next/deployment/storage/s3.html
+  # Note: the leading colon is required to enable the service.
+  #S3NG=:s3ng.yml
   # Configure the S3 storage endpoint. Defaults to "http://minio:9000" for testing purposes.
   S3NG_ENDPOINT=
   # S3 region. Defaults to "default".
@@ -149,17 +160,17 @@ See also [example server setup]({{< ref "preparing_server" >}})
   S3NG_SECRET_KEY=
   # S3 bucket. Defaults to "ocis"
   S3NG_BUCKET=
-  # Add local minio S3 storage to the docker-compose file.
-  # This is needed for testing purposes.
+  #
+  # For testing purposes, add local minio S3 storage to the docker-compose file.
   # The leading colon is required to enable the service.
-  # S3NG_MINIO=:minio.yml
+  #S3NG_MINIO=:minio.yml
   # Minio domain. Defaults to "minio.owncloud.test".
   MINIO_DOMAIN=
 
   # Define SMPT settings if you would like to send Infinite Scale email notifications.
   # For more details see:
   # https://doc.owncloud.com/ocis/latest/deployment/services/s-list/notifications.html
-  # NOTE: this doesn't work if you are using inbucket.
+  # NOTE: when configuring Inbucket, these settings have no effect, see inbucket.yml for details.
   # SMTP host to connect to.
   SMTP_HOST=
   # Port of the SMTP host to connect to.
@@ -176,19 +187,21 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # Allow insecure connections to the SMTP server. Defaults to false.
   SMTP_INSECURE=
 
+
   ## Default Enabled Services ##
 
   ### Apache Tika Content Analysis Toolkit ###
   # Tika (search) is enabled by default, comment if not required.
-  # The leading colon is required to enable the service.
+  # Note: the leading colon is required to enable the service.
   TIKA=:tika.yml
   # Set the desired docker image tag or digest.
   # Defaults to "latest"
   TIKA_IMAGE=
 
+
   ### Collabora Settings ###
   # Collabora web office is default enabled, comment if not required.
-  # The leading colon is required to enable the service.
+  # Note: the leading colon is required to enable the service.
   COLLABORA=:collabora.yml
   # Domain of Collabora, where you can find the frontend.
   # Defaults to "collabora.owncloud.test"
@@ -204,6 +217,11 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # Admin password for Collabora.
   # Defaults to "admin".
   COLLABORA_ADMIN_PASSWORD=
+  # Set to true to enable SSL for Collabora Online. Default is true if not specified.
+  COLLABORA_SSL_ENABLE=false
+  # If you're on an internet-facing server, enable SSL verification for Collabora Online.
+  # Please comment out the following line:
+  COLLABORA_SSL_VERIFICATION=false
   ...
   ```
   #### Reverse Proxy and SSL
@@ -329,16 +347,15 @@ You can use an S3 compatible Storage as the primary data store. The metadatata o
 The endpoint, region and keys for your S3 Server need to be provided by the service or company who operates it. Normally you can get these via web portal.
 {{</hint>}}
 
-```shell {linenos=table,hl_lines=[9,11,13,15,17,19]}
-# S3 Storage configuration
-#
-# - optional
-#
+```shell {linenos=table,hl_lines=[8,10,12,14,16,18]}
+# S3 Storage configuration - optional
 # Infinite Scale supports S3 storage as primary storage.
-# Per default, S3 storage is disabled and we use the local filesystem.
-# To enable S3 storage, uncomment the following lines and configure the S3 storage.
-# The leading colon is required to enable the service.
-S3NG=:s3ng.yml
+# Per default, S3 storage is disabled and the local filesystem is used.
+# To enable S3 storage, uncomment the following line and configure the S3 storage.
+# For more details see:
+# https://doc.owncloud.com/ocis/next/deployment/storage/s3.html
+# Note: the leading colon is required to enable the service.
+# S3NG=:s3ng.yml
 # Configure the S3 storage endpoint. Defaults to "http://minio:9000" for testing purposes.
 S3NG_ENDPOINT=
 # S3 region. Defaults to "default".
