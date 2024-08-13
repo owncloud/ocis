@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Change ocmproviders config defaultpath: [#9778](https://github.com/owncloud/ocis/pull/9778)
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 * Enhancement - Allow configuring grpc max connection age: [#9657](https://github.com/owncloud/ocis/pull/9657)
+* Enhancement - Tracing improvements in the collaboration service: [#9684](https://github.com/owncloud/ocis/pull/9684)
 * Enhancement - Local WEB App configuration: [#9691](https://github.com/owncloud/ocis/pull/9691)
 * Enhancement - Bump tusd pkg to v2: [#9714](https://github.com/owncloud/ocis/pull/9714)
 * Enhancement - Gateways should directly talk to themselves: [#9714](https://github.com/owncloud/ocis/pull/9714)
@@ -132,6 +133,16 @@ The following sections list the changes for unreleased.
    pick up new IPs.
 
    https://github.com/owncloud/ocis/pull/9657
+
+* Enhancement - Tracing improvements in the collaboration service: [#9684](https://github.com/owncloud/ocis/pull/9684)
+
+   Uploads and downloads through the collaboration service will be traced. The
+   openInApp request will also be linked properly with other requests in the
+   tracing. In addition, the collaboration service will include some additional
+   information in the traces. Filtering based on that information might be an
+   option.
+
+   https://github.com/owncloud/ocis/pull/9684
 
 * Enhancement - Local WEB App configuration: [#9691](https://github.com/owncloud/ocis/pull/9691)
 
