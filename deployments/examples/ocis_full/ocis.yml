@@ -6,7 +6,9 @@ services:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
   ocis:
-    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
+    # FIXME: move back to "owncloud/ocis:latest" once the collaboratoin service is
+    #   available in a production release
+    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis-rolling}:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     entrypoint:
