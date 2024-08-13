@@ -55,8 +55,9 @@ services:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
       - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
-      - ocis-config:/etc/ocis
-      - ocis-data:/var/lib/ocis
+      # configure the .env file to use own paths instead docker internal volumes
+      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
+      - ${OCIS_DATA_DIR:-ocis-data}:/var/lib/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
