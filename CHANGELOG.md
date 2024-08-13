@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add an API to auth-app service: [#9755](https://github.com/owncloud/ocis/pull/9755)
 * Enhancement - Bump go-micro plugins pkg: [#9756](https://github.com/owncloud/ocis/pull/9756)
 * Enhancement - Bump reva: [#9763](https://github.com/owncloud/ocis/pull/9763)
+* Enhancement - Allow querying federated user roles for sharing: [#9765](https://github.com/owncloud/ocis/pull/9765)
 * Enhancement - Refactor the connector in the collaboration service: [#9771](https://github.com/owncloud/ocis/pull/9771)
 * Enhancement - Add OCIS_ENABLE_OCM env var: [#9784](https://github.com/owncloud/ocis/pull/9784)
 
@@ -212,6 +213,17 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9763
    https://github.com/owncloud/ocis/pull/9714
    https://github.com/owncloud/ocis/pull/9715
+
+* Enhancement - Allow querying federated user roles for sharing: [#9765](https://github.com/owncloud/ocis/pull/9765)
+
+   When listing permissions clients can now fetch the list of available federated
+   sharing roles by sending a `GET
+   /graph/v1beta1/drives/{driveid}/items/{itemid}/permissions?$filter=@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition,
+   '@Subject.UserType=="Federated"'))` request. Note that this is the only
+   supported filter expression. Federated sharing roles will be omitted from
+   requests without this filter.
+
+   https://github.com/owncloud/ocis/pull/9765
 
 * Enhancement - Refactor the connector in the collaboration service: [#9771](https://github.com/owncloud/ocis/pull/9771)
 
