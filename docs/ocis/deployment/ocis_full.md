@@ -113,7 +113,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # The oCIS container image.
   # For production releases: "owncloud/ocis"
   # For rolling releases:    "owncloud/ocis-rolling"
-  # Defaults to "owncloud/ocis" (production)
+  # Defaults to "owncloud/ocis-rolling" (rolling release)
   OCIS_DOCKER_IMAGE=
   # The oCIS container version.
   # Defaults to "latest" and points to the latest stable tag.
@@ -238,10 +238,10 @@ See also [example server setup]({{< ref "preparing_server" >}})
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
   #### Infinite Scale Release and Version
-  By default oCIS will be started in the `latest` production version.
-  You can change it to use the oCIS rolling releases by setting `OCIS_DOCKER_IMAGE=owncloud/ocis-rolling`. This will always use the latest rolling release.
+  By default oCIS will be started in the `latest` rolling version. Please note that this deployment does currently not work with the 5.x productions releases.
+  The oCIS "collaboration" service, which is required by this deployment, is not part of the 5.x releases.
 
-  If you want to use a specific version of oCIS, set the version to a dedicated tag like `OCIS_DOCKER_TAG=5.0.1`. Available  production versions can be found on [Docker Hub Production](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated) and available rolling releases can be found on [Docker Hub Rolling](https://hub.docker.com/r/owncloud/ocis-rolling/tags?page=1&ordering=last_updated)
+  If you want to use a specific version of oCIS, set the version to a dedicated tag like `OCIS_DOCKER_TAG=6.2.0`. The minimal required oCIS Version to run this deployment is 6.2.0. Available  production versions can be found on [Docker Hub Production](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated) and available rolling releases can be found on [Docker Hub Rolling](https://hub.docker.com/r/owncloud/ocis-rolling/tags?page=1&ordering=last_updated)
 
   {{< hint type=info title="oCIS Releases" >}}
   You can read more about the different oCIS releases in the [oCIS Release Lifecycle](../release_roadmap.md).
