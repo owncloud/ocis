@@ -237,7 +237,7 @@ class SharingNgContext implements Context {
 	 * share the item (resource) or drive (space) using the drives.permissions endpoint
 	 *
 	 * @param string $user
-	 * @param TableNode $table
+	 * @param array $shareInfo
 	 * @param string|null $fileId
 	 *
 	 * @return ResponseInterface
@@ -246,12 +246,11 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendShareInvitation(string $user, TableNode $table, string $fileId = null): ResponseInterface {
-		$rows = $table->getRowsHash();
-		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
-			$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
+	public function sendShareInvitation(string $user, array $shareInfo, string $fileId = null): ResponseInterface {
+		if ($shareInfo['space'] === 'Personal' || $shareInfo['space'] === 'Shares') {
+			$space = $this->spacesContext->getSpaceByName($user, $shareInfo['space']);
 		} else {
-			$space = $this->spacesContext->getCreatedSpace($rows['space']);
+			$space = $this->spacesContext->getCreatedSpace($shareInfo['space']);
 		}
 		$spaceId = $space['id'];
 
@@ -259,24 +258,24 @@ class SharingNgContext implements Context {
 		if ($fileId) {
 			$itemId = $fileId;
 		} else {
-			$resource = $rows['resource'] ?? '';
+			$resource = $shareInfo['resource'] ?? '';
 
 			// for a disabled and deleted space, resource id is not accessible, so get resource id from the saved response
-			if ($resource === '' && !\in_array($rows['space'], ['Personal', 'Shares'])) {
+			if ($resource === '' && !\in_array($shareInfo['space'], ['Personal', 'Shares'])) {
 				$itemId = $space['fileId'];
 			} else {
-				$itemId = $this->spacesContext->getResourceId($user, $rows['space'], $resource);
+				$itemId = $this->spacesContext->getResourceId($user, $shareInfo['space'], $resource);
 			}
 		}
 
 		$shareeIds = [];
 
-		if (\array_key_exists('shareeId', $rows)) {
-			$shareeIds[] = $rows['shareeId'];
-			$shareTypes[] = $rows['shareType'];
+		if (\array_key_exists('shareeId', $shareInfo)) {
+			$shareeIds[] = $shareInfo['shareeId'];
+			$shareTypes[] = $shareInfo['shareType'];
 		} else {
-			$sharees = array_map('trim', explode(',', $rows['sharee']));
-			$shareTypes = array_map('trim', explode(',', $rows['shareType']));
+			$sharees = array_map('trim', explode(',', $shareInfo['sharee']));
+			$shareTypes = array_map('trim', explode(',', $shareInfo['shareType']));
 
 			foreach ($sharees as $index => $sharee) {
 				$shareType = $shareTypes[$index];
@@ -291,9 +290,9 @@ class SharingNgContext implements Context {
 			}
 		}
 
-		$permissionsRole = $rows['permissionsRole'] ?? null;
-		$permissionsAction = $rows['permissionsAction'] ?? null;
-		$expirationDateTime = $rows["expirationDateTime"] ?? null;
+		$permissionsRole = $shareInfo['permissionsRole'] ?? null;
+		$permissionsAction = $shareInfo['permissionsAction'] ?? null;
+		$expirationDateTime = $shareInfo["expirationDateTime"] ?? null;
 
 		$response = GraphHelper::sendSharingInvitation(
 			$this->featureContext->getBaseUrl(),
@@ -387,7 +386,7 @@ class SharingNgContext implements Context {
 	public function userHasSentTheFollowingResourceShareInvitation(string $user, TableNode $table): void {
 		$rows = $table->getRowsHash();
 		Assert::assertArrayHasKey("resource", $rows, "'resource' should be provided in the data-table while sharing a resource");
-		$response = $this->sendShareInvitation($user, $table);
+		$response = $this->sendShareInvitation($user, $rows);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
@@ -423,7 +422,7 @@ class SharingNgContext implements Context {
 		$rows = $table->getRowsHash();
 		Assert::assertArrayHasKey("resource", $rows, "'resource' should be provided in the data-table while sharing a resource");
 		$this->featureContext->setResponse(
-			$this->sendShareInvitation($user, $table)
+			$this->sendShareInvitation($user, $rows)
 		);
 	}
 
@@ -441,7 +440,7 @@ class SharingNgContext implements Context {
 		$rows = $table->getRowsHash();
 		Assert::assertArrayNotHasKey("resource", $rows, "'resource' should not be provided in the data-table while sharing a space");
 		$this->featureContext->setResponse(
-			$this->sendShareInvitation($user, $table)
+			$this->sendShareInvitation($user, $rows)
 		);
 	}
 
@@ -547,8 +546,9 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userSendsTheFollowingShareInvitationWithFileIdUsingTheGraphApi(string $user, string $fileId, TableNode $table): void {
+		$rows = $table->getRowsHash();
 		$this->featureContext->setResponse(
-			$this->sendShareInvitation($user, $table, $fileId)
+			$this->sendShareInvitation($user, $rows, $fileId)
 		);
 	}
 
@@ -1380,7 +1380,7 @@ class SharingNgContext implements Context {
 		foreach ($allowedPermissionRoles as $role) {
 			//we should be able to send share invitation for each of the role allowed for the files/folders which are listed in permissions (allowed)
 			$roleAllowed = GraphHelper::getPermissionNameByPermissionRoleId($role->id);
-			$responseSendInvitation = $this->sendShareInvitation($user, new TableNode(array_merge($table->getTable(), [['permissionsRole', $roleAllowed]])));
+			$responseSendInvitation = $this->sendShareInvitation($user, array_merge($rows, ['permissionsRole' => $roleAllowed]));
 			$jsonResponseSendInvitation = $this->featureContext->getJsonDecodedResponseBodyContent($responseSendInvitation);
 			$httpsStatusCode = $responseSendInvitation->getStatusCode();
 			if ($httpsStatusCode === 200 && !empty($jsonResponseSendInvitation->value)) {
@@ -1723,5 +1723,62 @@ class SharingNgContext implements Context {
 	 */
 	public function userShouldHaveShare(string $sharee, string $share, string $sharer): void {
 		$this->checkIfShareExists($share, $sharee, $sharer);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has shared the following (?:files|folders) from space "([^"]*)" with user "([^"]*)" and role "([^"]*)":$/
+	 *
+	 * @param string $sharer
+	 * @param string $space
+	 * @param string $sharee
+	 * @param string $role
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userHasSharedTheFollowingFilesFromSpaceWithUserAndRole(string $sharer, string $space, string $sharee, string $role, TableNode $table):void {
+		$rows = $table->getRows();
+		foreach ($rows as $row) {
+			if (isset($row[0])) {
+				$shareData = [
+					'resource' => $row[0],
+					'space' => $space,
+					'sharee' => $sharee,
+					'shareType' => 'user',
+					'permissionsRole' => $role,
+				];
+				$response = $this->sendShareInvitation($sharer, $shareData);
+				$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+			}
+		}
+	}
+
+	/**
+	 * @Then the json response should contain the following shares:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theJsonResponseShouldContainTheFollowingShares(TableNode $table):void {
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent();
+
+		$resourceNames = [];
+		if (isset($responseBody->value) && \is_array($responseBody->value)) {
+			foreach ($responseBody->value as $item) {
+				if (isset($item->name)) {
+					$resourceNames[] = $item->name;
+				}
+			}
+		}
+
+		$expectedShares = $table->getColumn(0);
+
+		foreach ($expectedShares as $expectedShare) {
+			Assert::assertTrue(
+				\in_array($expectedShare, $resourceNames),
+				"The share '$expectedShare' was not found in the response."
+			);
+		}
 	}
 }
