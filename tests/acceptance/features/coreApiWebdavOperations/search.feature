@@ -152,7 +152,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-4712
+  @issue-4712 @issue-9780 @issue-9781 @issue-9783
   Scenario Outline: report extra properties in search entries for a file
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*upload*" using the WebDAV API requesting these properties:
@@ -181,7 +181,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-4712
+  @issue-4712 @issue-9780 @issue-9781 @issue-9783
   Scenario Outline: report extra properties in search entries for a folder
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*upload*" using the WebDAV API requesting these properties:

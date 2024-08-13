@@ -137,15 +137,12 @@ Feature: upload file
       | new              |
       | spaces           |
 
-  @issue-1345
+  @issue-1345 @issue-2177
   Scenario Outline: uploading file to path with extension .part should not be possible
     Given using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/textfile.part" using the WebDAV API
-    Then the HTTP status code should be "400"
-    And the DAV exception should be "OCA\DAV\Connector\Sabre\Exception\InvalidPath"
-    And the DAV message should be "Can`t upload files with extension .part because these extensions are reserved for internal use."
-    And the DAV reason should be "Can`t upload files with extension .part because these extensions are reserved for internal use."
-    And user "Alice" should not see the following elements
+    Then the HTTP status code should be "201"
+    And user "Alice" should see the following elements
       | /textfile.part |
     Examples:
       | dav-path-version |

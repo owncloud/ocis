@@ -80,16 +80,12 @@ Feature: create files and folder
       | new              |
       | spaces           |
 
-  @issue-1345
+  @issue-1345 @issue-2177
   Scenario Outline: creating a directory which contains .part should not be possible
     Given using <dav-path-version> DAV path
     When user "Alice" creates folder "/folder.with.ext.part" using the WebDAV API
-    Then the HTTP status code should be "400"
-    And the DAV exception should be "OCA\DAV\Connector\Sabre\Exception\InvalidPath"
-    And the DAV message should be "Can`t upload files with extension .part because these extensions are reserved for internal use."
-    And the DAV reason should be "Can`t upload files with extension .part because these extensions are reserved for internal use."
-    And user "Alice" should not see the following elements
-      | /folder.with.ext.part |
+    Then the HTTP status code should be "201"
+    And as "Alice" folder "folder.with.ext.part" should exist
     Examples:
       | dav-path-version |
       | old              |

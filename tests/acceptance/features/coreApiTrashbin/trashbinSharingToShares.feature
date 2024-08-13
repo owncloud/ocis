@@ -30,8 +30,8 @@ Feature: using trashbin together with sharing
       | new              |
       | spaces           |
 
-  @issue-1224 @issue-7555
-  Scenario Outline: deleting a file in a received folder moves it to trashbin of both users
+  @issue-1124 @issue-7555
+  Scenario Outline: sharee deleting a file in a received folder after renaming the shared folder moves it to trashbin of both users
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/shared"

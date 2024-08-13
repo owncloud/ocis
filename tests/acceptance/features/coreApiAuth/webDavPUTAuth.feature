@@ -48,11 +48,11 @@ Feature: PUT file/folder
       | endpoint                                       |
       | /remote.php/dav/files/%username%/textfile1.txt |
       | /remote.php/dav/files/%username%/PARENT        |
-    Then the HTTP status code of responses on all endpoints should be "403"
+    Then the HTTP status code of responses on all endpoints should be "404"
     When user "Brian" requests these endpoints with "PUT" including body "doesnotmatter" about user "Alice"
       | endpoint                                           |
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "403"
+    Then the HTTP status code of responses on all endpoints should be "404"
 
 
   Scenario: send PUT requests to another user's webDav endpoints as normal user using the spaces WebDAV API
@@ -60,11 +60,11 @@ Feature: PUT file/folder
       | endpoint                                       |
       | /remote.php/dav/spaces/%spaceid%/textfile0.txt |
       | /remote.php/dav/spaces/%spaceid%/PARENT        |
-    Then the HTTP status code of responses on all endpoints should be "403"
+    Then the HTTP status code of responses on all endpoints should be "404"
     When user "Brian" requests these endpoints with "PUT" including body "doesnotmatter" about user "Alice"
       | endpoint                                           |
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "403"
+    Then the HTTP status code of responses on all endpoints should be "404"
 
 
   Scenario: send PUT requests to webDav endpoints using invalid username but correct password

@@ -207,7 +207,7 @@ Feature: checksums
       | spaces           |
 
   ## Validation Plugin or Old Endpoint Specific
-  @issue-1343
+  @issue-1343 @issue-2323
   Scenario Outline: uploading an old method chunked file with checksum should fail using new DAV path
     Given using <dav-path-version> DAV path
     When user "Alice" uploads chunk file "1" of "3" with "AAAAA" to "/myChecksumFile.txt" with checksum "MD5:45a72715acdd5019c5be30bdbb75233e" using the WebDAV API

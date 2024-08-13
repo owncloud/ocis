@@ -1652,10 +1652,15 @@ trait WebDav {
 					$elementToRequest,
 					"1"
 				);
+
+				// TODO: make it work for folder entries
+				// Doesn't work for folder entries
+				// as the folder entry has trailing '/' in d:href
 				$webdavPath = "/" . $this->getFullDavFilesPath($user) . $expectedElement;
 				$element = $responseXmlObject->xpath(
 					"//d:response/d:href[text() = \"$webdavPath\"]"
 				);
+
 				if ($expectedToBeListed
 					&& (!isset($element[0]) || urldecode($element[0]->__toString()) !== urldecode($webdavPath))
 				) {

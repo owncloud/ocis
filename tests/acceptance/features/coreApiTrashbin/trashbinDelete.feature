@@ -72,7 +72,7 @@ Feature: files and folders can be deleted from the trashbin
       | new              |
       | spaces           |
 
-
+  @issue-3544 @issue-9791
   Scenario Outline: user tries to delete another user's trashbin
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
