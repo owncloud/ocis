@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestGraph(t *testing.T) {
+func TestConnector(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Connector Suite")
 }
