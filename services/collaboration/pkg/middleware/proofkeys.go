@@ -10,6 +10,16 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// ProofKeysMiddleware will verify the proof keys of the requests.
+// This is a middleware that could be disabled / not set.
+//
+// Requests will fail with a 500 HTTP status if the verification fails.
+// As said, this can be disabled (via configuration) if you want to skip
+// the verification.
+// The middleware requires hitting the "/hosting/discovery" endpoint of the
+// WOPI app in order to get the keys. The keys will be cached in memory for
+// 12 hours (or the configured value) before hitting the endpoint again to
+// request new / updated keys.
 func ProofKeysMiddleware(cfg *config.Config, next http.Handler) http.Handler {
 	wopiDiscovery := cfg.App.Addr + "/hosting/discovery"
 	insecure := cfg.App.Insecure
