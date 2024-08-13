@@ -49,7 +49,7 @@ Feature: POST file/folder
       | /remote.php/dav/files/%username%/textfile1.txt     |
       | /remote.php/dav/files/%username%/PARENT            |
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "404"
+    Then the HTTP status code of responses on all endpoints should be "412"
 
   @issue-1287
   Scenario: send POST requests to another user's webDav endpoints as normal user using the spaces WebDAV API
@@ -58,7 +58,7 @@ Feature: POST file/folder
       | /remote.php/dav/spaces/%spaceid%/textfile0.txt     |
       | /remote.php/dav/spaces/%spaceid%/PARENT            |
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "404"
+    Then the HTTP status code of responses on all endpoints should be "412"
 
 
   Scenario: send POST requests to webDav endpoints using invalid username but correct password
