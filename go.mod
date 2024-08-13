@@ -87,7 +87,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.5
-	github.com/tidwall/gjson v1.17.1
+	github.com/tidwall/gjson v1.17.3
 	github.com/tus/tusd/v2 v2.4.0
 	github.com/unrolled/secure v1.14.0
 	github.com/urfave/cli/v2 v2.27.3

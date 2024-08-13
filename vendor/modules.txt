@@ -1861,7 +1861,7 @@ github.com/test-go/testify/require
 # github.com/thejerf/suture/v4 v4.0.5
 ## explicit; go 1.9
 github.com/thejerf/suture/v4
-# github.com/tidwall/gjson v1.17.1
+# github.com/tidwall/gjson v1.17.3
 ## explicit; go 1.12
 github.com/tidwall/gjson
 # github.com/tidwall/match v1.1.1
