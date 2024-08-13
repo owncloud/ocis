@@ -101,9 +101,11 @@ Feature: check activities
       """
 
   @issue-9712
-  Scenario: check activities after deleting a file
+  Scenario: check activities after deleting a file and a folder
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has created folder "/FOLDER"
     And user "Alice" has deleted file "textfile0.txt"
+    And user "Alice" has deleted folder "FOLDER"
     When user "Alice" lists the activities of space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -114,8 +116,8 @@ Feature: check activities
         "properties": {
           "value": {
             "type": "array",
-            "minItems": 2,
-            "maxItems": 2,
+            "minItems": 4,
+            "maxItems": 4,
             "uniqueItems": true,
             "items": {
               "oneOf": [
@@ -129,6 +131,51 @@ Feature: check activities
                       "properties": {
                         "message": {
                           "const": "{user} added {resource} to {space}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["resource", "space", "user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "textfile0.txt"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {space}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["resource", "space", "user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -203,47 +250,6 @@ Feature: check activities
                         "recordedTime": {
                           "type": "string",
                           "format": "date-time"
-                        }
-                      }
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      }
-      """
-
-  @issue-9712
-  Scenario: check activities after deleting a folder
-    Given user "Alice" has created folder "/FOLDER"
-    And user "Alice" has deleted folder "FOLDER"
-    When user "Alice" lists the activities of space "Personal" using the Graph API
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-      """
-      {
-        "type": "object",
-        "required": ["value"],
-        "properties": {
-          "value": {
-            "type": "array",
-            "minItems": 2,
-            "maxItems": 2,
-            "uniqueItems": true,
-            "items": {
-              "oneOf": [
-                {
-                  "type": "object",
-                  "required": ["id","template","times"],
-                  "properties": {
-                    "template": {
-                      "type": "object",
-                      "required": ["message","variables"],
-                      "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {space}"
                         }
                       }
                     }
