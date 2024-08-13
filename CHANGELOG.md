@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add an API to auth-app service: [#9755](https://github.com/owncloud/ocis/pull/9755)
 * Enhancement - Bump go-micro plugins pkg: [#9756](https://github.com/owncloud/ocis/pull/9756)
 * Enhancement - Bump reva: [#9763](https://github.com/owncloud/ocis/pull/9763)
+* Enhancement - Refactor the connector in the collaboration service: [#9771](https://github.com/owncloud/ocis/pull/9771)
 * Enhancement - Add OCIS_ENABLE_OCM env var: [#9784](https://github.com/owncloud/ocis/pull/9784)
 
 ## Details
@@ -211,6 +212,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9763
    https://github.com/owncloud/ocis/pull/9714
    https://github.com/owncloud/ocis/pull/9715
+
+* Enhancement - Refactor the connector in the collaboration service: [#9771](https://github.com/owncloud/ocis/pull/9771)
+
+   This will simplify and homogenize the code around the connector
+
+   https://github.com/owncloud/ocis/pull/9771
 
 * Enhancement - Add OCIS_ENABLE_OCM env var: [#9784](https://github.com/owncloud/ocis/pull/9784)
 
