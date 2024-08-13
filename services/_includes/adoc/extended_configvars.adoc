@@ -10,6 +10,14 @@
 | Description
     
     
+
+a| `DAYS` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
     
     
 
@@ -38,6 +46,7 @@ a| [subs=-attributes]
 ++nats-js-kv ++
 a| [subs=-attributes]
 ++The Go micro registry type to use. Supported types are: 'memory', 'nats-js-kv' (default) and 'kubernetes'. Note that 'nats', 'etcd', 'consul' and 'mdns' are deprecated and will be removed in a later version. Only change on supervision of ownCloud Support. ++
+    
 
 a| `MICRO_REGISTRY_ADDRESS` +
 a| [subs=-attributes]
@@ -46,7 +55,6 @@ a| [subs=-attributes]
 ++127.0.0.1:9233 ++
 a| [subs=-attributes]
 ++The bind address of the internal go micro framework. Only change on supervision of ownCloud Support. ++
-    
 
 a| `MICRO_REGISTRY_AUTH_PASSWORD` +
 a| [subs=-attributes]
@@ -64,6 +72,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++Optional when using nats to authenticate with the nats cluster. ++
 
+a| `MONTH` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+
 a| `OCIS_BASE_DATA_PATH` +
 a| [subs=-attributes]
 ++string ++
@@ -80,5 +96,13 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++The default directory location for config files. See the General Info section in the documentation for more details on defaults. ++
     
+
+a| `YEAR` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
     
 |===
