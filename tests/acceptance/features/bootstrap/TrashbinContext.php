@@ -519,7 +519,7 @@ class TrashbinContext implements Context {
 	/**
 	 * @When user :user tries to delete the file with original path :path from the trashbin of user :ofUser using the password :password and the trashbin API
 	 *
-	 * @param string $asUser
+	 * @param string $user
 	 * @param string $path
 	 * @param string $ofUser
 	 * @param string $password
