@@ -72,7 +72,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   The file by default looks like this:
 
-  ```shell {linenos=table,hl_lines=[8,24,46,48,133,136]}
+  ```shell {linenos=table,hl_lines=[8,24,48,50,135,138]}
   ## Basic Settings ##
   # Define the docker compose log driver used.
   # Defaults to local
@@ -111,10 +111,12 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # Note: the leading colon is required to enable the service.
   OCIS=:ocis.yml
   # The oCIS container image.
-  # Defaults to "owncloud/ocis" which contains the production releases.
+  # For production releases: "owncloud/ocis"
+  # For rolling releases:    "owncloud/ocis-rolling"
+  # Defaults to "owncloud/ocis" (production)
   OCIS_DOCKER_IMAGE=
   # The oCIS container version.
-  # Defaults to "latest". This will point to the latest stable tag.
+  # Defaults to "latest" and points to the latest stable tag.
   OCIS_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend.
   # Defaults to "ocis.owncloud.test"
