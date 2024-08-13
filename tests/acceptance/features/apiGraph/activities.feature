@@ -428,10 +428,12 @@ Feature: check activities
       """
 
   @issue-9712
-  Scenario: check move activity for a file
+  Scenario: check move activity for a file and a folder
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has created folder "/FOLDER"
     And user "Alice" has created folder "/New Folder"
     And user "Alice" has moved file "textfile0.txt" to "New Folder/textfile0.txt"
+    And user "Alice" has moved folder "FOLDER" to "New Folder/FOLDER"
     When user "Alice" lists the activities for file "New Folder/textfile0.txt" of space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -491,6 +493,116 @@ Feature: check activities
                                 },
                                 "name": {
                                   "const": "textfile0.txt"
+                                }
+                              }
+                            },
+                            "space": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    When user "Alice" lists the activities for folder "New Folder/FOLDER" of space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {space}"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} moved {resource} to {space}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["resource","space","user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%file_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "FOLDER"
                                 }
                               }
                             },
