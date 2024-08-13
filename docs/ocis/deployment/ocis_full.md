@@ -239,7 +239,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   #### Infinite Scale Release and Version
   By default oCIS will be started in the `latest` rolling version. Please note that this deployment does currently not work with the 5.x productions releases.
-  The oCIS "collaboration" service, which is required by this deployment is not part of the 5.x releases.
+  The oCIS "collaboration" service, which is required by this deployment, is not part of the 5.x releases.
 
   If you want to use a specific version of oCIS, set the version to a dedicated tag like `OCIS_DOCKER_TAG=6.2.0`. The minimal required oCIS Version to run this deployment is 6.2.0. Available  production versions can be found on [Docker Hub Production](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated) and available rolling releases can be found on [Docker Hub Rolling](https://hub.docker.com/r/owncloud/ocis-rolling/tags?page=1&ordering=last_updated)
 
