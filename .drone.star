@@ -90,6 +90,7 @@ config = {
                 "apiSharingNgShareInvitation",
                 "apiSharingNgLinkSharePermission",
                 "apiSharingNgLinkShareRoot",
+                "apiActivities",
             ],
             "skip": False,
         },
