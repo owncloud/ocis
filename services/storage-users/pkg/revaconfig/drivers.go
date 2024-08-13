@@ -146,6 +146,12 @@ func OwnCloudSQL(cfg *config.Config) map[string]interface{} {
 		"dbport":          cfg.Drivers.OwnCloudSQL.DBPort,
 		"dbname":          cfg.Drivers.OwnCloudSQL.DBName,
 		"userprovidersvc": cfg.Drivers.OwnCloudSQL.UsersProviderEndpoint,
+		"tokens": map[string]interface{}{
+			"download_endpoint":      cfg.DataServerURL,
+			"datagateway_endpoint":   cfg.DataGatewayURL,
+			"transfer_shared_secret": cfg.Commons.TransferSecret,
+			"transfer_expires":       cfg.TransferExpires,
+		},
 	}
 }
 

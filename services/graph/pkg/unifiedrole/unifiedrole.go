@@ -156,6 +156,14 @@ func NewViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 				AllowedResourceActions: convert(r),
 				Condition:              proto.String(UnifiedRoleConditionFolder),
 			},
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFileFederatedUser),
+			},
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFolderFederatedUser),
+			},
 		},
 		LibreGraphWeight: proto.Int32(0),
 	}
@@ -190,6 +198,10 @@ func NewEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 				AllowedResourceActions: convert(r),
 				Condition:              proto.String(UnifiedRoleConditionFolder),
 			},
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFolderFederatedUser),
+			},
 		},
 		LibreGraphWeight: proto.Int32(0),
 	}
@@ -223,6 +235,10 @@ func NewFileEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
 			{
 				AllowedResourceActions: convert(r),
 				Condition:              proto.String(UnifiedRoleConditionFile),
+			},
+			{
+				AllowedResourceActions: convert(r),
+				Condition:              proto.String(UnifiedRoleConditionFileFederatedUser),
 			},
 		},
 		LibreGraphWeight: proto.Int32(0),
@@ -284,48 +300,6 @@ func NewSecureViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
 	}
 }
 
-// NewFederatedViewerUnifiedRole creates a federated viewer role
-func NewFederatedViewerUnifiedRole() *libregraph.UnifiedRoleDefinition {
-	r := conversions.NewViewerRole()
-	return &libregraph.UnifiedRoleDefinition{
-		Id:          proto.String(UnifiedRoleFederatedViewerID),
-		Description: proto.String("View and download."),
-		DisplayName: displayName(r),
-		RolePermissions: []libregraph.UnifiedRolePermission{
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionFileFederatedUser),
-			},
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionFolderFederatedUser),
-			},
-		},
-		LibreGraphWeight: proto.Int32(0),
-	}
-}
-
-// NewFederatedEditorUnifiedRole creates a federated editor role
-func NewFederatedEditorUnifiedRole() *libregraph.UnifiedRoleDefinition {
-	r := conversions.NewEditorRole()
-	return &libregraph.UnifiedRoleDefinition{
-		Id:          proto.String(UnifiedRoleFederatedEditorID),
-		Description: proto.String("View, download and edit."),
-		DisplayName: displayName(r),
-		RolePermissions: []libregraph.UnifiedRolePermission{
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionFileFederatedUser),
-			},
-			{
-				AllowedResourceActions: convert(r),
-				Condition:              proto.String(UnifiedRoleConditionFolderFederatedUser),
-			},
-		},
-		LibreGraphWeight: proto.Int32(0),
-	}
-}
-
 // NewUnifiedRoleFromID returns a unified role definition from the provided id
 func NewUnifiedRoleFromID(id string) (*libregraph.UnifiedRoleDefinition, error) {
 	for _, definition := range GetBuiltinRoleDefinitionList() {
@@ -349,8 +323,6 @@ func GetBuiltinRoleDefinitionList() []*libregraph.UnifiedRoleDefinition {
 		NewEditorLiteUnifiedRole(),
 		NewManagerUnifiedRole(),
 		NewSecureViewerUnifiedRole(),
-		NewFederatedViewerUnifiedRole(),
-		NewFederatedEditorUnifiedRole(),
 	}
 }
 

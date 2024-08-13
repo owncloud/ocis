@@ -155,22 +155,34 @@ var _ = Describe("unifiedroles", func() {
 			),
 
 			Entry(
-				"FederatedViewerUnifiedRole | share",
-				rolesToAction(unifiedrole.NewFederatedViewerUnifiedRole()),
+				"ViewerUnifiedRole | share",
+				rolesToAction(unifiedrole.NewViewerUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionFile,
 				true,
 				[]*libregraph.UnifiedRoleDefinition{
-					unifiedrole.NewFederatedViewerUnifiedRole(),
+					unifiedrole.NewViewerUnifiedRole(),
 				},
 			),
+
 			Entry(
-				"FederatedEditorUnifiedRole | share",
-				rolesToAction(unifiedrole.NewFederatedEditorUnifiedRole()),
+				"EditorUnifiedRole | share folder",
+				rolesToAction(unifiedrole.NewEditorUnifiedRole()),
+				unifiedrole.UnifiedRoleConditionFolder,
+				true,
+				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewEditorUnifiedRole(),
+				},
+			),
+
+			Entry(
+				"EditorUnifiedRole | share file",
+				rolesToAction(unifiedrole.NewEditorUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionFile,
 				true,
 				[]*libregraph.UnifiedRoleDefinition{
-					unifiedrole.NewFederatedViewerUnifiedRole(),
-					unifiedrole.NewFederatedEditorUnifiedRole(),
+					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewFileEditorUnifiedRole(),
 				},
 			),
 
