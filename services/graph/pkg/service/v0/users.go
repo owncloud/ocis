@@ -237,7 +237,21 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !ctxHasFullPerms && (odataReq.Query.Filter != nil || odataReq.Query.Apply != nil || odataReq.Query.Expand != nil || odataReq.Query.Compute != nil) {
+	if !ctxHasFullPerms && odataReq.Query.Filter != nil {
+		// regular users are allowed to filter only by userType
+		filter := odataReq.Query.Filter
+		switch {
+		case filter.Tree.Token.Type != godata.ExpressionTokenLogical:
+			fallthrough
+		case filter.Tree.Token.Value != "eq":
+			fallthrough
+		case filter.Tree.Children[0].Token.Value != "userType":
+			logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden filter for a regular user")
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "filter has forbidden elements for regular users")
+			return
+		}
+	}
+	if !ctxHasFullPerms && (odataReq.Query.Apply != nil || odataReq.Query.Expand != nil || odataReq.Query.Compute != nil) {
 		// regular users can't use filter, apply, expand and compute
 		logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden query elements for a regular user")
 		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "query has forbidden elements for regular users")

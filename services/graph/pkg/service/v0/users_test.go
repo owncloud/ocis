@@ -291,6 +291,14 @@ var _ = Describe("Users", func() {
 
 				Expect(rr.Code).To(Equal(http.StatusForbidden))
 			})
+			It("denies filters other that 'userType eq ...' for unprivileged users", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=%22abc%22&$filter="+url.QueryEscape("memberOf/any(n:n/id eq 25cb7bc0-3168-4a0c-adbe-396f478ad494)"), nil)
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusForbidden))
+			})
+
 			It("only returns a restricted set of attributes for unprivileged users", func() {
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 				user := &libregraph.User{}
@@ -1127,18 +1135,13 @@ var _ = Describe("Users", func() {
 		Describe("GetUsers", func() {
 			It("does not list the federated users without a filter", func() {
 				gatewayClient.AssertNotCalled(GinkgoT(), "FindAcceptedUsers, mock.Anything, mock.Anything")
-				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
-					Permission: &settingsmsg.Permission{
-						Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
-						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
-					},
-				}, nil)
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 
 				identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(
 					[]*libregraph.User{}, nil,
 				)
 
-				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=user", nil)
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -1164,18 +1167,13 @@ var _ = Describe("Users", func() {
 						},
 					},
 				}, nil)
-				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
-					Permission: &settingsmsg.Permission{
-						Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
-						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
-					},
-				}, nil)
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 
 				identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(
 					[]*libregraph.User{}, nil,
 				)
 
-				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape("userType eq 'Federated'"), nil)
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=federated&$filter="+url.QueryEscape("userType eq 'Federated'"), nil)
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -1191,12 +1189,7 @@ var _ = Describe("Users", func() {
 				Expect(res.Value[0].GetUserType()).To(Equal("Federated"))
 			})
 			It("does not list federated users when filtering for 'Member' users", func() {
-				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
-					Permission: &settingsmsg.Permission{
-						Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
-						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
-					},
-				}, nil)
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 
 				user := &libregraph.User{}
 				user.SetId("user1")
@@ -1207,7 +1200,7 @@ var _ = Describe("Users", func() {
 					users, nil,
 				)
 
-				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape("userType eq 'Member'"), nil)
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=user&$filter="+url.QueryEscape("userType eq 'Member'"), nil)
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
