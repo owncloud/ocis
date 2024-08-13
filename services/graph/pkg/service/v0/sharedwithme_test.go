@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -182,16 +183,16 @@ var _ = Describe("SharedWithMe", func() {
 			}
 
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(func(_ context.Context, r *providerv1beta1.StatRequest, _ ...grpc.CallOption) (*providerv1beta1.StatResponse, error) {
+				// copy the response to	avoid side effects
+				res := proto.Clone(statResponse).(*providerv1beta1.StatResponse)
 				for _, share := range listReceivedSharesResponse.Shares {
 					if share.Share.ResourceId != r.Ref.ResourceId {
 						continue
 					}
 
-					if statResponse.Info.Id == nil {
-						statResponse.Info.Id = share.Share.ResourceId
-					}
+					res.Info.Id = share.Share.ResourceId
 
-					return statResponse, nil
+					return res, nil
 				}
 
 				return nil, nil

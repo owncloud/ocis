@@ -43,8 +43,8 @@ Feature: permissions role definitions
                 },
                 "rolePermissions": {
                   "type": "array",
-                  "maxItems": 2,
-                  "minItems": 2,
+                  "maxItems": 4,
+                  "minItems": 4,
                   "uniqueItems": true,
                   "items": {
                     "oneOf": [
@@ -89,6 +89,50 @@ Feature: permissions role definitions
                           },
                           "condition": {
                             "const": "exists @Resource.Folder"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "allowedResourceActions",
+                          "condition"
+                        ],
+                        "properties": {
+                          "allowedResourceActions": {
+                            "const": [
+                              "libre.graph/driveItem/path/read",
+                              "libre.graph/driveItem/quota/read",
+                              "libre.graph/driveItem/content/read",
+                              "libre.graph/driveItem/children/read",
+                              "libre.graph/driveItem/deleted/read",
+                              "libre.graph/driveItem/basic/read"
+                            ]
+                          },
+                          "condition": {
+                            "const": "exists @Resource.File \u0026\u0026 @Subject.UserType==\"Federated\""
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "allowedResourceActions",
+                          "condition"
+                        ],
+                        "properties": {
+                          "allowedResourceActions": {
+                            "const": [
+                              "libre.graph/driveItem/path/read",
+                              "libre.graph/driveItem/quota/read",
+                              "libre.graph/driveItem/content/read",
+                              "libre.graph/driveItem/children/read",
+                              "libre.graph/driveItem/deleted/read",
+                              "libre.graph/driveItem/basic/read"
+                            ]
+                          },
+                          "condition": {
+                            "const": "exists @Resource.Folder \u0026\u0026 @Subject.UserType==\"Federated\""
                           }
                         }
                       }
@@ -174,35 +218,66 @@ Feature: permissions role definitions
                 },
                 "rolePermissions": {
                   "type": "array",
-                  "maxItems": 1,
-                  "minItems": 1,
+                  "maxItems": 2,
+                  "minItems": 2,
                   "uniqueItems": true,
                   "items": {
-                    "type": "object",
-                    "required": [
-                      "allowedResourceActions",
-                      "condition"
-                    ],
-                    "properties": {
-                      "allowedResourceActions": {
-                        "const": [
-                          "libre.graph/driveItem/children/create",
-                          "libre.graph/driveItem/standard/delete",
-                          "libre.graph/driveItem/path/read",
-                          "libre.graph/driveItem/quota/read",
-                          "libre.graph/driveItem/content/read",
-                          "libre.graph/driveItem/upload/create",
-                          "libre.graph/driveItem/children/read",
-                          "libre.graph/driveItem/deleted/read",
-                          "libre.graph/driveItem/path/update",
-                          "libre.graph/driveItem/deleted/update",
-                          "libre.graph/driveItem/basic/read"
-                        ]
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "allowedResourceActions",
+                          "condition"
+                        ],
+                        "properties": {
+                          "allowedResourceActions": {
+                            "const": [
+                              "libre.graph/driveItem/children/create",
+                              "libre.graph/driveItem/standard/delete",
+                              "libre.graph/driveItem/path/read",
+                              "libre.graph/driveItem/quota/read",
+                              "libre.graph/driveItem/content/read",
+                              "libre.graph/driveItem/upload/create",
+                              "libre.graph/driveItem/children/read",
+                              "libre.graph/driveItem/deleted/read",
+                              "libre.graph/driveItem/path/update",
+                              "libre.graph/driveItem/deleted/update",
+                              "libre.graph/driveItem/basic/read"
+                            ]
+                          },
+                          "condition": {
+                            "const": "exists @Resource.Folder"
+                          }
+                        }
                       },
-                      "condition": {
-                        "const": "exists @Resource.Folder"
+                      {
+                        "type": "object",
+                        "required": [
+                          "allowedResourceActions",
+                          "condition"
+                        ],
+                        "properties": {
+                          "allowedResourceActions": {
+                            "const": [
+                              "libre.graph/driveItem/children/create",
+                              "libre.graph/driveItem/standard/delete",
+                              "libre.graph/driveItem/path/read",
+                              "libre.graph/driveItem/quota/read",
+                              "libre.graph/driveItem/content/read",
+                              "libre.graph/driveItem/upload/create",
+                              "libre.graph/driveItem/children/read",
+                              "libre.graph/driveItem/deleted/read",
+                              "libre.graph/driveItem/path/update",
+                              "libre.graph/driveItem/deleted/update",
+                              "libre.graph/driveItem/basic/read"
+                            ]
+                          },
+                          "condition": {
+                            "const": "exists @Resource.Folder \u0026\u0026 @Subject.UserType==\"Federated\""
+                          }
+                        }
                       }
-                    }
+                    ]
                   }
                 }
               }
@@ -291,32 +366,60 @@ Feature: permissions role definitions
                 },
                 "rolePermissions": {
                   "type": "array",
-                  "maxItems": 1,
-                  "minItems": 1,
+                  "maxItems": 2,
+                  "minItems": 2,
                   "uniqueItems": true,
                   "items": {
-                    "type": "object",
-                    "required": [
-                      "allowedResourceActions",
-                      "condition"
-                    ],
-                    "properties": {
-                      "allowedResourceActions": {
-                        "const": [
-                          "libre.graph/driveItem/path/read",
-                          "libre.graph/driveItem/quota/read",
-                          "libre.graph/driveItem/content/read",
-                          "libre.graph/driveItem/upload/create",
-                          "libre.graph/driveItem/children/read",
-                          "libre.graph/driveItem/deleted/read",
-                          "libre.graph/driveItem/deleted/update",
-                          "libre.graph/driveItem/basic/read"
-                        ]
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "allowedResourceActions",
+                          "condition"
+                        ],
+                        "properties": {
+                          "allowedResourceActions": {
+                            "const": [
+                              "libre.graph/driveItem/path/read",
+                              "libre.graph/driveItem/quota/read",
+                              "libre.graph/driveItem/content/read",
+                              "libre.graph/driveItem/upload/create",
+                              "libre.graph/driveItem/children/read",
+                              "libre.graph/driveItem/deleted/read",
+                              "libre.graph/driveItem/deleted/update",
+                              "libre.graph/driveItem/basic/read"
+                            ]
+                          },
+                          "condition": {
+                            "const":"exists @Resource.File"
+                          }
+                        }
                       },
-                      "condition": {
-                        "const":"exists @Resource.File"
+                      {
+                        "type": "object",
+                        "required": [
+                          "allowedResourceActions",
+                          "condition"
+                        ],
+                        "properties": {
+                          "allowedResourceActions": {
+                            "const": [
+                              "libre.graph/driveItem/path/read",
+                              "libre.graph/driveItem/quota/read",
+                              "libre.graph/driveItem/content/read",
+                              "libre.graph/driveItem/upload/create",
+                              "libre.graph/driveItem/children/read",
+                              "libre.graph/driveItem/deleted/read",
+                              "libre.graph/driveItem/deleted/update",
+                              "libre.graph/driveItem/basic/read"
+                            ]
+                          },
+                          "condition": {
+                            "const":"exists @Resource.File \u0026\u0026 @Subject.UserType==\"Federated\""
+                          }
+                        }
                       }
-                    }
+                    ]
                   }
                 }
               }
@@ -544,60 +647,104 @@ Feature: permissions role definitions
             "id": {
               "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
             },
-            "rolePermissions": {
-              "type": "array",
-              "maxItems": 2,
-              "minItems": 2,
-              "uniqueItems": true,
-              "items": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "required": [
-                      "allowedResourceActions",
-                      "condition"
-                    ],
-                    "properties": {
-                      "allowedResourceActions": {
-                        "const": [
-                          "libre.graph/driveItem/path/read",
-                          "libre.graph/driveItem/quota/read",
-                          "libre.graph/driveItem/content/read",
-                          "libre.graph/driveItem/children/read",
-                          "libre.graph/driveItem/deleted/read",
-                          "libre.graph/driveItem/basic/read"
-                        ]
+                "rolePermissions": {
+                  "type": "array",
+                  "maxItems": 4,
+                  "minItems": 4,
+                  "uniqueItems": true,
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "allowedResourceActions",
+                          "condition"
+                        ],
+                        "properties": {
+                          "allowedResourceActions": {
+                            "const": [
+                              "libre.graph/driveItem/path/read",
+                              "libre.graph/driveItem/quota/read",
+                              "libre.graph/driveItem/content/read",
+                              "libre.graph/driveItem/children/read",
+                              "libre.graph/driveItem/deleted/read",
+                              "libre.graph/driveItem/basic/read"
+                            ]
+                          },
+                          "condition": {
+                            "const": "exists @Resource.File"
+                          }
+                        }
                       },
-                      "condition": {
-                        "const": "exists @Resource.File"
-                      }
-                    }
-                  },
-                  {
-                    "type": "object",
-                    "required": [
-                      "allowedResourceActions",
-                      "condition"
-                    ],
-                    "properties": {
-                      "allowedResourceActions": {
-                        "const": [
-                          "libre.graph/driveItem/path/read",
-                          "libre.graph/driveItem/quota/read",
-                          "libre.graph/driveItem/content/read",
-                          "libre.graph/driveItem/children/read",
-                          "libre.graph/driveItem/deleted/read",
-                          "libre.graph/driveItem/basic/read"
-                        ]
+                      {
+                        "type": "object",
+                        "required": [
+                          "allowedResourceActions",
+                          "condition"
+                        ],
+                        "properties": {
+                          "allowedResourceActions": {
+                            "const": [
+                              "libre.graph/driveItem/path/read",
+                              "libre.graph/driveItem/quota/read",
+                              "libre.graph/driveItem/content/read",
+                              "libre.graph/driveItem/children/read",
+                              "libre.graph/driveItem/deleted/read",
+                              "libre.graph/driveItem/basic/read"
+                            ]
+                          },
+                          "condition": {
+                            "const": "exists @Resource.Folder"
+                          }
+                        }
                       },
-                      "condition": {
-                        "const": "exists @Resource.Folder"
+                      {
+                        "type": "object",
+                        "required": [
+                          "allowedResourceActions",
+                          "condition"
+                        ],
+                        "properties": {
+                          "allowedResourceActions": {
+                            "const": [
+                              "libre.graph/driveItem/path/read",
+                              "libre.graph/driveItem/quota/read",
+                              "libre.graph/driveItem/content/read",
+                              "libre.graph/driveItem/children/read",
+                              "libre.graph/driveItem/deleted/read",
+                              "libre.graph/driveItem/basic/read"
+                            ]
+                          },
+                          "condition": {
+                            "const": "exists @Resource.File \u0026\u0026 @Subject.UserType==\"Federated\""
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "allowedResourceActions",
+                          "condition"
+                        ],
+                        "properties": {
+                          "allowedResourceActions": {
+                            "const": [
+                              "libre.graph/driveItem/path/read",
+                              "libre.graph/driveItem/quota/read",
+                              "libre.graph/driveItem/content/read",
+                              "libre.graph/driveItem/children/read",
+                              "libre.graph/driveItem/deleted/read",
+                              "libre.graph/driveItem/basic/read"
+                            ]
+                          },
+                          "condition": {
+                            "const": "exists @Resource.Folder \u0026\u0026 @Subject.UserType==\"Federated\""
+                          }
+                        }
                       }
-                    }
+                    ]
                   }
-                ]
-              }
-            }
+                }
           }
       }
       """

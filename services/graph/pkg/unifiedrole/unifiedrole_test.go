@@ -1,7 +1,6 @@
 package unifiedrole_test
 
 import (
-	"fmt"
 	"slices"
 
 	rConversions "github.com/cs3org/reva/v2/pkg/conversions"
@@ -114,9 +113,9 @@ var _ = Describe("unifiedroles", func() {
 		}
 
 		DescribeTable("GetApplicableRoleDefinitionsForActions",
-			func(givenActions []string, constraints string, expectedDefinitions []*libregraph.UnifiedRoleDefinition) {
+			func(givenActions []string, constraints string, listFederatedRoles bool, expectedDefinitions []*libregraph.UnifiedRoleDefinition) {
 
-				generatedDefinitions := unifiedrole.GetApplicableRoleDefinitionsForActions(givenActions, constraints, false)
+				generatedDefinitions := unifiedrole.GetApplicableRoleDefinitionsForActions(givenActions, constraints, listFederatedRoles, false)
 
 				Expect(len(generatedDefinitions)).To(Equal(len(expectedDefinitions)))
 
@@ -137,6 +136,7 @@ var _ = Describe("unifiedroles", func() {
 				"ViewerUnifiedRole",
 				rolesToAction(unifiedrole.NewViewerUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionFolder,
+				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
@@ -147,6 +147,7 @@ var _ = Describe("unifiedroles", func() {
 				"ViewerUnifiedRole | share",
 				rolesToAction(unifiedrole.NewViewerUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionFile,
+				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
@@ -154,9 +155,42 @@ var _ = Describe("unifiedroles", func() {
 			),
 
 			Entry(
+				"ViewerUnifiedRole | share",
+				rolesToAction(unifiedrole.NewViewerUnifiedRole()),
+				unifiedrole.UnifiedRoleConditionFile,
+				true,
+				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewViewerUnifiedRole(),
+				},
+			),
+
+			Entry(
+				"EditorUnifiedRole | share folder",
+				rolesToAction(unifiedrole.NewEditorUnifiedRole()),
+				unifiedrole.UnifiedRoleConditionFolder,
+				true,
+				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewEditorUnifiedRole(),
+				},
+			),
+
+			Entry(
+				"EditorUnifiedRole | share file",
+				rolesToAction(unifiedrole.NewEditorUnifiedRole()),
+				unifiedrole.UnifiedRoleConditionFile,
+				true,
+				[]*libregraph.UnifiedRoleDefinition{
+					unifiedrole.NewViewerUnifiedRole(),
+					unifiedrole.NewFileEditorUnifiedRole(),
+				},
+			),
+
+			Entry(
 				"NewFileEditorUnifiedRole",
 				rolesToAction(unifiedrole.NewFileEditorUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionFile,
+				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
@@ -168,6 +202,7 @@ var _ = Describe("unifiedroles", func() {
 				"NewEditorUnifiedRole",
 				rolesToAction(unifiedrole.NewEditorUnifiedRole()),
 				unifiedrole.UnifiedRoleConditionFolder,
+				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
@@ -180,6 +215,7 @@ var _ = Describe("unifiedroles", func() {
 				"GetBuiltinRoleDefinitionList",
 				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList()...),
 				unifiedrole.UnifiedRoleConditionFile,
+				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
@@ -191,6 +227,7 @@ var _ = Describe("unifiedroles", func() {
 				"GetBuiltinRoleDefinitionList",
 				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList()...),
 				unifiedrole.UnifiedRoleConditionFolder,
+				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewViewerUnifiedRole(),
@@ -203,6 +240,7 @@ var _ = Describe("unifiedroles", func() {
 				"GetBuiltinRoleDefinitionList",
 				rolesToAction(unifiedrole.GetBuiltinRoleDefinitionList()...),
 				unifiedrole.UnifiedRoleConditionDrive,
+				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSpaceViewerUnifiedRole(),
 					unifiedrole.NewSpaceEditorUnifiedRole(),
@@ -214,6 +252,7 @@ var _ = Describe("unifiedroles", func() {
 				"single",
 				[]string{unifiedrole.DriveItemQuotaRead},
 				unifiedrole.UnifiedRoleConditionFile,
+				false,
 				[]*libregraph.UnifiedRoleDefinition{},
 			),
 
@@ -221,6 +260,7 @@ var _ = Describe("unifiedroles", func() {
 				"mixed",
 				append(rolesToAction(unifiedrole.NewEditorLiteUnifiedRole()), unifiedrole.DriveItemQuotaRead),
 				unifiedrole.UnifiedRoleConditionFolder,
+				false,
 				[]*libregraph.UnifiedRoleDefinition{
 					unifiedrole.NewSecureViewerUnifiedRole(),
 					unifiedrole.NewEditorLiteUnifiedRole(),
@@ -233,7 +273,7 @@ var _ = Describe("unifiedroles", func() {
 		var newUnifiedRoleFromIDEntries []TableEntry
 		attachEntry := func(name, id string, definition *libregraph.UnifiedRoleDefinition, errors bool) {
 			e := Entry(
-				fmt.Sprintf("%s", name),
+				name,
 				id,
 				definition,
 				errors,

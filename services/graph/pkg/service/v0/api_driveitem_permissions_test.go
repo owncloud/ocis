@@ -15,7 +15,6 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
@@ -367,7 +366,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
 			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
-			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
@@ -414,7 +413,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
-			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
@@ -806,10 +805,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("UpdateShare",
 				mock.Anything,
 				mock.MatchedBy(func(req *collaboration.UpdateShareRequest) bool {
-					if req.GetShare().GetId().GetOpaqueId() == "permissionid" {
-						return true
-					}
-					return false
+					return req.GetShare().GetId().GetOpaqueId() == "permissionid"
 				}),
 			).Return(updateShareMockResponse, nil)
 
@@ -1072,7 +1068,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 
 			onInvite := mockProvider.On("Invite", mock.Anything, mock.Anything, mock.Anything)
 
-			onInvite.Return(func(ctx context.Context, resourceID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+			onInvite.Return(func(ctx context.Context, resourceID *provider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 				return libregraph.Permission{}, errors.New("any")
 			}).Once()
 
@@ -1088,7 +1084,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			onInvite := mockProvider.On("Invite", mock.Anything, mock.Anything, mock.Anything)
-			onInvite.Return(func(ctx context.Context, resourceID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+			onInvite.Return(func(ctx context.Context, resourceID *provider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 				Expect(storagespace.FormatResourceID(resourceID)).To(Equal("1$2!3"))
 				return libregraph.Permission{}, nil
 			}).Once()
@@ -1109,7 +1105,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			onInvite := mockProvider.On("SpaceRootInvite", mock.Anything, mock.Anything, mock.Anything)
-			onInvite.Return(func(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+			onInvite.Return(func(ctx context.Context, driveID *provider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
 				Expect(storagespace.FormatResourceID(driveID)).To(Equal("1$2"))
 				return libregraph.Permission{}, nil
 			}).Once()
@@ -1144,8 +1140,9 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			inviteJson, err := json.Marshal(invite)
 			Expect(err).ToNot(HaveOccurred())
 
-			mockProvider.On("ListPermissions", mock.Anything, mock.Anything, mock.Anything).
-				Return(func(ctx context.Context, itemid *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+			mockProvider.On("ListPermissions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				Return(func(ctx context.Context, itemid *provider.ResourceId, listFederatedRoles, selectRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+					Expect(listFederatedRoles).To(Equal(false))
 					Expect(storagespace.FormatResourceID(itemid)).To(Equal("1$2!3"))
 					return libregraph.CollectionOfPermissionsWithAllowedValues{}, nil
 				}).Once()
