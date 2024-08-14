@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.thumbnails.v0"
 url: /apis/grpc_apis/ocis_messages_thumbnails_v0
-date: 2024-08-14T08:12:40Z
+date: 2024-08-14T09:09:14Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
