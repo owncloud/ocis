@@ -113,6 +113,11 @@ func DefaultPolicies() []config.Policy {
 					Unprotected: true,
 				},
 				{
+					Endpoint:    "/.well-known/ocm",
+					Service:     "com.owncloud.web.ocm",
+					Unprotected: true,
+				},
+				{
 					Endpoint:    "/.well-known/webfinger",
 					Service:     "com.owncloud.web.webfinger",
 					Unprotected: true,
