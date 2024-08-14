@@ -33,7 +33,8 @@ services:
       COLLABORATION_LOG_LEVEL: ${LOG_LEVEL:-info}
       COLLABORATION_APP_PROOF_DISABLE: "true"
     volumes:
-      - ocis-config:/etc/ocis
+      # configure the .env file to use own paths instead of docker internal volumes
+      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.collaboration-oo.entrypoints=https"

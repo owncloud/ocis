@@ -36,7 +36,8 @@ services:
       COLLABORATION_CS3API_DATAGATEWAY_INSECURE: "${INSECURE:-true}"
       COLLABORATION_LOG_LEVEL: ${LOG_LEVEL:-info}
     volumes:
-      - ocis-config:/etc/ocis
+      # configure the .env file to use own paths instead of docker internal volumes
+      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.collaboration.entrypoints=https"
