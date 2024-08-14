@@ -1254,6 +1254,27 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When user :byUser searches for federated user :searchTerm using Graph API
+	 *
+	 * @param string $byUser
+	 * @param string $searchTerm
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userSearchesForFederatedUserUsingGraphApi(string $byUser, string $searchTerm): void {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+		$response = GraphHelper::searchFederatedUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+			$searchTerm,
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When user :user tries to get all users using the Graph API
 	 * @When user :user gets all users using the Graph API
 	 *

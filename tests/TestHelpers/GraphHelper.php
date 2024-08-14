@@ -309,6 +309,32 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string $searchTerm
+	 *
+	 * @return ResponseInterface
+	 */
+	public static function searchFederatedUser(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		string $searchTerm
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, "users?\$filter=userType eq 'Federated'&\$search=$searchTerm");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$adminUser,
+			$adminPassword,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $userPassword
 	 *

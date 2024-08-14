@@ -291,6 +291,14 @@ var _ = Describe("Users", func() {
 
 				Expect(rr.Code).To(Equal(http.StatusForbidden))
 			})
+			It("denies filters other that 'userType eq ...' for unprivileged users", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=%22abc%22&$filter="+url.QueryEscape("memberOf/any(n:n/id eq 25cb7bc0-3168-4a0c-adbe-396f478ad494)"), nil)
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusForbidden))
+			})
+
 			It("only returns a restricted set of attributes for unprivileged users", func() {
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 				user := &libregraph.User{}
@@ -503,8 +511,8 @@ var _ = Describe("Users", func() {
 				"appRoleAssignments/all(n:n/appRoleId eq 'id') and appRoleAssignments/any(n:n/appRoleId eq 'id')", http.StatusNotImplemented),
 			Entry("with unsupported appRoleAssignments lambda filter operation",
 				"appRoleAssignments/any(n:n/appRoleId ne 'id') and appRoleAssignments/any(n:n/appRoleId eq 'id')", http.StatusNotImplemented),
-			Entry("with unsupported appRoleAssignments lambda filter operation",
-				"appRoleAssignments/any(n:n/appRoleId eq 1) and appRoleAssignments/any(n:n/appRoleId eq 'id')", http.StatusNotImplemented),
+			Entry("with unsupported userType in filter", "userType eq 'unsupported'", http.StatusNotImplemented),
+			Entry("with unsupported property in eq filter", "unsupported eq 'unsupported'", http.StatusNotImplemented),
 		)
 
 		DescribeTable("With a valid filter",
@@ -1125,7 +1133,28 @@ var _ = Describe("Users", func() {
 			)
 		})
 		Describe("GetUsers", func() {
-			It("lists the users", func() {
+			It("does not list the federated users without a filter", func() {
+				gatewayClient.AssertNotCalled(GinkgoT(), "FindAcceptedUsers, mock.Anything, mock.Anything")
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+
+				identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(
+					[]*libregraph.User{}, nil,
+				)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=user", nil)
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				res := userList{}
+				err = json.Unmarshal(data, &res)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(len(res.Value)).To(Equal(0))
+			})
+			It("does list federated users when the right filter is used", func() {
 				gatewayClient.On("FindAcceptedUsers", mock.Anything, mock.Anything).Return(&invitepb.FindAcceptedUsersResponse{
 					Status: status.NewOK(ctx),
 					AcceptedUsers: []*userv1beta1.User{
@@ -1138,18 +1167,13 @@ var _ = Describe("Users", func() {
 						},
 					},
 				}, nil)
-				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
-					Permission: &settingsmsg.Permission{
-						Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
-						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
-					},
-				}, nil)
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 
 				identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(
 					[]*libregraph.User{}, nil,
 				)
 
-				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=federated&$filter="+url.QueryEscape("userType eq 'Federated'"), nil)
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -1163,6 +1187,33 @@ var _ = Describe("Users", func() {
 				Expect(len(res.Value)).To(Equal(1))
 				Expect(res.Value[0].GetId()).To(Equal("federated"))
 				Expect(res.Value[0].GetUserType()).To(Equal("Federated"))
+			})
+			It("does not list federated users when filtering for 'Member' users", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+
+				user := &libregraph.User{}
+				user.SetId("user1")
+				user.SetUserType("Member")
+				users := []*libregraph.User{user}
+
+				identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(
+					users, nil,
+				)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=user&$filter="+url.QueryEscape("userType eq 'Member'"), nil)
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				res := userList{}
+				err = json.Unmarshal(data, &res)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(len(res.Value)).To(Equal(1))
+				Expect(res.Value[0].GetId()).To(Equal("user1"))
+				Expect(res.Value[0].GetUserType()).To(Equal("Member"))
 			})
 		})
 	})

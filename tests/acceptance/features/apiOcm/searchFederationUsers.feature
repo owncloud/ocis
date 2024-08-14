@@ -18,7 +18,7 @@ Feature: search federation users
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
     And "Brian" has accepted invitation
-    When user "Brian" searches for user "ali" using Graph API
+    When user "Brian" searches for federated user "ali" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -53,7 +53,7 @@ Feature: search federation users
       }
       """
     And using server "LOCAL"
-    When user "Alice" searches for user "bri" using Graph API
+    When user "Alice" searches for federated user "bri" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -94,7 +94,7 @@ Feature: search federation users
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
     And "Brian" has accepted invitation
-    When user "Brian" searches for user "%22alice@example.org%22" using Graph API
+    When user "Brian" searches for federated user "%22alice@example.org%22" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -129,7 +129,7 @@ Feature: search federation users
       }
       """
     And using server "LOCAL"
-    When user "Alice" searches for user "%22brian@example.org%22" using Graph API
+    When user "Alice" searches for federated user "%22brian@example.org%22" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -170,7 +170,7 @@ Feature: search federation users
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
     And "Brian" has accepted invitation
-    When user "Brian" searches for user "%22carol@example.org%22" using Graph API
+    When user "Brian" searches for federated user "%22carol@example.org%22" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -189,7 +189,7 @@ Feature: search federation users
       }
       """
     And using server "LOCAL"
-    When user "Carol" searches for user "bria" using Graph API
+    When user "Carol" searches for federated user "bria" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """

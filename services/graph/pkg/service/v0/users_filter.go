@@ -124,19 +124,19 @@ func (g Graph) applyFilterLogical(ctx context.Context, req *godata.GoDataRequest
 		return users, invalidFilterError()
 	}
 
+	// As we currently don't suppport the 'has' or 'in' operator, all our
+	// currently supported user filters of the ExpressionTokenLogical type
+	// require exactly two operands.
+	if len(root.Children) != 2 {
+		return users, invalidFilterError()
+	}
 	switch root.Token.Value {
 	case "and":
-		// 'and' needs 2 operands
-		if len(root.Children) != 2 {
-			return users, invalidFilterError()
-		}
 		return g.applyFilterLogicalAnd(ctx, req, root.Children[0], root.Children[1])
 	case "or":
-		// 'or' needs 2 operands
-		if len(root.Children) != 2 {
-			return users, invalidFilterError()
-		}
 		return g.applyFilterLogicalOr(ctx, req, root.Children[0], root.Children[1])
+	case "eq":
+		return g.applyFilterEq(ctx, req, root.Children[0], root.Children[1])
 	}
 	logger.Debug().Str("Token", root.Token.Value).Msg("unsupported logical filter")
 	return users, unsupportedFilterError()
@@ -222,6 +222,29 @@ func (g Graph) applyFilterLogicalOr(ctx context.Context, req *godata.GoDataReque
 	}
 	return filteredUsers, nil
 }
+
+func (g Graph) applyFilterEq(ctx context.Context, req *godata.GoDataRequest, operand1 *godata.ParseNode, operand2 *godata.ParseNode) (users []*libregraph.User, err error) {
+	// We only support the 'eq' on 'userType' for now
+	switch {
+	case operand1.Token.Type != godata.ExpressionTokenLiteral:
+		fallthrough
+	case operand1.Token.Value != "userType":
+		fallthrough
+	case operand2.Token.Type != godata.ExpressionTokenString:
+		return users, unsupportedFilterError()
+	}
+
+	// unquote
+	value := strings.Trim(operand2.Token.Value, "'")
+	switch value {
+	case "Member", "Guest":
+		return g.identityBackend.GetUsers(ctx, req)
+	case "Federated":
+		return g.searchOCMAcceptedUsers(ctx, req)
+	}
+	return users, unsupportedFilterError()
+}
+
 func (g Graph) applyFilterLambda(ctx context.Context, req *godata.GoDataRequest, nodes []*godata.ParseNode) (users []*libregraph.User, err error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
 	if len(nodes) != 2 {

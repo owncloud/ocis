@@ -237,7 +237,21 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !ctxHasFullPerms && (odataReq.Query.Filter != nil || odataReq.Query.Apply != nil || odataReq.Query.Expand != nil || odataReq.Query.Compute != nil) {
+	if !ctxHasFullPerms && odataReq.Query.Filter != nil {
+		// regular users are allowed to filter only by userType
+		filter := odataReq.Query.Filter
+		switch {
+		case filter.Tree.Token.Type != godata.ExpressionTokenLogical:
+			fallthrough
+		case filter.Tree.Token.Value != "eq":
+			fallthrough
+		case filter.Tree.Children[0].Token.Value != "userType":
+			logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden filter for a regular user")
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "filter has forbidden elements for regular users")
+			return
+		}
+	}
+	if !ctxHasFullPerms && (odataReq.Query.Apply != nil || odataReq.Query.Expand != nil || odataReq.Query.Compute != nil) {
 		// regular users can't use filter, apply, expand and compute
 		logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden query elements for a regular user")
 		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "query has forbidden elements for regular users")
@@ -252,34 +266,6 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		users, err = g.applyUserFilter(r.Context(), odataReq, nil)
 	} else {
 		users, err = g.identityBackend.GetUsers(r.Context(), odataReq)
-	}
-
-	if g.config.IncludeOCMSharees {
-		gwc, err := g.gatewaySelector.Next()
-		if err != nil {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			return
-		}
-		term, err := identity.GetSearchValues(odataReq.Query)
-		if err != nil {
-			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		remoteUsersRes, err := gwc.FindAcceptedUsers(r.Context(), &invitepb.FindAcceptedUsersRequest{Filter: term})
-		if err != nil {
-			// TODO grpc FindAcceptedUsers call failed
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			return
-		}
-		if remoteUsersRes.Status.Code != cs3rpc.Code_CODE_OK {
-			// TODO "error searching remote users"
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, remoteUsersRes.Status.Message)
-			return
-		}
-		for _, user := range remoteUsersRes.GetAcceptedUsers() {
-			users = append(users, identity.CreateUserModelFromCS3(user))
-		}
 	}
 
 	if err != nil {
@@ -1013,4 +999,39 @@ func isValidUserType(userType string) bool {
 	}
 
 	return false
+}
+
+func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDataRequest) ([]*libregraph.User, error) {
+	logger := g.logger.SubloggerWithRequestID(ctx)
+	users := []*libregraph.User{}
+
+	if !g.config.IncludeOCMSharees {
+		logger.Debug().Msg("OCM sharing is disabled")
+		return users, nil
+	}
+
+	gwc, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+	term, err := identity.GetSearchValues(odataReq.Query)
+	if err != nil {
+		return nil, errorcode.New(errorcode.InvalidRequest, err.Error())
+	}
+
+	remoteUsersRes, err := gwc.FindAcceptedUsers(ctx, &invitepb.FindAcceptedUsersRequest{Filter: term})
+	if err != nil {
+		logger.Error().Err(err).Msg("FindAcceptedUsers call failed")
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+	if remoteUsersRes.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
+		return nil, errorcode.FromCS3Status(remoteUsersRes.Status, nil)
+	}
+
+	cs3Users := remoteUsersRes.GetAcceptedUsers()
+	users = make([]*libregraph.User, 0, len(cs3Users))
+	for _, user := range cs3Users {
+		users = append(users, identity.CreateUserModelFromCS3(user))
+	}
+	return users, nil
 }
