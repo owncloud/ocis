@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"net/url"
 	"path"
 	"strconv"
+	"strings"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -80,147 +81,47 @@ func (s *Service) OpenInApp(
 		Path:       ".",
 	}
 
-	// build a urlsafe and stable file reference that can be used for proxy routing,
-	// so that all sessions on one file end on the same office server
-	fileRef := helpers.HashResourceId(req.GetResourceInfo().GetId())
+	logger := s.logger.With().
+		Str("FileReference", providerFileRef.String()).
+		Str("ViewMode", req.GetViewMode().String()).
+		Str("Requester", user.GetId().String()).
+		Logger()
 
 	// get the file extension to use the right wopi app url
 	fileExt := path.Ext(req.GetResourceInfo().GetPath())
 
-	var viewCommentAppURL string
-	var viewAppURL string
-	var editAppURL string
-	if viewCommentAppURLs, ok := s.appURLs["view_comment"]; ok {
-		if u, ok := viewCommentAppURLs[fileExt]; ok {
-			viewCommentAppURL = u
-		}
-	}
-	if viewAppURLs, ok := s.appURLs["view"]; ok {
-		if u, ok := viewAppURLs[fileExt]; ok {
-			viewAppURL = u
-		}
-	}
-	if editAppURLs, ok := s.appURLs["edit"]; ok {
-		if u, ok := editAppURLs[fileExt]; ok {
-			editAppURL = u
-		}
-	}
-	if editAppURL == "" && viewAppURL == "" && viewCommentAppURL == "" {
-		err := fmt.Errorf("OpenInApp: neither edit nor view app url found")
-		s.logger.Error().
-			Err(err).
-			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.GetViewMode().String()).
-			Str("Requester", user.GetId().String()).Send()
-		return nil, err
+	// get the appURL we need to use
+	appURL := s.getAppUrl(fileExt, req.GetViewMode())
+	if appURL == "" {
+		logger.Error().Msg("OpenInApp: neither edit nor view app URL found")
+		return nil, errors.New("neither edit nor view app URL found")
 	}
 
-	if editAppURL == "" {
-		// assuming that an view action is always available in the /hosting/discovery manifest
-		// eg. Collabora does support viewing jpgs but no editing
-		// eg. OnlyOffice does support viewing pdfs but no editing
-		// there is no known case of supporting edit only without view
-		editAppURL = viewAppURL
-	}
-	if viewAppURL == "" {
-		// the URL of the end-user application in view mode when different (defaults to edit mod URL)
-		viewAppURL = editAppURL
-	}
-	// TODO: check if collabora will support an "edit" url in the future
-	if viewAppURL == "" && editAppURL == "" && viewCommentAppURL != "" {
-		// there are rare cases where neither view nor edit is supported but view_comment is
-		viewAppURL = viewCommentAppURL
-		// that can be the case for editable and viewable files
-		if req.GetViewMode() == appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE {
-			editAppURL = viewCommentAppURL
-		}
-	}
-	wopiSrcURL, err := url.Parse(s.config.Wopi.WopiSrc)
+	// append the parameters we need
+	appURL, err = s.addQueryToURL(appURL, req)
 	if err != nil {
-		return nil, err
-	}
-	wopiSrcURL.Path = path.Join("wopi", "files", fileRef)
-
-	addWopiSrcQueryParam := func(baseURL string) (string, error) {
-		u, err := url.Parse(baseURL)
-		if err != nil {
-			return "", err
-		}
-
-		q := u.Query()
-		q.Add("WOPISrc", wopiSrcURL.String())
-
-		if s.config.Wopi.DisableChat {
-			q.Add("dchat", "1")
-		}
-
-		lang := utils.ReadPlainFromOpaque(req.GetOpaque(), "lang")
-
-		if lang != "" {
-			q.Add("ui", lang)      // OnlyOffice
-			q.Add("lang", lang)    // Collabora, Impact on the default document language of OnlyOffice
-			q.Add("UI_LLCC", lang) // Office365
-		}
-		qs := q.Encode()
-		u.RawQuery = qs
-
-		return u.String(), nil
-	}
-
-	viewAppURL, err = addWopiSrcQueryParam(viewAppURL)
-	if err != nil {
-		s.logger.Error().
-			Err(err).
-			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.GetViewMode().String()).
-			Str("Requester", user.GetId().String()).
-			Msg("OpenInApp: error parsing viewAppUrl")
-		return nil, err
-	}
-	editAppURL, err = addWopiSrcQueryParam(editAppURL)
-	if err != nil {
-		s.logger.Error().
-			Err(err).
-			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.GetViewMode().String()).
-			Str("Requester", user.GetId().String()).
-			Msg("OpenInApp: error parsing editAppUrl")
+		logger.Error().Err(err).Msg("OpenInApp: error parsing appUrl")
 		return nil, err
 	}
 
-	appURL := viewAppURL
-	if req.GetViewMode() == appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE {
-		appURL = editAppURL
-	}
-
+	// create the wopiContext and generate the token
 	wopiContext := middleware.WopiContext{
 		AccessToken:   req.GetAccessToken(), // it will be encrypted
 		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
 		FileReference: &providerFileRef,
 		User:          user,
 		ViewMode:      req.GetViewMode(),
-		EditAppUrl:    editAppURL,
-		ViewAppUrl:    viewAppURL,
 	}
 
 	accessToken, accessExpiration, err := middleware.GenerateWopiToken(wopiContext, s.config)
 	if err != nil {
-		s.logger.Error().
-			Err(err).
-			Str("FileReference", providerFileRef.String()).
-			Str("ViewMode", req.GetViewMode().String()).
-			Str("Requester", user.GetId().String()).
-			Msg("OpenInApp: error generating the token")
+		logger.Error().Err(err).Msg("OpenInApp: error generating the token")
 		return &appproviderv1beta1.OpenInAppResponse{
 			Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_INTERNAL},
 		}, err
 	}
 
-	s.logger.Debug().
-		Str("FileReference", providerFileRef.String()).
-		Str("ViewMode", req.GetViewMode().String()).
-		Str("Requester", user.GetId().String()).
-		Msg("OpenInApp: success")
+	logger.Debug().Msg("OpenInApp: success")
 
 	return &appproviderv1beta1.OpenInAppResponse{
 		Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_OK},
@@ -236,4 +137,90 @@ func (s *Service) OpenInApp(
 			},
 		},
 	}, nil
+}
+
+// getAppUrlFor gets the appURL from the list of appURLs based on the
+// action and file extension provided. If there is no match, an empty
+// string will be returned.
+func (s *Service) getAppUrlFor(action, fileExt string) string {
+	if actionURL, ok := s.appURLs[action]; ok {
+		if actionExtensionURL, ok := actionURL[fileExt]; ok {
+			return actionExtensionURL
+		}
+	}
+	return ""
+}
+
+// getAppUrl will get the appURL that should be used based on the extension
+// and the provided view mode.
+// "view" urls will be chosen first, then if the view mode is "read/write",
+// "edit" urls will be prioritized. Note that "view" url might be returned for
+// "read/write" view mode if no "edit" url is found.
+func (s *Service) getAppUrl(fileExt string, viewMode appproviderv1beta1.ViewMode) string {
+	// check view_comment action first (for collabora)
+	appURL := s.getAppUrlFor("view_comment", fileExt)
+
+	// prioritize view action if possible
+	if viewAppURL := s.getAppUrlFor("view", fileExt); viewAppURL != "" {
+		appURL = viewAppURL
+	}
+
+	// If read/write mode has been requested, prioritize edit action.
+	// Special case for collabora because it only provides one action per
+	// extension,
+	if viewMode == appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE || strings.ToLower(s.config.App.Name) == "collabora" {
+		if editAppURL := s.getAppUrlFor("edit", fileExt); editAppURL != "" {
+			appURL = editAppURL
+		}
+	}
+
+	return appURL
+}
+
+// addQueryToURL will add specific query parameters to the baseURL. These
+// parameters are:
+// * "WOPISrc" pointing to the requested resource in the OpenInAppRequest
+// * "dchat" to disable the chat, based on configuration
+// * "lang" (WOPI app dependent) with the language in the request. "lang"
+// for collabora, "ui" for onlyoffice and "UI_LLCC" for the rest
+func (s *Service) addQueryToURL(baseURL string, req *appproviderv1beta1.OpenInAppRequest) (string, error) {
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return "", err
+	}
+
+	// build a urlsafe and stable file reference that can be used for proxy routing,
+	// so that all sessions on one file end on the same office server
+	fileRef := helpers.HashResourceId(req.GetResourceInfo().GetId())
+
+	wopiSrcURL, err := url.Parse(s.config.Wopi.WopiSrc)
+	if err != nil {
+		return "", err
+	}
+	wopiSrcURL.Path = path.Join("wopi", "files", fileRef)
+
+	q := u.Query()
+	q.Add("WOPISrc", wopiSrcURL.String())
+
+	if s.config.Wopi.DisableChat {
+		q.Add("dchat", "1")
+	}
+
+	lang := utils.ReadPlainFromOpaque(req.GetOpaque(), "lang")
+
+	if lang != "" {
+		switch strings.ToLower(s.config.App.Name) {
+		case "collabora":
+			q.Add("lang", lang)
+		case "onlyoffice":
+			q.Add("ui", lang)
+		default:
+			q.Add("UI_LLCC", lang)
+		}
+	}
+
+	qs := q.Encode()
+	u.RawQuery = qs
+
+	return u.String(), nil
 }

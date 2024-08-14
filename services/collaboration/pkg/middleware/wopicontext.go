@@ -31,8 +31,6 @@ type WopiContext struct {
 	FileReference *providerv1beta1.Reference
 	User          *userv1beta1.User
 	ViewMode      appproviderv1beta1.ViewMode
-	EditAppUrl    string
-	ViewAppUrl    string
 }
 
 // WopiContextAuthMiddleware will prepare an HTTP handler to be used as
