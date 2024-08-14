@@ -391,6 +391,15 @@ default:
         - SpacesContext:
         - OcisConfigContext:
 
+    apiActivities:
+      paths:
+        - "%paths.base%/../features/apiActivities"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - SharingNgContext:
+        - GraphContext:
+
     cliCommands:
       paths:
         - "%paths.base%/../features/cliCommands"
