@@ -113,8 +113,8 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # The oCIS container image.
   # For production releases: "owncloud/ocis"
   # For rolling releases:    "owncloud/ocis-rolling"
-  # Defaults to "owncloud/ocis-rolling" (rolling release)
-  OCIS_DOCKER_IMAGE=
+  # Defaults to production if not set otherwise
+  OCIS_DOCKER_IMAGE=owncloud/ocis-rolling
   # The oCIS container version.
   # Defaults to "latest" and points to the latest stable tag.
   OCIS_DOCKER_TAG=
