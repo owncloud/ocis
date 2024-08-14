@@ -72,6 +72,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow querying federated user roles for sharing: [#9765](https://github.com/owncloud/ocis/pull/9765)
 * Enhancement - Refactor the connector in the collaboration service: [#9771](https://github.com/owncloud/ocis/pull/9771)
 * Enhancement - Add OCIS_ENABLE_OCM env var: [#9784](https://github.com/owncloud/ocis/pull/9784)
+* Enhancement - OCM related adjustments in graph: [#9788](https://github.com/owncloud/ocis/pull/9788)
 
 ## Details
 
@@ -236,6 +237,20 @@ The following sections list the changes for unreleased.
    We added a new `OCIS_ENABLE_OCM` env var that will enable all ocm flags.
 
    https://github.com/owncloud/ocis/pull/9784
+
+* Enhancement - OCM related adjustments in graph: [#9788](https://github.com/owncloud/ocis/pull/9788)
+
+   The /users enpdoint of the graph service was changed with respect to how it
+   handles OCM federeated users: - The 'userType' property is now alway returned.
+   As new usertype 'Federated' was introduced. To indicate that the user is a
+   federated user. - Supported for filtering users by 'userType' as added. Queries
+   like "$filter=userType eq 'Federated'" are now possible. - Federated users are
+   only returned when explicitly requested via filter. When no filter is provider
+   only 'Member' users are returned.
+
+   https://github.com/owncloud/ocis/issues/9702
+   https://github.com/owncloud/ocis/pull/9788
+   https://github.com/owncloud/ocis/pull/9757
 
 # Changelog for [6.2.0] (2024-07-30)
 
