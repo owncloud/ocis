@@ -13,39 +13,109 @@ Internal GRPC APIs:
 * ocmcore: used for creating federated shares on the receiver side
 * authprovider: authenticates webdav requests using the ocm share tokens
 
+## Enable OCM
+
+To enable OpenCloudMesh you have to set three environment variables:
+```console
+export OCIS_ENABLE_OCM=true
+export OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE="/etc/ocis/ocmproviders.json"
+export OCIS_ADD_RUN_SERVICES="ocm"
+```
+
+{{< hint info >}}
+Point `OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` to a file as described below.
+{{< /hint >}}
+
+
 ## Trust Between Instances
 
 The `ocm` services implements an invitation workflow which needs to be followed before creating federated shares. Invitations are limited to trusted instances, however.
 
 The list of trusted instances is managed by the `ocmproviderauthorizer` service. The only supported backend currently is `json` which stores the list in a json file on disk. Note that the `ocmproviders.json` file, which holds that configuration, is expected to be located in the root of the ocis config directory if not otherwise defined. See the `OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` envvar for more details.
 
-Example `ocmproviders.json` file:
-```
+When all instances of a fedaration should trust auch other, an `ocmproviders.json` file like this can be used for all instances:
+```json
 [
     {
-        "name": "Example",
-        "full_name": "Example provider",
-        "organization": "Owncloud",
-        "domain": "example.com",
-        "homepage": "https://example.com",
+        "name": "oCIS Test",
+        "full_name": "oCIS Test provider",
+        "organization": "oCIS",
+        "domain": "cloud.ocis.test",
+        "homepage": "https://ocis.test",
+        "description": "oCIS Example cloud storage",
         "services": [
             {
                 "endpoint": {
                     "type": {
                         "name": "OCM",
-                        "description": "example.com Open Cloud Mesh API"
+                        "description": "cloud.ocis.test Open Cloud Mesh API"
                     },
-                    "name": "example.com - OCM API",
-                    "path": "https://example.com/ocm/",
+                    "name": "cloud.ocis.test - OCM API",
+                    "path": "https://cloud.ocis.test/ocm/",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "example.com"
+                "host": "http://cloud.ocis.test"
+            },
+            {
+                "endpoint": {
+                    "type": {
+                        "name": "Webdav",
+                        "description": "cloud.ocis.test Webdav API"
+                    },
+                    "name": "cloud.ocis.test Example - Webdav API",
+                    "path": "https://cloud.ocis.test/dav/",
+                    "is_monitored": true
+                },
+                "api_version": "0.0.1",
+                "host": "https://cloud.ocis.test/"
+            }
+        ]
+    },
+    {
+        "name": "ownCloud Test",
+        "full_name": "ownCloud Test provider",
+        "organization": "ownCloud",
+        "domain": "cloud.owncloud.test",
+        "homepage": "https://owncloud.test",
+        "description": "ownCloud Example cloud storage",
+        "services": [
+            {
+                "endpoint": {
+                    "type": {
+                        "name": "OCM",
+                        "description": "cloud.owncloud.test Open Cloud Mesh API"
+                    },
+                    "name": "cloud.owncloud.test - OCM API",
+                    "path": "https://cloud.owncloud.test/ocm/",
+                    "is_monitored": true
+                },
+                "api_version": "0.0.1",
+                "host": "http://cloud.owncloud.test"
+            },
+            {
+                "endpoint": {
+                    "type": {
+                        "name": "Webdav",
+                        "description": "cloud.owncloud.test Webdav API"
+                    },
+                    "name": "cloud.owncloud.test Example - Webdav API",
+                    "path": "https://cloud.owncloud.test/dav/",
+                    "is_monitored": true
+                },
+                "api_version": "0.0.1",
+                "host": "https://cloud.owncloud.test/"
             }
         ]
     }
 ]
 ```
+
+{{< hint info >}}
+Note: the `domain` must not contain the protocol as it has to match the [GOCDB site object domain](https://developer.sciencemesh.io/docs/technical-documentation/central-database/#site-object).
+{{< /hint >}}
+
+The above federation consists of two instances: `cloud.owncloud.test` and `cloud.ocis.test` that can use the Invitation workflow described below to generate, send and accept invitations.
 
 ## Invitation Workflow
 
@@ -56,6 +126,10 @@ In order to do so a POST request is sent to the `generate-invite` endpoint of th
 The data backend of the `ocminvitemanager` is configurable. The only supported backend currently is `json` which stores the data in a json file on disk.
 
 ## Creating Shares
+
+{{< hint info >}}
+The below info is outdated as we allow creating federated shares using the graph API. Clients can now discover the available sharing roles and invite federated users using the graph API.
+{{< /hint >}}
 
 OCM Shares are currently created using the ocs API, just like regular shares. The difference is the share type, which is 6 (ShareTypeFederatedCloudShare) in this case, and a few additional parameters required for identifying the remote user.
 
