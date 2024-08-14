@@ -293,5 +293,11 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [OCM. user cannot see invite description and inviteUser email](https://github.com/owncloud/ocis/issues/9591)
 
 - [apiOcm/createInvitation.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/createInvitation.feature#L63)
+
+### [OCM. admin cannot get federated users if he hasn't connection with them ](https://github.com/owncloud/ocis/issues/9829)
+
+tests/acceptance/features/apiOcm/searchFederationUsers.feature
+- [apiOcm/searchFederationUsers.feature:434](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/searchFederationUsers.feature#L434)
+- [apiOcm/searchFederationUsers.feature:611](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/searchFederationUsers.feature#L611)
 - Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.

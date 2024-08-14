@@ -2309,6 +2309,14 @@ class FeatureContext extends BehatVariablesContext {
 					"getUUIDv4Regex"
 				],
 				"parameter" => []
+			],
+			[
+				"code" => "%identities_issuer_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getUUIDv4Regex"
+				],
+				"parameter" => []
 			]
 		];
 		if ($user !== null) {
