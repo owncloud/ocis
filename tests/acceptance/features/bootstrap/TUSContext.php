@@ -259,6 +259,7 @@ class TUSContext implements Context {
 				'headers' => $headers
 			]
 		);
+		$client->setChecksumAlgorithm('sha1');
 		$client->setApiPath(
 			WebDavHelper::getDavPath(
 				$user,
