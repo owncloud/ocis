@@ -64,7 +64,7 @@ func (c *ConcreteClient) CreateUser(ctx context.Context, realm string, user *lib
 	req := gocloak.User{
 		Email:     user.Mail,
 		Enabled:   user.AccountEnabled,
-		Username:  user.OnPremisesSamAccountName,
+		Username:  &user.OnPremisesSamAccountName,
 		FirstName: user.GivenName,
 		LastName:  user.Surname,
 		Attributes: &map[string][]string{

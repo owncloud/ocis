@@ -250,12 +250,10 @@ func (i *LDAP) GetEducationUsers(ctx context.Context) ([]*libregraph.EducationUs
 }
 
 func (i *LDAP) educationUserToUser(eduUser libregraph.EducationUser) *libregraph.User {
-	user := libregraph.NewUser()
-	user.OnPremisesSamAccountName = eduUser.OnPremisesSamAccountName
+	user := libregraph.NewUser(*eduUser.DisplayName, *eduUser.OnPremisesSamAccountName)
 	user.Surname = eduUser.Surname
 	user.AccountEnabled = eduUser.AccountEnabled
 	user.GivenName = eduUser.GivenName
-	user.DisplayName = eduUser.DisplayName
 	user.Mail = eduUser.Mail
 	user.UserType = eduUser.UserType
 	user.Identities = eduUser.Identities
@@ -266,11 +264,11 @@ func (i *LDAP) educationUserToUser(eduUser libregraph.EducationUser) *libregraph
 func (i *LDAP) userToEducationUser(user libregraph.User, e *ldap.Entry) *libregraph.EducationUser {
 	eduUser := libregraph.NewEducationUser()
 	eduUser.Id = user.Id
-	eduUser.OnPremisesSamAccountName = user.OnPremisesSamAccountName
+	eduUser.OnPremisesSamAccountName = &user.OnPremisesSamAccountName
 	eduUser.Surname = user.Surname
 	eduUser.AccountEnabled = user.AccountEnabled
 	eduUser.GivenName = user.GivenName
-	eduUser.DisplayName = user.DisplayName
+	eduUser.DisplayName = &user.DisplayName
 	eduUser.Mail = user.Mail
 	eduUser.UserType = user.UserType
 

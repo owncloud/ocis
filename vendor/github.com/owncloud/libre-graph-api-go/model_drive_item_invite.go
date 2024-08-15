@@ -20,7 +20,7 @@ var _ MappedNullable = &DriveItemInvite{}
 
 // DriveItemInvite struct for DriveItemInvite
 type DriveItemInvite struct {
-	// A collection of recipients who will receive access and the sharing invitation. Currently, only internal users or gorups are supported.
+	// A collection of recipients who will receive access and the sharing invitation. Currently, only internal users or groups are supported.
 	Recipients []DriveRecipient `json:"recipients,omitempty"`
 	// Specifies the roles that are to be granted to the recipients of the sharing invitation.
 	Roles []string `json:"roles,omitempty"`

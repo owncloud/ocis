@@ -20,7 +20,7 @@ var _ MappedNullable = &EducationSchool{}
 
 // EducationSchool Represents a school
 type EducationSchool struct {
-	// The unique idenfier for an entity. Read-only.
+	// The unique identifier for an entity. Read-only.
 	Id *string `json:"id,omitempty"`
 	// The organization name
 	DisplayName *string `json:"displayName,omitempty"`

@@ -32,7 +32,7 @@ type Backend interface {
 	// DeleteUser deletes a given user, identified by username or id, from the backend
 	DeleteUser(ctx context.Context, nameOrID string) error
 	// UpdateUser applies changes to given user, identified by username or id
-	UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error)
+	UpdateUser(ctx context.Context, nameOrID string, user libregraph.UserUpdate) (*libregraph.User, error)
 	GetUser(ctx context.Context, nameOrID string, oreq *godata.GoDataRequest) (*libregraph.User, error)
 	GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error)
 
@@ -124,9 +124,9 @@ func CreateUserModelFromCS3(u *cs3user.User) *libregraph.User {
 			},
 		},
 		UserType:                 &userType,
-		DisplayName:              &u.DisplayName,
+		DisplayName:              u.DisplayName,
 		Mail:                     &u.Mail,
-		OnPremisesSamAccountName: &u.Username,
+		OnPremisesSamAccountName: u.Username,
 		Id:                       &u.Id.OpaqueId,
 	}
 }

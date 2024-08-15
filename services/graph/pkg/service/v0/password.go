@@ -86,7 +86,7 @@ func (g Graph) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 
 	newPwProfile := libregraph.NewPasswordProfile()
 	newPwProfile.SetPassword(newPw)
-	changes := libregraph.NewUser()
+	changes := libregraph.NewUserUpdate()
 	changes.SetPasswordProfile(*newPwProfile)
 	_, err = g.identityBackend.UpdateUser(ctx, u.Id.OpaqueId, *changes)
 	if err != nil {

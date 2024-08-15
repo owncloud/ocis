@@ -371,12 +371,12 @@ type ApiUpdateUserRequest struct {
 	ctx        context.Context
 	ApiService *UserApiService
 	userId     string
-	user       *User
+	userUpdate *UserUpdate
 }
 
 // New property values
-func (r ApiUpdateUserRequest) User(user User) ApiUpdateUserRequest {
-	r.user = &user
+func (r ApiUpdateUserRequest) UserUpdate(userUpdate UserUpdate) ApiUpdateUserRequest {
+	r.userUpdate = &userUpdate
 	return r
 }
 
@@ -421,8 +421,8 @@ func (a *UserApiService) UpdateUserExecute(r ApiUpdateUserRequest) (*User, *http
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.user == nil {
-		return localVarReturnValue, nil, reportError("user is required and must be specified")
+	if r.userUpdate == nil {
+		return localVarReturnValue, nil, reportError("userUpdate is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -443,7 +443,7 @@ func (a *UserApiService) UpdateUserExecute(r ApiUpdateUserRequest) (*User, *http
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.user
+	localVarPostBody = r.userUpdate
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

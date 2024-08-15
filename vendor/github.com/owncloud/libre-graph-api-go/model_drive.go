@@ -22,7 +22,7 @@ var _ MappedNullable = &Drive{}
 
 // Drive The drive represents a space on the storage.
 type Drive struct {
-	// The unique idenfier for this drive.
+	// The unique identifier for this drive.
 	Id        *string      `json:"id,omitempty"`
 	CreatedBy *IdentitySet `json:"createdBy,omitempty"`
 	// Date and time of item creation. Read-only.

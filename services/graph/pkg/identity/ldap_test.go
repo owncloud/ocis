@@ -135,10 +135,8 @@ func TestCreateUser(t *testing.T) {
 	l.On("Add", ar).Return(nil)
 	logger := log.NewLogger(log.Level("debug"))
 
-	user := libregraph.NewUser()
-	user.SetDisplayName(displayName)
+	user := libregraph.NewUser(displayName, userName)
 	user.SetMail(mail)
-	user.SetOnPremisesSamAccountName(userName)
 	user.SetSurname(surname)
 	user.SetGivenName(givenName)
 	user.SetAccountEnabled(true)
@@ -171,14 +169,14 @@ func TestCreateUserModelFromLDAP(t *testing.T) {
 	if user == nil {
 		t.Error("Converting a valid LDAP Entry should succeed")
 	} else {
-		if *user.OnPremisesSamAccountName != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.userName) {
+		if user.OnPremisesSamAccountName != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.userName) {
 			t.Errorf("Error creating msGraph User from LDAP Entry: %v != %v", user.OnPremisesSamAccountName, pointerOrNil(userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.userName)))
 		}
 		if *user.Mail != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.mail) {
 			t.Errorf("Error creating msGraph User from LDAP Entry: %s != %s", *user.Mail, userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.mail))
 		}
-		if *user.DisplayName != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.displayName) {
-			t.Errorf("Error creating msGraph User from LDAP Entry: %s != %s", *user.DisplayName, userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.displayName))
+		if user.DisplayName != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.displayName) {
+			t.Errorf("Error creating msGraph User from LDAP Entry: %s != %s", user.DisplayName, userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.displayName))
 		}
 		if *user.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
 			t.Errorf("Error creating msGraph User from LDAP Entry: %s != %s", *user.Id, userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id))
@@ -1447,7 +1445,7 @@ func TestUpdateUser(t *testing.T) {
 			ldapConfig.DisableUserMechanism = tt.args.disableUserMechanism
 			i, _ := getMockedBackend(lm, ldapConfig, &logger)
 
-			user := libregraph.User{
+			user := libregraph.UserUpdate{
 				Id:                       &tt.args.userProps.id,
 				Mail:                     &tt.args.userProps.mail,
 				DisplayName:              &tt.args.userProps.displayName,
@@ -1462,15 +1460,15 @@ func TestUpdateUser(t *testing.T) {
 				want = &libregraph.User{
 					Id:                       &tt.want.id,
 					Mail:                     &tt.want.mail,
-					DisplayName:              &tt.want.displayName,
-					OnPremisesSamAccountName: &tt.want.onPremisesSamAccountName,
+					DisplayName:              tt.want.displayName,
+					OnPremisesSamAccountName: tt.want.onPremisesSamAccountName,
 					Surname:                  &emptyString,
 					GivenName:                tt.want.givenName,
 					UserType:                 tt.want.userType,
 				}
 
 				if tt.want.accountEnabled != nil {
-					want.AccountEnabled = *&tt.want.accountEnabled
+					want.AccountEnabled = tt.want.accountEnabled
 				}
 			}
 

@@ -239,7 +239,7 @@ var _ = Describe("Groups", func() {
 			group.SetDisplayName("Group Name")
 			group.SetMembers(
 				[]libregraph.User{
-					libregraph.User{
+					{
 						Id: libregraph.PtrString("userid"),
 					},
 				},
@@ -259,7 +259,7 @@ var _ = Describe("Groups", func() {
 			Expect(err).ToNot(HaveOccurred())
 			groupMap, err := res.Value[0].ToMap()
 			Expect(err).ToNot(HaveOccurred())
-			for k, _ := range groupMap {
+			for k := range groupMap {
 				Expect(k).Should(BeElementOf([]string{"displayName", "id", "groupTypes"}))
 			}
 		})
@@ -523,8 +523,8 @@ var _ = Describe("Groups", func() {
 
 	Describe("GetGroupMembers", func() {
 		It("gets the list of members", func() {
-			user := libregraph.NewUser()
-			user.SetId("user")
+			user := libregraph.NewUser("display name", "username")
+			user.SetId("userid")
 			identityBackend.On("GetGroupMembers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.User{user}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups/{groupID}/members", nil)
@@ -542,7 +542,7 @@ var _ = Describe("Groups", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(len(members)).To(Equal(1))
-			Expect(members[0].GetId()).To(Equal("user"))
+			Expect(members[0].GetId()).To(Equal("userid"))
 		})
 	})
 

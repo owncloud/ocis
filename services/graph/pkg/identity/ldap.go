@@ -264,7 +264,7 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 }
 
 // UpdateUser implements the Backend Interface for the LDAP Backend
-func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error) {
+func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.UserUpdate) (*libregraph.User, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("UpdateUser")
 	if !i.writeEnabled {
@@ -804,9 +804,9 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 
 	if id != "" && opsan != "" {
 		user := &libregraph.User{
-			DisplayName:              pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName)),
+			DisplayName:              e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName),
 			Mail:                     pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.mail)),
-			OnPremisesSamAccountName: &opsan,
+			OnPremisesSamAccountName: opsan,
 			Id:                       &id,
 			GivenName:                pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)),
 			Surname:                  &surname,
@@ -874,7 +874,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 	if user.Surname != nil && *user.Surname != "" {
 		sn = *user.Surname
 	} else {
-		sn = *user.OnPremisesSamAccountName
+		sn = user.OnPremisesSamAccountName
 	}
 	attrs[i.userAttributeMap.surname] = []string{sn}
 
@@ -921,7 +921,7 @@ func (i *LDAP) getUserAttrTypes() []string {
 func (i *LDAP) getUserLDAPDN(user libregraph.User) string {
 	attributeTypeAndValue := ldap.AttributeTypeAndValue{
 		Type:  "uid",
-		Value: *user.OnPremisesSamAccountName,
+		Value: user.OnPremisesSamAccountName,
 	}
 	return fmt.Sprintf("%s,%s", attributeTypeAndValue.String(), i.userBaseDN)
 }
@@ -1256,7 +1256,7 @@ func (i *LDAP) mapLDAPError(err error, errmap ldapResultToErrMap) errorcode.Erro
 	return errorcode.New(errorcode.GeneralException, err.Error())
 }
 
-func isUserEnabledUpdate(user libregraph.User) bool {
+func isUserEnabledUpdate(user libregraph.UserUpdate) bool {
 	switch {
 	case user.Id != nil, user.DisplayName != nil,
 		user.Drive != nil, user.Mail != nil, user.OnPremisesSamAccountName != nil,

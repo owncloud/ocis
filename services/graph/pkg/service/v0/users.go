@@ -339,7 +339,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Debug().Msg("calling create user")
-	u := libregraph.NewUser()
+	u := libregraph.NewUser("", "")
 	err := StrictJSONUnmarshal(r.Body, u)
 	if err != nil {
 		logger.Info().Err(err).Msg("could not create user: invalid request body")
@@ -347,23 +347,16 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := u.GetDisplayNameOk(); !ok {
-		logger.Info().Err(err).Interface("user", u).Msg("could not create user: missing required Attribute: 'displayName'")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'displayName'")
+	if u.GetDisplayName() == "" {
+		logger.Info().Err(err).Interface("user", u).Msg("could not create user: empty displayname")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Empty displayname")
 		return
 	}
-	if accountName, ok := u.GetOnPremisesSamAccountNameOk(); ok {
-		if !g.isValidUsername(*accountName) {
-			logger.Info().Str("username", *accountName).Msg("could not create user: invalid username")
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Invalid username")
-			return
-		}
-	} else {
-		logger.Info().Interface("user", u).Msg("could not create user: missing required Attribute: 'onPremisesSamAccountName'")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'onPremisesSamAccountName'")
+	if username := u.GetOnPremisesSamAccountName(); !g.isValidUsername(username) {
+		logger.Info().Str("username", username).Msg("could not create user: invalid username")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Invalid username")
 		return
 	}
-
 	if mail, ok := u.GetMailOk(); ok {
 		if !isValidEmail(*mail) {
 			logger.Info().Str("mail", *u.Mail).Msg("could not create user: invalid email address")
@@ -715,7 +708,7 @@ func (g Graph) PatchMe(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 		return
 	}
-	changes := libregraph.NewUser()
+	changes := libregraph.NewUserUpdate()
 	err := StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
@@ -747,7 +740,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
 		return
 	}
-	changes := libregraph.NewUser()
+	changes := libregraph.NewUserUpdate()
 	err = StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
@@ -764,7 +757,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	g.patchUser(w, r, nameOrID, changes)
 }
 
-func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string, changes *libregraph.User) {
+func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string, changes *libregraph.UserUpdate) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Debug().Msg("calling patch user")
 
@@ -875,7 +868,7 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 	}
 
 	if name, ok := changes.GetDisplayNameOk(); ok {
-		addfeature("displayname", *name, oldUserValues.DisplayName)
+		addfeature("displayname", *name, &oldUserValues.DisplayName)
 	}
 
 	if userType, ok := changes.GetUserTypeOk(); ok {

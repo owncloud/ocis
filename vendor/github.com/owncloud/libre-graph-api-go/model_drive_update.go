@@ -20,7 +20,7 @@ var _ MappedNullable = &DriveUpdate{}
 
 // DriveUpdate The drive represents an update to a space on the storage.
 type DriveUpdate struct {
-	// The unique idenfier for this drive.
+	// The unique identifier for this drive.
 	Id        *string      `json:"id,omitempty"`
 	CreatedBy *IdentitySet `json:"createdBy,omitempty"`
 	// Date and time of item creation. Read-only.

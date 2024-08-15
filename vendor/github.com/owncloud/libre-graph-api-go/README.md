@@ -74,7 +74,7 @@ ctx = context.WithValue(context.Background(), libregraph.ContextOperationServerV
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *https://ocis.ocis-traefik.latest.owncloud.works/graph*
+All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
@@ -141,7 +141,7 @@ Class | Method | HTTP request | Description
 *GroupApi* | [**UpdateGroup**](docs/GroupApi.md#updategroup) | **Patch** /v1.0/groups/{group-id} | Update entity in groups
 *GroupsApi* | [**CreateGroup**](docs/GroupsApi.md#creategroup) | **Post** /v1.0/groups | Add new entity to groups
 *GroupsApi* | [**ListGroups**](docs/GroupsApi.md#listgroups) | **Get** /v1.0/groups | Get entities from groups
-*MeChangepasswordApi* | [**ChangeOwnPassword**](docs/MeChangepasswordApi.md#changeownpassword) | **Post** /v1.0/me/changePassword | Chanage your own password
+*MeChangepasswordApi* | [**ChangeOwnPassword**](docs/MeChangepasswordApi.md#changeownpassword) | **Post** /v1.0/me/changePassword | Change your own password
 *MeDriveApi* | [**GetHome**](docs/MeDriveApi.md#gethome) | **Get** /v1.0/me/drive | Get personal space for user
 *MeDriveApi* | [**ListSharedByMe**](docs/MeDriveApi.md#listsharedbyme) | **Get** /v1beta1/me/drive/sharedByMe | Get a list of driveItem objects shared by the current user.
 *MeDriveApi* | [**ListSharedWithMe**](docs/MeDriveApi.md#listsharedwithme) | **Get** /v1beta1/me/drive/sharedWithMe | Get a list of driveItem objects shared with the owner of a drive.
@@ -244,6 +244,7 @@ Class | Method | HTTP request | Description
  - [UnifiedRoleDefinition](docs/UnifiedRoleDefinition.md)
  - [UnifiedRolePermission](docs/UnifiedRolePermission.md)
  - [User](docs/User.md)
+ - [UserUpdate](docs/UserUpdate.md)
  - [Video](docs/Video.md)
 
 

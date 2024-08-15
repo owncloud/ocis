@@ -25,6 +25,8 @@ type Identity struct {
 	DisplayName string `json:"displayName"`
 	// Unique identifier for the identity.
 	Id *string `json:"id,omitempty"`
+	// The type of the identity. This can be either \"Member\" for regular user, \"Guest\" for guest users or \"Federated\" for users imported from a federated instance. Can be used by clients to indicate the type of user. For more details, clients should look up and cache the user at the /users enpoint.
+	LibreGraphUserType *string `json:"@libre.graph.userType,omitempty"`
 }
 
 type _Identity Identity
@@ -103,6 +105,38 @@ func (o *Identity) SetId(v string) {
 	o.Id = &v
 }
 
+// GetLibreGraphUserType returns the LibreGraphUserType field value if set, zero value otherwise.
+func (o *Identity) GetLibreGraphUserType() string {
+	if o == nil || IsNil(o.LibreGraphUserType) {
+		var ret string
+		return ret
+	}
+	return *o.LibreGraphUserType
+}
+
+// GetLibreGraphUserTypeOk returns a tuple with the LibreGraphUserType field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Identity) GetLibreGraphUserTypeOk() (*string, bool) {
+	if o == nil || IsNil(o.LibreGraphUserType) {
+		return nil, false
+	}
+	return o.LibreGraphUserType, true
+}
+
+// HasLibreGraphUserType returns a boolean if a field has been set.
+func (o *Identity) HasLibreGraphUserType() bool {
+	if o != nil && !IsNil(o.LibreGraphUserType) {
+		return true
+	}
+
+	return false
+}
+
+// SetLibreGraphUserType gets a reference to the given string and assigns it to the LibreGraphUserType field.
+func (o *Identity) SetLibreGraphUserType(v string) {
+	o.LibreGraphUserType = &v
+}
+
 func (o Identity) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -116,6 +150,9 @@ func (o Identity) ToMap() (map[string]interface{}, error) {
 	toSerialize["displayName"] = o.DisplayName
 	if !IsNil(o.Id) {
 		toSerialize["id"] = o.Id
+	}
+	if !IsNil(o.LibreGraphUserType) {
+		toSerialize["@libre.graph.userType"] = o.LibreGraphUserType
 	}
 	return toSerialize, nil
 }
