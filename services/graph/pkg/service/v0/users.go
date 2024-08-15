@@ -291,6 +291,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 				Id:          u.Id,
 				DisplayName: u.DisplayName,
 				UserType:    u.UserType,
+				Identities:  u.Identities,
 			}
 
 			if g.config.API.ShowUserEmailInResults {
