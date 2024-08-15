@@ -407,6 +407,7 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 	)
 	if role != nil {
 		perm.SetRoles([]string{role.GetId()})
+		perm.SetLibreGraphPermissionsActions(unifiedrole.GetAllowedResourceActions(role, roleCondition))
 	} else {
 		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(share.GetPermissions().GetPermissions())
 		perm.SetLibreGraphPermissionsActions(actions)
