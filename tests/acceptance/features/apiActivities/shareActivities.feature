@@ -497,3 +497,266 @@ Feature: check share activity
         }
       }
       """
+
+  @issue-9712
+  Scenario: sharer checks sharee's activities
+    Given user "Alice" has created folder "FOLDER"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Brian" has a share "FOLDER" synced
+    And user "Brian" has uploaded file with content "some data" to "Shares/FOLDER/newfile.txt"
+    And user "Brian" has uploaded file with content "edited data" to "Shares/FOLDER/newfile.txt"
+    And user "Brian" has deleted file "Shares/FOLDER/newfile.txt"
+    When user "Alice" lists the activities for file "FOLDER" of space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 5,
+            "maxItems": 5,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {space}"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} shared {resource} with {sharee}"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {space}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["resource","space","user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "newfile.txt"
+                                }
+                              }
+                            },
+                            "space": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Brian"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {space}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["resource","space","user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "newfile.txt"
+                                }
+                              }
+                            },
+                            "space": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Brian"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} deleted {resource} from {space}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["resource","space","user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "newfile.txt"
+                                }
+                              }
+                            },
+                            "space": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%file_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Brian"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
