@@ -167,6 +167,7 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 				g.logger.Warn().Str("userid", tmp).Msg("User not found by id")
 			}
 		}
+
 		switch apiVersion {
 		case APIVersion_1:
 			var identitySet libregraph.IdentitySet
@@ -200,6 +201,14 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			case APIVersion_1_Beta_1:
 				p.SetRoles([]string{role.GetId()})
 			}
+
+			p.SetLibreGraphPermissionsActions(unifiedrole.GetAllowedResourceActions(role, unifiedrole.UnifiedRoleConditionDrive))
+		}
+
+		// if the permissions are not mapped to a role, we need to set the actions as a fallback
+		// this could happen if a role is disabled or unknown
+		if !p.HasLibreGraphPermissionsActions() {
+			p.SetLibreGraphPermissionsActions(unifiedrole.CS3ResourcePermissionsToLibregraphActions(perm))
 		}
 
 		permissions = append(permissions, p)
