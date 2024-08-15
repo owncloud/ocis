@@ -126,6 +126,7 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 		Name     string
 		Password string
 		ID       string
+		Issuer   string
 	}
 
 	serviceUsers := []svcUser{
@@ -148,6 +149,7 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 			Name:     "admin",
 			Password: cfg.ServiceUserPasswords.OcisAdmin,
 			ID:       cfg.AdminUserID,
+			Issuer:   cfg.DemoUsersIssuerUrl,
 		})
 	}
 
@@ -179,7 +181,7 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 			}
 		}
 		// We need to treat the hash as binary in the LDIF template to avoid
-		// go-ldap/ldif to to any fancy escaping
+		// go-ldap/ldif to do any fancy escaping
 		serviceUsers[i].Password = base64.StdEncoding.EncodeToString([]byte(serviceUsers[i].Password))
 	}
 	var tmplWriter strings.Builder
@@ -190,7 +192,16 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 
 	bootstrapData := tmplWriter.String()
 	if cfg.CreateDemoUsers {
-		bootstrapData = bootstrapData + "\n" + idm.DemoUsersLDIF
+		demoUsersTmpl, err := template.New("demousers").Parse(idm.DemoUsersLDIF)
+		if err != nil {
+			return err
+		}
+		var demoUsersWriter strings.Builder
+		err = demoUsersTmpl.Execute(&demoUsersWriter, cfg.DemoUsersIssuerUrl)
+		if err != nil {
+			return err
+		}
+		bootstrapData = bootstrapData + "\n" + demoUsersWriter.String()
 	}
 
 	s := strings.NewReader(bootstrapData)

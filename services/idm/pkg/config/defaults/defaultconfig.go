@@ -27,7 +27,8 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "idm",
 		},
-		CreateDemoUsers: false,
+		CreateDemoUsers:    false,
+		DemoUsersIssuerUrl: "https://localhost:9200",
 		IDM: config.Settings{
 			LDAPSAddr:    "127.0.0.1:9235",
 			Cert:         path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
