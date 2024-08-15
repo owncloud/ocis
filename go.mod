@@ -50,7 +50,7 @@ require (
 	github.com/gookit/config/v2 v2.2.5
 	github.com/gorilla/mux v1.8.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.21.0
-	github.com/invopop/validation v0.3.0
+	github.com/invopop/validation v0.8.0
 	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/jellydator/ttlcache/v3 v3.2.0
 	github.com/jinzhu/now v1.1.5

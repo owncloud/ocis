@@ -60,11 +60,11 @@ var (
 // Validate validates the given value and returns the validation error, if any.
 //
 // Validate performs validation using the following steps:
-// 1. For each rule, call its `Validate()` to validate the value. Return if any error is found.
-// 2. If the value being validated implements `Validatable`, call the value's `Validate()`.
-//    Return with the validation result.
-// 3. If the value being validated is a map/slice/array, and the element type implements `Validatable`,
-//    for each element call the element value's `Validate()`. Return with the validation result.
+//  1. For each rule, call its `Validate()` to validate the value. Return if any error is found.
+//  2. If the value being validated implements `Validatable`, call the value's `Validate()`.
+//     Return with the validation result.
+//  3. If the value being validated is a map/slice/array, and the element type implements `Validatable`,
+//     for each element call the element value's `Validate()`. Return with the validation result.
 func Validate(value interface{}, rules ...Rule) error {
 	for _, rule := range rules {
 		if s, ok := rule.(skipRule); ok && s.skip {
@@ -103,16 +103,16 @@ func Validate(value interface{}, rules ...Rule) error {
 // ValidateWithContext validates the given value with the given context and returns the validation error, if any.
 //
 // ValidateWithContext performs validation using the following steps:
-// 1. For each rule, call its `ValidateWithContext()` to validate the value if the rule implements `RuleWithContext`.
-//    Otherwise call `Validate()` of the rule. Return if any error is found.
-// 2. If the value being validated implements `ValidatableWithContext`, call the value's `ValidateWithContext()`
-//    and return with the validation result.
-// 3. If the value being validated implements `Validatable`, call the value's `Validate()`
-//    and return with the validation result.
-// 4. If the value being validated is a map/slice/array, and the element type implements `ValidatableWithContext`,
-//    for each element call the element value's `ValidateWithContext()`. Return with the validation result.
-// 5. If the value being validated is a map/slice/array, and the element type implements `Validatable`,
-//    for each element call the element value's `Validate()`. Return with the validation result.
+//  1. For each rule, call its `ValidateWithContext()` to validate the value if the rule implements `RuleWithContext`.
+//     Otherwise call `Validate()` of the rule. Return if any error is found.
+//  2. If the value being validated implements `ValidatableWithContext`, call the value's `ValidateWithContext()`
+//     and return with the validation result.
+//  3. If the value being validated implements `Validatable`, call the value's `Validate()`
+//     and return with the validation result.
+//  4. If the value being validated is a map/slice/array, and the element type implements `ValidatableWithContext`,
+//     for each element call the element value's `ValidateWithContext()`. Return with the validation result.
+//  5. If the value being validated is a map/slice/array, and the element type implements `Validatable`,
+//     for each element call the element value's `Validate()`. Return with the validation result.
 func ValidateWithContext(ctx context.Context, value interface{}, rules ...Rule) error {
 	for _, rule := range rules {
 		if s, ok := rule.(skipRule); ok && s.skip {
@@ -199,7 +199,11 @@ func validateSlice(rv reflect.Value) error {
 	errs := Errors{}
 	l := rv.Len()
 	for i := 0; i < l; i++ {
-		if ev := rv.Index(i).Interface(); ev != nil {
+		v := rv.Index(i)
+		if v.Kind() == reflect.Ptr && v.IsNil() {
+			continue
+		}
+		if ev := v.Interface(); ev != nil {
 			if err := ev.(Validatable).Validate(); err != nil {
 				errs[strconv.Itoa(i)] = err
 			}
@@ -216,7 +220,11 @@ func validateSliceWithContext(ctx context.Context, rv reflect.Value) error {
 	errs := Errors{}
 	l := rv.Len()
 	for i := 0; i < l; i++ {
-		if ev := rv.Index(i).Interface(); ev != nil {
+		v := rv.Index(i)
+		if v.Kind() == reflect.Ptr && v.IsNil() {
+			continue
+		}
+		if ev := v.Interface(); ev != nil {
 			if err := ev.(ValidatableWithContext).ValidateWithContext(ctx); err != nil {
 				errs[strconv.Itoa(i)] = err
 			}
