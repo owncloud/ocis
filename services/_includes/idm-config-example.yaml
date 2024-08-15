@@ -22,6 +22,7 @@ idm:
   key: /var/lib/ocis/idm/ldap.key
   database: /var/lib/ocis/idm/ocis.boltdb
 create_demo_users: false
+demo_users_issuer_url: https://localhost:9200
 service_user_passwords:
   admin_password: ""
   idm_password: ""

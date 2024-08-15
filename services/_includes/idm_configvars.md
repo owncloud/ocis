@@ -19,6 +19,7 @@
 | IDM_LDAPS_KEY | string | /var/lib/ocis/idm/ldap.key | File name for the TLS certificate key for the server certificate. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.|
 | IDM_DATABASE_PATH | string | /var/lib/ocis/idm/ocis.boltdb | Full path to the IDM backend database. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.|
 | IDM_CREATE_DEMO_USERS | bool | false | Flag to enable or disable the creation of the demo users.|
+| OCIS_URL<br/>OCIS_OIDC_ISSUER | string | https://localhost:9200 | The OIDC issuer URL to assign to the demo users.|
 | IDM_ADMIN_PASSWORD | string |  | Password to set for the oCIS 'admin' user. Either cleartext or an argon2id hash.|
 | IDM_SVC_PASSWORD | string |  | Password to set for the 'idm' service user. Either cleartext or an argon2id hash.|
 | IDM_REVASVC_PASSWORD | string |  | Password to set for the 'reva' service user. Either cleartext or an argon2id hash.|

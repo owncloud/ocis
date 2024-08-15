@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-15-11-26-28]
+[#deprecation-note-2024-08-15-16-03-31]
 [caption=]
 .Deprecation notes for the idm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -225,6 +225,18 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Flag to enable or disable the creation of the demo users.
+
+a|`OCIS_URL` +
+`OCIS_OIDC_ISSUER` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://localhost:9200 ++
+a| [subs=-attributes]
+The OIDC issuer URL to assign to the demo users.
 
 a|`IDM_ADMIN_PASSWORD` +
 
