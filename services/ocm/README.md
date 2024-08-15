@@ -33,7 +33,7 @@ The `ocm` services implements an invitation workflow which needs to be followed 
 
 The list of trusted instances is managed by the `ocmproviderauthorizer` service. The only supported backend currently is `json` which stores the list in a json file on disk. Note that the `ocmproviders.json` file, which holds that configuration, is expected to be located in the root of the ocis config directory if not otherwise defined. See the `OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` envvar for more details.
 
-When all instances of a fedaration should trust auch other, an `ocmproviders.json` file like this can be used for all instances:
+When all instances of a federation should trust each other, an `ocmproviders.json` file like this can be used for all instances:
 ```json
 [
     {
