@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-14-00-55-21]
+[#deprecation-note-2024-08-15-01-25-55]
 [caption=]
 .Deprecation notes for the antivirus service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -249,7 +249,7 @@ a| [subs=-attributes]
 The socket clamav is running on. Note the default value is an example which needs adaption according your OS.
 
 a|`ANTIVIRUS_ICAP_TIMEOUT` +
-xref:deprecation-note-2024-08-14-00-55-21[Deprecation Note]
+xref:deprecation-note-2024-08-15-01-25-55[Deprecation Note]
 a| [subs=-attributes]
 ++int64 ++
 a| [subs=-attributes]
