@@ -3,7 +3,7 @@
 [![Lint](https://github.com/invopop/validation/actions/workflows/lint.yaml/badge.svg)](https://github.com/invopop/validation/actions/workflows/lint.yaml)
 [![Test Go](https://github.com/invopop/validation/actions/workflows/test.yaml/badge.svg)](https://github.com/invopop/validation/actions/workflows/test.yaml)
 [![GoDoc](https://godoc.org/github.com/invopop/validation?status.png)](http://godoc.org/github.com/invopop/validation)
-[![Coverage Status](https://coveralls.io/repos/github/invopop/validation/badge.svg?branch=main)](https://coveralls.io/github/invopop/validation?branch=main)
+[![Coverage Status](https://codecov.io/gh/invopop/validation/graph/badge.svg?token=Q3AEO8GZ8G)](https://codecov.io/gh/invopop/validation)
 [![Go Report](https://goreportcard.com/badge/github.com/invopop/validation)](https://goreportcard.com/report/github.com/invopop/validation)
 ![Latest Tag](https://img.shields.io/github/v/tag/invopop/validation)
 
@@ -607,14 +607,14 @@ When performing context-aware validation, if a rule does not implement `validati
 
 The following rules are provided in the `validation` package:
 
-- `In(...interface{})`: checks if a value can be found in the given list of values.
-- `NotIn(...interface{})`: checks if a value is NOT among the given list of values.
+- `In[T any](values ...T)`: checks if a value can be found in the given list of values.
+- `NotIn[T any](values ...T)`: checks if a value is NOT among the given list of values.
 - `Length(min, max int)`: checks if the length of a value is within the specified range.
   This rule should only be used for validating strings, slices, maps, and arrays.
 - `RuneLength(min, max int)`: checks if the length of a string is within the specified range.
   This rule is similar as `Length` except that when the value being validated is a string, it checks
   its rune length instead of byte length.
-- `Min(min interface{})` and `Max(max interface{})`: checks if a value is within the specified range.
+- `Min(min any)` and `Max(max any)`: checks if a value is within the specified range.
   These two rules should only be used for validating int, uint, float and time.Time types.
 - `Match(*regexp.Regexp)`: checks if a value matches the specified regular expression.
   This rule should only be used for strings and byte slices.
