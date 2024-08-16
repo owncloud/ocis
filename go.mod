@@ -107,9 +107,9 @@ require (
 	golang.org/x/image v0.18.0
 	golang.org/x/net v0.27.0
 	golang.org/x/oauth2 v0.22.0
-	golang.org/x/sync v0.7.0
+	golang.org/x/sync v0.8.0
 	golang.org/x/term v0.23.0
-	golang.org/x/text v0.16.0
+	golang.org/x/text v0.17.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240723171418-e6d459c13d2a
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
