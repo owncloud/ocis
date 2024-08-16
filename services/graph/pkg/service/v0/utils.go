@@ -16,11 +16,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
-	"golang.org/x/sync/errgroup"
 )
 
 // StrictJSONUnmarshal is a wrapper around json.Unmarshal that returns an error if the json contains unknown fields.
@@ -426,17 +427,14 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 		if err != nil {
 			return nil, err
 		}
-		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(permissionSet, condition)
 
-		if role != nil {
+		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(permissionSet, condition); role != nil {
 			permission.SetRoles([]string{role.GetId()})
+			permission.SetLibreGraphPermissionsActions(unifiedrole.GetAllowedResourceActions(role, condition))
 		}
 
-		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissionSet)
-
-		// actions only make sense if no role is set
-		if role == nil && len(actions) > 0 {
-			permission.SetLibreGraphPermissionsActions(actions)
+		if !permission.HasLibreGraphPermissionsActions() {
+			permission.SetLibreGraphPermissionsActions(unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissionSet))
 		}
 	}
 	switch grantee := receivedShare.GetShare().GetGrantee(); {
