@@ -3,6 +3,7 @@ directives:
     - '''self'''
   connect-src:
     - '''self'''
+    - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
   default-src:
     - '''none'''
   font-src:
@@ -17,6 +18,7 @@ directives:
     - '''self'''
     - 'data:'
     - 'blob:'
+    - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
   manifest-src:
     - '''self'''
   media-src:

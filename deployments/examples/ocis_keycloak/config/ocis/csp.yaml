@@ -3,6 +3,7 @@ directives:
     - '''self'''
   connect-src:
     - '''self'''
+    - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${KEYCLOAK_DOMAIN|keycloak.owncloud.test}/'
   default-src:
@@ -19,6 +20,7 @@ directives:
     - '''self'''
     - 'data:'
     - 'blob:'
+    - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
   manifest-src:
     - '''self'''
   media-src:
