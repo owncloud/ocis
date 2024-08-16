@@ -157,20 +157,28 @@ func (s *Service) getAppUrlFor(action, fileExt string) string {
 // "edit" urls will be prioritized. Note that "view" url might be returned for
 // "read/write" view mode if no "edit" url is found.
 func (s *Service) getAppUrl(fileExt string, viewMode appproviderv1beta1.ViewMode) string {
-	// check view_comment action first (for collabora)
-	appURL := s.getAppUrlFor("view_comment", fileExt)
-
 	// prioritize view action if possible
-	if viewAppURL := s.getAppUrlFor("view", fileExt); viewAppURL != "" {
-		appURL = viewAppURL
-	}
+	appURL := s.getAppUrlFor("view", fileExt)
 
-	// If read/write mode has been requested, prioritize edit action.
-	// Special case for collabora because it only provides one action per
-	// extension,
-	if viewMode == appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE || strings.ToLower(s.config.App.Name) == "collabora" {
-		if editAppURL := s.getAppUrlFor("edit", fileExt); editAppURL != "" {
-			appURL = editAppURL
+	if strings.ToLower(s.config.App.Name) == "collabora" {
+		// collabora provides only one action per extension. usual options
+		// are "view" (checked above), "edit" or "view_comment" (this last one
+		// is exclusive of collabora)
+		if appURL == "" {
+			if editURL := s.getAppUrlFor("edit", fileExt); editURL != "" {
+				return editURL
+			}
+			if commentURL := s.getAppUrlFor("view_comment", fileExt); commentURL != "" {
+				return commentURL
+			}
+		}
+	} else {
+		// If not collabora, there might be an edit action for the extension.
+		// If read/write mode has been requested, prioritize edit action.
+		if viewMode == appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE {
+			if editAppURL := s.getAppUrlFor("edit", fileExt); editAppURL != "" {
+				appURL = editAppURL
+			}
 		}
 	}
 
