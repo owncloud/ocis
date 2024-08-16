@@ -52,10 +52,8 @@ var _ = Describe("ContentConnector", func() {
 				},
 				Path: ".",
 			},
-			User:       &userv1beta1.User{}, // Not used for now
-			ViewMode:   appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE,
-			EditAppUrl: "http://test.ex.prv/edit",
-			ViewAppUrl: "http://test.ex.prv/view",
+			User:     &userv1beta1.User{}, // Not used for now
+			ViewMode: appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE,
 		}
 
 		randomContent = "This is the content of the test.txt file"
@@ -186,10 +184,8 @@ var _ = Describe("ContentConnector", func() {
 					},
 					Path: ".",
 				},
-				User:       &userv1beta1.User{}, // Not used for now
-				ViewMode:   appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY,
-				EditAppUrl: "http://test.ex.prv/edit",
-				ViewAppUrl: "http://test.ex.prv/view",
+				User:     &userv1beta1.User{}, // Not used for now
+				ViewMode: appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY,
 			}
 
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
