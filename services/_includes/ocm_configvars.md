@@ -38,7 +38,7 @@
 | OCM_OCM_INVITE_MANAGER_TIMEOUT | Duration | 30s | Timeout specifies a time limit for requests made to OCM endpoints.|
 | OCM_OCM_INVITE_MANAGER_INSECURE | bool | false | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
 | SHARING_OCM_PROVIDER_AUTHORIZER_DRIVER | string | json | Driver to be used to persist ocm invites. Supported value is only 'json'.|
-| OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE | string | /etc/ocis/ocmproviders.json | Path to the JSON file where ocm invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE | string | /etc/ocis/ocmproviders.json | Path to the JSON file where ocm invite data will be stored. Defaults to $OCIS_CONFIG_DIR:/ocmproviders.json.|
 | OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME | bool | false | Verify the hostname of the incoming request against the hostname of the OCM provider.|
 | OCM_OCM_SHARE_PROVIDER_DRIVER | string | json | Driver to be used for the OCM share provider. Supported value is only 'json'.|
 | OCM_OCM_SHAREPROVIDER_JSON_FILE | string | /var/lib/ocis/storage/ocm/ocmshares.json | Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
