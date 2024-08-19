@@ -2861,8 +2861,8 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When the administrator gets federated and member users using the Graph API
-	 * @When user :user tries to get federated and member users using the Graph API
+	 * @When the administrator gets federated and local users using the Graph API
+	 * @When user :user tries to get federated and local users using the Graph API
 	 *
 	 * @param ?string $user
 	 *

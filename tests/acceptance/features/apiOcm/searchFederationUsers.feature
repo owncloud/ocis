@@ -382,15 +382,12 @@ Feature: search federation users
               ],
               "properties": {
                 "display_name": {
-                  "type": "string",
                   "const": "Alice Hansen"
                 },
                 "idp": {
-                  "type": "string",
                   "const": "https://ocis-server:9200"
                 },
                 "mail": {
-                  "type": "string",
                   "pattern": "alice@example.org"
                 },
                 "user_id": {
@@ -409,15 +406,12 @@ Feature: search federation users
               ],
               "properties": {
                 "display_name": {
-                  "type": "string",
                   "const": "Carol King"
                 },
                 "idp": {
-                  "type": "string",
                   "const": "https://ocis-server:9200"
                 },
                 "mail": {
-                  "type": "string",
                   "pattern": "carol@example.org"
                 },
                 "user_id": {
@@ -469,11 +463,9 @@ Feature: search federation users
                   "pattern": "^%user_id_pattern%$"
                 },
                 "mail": {
-                  "type": "string",
                   "const": "alice@example.org"
                 },
                 "userType": {
-                  "type": "string",
                   "const": "Federated"
                 },
                 "identities": {
@@ -536,11 +528,9 @@ Feature: search federation users
                   "pattern": "^%user_id_pattern%$"
                 },
                 "mail": {
-                  "type": "string",
                   "const": "brian@example.org"
                 },
                 "userType": {
-                  "type": "string",
                   "const": "Federated"
                 },
                 "identities": {
@@ -596,11 +586,9 @@ Feature: search federation users
             ],
             "properties": {
               "code": {
-                "type": "string",
                 "const": "accessDenied"
               },
               "message": {
-                "type": "string",
                 "const": "search term too short"
               }
             }
@@ -610,13 +598,13 @@ Feature: search federation users
       """
 
   @issue-9829
-  Scenario: admin gets federated and member users
+  Scenario: admin gets federated and local users
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
     And "Brian" has accepted invitation
     And using server "LOCAL"
-    When the administrator gets federated and member users using the Graph API
+    When the administrator gets federated and local users using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -656,7 +644,6 @@ Feature: search federation users
                       "pattern": "^%user_id_pattern%$"
                     },
                     "mail": {
-                      "type": "string",
                       "const": "carol@example.org"
                     },
                     "onPremisesSamAccountName": {
@@ -666,7 +653,6 @@ Feature: search federation users
                       "const": "Carol"
                     },
                     "userType": {
-                      "type": "string",
                       "const": "Member"
                     }
                   }
@@ -689,11 +675,9 @@ Feature: search federation users
                       "pattern": "^%user_id_pattern%$"
                     },
                     "mail": {
-                      "type": "string",
                       "const": "brian@example.org"
                     },
                     "userType": {
-                      "type": "string",
                       "const": "Federated"
                     },
                     "identities": {
