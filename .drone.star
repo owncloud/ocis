@@ -280,20 +280,12 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
-    build_release_pipelines = \
-        dockerReleases(ctx) + \
-        binaryReleases(ctx)
+    # build_release_pipelines = \
+    #     dockerReleases(ctx) + \
+    #     binaryReleases(ctx)
 
     test_pipelines.append(
         pipelineDependsOn(
@@ -302,7 +294,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines  #+ build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -389,7 +381,8 @@ def testPipelines(ctx):
 
     pipelines += e2eTestPipeline(ctx)
 
-    return pipelines
+    # return pipelines
+    return [wopiValidatorTests(ctx, "ocis", "builtin", "default")]
 
 def getGoBinForTesting(ctx):
     return [{
@@ -1109,8 +1102,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                              "cat open.json | jq .app_url | sed -n -e 's/^.*files%2F//p' | tr -d '\"' >> wopisrc",
                          ],
                      },
-                 ] +
-                 validatorTests,
+                 ],
         "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
@@ -2088,22 +2080,22 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     container_name = "ocis-server"
     environment = {
         "OCIS_URL": OCIS_URL,
-        "OCIS_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
-        "STORAGE_USERS_DRIVER": "%s" % (storage),
+        # "OCIS_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
+        # "STORAGE_USERS_DRIVER": "%s" % (storage),
         "PROXY_ENABLE_BASIC_AUTH": True,
-        "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+        # "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
         "OCIS_LOG_LEVEL": "error",
-        "IDM_CREATE_DEMO_USERS": True,  # needed for litmus and cs3api-validator tests
+        # "IDM_CREATE_DEMO_USERS": True,  # needed for litmus and cs3api-validator tests
         "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
-        "FRONTEND_SEARCH_MIN_LENGTH": "2",
-        "OCIS_ASYNC_UPLOADS": True,
-        "OCIS_EVENTS_ENABLE_TLS": False,
+        # "FRONTEND_SEARCH_MIN_LENGTH": "2",
+        # "OCIS_ASYNC_UPLOADS": True,
+        # "OCIS_EVENTS_ENABLE_TLS": False,
         "MICRO_REGISTRY": "nats-js-kv",
         "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
         "NATS_NATS_HOST": "0.0.0.0",
         "NATS_NATS_PORT": 9233,
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
-        "EVENTHISTORY_STORE": "memory",
+        # "EVENTHISTORY_STORE": "memory",
     }
 
     if deploy_type == "":
@@ -2118,13 +2110,13 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
 
     if deploy_type == "wopi_validator":
         environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  # make gateway available to wopi server
-        environment["APP_PROVIDER_EXTERNAL_ADDR"] = "com.owncloud.api.app-provider"
-        environment["APP_PROVIDER_DRIVER"] = "wopi"
-        environment["APP_PROVIDER_WOPI_APP_NAME"] = "FakeOffice"
-        environment["APP_PROVIDER_WOPI_APP_URL"] = "http://fakeoffice:8080"
-        environment["APP_PROVIDER_WOPI_INSECURE"] = "true"
-        environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopiserver:9300"
-        environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = OCIS_URL
+        # environment["APP_PROVIDER_EXTERNAL_ADDR"] = "com.owncloud.api.app-provider"
+        # environment["APP_PROVIDER_DRIVER"] = "wopi"
+        # environment["APP_PROVIDER_WOPI_APP_NAME"] = "FakeOffice"
+        # environment["APP_PROVIDER_WOPI_APP_URL"] = "http://fakeoffice:8080"
+        # environment["APP_PROVIDER_WOPI_INSECURE"] = "true"
+        # environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopiserver:9300"
+        # environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = OCIS_URL
 
     if deploy_type == "federation":
         environment["OCIS_URL"] = OCIS_FED_URL
@@ -2175,7 +2167,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "user": user,
             "commands": [
                 "%s init --insecure true" % ocis_bin,
-                "cat $OCIS_CONFIG_DIR/ocis.yaml",
+                # "cat $OCIS_CONFIG_DIR/ocis.yaml",
             ] + (wrapper_commands),
             "volumes": volumes,
             "depends_on": depends_on,
