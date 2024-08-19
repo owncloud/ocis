@@ -126,12 +126,10 @@ Feature: an user shares resources usin ScienceMesh application
               ],
               "properties": {
                 "@UI.Hidden":{
-                  "type": "boolean",
-                  "enum": [false]
+                  "const": "false"
                 },
                 "@client.synchronize":{
-                  "type": "boolean",
-                  "enum": [true]
+                  "const": "true"
                 },
                 "createdBy": {
                   "type": "object",
@@ -144,7 +142,6 @@ Feature: an user shares resources usin ScienceMesh application
                       "required": ["displayName", "id"],
                       "properties": {
                         "displayName": {
-                          "type": "string",
                           "const": "Brian Murphy"
                         },
                         "id": {

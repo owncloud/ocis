@@ -36,7 +36,9 @@ Feature: search federation users
               "type": "object",
               "required": [
                 "displayName",
-                "id"
+                "id",
+                "userType",
+                "identities"
               ],
               "properties": {
                 "displayName": {
@@ -45,6 +47,31 @@ Feature: search federation users
                 "id": {
                   "type": "string",
                   "pattern": "^%user_id_pattern%$"
+                },
+                "userType": {
+                  "type": "string",
+                  "const": "Federated"
+                },
+                "identities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "issuer",
+                      "issuerAssignedId"
+                    ],
+                    "properties": {
+                      "issuer": {
+                        "const": "ocis-server"
+                      },
+                      "issuerAssignedId": {
+                        "type": "string",
+                        "pattern": "^%identities_issuer_id_pattern%$"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -71,7 +98,9 @@ Feature: search federation users
               "type": "object",
               "required": [
                 "displayName",
-                "id"
+                "id",
+                "userType",
+                "identities"
               ],
               "properties": {
                 "displayName": {
@@ -80,6 +109,31 @@ Feature: search federation users
                 "id": {
                   "type": "string",
                   "pattern": "^%user_id_pattern%$"
+                },
+                "userType": {
+                  "type": "string",
+                  "const": "Federated"
+                },
+                "identities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "issuer",
+                      "issuerAssignedId"
+                    ],
+                    "properties": {
+                      "issuer": {
+                        "const": "https://federation-ocis-server:10200"
+                      },
+                      "issuerAssignedId": {
+                        "type": "string",
+                        "pattern": "^%identities_issuer_id_pattern%$"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -112,7 +166,9 @@ Feature: search federation users
               "type": "object",
               "required": [
                 "displayName",
-                "id"
+                "id",
+                "userType",
+                "identities"
               ],
               "properties": {
                 "displayName": {
@@ -121,6 +177,31 @@ Feature: search federation users
                 "id": {
                   "type": "string",
                   "pattern": "^%user_id_pattern%$"
+                },
+                "userType": {
+                  "type": "string",
+                  "const": "Federated"
+                },
+                "identities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "issuer",
+                      "issuerAssignedId"
+                    ],
+                    "properties": {
+                      "issuer": {
+                        "const": "ocis-server"
+                      },
+                      "issuerAssignedId": {
+                        "type": "string",
+                        "pattern": "^%identities_issuer_id_pattern%$"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -147,7 +228,9 @@ Feature: search federation users
               "type": "object",
               "required": [
                 "displayName",
-                "id"
+                "id",
+                "userType",
+                "identities"
               ],
               "properties": {
                 "displayName": {
@@ -156,6 +239,31 @@ Feature: search federation users
                 "id": {
                   "type": "string",
                   "pattern": "^%user_id_pattern%$"
+                },
+                "userType": {
+                  "type": "string",
+                  "const": "Federated"
+                },
+                "identities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "issuer",
+                      "issuerAssignedId"
+                    ],
+                    "properties": {
+                      "issuer": {
+                        "const": "https://federation-ocis-server:10200"
+                      },
+                      "issuerAssignedId": {
+                        "type": "string",
+                        "pattern": "^%identities_issuer_id_pattern%$"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -165,7 +273,7 @@ Feature: search federation users
       """
 
 
-  Scenario: sers search for federation users without federated connection
+  Scenario: users search for federation users without federated connection
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
@@ -207,7 +315,6 @@ Feature: search federation users
         }
       }
       """
-    And using server "REMOTE"
 
 
   Scenario: users search all federation users
@@ -275,15 +382,12 @@ Feature: search federation users
               ],
               "properties": {
                 "display_name": {
-                  "type": "string",
                   "const": "Alice Hansen"
                 },
                 "idp": {
-                  "type": "string",
                   "const": "https://ocis-server:9200"
                 },
                 "mail": {
-                  "type": "string",
                   "pattern": "alice@example.org"
                 },
                 "user_id": {
@@ -302,15 +406,12 @@ Feature: search federation users
               ],
               "properties": {
                 "display_name": {
-                  "type": "string",
                   "const": "Carol King"
                 },
                 "idp": {
-                  "type": "string",
                   "const": "https://ocis-server:9200"
                 },
                 "mail": {
-                  "type": "string",
                   "pattern": "carol@example.org"
                 },
                 "user_id": {
@@ -324,5 +425,289 @@ Feature: search federation users
       }
       """
 
+  @issue-9829
+  Scenario: admin gets federated users
+    Given using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    When the administrator gets federated users using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "userType",
+                "identities"
+              ],
+              "properties": {
+                "displayName": {
+                  "const": "Alice Hansen"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "mail": {
+                  "const": "alice@example.org"
+                },
+                "userType": {
+                  "const": "Federated"
+                },
+                "identities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "issuer",
+                      "issuerAssignedId"
+                    ],
+                    "properties": {
+                      "issuer": {
+                        "const": "ocis-server"
+                      },
+                      "issuerAssignedId": {
+                        "type": "string",
+                        "pattern": "^%identities_issuer_id_pattern%$"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    And using server "LOCAL"
+    When the administrator gets federated users using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "userType",
+                "identities"
+              ],
+              "properties": {
+                "displayName": {
+                  "const": "Brian Murphy"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "mail": {
+                  "const": "brian@example.org"
+                },
+                "userType": {
+                  "const": "Federated"
+                },
+                "identities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "issuer",
+                      "issuerAssignedId"
+                    ],
+                    "properties": {
+                      "issuer": {
+                        "const": "https://federation-ocis-server:10200"
+                      },
+                      "issuerAssignedId": {
+                        "type": "string",
+                        "pattern": "^%identities_issuer_id_pattern%$"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: user without admin permissions cannot get federated users
+    Given using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And using server "LOCAL"
+    When user "Carol" tries to get federated users using the Graph API
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "accessDenied"
+              },
+              "message": {
+                "const": "search term too short"
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @issue-9829
+  Scenario: admin gets federated and local users
+    Given using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And using server "LOCAL"
+    When the administrator gets federated and local users using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "accountEnabled",
+                    "displayName",
+                    "id",
+                    "mail",
+                    "onPremisesSamAccountName",
+                    "surname",
+                    "userType"
+                  ],
+                  "properties": {
+                    "accountEnabled": {
+                      "const": true
+                    },
+                    "displayName": {
+                      "const": "Carol King"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "mail": {
+                      "const": "carol@example.org"
+                    },
+                    "onPremisesSamAccountName": {
+                      "const": "Carol"
+                    },
+                    "surname": {
+                      "const": "Carol"
+                    },
+                    "userType": {
+                      "const": "Member"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "displayName",
+                    "id",
+                    "mail",
+                    "userType",
+                    "identities"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "const": "Brian Murphy"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "mail": {
+                      "const": "brian@example.org"
+                    },
+                    "userType": {
+                      "const": "Federated"
+                    },
+                    "identities": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "issuer",
+                          "issuerAssignedId"
+                        ],
+                        "properties": {
+                          "issuer": {
+                            "const": "https://federation-ocis-server:10200"
+                          },
+                          "issuerAssignedId": {
+                            "type": "string",
+                            "pattern": "^%identities_issuer_id_pattern%$"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
 
 # TODO try to find federation users after deleting federated conection

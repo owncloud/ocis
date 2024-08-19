@@ -2838,4 +2838,46 @@ class GraphContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * @When the administrator gets federated users using the Graph API
+	 * @When user :user tries to get federated users using the Graph API
+	 *
+	 * @param ?string $user
+	 *
+	 * @return void
+	 */
+	public function theUserGetsFederatedUsersUsingTheGraphApi(?string $user = null): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+	
+		$response = GraphHelper::getFederatedUsers(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password']
+		);
+
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator gets federated and local users using the Graph API
+	 * @When user :user tries to get federated and local users using the Graph API
+	 *
+	 * @param ?string $user
+	 *
+	 * @return void
+	 */
+	public function theUserGetsAllUsersUsingTheGraphApi(?string $user = null): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+	
+		$response = GraphHelper::getAllUsers(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password']
+		);
+
+		$this->featureContext->setResponse($response);
+	}
 }

@@ -2346,4 +2346,54 @@ class GraphHelper {
 			$password
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getFederatedUsers(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, "users?\$filter=userType eq 'Federated'");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getAllUsers(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, "users?\$filter=userType eq 'Federated' or userType eq 'Member'");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$adminUser,
+			$adminPassword,
+			self::getRequestHeaders()
+		);
+	}
 }

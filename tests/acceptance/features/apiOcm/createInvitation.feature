@@ -84,11 +84,9 @@ Feature: create invitation
             "pattern": "^%fed_invitation_token_pattern%$"
           },
           "description": {
-            "type": "string",
             "const": "a share invitation from Alice"
           },
           "recipient": {
-            "type": "string",
             "const": "brian@example.com"
           }
         }
@@ -117,11 +115,9 @@ Feature: create invitation
               "pattern": "^%fed_invitation_token_pattern%$"
             },
             "description": {
-              "type": "string",
               "const": "a share invitation from Alice"
             },
             "recipient": {
-              "type": "string",
               "const": "brian@example.com"
             }
           }
