@@ -309,6 +309,17 @@ func (fs *owncloudsqlfs) toDatabasePath(ip string) string {
 	return p
 }
 
+func (fs *owncloudsqlfs) toResourcePath(ip, owner string) string {
+	trim := filepath.Join(fs.c.DataDirectory, owner, "files")
+	p := strings.TrimPrefix(ip, trim)
+	p = strings.TrimPrefix(p, "/")
+	// root directory
+	if p == "" {
+		p = "."
+	}
+	return p
+}
+
 func (fs *owncloudsqlfs) toStoragePath(ctx context.Context, ip string) (sp string) {
 	if fs.c.EnableHome {
 		u := ctxpkg.ContextMustGetUser(ctx)
@@ -523,14 +534,15 @@ func (fs *owncloudsqlfs) convertToResourceInfo(ctx context.Context, entry *filec
 	if _, ok := mdKeysMap["*"]; len(mdKeys) == 0 || ok {
 		returnAllKeys = true
 	}
-
+	owner := fs.getOwner(ip)
+	path := fs.toResourcePath(ip, owner)
 	isDir := entry.MimeTypeString == "httpd/unix-directory"
 	ri := &provider.ResourceInfo{
 		Id: &provider.ResourceId{
 			// return ownclouds numeric storage id as the space id!
 			SpaceId: strconv.Itoa(entry.Storage), OpaqueId: strconv.Itoa(entry.ID),
 		},
-		Path:     filepath.Base(ip),
+		Path:     filepath.Base(path), // we currently only return the name, decomposedfs returns the path if the request was path based. is that even still possible?
 		Type:     getResourceType(isDir),
 		Etag:     entry.Etag,
 		MimeType: entry.MimeTypeString,
@@ -542,8 +554,16 @@ func (fs *owncloudsqlfs) convertToResourceInfo(ctx context.Context, entry *filec
 			Metadata: map[string]string{}, // TODO aduffeck: which metadata needs to go in here?
 		},
 	}
+	// omit parentid for root
+	if path != "." {
+		ri.Name = entry.Name
+		ri.ParentId = &provider.ResourceId{
+			// return ownclouds numeric storage id as the space id!
+			SpaceId: strconv.Itoa(entry.Storage), OpaqueId: strconv.Itoa(entry.Parent),
+		}
+	}
 
-	if owner, err := fs.getUser(ctx, fs.getOwner(ip)); err == nil {
+	if owner, err := fs.getUser(ctx, owner); err == nil {
 		ri.Owner = owner.Id
 	} else {
 		appctx.GetLogger(ctx).Error().Err(err).Msg("error getting owner")
@@ -1419,9 +1439,6 @@ func (fs *owncloudsqlfs) listWithNominalHome(ctx context.Context, ip string, mdK
 	finfos := []*provider.ResourceInfo{}
 	for _, entry := range entries {
 		cp := filepath.Join(fs.c.DataDirectory, owner, entry.Path)
-		if err != nil {
-			return nil, err
-		}
 		m, err := fs.convertToResourceInfo(ctx, entry, cp, mdKeys)
 		if err != nil {
 			appctx.GetLogger(ctx).Error().Err(err).Str("path", cp).Msg("error converting to a resource info")
