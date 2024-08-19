@@ -1,6 +1,6 @@
 ---
 title: OCM
-date: 2024-08-19T08:11:31.626694076Z
+date: 2024-08-19T08:39:06.245098201Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/ocm
@@ -38,7 +38,7 @@ Internal GRPC APIs:
 
 The `ocm` services implements an invitation workflow which needs to be followed before creating federated shares. Invitations are limited to trusted instances, however.
 
-The list of trusted instances is managed by the `ocmproviderauthorizer` service. The only supported backend currently is `json` which stores the list in a json file on disk.
+The list of trusted instances is managed by the `ocmproviderauthorizer` service. The only supported backend currently is `json` which stores the list in a json file on disk. Note that the `ocmproviders.json` file, which holds that configuration, is expected to be located in the root of the ocis config directory.
 
 Example `ocmproviders.json` file:
 ```
