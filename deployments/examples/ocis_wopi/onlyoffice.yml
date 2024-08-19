@@ -62,7 +62,8 @@ services:
       # share the registry with the ocis container
       MICRO_REGISTRY_ADDRESS: ocis:9233
     volumes:
-      - ocis-config:/etc/ocis
+      # configure the .env file to use own paths instead of docker internal volumes
+      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
