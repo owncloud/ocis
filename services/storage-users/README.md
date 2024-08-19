@@ -51,58 +51,90 @@ ocis storage-users uploads <command>
 ```plaintext
 COMMANDS:
    sessions   Print a list of upload sessions
-   clean      Clean up leftovers from expired uploads
+   clean      Clean up leftovers from expired uploads (deprecated)
    list       Print a list of all incomplete uploads (deprecated)
 ```
+
+#### Sessions command
+
+The `sessions` command is the entry point for listing, restarting and cleaning unfinished uploads.
+
+```bash
+ocis storage-users uploads sessions <command>
+```
+
+```
+NAME:
+   ocis storage-users uploads sessions - Print a list of upload sessions
+
+USAGE:
+   ocis storage-users uploads sessions [command options]
+
+OPTIONS:
+   --id value    filter sessions by upload session id (default: unset)
+   --processing  filter sessions by processing status (default: unset)
+   --expired     filter sessions by expired status (default: unset)
+   --has-virus   filter sessions by virus scan result (default: unset)
+   --json        output as json (default: false)
+   --restart     send restart event for all listed sessions (default: false)
+   --clean       remove uploads (default: false)
+   --help, -h    show help
+```
+
+This will always output a list of uploads that match the criteria. See Command Examples section.
+
+Some additional information on returned information:
+  -  `Offset` is the amount of bytes the server has already received. If `Offset` == `Size` the server has reveived all bytes of the upload.
+  -  `Processing` indicates if the uploaded file is currently going through postprocessing.
+  -  `Scan Date` and `Scan Result` indicate the scanning status. If `Scan Date` is set and `Scan Result` is empty the file is not virus infected.
 
 #### Command Examples
 
 Command to list ongoing upload sessions
 
 ```bash
-ocis storage-users sessions --expired=false
+ocis storage-users uploads sessions --expired=false --processing=false
 ```
 
 ```plaintext
 Not expired sessions:
-+--------------------------------------+--------------------------------------+---------+--------+------+--------------------------------------+--------------------------------------+---------------------------+------------+
-|                Space                 |              Upload Id               |  Name   | Offset | Size |              Executant               |                Owner                 |          Expires          | Processing |
-+--------------------------------------+--------------------------------------+---------+--------+------+--------------------------------------+--------------------------------------+---------------------------+------------+
-| f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | 5e387954-7313-4223-a904-bf996da6ec0b | foo.txt |      0 | 1234 | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | 2024-01-26T13:04:31+01:00 | false      |
-| f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | f066244d-97b2-48e7-a30d-b40fcb60cec6 | bar.txt |      0 | 4321 | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | 2024-01-26T13:18:47+01:00 | false      |
-+--------------------------------------+--------------------------------------+---------+--------+------+--------------------------------------+--------------------------------------+---------------------------+------------+
++--------------------------------------+--------------------------------------+---------+--------+------+--------------------------------------+--------------------------------------+---------------------------+------------+---------------------------+-----------------------+
+|                Space                 |              Upload Id               |  Name   | Offset | Size |              Executant               |                Owner                 |          Expires          | Processing |         Scan Date         |      Scan Result      |
++--------------------------------------+--------------------------------------+---------+--------+------+--------------------------------------+--------------------------------------+---------------------------+------------+---------------------------+-----------------------+
+| f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | 5e387954-7313-4223-a904-bf996da6ec0b | foo.txt |      0 | 1234 | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | 2024-01-26T13:04:31+01:00 | false      | 2024-04-24T11:24:14+02:00 |   infected: virus A   |
+| f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | f066244d-97b2-48e7-a30d-b40fcb60cec6 | bar.txt |      0 | 4321 | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c | 2024-01-26T13:18:47+01:00 | false      | 2024-04-24T14:38:29+02:00 |                       |
++--------------------------------------+--------------------------------------+---------+--------+------+--------------------------------------+--------------------------------------+---------------------------+------------+---------------------------+-----------------------+
 ```
 
 The sessions command can also output json
 
 ```bash
-ocis storage-users sessions --expired=false --json
+ocis storage-users uploads sessions --expired=false --processing=false --json
 ```
 
 ```json
-{"id":"5e387954-7313-4223-a904-bf996da6ec0b","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"foo.txt","offset":0,"size":1234,"executant":{"idp":"https://cloud.ocis.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:04:31+01:00","processing":false}
-{"id":"f066244d-97b2-48e7-a30d-b40fcb60cec6","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"bar.txt","offset":0,"size":4321,"executant":{"idp":"https://cloud.ocis.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:18:47+01:00","processing":false}
+{"id":"5e387954-7313-4223-a904-bf996da6ec0b","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"foo.txt","offset":0,"size":1234,"executant":{"idp":"https://cloud.ocis.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:04:31+01:00","processing":false, "scanDate": "2024-04-24T11:24:14+02:00", "scanResult": "infected: virus A"}
+{"id":"f066244d-97b2-48e7-a30d-b40fcb60cec6","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"bar.txt","offset":0,"size":4321,"executant":{"idp":"https://cloud.ocis.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:18:47+01:00","processing":false, "scanDate": "2024-04-24T14:38:29+02:00", "scanResult": ""}
 ```
 
-Command to clear expired uploads
+The sessions command can also clear and restart uploads. The output is the same as if run without `--clean` or `--restart` flag.
+Note: It is recommended to run to command first without the `--clean` (`--processing`) flag to double check which uploads get cleaned (restarted).
 ```bash
-ocis storage-users uploads clean
+# cleans all expired uploads regardless of processing and virus state.
+ocis storage-users uploads sessions --expired=true --clean
+
+# restarts all uploads that are processing and are not virus infected
+ocis storage-users uploads sessions --processing=false --has-virus=false --restart
 ```
 
-```plaintext
-Cleaned uploads:
-- 455bd640-cd08-46e8-a5a0-9304908bd40a (Filename: file_example_PPT_1MB.ppt, Size: 1028608, Expires: 2022-08-17T12:35:34+02:00)
-```
-
-Deprecated list command to identify unfinished uploads
+IMPOTANT: `list` and `clean` commands are deprecated. Do not use them.
 
 ```bash
+# deprecated
 ocis storage-users uploads list
-```
 
-```plaintext
-Incomplete uploads:
- - 455bd640-cd08-46e8-a5a0-9304908bd40a (file_example_PPT_1MB.ppt, Size: 1028608, Expires: 2022-08-17T12:35:34+02:00)
+# deprecated
+ocis storage-users uploads clean
 ```
 
 ### Purge Expired Space Trash-Bins Items
