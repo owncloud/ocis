@@ -15,6 +15,14 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
+- rawname: DAYS
+  path: tests/qa-activity-report/generate-qa-activity-report.go:94
+  foundincode: true
+  name: DAYS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
 - rawname: _registryRegisterIntervalEnv
   path: ocis-pkg/registry/expiry.go:19
   foundincode: true
@@ -78,6 +86,14 @@ variables:
     on supervision of ownCloud Support.'
   do_ignore: false
 - rawname: _registryAddressEnv
+  path: ocis-pkg/registry/registry.go:118
+  foundincode: true
+  name: MICRO_REGISTRY_ADDRESS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _registryAddressEnv
   path: ocis-pkg/natsjsregistry/registry.go:192
   foundincode: true
   name: MICRO_REGISTRY_ADDRESS
@@ -86,14 +102,6 @@ variables:
   description: The bind address of the internal go micro framework. Only change on
     supervision of ownCloud Support.
   do_ignore: false
-- rawname: _registryAddressEnv
-  path: ocis-pkg/registry/registry.go:118
-  foundincode: true
-  name: MICRO_REGISTRY_ADDRESS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: true
 - rawname: _registryPasswordEnv
   path: ocis-pkg/natsjsregistry/registry.go:220
   foundincode: true
@@ -110,6 +118,14 @@ variables:
   default_value: ""
   description: Optional when using nats to authenticate with the nats cluster.
   do_ignore: false
+- rawname: MONTH
+  path: tests/qa-activity-report/generate-qa-activity-report.go:92
+  foundincode: true
+  name: MONTH
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
 - rawname: OCIS_BASE_DATA_PATH
   path: ocis-pkg/config/defaults/paths.go:23
   foundincode: true
@@ -134,6 +150,14 @@ variables:
   path: internal/testenv/test.go:33
   foundincode: true
   name: RUN_CMD_TEST
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: YEAR
+  path: tests/qa-activity-report/generate-qa-activity-report.go:93
+  foundincode: true
+  name: YEAR
   type: ""
   default_value: ""
   description: ""
