@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strconv"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/capabilities"
@@ -79,6 +80,11 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 	readOnlyUserAttributes := []string{}
 	if cfg.ReadOnlyUserAttributes != nil {
 		readOnlyUserAttributes = cfg.ReadOnlyUserAttributes
+	}
+
+	changePasswordDisabled := !cfg.LDAPServerWriteEnabled
+	if slices.Contains(readOnlyUserAttributes, "user.passwordProfile") {
+		changePasswordDisabled = true
 	}
 
 	return map[string]interface{}{
@@ -218,7 +224,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 									"read_only_attributes":          readOnlyUserAttributes,
 									"create_disabled":               !cfg.LDAPServerWriteEnabled,
 									"delete_disabled":               !cfg.LDAPServerWriteEnabled,
-									"change_password_self_disabled": !cfg.LDAPServerWriteEnabled,
+									"change_password_self_disabled": changePasswordDisabled,
 								},
 							},
 							"checksums": map[string]interface{}{
