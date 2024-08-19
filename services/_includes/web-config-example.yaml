@@ -93,6 +93,7 @@ web:
     - admin-settings
     - epub-reader
     - preview
+    - app-store
     applications: []
     external_apps: []
     options:
