@@ -31,12 +31,14 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/owncloudsql/filecache"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
 // ListStorageSpaces lists storage spaces according to the provided filters
 func (fs *owncloudsqlfs) ListStorageSpaces(ctx context.Context, filter []*provider.ListStorageSpacesRequest_Filter, unrestricted bool) ([]*provider.StorageSpace, error) {
 	var (
 		spaceID = "*"
+		// uid     *userpb.UserId
 	)
 
 	filteringUnsupportedSpaceTypes := false
@@ -49,7 +51,7 @@ func (fs *owncloudsqlfs) ListStorageSpaces(ctx context.Context, filter []*provid
 		case provider.ListStorageSpacesRequest_Filter_TYPE_ID:
 			_, spaceID, _, _ = storagespace.SplitID(filter[i].GetId().OpaqueId)
 		case provider.ListStorageSpacesRequest_Filter_TYPE_USER:
-			_, spaceID, _, _ = storagespace.SplitID(filter[i].GetId().OpaqueId)
+			// uid = filter[i].GetUser()
 		}
 	}
 	if filteringUnsupportedSpaceTypes {
@@ -63,6 +65,9 @@ func (fs *owncloudsqlfs) ListStorageSpaces(ctx context.Context, filter []*provid
 		if !ok {
 			return nil, errtypes.UserRequired("error getting user from context")
 		}
+		// if uid != nil && utils.UserIDEqual(uid, u.Id) {
+		//       return nil, errtypes.PermissionDenied("cannot access space of other user?")
+		// }
 		space, err := fs.getPersonalSpace(ctx, u)
 		if err != nil {
 			return nil, err
@@ -141,6 +146,8 @@ func (fs *owncloudsqlfs) getPersonalSpace(ctx context.Context, owner *userpb.Use
 		Mtime:     &types.Timestamp{Seconds: uint64(root.MTime)},
 		Owner:     owner,
 	}
+	space.Opaque = utils.AppendPlainToOpaque(space.Opaque, "spaceAlias", "personal/"+owner.Username)
+	space.Opaque = utils.AppendPlainToOpaque(space.Opaque, "etag", fmt.Sprintf(`"%s"`, root.Etag))
 	return space, nil
 }
 
@@ -179,5 +186,7 @@ func (fs *owncloudsqlfs) storageToSpace(ctx context.Context, storage *filecache.
 		Mtime:     &types.Timestamp{Seconds: uint64(root.MTime)},
 		Owner:     owner,
 	}
+	space.Opaque = utils.AppendPlainToOpaque(space.Opaque, "spaceAlias", "personal/"+owner.Username)
+	space.Opaque = utils.AppendPlainToOpaque(space.Opaque, "etag", fmt.Sprintf(`"%s"`, root.Etag))
 	return space, nil
 }

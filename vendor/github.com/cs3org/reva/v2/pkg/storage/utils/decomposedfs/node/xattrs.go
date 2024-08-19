@@ -21,6 +21,7 @@ package node
 import (
 	"context"
 	"io"
+	"io/fs"
 	"strconv"
 	"time"
 
@@ -144,14 +145,21 @@ func (n *Node) Xattrs(ctx context.Context) (Attributes, error) {
 // Xattr returns an extended attribute of the node. If the attributes have already
 // been cached it is not read from disk again.
 func (n *Node) Xattr(ctx context.Context, key string) ([]byte, error) {
+	path := n.InternalPath()
+
+	if path == "" {
+		// Do not try to read the attribute of an non-existing node
+		return []byte{}, fs.ErrNotExist
+	}
+
 	if n.ID == "" {
 		// Do not try to read the attribute of an empty node. The InternalPath points to the
 		// base nodes directory in this case.
-		return []byte{}, &xattr.Error{Op: "node.Xattr", Path: n.InternalPath(), Name: key, Err: xattr.ENOATTR}
+		return []byte{}, &xattr.Error{Op: "node.Xattr", Path: path, Name: key, Err: xattr.ENOATTR}
 	}
 
 	if n.xattrsCache == nil {
-		attrs, err := n.lu.MetadataBackend().All(ctx, n.InternalPath())
+		attrs, err := n.lu.MetadataBackend().All(ctx, path)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -162,7 +170,7 @@ func (n *Node) Xattr(ctx context.Context, key string) ([]byte, error) {
 		return val, nil
 	}
 	// wrap the error as xattr does
-	return []byte{}, &xattr.Error{Op: "node.Xattr", Path: n.InternalPath(), Name: key, Err: xattr.ENOATTR}
+	return []byte{}, &xattr.Error{Op: "node.Xattr", Path: path, Name: key, Err: xattr.ENOATTR}
 }
 
 // XattrString returns the string representation of an attribute
