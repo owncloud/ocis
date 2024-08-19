@@ -140,12 +140,12 @@ func (a *MeUserApiService) GetOwnUserExecute(r ApiGetOwnUserRequest) (*User, *ht
 type ApiUpdateOwnUserRequest struct {
 	ctx        context.Context
 	ApiService *MeUserApiService
-	user       *User
+	userUpdate *UserUpdate
 }
 
 // New user values
-func (r ApiUpdateOwnUserRequest) User(user User) ApiUpdateOwnUserRequest {
-	r.user = &user
+func (r ApiUpdateOwnUserRequest) UserUpdate(userUpdate UserUpdate) ApiUpdateOwnUserRequest {
+	r.userUpdate = &userUpdate
 	return r
 }
 
@@ -206,7 +206,7 @@ func (a *MeUserApiService) UpdateOwnUserExecute(r ApiUpdateOwnUserRequest) (*Use
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.user
+	localVarPostBody = r.userUpdate
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

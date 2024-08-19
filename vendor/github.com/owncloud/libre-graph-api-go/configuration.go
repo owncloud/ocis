@@ -96,8 +96,8 @@ func NewConfiguration() *Configuration {
 		Debug:         false,
 		Servers: ServerConfigurations{
 			{
-				URL:         "https://ocis.ocis-traefik.latest.owncloud.works/graph",
-				Description: "ownCloud Infinite Scale Latest",
+				URL:         "https://ocis.ocis.rolling.owncloud.works/graph",
+				Description: "ownCloud Infinite Scale Rolling Release",
 			},
 			{
 				URL:         "https://localhost:9200/graph",

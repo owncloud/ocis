@@ -301,7 +301,7 @@ var _ = Describe("Users", func() {
 
 			It("only returns a restricted set of attributes for unprivileged users", func() {
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
-				user := &libregraph.User{}
+				user := libregraph.NewUser("abc user", "username")
 				user.SetId("user1")
 				user.SetPasswordProfile(
 					libregraph.PasswordProfile{
@@ -309,7 +309,6 @@ var _ = Describe("Users", func() {
 					},
 				)
 				user.SetUserType("usertype")
-				user.SetDisplayName("abc user")
 				users := []*libregraph.User{user}
 
 				identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
@@ -325,8 +324,8 @@ var _ = Describe("Users", func() {
 				Expect(err).ToNot(HaveOccurred())
 				userMap, err := res.Value[0].ToMap()
 				Expect(err).ToNot(HaveOccurred())
-				for k, _ := range userMap {
-					Expect(k).Should(BeElementOf([]string{"mail", "displayName", "id", "userType"}))
+				for k := range userMap {
+					Expect(k).Should(BeElementOf([]string{"displayName", "onPremisesSamAccountName", "mail", "id", "userType"}))
 				}
 			})
 
@@ -800,10 +799,7 @@ var _ = Describe("Users", func() {
 			)
 
 			BeforeEach(func() {
-				user = &libregraph.User{}
-				user.SetDisplayName("Display Name")
-				user.SetOnPremisesSamAccountName("user")
-				user.SetMail("user@example.com")
+				user = libregraph.NewUser("Display Name", "user")
 			})
 
 			It("handles invalid bodies", func() {
@@ -814,15 +810,11 @@ var _ = Describe("Users", func() {
 			})
 
 			It("handles missing display names", func() {
-				user.DisplayName = nil
+				user.SetDisplayName("")
 				assertHandleBadAttributes(user)
-
 			})
 
 			It("handles missing OnPremisesSamAccountName", func() {
-				user.OnPremisesSamAccountName = nil
-				assertHandleBadAttributes(user)
-
 				user.SetOnPremisesSamAccountName("")
 				assertHandleBadAttributes(user)
 			})
@@ -1034,15 +1026,22 @@ var _ = Describe("Users", func() {
 
 		Describe("PatchUser", func() {
 			var (
-				user *libregraph.User
+				user         *libregraph.User
+				userUpdate   *libregraph.UserUpdate
+				expectedUser *libregraph.User
 			)
 
 			BeforeEach(func() {
-				user = &libregraph.User{}
-				user.SetDisplayName("Display Name")
-				user.SetOnPremisesSamAccountName("user")
+				user = libregraph.NewUser("Display Name", "user")
 				user.SetMail("user@example.com")
 				user.SetId("/users/user")
+
+				userUpdate = libregraph.NewUserUpdate()
+				userUpdate.SetId(user.GetId())
+
+				expectedUser = libregraph.NewUser("Display Name", "user")
+				expectedUser.SetMail(user.GetMail())
+				expectedUser.SetId(user.GetId())
 
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 			})
@@ -1065,13 +1064,13 @@ var _ = Describe("Users", func() {
 			})
 
 			It("handles invalid email", func() {
-				user.SetMail("invalid")
-				data, err := json.Marshal(user)
+				userUpdate.SetMail("invalid")
+				data, err := json.Marshal(userUpdate)
 				Expect(err).ToNot(HaveOccurred())
 
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users?$invalid=true", bytes.NewBuffer(data))
 				rctx := chi.NewRouteContext()
-				rctx.URLParams.Add("userID", user.GetId())
+				rctx.URLParams.Add("userID", userUpdate.GetId())
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchUser(rr, r)
 
@@ -1079,13 +1078,13 @@ var _ = Describe("Users", func() {
 			})
 
 			It("handles invalid userType", func() {
-				user.SetUserType("Clown")
-				data, err := json.Marshal(user)
+				userUpdate.SetUserType("Clown")
+				data, err := json.Marshal(userUpdate)
 				Expect(err).ToNot(HaveOccurred())
 
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users?$invalid=true", bytes.NewBuffer(data))
 				rctx := chi.NewRouteContext()
-				rctx.URLParams.Add("userID", user.GetId())
+				rctx.URLParams.Add("userID", userUpdate.GetId())
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchUser(rr, r)
 
@@ -1093,12 +1092,14 @@ var _ = Describe("Users", func() {
 			})
 
 			It("updates attributes", func() {
-				user.SetUserType("Member")
-				identityBackend.On("UpdateUser", mock.Anything, user.GetId(), mock.Anything).Return(user, nil)
+				userUpdate.SetUserType("Member")
+				userUpdate.SetDisplayName("New Display Name")
 
-				user.SetUserType(("Member"))
-				user.SetDisplayName("New Display Name")
-				data, err := json.Marshal(user)
+				expectedUser.SetUserType("Member")
+				expectedUser.SetDisplayName("New Display Name")
+				identityBackend.On("UpdateUser", mock.Anything, userUpdate.GetId(), mock.Anything).Return(expectedUser, nil)
+
+				data, err := json.Marshal(userUpdate)
 				Expect(err).ToNot(HaveOccurred())
 
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users", bytes.NewBuffer(data))
@@ -1111,11 +1112,11 @@ var _ = Describe("Users", func() {
 				data, err = io.ReadAll(rr.Body)
 				Expect(err).ToNot(HaveOccurred())
 
-				updatedUser := libregraph.User{}
-				err = json.Unmarshal(data, &updatedUser)
+				unmarshaledUser := libregraph.User{}
+				err = json.Unmarshal(data, &unmarshaledUser)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(updatedUser.GetUserType()).To(Equal("Member"))
-				Expect(updatedUser.GetDisplayName()).To(Equal("New Display Name"))
+				Expect(unmarshaledUser.GetUserType()).To(Equal("Member"))
+				Expect(unmarshaledUser.GetDisplayName()).To(Equal("New Display Name"))
 			})
 		})
 	})

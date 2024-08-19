@@ -189,7 +189,7 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 	newUser, err := c.libregraphUserFromClaims(claims)
 	if err != nil {
 		c.logger.Error().Err(err).Interface("claims", claims).Msg("Error creating user from claims")
-		return nil, fmt.Errorf("Error creating user from claims: %w", err)
+		return nil, fmt.Errorf("error creating user from claims: %w", err)
 	}
 
 	req := lgClient.UsersApi.CreateUser(newctx).User(newUser)
@@ -242,11 +242,16 @@ func (c cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, clai
 
 	// Check if the user needs to be updated, only updates of "displayName" and "mail" are supported
 	// currently.
+	userupdate := libregraph.NewUserUpdate()
 	switch {
 	case newUser.GetDisplayName() != user.GetDisplayName():
-		fallthrough
+		userupdate.SetDisplayName(newUser.GetDisplayName())
 	case newUser.GetMail() != user.GetMail():
-		return c.updateLibregraphUser(user.GetId().GetOpaqueId(), newUser)
+		userupdate.SetMail(newUser.GetMail())
+	}
+
+	if userupdate.HasDisplayName() || userupdate.HasMail() {
+		return c.updateLibregraphUser(user.GetId().GetOpaqueId(), *userupdate)
 	}
 
 	return nil
@@ -389,7 +394,7 @@ func (c cs3backend) getLibregraphGroup(ctx context.Context, client *libregraph.A
 	return lgGroup, nil
 }
 
-func (c cs3backend) updateLibregraphUser(userid string, user libregraph.User) error {
+func (c cs3backend) updateLibregraphUser(userid string, user libregraph.UserUpdate) error {
 	gatewayClient, err := c.gatewaySelector.Next()
 	if err != nil {
 		c.logger.Error().Err(err).Msg("could not select next gateway client")
@@ -408,7 +413,7 @@ func (c cs3backend) updateLibregraphUser(userid string, user libregraph.User) er
 		return err
 	}
 
-	req := lgClient.UserApi.UpdateUser(newctx, userid).User(user)
+	req := lgClient.UserApi.UpdateUser(newctx, userid).UserUpdate(user)
 
 	_, resp, err := req.Execute()
 	defer resp.Body.Close()
@@ -420,7 +425,7 @@ func (c cs3backend) updateLibregraphUser(userid string, user libregraph.User) er
 	return nil
 }
 
-func (c cs3backend) setupLibregraphClient(ctx context.Context, cs3token string) (*libregraph.APIClient, error) {
+func (c cs3backend) setupLibregraphClient(_ context.Context, cs3token string) (*libregraph.APIClient, error) {
 	// Use micro registry to resolve next graph service endpoint
 	next, err := c.graphSelector.Select("com.owncloud.web.graph")
 	if err != nil {
@@ -469,12 +474,12 @@ func (c cs3backend) libregraphUserFromClaims(claims map[string]interface{}) (lib
 	if dn, ok := claims[c.autoProvisionClaims.DisplayName].(string); ok {
 		user.SetDisplayName(dn)
 	} else {
-		return user, fmt.Errorf("Missing claim '%s' (displayName)", c.autoProvisionClaims.DisplayName)
+		return user, fmt.Errorf("missing claim '%s' (displayName)", c.autoProvisionClaims.DisplayName)
 	}
 	if username, ok := claims[c.autoProvisionClaims.Username].(string); ok {
 		user.SetOnPremisesSamAccountName(username)
 	} else {
-		return user, fmt.Errorf("Missing claim '%s' (username)", c.autoProvisionClaims.Username)
+		return user, fmt.Errorf("missing claim '%s' (username)", c.autoProvisionClaims.Username)
 	}
 	// Email is optional so we don't need an 'else' here
 	if mail, ok := claims[c.autoProvisionClaims.Email].(string); ok {
@@ -494,7 +499,7 @@ func (c cs3backend) libregraphUserFromClaims(claims map[string]interface{}) (lib
 	return user, nil
 }
 
-func (c cs3backend) cs3UserFromLibregraph(ctx context.Context, lu *libregraph.User) cs3.User {
+func (c cs3backend) cs3UserFromLibregraph(_ context.Context, lu *libregraph.User) cs3.User {
 	cs3id := cs3.UserId{
 		Type: cs3.UserType_USER_TYPE_PRIMARY,
 		Idp:  c.oidcISS,

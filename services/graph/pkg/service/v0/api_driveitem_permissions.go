@@ -171,8 +171,9 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		}
 		permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
 			User: &libregraph.Identity{
-				DisplayName: user.GetDisplayName(),
-				Id:          conversions.ToPointer(user.GetId()),
+				DisplayName:        user.GetDisplayName(),
+				Id:                 conversions.ToPointer(user.GetId()),
+				LibreGraphUserType: conversions.ToPointer(user.GetUserType()),
 			},
 		}
 

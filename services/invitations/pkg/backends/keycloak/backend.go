@@ -68,7 +68,7 @@ func (b Backend) CreateUser(ctx context.Context, invitation *invitations.Invitat
 	user := &libregraph.User{
 		Mail:                     &invitation.InvitedUserEmailAddress,
 		AccountEnabled:           boolP(true),
-		OnPremisesSamAccountName: &invitation.InvitedUserEmailAddress,
+		OnPremisesSamAccountName: invitation.InvitedUserEmailAddress,
 		Id:                       stringP(u.String()),
 		UserType:                 stringP(userType),
 	}

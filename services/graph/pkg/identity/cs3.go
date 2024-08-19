@@ -37,7 +37,7 @@ func (i *CS3) DeleteUser(ctx context.Context, nameOrID string) error {
 }
 
 // UpdateUser implements the Backend Interface. It's currently not supported for the CS3 backend
-func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error) {
+func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.UserUpdate) (*libregraph.User, error) {
 	return nil, errNotImplemented
 }
 

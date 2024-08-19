@@ -394,6 +394,9 @@ var _ = Describe("Schools", func() {
 	Describe("GetEducationSchoolUsers", func() {
 		It("gets the list of members", func() {
 			user := libregraph.NewEducationUser()
+			user.SetOnPremisesSamAccountName("user")
+			user.SetDisplayName("display name")
+			user.SetMail("mail")
 			user.SetId("user")
 			identityEducationBackend.On("GetEducationSchoolUsers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.EducationUser{user}, nil)
 
@@ -520,12 +523,12 @@ var _ = Describe("Schools", func() {
 			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
-			var members []*libregraph.User
-			err = json.Unmarshal(data, &members)
+			var classes []*libregraph.EducationClass
+			err = json.Unmarshal(data, &classes)
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(len(members)).To(Equal(1))
-			Expect(members[0].GetId()).To(Equal("class"))
+			Expect(len(classes)).To(Equal(1))
+			Expect(classes[0].GetId()).To(Equal("class"))
 		})
 	})
 

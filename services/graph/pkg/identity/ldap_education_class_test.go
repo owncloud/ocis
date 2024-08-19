@@ -511,7 +511,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 			args: args{
 				id: "abcd-defg",
 				class: libregraph.EducationClass{
-					Members: []libregraph.User{*libregraph.NewUser()},
+					Members: []libregraph.User{*libregraph.NewUser("display name", "username")},
 				},
 			},
 			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
