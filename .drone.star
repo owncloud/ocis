@@ -170,7 +170,7 @@ config = {
         "part": {
             "skip": False,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
-            "xsuites": ["search", "app-provider"],  # suites to skip
+            "xsuites": ["search", "app-provider", "oidc"],  # suites to skip
         },
         "search": {
             "skip": False,
