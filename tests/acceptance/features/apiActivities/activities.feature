@@ -10,7 +10,7 @@ Feature: check activities
   Scenario: check activities after uploading a file and a folder
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile.txt"
     And user "Alice" has created folder "/FOLDER"
-    When user "Alice" lists the activities for file "textfile.txt" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of file "textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -100,7 +100,7 @@ Feature: check activities
         }
       }
       """
-    When user "Alice" lists the activities for folder "FOLDER" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of folder "FOLDER" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -434,7 +434,7 @@ Feature: check activities
     And user "Alice" has created folder "/New Folder"
     And user "Alice" has moved file "textfile.txt" to "New Folder/textfile.txt"
     And user "Alice" has moved folder "FOLDER" to "New Folder/FOLDER"
-    When user "Alice" lists the activities for file "New Folder/textfile.txt" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of file "New Folder/textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -544,7 +544,7 @@ Feature: check activities
         }
       }
       """
-    When user "Alice" lists the activities for folder "New Folder/FOLDER" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of folder "New Folder/FOLDER" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -661,7 +661,7 @@ Feature: check activities
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has moved file "textfile.txt" to "renamed.txt"
     And user "Alice" has moved folder "/FOLDER" to "RENAMED FOLDER"
-    When user "Alice" lists the activities for file "renamed.txt" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of file "renamed.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -770,7 +770,7 @@ Feature: check activities
         }
       }
       """
-    When user "Alice" lists the activities for folder "RENAMED FOLDER" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of folder "RENAMED FOLDER" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -892,7 +892,7 @@ Feature: check activities
     And user "Alice" has moved folder "/New Folder/Sub Folder/Folder" to "/New Folder/Sub Folder/Renamed Folder"
     And user "Alice" has deleted file "/New Folder/Sub Folder/renamed.txt"
     And user "Alice" has deleted folder "/New Folder/Sub Folder/Renamed Folder"
-    When user "Alice" lists the activities for folder "/New Folder" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of folder "/New Folder" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -1236,7 +1236,7 @@ Feature: check activities
   Scenario: check activity message with different language
     Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
     And user "Alice" has switched the system language to "de" using the Graph API
-    When user "Alice" lists the activities for file "textfile.txt" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of file "textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -1332,7 +1332,7 @@ Feature: check activities
     Given user "Alice" has created folder "/New Folder"
     And user "Alice" has created folder "/New Folder/Sub Folder"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
-    When user "Alice" lists the activities for folder "New Folder" of space "Personal" with depth "-1" using the Graph API
+    When user "Alice" lists the activities of folder "New Folder" from space "Personal" with depth "-1" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -1461,7 +1461,7 @@ Feature: check activities
     Given user "Alice" has created folder "/New Folder"
     And user "Alice" has created folder "/New Folder/Sub Folder"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
-    When user "Alice" lists the activities for folder "New Folder" of space "Personal" with depth "1" using the Graph API
+    When user "Alice" lists the activities of folder "New Folder" from space "Personal" with depth "1" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -1556,7 +1556,7 @@ Feature: check activities
     Given user "Alice" has created folder "/New Folder"
     And user "Alice" has created folder "/New Folder/Sub Folder"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
-    When user "Alice" lists the activities for folder "New Folder" of space "Personal" with limit "2" using the Graph API
+    When user "Alice" lists the activities of folder "New Folder" from space "Personal" with limit "2" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
