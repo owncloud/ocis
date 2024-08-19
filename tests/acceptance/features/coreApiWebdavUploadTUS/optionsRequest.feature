@@ -19,7 +19,7 @@ Feature: OPTIONS request
       | Tus-Resumable          | 1.0.0                                             |
       | Tus-Version            | 1.0.0                                             |
       | Tus-Extension          | creation,creation-with-upload,checksum,expiration |
-      | Tus-Checksum-Algorithm | md5,sha1,adler32                                  |
+      | Tus-Checksum-Algorithm | md5,sha1,crc32                                    |
 
 
   Scenario: send OPTIONS request to webDav endpoints using the TUS protocol without any authentication
@@ -34,24 +34,24 @@ Feature: OPTIONS request
       | Tus-Resumable          | 1.0.0                                             |
       | Tus-Version            | 1.0.0                                             |
       | Tus-Extension          | creation,creation-with-upload,checksum,expiration |
-      | Tus-Checksum-Algorithm | md5,sha1,adler32                                  |
+      | Tus-Checksum-Algorithm | md5,sha1,crc32                                    |
 
-
+  @issue-1012
   Scenario: send OPTIONS request to webDav endpoints using the TUS protocol with valid username and wrong password
     When user "Alice" requests these endpoints with "OPTIONS" including body "doesnotmatter" using password "invalid" about user "Alice"
       | endpoint                          |
       | /remote.php/webdav/               |
       | /remote.php/dav/files/%username%/ |
       | /remote.php/dav/spaces/%spaceid%/ |
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "204"
     And the following headers should be set
       | header                 | value                                             |
       | Tus-Resumable          | 1.0.0                                             |
       | Tus-Version            | 1.0.0                                             |
       | Tus-Extension          | creation,creation-with-upload,checksum,expiration |
-      | Tus-Checksum-Algorithm | md5,sha1,adler32                                  |
+      | Tus-Checksum-Algorithm | md5,sha1,crc32                                    |
 
-
+  @issue-1012
   Scenario: send OPTIONS requests to webDav endpoints using valid password and username of different user
     Given user "Brian" has been created with default attributes and without skeleton files
     When user "Brian" requests these endpoints with "OPTIONS" including body "doesnotmatter" using the password of user "Alice"
@@ -59,10 +59,10 @@ Feature: OPTIONS request
       | /remote.php/webdav/               |
       | /remote.php/dav/files/%username%/ |
       | /remote.php/dav/spaces/%spaceid%/ |
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "204"
     And the following headers should be set
       | header                 | value                                             |
       | Tus-Resumable          | 1.0.0                                             |
       | Tus-Version            | 1.0.0                                             |
       | Tus-Extension          | creation,creation-with-upload,checksum,expiration |
-      | Tus-Checksum-Algorithm | md5,sha1,adler32                                  |
+      | Tus-Checksum-Algorithm | md5,sha1,crc32                                    |

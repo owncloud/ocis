@@ -218,7 +218,7 @@ Feature: upload resources on share using TUS protocol
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
       | Tus-Resumable   | 1.0.0                                 |
-    And user "Alice" has uploaded file with checksum "SHA1 8cb2237d069ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12345" via TUS inside of the space "Personal" using the WebDAV API
+    And user "Alice" has uploaded file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12345" via TUS inside of the space "Personal" using the WebDAV API
     When user "Brian" downloads the file "/FOLDER/textFile.txt" of the space "Shares" using the WebDAV API
     Then the header checksum should match "SHA1:8cb2237d0679ca88db6464eac60da96345513964"
 
@@ -270,14 +270,14 @@ Feature: upload resources on share using TUS protocol
       | permissionsRole | Editor   |
     And user "Brian" has a share "FOLDER" synced
     When user "Brian" creates a new TUS resource for the space "Shares" with content "" using the WebDAV API with these headers:
-      | Upload-Length   | 16                                    |
+      | Upload-Length   | 5                                     |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
       | Tus-Resumable   | 1.0.0                                 |
-    And user "Brian" uploads file with checksum "MD5 827ccb0eea8a706c4c34a16891f84e7b" to the last created TUS Location with offset "0" and content "uploaded content" via TUS inside of the space "Shares" using the WebDAV API
+    And user "Brian" uploads file with checksum "MD5 827ccb0eea8a706c4c34a16891f84e7b" to the last created TUS Location with offset "0" and content "12345" via TUS inside of the space "Shares" using the WebDAV API
     Then for user "Alice" folder "FOLDER" of the space "Personal" should contain these entries:
       | textFile.txt |
-    And for user "Alice" the content of the file "FOLDER/textFile.txt" of the space "Personal" should be "uploaded content"
+    And for user "Alice" the content of the file "FOLDER/textFile.txt" of the space "Personal" should be "12345"
 
   @issue-1755
   Scenario: sharee uploads a file to a received share folder with wrong checksum should not work
@@ -290,11 +290,11 @@ Feature: upload resources on share using TUS protocol
       | permissionsRole | Editor   |
     And user "Brian" has a share "FOLDER" synced
     When user "Brian" creates a new TUS resource for the space "Shares" with content "" using the WebDAV API with these headers:
-      | Upload-Length   | 16                                    |
+      | Upload-Length   | 5                                     |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
       | Tus-Resumable   | 1.0.0                                 |
-    And user "Brian" uploads file with checksum "MD5 827ccb0eea8a706c4c34a16891f84e8c" to the last created TUS Location with offset "0" and content "uploaded content" via TUS inside of the space "Shares" using the WebDAV API
+    And user "Brian" uploads file with checksum "MD5 827ccb0eea8a706c4c34a16891f84e7b" to the last created TUS Location with offset "0" and content "12346" via TUS inside of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "460"
     And for user "Alice" folder "FOLDER" of the space "Personal" should not contain these entries:
       | textFile.txt |
@@ -314,7 +314,7 @@ Feature: upload resources on share using TUS protocol
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
       | Tus-Resumable   | 1.0.0                                 |
-    When user "Alice" uploads file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513954" to the last created TUS Location with offset "0" and content "uploaded content" via TUS inside of the space "Personal" using the WebDAV API
+    When user "Alice" uploads file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12346" via TUS inside of the space "Personal" using the WebDAV API
     Then the HTTP status code should be "460"
     And for user "Alice" folder "FOLDER" of the space "Personal" should not contain these entries:
       | textFile.txt |
