@@ -43,9 +43,10 @@ services:
       # enable to allow using the banned passwords list
       #OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: banned-password-list.txt
     volumes:
+      # configure the .env file to use own paths instead of docker internal volumes
+      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
+      - ${OCIS_DATA_DIR:-ocis-data}:/var/lib/ocis
       # paths are relative to the main compose file
-      - ocis-config:/etc/ocis
-      - ocis-data:/var/lib/ocis
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
       - ./config/ocis/web.yaml:/etc/ocis/web.yaml
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
