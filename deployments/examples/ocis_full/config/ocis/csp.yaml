@@ -5,6 +5,7 @@ directives:
     - '''self'''
     - 'https://${COMPANION_DOMAIN|companion.owncloud.test}/'
     - 'wss://${COMPANION_DOMAIN|companion.owncloud.test}/'
+    - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
   default-src:
     - '''none'''
   font-src:
@@ -22,6 +23,7 @@ directives:
     - '''self'''
     - 'data:'
     - 'blob:'
+    - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${ONLYOFFICE_DOMAIN|onlyoffice.owncloud.test}/'
     - 'https://${COLLABORA_DOMAIN|collabora.owncloud.test}/'
