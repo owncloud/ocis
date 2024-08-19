@@ -10,14 +10,7 @@
 | Description
     
     
-
-a| `DAYS` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
+    
     
     
 
@@ -71,14 +64,7 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++Optional when using nats to authenticate with the nats cluster. ++
-
-a| `MONTH` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
+    
 
 a| `OCIS_BASE_DATA_PATH` +
 a| [subs=-attributes]
@@ -96,13 +82,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++The default directory location for config files. See the General Info section in the documentation for more details on defaults. ++
     
-
-a| `YEAR` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
+    
     
 |===

@@ -22,7 +22,7 @@ variables:
   type: ""
   default_value: ""
   description: ""
-  do_ignore: false
+  do_ignore: true
 - rawname: _registryRegisterIntervalEnv
   path: ocis-pkg/registry/expiry.go:19
   foundincode: true
@@ -125,7 +125,7 @@ variables:
   type: ""
   default_value: ""
   description: ""
-  do_ignore: false
+  do_ignore: true
 - rawname: OCIS_BASE_DATA_PATH
   path: ocis-pkg/config/defaults/paths.go:23
   foundincode: true
@@ -161,7 +161,7 @@ variables:
   type: ""
   default_value: ""
   description: ""
-  do_ignore: false
+  do_ignore: true
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:382
   foundincode: true
