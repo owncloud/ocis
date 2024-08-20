@@ -2326,6 +2326,7 @@ class GraphHelper {
 	 * @param string $user
 	 * @param string $password
 	 * @param string $resourceId
+	 * @param string $depth
 	 *
 	 * @return ResponseInterface
 	 */
@@ -2334,11 +2335,16 @@ class GraphHelper {
 		string $requestId,
 		string $user,
 		string $password,
-		string $resourceId
+		string $resourceId,
+		?string $depth = null
 	): ResponseInterface {
 		// 'kql=itemId' filter is required for the current implementation but it might change in future
 		// See: https://github.com/owncloud/ocis/issues/9194
-		$fullUrl = self::getBetaFullUrl($baseUrl, "extensions/org.libregraph/activities?kql=itemid%3A$resourceId");
+		if ($depth !== null) {
+			$fullUrl = self::getBetaFullUrl($baseUrl, "extensions/org.libregraph/activities?kql=itemid%3A$resourceId+AND+depth%3A$depth");
+		} else {
+			$fullUrl = self::getBetaFullUrl($baseUrl, "extensions/org.libregraph/activities?kql=itemid%3A$resourceId");
+		}
 		return HttpRequestHelper::get(
 			$fullUrl,
 			$requestId,

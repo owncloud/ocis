@@ -2840,6 +2840,29 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" lists the activities for (?:folder|file) "([^"]*)" of space "([^"]*)" with depth "([^"]*)" using the Graph API/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $spaceName
+	 * @param string $folderDepth
+	 *
+	 * @return void
+	 */
+	public function userListsTheActivitiesForFolderOfSpaceWithDepthUsingTheGraphApi(string $user, string $resource, string $spaceName, string $folderDepth): void {
+		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
+		$response = GraphHelper::getActivities(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$resourceId,
+			$folderDepth
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When the administrator gets federated users using the Graph API
 	 * @When user :user tries to get federated users using the Graph API
 	 *
