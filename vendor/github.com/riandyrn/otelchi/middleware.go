@@ -46,7 +46,7 @@ func Middleware(serverName string, opts ...Option) func(next http.Handler) http.
 			handler:                handler,
 			chiRoutes:              cfg.ChiRoutes,
 			reqMethodInSpanName:    cfg.RequestMethodInSpanName,
-			filter:                 cfg.Filter,
+			filters:                cfg.Filters,
 			traceResponseHeaderKey: cfg.TraceResponseHeaderKey,
 			publicEndpointFn:       cfg.PublicEndpointFn,
 		}
@@ -60,7 +60,7 @@ type traceware struct {
 	handler                http.Handler
 	chiRoutes              chi.Routes
 	reqMethodInSpanName    bool
-	filter                 func(r *http.Request) bool
+	filters                []Filter
 	traceResponseHeaderKey string
 	publicEndpointFn       func(r *http.Request) bool
 }
@@ -111,10 +111,14 @@ func putRRW(rrw *recordingResponseWriter) {
 // ServeHTTP implements the http.Handler interface. It does the actual
 // tracing of the request.
 func (tw traceware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// skip if filter returns false
-	if tw.filter != nil && !tw.filter(r) {
-		tw.handler.ServeHTTP(w, r)
-		return
+	// go through all filters if any
+	for _, filter := range tw.filters {
+		// if there is a filter that returns false, we skip tracing
+		// and execute next handler
+		if !filter(r) {
+			tw.handler.ServeHTTP(w, r)
+			return
+		}
 	}
 
 	// extract tracing header using propagator
