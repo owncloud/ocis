@@ -14,9 +14,10 @@ RESET := $(shell tput -Txterm sgr0)
 
 # add a service here when it uses transifex
 L10N_MODULES := \
+	services/activitylog \
+	services/graph \
 	services/notifications \
-	services/userlog \
-	services/graph
+	services/userlog
 
 # if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
