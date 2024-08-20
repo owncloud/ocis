@@ -8,6 +8,19 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.9.0] - 2024-07-06
+
+### Changed
+
+- `WithFilter` option now support multiple filter functions, just like in [otelmux](https://github.com/open-telemetry/opentelemetry-go-contrib/blob/v1.24.0/instrumentation/github.com/gorilla/mux/otelmux/config.go#L106-L110). ([#47])
+- Upgrade `go.opentelemetry.io/otel`, `go.opentelemetry.io/otel/sdk`, & `go.opentelemetry.io/otel/trace` to `v1.28.0`. ([#49])
+- Upgrade `github.com/go-chi/chi/v5` to `v5.1.0`. ([#49])
+- Set the go versions for testing in both `Makefile` & `compatibility-test.yml` to `1.21` & `1.22`. ([#49])
+
+### Removed
+
+- Drop support for Go `<1.21`. ([#49])
+
 ## [0.8.0] - 2024-04-29
 
 ### ⚠️ Notice ⚠️
@@ -161,6 +174,8 @@ It contains instrumentation for trace and depends on:
 - Example code for a basic usage.
 - Apache-2.0 license.
 
+[#49]: https://github.com/riandyrn/otelchi/pull/49
+[#47]: https://github.com/riandyrn/otelchi/pull/47
 [#43]: https://github.com/riandyrn/otelchi/pull/43
 [#42]: https://github.com/riandyrn/otelchi/pull/42
 [#41]: https://github.com/riandyrn/otelchi/pull/41
@@ -181,7 +196,8 @@ It contains instrumentation for trace and depends on:
 [#2]: https://github.com/riandyrn/otelchi/pull/2
 [#1]: https://github.com/riandyrn/otelchi/pull/1
 
-[Unreleased]: https://github.com/riandyrn/otelchi/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/riandyrn/otelchi/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.9.0
 [0.8.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.8.0
 [0.7.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.7.0
 [0.6.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.6.0
