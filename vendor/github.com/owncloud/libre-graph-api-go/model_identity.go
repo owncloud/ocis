@@ -25,7 +25,7 @@ type Identity struct {
 	DisplayName string `json:"displayName"`
 	// Unique identifier for the identity.
 	Id *string `json:"id,omitempty"`
-	// The type of the identity. This can be either \"Member\" for regular user, \"Guest\" for guest users or \"Federated\" for users imported from a federated instance. Can be used by clients to indicate the type of user. For more details, clients should look up and cache the user at the /users enpoint.
+	// The type of the identity. This can be either \"Member\" for regular user, \"Guest\" for guest users or \"Federated\" for users imported from a federated instance. Can be used by clients to indicate the type of user. For more details, clients should look up and cache the user at the /users endpoint.
 	LibreGraphUserType *string `json:"@libre.graph.userType,omitempty"`
 }
 
