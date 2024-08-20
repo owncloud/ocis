@@ -133,5 +133,5 @@ As ownCloud understands that the effort taken to report a problem is significant
 Please consider the [Contribution guidelines](https://github.com/owncloud/ocis/blob/master/CONTRIBUTING.md) for this.
 
 ## Versioning Scheme
-{{< figure src="../static/semver-schema.png" width="70%" alt="Schema of Semantic Versioning" >}}
+{{< figure src="../static/storage/semver-schema.png" width="70%" alt="Schema of Semantic Versioning" >}}
 We adhere to **Semantic Versioning** (SemVer) to ensure clarity and predictability in each of our releases. Learn how Semantic Versioning works on [https://semver.org/](https://semver.org/ ).
