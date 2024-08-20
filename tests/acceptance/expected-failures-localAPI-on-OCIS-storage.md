@@ -13,11 +13,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiArchiver/downloadByPath.feature:171](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadByPath.feature#L171)
 - [apiArchiver/downloadByPath.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadByPath.feature#L172)
 
-#### [Downloaded /Shares tar contains resource (files|folder) with leading / in Response](https://github.com/owncloud/ocis/issues/4636)
-
-- [apiArchiver/downloadById.feature:173](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L173)
-- [apiArchiver/downloadById.feature:174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L174)
-
 #### [Shared mount folder gets deleted when overwritten by a file from personal space](https://github.com/owncloud/ocis/issues/7208)
 
 - [apiSpacesShares/copySpaces.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L696)
