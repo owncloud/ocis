@@ -282,8 +282,34 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 	reqRole, reqPermissions := r.FormValue("role"), r.FormValue("permissions")
 	switch shareType {
 	case int(conversions.ShareTypeUser), int(conversions.ShareTypeGroup):
-		// user collaborations default to Manager (=all permissions)
-		role, val, ocsErr := h.extractPermissions(reqRole, reqPermissions, statRes.Info, conversions.NewManagerRole())
+		// NOTE: clients tend to send "31" as permissions but they mean "15".
+		// This is because it adds the "16" for sharing , but that is now no longer allowed.
+		// We could now have some fancy mechanism that casts the string to an int, subtracts 16 and casts it back to a string.
+		// Or we could change the role later and hope everything works out.
+		// Or:
+		if reqRole == "" {
+			switch reqPermissions {
+			case "31":
+				reqPermissions = "15"
+			case "29":
+				reqPermissions = "13"
+			case "27":
+				reqPermissions = "11"
+			case "23":
+				reqPermissions = "7"
+			case "22":
+				reqPermissions = "6"
+			case "21":
+				reqPermissions = "5"
+			case "19":
+				reqPermissions = "3"
+			case "17":
+				reqPermissions = "1"
+			}
+		}
+
+		// user collaborations default to Viewer. Sane Default.
+		role, val, ocsErr := h.extractPermissions(reqRole, reqPermissions, statRes.Info, conversions.NewViewerRole())
 		if ocsErr != nil {
 			response.WriteOCSError(w, r, ocsErr.Code, ocsErr.Message, ocsErr.Error)
 			return
