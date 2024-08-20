@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Use less selectors that watch the registry: [#9741](https://github.com/owncloud/ocis/pull/9741)
 * Bugfix - We fixed the client config generation for the built in IDP: [#9770](https://github.com/owncloud/ocis/pull/9770)
 * Bugfix - Change ocmproviders config defaultpath: [#9778](https://github.com/owncloud/ocis/pull/9778)
+* Bugfix - Set capability response `disable_self_password_change` correctly: [#9853](https://github.com/owncloud/ocis/pull/9853)
 * Bugfix - Web theme color contrasts: [#10726](https://github.com/owncloud/web/issues/10726)
 * Enhancement - New WOPI operations added to the collaboration service: [#9505](https://github.com/owncloud/ocis/pull/9505)
 * Enhancement - Allow configuring grpc max connection age: [#9657](https://github.com/owncloud/ocis/pull/9657)
@@ -122,6 +123,14 @@ The following sections list the changes for unreleased.
    data directory of the ocm service to the ocis config directory.
 
    https://github.com/owncloud/ocis/pull/9778
+
+* Bugfix - Set capability response `disable_self_password_change` correctly: [#9853](https://github.com/owncloud/ocis/pull/9853)
+
+   The capability value `disable_self_password_change` was not being set correctly
+   when `user.passwordProfile` is configured as a read-only attribute.
+
+   https://github.com/owncloud/enterprise/issues/6849
+   https://github.com/owncloud/ocis/pull/9853
 
 * Bugfix - Web theme color contrasts: [#10726](https://github.com/owncloud/web/issues/10726)
 
