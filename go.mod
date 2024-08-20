@@ -3,7 +3,7 @@ module github.com/owncloud/ocis/v2
 go 1.22.0
 
 require (
-	dario.cat/mergo v1.0.0
+	dario.cat/mergo v1.0.1
 	github.com/CiscoM31/godata v1.0.10
 	github.com/KimMachineGun/automemlimit v0.6.1
 	github.com/Masterminds/semver v1.5.0
