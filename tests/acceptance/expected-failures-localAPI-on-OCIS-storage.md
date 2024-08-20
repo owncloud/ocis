@@ -13,11 +13,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiArchiver/downloadByPath.feature:171](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadByPath.feature#L171)
 - [apiArchiver/downloadByPath.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadByPath.feature#L172)
 
-#### [Shared mount folder gets deleted when overwritten by a file from personal space](https://github.com/owncloud/ocis/issues/7208)
-
-- [apiSpacesShares/copySpaces.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L696)
-- [apiSpacesShares/copySpaces.feature:715](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L715)
-
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 
 - [apiSpacesShares/shareUploadTUS.feature:283](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L283)

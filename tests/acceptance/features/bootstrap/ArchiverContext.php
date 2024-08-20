@@ -86,12 +86,13 @@ class ArchiverContext implements Context {
 	 * @return void
 	 */
 	public function removeDir(string $dir): void {
-		$items = \glob("$dir/*");
+		$items = array_diff(scandir($dir), ['.', '..']);
 		foreach ($items as $item) {
-			if (\is_dir($item)) {
-				$this->removeDir($item);
+			$itemPath = $dir . DIRECTORY_SEPARATOR . $item;
+			if (\is_dir($itemPath)) {
+				$this->removeDir($itemPath);
 			} else {
-				\unlink($item);
+				\unlink($itemPath);
 			}
 		}
 		\rmdir($dir);
