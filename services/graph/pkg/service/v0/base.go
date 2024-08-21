@@ -208,6 +208,12 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			}
 		}
 
+		// if there is no role, we need to set the actions as a fallback
+		// this could happen if a role is disabled or unknown
+		if !p.HasRoles() {
+			p.SetLibreGraphPermissionsActions(unifiedrole.CS3ResourcePermissionsToLibregraphActions(perm))
+		}
+
 		permissions = append(permissions, p)
 	}
 	return permissions
@@ -398,7 +404,6 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 	if share.GetCtime() != nil {
 		perm.SetCreatedDateTime(cs3TimestampToTime(share.GetCtime()))
 	}
-	// fixMe: should we use all roles?
 	role := unifiedrole.CS3ResourcePermissionsToRole(
 		unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...)),
 		share.GetPermissions().GetPermissions(),
