@@ -4131,4 +4131,26 @@ class SpacesContext implements Context {
 			)
 		);
 	}
+
+    /**
+     * @When user :user opens file :filename with Collabora service
+     *
+     * @param string $user
+     * @param string $filename
+     *
+     * @return void
+     */
+    public function userOpensFileWithCollaboraService(string $user, string $filename): void
+    {
+        $fileId = $this->getFileId($user, "Personal", $filename);
+        $url = $this->featureContext->getBaseUrl() . "/app/open?file_id=$fileId&app_name=Collabora";
+        $this->featureContext->setResponse(
+            HttpRequestHelper::post(
+                $url,
+                $this->featureContext->getStepLineRef(),
+                $user,
+                $this->featureContext->getPasswordForUser($user)
+            )
+        );
+    }
 }
