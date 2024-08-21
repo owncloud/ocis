@@ -55,6 +55,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Set capability response `disable_self_password_change` correctly: [#9853](https://github.com/owncloud/ocis/pull/9853)
 * Bugfix - Activity Translations: [#9856](https://github.com/owncloud/ocis/pull/9856)
+* Bugfix - The user attributes `userType` and `memberOf` are readonly: [#9867](https://github.com/owncloud/ocis/pull/9867)
 
 ## Details
 
@@ -71,6 +72,14 @@ The following sections list the changes for unreleased.
    Translations for activities did not show up in transifex
 
    https://github.com/owncloud/ocis/pull/9856
+
+* Bugfix - The user attributes `userType` and `memberOf` are readonly: [#9867](https://github.com/owncloud/ocis/pull/9867)
+
+   The graph API now treats the user attributes `userType` and `memberOf` as
+   read-only. They are not meant be updated directly by the client.
+
+   https://github.com/owncloud/ocis/issues/9858
+   https://github.com/owncloud/ocis/pull/9867
 
 # Changelog for [6.3.0] (2024-08-20)
 
