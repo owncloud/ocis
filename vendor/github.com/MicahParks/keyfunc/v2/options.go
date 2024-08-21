@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // ErrInvalidHTTPStatusCode indicates that the HTTP status code is invalid.
@@ -17,7 +17,7 @@ var ErrInvalidHTTPStatusCode = errors.New("invalid HTTP status code")
 
 // Options represents the configuration options for a JWKS.
 //
-// If RefreshInterval and or RefreshUnknownKID is not nil, then a background goroutine will be launched to refresh the
+// If either RefreshInterval is non-zero or RefreshUnknownKID is true, then a background goroutine will be launched to refresh the
 // remote JWKS under the specified circumstances.
 //
 // When using a background refresh goroutine, make sure to use RefreshRateLimit if paired with RefreshUnknownKID. Also
@@ -54,7 +54,7 @@ type Options struct {
 	// if a background refresh goroutine is active.
 	RefreshErrorHandler ErrorHandler
 
-	// RefreshInterval is the duration to refresh the JWKS in the background via a new HTTP request. If this is not nil,
+	// RefreshInterval is the duration to refresh the JWKS in the background via a new HTTP request. If this is not zero,
 	// then a background goroutine will be used to refresh the JWKS once per the given interval. Make sure to call the
 	// JWKS.EndBackground method to end this goroutine when it's no longer needed.
 	RefreshInterval time.Duration
@@ -84,6 +84,14 @@ type Options struct {
 	// ResponseExtractor consumes a *http.Response and produces the raw JSON for the JWKS. By default, the
 	// ResponseExtractorStatusOK function is used. The default behavior changed in v1.4.0.
 	ResponseExtractor func(ctx context.Context, resp *http.Response) (json.RawMessage, error)
+
+	// TolerateInitialJWKHTTPError will tolerate any error from the initial HTTP JWKS request. If an error occurs,
+	// the RefreshErrorHandler will be given the error. The program will continue to run as if the error did not occur
+	// and a valid JWK Set with no keys was received in the response. This allows for the background goroutine to
+	// request the JWKS at a later time.
+	//
+	// It does not make sense to mark this field as true unless the background refresh goroutine is active.
+	TolerateInitialJWKHTTPError bool
 }
 
 // MultipleOptions is used to configure the behavior when multiple JWKS are used by MultipleJWKS.

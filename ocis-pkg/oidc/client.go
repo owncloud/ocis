@@ -15,10 +15,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/MicahParks/keyfunc"
+	"github.com/MicahParks/keyfunc/v2"
 	goidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/go-jose/go-jose/v3"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"golang.org/x/oauth2"
@@ -296,7 +296,14 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.M
 		return claims, mapClaims, errors.New("error initializing jwks keyfunc")
 	}
 
-	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc)
+	issuer := c.issuer
+	if c.provider.AccessTokenIssuer != "" {
+		// AD FS .well-known/openid-configuration has an optional `access_token_issuer` which takes precedence over `issuer`
+		// See https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-oidce/586de7dd-3385-47c7-93a2-935d9e90441c
+		issuer = c.provider.AccessTokenIssuer
+	}
+
+	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc, jwt.WithIssuer(issuer))
 	if err != nil {
 		return claims, mapClaims, err
 	}
@@ -306,20 +313,6 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.M
 	if err != nil {
 		c.Logger.Info().Err(err).Msg("Failed to parse/verify the access token.")
 		return claims, mapClaims, err
-	}
-
-	issuer := c.issuer
-	if c.provider.AccessTokenIssuer != "" {
-		// AD FS .well-known/openid-configuration has an optional `access_token_issuer` which takes precedence over `issuer`
-		// See https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-oidce/586de7dd-3385-47c7-93a2-935d9e90441c
-		issuer = c.provider.AccessTokenIssuer
-	}
-
-	if !claims.VerifyIssuer(issuer, true) {
-		vErr := jwt.ValidationError{}
-		vErr.Inner = jwt.ErrTokenInvalidIssuer
-		vErr.Errors |= jwt.ValidationErrorIssuer
-		return claims, mapClaims, vErr
 	}
 
 	return claims, mapClaims, nil
