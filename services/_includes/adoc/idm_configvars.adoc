@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-21-10-39-15]
+[#deprecation-note-2024-08-21-10-40-08]
 [caption=]
 .Deprecation notes for the idm service
 [width="100%",cols="~,~,~,~",options="header"]
