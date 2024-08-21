@@ -3,7 +3,6 @@ package connector
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
@@ -20,11 +19,11 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/rs/zerolog"
 )
@@ -1172,10 +1171,7 @@ func (f *FileConnector) generateWOPISrc(ctx context.Context, wopiContext middlew
 	}
 
 	// get the reference
-	resourceId := wopiContext.FileReference.GetResourceId()
-	c := sha256.New()
-	c.Write([]byte(storagespace.FormatResourceID(resourceId)))
-	fileRef := hex.EncodeToString(c.Sum(nil))
+	fileRef := helpers.HashResourceId(wopiContext.FileReference.GetResourceId())
 
 	// generate the URL for the WOPI app to access the new created file
 	wopiSrcURL, err := url.Parse(f.cfg.Wopi.WopiSrc)

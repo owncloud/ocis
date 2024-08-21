@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"net/url"
 	"path"
@@ -19,6 +17,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 )
 
@@ -83,10 +82,7 @@ func (s *Service) OpenInApp(
 
 	// build a urlsafe and stable file reference that can be used for proxy routing,
 	// so that all sessions on one file end on the same office server
-
-	c := sha256.New()
-	c.Write([]byte(req.GetResourceInfo().GetId().GetStorageId() + "$" + req.GetResourceInfo().GetId().GetSpaceId() + "!" + req.GetResourceInfo().GetId().GetOpaqueId()))
-	fileRef := hex.EncodeToString(c.Sum(nil))
+	fileRef := helpers.HashResourceId(req.GetResourceInfo().GetId())
 
 	// get the file extension to use the right wopi app url
 	fileExt := path.Ext(req.GetResourceInfo().GetPath())

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -12,6 +13,7 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/metadata"
 )
@@ -45,6 +47,8 @@ type WopiContext struct {
 // * A contextual zerologger containing information about the request
 // and the WopiContext
 func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handler {
+	// compile a regexp here to extract the fileid from the URL
+	fileIDregexp := regexp.MustCompile(`^/wopi/files/([0-9a-f]{64})(/.*)?$`)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessToken := r.URL.Query().Get("access_token")
 		if accessToken == "" {
@@ -89,7 +93,7 @@ func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handl
 		// we might need to check https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/common-headers
 		// although some headers might not be sent depending on the client.
 		logger := zerolog.Ctx(ctx)
-		ctx = logger.With().
+		wopiLogger := logger.With().
 			Str("WopiSessionId", r.Header.Get("X-WOPI-SessionId")).
 			Str("WopiOverride", r.Header.Get("X-WOPI-Override")).
 			Str("WopiProof", r.Header.Get("X-WOPI-Proof")).
@@ -98,7 +102,16 @@ func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handl
 			Str("FileReference", claims.WopiContext.FileReference.String()).
 			Str("ViewMode", claims.WopiContext.ViewMode.String()).
 			Str("Requester", claims.WopiContext.User.GetId().String()).
-			Logger().WithContext(ctx)
+			Logger()
+		ctx = wopiLogger.WithContext(ctx)
+
+		hashedRef := helpers.HashResourceId(claims.WopiContext.FileReference.GetResourceId())
+		matches := fileIDregexp.FindStringSubmatch(r.URL.Path)
+		if len(matches) < 2 || matches[1] != hashedRef {
+			wopiLogger.Error().Msg("file reference in the URL doesn't match the one inside the access token")
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
