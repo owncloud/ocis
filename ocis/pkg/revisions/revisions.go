@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/shamaton/msgpack/v2"
@@ -25,16 +26,12 @@ type DelBlobstore interface {
 	Delete(node *node.Node) error
 }
 
-// PurgeRevisionsGlob removes all revisions from a storage provider using globbing.
-func PurgeRevisionsGlob(pattern string, bs DelBlobstore, dryRun bool, verbose bool) (int, int, int) {
-	if verbose {
-		fmt.Println("Looking for nodes in", pattern)
-	}
-
+// Glob uses globbing to find all revision nodes in a storage provider.
+func Glob(pattern string) <-chan string {
 	ch := make(chan string)
 	go func() {
 		defer close(ch)
-		nodes, err := filepath.Glob(pattern)
+		nodes, err := filepath.Glob(filepath.Join(pattern))
 		if err != nil {
 			fmt.Println("error globbing", pattern, err)
 			return
@@ -52,11 +49,51 @@ func PurgeRevisionsGlob(pattern string, bs DelBlobstore, dryRun bool, verbose bo
 		}
 	}()
 
-	return purgeRevisions(ch, bs, dryRun, verbose)
+	return ch
 }
 
-// PurgeRevisionsWalk removes all revisions from a storage provider using walking.
-func PurgeRevisionsWalk(base string, bs DelBlobstore, dryRun bool, verbose bool) (int, int, int) {
+// GlobWorkers uses multiple go routine to glob all revision nodes in a storage provider.
+func GlobWorkers(pattern string, depth string, remainder string) <-chan string {
+	wg := sync.WaitGroup{}
+	ch := make(chan string)
+	go func() {
+		defer close(ch)
+		nodes, err := filepath.Glob(pattern + depth)
+		if err != nil {
+			fmt.Println("error globbing", pattern, err)
+			return
+		}
+
+		if len(nodes) == 0 {
+			fmt.Println("no nodes found. Double check storage path")
+			return
+		}
+
+		for _, node := range nodes {
+			wg.Add(1)
+			go func(node string) {
+				defer wg.Done()
+				nodes, err := filepath.Glob(node + remainder)
+				if err != nil {
+					fmt.Println("error globbing", node, err)
+					return
+				}
+				for _, n := range nodes {
+					if _versionRegex.MatchString(n) {
+						ch <- n
+					}
+				}
+			}(node)
+		}
+
+		wg.Wait()
+	}()
+
+	return ch
+}
+
+// Walk walks the storage provider to find all revision nodes.
+func Walk(base string) <-chan string {
 	ch := make(chan string)
 	go func() {
 		defer close(ch)
@@ -79,58 +116,25 @@ func PurgeRevisionsWalk(base string, bs DelBlobstore, dryRun bool, verbose bool)
 		}
 
 	}()
-	return purgeRevisions(ch, bs, dryRun, verbose)
+	return ch
 }
 
-// PurgeRevisionsList removes all revisions from a storage provider using listing.
-func PurgeRevisionsList(base string, bs DelBlobstore, dryRun bool, verbose bool) (int, int, int) {
+// List uses directory listing to find all revision nodes in a storage provider.
+func List(base string, workers int) <-chan string {
 	ch := make(chan string)
 	go func() {
 		defer close(ch)
-		if err := listFolder(base, ch); err != nil {
+		if err := listFolder(base, ch, make(chan struct{}, workers)); err != nil {
 			fmt.Println("error listing", base, err)
 			return
 		}
 	}()
 
-	return purgeRevisions(ch, bs, dryRun, verbose)
+	return ch
 }
 
-func listFolder(path string, ch chan<- string) error {
-	children, err := os.ReadDir(path)
-	if err != nil {
-		return err
-	}
-
-	for _, child := range children {
-		if child.IsDir() {
-			if err := listFolder(filepath.Join(path, child.Name()), ch); err != nil {
-				return err
-			}
-		}
-
-		if _versionRegex.MatchString(child.Name()) {
-			ch <- filepath.Join(path, child.Name())
-		}
-
-	}
-	return nil
-}
-
-// PrintResults prints the results
-func PrintResults(countFiles, countBlobs, countRevisions int, dryRun bool) error {
-	switch {
-	case countFiles == 0 && countRevisions == 0 && countBlobs == 0:
-		fmt.Println("❎ No revisions found. Storage provider is clean.")
-	case !dryRun:
-		fmt.Printf("✅ Deleted %d revisions (%d files / %d blobs)\n", countRevisions, countFiles, countBlobs)
-	default:
-		fmt.Printf("👉 Would delete %d revisions (%d files / %d blobs)\n", countRevisions, countFiles, countBlobs)
-	}
-	return nil
-}
-
-func purgeRevisions(nodes <-chan string, bs DelBlobstore, dryRun, verbose bool) (int, int, int) {
+// PurgeRevisions removes all revisions from a storage provider.
+func PurgeRevisions(nodes <-chan string, bs DelBlobstore, dryRun, verbose bool) (int, int, int) {
 	countFiles := 0
 	countBlobs := 0
 	countRevisions := 0
@@ -199,6 +203,37 @@ func purgeRevisions(nodes <-chan string, bs DelBlobstore, dryRun, verbose bool) 
 	}
 
 	return countFiles, countBlobs, countRevisions
+}
+
+func listFolder(path string, ch chan<- string, workers chan struct{}) error {
+	workers <- struct{}{}
+	wg := sync.WaitGroup{}
+
+	children, err := os.ReadDir(path)
+	if err != nil {
+		<-workers
+		return err
+	}
+
+	for _, child := range children {
+		if child.IsDir() {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				if err := listFolder(filepath.Join(path, child.Name()), ch, workers); err != nil {
+					fmt.Println("error listing", path, err)
+				}
+			}()
+		}
+
+		if _versionRegex.MatchString(child.Name()) {
+			ch <- filepath.Join(path, child.Name())
+		}
+
+	}
+	<-workers
+	wg.Wait()
+	return nil
 }
 
 func getBlobID(path string) (string, error) {
