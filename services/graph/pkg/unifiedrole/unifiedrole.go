@@ -8,8 +8,9 @@ import (
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 
 	"github.com/cs3org/reva/v2/pkg/conversions"
 )

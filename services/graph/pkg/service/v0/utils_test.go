@@ -111,7 +111,7 @@ var _ = Describe("Utils", func() {
 	)
 
 	DescribeTable("_cs3ReceivedShareToLibreGraphPermissions",
-		func(permissionSet *provider.ResourcePermissions, matcher func(*libregraph.Permission)) {
+		func(permissionSet *provider.ResourcePermissions, match func(*libregraph.Permission)) {
 			permission, err := service.CS3ReceivedShareToLibreGraphPermissions(context.Background(), nil, identity.IdentityCache{}, &collaboration.ReceivedShare{
 				Share: &collaboration.Share{
 					Permissions: &collaboration.SharePermissions{
@@ -122,14 +122,14 @@ var _ = Describe("Utils", func() {
 				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
 			})
 			Expect(err).ToNot(HaveOccurred())
-			matcher(permission)
+			match(permission)
 		},
 		Entry(
 			"permissions match a role",
 			rConversions.NewViewerRole().CS3ResourcePermissions(),
 			func(p *libregraph.Permission) {
 				Expect(p.GetRoles()).To(HaveExactElements([]string{unifiedrole.UnifiedRoleViewerID}))
-				Expect(p.GetLibreGraphPermissionsActions()).To(HaveExactElements(unifiedrole.CS3ResourcePermissionsToLibregraphActions(rConversions.NewViewerRole().CS3ResourcePermissions())))
+				Expect(p.GetLibreGraphPermissionsActions()).To(BeNil())
 			},
 		),
 		Entry(
