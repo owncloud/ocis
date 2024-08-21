@@ -2840,16 +2840,17 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" lists the activities for (?:folder|file) "([^"]*)" of space "([^"]*)" with depth "([^"]*)" using the Graph API/
+	 * @When /^user "([^"]*)" lists the activities for (?:folder|file) "([^"]*)" of space "([^"]*)" with (depth|limit) "([^"]*)" using the Graph API/
 	 *
 	 * @param string $user
 	 * @param string $resource
 	 * @param string $spaceName
-	 * @param string $folderDepth
+	 * @param string $filterType
+	 * @param string $filterValue
 	 *
 	 * @return void
 	 */
-	public function userListsTheActivitiesForFolderOfSpaceWithDepthUsingTheGraphApi(string $user, string $resource, string $spaceName, string $folderDepth): void {
+	public function userListsTheActivitiesForFolderOfSpaceWithDepthOrLimitUsingTheGraphApi(string $user, string $resource, string $spaceName, string $filterType, string $filterValue): void {
 		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
@@ -2857,7 +2858,7 @@ class GraphContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId,
-			$folderDepth
+			[$filterType => $filterValue]
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -2872,7 +2873,7 @@ class GraphContext implements Context {
 	 */
 	public function theUserGetsFederatedUsersUsingTheGraphApi(?string $user = null): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
-	
+
 		$response = GraphHelper::getFederatedUsers(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2893,7 +2894,7 @@ class GraphContext implements Context {
 	 */
 	public function theUserGetsAllUsersUsingTheGraphApi(?string $user = null): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
-	
+
 		$response = GraphHelper::getAllUsers(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
