@@ -2,7 +2,6 @@
 package revisions
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -26,25 +25,118 @@ type DelBlobstore interface {
 	Delete(node *node.Node) error
 }
 
-// PurgeRevisions removes all revisions from a storage provider.
-func PurgeRevisions(pattern string, bs DelBlobstore, dryRun bool, verbose bool) error {
+// PurgeRevisionsGlob removes all revisions from a storage provider using globbing.
+func PurgeRevisionsGlob(pattern string, bs DelBlobstore, dryRun bool, verbose bool) (int, int, int) {
 	if verbose {
 		fmt.Println("Looking for nodes in", pattern)
 	}
 
-	nodes, err := filepath.Glob(pattern)
+	ch := make(chan string)
+	go func() {
+		defer close(ch)
+		nodes, err := filepath.Glob(pattern)
+		if err != nil {
+			fmt.Println("error globbing", pattern, err)
+			return
+		}
+
+		if len(nodes) == 0 {
+			fmt.Println("no nodes found. Double check storage path")
+			return
+		}
+
+		for _, n := range nodes {
+			if _versionRegex.MatchString(n) {
+				ch <- n
+			}
+		}
+	}()
+
+	return purgeRevisions(ch, bs, dryRun, verbose)
+}
+
+// PurgeRevisionsWalk removes all revisions from a storage provider using walking.
+func PurgeRevisionsWalk(base string, bs DelBlobstore, dryRun bool, verbose bool) (int, int, int) {
+	ch := make(chan string)
+	go func() {
+		defer close(ch)
+		err := filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				fmt.Println("error walking", base, err)
+				return err
+			}
+
+			if !_versionRegex.MatchString(info.Name()) {
+				return nil
+			}
+
+			ch <- path
+			return nil
+		})
+		if err != nil {
+			fmt.Println("error walking", base, err)
+			return
+		}
+
+	}()
+	return purgeRevisions(ch, bs, dryRun, verbose)
+}
+
+// PurgeRevisionsList removes all revisions from a storage provider using listing.
+func PurgeRevisionsList(base string, bs DelBlobstore, dryRun bool, verbose bool) (int, int, int) {
+	ch := make(chan string)
+	go func() {
+		defer close(ch)
+		if err := listFolder(base, ch); err != nil {
+			fmt.Println("error listing", base, err)
+			return
+		}
+	}()
+
+	return purgeRevisions(ch, bs, dryRun, verbose)
+}
+
+func listFolder(path string, ch chan<- string) error {
+	children, err := os.ReadDir(path)
 	if err != nil {
 		return err
 	}
 
-	if len(nodes) == 0 {
-		return errors.New("no nodes found, double check storage path")
-	}
+	for _, child := range children {
+		if child.IsDir() {
+			if err := listFolder(filepath.Join(path, child.Name()), ch); err != nil {
+				return err
+			}
+		}
 
+		if _versionRegex.MatchString(child.Name()) {
+			ch <- filepath.Join(path, child.Name())
+		}
+
+	}
+	return nil
+}
+
+// PrintResults prints the results
+func PrintResults(countFiles, countBlobs, countRevisions int, dryRun bool) error {
+	switch {
+	case countFiles == 0 && countRevisions == 0 && countBlobs == 0:
+		fmt.Println("❎ No revisions found. Storage provider is clean.")
+	case !dryRun:
+		fmt.Printf("✅ Deleted %d revisions (%d files / %d blobs)\n", countRevisions, countFiles, countBlobs)
+	default:
+		fmt.Printf("👉 Would delete %d revisions (%d files / %d blobs)\n", countRevisions, countFiles, countBlobs)
+	}
+	return nil
+}
+
+func purgeRevisions(nodes <-chan string, bs DelBlobstore, dryRun, verbose bool) (int, int, int) {
 	countFiles := 0
 	countBlobs := 0
 	countRevisions := 0
-	for _, d := range nodes {
+
+	var err error
+	for d := range nodes {
 		if !_versionRegex.MatchString(d) {
 			continue
 		}
@@ -106,15 +198,7 @@ func PurgeRevisions(pattern string, bs DelBlobstore, dryRun bool, verbose bool) 
 		}
 	}
 
-	switch {
-	case countFiles == 0 && countRevisions == 0 && countBlobs == 0:
-		fmt.Println("❎ No revisions found. Storage provider is clean.")
-	case !dryRun:
-		fmt.Printf("✅ Deleted %d revisions (%d files / %d blobs)\n", countRevisions, countFiles, countBlobs)
-	default:
-		fmt.Printf("👉 Would delete %d revisions (%d files / %d blobs)\n", countRevisions, countFiles, countBlobs)
-	}
-	return nil
+	return countFiles, countBlobs, countRevisions
 }
 
 func getBlobID(path string) (string, error) {
