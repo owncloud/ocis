@@ -93,9 +93,10 @@ func TestGetRolesByPermissions(t *testing.T) {
 	tests := map[string]struct {
 		givenActions          []string
 		constraints           string
+		listFederatedRoles    bool
 		unifiedRoleDefinition []*libregraph.UnifiedRoleDefinition
 	}{
-		"ViewerUnifiedRole": {
+		"RoleViewer | folder": {
 			givenActions: getRoleActions(unifiedrole.RoleViewer),
 			constraints:  unifiedrole.UnifiedRoleConditionFolder,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
@@ -103,7 +104,7 @@ func TestGetRolesByPermissions(t *testing.T) {
 				unifiedrole.RoleViewer,
 			},
 		},
-		"ViewerUnifiedRole | share": {
+		"RoleViewer | file": {
 			givenActions: getRoleActions(unifiedrole.RoleViewer),
 			constraints:  unifiedrole.UnifiedRoleConditionFile,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
@@ -111,7 +112,15 @@ func TestGetRolesByPermissions(t *testing.T) {
 				unifiedrole.RoleViewer,
 			},
 		},
-		"NewFileEditorUnifiedRole": {
+		"RoleViewer | file | federated": {
+			givenActions:       getRoleActions(unifiedrole.RoleViewer),
+			constraints:        unifiedrole.UnifiedRoleConditionFile,
+			listFederatedRoles: true,
+			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
+				unifiedrole.RoleViewer,
+			},
+		},
+		"RoleFileEditor | file": {
 			givenActions: getRoleActions(unifiedrole.RoleFileEditor),
 			constraints:  unifiedrole.UnifiedRoleConditionFile,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
@@ -120,7 +129,7 @@ func TestGetRolesByPermissions(t *testing.T) {
 				unifiedrole.RoleFileEditor,
 			},
 		},
-		"NewEditorUnifiedRole": {
+		"RoleEditor | folder": {
 			givenActions: getRoleActions(unifiedrole.RoleEditor),
 			constraints:  unifiedrole.UnifiedRoleConditionFolder,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
@@ -130,7 +139,25 @@ func TestGetRolesByPermissions(t *testing.T) {
 				unifiedrole.RoleEditor,
 			},
 		},
-		"GetRoles 1": {
+		"RoleEditor | folder | federated": {
+			givenActions:       getRoleActions(unifiedrole.RoleEditor),
+			constraints:        unifiedrole.UnifiedRoleConditionFolder,
+			listFederatedRoles: true,
+			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
+				unifiedrole.RoleViewer,
+				unifiedrole.RoleEditor,
+			},
+		},
+		"RoleEditor | file | federated": {
+			givenActions:       getRoleActions(unifiedrole.RoleEditor),
+			constraints:        unifiedrole.UnifiedRoleConditionFile,
+			listFederatedRoles: true,
+			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
+				unifiedrole.RoleViewer,
+				unifiedrole.RoleFileEditor,
+			},
+		},
+		"BuildInRoles | file": {
 			givenActions: getRoleActions(unifiedrole.BuildInRoles...),
 			constraints:  unifiedrole.UnifiedRoleConditionFile,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
@@ -139,7 +166,7 @@ func TestGetRolesByPermissions(t *testing.T) {
 				unifiedrole.RoleFileEditor,
 			},
 		},
-		"GetRoles 2": {
+		"BuildInRoles | folder": {
 			givenActions: getRoleActions(unifiedrole.BuildInRoles...),
 			constraints:  unifiedrole.UnifiedRoleConditionFolder,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
@@ -149,7 +176,7 @@ func TestGetRolesByPermissions(t *testing.T) {
 				unifiedrole.RoleEditor,
 			},
 		},
-		"GetRoles 3": {
+		"BuildInRoles | drive": {
 			givenActions: getRoleActions(unifiedrole.BuildInRoles...),
 			constraints:  unifiedrole.UnifiedRoleConditionDrive,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
@@ -158,12 +185,12 @@ func TestGetRolesByPermissions(t *testing.T) {
 				unifiedrole.RoleManager,
 			},
 		},
-		"single": {
+		"custom | file": {
 			givenActions:          []string{unifiedrole.DriveItemQuotaRead},
 			constraints:           unifiedrole.UnifiedRoleConditionFile,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{},
 		},
-		"mixed": {
+		"RoleEditorLite and custom | folder": {
 			givenActions: append(getRoleActions(unifiedrole.RoleEditorLite), unifiedrole.DriveItemQuotaRead),
 			constraints:  unifiedrole.UnifiedRoleConditionFolder,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
@@ -176,7 +203,7 @@ func TestGetRolesByPermissions(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			g := NewWithT(t)
-			generatedDefinitions := unifiedrole.GetRolesByPermissions(unifiedrole.BuildInRoles, tc.givenActions, tc.constraints, false)
+			generatedDefinitions := unifiedrole.GetRolesByPermissions(unifiedrole.BuildInRoles, tc.givenActions, tc.constraints, tc.listFederatedRoles, false)
 
 			g.Expect(len(generatedDefinitions)).To(Equal(len(tc.unifiedRoleDefinition)))
 
