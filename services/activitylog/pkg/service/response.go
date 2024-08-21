@@ -99,6 +99,7 @@ func WithTrashedResource(ref *provider.Reference, rid *provider.ResourceId) Acti
 
 		resp, err := gwc.ListRecycle(ctx, &provider.ListRecycleRequest{
 			Ref: ref,
+			Key: rid.GetOpaqueId(),
 		})
 		if err != nil {
 			return err

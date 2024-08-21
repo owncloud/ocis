@@ -221,6 +221,7 @@ func processShareEvent(ctx context.Context, ref *provider.Reference, gwc gateway
 func processItemTrashedEvent(ctx context.Context, ref *provider.Reference, gwc gateway.GatewayAPIClient, initiatorid string, itemID *provider.ResourceId) ([]string, FileEvent, error) {
 	resp, err := gwc.ListRecycle(ctx, &provider.ListRecycleRequest{
 		Ref: ref,
+		Key: itemID.GetOpaqueId(),
 	})
 	if err != nil {
 		return nil, FileEvent{}, err
