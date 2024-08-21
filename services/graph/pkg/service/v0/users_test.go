@@ -829,8 +829,16 @@ var _ = Describe("Users", func() {
 				assertHandleBadAttributes(user)
 			})
 
-			It("handles invalid userType", func() {
-				user.SetUserType("Clown")
+			It("handles set memberOf - it's read-only", func() {
+				group := libregraph.Group{}
+				group.SetId("/groups/group")
+				group.SetDisplayName("Group")
+				user.SetMemberOf([]libregraph.Group{group})
+				assertHandleBadAttributes(user)
+			})
+
+			It("handles set userType - it's read-only", func() {
+				user.SetUserType("Member")
 				assertHandleBadAttributes(user)
 			})
 
@@ -857,31 +865,6 @@ var _ = Describe("Users", func() {
 				Expect(createdUser.GetUserType()).To(Equal("Member"))
 			})
 
-			It("creates a guest user", func() {
-				roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{}, nil)
-				identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.User) *libregraph.User {
-					user.SetId("/users/user")
-					return &user
-				}, nil)
-
-				user.SetUserType("Guest")
-				userJson, err := json.Marshal(user)
-				Expect(err).ToNot(HaveOccurred())
-
-				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users", bytes.NewBuffer(userJson))
-				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
-				svc.PostUser(rr, r)
-
-				Expect(rr.Code).To(Equal(http.StatusCreated))
-				data, err := io.ReadAll(rr.Body)
-				Expect(err).ToNot(HaveOccurred())
-
-				createdUser := libregraph.User{}
-				err = json.Unmarshal(data, &createdUser)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(createdUser.GetUserType()).To(Equal("Guest"))
-			})
-
 			It("creates a member user", func() {
 				roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{}, nil)
 				identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.User) *libregraph.User {
@@ -889,7 +872,6 @@ var _ = Describe("Users", func() {
 					return &user
 				}, nil)
 
-				user.SetUserType("Member")
 				userJson, err := json.Marshal(user)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -1026,9 +1008,21 @@ var _ = Describe("Users", func() {
 
 		Describe("PatchUser", func() {
 			var (
-				user         *libregraph.User
-				userUpdate   *libregraph.UserUpdate
-				expectedUser *libregraph.User
+				user                      *libregraph.User
+				userUpdate                *libregraph.UserUpdate
+				expectedUser              *libregraph.User
+				assertHandleBadAttributes = func(userid string, update *libregraph.UserUpdate) {
+					userJson, err := json.Marshal(update)
+					Expect(err).ToNot(HaveOccurred())
+
+					r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/users/{userid}", bytes.NewBuffer(userJson))
+					rctx := chi.NewRouteContext()
+					rctx.URLParams.Add("userID", userid)
+					r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+					svc.PatchUser(rr, r)
+
+					Expect(rr.Code).To(Equal(http.StatusBadRequest))
+				}
 			)
 
 			BeforeEach(func() {
@@ -1037,7 +1031,6 @@ var _ = Describe("Users", func() {
 				user.SetId("/users/user")
 
 				userUpdate = libregraph.NewUserUpdate()
-				userUpdate.SetId(user.GetId())
 
 				expectedUser = libregraph.NewUser("Display Name", "user")
 				expectedUser.SetMail(user.GetMail())
@@ -1063,6 +1056,24 @@ var _ = Describe("Users", func() {
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
 			})
 
+			It("handles set Ids - they are read-only", func() {
+				userUpdate.SetId("/users/user")
+				assertHandleBadAttributes(user.GetId(), userUpdate)
+			})
+
+			It("handles set memberOf - it's read-only", func() {
+				group := libregraph.Group{}
+				group.SetId("/groups/group")
+				group.SetDisplayName("Group")
+				userUpdate.SetMemberOf([]libregraph.Group{group})
+				assertHandleBadAttributes(user.GetId(), userUpdate)
+			})
+
+			It("handles set userType - it's read-only", func() {
+				userUpdate.SetUserType("Member")
+				assertHandleBadAttributes(user.GetId(), userUpdate)
+			})
+
 			It("handles invalid email", func() {
 				userUpdate.SetMail("invalid")
 				data, err := json.Marshal(userUpdate)
@@ -1077,27 +1088,13 @@ var _ = Describe("Users", func() {
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
 			})
 
-			It("handles invalid userType", func() {
-				userUpdate.SetUserType("Clown")
-				data, err := json.Marshal(userUpdate)
-				Expect(err).ToNot(HaveOccurred())
-
-				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users?$invalid=true", bytes.NewBuffer(data))
-				rctx := chi.NewRouteContext()
-				rctx.URLParams.Add("userID", userUpdate.GetId())
-				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-				svc.PatchUser(rr, r)
-
-				Expect(rr.Code).To(Equal(http.StatusBadRequest))
-			})
-
 			It("updates attributes", func() {
-				userUpdate.SetUserType("Member")
+				userUpdate.SetMail("mail@mail.test")
 				userUpdate.SetDisplayName("New Display Name")
 
-				expectedUser.SetUserType("Member")
+				expectedUser.SetMail("mail@mail.test")
 				expectedUser.SetDisplayName("New Display Name")
-				identityBackend.On("UpdateUser", mock.Anything, userUpdate.GetId(), mock.Anything).Return(expectedUser, nil)
+				identityBackend.On("UpdateUser", mock.Anything, user.GetId(), mock.Anything).Return(expectedUser, nil)
 
 				data, err := json.Marshal(userUpdate)
 				Expect(err).ToNot(HaveOccurred())
@@ -1115,7 +1112,7 @@ var _ = Describe("Users", func() {
 				unmarshaledUser := libregraph.User{}
 				err = json.Unmarshal(data, &unmarshaledUser)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(unmarshaledUser.GetUserType()).To(Equal("Member"))
+				Expect(unmarshaledUser.GetMail()).To(Equal("mail@mail.test"))
 				Expect(unmarshaledUser.GetDisplayName()).To(Equal("New Display Name"))
 			})
 		})

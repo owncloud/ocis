@@ -368,21 +368,26 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	// Disallow user-supplied IDs. It's supposed to be readonly. We're either
 	// generating them in the backend ourselves or rely on the Backend's
 	// storage (e.g. LDAP) to provide a unique ID.
-	if _, ok := u.GetIdOk(); ok {
+	if u.HasId() {
 		logger.Info().Interface("user", u).Msg("could not create user: user id is a read-only attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user id is a read-only attribute")
 		return
 	}
 
-	if u.HasUserType() {
-		if !isValidUserType(*u.UserType) {
-			logger.Info().Interface("user", u).Msg("invalid userType attribute")
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType attribute, valid options are 'Member' or 'Guest'")
-			return
-		}
-	} else {
-		u.SetUserType("Member")
+	// treat memberOf as a read-only attribute.
+	if u.HasMemberOf() {
+		logger.Info().Interface("user", u).Msg("could not create user: memberOf id is a read-only attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "memberOf id is a read-only attribute")
+		return
 	}
+
+	// treat userType as a read-only attribute.
+	if u.HasUserType() {
+		logger.Info().Interface("user", u).Msg("could not create user: userType is a read-only attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "userType is a read-only attribute")
+		return
+	}
+	u.SetUserType("Member")
 
 	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
@@ -790,6 +795,24 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 		return
 	}
 
+	if changes.HasId() {
+		logger.Debug().Msg("could not update user: user id is a read-only attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user id is a read-only attribute")
+		return
+	}
+
+	if changes.HasMemberOf() {
+		logger.Debug().Msg("could not update user: memberOf id is a read-only attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "memberOf id is a read-only attribute")
+		return
+	}
+
+	if changes.HasUserType() {
+		logger.Debug().Msg("could not update user: userType is a read-only attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "userType is a read-only attribute")
+		return
+	}
+
 	if accountName, ok := changes.GetOnPremisesSamAccountNameOk(); ok {
 		if !g.isValidUsername(*accountName) {
 			logger.Info().Str("username", *accountName).Msg("could not update user: invalid username")
@@ -869,15 +892,6 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 
 	if name, ok := changes.GetDisplayNameOk(); ok {
 		addfeature("displayname", *name, &oldUserValues.DisplayName)
-	}
-
-	if userType, ok := changes.GetUserTypeOk(); ok {
-		if !isValidUserType(*changes.UserType) {
-			logger.Debug().Interface("user", changes).Msg("invalid userType attribute")
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType attribute, valid options are 'Member' or 'Guest'")
-			return
-		}
-		addfeature("userType", *userType, oldUserValues.UserType)
 	}
 
 	if accEnabled, ok := changes.GetAccountEnabledOk(); ok {

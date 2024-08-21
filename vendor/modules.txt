@@ -1628,7 +1628,7 @@ github.com/opentracing/opentracing-go/log
 # github.com/orcaman/concurrent-map v1.0.0
 ## explicit
 github.com/orcaman/concurrent-map
-# github.com/owncloud/libre-graph-api-go v1.0.5-0.20240816082515-afcf4367b966
+# github.com/owncloud/libre-graph-api-go v1.0.5-0.20240820135012-5fac8096ce9c
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
 # github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
