@@ -26,6 +26,9 @@ type Config struct {
 	HTTP         HTTP          `yaml:"http"`
 	TokenManager *TokenManager `yaml:"token_manager"`
 
+	TranslationPath string `yaml:"translation_path" env:"OCIS_TRANSLATION_PATH;ACTIVITYLOG_TRANSLATION_PATH" desc:"(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details." introductionVersion:"6.3"`
+	DefaultLanguage string `yaml:"default_language" env:"OCIS_DEFAULT_LANGUAGE" desc:"The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details." introductionVersion:"6.3"`
+
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 
 	Context context.Context `yaml:"-"`
