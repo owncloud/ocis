@@ -2962,6 +2962,24 @@ def collaborationService(extra_environment = {}):
                 "wait-for -it wopiserver:9300 -t 300",
             ],
         },
+        {
+            "name": "prepare-test-file",
+            "image": OC_CI_ALPINE,
+            "environment": {},
+            "commands": [
+                "curl -v -X PUT 'https://ocis-server:9200/remote.php/webdav/test.wopitest' -k --fail --retry-connrefused --retry 7 --retry-all-errors -u admin:admin -D headers.txt",
+                "cat headers.txt",
+                "export FILE_ID=$(cat headers.txt | sed -n -e 's/^.*Oc-Fileid: //p')",
+                "export URL=\"https://ocis-server:9200/app/open?app_name=FakeOffice&file_id=$FILE_ID\"",
+                "export URL=$(echo $URL | tr -d '[:cntrl:]')",
+                "curl -v -X POST \"$URL\" -k --fail --retry-connrefused --retry 7 --retry-all-errors -u admin:admin > open.json",
+                "cat open.json",
+                "cat open.json | jq .form_parameters.access_token | tr -d '\"' > accesstoken",
+                "cat open.json | jq .form_parameters.access_token_ttl | tr -d '\"' > accesstokenttl",
+                "echo -n 'http://wopiserver:9300/wopi/files/' > wopisrc",
+                "cat open.json | jq .app_url | sed -n -e 's/^.*files%2F//p' | tr -d '\"' >> wopisrc",
+            ],
+        },
     ]
 
 def tikaService():
