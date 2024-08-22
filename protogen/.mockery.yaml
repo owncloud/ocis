@@ -16,10 +16,6 @@ packages:
     github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0:
         interfaces:
             ValueService:
-    github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0:
-        interfaces:
-            StoreService:
     github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0:
         interfaces:
             ThumbnailService:
-            
