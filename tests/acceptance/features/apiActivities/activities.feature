@@ -1261,7 +1261,7 @@ Feature: check activities
                   "required": ["message","variables"],
                   "properties": {
                     "message": {
-                      "const": "{user} hat {resource} zum {space} hinzugefügt"
+                      "const": "{user} hat {resource} zu {space} hinzugefügt"
                     },
                     "variables": {
                       "type": "object",
