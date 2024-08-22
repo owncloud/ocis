@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Set capability response `disable_self_password_change` correctly: [#9853](https://github.com/owncloud/ocis/pull/9853)
 * Bugfix - Activity Translations: [#9856](https://github.com/owncloud/ocis/pull/9856)
 * Bugfix - The user attributes `userType` and `memberOf` are readonly: [#9867](https://github.com/owncloud/ocis/pull/9867)
+* Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
 
 ## Details
 
@@ -80,6 +81,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9858
    https://github.com/owncloud/ocis/pull/9867
+
+* Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
+
+   We have removed the unused store service.
+
+   https://github.com/owncloud/ocis/issues/1357
+   https://github.com/owncloud/ocis/pull/9890
 
 # Changelog for [6.3.0] (2024-08-20)
 
