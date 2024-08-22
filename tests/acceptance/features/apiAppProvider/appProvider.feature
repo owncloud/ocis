@@ -4,7 +4,7 @@ Feature: App Provider
   Scenario: open file with Collabora
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
-    When user "Alice" opens file "simple.odt" with Collabora service
+    When user "Alice" opens file "simple.odt" with collaboration service
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """

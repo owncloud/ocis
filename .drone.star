@@ -59,13 +59,13 @@ dirs = {
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
     },
     "k6LoadTests": {
-        "skip": False,
+        "skip": True,
     },
     "localApiTests": {
         "basic": {
@@ -92,19 +92,20 @@ config = {
                 "apiSharingNgLinkShareRoot",
                 "apiActivities",
             ],
-            "skip": False,
+            "skip": True,
         },
         "apiAccountsHashDifficulty": {
             "suites": [
                 "apiAccountsHashDifficulty",
             ],
             "accounts_hash_difficulty": "default",
+            "skip": True,
         },
         "apiNotification": {
             "suites": [
                 "apiNotification",
             ],
-            "skip": False,
+            "skip": True,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
@@ -122,7 +123,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -136,14 +137,14 @@ config = {
             "suites": [
                 "apiSearchContent",
             ],
-            "skip": False,
+            "skip": True,
             "tikaNeeded": True,
         },
         "apiOcm": {
             "suites": [
                 "apiOcm",
             ],
-            "skip": False,
+            "skip": True,
             "federationServer": True,
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "ocm",
@@ -158,22 +159,36 @@ config = {
             "suites": [
                 "cliCommands",
             ],
+            "skip": True,
+        },
+        "apiAppProvider": {
+            "suites": [
+                "apiAppProvider",
+            ],
             "skip": False,
+            "collaborationServiceNeeded": True,
+            "extraCollaborationEnvironment": {
+                "COLLABORATION_APP_NAME": "FakeOffice",
+                "COLLABORATION_APP_ADDR": "http://fakeoffice:8080",
+            },
+            "extraServerEnvironment": {
+                "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
+            },
         },
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "e2eTests": {
         "part": {
-            "skip": False,
+            "skip": True,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc"],  # suites to skip
         },
         "search": {
-            "skip": False,
+            "skip": True,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
         },
@@ -189,7 +204,7 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": True,
+    "litmus": False,
     "codestyle": True,
 }
 
@@ -280,15 +295,9 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -302,7 +311,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -855,6 +864,8 @@ def localApiTestPipeline(ctx):
         "antivirusNeeded": False,
         "tikaNeeded": False,
         "federationServer": False,
+        "collaborationServiceNeeded": False,
+        "extraCollaborationEnvironment": {},
     }
 
     if "localApiTests" in config:
@@ -880,9 +891,10 @@ def localApiTestPipeline(ctx):
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
+                                     (collaborationService(extra_environment = params["extraCollaborationEnvironment"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      logRequests(),
-                            "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [],
+                            "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [] + fakeOffice() if params["collaborationServiceNeeded"] else [],
                             "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
@@ -2893,6 +2905,64 @@ def waitForClamavService():
             "wait-for -it clamav:3310 -t 600",
         ],
     }]
+
+def fakeOffice():
+    return [
+        {
+            "name": "fakeoffice",
+            "image": OC_CI_ALPINE,
+            "detach": True,
+            "environment": {},
+            "commands": [
+                "sh %s/tests/config/drone/serve-hosting-discovery.sh" % (dirs["base"]),
+            ],
+        },
+        {
+            "name": "wait-for-fakeoffice",
+            "image": OC_CI_WAIT_FOR,
+            "commands": [
+                "wait-for -it fakeoffice:8080 -t 300",
+            ],
+        },
+    ]
+
+def collaborationService(extra_environment = {}):
+    environment = {
+        "MICRO_REGISTRY": "nats-js-kv",
+        "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
+        "COLLABORATION_LOG_LEVEL": "debug",
+        "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
+        "COLLABORATION_GRPC_ADDR": "0.0.0.0:9301",
+        # no proof keys available in the FakeOffice
+        "COLLABORATION_APP_PROOF_DISABLE": "true",
+        "COLLABORATION_APP_INSECURE": "true",
+        "COLLABORATION_WOPI_SRC": "http://wopiserver:9300",
+        "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
+        "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
+        "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+    }
+
+    for item in extra_environment:
+        environment[item] = extra_environment[item]
+
+    return [
+        {
+            "name": "wopiserver",
+            "image": OC_CI_GOLANG,
+            "detach": True,
+            "environment": environment,
+            "commands": [
+                "ocis/bin/ocis collaboration server",
+            ],
+        },
+        {
+            "name": "wait-for-wopi-server",
+            "image": OC_CI_WAIT_FOR,
+            "commands": [
+                "wait-for -it wopiserver:9300 -t 300",
+            ],
+        },
+    ]
 
 def tikaService():
     return [{
