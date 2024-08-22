@@ -65,8 +65,7 @@ func Server(cfg *config.Config) *cli.Command {
 				store.Authentication(cfg.OIDC.UserinfoCache.AuthUsername, cfg.OIDC.UserinfoCache.AuthPassword),
 			)
 
-			var signingKeyStore microstore.Store
-			signingKeyStore = store.Create(
+			signingKeyStore := store.Create(
 				store.Store(cfg.PreSignedURL.SigningKeys.Store),
 				store.TTL(cfg.PreSignedURL.SigningKeys.TTL),
 				microstore.Nodes(cfg.PreSignedURL.SigningKeys.Nodes...),

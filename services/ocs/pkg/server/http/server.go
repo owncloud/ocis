@@ -36,8 +36,7 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
-	var signingKeyStore microstore.Store
-	signingKeyStore = store.Create(
+	signingKeyStore := store.Create(
 		store.Store(options.Config.SigningKeys.Store),
 		store.TTL(options.Config.SigningKeys.TTL),
 		microstore.Nodes(options.Config.SigningKeys.Nodes...),
