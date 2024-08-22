@@ -40,5 +40,7 @@
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | OCIS_JWT_SECRET<br/>ACTIVITYLOG_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
+| OCIS_TRANSLATION_PATH<br/>ACTIVITYLOG_TRANSLATION_PATH | string |  | (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.|
+| OCIS_DEFAULT_LANGUAGE | string | en | The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>ACTIVITYLOG_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>ACTIVITYOG_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|

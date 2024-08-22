@@ -59,6 +59,8 @@ http:
     key: ""
 token_manager:
   jwt_secret: ""
+translation_path: ""
+default_language: en
 service_account:
   service_account_id: ""
   service_account_secret: ""
