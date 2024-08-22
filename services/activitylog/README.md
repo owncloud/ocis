@@ -1,4 +1,4 @@
-# Activitylog Service
+# Activitylog
 
 The `activitylog` service is responsible for storing events (activities) per resource.
 

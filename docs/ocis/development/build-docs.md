@@ -1,7 +1,7 @@
 ---
 title: "Documentation"
 date: 2020-07-27T08:39:38+00:00
-weight: 99
+weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: build-docs.md
