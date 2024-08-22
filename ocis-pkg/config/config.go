@@ -38,7 +38,6 @@ import (
 	storageshares "github.com/owncloud/ocis/v2/services/storage-shares/pkg/config"
 	storagesystem "github.com/owncloud/ocis/v2/services/storage-system/pkg/config"
 	storageusers "github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
-	store "github.com/owncloud/ocis/v2/services/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
 	userlog "github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	users "github.com/owncloud/ocis/v2/services/users/pkg/config"
@@ -117,7 +116,6 @@ type Config struct {
 	StoragePublicLink *storagepublic.Config  `yaml:"storage_public"`
 	StorageShares     *storageshares.Config  `yaml:"storage_shares"`
 	StorageUsers      *storageusers.Config   `yaml:"storage_users"`
-	Store             *store.Config          `yaml:"store"`
 	Thumbnails        *thumbnails.Config     `yaml:"thumbnails"`
 	Userlog           *userlog.Config        `yaml:"userlog"`
 	Users             *users.Config          `yaml:"users"`

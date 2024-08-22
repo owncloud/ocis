@@ -9,7 +9,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	svc "github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0"
-	ocisstore "github.com/owncloud/ocis/v2/services/store/pkg/store"
 	"go-micro.dev/v4"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -37,23 +36,14 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
-	var signingKeyStore microstore.Store
-	if options.Config.SigningKeys.Store == "ocisstoreservice" {
-		signingKeyStore = ocisstore.NewStore(
-			microstore.Nodes(options.Config.SigningKeys.Nodes...),
-			microstore.Database("proxy"),
-			microstore.Table("signing-keys"),
-		)
-	} else {
-		signingKeyStore = store.Create(
-			store.Store(options.Config.SigningKeys.Store),
-			store.TTL(options.Config.SigningKeys.TTL),
-			microstore.Nodes(options.Config.SigningKeys.Nodes...),
-			microstore.Database("proxy"),
-			microstore.Table("signing-keys"),
-			store.Authentication(options.Config.SigningKeys.AuthUsername, options.Config.SigningKeys.AuthPassword),
-		)
-	}
+	signingKeyStore := store.Create(
+		store.Store(options.Config.SigningKeys.Store),
+		store.TTL(options.Config.SigningKeys.TTL),
+		microstore.Nodes(options.Config.SigningKeys.Nodes...),
+		microstore.Database("proxy"),
+		microstore.Table("signing-keys"),
+		store.Authentication(options.Config.SigningKeys.AuthUsername, options.Config.SigningKeys.AuthPassword),
+	)
 
 	handle := svc.NewService(
 		svc.Logger(options.Logger),

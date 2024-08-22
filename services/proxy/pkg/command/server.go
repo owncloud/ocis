@@ -37,7 +37,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/staticroutes"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
-	ocisstore "github.com/owncloud/ocis/v2/services/store/pkg/store"
 	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4/selector"
 	microstore "go-micro.dev/v4/store"
@@ -66,23 +65,14 @@ func Server(cfg *config.Config) *cli.Command {
 				store.Authentication(cfg.OIDC.UserinfoCache.AuthUsername, cfg.OIDC.UserinfoCache.AuthPassword),
 			)
 
-			var signingKeyStore microstore.Store
-			if cfg.PreSignedURL.SigningKeys.Store == "ocisstoreservice" {
-				signingKeyStore = ocisstore.NewStore(
-					microstore.Nodes(cfg.PreSignedURL.SigningKeys.Nodes...),
-					microstore.Database("proxy"),
-					microstore.Table("signing-keys"),
-				)
-			} else {
-				signingKeyStore = store.Create(
-					store.Store(cfg.PreSignedURL.SigningKeys.Store),
-					store.TTL(cfg.PreSignedURL.SigningKeys.TTL),
-					microstore.Nodes(cfg.PreSignedURL.SigningKeys.Nodes...),
-					microstore.Database("proxy"),
-					microstore.Table("signing-keys"),
-					store.Authentication(cfg.PreSignedURL.SigningKeys.AuthUsername, cfg.PreSignedURL.SigningKeys.AuthPassword),
-				)
-			}
+			signingKeyStore := store.Create(
+				store.Store(cfg.PreSignedURL.SigningKeys.Store),
+				store.TTL(cfg.PreSignedURL.SigningKeys.TTL),
+				microstore.Nodes(cfg.PreSignedURL.SigningKeys.Nodes...),
+				microstore.Database("proxy"),
+				microstore.Table("signing-keys"),
+				store.Authentication(cfg.PreSignedURL.SigningKeys.AuthUsername, cfg.PreSignedURL.SigningKeys.AuthPassword),
+			)
 
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
