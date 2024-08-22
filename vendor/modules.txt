@@ -1993,8 +1993,8 @@ go-micro.dev/v4/util/ring
 go-micro.dev/v4/util/signal
 go-micro.dev/v4/util/socket
 go-micro.dev/v4/util/tls
-# go.etcd.io/bbolt v1.3.10
-## explicit; go 1.21
+# go.etcd.io/bbolt v1.3.11
+## explicit; go 1.22
 go.etcd.io/bbolt
 # go.etcd.io/etcd/api/v3 v3.5.12
 ## explicit; go 1.20
