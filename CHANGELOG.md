@@ -56,9 +56,10 @@ The following sections list the changes for unreleased.
 * Bugfix - Set capability response `disable_self_password_change` correctly: [#9853](https://github.com/owncloud/ocis/pull/9853)
 * Bugfix - Activity Translations: [#9856](https://github.com/owncloud/ocis/pull/9856)
 * Bugfix - The user attributes `userType` and `memberOf` are readonly: [#9867](https://github.com/owncloud/ocis/pull/9867)
+* Bugfix - Use key to get specific trash item: [#9879](https://github.com/owncloud/ocis/pull/9879)
 * Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
-* Enhancement - Bump reva: [#9860](https://github.com/owncloud/ocis/pull/9860)
+* Enhancement - Bump reva: [#9879](https://github.com/owncloud/ocis/pull/9879)
 * Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
 * Enhancement - Allow setting default locale of activitylog: [#9892](https://github.com/owncloud/ocis/pull/9892)
 * Enhancement - Graph translation path: [#9902](https://github.com/owncloud/ocis/pull/9902)
@@ -87,6 +88,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/9858
    https://github.com/owncloud/ocis/pull/9867
 
+* Bugfix - Use key to get specific trash item: [#9879](https://github.com/owncloud/ocis/pull/9879)
+
+   The activitylog and clientlog services now only fetch the specific trash item
+   instead of getting all items in trash and filtering them on their side. This
+   reduces the load on the storage users service because it no longer has to
+   assemble a full trash listing.
+
+   https://github.com/owncloud/ocis/pull/9879
+
 * Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
 
    The libre graph API now returns OCM shares when listing driveItem permissions.
@@ -101,10 +111,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/1357
    https://github.com/owncloud/ocis/pull/9890
 
-* Enhancement - Bump reva: [#9860](https://github.com/owncloud/ocis/pull/9860)
+* Enhancement - Bump reva: [#9879](https://github.com/owncloud/ocis/pull/9879)
 
    Bumps reva version
 
+   https://github.com/owncloud/ocis/pull/9879
    https://github.com/owncloud/ocis/pull/9860
 
 * Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
