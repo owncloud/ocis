@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ocisbs "github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/lookup"
 	s3bs "github.com/cs3org/reva/v2/pkg/storage/fs/s3ng/blobstore"
@@ -19,7 +20,7 @@ import (
 
 var (
 	// _nodesGlobPattern is the glob pattern to find all nodes
-	_nodesGlobPattern = "spaces/*/*/*/*/*/*/*/*"
+	_nodesGlobPattern = "spaces/*/*/nodes/"
 )
 
 // RevisionsCommand is the entrypoint for the revisions command.
@@ -30,7 +31,7 @@ func RevisionsCommand(cfg *config.Config) *cli.Command {
 		Subcommands: []*cli.Command{
 			PurgeRevisionsCommand(cfg),
 		},
-		Before: func(c *cli.Context) error {
+		Before: func(_ *cli.Context) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg, true))
 		},
 		Action: func(_ *cli.Context) error {
@@ -74,6 +75,11 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 				Aliases: []string{"r"},
 				Usage:   "purge all revisions of this file/space. If not set, all revisions will be purged",
 			},
+			&cli.StringFlag{
+				Name:  "glob-mechanism",
+				Usage: "the glob mechanism to find all nodes. Can be 'glob', 'list' or 'workers'. 'glob' uses globbing with a single worker. 'workers' spawns multiple go routines, accelatering the command drastically but causing high cpu and ram usage. 'list' looks for references by listing directories with multiple workers. Default is 'glob'",
+				Value: "glob",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			basePath := c.String("basepath")
@@ -108,43 +114,72 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			p, err := generatePath(basePath, c.String("resource-id"))
-			if err != nil {
-				fmt.Printf("❌ Error parsing resourceID: %s", err)
-				return err
+			var rid *provider.ResourceId
+			resid, err := storagespace.ParseID(c.String("resource-id"))
+			if err == nil {
+				rid = &resid
 			}
 
-			if err := revisions.PurgeRevisions(p, bs, c.Bool("dry-run"), c.Bool("verbose")); err != nil {
-				fmt.Printf("❌ Error purging revisions: %s", err)
-				return err
+			mechanism := c.String("glob-mechanism")
+			if rid.GetOpaqueId() != "" {
+				mechanism = "glob"
 			}
 
+			var ch <-chan string
+			switch mechanism {
+			default:
+				fallthrough
+			case "glob":
+				p := generatePath(basePath, rid)
+				if rid.GetOpaqueId() == "" {
+					p = filepath.Join(p, "*/*/*/*/*")
+				}
+				ch = revisions.Glob(p)
+			case "workers":
+				p := generatePath(basePath, rid)
+				ch = revisions.GlobWorkers(p, "/*", "/*/*/*/*")
+			case "list":
+				p := filepath.Join(basePath, "spaces")
+				if rid != nil {
+					p = generatePath(basePath, rid)
+				}
+				ch = revisions.List(p, 10)
+			}
+
+			files, blobs, revisions := revisions.PurgeRevisions(ch, bs, c.Bool("dry-run"), c.Bool("verbose"))
+			printResults(files, blobs, revisions, c.Bool("dry-run"))
 			return nil
 		},
 	}
 }
 
-func generatePath(basePath string, resourceID string) (string, error) {
-	if resourceID == "" {
-		return filepath.Join(basePath, _nodesGlobPattern), nil
+func printResults(countFiles, countBlobs, countRevisions int, dryRun bool) {
+	switch {
+	case countFiles == 0 && countRevisions == 0 && countBlobs == 0:
+		fmt.Println("❎ No revisions found. Storage provider is clean.")
+	case !dryRun:
+		fmt.Printf("✅ Deleted %d revisions (%d files / %d blobs)\n", countRevisions, countFiles, countBlobs)
+	default:
+		fmt.Printf("👉 Would delete %d revisions (%d files / %d blobs)\n", countRevisions, countFiles, countBlobs)
 	}
+}
 
-	rid, err := storagespace.ParseID(resourceID)
-	if err != nil {
-		return "", err
+func generatePath(basePath string, rid *provider.ResourceId) string {
+	if rid == nil {
+		return filepath.Join(basePath, _nodesGlobPattern)
 	}
 
 	sid := lookup.Pathify(rid.GetSpaceId(), 1, 2)
 	if sid == "" {
-		sid = "*/*"
+		return ""
 	}
 
 	nid := lookup.Pathify(rid.GetOpaqueId(), 4, 2)
 	if nid == "" {
-		nid = "*/*/*/*/"
+		return filepath.Join(basePath, "spaces", sid, "nodes")
 	}
 
-	return filepath.Join(basePath, "spaces", sid, "nodes", nid+"*"), nil
+	return filepath.Join(basePath, "spaces", sid, "nodes", nid+"*")
 }
 
 func init() {
