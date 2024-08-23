@@ -59,6 +59,7 @@ The following sections list the changes for unreleased.
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
 * Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
 * Enhancement - Allow setting default locale of activitylog: [#9892](https://github.com/owncloud/ocis/pull/9892)
+* Enhancement - Graph translation path: [#9902](https://github.com/owncloud/ocis/pull/9902)
 
 ## Details
 
@@ -103,6 +104,12 @@ The following sections list the changes for unreleased.
    Allows setting the default locale via `OCIS_DEFAULT_LANGUAGE` envvar
 
    https://github.com/owncloud/ocis/pull/9892
+
+* Enhancement - Graph translation path: [#9902](https://github.com/owncloud/ocis/pull/9902)
+
+   Add `GRAPH_TRANSLATION_PATH` envvar like in other l10n services
+
+   https://github.com/owncloud/ocis/pull/9902
 
 # Changelog for [6.3.0] (2024-08-20)
 
