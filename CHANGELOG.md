@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Set capability response `disable_self_password_change` correctly: [#9853](https://github.com/owncloud/ocis/pull/9853)
 * Bugfix - Activity Translations: [#9856](https://github.com/owncloud/ocis/pull/9856)
 * Bugfix - The user attributes `userType` and `memberOf` are readonly: [#9867](https://github.com/owncloud/ocis/pull/9867)
+* Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
 * Enhancement - Bump reva: [#9860](https://github.com/owncloud/ocis/pull/9860)
 * Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
@@ -85,6 +86,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9858
    https://github.com/owncloud/ocis/pull/9867
+
+* Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
+
+   The libre graph API now returns OCM shares when listing driveItem permissions.
+
+   https://github.com/owncloud/ocis/issues/9898
+   https://github.com/owncloud/ocis/pull/9905
 
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
 
