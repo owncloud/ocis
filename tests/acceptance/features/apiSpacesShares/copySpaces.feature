@@ -706,10 +706,12 @@ Feature: copy file
       | permissionsRole | Editor       |
     And user "Alice" has a share "BRIAN-Folder" synced
     When user "Alice" copies file "/textfile1.txt" from space "Personal" to "/BRIAN-Folder" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And for user "Alice" the content of the file "/BRIAN-Folder" of the space "Shares" should be "ownCloud test text file 1"
-    And as "Alice" file "/textfile1.txt" should exist
-    And user "Alice" should not have any received shares
+    Then the HTTP status code should be "400"
+    And as "Alice" folder "Shares/BRIAN-Folder/sample-folder" should exist
+    And as "Brian" folder "BRIAN-Folder/sample-folder" should exist
+    But as "Alice" file "Shares/BRIAN-Folder" should not exist
+    And as "Alice" file "Shares/textfile1.txt" should not exist
+    And user "Alice" should have a share "BRIAN-Folder" shared by user "Brian"
 
   @issue-7208
   Scenario: copy a folder over the top of an existing file received as a user share
@@ -725,11 +727,11 @@ Feature: copy file
       | permissionsRole | File Editor     |
     And user "Alice" has a share "sharedfile1.txt" synced
     When user "Alice" copies folder "/FOLDER" from space "Personal" to "/sharedfile1.txt" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And as "Alice" folder "/FOLDER/sample-folder" should exist
-    And for user "Alice" folder "/sharedfile1.txt" of the space "Shares" should contain these files:
-      | /sample-folder |
-    And user "Alice" should not have any received shares
+    Then the HTTP status code should be "400"
+    And for user "Alice" the content of the file "sharedfile1.txt" of the space "Shares" should be "file to share"
+    And for user "Brian" the content of the file "sharedfile1.txt" of the space "Personal" should be "file to share"
+    But as "Alice" folder "Shares/FOLDER/sample-folder" should not exist
+    And user "Alice" should have a share "sharedfile1.txt" shared by user "Brian"
 
 
   Scenario: copy a folder into another folder at different level which is received as a user share

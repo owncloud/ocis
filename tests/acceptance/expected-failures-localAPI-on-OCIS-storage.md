@@ -13,23 +13,13 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiArchiver/downloadByPath.feature:171](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadByPath.feature#L171)
 - [apiArchiver/downloadByPath.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadByPath.feature#L172)
 
-### [Downloaded /Shares tar contains resource (files|folder) with leading / in Response](https://github.com/owncloud/ocis/issues/4636)
-
-- [apiArchiver/downloadById.feature:173](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L173)
-- [apiArchiver/downloadById.feature:174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L174)
-
-### [Shared mount folder gets deleted when overwritten by a file from personal space](https://github.com/owncloud/ocis/issues/7208)
-
-- [apiSpacesShares/copySpaces.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L696)
-- [apiSpacesShares/copySpaces.feature:715](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L715)
-
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 
 - [apiSpacesShares/shareUploadTUS.feature:283](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L283)
 - [apiSpacesShares/shareUploadTUS.feature:303](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L303)
 - [apiSpacesShares/shareUploadTUS.feature:384](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L384)
 
-### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
+#### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
 
 - [apiAccountsHashDifficulty/assignRole.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L27)
 - [apiAccountsHashDifficulty/assignRole.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L28)
@@ -83,16 +73,16 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiGraphUserGroup/addUserToGroup.feature:295](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L295)
 
-### [Users are added in a group with wrong host in host-part of user](https://github.com/owncloud/ocis/issues/5871)
+#### [Users are added in a group with wrong host in host-part of user](https://github.com/owncloud/ocis/issues/5871)
 
 - [apiGraphUserGroup/addUserToGroup.feature:379](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L379)
 - [apiGraphUserGroup/addUserToGroup.feature:393](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L393)
 
-### [Adding the same user as multiple members in a single request results in listing the same user twice in the group](https://github.com/owncloud/ocis/issues/5855)
+#### [Adding the same user as multiple members in a single request results in listing the same user twice in the group](https://github.com/owncloud/ocis/issues/5855)
 
 - [apiGraphUserGroup/addUserToGroup.feature:430](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/addUserToGroup.feature#L430)
 
-### [Shared file locking is not possible using different path](https://github.com/owncloud/ocis/issues/7599)
+#### [Shared file locking is not possible using different path](https://github.com/owncloud/ocis/issues/7599)
 
 - [apiLocks/lockFiles.feature:188](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L188)
 - [apiLocks/lockFiles.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L189)
@@ -170,7 +160,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:423](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L423)
 - [apiLocks/lockFiles.feature:424](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L424)
 
-### [Anonymous users can unlock a file shared to them through a public link if they get the lock token](https://github.com/owncloud/ocis/issues/7761)
+#### [Anonymous users can unlock a file shared to them through a public link if they get the lock token](https://github.com/owncloud/ocis/issues/7761)
 
 - [apiLocks/unlockFiles.feature:42](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L42)
 - [apiLocks/unlockFiles.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L43)
@@ -179,7 +169,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/unlockFiles.feature:46](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L46)
 - [apiLocks/unlockFiles.feature:47](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L47)
 
-### [Trying to unlock a shared file with sharer's lock token gives 500](https://github.com/owncloud/ocis/issues/7767)
+#### [Trying to unlock a shared file with sharer's lock token gives 500](https://github.com/owncloud/ocis/issues/7767)
 
 - [apiLocks/unlockFiles.feature:115](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L115)
 - [apiLocks/unlockFiles.feature:116](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L116)
@@ -194,7 +184,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/unlockFiles.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L147)
 - [apiLocks/unlockFiles.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L148)
 
-### [Anonymous user trying lock a file shared to them through a public link gives 405](https://github.com/owncloud/ocis/issues/7790)
+#### [Anonymous user trying lock a file shared to them through a public link gives 405](https://github.com/owncloud/ocis/issues/7790)
 
 - [apiLocks/lockFiles.feature:538](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L538)
 - [apiLocks/lockFiles.feature:539](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L539)
@@ -209,7 +199,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:566](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L566)
 - [apiLocks/lockFiles.feature:567](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L567)
 
-### [blocksDownload link type is not implemented yet (sharing-ng)](https://github.com/owncloud/ocis/issues/7879)
+#### [blocksDownload link type is not implemented yet (sharing-ng)](https://github.com/owncloud/ocis/issues/7879)
 
 - [apiSharingNgLinkSharePermission/createLinkShare.feature:72](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgLinkSharePermission/createLinkShare.feature#L72)
 - [apiSharingNgLinkSharePermission/createLinkShare.feature:202](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgLinkSharePermission/createLinkShare.feature#L202)
@@ -262,14 +252,14 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg1/removeAccessToDrive.feature:206](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg1/removeAccessToDrive.feature#L206)
 - [apiSharingNg1/removeAccessToDrive.feature:236](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg1/removeAccessToDrive.feature#L236)
 
-### [sharee (editor role) MOVE a file by file-id into shared sub-folder returns 502](https://github.com/owncloud/ocis/issues/7617)
+#### [sharee (editor role) MOVE a file by file-id into shared sub-folder returns 502](https://github.com/owncloud/ocis/issues/7617)
 
 - [apiSpacesDavOperation/moveByFileId.feature:469](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L469)
 - [apiSpacesDavOperation/moveByFileId.feature:470](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L470)
 - [apiSpacesDavOperation/moveByFileId.feature:732](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L732)
 - [apiSpacesDavOperation/moveByFileId.feature:733](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L733)
 
-### [MOVE a file into same folder with same name returns 404 instead of 403](https://github.com/owncloud/ocis/issues/1976)
+#### [MOVE a file into same folder with same name returns 404 instead of 403](https://github.com/owncloud/ocis/issues/1976)
 
 - [apiSpacesShares/moveSpaces.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L69)
 - [apiSpacesShares/moveSpaces.feature:70](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L70)
@@ -285,19 +275,21 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:492](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L492)
 - [apiSpacesDavOperation/moveByFileId.feature:493](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L493)
 
-### [OCM. sharing issues](https://github.com/owncloud/ocis/issues/9534)
+#### [OCM. sharing issues](https://github.com/owncloud/ocis/issues/9534)
 
 - [apiOcm/share.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L12)
 - [apiOcm/share.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L91)
 
-### [OCM. user cannot see invite description and inviteUser email](https://github.com/owncloud/ocis/issues/9591)
+#### [OCM. user cannot see invite description and inviteUser email](https://github.com/owncloud/ocis/issues/9591)
 
 - [apiOcm/createInvitation.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/createInvitation.feature#L63)
 
-### [OCM. admin cannot get federated users if he hasn't connection with them ](https://github.com/owncloud/ocis/issues/9829)
+#### [OCM. admin cannot get federated users if he hasn't connection with them ](https://github.com/owncloud/ocis/issues/9829)
 
 tests/acceptance/features/apiOcm/searchFederationUsers.feature
+
 - [apiOcm/searchFederationUsers.feature:429](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/searchFederationUsers.feature#L429)
 - [apiOcm/searchFederationUsers.feature:601](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/searchFederationUsers.feature#L601)
-- Note: always have an empty line at the end of this file.
-  The bash script that processes this file requires that the last line has a newline on the end.
+
+Note: always have an empty line at the end of this file.
+The bash script that processes this file requires that the last line has a newline on the end.

@@ -28,6 +28,9 @@ use TestHelpers\HttpRequestHelper;
 use TestHelpers\SetupHelper;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
+use splitbrain\PHPArchive\Tar;
+use splitbrain\PHPArchive\Zip;
+use splitbrain\PHPArchive\Archive;
 
 require_once 'bootstrap.php';
 
@@ -63,6 +66,39 @@ class ArchiverContext implements Context {
 	}
 
 	/**
+	 * @param string $type
+	 *
+	 * @return Archive
+	 */
+	public function getArchiveClass(string $type): Archive {
+		if ($type === 'zip') {
+			return new Zip();
+		} elseif ($type === 'tar') {
+			return new Tar();
+		} else {
+			throw new Exception('Unknown archive type: ' . $type);
+		}
+	}
+
+	/**
+	 * @param string $dir
+	 *
+	 * @return void
+	 */
+	public function removeDir(string $dir): void {
+		$items = array_diff(scandir($dir), ['.', '..']);
+		foreach ($items as $item) {
+			$itemPath = $dir . DIRECTORY_SEPARATOR . $item;
+			if (\is_dir($itemPath)) {
+				$this->removeDir($itemPath);
+			} else {
+				\unlink($itemPath);
+			}
+		}
+		\rmdir($dir);
+	}
+
+	/**
 	 * @param string $user
 	 * @param string $resource
 	 * @param string $addressType id|ids|path|paths
@@ -92,9 +128,10 @@ class ArchiverContext implements Context {
 	}
 
 	/**
-	 * @When user :user downloads the archive of :resource using the resource :addressType and setting these headers
+	 * @When /^user "([^"]*)" downloads the (zip|tar) archive of "([^"]*)" using the resource (id|ids|path|paths) and setting these headers:$/
 	 *
 	 * @param string $user
+	 * @param string $archiveType
 	 * @param string $resource
 	 * @param string $addressType id|path
 	 * @param TableNode $headersTable
@@ -104,8 +141,9 @@ class ArchiverContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function userDownloadsTheArchive(
+	public function userDownloadsTheZipOrTarArchiveOfResourceUsingResourceIdOrPathAndSettingTheseHeaders(
 		string $user,
+		string $archiveType,
 		string $resource,
 		string $addressType,
 		TableNode $headersTable
@@ -118,7 +156,7 @@ class ArchiverContext implements Context {
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
-		$this->featureContext->setResponse($this->downloadArchive($user, $resource, $addressType, null, $headers));
+		$this->featureContext->setResponse($this->downloadArchive($user, $resource, $addressType, $archiveType, null, $headers));
 	}
 
 	/**
@@ -140,13 +178,14 @@ class ArchiverContext implements Context {
 		string $owner,
 		string $addressType
 	): void {
-		$this->featureContext->setResponse($this->downloadArchive($downloader, $resource, $addressType, $owner));
+		$this->featureContext->setResponse($this->downloadArchive($downloader, $resource, $addressType, null, $owner));
 	}
 
 	/**
 	 * @param string $downloader
 	 * @param string $resource
 	 * @param string $addressType
+	 * @param string|null $archiveType
 	 * @param string|null $owner
 	 * @param array|null $headers
 	 *
@@ -158,12 +197,16 @@ class ArchiverContext implements Context {
 		string $downloader,
 		string $resource,
 		string $addressType,
+		?string $archiveType = null,
 		?string $owner = null,
 		?array $headers = null
 	): ResponseInterface {
 		$owner = $owner ??  $downloader;
 		$downloader = $this->featureContext->getActualUsername($downloader);
 		$queryString = $this->getArchiverQueryString($owner, $resource, $addressType);
+		if ($archiveType !== null) {
+			$queryString .= '&output-format=' . $archiveType;
+		}
 		return HttpRequestHelper::get(
 			$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
 			$this->featureContext->getStepLineRef(),
@@ -220,28 +263,34 @@ class ArchiverContext implements Context {
 		$this->featureContext->verifyTableNodeColumns($expectedFiles, ['name', 'content']);
 		$contents = $this->featureContext->getResponse()->getBody()->getContents();
 		$tempFile = \tempnam(\sys_get_temp_dir(), 'OcAcceptanceTests_');
+		$tempExtractFolder = $tempFile;
 		\unlink($tempFile); // we only need the name
 		$tempFile = $tempFile . '.' . $type; // it needs the extension
 		\file_put_contents($tempFile, $contents);
 
 		// open the archive
-		$archiveData = new RecursiveIteratorIterator(
-			new PharData($tempFile),
-			RecursiveIteratorIterator::SELF_FIRST
-		);
+		$tar = $this->getArchiveClass($type);
+		$tar->open($tempFile);
+		$archiveData = $tar->contents();
+		
+		// extract the archive
+		$tar->open($tempFile);
+		$tar->extract($tempExtractFolder);
+		$tar->close();
+
 		foreach ($expectedFiles->getHash() as $expectedItem) {
 			$expectedPath = trim($expectedItem['name'], "/");
 			$found = false;
 			foreach ($archiveData as $info) {
 				// get only the parent folder path for the given item
-				$actualPath = explode(".$type", $info->getPathname())[1];
-				$actualPath = trim($actualPath, "/");
+				$actualPath = $info->getPath();
 
 				if ($expectedPath === $actualPath) {
-					if (!$info->isDir()) {
+					if (!$info->getIsdir()) {
+						$fileContent = \file_get_contents("$tempExtractFolder/$actualPath");
 						Assert::assertEquals(
 							$expectedItem['content'],
-							$info->getContent(),
+							$fileContent,
 							__METHOD__ .
 							" content of '" . $expectedPath . "' not as expected"
 						);
@@ -255,5 +304,6 @@ class ArchiverContext implements Context {
 			}
 		}
 		\unlink($tempFile);
+		$this->removeDir($tempExtractFolder);
 	}
 }
