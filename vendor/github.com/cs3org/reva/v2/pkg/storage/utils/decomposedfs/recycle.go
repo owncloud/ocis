@@ -23,7 +23,6 @@ import (
 	iofs "io/fs"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -55,6 +54,9 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 	if ref == nil || ref.ResourceId == nil || ref.ResourceId.OpaqueId == "" {
 		return nil, errtypes.BadRequest("spaceid required")
 	}
+	if key == "" && relativePath != "" {
+		return nil, errtypes.BadRequest("key is required when navigating with a path")
+	}
 	spaceID := ref.ResourceId.OpaqueId
 
 	sublog := appctx.GetLogger(ctx).With().Str("spaceid", spaceID).Str("key", key).Str("relative_path", relativePath).Logger()
@@ -75,7 +77,7 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 		return nil, errtypes.NotFound(key)
 	}
 
-	if key == "" && relativePath == "/" {
+	if key == "" && relativePath == "" {
 		return fs.listTrashRoot(ctx, spaceID)
 	}
 
@@ -113,16 +115,25 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 		sublog.Error().Err(err).Msg("could not parse time format, ignoring")
 	}
 
-	nodeType := fs.lu.TypeFromPath(ctx, originalPath)
-	if nodeType != provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+	var size int64
+	if relativePath == "" {
 		// this is the case when we want to directly list a file in the trashbin
-		blobsize, err := strconv.ParseInt(string(attrs[prefixes.BlobsizeAttr]), 10, 64)
-		if err != nil {
-			return items, err
+		nodeType := fs.lu.TypeFromPath(ctx, originalPath)
+		switch nodeType {
+		case provider.ResourceType_RESOURCE_TYPE_FILE:
+			size, err = fs.lu.ReadBlobSizeAttr(ctx, originalPath)
+			if err != nil {
+				return items, err
+			}
+		case provider.ResourceType_RESOURCE_TYPE_CONTAINER:
+			size, err = fs.lu.MetadataBackend().GetInt64(ctx, originalPath, prefixes.TreesizeAttr)
+			if err != nil {
+				return items, err
+			}
 		}
 		item := &provider.RecycleItem{
-			Type:         nodeType,
-			Size:         uint64(blobsize),
+			Type:         fs.lu.TypeFromPath(ctx, originalPath),
+			Size:         uint64(size),
 			Key:          filepath.Join(key, relativePath),
 			DeletionTime: deletionTime,
 			Ref: &provider.Reference{
@@ -134,9 +145,6 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 	}
 
 	// we have to read the names and stat the path to follow the symlinks
-	if err != nil {
-		return nil, err
-	}
 	childrenPath := filepath.Join(originalPath, relativePath)
 	childrenDir, err := os.Open(childrenPath)
 	if err != nil {
@@ -154,9 +162,10 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 			continue
 		}
 
-		size := int64(0)
+		// reset size
+		size = 0
 
-		nodeType = fs.lu.TypeFromPath(ctx, resolvedChildPath)
+		nodeType := fs.lu.TypeFromPath(ctx, resolvedChildPath)
 		switch nodeType {
 		case provider.ResourceType_RESOURCE_TYPE_FILE:
 			size, err = fs.lu.ReadBlobSizeAttr(ctx, resolvedChildPath)
@@ -165,12 +174,7 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 				continue
 			}
 		case provider.ResourceType_RESOURCE_TYPE_CONTAINER:
-			attr, err := fs.lu.MetadataBackend().Get(ctx, resolvedChildPath, prefixes.TreesizeAttr)
-			if err != nil {
-				sublog.Error().Err(err).Str("name", name).Msg("invalid tree size, skipping")
-				continue
-			}
-			size, err = strconv.ParseInt(string(attr), 10, 64)
+			size, err = fs.lu.MetadataBackend().GetInt64(ctx, resolvedChildPath, prefixes.TreesizeAttr)
 			if err != nil {
 				sublog.Error().Err(err).Str("name", name).Msg("invalid tree size, skipping")
 				continue
@@ -217,7 +221,7 @@ func readTrashLink(path string) (string, string, string, error) {
 func (fs *Decomposedfs) listTrashRoot(ctx context.Context, spaceID string) ([]*provider.RecycleItem, error) {
 	log := appctx.GetLogger(ctx)
 	trashRoot := fs.getRecycleRoot(spaceID)
-
+	items := []*provider.RecycleItem{}
 	subTrees, err := filepath.Glob(trashRoot + "/*")
 	if err != nil {
 		return nil, err
@@ -256,6 +260,7 @@ func (fs *Decomposedfs) listTrashRoot(ctx context.Context, spaceID string) ([]*p
 				}
 
 				for _, itemPath := range matches {
+					// TODO can we encode this in the path instead of reading the link?
 					nodePath, nodeID, timeSuffix, err := readTrashLink(itemPath)
 					if err != nil {
 						log.Error().Err(err).Str("trashRoot", trashRoot).Str("item", itemPath).Msg("error reading trash link, skipping")
@@ -300,6 +305,7 @@ func (fs *Decomposedfs) listTrashRoot(ctx context.Context, spaceID string) ([]*p
 					} else {
 						log.Error().Str("trashRoot", trashRoot).Str("item", itemPath).Str("spaceid", spaceID).Str("nodeid", nodeID).Str("dtime", timeSuffix).Msg("could not read origin path")
 					}
+
 					select {
 					case results <- item:
 					case <-ctx.Done():
@@ -318,7 +324,6 @@ func (fs *Decomposedfs) listTrashRoot(ctx context.Context, spaceID string) ([]*p
 	}()
 
 	// Collect results
-	items := []*provider.RecycleItem{}
 	for ri := range results {
 		items = append(items, ri)
 	}
@@ -414,7 +419,7 @@ func (fs *Decomposedfs) EmptyRecycle(ctx context.Context, ref *provider.Referenc
 		return errtypes.BadRequest("spaceid must be set")
 	}
 
-	items, err := fs.ListRecycle(ctx, ref, "", "/")
+	items, err := fs.ListRecycle(ctx, ref, "", "")
 	if err != nil {
 		return err
 	}

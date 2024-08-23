@@ -129,8 +129,8 @@ var responses = map[string]Response{
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/ListGrants {"path":"/subdir"} GRANT-UPDATED`: {200, `[{"grantee":{"type":1,"Id":{"UserId":{"idp":"some-idp","opaque_id":"some-opaque-id","type":1}}},"permissions":{"add_grant":true,"create_container":true,"delete":true,"get_path":true,"get_quota":true,"initiate_file_download":true,"initiate_file_upload":true,"list_grants":true,"list_container":true,"list_file_versions":true,"list_recycle":true,"move":true,"remove_grant":true,"purge_recycle":true,"restore_file_version":true,"restore_recycle_item":true,"stat":true,"update_grant":true,"deny_grant":true}}]`, serverStateEmpty},
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/ListGrants {"path":"/subdir"} GRANT-REMOVED`: {200, `[]`, serverStateEmpty},
 
-	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/ListRecycle {"key":"","path":"/"} EMPTY`:   {200, `[]`, serverStateEmpty},
-	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/ListRecycle {"key":"","path":"/"} RECYCLE`: {200, `[{"opaque":{},"key":"some-deleted-version","ref":{"resource_id":{},"path":"/subdir"},"size":12345,"deletion_time":{"seconds":1234567890}}]`, serverStateRecycle},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/ListRecycle {"key":"","path":""} EMPTY`:   {200, `[]`, serverStateEmpty},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/ListRecycle {"key":"","path":""} RECYCLE`: {200, `[{"opaque":{},"key":"some-deleted-version","ref":{"resource_id":{},"path":"/subdir"},"size":12345,"deletion_time":{"seconds":1234567890}}]`, serverStateRecycle},
 
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/ListRevisions {"path":"/versionedFile"} EMPTY`:         {200, `[{"opaque":{"map":{"some":{"value":"ZGF0YQ=="}}},"key":"version-12","size":1,"mtime":1234567890,"etag":"deadb00f"}]`, serverStateEmpty},
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/ListRevisions {"path":"/versionedFile"} FILE-RESTORED`: {200, `[{"opaque":{"map":{"some":{"value":"ZGF0YQ=="}}},"key":"version-12","size":1,"mtime":1234567890,"etag":"deadb00f"},{"opaque":{"map":{"different":{"value":"c3R1ZmY="}}},"key":"asdf","size":2,"mtime":1234567890,"etag":"deadbeef"}]`, serverStateFileRestored},
@@ -139,9 +139,9 @@ var responses = map[string]Response{
 
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/RemoveGrant {"path":"/subdir"} GRANT-ADDED`: {200, ``, serverStateGrantRemoved},
 
-	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/RestoreRecycleItem null`:                                                                              {200, ``, serverStateSubdir},
-	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/RestoreRecycleItem {"key":"some-deleted-version","path":"/","restoreRef":{"path":"/subdirRestored"}}`: {200, ``, serverStateFileRestored},
-	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/RestoreRecycleItem {"key":"some-deleted-version","path":"/","restoreRef":null}`:                       {200, ``, serverStateFileRestored},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/RestoreRecycleItem null`:                                                                             {200, ``, serverStateSubdir},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/RestoreRecycleItem {"key":"some-deleted-version","path":"","restoreRef":{"path":"/subdirRestored"}}`: {200, ``, serverStateFileRestored},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/RestoreRecycleItem {"key":"some-deleted-version","path":"","restoreRef":null}`:                       {200, ``, serverStateFileRestored},
 
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/RestoreRevision {"ref":{"path":"/versionedFile"},"key":"version-12"}`: {200, ``, serverStateFileRestored},
 
