@@ -382,6 +382,17 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 		if err != nil {
 			return collectionOfPermissions, err
 		}
+		if s.config.IncludeOCMSharees {
+			driveItems, err = s.listOCMShares(ctx, []*ocm.ListOCMSharesRequest_Filter{
+				{
+					Type: ocm.ListOCMSharesRequest_Filter_TYPE_RESOURCE_ID,
+					Term: &ocm.ListOCMSharesRequest_Filter_ResourceId{ResourceId: itemID},
+				},
+			}, driveItems)
+			if err != nil {
+				return collectionOfPermissions, err
+			}
+		}
 	}
 	// finally get public shares, which are possible for spaceroots and "normal" resources
 	driveItems, err = s.listPublicShares(ctx, []*link.ListPublicSharesRequest_Filter{
