@@ -1169,8 +1169,8 @@ github.com/gorilla/schema
 ## explicit; go 1.14
 github.com/grpc-ecosystem/go-grpc-middleware
 github.com/grpc-ecosystem/go-grpc-middleware/recovery
-# github.com/grpc-ecosystem/grpc-gateway/v2 v2.21.0
-## explicit; go 1.20
+# github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0
+## explicit; go 1.21
 github.com/grpc-ecosystem/grpc-gateway/v2/internal/httprule
 github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options
 github.com/grpc-ecosystem/grpc-gateway/v2/runtime
@@ -2286,13 +2286,13 @@ golang.org/x/xerrors/internal
 # google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de
 ## explicit; go 1.19
 google.golang.org/genproto/protobuf/field_mask
-# google.golang.org/genproto/googleapis/api v0.0.0-20240723171418-e6d459c13d2a
-## explicit; go 1.20
+# google.golang.org/genproto/googleapis/api v0.0.0-20240814211410-ddb44dafa142
+## explicit; go 1.21
 google.golang.org/genproto/googleapis/api
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/api/httpbody
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20240723171418-e6d459c13d2a
-## explicit; go 1.20
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20240814211410-ddb44dafa142
+## explicit; go 1.21
 google.golang.org/genproto/googleapis/rpc/errdetails
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.65.0
