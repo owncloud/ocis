@@ -11,7 +11,7 @@ geekdocFilePath: deprecating-variables.md
 
 ## Deprecating Environment Variables
 
-Sometimes it is necessary to deprecate an environment variable to align the naming with conventions or remove it at all. We therefore added annotations to automate the *documentation* process.
+Sometimes it is necessary to deprecate an environment variable to align the naming with conventions or remove it completely. We therefore added annotations to automate the *documentation* process.
 
 The relevant annotations in the envvar struct tag are:
 
@@ -20,15 +20,15 @@ The relevant annotations in the envvar struct tag are:
 * `removalVersion`\
   The version it is finally going to be removed is defined via the mandatory placeholder `%%NEXT_PRODUCTION_VERSION%%`, not an actual version number.
 * `deprecationInfo`\
-  The reason why it got deprecated.
+  The reason why it was deprecated.
 * `deprecationReplacement`\
   Only if it is going to be replaced, not necessary if removed.
 
 {{< hint warning >}}
-During the development cycle, the value for the `removalVersion` must be set to `%%NEXT_PRODUCTION_VERSION%%`.  This placeholder will be removed by the real version number during the production releasing process.
+During the development cycle, the value for the `removalVersion` must be set to `%%NEXT_PRODUCTION_VERSION%%`.  This placeholder will be replaced by the real version number during the production releasing process.
 {{< /hint >}}
 
-For the documentation only to show the correct value for the `removalVersion`, our docs helper scripts will automatically generate the correct version to be printed in the documentation. If `%%NEXT_PRODUCTION_VERSION%%` is found in the query, it will be replaced with `next-prod`, else the value found is used.
+For the documentation to show the correct value for the `removalVersion`, our docs helper scripts will automatically generate the correct version to be printed in the documentation. If `%%NEXT_PRODUCTION_VERSION%%` is found in the query, it will be replaced with `next-prod`, else the value found is used.
 
 ### Example
 

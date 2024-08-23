@@ -54,13 +54,13 @@ If a new envvar is introduced, only the `introductionVersion` is required.
 During the development cycle, the value for the `introductionVersion` must be set to `%%NEXT%%`. This placeholder will be removed by the real version number during the production releasing process. 
 {{< /hint >}}
 
-For the documentation only to show the correct value for the `IV` (introduction version), our docs helper scripts will automatically generate the correct version to be printed in the documentation. If `%%NEXT%%` is found in the query, it will be replaced with `next`, else the value found is used.
+For the documentation to show the correct value for the `IV` (introduction version), our docs helper scripts will automatically generate the correct version to be printed in the documentation. If `%%NEXT%%` is found in the query, it will be replaced with `next`, else the value found is used.
 
 During the releasing process for a production release, the placeholder `%%NEXT%%` has to be replaced with the new production version number like `%%NEXT%%` → `7.0.0`.
 
 ### Deprecate Existing Envvars
 
-See the [deprecation rules]({{< ref "./deprecating-variables.md" >}}) documentation fo rmore details.
+See the [deprecation rules]({{< ref "./deprecating-variables.md" >}}) documentation for more details.
 
 ## Separating Multiple Envvars
 
