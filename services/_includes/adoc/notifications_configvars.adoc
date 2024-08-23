@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-23-12-43-00]
+[#deprecation-note-2024-08-23-13-05-05]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -18,7 +18,7 @@ ifeval::[{show-deprecation} == true]
 
 | The NOTIFICATIONS_SMTP_ENCRYPTION values 'ssl' and 'tls' are deprecated and will be removed in the future.
 | 5.0.0
-| 7.0.0
+| next-prod
 | Use 'starttls' instead of 'tls' and 'ssltls' instead of 'ssl'.
 |===
 
@@ -266,7 +266,7 @@ a| [subs=-attributes]
 Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none' or 'auto'. If set to 'auto' or unset, the authentication method is automatically negotiated with the server.
 
 a|`NOTIFICATIONS_SMTP_ENCRYPTION` +
-xref:deprecation-note-2024-08-23-12-43-00[Deprecation Note]
+xref:deprecation-note-2024-08-23-13-05-05[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
