@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-23-09-12-52]
+[#deprecation-note-2024-08-23-09-33-55]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -601,6 +601,18 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.
+
+a|`OCIS_TRANSLATION_PATH` +
+`GRAPH_TRANSLATION_PATH` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
 
 a|`GRAPH_IDENTITY_BACKEND` +
 

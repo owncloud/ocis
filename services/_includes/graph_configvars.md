@@ -52,6 +52,7 @@
 | GRAPH_SPACES_GROUPS_CACHE_TTL | int | 60000000000 | Max TTL in seconds for the spaces groups cache.|
 | GRAPH_SPACES_STORAGE_USERS_ADDRESS | string | com.owncloud.api.storage-users | The address of the storage-users service.|
 | OCIS_DEFAULT_LANGUAGE | string |  | The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.|
+| OCIS_TRANSLATION_PATH<br/>GRAPH_TRANSLATION_PATH | string |  | (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.|
 | GRAPH_IDENTITY_BACKEND | string | ldap | The user identity backend to use. Supported backend types are 'ldap' and 'cs3'.|
 | OCIS_LDAP_URI<br/>GRAPH_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|
 | OCIS_LDAP_CACERT<br/>GRAPH_LDAP_CACERT | string | /var/lib/ocis/idm/ldap.crt | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.|

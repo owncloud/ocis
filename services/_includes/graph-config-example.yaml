@@ -81,6 +81,7 @@ spaces:
   groups_cache_ttl: 60000000000
   storage_users_address: com.owncloud.api.storage-users
   default_language: ""
+  translation_path: ""
 identity:
   backend: ldap
   ldap:
