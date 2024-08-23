@@ -1,7 +1,7 @@
 ---
 title: "Profiling"
 date: 2021-08-24T12:32:20+01:00
-weight: 56
+weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: profiling.md

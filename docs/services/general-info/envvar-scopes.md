@@ -1,5 +1,5 @@
 ---
-title: Envvar Naming Scope
+title: Envvar Naming Scopes
 date: 2023-03-23T00:00:00+00:00
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
@@ -7,6 +7,8 @@ geekdocEditPath: edit/master/docs/services/general-info
 geekdocFilePath: envvar-scopes.md
 geekdocCollapseSection: true
 ---
+
+{{< toc >}}
 
 The scope of an environment variable can be derived from its name. Therefore, it is important to follow the correct naming scheme to enable easy and proper identification. This is important when either:
 
@@ -20,7 +22,7 @@ The scope of an environment variable can be derived from its name. Therefore, it
 -   Mandatory when used in a service, a global envvar must have a local counterpart.
 -   Variables that do not belong to any service are by definition global.
 
-## Name Scope
+## Naming Scope
 
 ### Local Envvars
 
@@ -34,14 +36,32 @@ Note that this envvar is the global representation of the local example from abo
 
 To get a list of global envvars used in all services, see the [Global Environment Variables](https://doc.owncloud.com/ocis/next/deployment/services/env-vars-special-scope.html#global-environment-variables) table in the ocis admin documentation.
 
-### Lifecycle
+## Lifecycle of Envvars
 
-In the struct tag values of our config data types, we are using three key/value pairs to document the lifecycle of a config variable: `introductionVersion`, `deprecationVersion` and `removalVersion`. During the development cycle, a new value should set to `%%NEXT%%` as long as no release is scheduled. During the release process, the placeholder will be replaced with the actual version number. Our docs helper scripts will then automatically generate the correct documentation based on the version number.
+The envvar struct tag contains at maximum the following key/value pairs to document the lifecycle of a config variable:
 
-## Deprecations
+* `introductionVersion`
+* `deprecationVersion`
+* `removalVersion`
+* `deprecationInfo`
+* `deprecationReplacement`
 
-All environment variable types that are used in a service follow the same [deprecation rules]({{< ref "ocis/development/deprecating-variables/_index.md" >}}) independent of their scope.
+### Introduce new Envvars
 
-## Separating Envvars
+If a new envvar is introduced, only the `introductionVersion` is required.
+
+{{< hint warning >}}
+During the development cycle, the value for the `introductionVersion` must be set to `%%NEXT%%`. This placeholder will be removed by the real version number during the production releasing process. 
+{{< /hint >}}
+
+For the documentation to show the correct value for the `IV` (introduction version), our docs helper scripts will automatically generate the correct version to be printed in the documentation. If `%%NEXT%%` is found in the query, it will be replaced with `next`, else the value found is used.
+
+During the releasing process for a production release, the placeholder `%%NEXT%%` has to be replaced with the new production version number like `%%NEXT%%` → `7.0.0`.
+
+### Deprecate Existing Envvars
+
+See the [deprecation rules]({{< ref "./deprecating-variables.md" >}}) documentation for more details.
+
+## Separating Multiple Envvars
 
 When multiple envvars are defined for one purpose like a global and local one, use `;` (semicolon) to properly separate the envvars in go code. Though it is possible to separate with `,` (comma) according go rules, the current implementation of the docs generation process only recognizes semicolons as separator.
