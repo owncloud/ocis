@@ -1,7 +1,7 @@
 ---
 title: "Beta testplan"
 date: 2022-03-24T00:00:00+00:00
-weight: 37
+weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: beta-testplan.md

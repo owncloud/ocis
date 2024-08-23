@@ -32,7 +32,7 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
   - Add the service config to `ocis-pkg/config/defaultconfig.go`
 - [ ] If the service is using service accounts, add it to `ocis/pkg/init/init.go`
 - [ ] Add the service to `.drone.star` to enable CI.
-- [ ] Inform doc team in an _early stage_ to review the readme AND the environment variables created.
+- [ ] Inform doc team in an *early stage* to review the readme AND the environment variables created.
   - The description must reflect the behaviour AND usually has a positive code quality impact.
 - [ ] Create proper description strings for envvars - see other services for examples, especially when it comes to multiple values. This must include:
   - base description, set of available values, description of each value.
@@ -44,4 +44,5 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
 - [ ] Make sure to have a function `FullDefaultConfig()` in `pkg/config/defaults/defaultconfig.go` of your service. It is needed to create the documentation.
 - [ ] Add metrics to the code to enable monitoring. See the proxy service for implementation details.
   - Plus add documentation about monitoring in the README.md file
+- [ ] When the service requires translations that have to be covered by the service and are not sourced by web, see the [add translation]({{< ref "./add-translations.md" >}}) documentation for more details.
 ```

@@ -1,7 +1,7 @@
 ---
 title: "Build"
 date: 2020-02-27T20:35:00+01:00
-weight: 30
+weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: build.md
