@@ -291,7 +291,7 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 						http.Redirect(w, r, rUrl, http.StatusTemporaryRedirect)
 						return
 					}
-					log.Debug().Str("token", token).Interface("status", res.Status).Msg("resource id not found")
+					log.Debug().Str("token", token).Interface("status", psRes.Status).Msg("resource id not found")
 					w.WriteHeader(http.StatusNotFound)
 					return
 				}

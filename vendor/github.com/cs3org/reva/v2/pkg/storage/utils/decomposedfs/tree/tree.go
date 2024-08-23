@@ -584,10 +584,8 @@ func (t *Tree) RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPa
 
 		attrs := node.Attributes{}
 		attrs.SetString(prefixes.NameAttr, targetNode.Name)
-		if trashPath != "" {
-			// set ParentidAttr to restorePath's node parent id
-			attrs.SetString(prefixes.ParentidAttr, targetNode.ParentID)
-		}
+		// set ParentidAttr to restorePath's node parent id
+		attrs.SetString(prefixes.ParentidAttr, targetNode.ParentID)
 
 		if err = recycleNode.SetXattrsWithContext(ctx, attrs, true); err != nil {
 			return errors.Wrap(err, "Decomposedfs: could not update recycle node")

@@ -21,6 +21,7 @@ package ocdav
 import (
 	"net/http"
 	"path"
+	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
@@ -132,8 +133,7 @@ func (h *SpacesHandler) handleSpacesTrashbin(w http.ResponseWriter, r *http.Requ
 	ctx := r.Context()
 	log := appctx.GetLogger(ctx)
 
-	var spaceID string
-	spaceID, r.URL.Path = router.ShiftPath(r.URL.Path)
+	spaceID, key := splitSpaceAndKey(r.URL.Path)
 	if spaceID == "" {
 		// listing is disabled, no auth will change that
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -146,12 +146,9 @@ func (h *SpacesHandler) handleSpacesTrashbin(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var key string
-	key, r.URL.Path = router.ShiftPath(r.URL.Path)
-
 	switch r.Method {
 	case MethodPropfind:
-		trashbinHandler.listTrashbin(w, r, s, &ref, path.Join(_trashbinPath, spaceID), key, r.URL.Path)
+		trashbinHandler.listTrashbin(w, r, s, &ref, path.Join(_trashbinPath, spaceID), key)
 	case MethodMove:
 		if key == "" {
 			http.Error(w, "501 Not implemented", http.StatusNotImplemented)
@@ -167,15 +164,25 @@ func (h *SpacesHandler) handleSpacesTrashbin(w http.ResponseWriter, r *http.Requ
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		log.Debug().Str("key", key).Str("path", r.URL.Path).Str("dst", dst).Msg("spaces restore")
+		log.Debug().Str("key", key).Str("dst", dst).Msg("spaces restore")
 
 		dstRef := proto.Clone(&ref).(*provider.Reference)
 		dstRef.Path = utils.MakeRelativePath(dst)
 
-		trashbinHandler.restore(w, r, s, &ref, dstRef, key, r.URL.Path)
+		trashbinHandler.restore(w, r, s, &ref, dstRef, key)
 	case http.MethodDelete:
-		trashbinHandler.delete(w, r, s, &ref, key, r.URL.Path)
+		trashbinHandler.delete(w, r, s, &ref, key)
 	default:
 		http.Error(w, "501 Not implemented", http.StatusNotImplemented)
 	}
+}
+
+func splitSpaceAndKey(p string) (space, key string) {
+	p = strings.TrimPrefix(p, "/")
+	parts := strings.SplitN(p, "/", 2)
+	space = parts[0]
+	if len(parts) > 1 {
+		key = parts[1]
+	}
+	return
 }
