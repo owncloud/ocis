@@ -42,23 +42,6 @@ use GuzzleHttp\Pool;
 class HttpRequestHelper {
 	public const HTTP_TOO_EARLY = 425;
 	public const HTTP_CONFLICT = 409;
-	private static ?string $oCSelectorCookie = null;
-
-	/**
-	 * @return string
-	 */
-	public static function getOCSelectorCookie(): string {
-		return self::$oCSelectorCookie;
-	}
-
-	/**
-	 * @param string $oCSelectorCookie	"owncloud-selector=oc10;path=/;"
-	 *
-	 * @return void
-	 */
-	public static function setOCSelectorCookie(string $oCSelectorCookie): void {
-		self::$oCSelectorCookie = $oCSelectorCookie;
-	}
 
 	/**
 	 * Some systems-under-test do async post-processing of operations like upload,
@@ -407,20 +390,6 @@ class HttpRequestHelper {
 			// So we need to do it here.
 			$body = \http_build_query($body, '', '&');
 			$headers['Content-Type'] = 'application/x-www-form-urlencoded';
-		}
-
-		if (OcisHelper::isTestingParallelDeployment()) {
-			// oCIS cannot handle '/apps/testing' endpoints
-			// so those requests must be redirected to oC10 server
-			// change server to oC10 if the request url has `/apps/testing`
-			if (strpos($url, "/apps/testing") !== false) {
-				$oCISServerUrl = \getenv('TEST_SERVER_URL');
-				$oC10ServerUrl = \getenv('TEST_OC10_URL');
-				$url = str_replace($oCISServerUrl, $oC10ServerUrl, $url);
-			} else {
-				// set 'owncloud-server' selector cookie for oCIS requests
-				$headers['Cookie'] = self::getOCSelectorCookie();
-			}
 		}
 
 		$request = new Request(

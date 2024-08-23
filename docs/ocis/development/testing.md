@@ -419,56 +419,6 @@ BEHAT_FEATURE="tests/acceptance/features/apiSearchContent/contentSearch.feature"
 make test-acceptance-api
 ```
 
-## Running Tests for Parallel Deployment
-
-### Setup the Parallel Deployment Environment
-
-Instruction on setup is available [here](https://owncloud.dev/ocis/deployment/oc10_ocis_parallel/#local-setup)
-
-Edit the `.env` file and uncomment this line:
-
-```bash
-COMPOSE_FILE=docker-compose.yml:testing/docker-compose-additions.yml
-```
-
-Start the docker stack with the following command:
-
-```bash
-docker-compose up -d
-```
-
-### Getting the Test Helpers
-
-All the test helpers are located in the core repo.
-
-```bash
-git clone https://github.com/owncloud/core.git
-```
-
-### Run the Acceptance Tests
-
-Run the acceptance tests with the following command from the root of the oCIS repository:
-
-```bash
-make test-paralleldeployment-api \
-TEST_SERVER_URL="https://cloud.owncloud.test" \
-TEST_OC10_URL="http://localhost:8080" \
-TEST_PARALLEL_DEPLOYMENT=true \
-TEST_WITH_LDAP=true \
-PATH_TO_CORE="<path_to_core>" \
-SKELETON_DIR="<path_to_core>/apps/testing/data/apiSkeleton"
-```
-
-Replace `<path_to_core>` with the actual path to the root directory of core repo that you have cloned earlier.
-
-In order to run a single test, use the `BEHAT_FEATURE` environment variable.
-
-```bash
-make test-paralleldeployment-api \
-... \
-BEHAT_FEATURE="tests/parallelDeployAcceptance/features/apiShareManagement/acceptShares.feature"
-```
-
 ## Running Test Suite With Antivirus Service (@antivirus)
 Test suites that are tagged with `@antivirus` require antivirus service. The available antivirus and the configuration related to them can be found [here](https://doc.owncloud.com/ocis/next/deployment/services/s-list/antivirus.html). This documentation is only going to use `clamAv` as antivirus.
 
