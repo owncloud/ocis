@@ -71,7 +71,7 @@ func (g Graph) applyDefaultTemplate(ctx context.Context, gwc gateway.GatewayAPIC
 	opaque = utils.AppendPlainToOpaque(opaque, SpaceImageSpecialFolderName, iid)
 
 	// upload readme.md
-	rid, err := readmeUpload(ctx, mdc, locale, g.config.Spaces.DefaultLanguage)
+	rid, err := readmeUpload(ctx, mdc, locale, g.config.Spaces.DefaultLanguage, g.config.Spaces.TranslationPath)
 	if err != nil {
 		return err
 	}
@@ -112,10 +112,10 @@ func imageUpload(ctx context.Context, mdc *metadata.CS3) (string, error) {
 	return res.FileID, nil
 }
 
-func readmeUpload(ctx context.Context, mdc *metadata.CS3, locale string, defaultLocale string) (string, error) {
+func readmeUpload(ctx context.Context, mdc *metadata.CS3, locale string, defaultLocale string, translationPath string) (string, error) {
 	res, err := mdc.Upload(ctx, metadata.UploadRequest{
 		Path:    filepath.Join(_spaceFolderName, _readmeName),
-		Content: []byte(l10n_pkg.Translate(_readmeText, locale, defaultLocale)),
+		Content: []byte(l10n_pkg.Translate(_readmeText, locale, defaultLocale, translationPath)),
 	})
 	if err != nil {
 		return "", err

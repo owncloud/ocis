@@ -20,8 +20,8 @@ const (
 )
 
 // Translate translates a string based on the locale and default locale
-func Translate(content, locale, defaultLocale string) string {
-	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, "", _localeFS, _localeSubPath)
+func Translate(content, locale, defaultLocale, translationPath string) string {
+	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, translationPath, _localeFS, _localeSubPath)
 	return t.Translate(content, locale)
 }
 
