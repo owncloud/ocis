@@ -57,6 +57,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Activity Translations: [#9856](https://github.com/owncloud/ocis/pull/9856)
 * Bugfix - The user attributes `userType` and `memberOf` are readonly: [#9867](https://github.com/owncloud/ocis/pull/9867)
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
+* Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
 * Enhancement - Allow setting default locale of activitylog: [#9892](https://github.com/owncloud/ocis/pull/9892)
 
 ## Details
@@ -89,6 +90,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/1357
    https://github.com/owncloud/ocis/pull/9890
+
+* Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
+
+   The `revisions purge` command would time out on big spaces. We have improved
+   performance by parallelizing the process.
+
+   https://github.com/owncloud/ocis/pull/9891
 
 * Enhancement - Allow setting default locale of activitylog: [#9892](https://github.com/owncloud/ocis/pull/9892)
 
