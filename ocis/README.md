@@ -89,6 +89,8 @@ Do not remove any revisions but print the revisions that would be removed.
 Allows specifying the blobstore to use. Defaults to `ocis`. Can be switched to `s3ng` but needs addtional envvar configuration (see the `storage-users` service for more details).
 * `-v` / `--verbose`\
 Prints additional information about the revisions that are removed.
+* `--glob-mechanism` (default: `glob`\
+(advanced) Allows specifying the mechanism to use for globbing. Can be `glob`, `list` or `workers`. In most cases the default `glob` does not need to be changed. If large spaces need to be purged, `list` or `workers` can be used to improve performance at the cost of higher cpu and ram usage. `list` will spawn 10 threads that list folder contents in parallel. `workers` will use a special globbing mechanism and multiple threads to achieve the best performance for the highest cost.
 
 ### Trash CLI
 
