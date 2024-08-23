@@ -59,13 +59,13 @@ dirs = {
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": True,
+        "skip": False,
     },
     "wopiValidatorTests": {
-        "skip": True,
+        "skip": False,
     },
     "k6LoadTests": {
-        "skip": True,
+        "skip": False,
     },
     "localApiTests": {
         "basic": {
@@ -92,20 +92,19 @@ config = {
                 "apiSharingNgLinkShareRoot",
                 "apiActivities",
             ],
-            "skip": True,
+            "skip": False,
         },
         "apiAccountsHashDifficulty": {
             "suites": [
                 "apiAccountsHashDifficulty",
             ],
             "accounts_hash_difficulty": "default",
-            "skip": True,
         },
         "apiNotification": {
             "suites": [
                 "apiNotification",
             ],
-            "skip": True,
+            "skip": False,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
@@ -123,7 +122,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": True,
+            "skip": False,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -137,14 +136,14 @@ config = {
             "suites": [
                 "apiSearchContent",
             ],
-            "skip": True,
+            "skip": False,
             "tikaNeeded": True,
         },
         "apiOcm": {
             "suites": [
                 "apiOcm",
             ],
-            "skip": True,
+            "skip": False,
             "federationServer": True,
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "ocm",
@@ -159,7 +158,6 @@ config = {
             "suites": [
                 "cliCommands",
             ],
-            "skip": True,
         },
         "apiAppProvider": {
             "suites": [
@@ -178,17 +176,17 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
     },
     "e2eTests": {
         "part": {
-            "skip": True,
+            "skip": False,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc"],  # suites to skip
         },
         "search": {
-            "skip": True,
+            "skip": False,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
         },
@@ -204,7 +202,7 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": False,
+    "litmus": True,
     "codestyle": True,
 }
 
@@ -295,7 +293,15 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
+        codestyle(ctx) + \
+        checkGherkinLint(ctx) + \
+        checkTestSuitesInExpectedFailures(ctx) + \
+        buildWebCache(ctx) + \
+        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
+        checkStarlark() + \
+        build_release_helpers + \
+        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -309,7 +315,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines
+    pipelines = test_pipelines + build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -2186,6 +2192,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "commands": [
                 "%s init --insecure true" % ocis_bin,
                 "cat $OCIS_CONFIG_DIR/ocis.yaml",
+                "cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml",
             ] + (wrapper_commands),
             "volumes": volumes,
             "depends_on": depends_on,

@@ -8,7 +8,7 @@ Feature: App Provider
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
     And we save it into "FILEID"
-    When user "Alice" sends HTTP method "POST" to URL "<endpoint>"
+    When user "Alice" sends HTTP method "POST" to URL "<app-endpoint>"
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -46,6 +46,6 @@ Feature: App Provider
       }
       """
     Examples:
-      | endpoint                                         |
+      | app-endpoint                                     |
       | /app/open?file_id=<<FILEID>>&app_name=FakeOffice |
       | /app/open?file_id=<<FILEID>>                     |
