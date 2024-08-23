@@ -20,7 +20,7 @@ The following roles are now disabled by default:
 
 To enable the UnifiedRoleSecureViewer role, you must provide a list of all available roles through one of the following methods:
 
-- Using the UNIFIED_ROLES_AVAILABLE_ROLES environment variable.
+- Using the GRAPH_AVAILABLE_ROLES environment variable.
 - Setting the available_roles configuration value.
 
 To enable a role, include the UID of the role in the list of available roles.

@@ -10,8 +10,10 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
-var (
-	_contextRoleIDsValueKey = "roleFilterIDs"
+type contextKey int
+
+const (
+	ContextKeyRoleIDsValueKey contextKey = iota
 )
 
 // initLibregraph initializes libregraph validation
@@ -88,7 +90,7 @@ func rolesAndActions(ctx context.Context, sl validator.StructLevel, roles, actio
 	var availableActions []string
 	var definitions []*libregraph.UnifiedRoleDefinition
 
-	switch roles, ok := ctx.Value(_contextRoleIDsValueKey).([]string); {
+	switch roles, ok := ctx.Value(ContextKeyRoleIDsValueKey).([]string); {
 	case ok:
 		definitions = unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(roles...))
 	default:
@@ -133,5 +135,5 @@ func rolesAndActions(ctx context.Context, sl validator.StructLevel, roles, actio
 
 // ContextWithAllowedRoleIDs returns a new context which includes the allowed role IDs.
 func ContextWithAllowedRoleIDs(ctx context.Context, rolesIds []string) context.Context {
-	return context.WithValue(ctx, _contextRoleIDsValueKey, rolesIds)
+	return context.WithValue(ctx, ContextKeyRoleIDsValueKey, rolesIds)
 }

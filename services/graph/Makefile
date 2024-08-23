@@ -45,7 +45,7 @@ l10n-push:
 
 .PHONY: l10n-read
 l10n-read: $(GO_XGETTEXT)
-	go-xgettext -o $(OUTPUT_DIR)/graph.pot --keyword=l10n.Template --add-comments -s pkg/service/v0/spacetemplates.go -s pkg/unifiedrole/unifiedrole.go
+	go-xgettext -o $(OUTPUT_DIR)/graph.pot --keyword=l10n.Template --add-comments -s pkg/service/v0/spacetemplates.go -s pkg/unifiedrole/roles.go
 
 .PHONY: l10n-write
 l10n-write:
