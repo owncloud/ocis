@@ -5928,10 +5928,10 @@ IDM_ADMIN_USER_ID:
   removalVersion: ""
   deprecationInfo: ""
 IDM_CREATE_DEMO_USERS:
-  name: SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;IDM_CREATE_DEMO_USERS
+  name: IDM_CREATE_DEMO_USERS
   defaultValue: "false"
   type: bool
-  description: The default role assignments the demo users should be setup.
+  description: Flag to enable or disable the creation of the demo users.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -7703,7 +7703,7 @@ OCDAV_WEBDAV_NAMESPACE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_ADMIN_USER_ID:
-  name: OCIS_ADMIN_USER_ID;SETTINGS_ADMIN_USER_ID
+  name: OCIS_ADMIN_USER_ID;IDM_ADMIN_USER_ID
   defaultValue: ""
   type: string
   description: ID of the user that should receive admin privileges. Consider that
@@ -7733,28 +7733,28 @@ OCIS_ASYNC_UPLOADS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_AUTH_PASSWORD:
-  name: OCIS_CACHE_AUTH_PASSWORD;STORAGE_SYSTEM_CACHE_AUTH_PASSWORD
+  name: OCIS_CACHE_AUTH_PASSWORD;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD
   defaultValue: ""
   type: string
-  description: Password for the configured store. Only applies when store type 'nats-js-kv'
-    is configured.
+  description: The password to authenticate with the store. Only applies when store
+    type 'nats-js-kv' is configured.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_AUTH_USERNAME:
-  name: OCIS_CACHE_AUTH_USERNAME;STORAGE_SYSTEM_CACHE_AUTH_USERNAME
+  name: OCIS_CACHE_AUTH_USERNAME;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME
   defaultValue: ""
   type: string
-  description: Username for the configured store. Only applies when store type 'nats-js-kv'
-    is configured.
+  description: The username to authenticate with the store. Only applies when store
+    type 'nats-js-kv' is configured.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_DATABASE:
   name: OCIS_CACHE_DATABASE
-  defaultValue: storage-system
+  defaultValue: cache-userinfo
   type: string
   description: The database name the configured store should use.
   introductionVersion: pre5.0
@@ -7762,61 +7762,60 @@ OCIS_CACHE_DATABASE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_DISABLE_PERSISTENCE:
-  name: OCIS_CACHE_DISABLE_PERSISTENCE;STORAGE_SYSTEM_CACHE_DISABLE_PERSISTENCE
-  defaultValue: "false"
+  name: OCIS_CACHE_DISABLE_PERSISTENCE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE
+  defaultValue: "true"
   type: bool
-  description: Disables persistence of the cache. Only applies when store type 'nats-js-kv'
-    is configured. Defaults to false.
+  description: Disables persistence of the store. Only applies when store type 'nats-js-kv'
+    is configured. Defaults to true.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_SIZE:
-  name: OCIS_CACHE_SIZE;STORAGE_SYSTEM_CACHE_SIZE
+  name: OCIS_CACHE_SIZE;PROXY_OIDC_USERINFO_CACHE_SIZE
   defaultValue: "0"
   type: int
   description: The maximum quantity of items in the user info cache. Only applies
     when store type 'ocmem' is configured. Defaults to 512 which is derived from the
-    ocmem package though not exclicitly set as default.
+    ocmem package though not explicitly set as default.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_STORE:
-  name: OCIS_CACHE_STORE;STORAGE_SYSTEM_CACHE_STORE
-  defaultValue: memory
+  name: OCIS_CACHE_STORE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE
+  defaultValue: nats-js-kv
   type: string
-  description: 'The type of the cache store. Supported values are: ''memory'', ''redis-sentinel'',
-    ''nats-js-kv'', ''noop''. See the text description for details.'
-  introductionVersion: pre5.0
+  description: 'The type of the signing key store. Supported values are: ''redis-sentinel'',
+    ''nats-js-kv'' and ''ocisstoreservice'' (deprecated). See the text description
+    for details.'
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_STORE_NODES:
-  name: OCIS_CACHE_STORE_NODES;STORAGE_SYSTEM_CACHE_STORE_NODES
+  name: OCIS_CACHE_STORE_NODES;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES
   defaultValue: '[127.0.0.1:9233]'
   type: '[]string'
-  description: A list of nodes to access the configured store. This has no effect
-    when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes
-    are used is dependent on the library of the configured store. See the Environment
-    Variable Types description for more details.
-  introductionVersion: pre5.0
+  description: A list of nodes to access the configured store. Note that the behaviour
+    how nodes are used is dependent on the library of the configured store. See the
+    Environment Variable Types description for more details.
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_TTL:
-  name: OCIS_CACHE_TTL;STORAGE_SYSTEM_CACHE_TTL
-  defaultValue: 24m0s
+  name: OCIS_CACHE_TTL;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL
+  defaultValue: 12h0m0s
   type: Duration
-  description: Default time to live for user info in the user info cache. Only applied
-    when access tokens has no expiration. See the Environment Variable Types description
-    for more details.
-  introductionVersion: pre5.0
+  description: Default time to live for signing keys. See the Environment Variable
+    Types description for more details.
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_CREDENTIALS:
-  name: OCIS_CORS_ALLOW_CREDENTIALS;WEBFINGER_CORS_ALLOW_CREDENTIALS
+  name: OCIS_CORS_ALLOW_CREDENTIALS;OCDAV_CORS_ALLOW_CREDENTIALS
   defaultValue: "false"
   type: bool
   description: 'Allow credentials for CORS.See following chapter for more details:
@@ -7826,8 +7825,11 @@ OCIS_CORS_ALLOW_CREDENTIALS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_HEADERS:
-  name: OCIS_CORS_ALLOW_HEADERS;WEBFINGER_CORS_ALLOW_HEADERS
-  defaultValue: '[]'
+  name: OCIS_CORS_ALLOW_HEADERS;OCDAV_CORS_ALLOW_HEADERS
+  defaultValue: '[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match
+    If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm
+    Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires
+    Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control]'
   type: '[]string'
   description: 'A list of allowed CORS headers. See following chapter for more details:
     *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -7837,8 +7839,9 @@ OCIS_CORS_ALLOW_HEADERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_METHODS:
-  name: OCIS_CORS_ALLOW_METHODS;WEBFINGER_CORS_ALLOW_METHODS
-  defaultValue: '[]'
+  name: OCIS_CORS_ALLOW_METHODS;OCDAV_CORS_ALLOW_METHODS
+  defaultValue: '[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY
+    REPORT SEARCH]'
   type: '[]string'
   description: 'A list of allowed CORS methods. See following chapter for more details:
     *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method.
@@ -7848,7 +7851,7 @@ OCIS_CORS_ALLOW_METHODS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_ORIGINS:
-  name: OCIS_CORS_ALLOW_ORIGINS;WEBFINGER_CORS_ALLOW_ORIGINS
+  name: OCIS_CORS_ALLOW_ORIGINS;OCDAV_CORS_ALLOW_ORIGINS
   defaultValue: '[https://localhost:9200]'
   type: '[]string'
   description: 'A list of allowed CORS origins. See following chapter for more details:
@@ -7909,7 +7912,7 @@ OCIS_DEFAULT_LANGUAGE:
   type: string
   description: The default language used by services and the WebUI. If not defined,
     English will be used as default. See the documentation for more details.
-  introductionVersion: '%%NEXT%%'
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -7973,10 +7976,10 @@ OCIS_EMAIL_TEMPLATE_PATH:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_ENABLE_OCM:
-  name: OCIS_ENABLE_OCM;FRONTEND_OCS_INCLUDE_OCM_SHAREES
+  name: OCIS_ENABLE_OCM;GRAPH_INCLUDE_OCM_SHAREES
   defaultValue: "false"
   type: bool
-  description: Include OCM sharees when listing sharees.
+  description: Include OCM sharees when listing users.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
@@ -8116,25 +8119,25 @@ OCIS_HTTP_TLS_KEY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_INSECURE:
-  name: OCIS_INSECURE;WEBFINGER_INSECURE
+  name: OCIS_INSECURE;CLIENTLOG_EVENTS_TLS_INSECURE
   defaultValue: "false"
   type: bool
-  description: Allow insecure connections to the WEBFINGER service.
-  introductionVersion: pre5.0
-  deprecationVersion: ""
-  removalVersion: ""
-  deprecationInfo: ""
-OCIS_JWT_SECRET:
-  name: OCIS_JWT_SECRET;CLIENTLOG_JWT_SECRET
-  defaultValue: ""
-  type: string
-  description: The secret to mint and validate jwt tokens.
+  description: Whether to verify the server TLS certificates.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
+OCIS_JWT_SECRET:
+  name: OCIS_JWT_SECRET;COLLABORATION_JWT_SECRET
+  defaultValue: ""
+  type: string
+  description: The secret to mint and validate jwt tokens.
+  introductionVersion: pre5.0
+  deprecationVersion: ""
+  removalVersion: ""
+  deprecationInfo: ""
 OCIS_KEYCLOAK_BASE_PATH:
-  name: OCIS_KEYCLOAK_BASE_PATH;GRAPH_KEYCLOAK_BASE_PATH
+  name: OCIS_KEYCLOAK_BASE_PATH;INVITATIONS_KEYCLOAK_BASE_PATH
   defaultValue: ""
   type: string
   description: The URL to access keycloak.
@@ -8143,16 +8146,16 @@ OCIS_KEYCLOAK_BASE_PATH:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_CLIENT_ID:
-  name: OCIS_KEYCLOAK_CLIENT_ID;GRAPH_KEYCLOAK_CLIENT_ID
+  name: OCIS_KEYCLOAK_CLIENT_ID;INVITATIONS_KEYCLOAK_CLIENT_ID
   defaultValue: ""
   type: string
-  description: The client id to authenticate with keycloak.
+  description: The client ID to authenticate with keycloak.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_CLIENT_REALM:
-  name: OCIS_KEYCLOAK_CLIENT_REALM;GRAPH_KEYCLOAK_CLIENT_REALM
+  name: OCIS_KEYCLOAK_CLIENT_REALM;INVITATIONS_KEYCLOAK_CLIENT_REALM
   defaultValue: ""
   type: string
   description: The realm the client is defined in.
@@ -8161,7 +8164,7 @@ OCIS_KEYCLOAK_CLIENT_REALM:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_CLIENT_SECRET:
-  name: OCIS_KEYCLOAK_CLIENT_SECRET;GRAPH_KEYCLOAK_CLIENT_SECRET
+  name: OCIS_KEYCLOAK_CLIENT_SECRET;INVITATIONS_KEYCLOAK_CLIENT_SECRET
   defaultValue: ""
   type: string
   description: The client secret to use in authentication.
@@ -8170,7 +8173,7 @@ OCIS_KEYCLOAK_CLIENT_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY:
-  name: OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY;GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY
+  name: OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY;INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY
   defaultValue: "false"
   type: bool
   description: Disable TLS certificate validation for Keycloak connections. Do not
@@ -8180,7 +8183,7 @@ OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_KEYCLOAK_USER_REALM:
-  name: OCIS_KEYCLOAK_USER_REALM;GRAPH_KEYCLOAK_USER_REALM
+  name: OCIS_KEYCLOAK_USER_REALM;INVITATIONS_KEYCLOAK_USER_REALM
   defaultValue: ""
   type: string
   description: The realm users are defined.
@@ -8348,7 +8351,7 @@ OCIS_LDAP_INSECURE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_SERVER_WRITE_ENABLED:
-  name: OCIS_LDAP_SERVER_WRITE_ENABLED;FRONTEND_LDAP_SERVER_WRITE_ENABLED
+  name: OCIS_LDAP_SERVER_WRITE_ENABLED;GRAPH_LDAP_SERVER_WRITE_ENABLED
   defaultValue: "true"
   type: bool
   description: Allow creating, modifying and deleting LDAP users via the GRAPH API.
@@ -8475,39 +8478,39 @@ OCIS_LDAP_USER_SCOPE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_COLOR:
-  name: OCIS_LOG_COLOR;WEBFINGER_LOG_COLOR
+  name: OCIS_LOG_COLOR;COLLABORATION_LOG_COLOR
   defaultValue: "false"
   type: bool
   description: Activates colorized log output.
-  introductionVersion: pre5.0
+  introductionVersion: 6.0.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_FILE:
-  name: OCIS_LOG_FILE;WEBFINGER_LOG_FILE
+  name: OCIS_LOG_FILE;COLLABORATION_LOG_FILE
   defaultValue: ""
   type: string
   description: The path to the log file. Activates logging to this file if set.
-  introductionVersion: pre5.0
+  introductionVersion: 6.0.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_LEVEL:
-  name: OCIS_LOG_LEVEL;WEBFINGER_LOG_LEVEL
+  name: OCIS_LOG_LEVEL;COLLABORATION_LOG_LEVEL
   defaultValue: ""
   type: string
   description: 'The log level. Valid values are: ''panic'', ''fatal'', ''error'',
     ''warn'', ''info'', ''debug'', ''trace''.'
-  introductionVersion: pre5.0
+  introductionVersion: 6.0.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_PRETTY:
-  name: OCIS_LOG_PRETTY;WEBFINGER_LOG_PRETTY
+  name: OCIS_LOG_PRETTY;COLLABORATION_LOG_PRETTY
   defaultValue: "false"
   type: bool
   description: Activates pretty log output.
-  introductionVersion: pre5.0
+  introductionVersion: 6.0.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8533,16 +8536,17 @@ OCIS_OIDC_CLIENT_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_OIDC_ISSUER:
-  name: OCIS_URL;OCIS_OIDC_ISSUER;WEBFINGER_OIDC_ISSUER
+  name: OCIS_URL;OCIS_OIDC_ISSUER;USERS_IDP_URL
   defaultValue: https://localhost:9200
   type: string
-  description: The identity provider href for the openid-discovery relation.
+  description: The identity provider value to set in the userids of the CS3 user objects
+    for users returned by this user provider.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST:
-  name: OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST;FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST
+  name: OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST;SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST
   defaultValue: ""
   type: string
   description: Path to the 'banned passwords list' file. This only impacts public
@@ -8552,7 +8556,7 @@ OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_DISABLED:
-  name: OCIS_PASSWORD_POLICY_DISABLED;FRONTEND_PASSWORD_POLICY_DISABLED
+  name: OCIS_PASSWORD_POLICY_DISABLED;SHARING_PASSWORD_POLICY_DISABLED
   defaultValue: "false"
   type: bool
   description: Disable the password policy. Defaults to false if not set.
@@ -8561,7 +8565,7 @@ OCIS_PASSWORD_POLICY_DISABLED:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_CHARACTERS
   defaultValue: "8"
   type: int
   description: Define the minimum password length. Defaults to 8 if not set.
@@ -8570,7 +8574,7 @@ OCIS_PASSWORD_POLICY_MIN_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_DIGITS:
-  name: OCIS_PASSWORD_POLICY_MIN_DIGITS;FRONTEND_PASSWORD_POLICY_MIN_DIGITS
+  name: OCIS_PASSWORD_POLICY_MIN_DIGITS;SHARING_PASSWORD_POLICY_MIN_DIGITS
   defaultValue: "1"
   type: int
   description: Define the minimum number of digits. Defaults to 1 if not set.
@@ -8579,7 +8583,7 @@ OCIS_PASSWORD_POLICY_MIN_DIGITS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS
   defaultValue: "1"
   type: int
   description: Define the minimum number of uppercase letters. Defaults to 1 if not
@@ -8589,7 +8593,7 @@ OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS
   defaultValue: "1"
   type: int
   description: Define the minimum number of characters from the special characters
@@ -8599,7 +8603,7 @@ OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS
   defaultValue: "1"
   type: int
   description: Define the minimum number of lowercase letters. Defaults to 1 if not
@@ -8609,7 +8613,7 @@ OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE:
-  name: OCIS_PERSISTENT_STORE;ACTIVITYLOG_STORE
+  name: OCIS_PERSISTENT_STORE;EVENTHISTORY_STORE
   defaultValue: nats-js-kv
   type: string
   description: 'The type of the store. Supported values are: ''memory'', ''ocmem'',
@@ -8620,7 +8624,7 @@ OCIS_PERSISTENT_STORE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_AUTH_PASSWORD:
-  name: OCIS_PERSISTENT_STORE_AUTH_PASSWORD;ACTIVITYLOG_STORE_AUTH_PASSWORD
+  name: OCIS_PERSISTENT_STORE_AUTH_PASSWORD;EVENTHISTORY_STORE_AUTH_PASSWORD
   defaultValue: ""
   type: string
   description: The password to authenticate with the store. Only applies when store
@@ -8630,7 +8634,7 @@ OCIS_PERSISTENT_STORE_AUTH_PASSWORD:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_AUTH_USERNAME:
-  name: OCIS_PERSISTENT_STORE_AUTH_USERNAME;ACTIVITYLOG_STORE_AUTH_USERNAME
+  name: OCIS_PERSISTENT_STORE_AUTH_USERNAME;EVENTHISTORY_STORE_AUTH_USERNAME
   defaultValue: ""
   type: string
   description: The username to authenticate with the store. Only applies when store
@@ -8640,7 +8644,7 @@ OCIS_PERSISTENT_STORE_AUTH_USERNAME:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_NODES:
-  name: OCIS_PERSISTENT_STORE_NODES;ACTIVITYLOG_STORE_NODES
+  name: OCIS_PERSISTENT_STORE_NODES;EVENTHISTORY_STORE_NODES
   defaultValue: '[127.0.0.1:9233]'
   type: '[]string'
   description: A list of nodes to access the configured store. This has no effect
@@ -8652,22 +8656,22 @@ OCIS_PERSISTENT_STORE_NODES:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_SIZE:
-  name: OCIS_PERSISTENT_STORE_SIZE;ACTIVITYLOG_STORE_SIZE
+  name: OCIS_PERSISTENT_STORE_SIZE;EVENTHISTORY_STORE_SIZE
   defaultValue: "0"
   type: int
   description: The maximum quantity of items in the store. Only applies when store
-    type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package
-    though not explicitly set as default.
+    type 'ocmem' is configured. Defaults to 512 which is derived and used from the
+    ocmem package though no explicit default was set.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_TTL:
-  name: OCIS_PERSISTENT_STORE_TTL;ACTIVITYLOG_STORE_TTL
-  defaultValue: 0s
+  name: OCIS_PERSISTENT_STORE_TTL;EVENTHISTORY_STORE_TTL
+  defaultValue: 336h0m0s
   type: Duration
-  description: Time to live for events in the store. See the Environment Variable
-    Types description for more details.
+  description: Time to live for events in the store. Defaults to '336h' (2 weeks).
+    See the Environment Variable Types description for more details.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8682,11 +8686,11 @@ OCIS_PUBLIC_URL:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_REVA_GATEWAY:
-  name: OCIS_REVA_GATEWAY;CLIENTLOG_REVA_GATEWAY
+  name: OCIS_REVA_GATEWAY;COLLABORATION_CS3API_GATEWAY_NAME
   defaultValue: com.owncloud.api.gateway
   type: string
-  description: CS3 gateway used to look up user metadata
-  introductionVersion: "5.0"
+  description: CS3 gateway used to look up user metadata.
+  introductionVersion: 6.0.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8732,7 +8736,7 @@ OCIS_SERVICE_ACCOUNT_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD:
-  name: OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD
+  name: OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD
   defaultValue: "true"
   type: bool
   description: Set this to true if you want to enforce passwords on all public shares.
@@ -8741,11 +8745,13 @@ OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD:
-  name: OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD
+  name: OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD
   defaultValue: "false"
   type: bool
-  description: Set this to true if you want to enforce passwords for writable shares.
-    Only effective if the setting for 'passwords on all public shares' is set to false.
+  description: Set this to true if you want to enforce passwords on Uploader, Editor
+    or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD,
+    you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in
+    the frontend service.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
@@ -8772,7 +8778,7 @@ OCIS_SPACES_MAX_QUOTA:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_API_KEY:
-  name: OCIS_SYSTEM_USER_API_KEY
+  name: OCIS_SYSTEM_USER_API_KEY;SHARING_PUBLIC_CS3_SYSTEM_USER_API_KEY
   defaultValue: ""
   type: string
   description: API key for the STORAGE-SYSTEM system user.
@@ -8781,10 +8787,10 @@ OCIS_SYSTEM_USER_API_KEY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_ID:
-  name: OCIS_SYSTEM_USER_ID
+  name: OCIS_SYSTEM_USER_ID;SHARING_PUBLIC_CS3_SYSTEM_USER_ID
   defaultValue: ""
   type: string
-  description: ID of the oCIS storage-system system user. Admins need to set the ID
+  description: ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID
     for the STORAGE-SYSTEM system user in this config option which is then used to
     reference the user. Any reasonable long string is possible, preferably this would
     be an UUIDv4 format.
@@ -8793,7 +8799,7 @@ OCIS_SYSTEM_USER_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_IDP:
-  name: OCIS_SYSTEM_USER_IDP;SETTINGS_SYSTEM_USER_IDP
+  name: OCIS_SYSTEM_USER_IDP;SHARING_PUBLIC_CS3_SYSTEM_USER_IDP
   defaultValue: internal
   type: string
   description: IDP of the oCIS STORAGE-SYSTEM system user.
@@ -8802,40 +8808,40 @@ OCIS_SYSTEM_USER_IDP:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_COLLECTOR:
-  name: OCIS_TRACING_COLLECTOR;WEBFINGER_TRACING_COLLECTOR
+  name: OCIS_TRACING_COLLECTOR;COLLABORATION_TRACING_COLLECTOR
   defaultValue: ""
   type: string
   description: The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces.
     Only used if the tracing endpoint is unset.
-  introductionVersion: pre5.0
+  introductionVersion: 6.0.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENABLED:
-  name: OCIS_TRACING_ENABLED;WEBFINGER_TRACING_ENABLED
+  name: OCIS_TRACING_ENABLED;COLLABORATION_TRACING_ENABLED
   defaultValue: "false"
   type: bool
   description: Activates tracing.
-  introductionVersion: pre5.0
+  introductionVersion: 6.0.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENDPOINT:
-  name: OCIS_TRACING_ENDPOINT;WEBFINGER_TRACING_ENDPOINT
+  name: OCIS_TRACING_ENDPOINT;COLLABORATION_TRACING_ENDPOINT
   defaultValue: ""
   type: string
   description: The endpoint of the tracing agent.
-  introductionVersion: pre5.0
+  introductionVersion: 6.0.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_TYPE:
-  name: OCIS_TRACING_TYPE;WEBFINGER_TRACING_TYPE
+  name: OCIS_TRACING_TYPE;COLLABORATION_TRACING_TYPE
   defaultValue: ""
   type: string
   description: The type of tracing. Defaults to '', which is the same as 'jaeger'.
     Allowed tracing types are 'jaeger' and '' as of now.
-  introductionVersion: pre5.0
+  introductionVersion: 6.0.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8849,24 +8855,22 @@ OCIS_TRANSFER_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRANSLATION_PATH:
-  name: OCIS_TRANSLATION_PATH;ACTIVITYLOG_TRANSLATION_PATH
+  name: OCIS_TRANSLATION_PATH;NOTIFICATIONS_TRANSLATION_PATH
   defaultValue: ""
   type: string
   description: (optional) Set this to a path with custom translations to overwrite
     the builtin translations. Note that file and folder naming rules apply, see the
     documentation for more details.
-  introductionVersion: '%%NEXT%%'
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_URL:
-  name: OCIS_URL;WEBFINGER_OWNCLOUD_SERVER_INSTANCE_URL
-  defaultValue: https://localhost:9200
+  name: OCIS_URL;APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL
+  defaultValue: https://localhost:9200/
   type: string
-  description: The URL for the legacy ownCloud server instance relation (not to be
-    confused with the product ownCloud Server). It defaults to the OCIS_URL but can
-    be overridden to support some reverse proxy corner cases. To shard the deployment,
-    multiple instances can be configured in the configuration file.
+  description: Base url to navigate back from the app to the containing folder in
+    the file list.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
