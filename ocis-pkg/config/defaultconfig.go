@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	activitylog "github.com/owncloud/ocis/v2/services/activitylog/pkg/config/defaults"
 	antivirus "github.com/owncloud/ocis/v2/services/antivirus/pkg/config/defaults"
 	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/config/defaults"
@@ -51,6 +52,9 @@ func DefaultConfig() *Config {
 		Runtime: Runtime{
 			Port: "9250",
 			Host: "localhost",
+		},
+		Reva: &shared.Reva{
+			Address: "com.owncloud.api.gateway",
 		},
 
 		Activitylog:       activitylog.DefaultConfig(),
