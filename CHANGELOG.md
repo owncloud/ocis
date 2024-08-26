@@ -59,6 +59,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Use key to get specific trash item: [#9879](https://github.com/owncloud/ocis/pull/9879)
 * Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
+* Enhancement - We now set the configured protocol transport for service metadata: [#9490](https://github.com/owncloud/ocis/pull/9490)
 * Enhancement - Bump reva: [#9879](https://github.com/owncloud/ocis/pull/9879)
 * Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
 * Enhancement - Allow setting default locale of activitylog: [#9892](https://github.com/owncloud/ocis/pull/9892)
@@ -110,6 +111,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/1357
    https://github.com/owncloud/ocis/pull/9890
+
+* Enhancement - We now set the configured protocol transport for service metadata: [#9490](https://github.com/owncloud/ocis/pull/9490)
+
+   This allows configuring services to listan on `tcp` or `unix` sockets and
+   clients to use the `dns`, `kubernetes` or `unix` protocol URIs instead of
+   service names.
+
+   https://github.com/owncloud/ocis/pull/9490
+   https://github.com/cs3org/reva/pull/4744
 
 * Enhancement - Bump reva: [#9879](https://github.com/owncloud/ocis/pull/9879)
 
