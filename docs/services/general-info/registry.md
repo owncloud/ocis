@@ -10,6 +10,8 @@ geekdocCollapseSection: true
 
 To be able to communicate with each other, services need to register in a common registry.
 
+{{< toc >}}
+
 ## Configuration
 
 The type of registry to use can be configured with the `MICRO_REGISTRY` environment variable. Supported values are:
