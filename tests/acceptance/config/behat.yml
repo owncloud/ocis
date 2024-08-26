@@ -400,6 +400,13 @@ default:
         - SharingNgContext:
         - GraphContext:
 
+    apiCollaboration:
+      paths:
+        - "%paths.base%/../features/apiCollaboration"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+
     cliCommands:
       paths:
         - "%paths.base%/../features/cliCommands"
@@ -413,13 +420,6 @@ default:
         - SearchContext:
         - TagContext:
         - TrashbinContext:
-
-    apiAppProvider:
-      paths:
-        - "%paths.base%/../features/apiAppProvider"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~

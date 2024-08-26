@@ -154,14 +154,9 @@ config = {
                 "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
             },
         },
-        "cli": {
+        "apiWopi": {
             "suites": [
-                "cliCommands",
-            ],
-        },
-        "apiAppProvider": {
-            "suites": [
-                "apiAppProvider",
+                "apiCollaboration",
             ],
             "skip": False,
             "collaborationServiceNeeded": True,
@@ -172,6 +167,12 @@ config = {
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
             },
+        },
+        "cli": {
+            "suites": [
+                "cliCommands",
+            ],
+            "skip": False,
         },
     },
     "apiTests": {
@@ -895,7 +896,7 @@ def localApiTestPipeline(ctx):
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
-                                     (collaborationService(extra_environment = params["extraCollaborationEnvironment"]) if params["collaborationServiceNeeded"] else []) +
+                                     (collaborationService(params["extraCollaborationEnvironment"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      logRequests(),
                             "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [] + fakeOffice() if params["collaborationServiceNeeded"] else [],
@@ -1003,38 +1004,25 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                     "/app/wopiserver.py",
                 ],
             },
+            {
+                "name": "wait-for-wopi-server",
+                "image": OC_CI_WAIT_FOR,
+                "commands": [
+                    "wait-for -it wopiserver:9300 -t 300",
+                ],
+            },
         ]
     else:
         extra_server_environment = {
             "OCIS_EXCLUDE_RUN_SERVICES": "app-provider",
         }
 
-        wopiServer = [
-            {
-                "name": "wopiserver",
-                "image": OC_CI_GOLANG,
-                "detach": True,
-                "environment": {
-                    "MICRO_REGISTRY": "nats-js-kv",
-                    "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
-                    "COLLABORATION_LOG_LEVEL": "debug",
-                    "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
-                    "COLLABORATION_GRPC_ADDR": "0.0.0.0:9301",
-                    # no proof keys available in the FakeOffice
-                    "COLLABORATION_APP_PROOF_DISABLE": "true",
-                    "COLLABORATION_APP_NAME": "FakeOffice",
-                    "COLLABORATION_APP_ADDR": "http://fakeoffice:8080",
-                    "COLLABORATION_APP_INSECURE": "true",
-                    "COLLABORATION_WOPI_SRC": "http://wopiserver:9300",
-                    "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
-                    "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
-                    "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
-                },
-                "commands": [
-                    "%s collaboration server" % ocis_bin,
-                ],
-            },
-        ]
+        extra_environment = {
+            "COLLABORATION_APP_NAME": "FakeOffice",
+            "COLLABORATION_APP_ADDR": "http://fakeoffice:8080",
+        }
+
+        wopiServer = collaborationService(extra_environment)
 
     wopiTestCases = dirs["base"] + "/tests/config/drone/wopiValidatorCustomTestCases.xml"
     for testgroup in testgroups:
@@ -1079,34 +1067,10 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 [
-                     {
-                         "name": "fakeoffice",
-                         "image": OC_CI_ALPINE,
-                         "detach": True,
-                         "environment": {},
-                         "commands": [
-                             "sh %s/tests/config/drone/serve-hosting-discovery.sh" % (dirs["base"]),
-                         ],
-                     },
-                     {
-                         "name": "wait-for-fakeoffice",
-                         "image": OC_CI_WAIT_FOR,
-                         "commands": [
-                             "wait-for -it fakeoffice:8080 -t 300",
-                         ],
-                     },
-                 ] +
+                 fakeOffice() +
                  ocisServer(storage, accounts_hash_difficulty, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
                  wopiServer +
                  [
-                     {
-                         "name": "wait-for-wopi-server",
-                         "image": OC_CI_WAIT_FOR,
-                         "commands": [
-                             "wait-for -it wopiserver:9300 -t 300",
-                         ],
-                     },
                      {
                          "name": "prepare-test-file",
                          "image": OC_CI_ALPINE,

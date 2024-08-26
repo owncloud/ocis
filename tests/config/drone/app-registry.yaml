@@ -2,8 +2,8 @@ app_registry:
   mimetypes:
     - mime_type: application/vnd.oasis.opendocument.text
       extension: odt
-      name: FakeOffice
-      description: FakeOffice text document
+      name: OpenDocument
+      description: OpenDocument text document
       icon: ""
       default_app: FakeOffice
       allow_creation: true
