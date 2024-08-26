@@ -19,7 +19,7 @@ var _ = Describe("unifiedroles", func() {
 		func(legacyRole *rConversions.Role, unifiedRole *libregraph.UnifiedRoleDefinition, constraints string) {
 			cs3perm := legacyRole.CS3ResourcePermissions()
 
-			r := unifiedrole.CS3ResourcePermissionsToUnifiedRole(cs3perm, constraints)
+			r := unifiedrole.CS3ResourcePermissionsToUnifiedRole(cs3perm, constraints, false)
 			Expect(r.GetId()).To(Equal(unifiedRole.GetId()))
 
 		},

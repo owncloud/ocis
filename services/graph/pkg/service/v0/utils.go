@@ -445,7 +445,7 @@ func cs3ReceivedShareToLibreGraphPermissions(ctx context.Context, logger *log.Lo
 		if err != nil {
 			return nil, err
 		}
-		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(permissionSet, condition)
+		role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(permissionSet, condition, false)
 
 		if role != nil {
 			permission.SetRoles([]string{role.GetId()})
@@ -488,6 +488,17 @@ func roleConditionForResourceType(ri *storageprovider.ResourceInfo) (string, err
 		return unifiedrole.UnifiedRoleConditionFile, nil
 	default:
 		return "", errorcode.New(errorcode.InvalidRequest, "unsupported resource type")
+	}
+}
+
+func federatedRoleConditionForResourceType(ri *storageprovider.ResourceInfo) (string, error) {
+	switch {
+	case ri.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER:
+		return unifiedrole.UnifiedRoleConditionFolderFederatedUser, nil
+	case ri.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE:
+		return unifiedrole.UnifiedRoleConditionFileFederatedUser, nil
+	default:
+		return "", errorcode.New(errorcode.InvalidRequest, "unsupported resource type for federated role")
 	}
 }
 
@@ -764,36 +775,43 @@ func fillDriveItemPropertiesFromReceivedOCMShare(ctx context.Context, logger *lo
 
 func cs3ReceivedOCMShareToLibreGraphPermissions(ctx context.Context, logger *log.Logger,
 	identityCache identity.IdentityCache, receivedShare *ocm.ReceivedShare,
-	_ *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
+	resourceInfo *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
 	permission := libregraph.NewPermission()
 	if id := receivedShare.GetId().GetOpaqueId(); id != "" {
 		permission.SetId(id)
+	}
+
+	if cTime := receivedShare.GetCtime(); cTime != nil {
+		permission.SetCreatedDateTime(cs3TimestampToTime(cTime))
 	}
 
 	if expiration := receivedShare.GetExpiration(); expiration != nil {
 		permission.SetExpirationDateTime(cs3TimestampToTime(expiration))
 	}
 
-	/*
-		if permissionSet := receivedShare.GetShare().GetPermissions().GetPermissions(); permissionSet != nil {
-			condition, err := roleConditionForResourceType(resourceInfo)
-			if err != nil {
-				return nil, err
-			}
-			role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(*permissionSet, condition)
-
-			if role != nil {
-				permission.SetRoles([]string{role.GetId()})
-			}
-
-			actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(*permissionSet)
-
-			// actions only make sense if no role is set
-			if role == nil && len(actions) > 0 {
-				permission.SetLibreGraphPermissionsActions(actions)
-			}
+	var permissions *storageprovider.ResourcePermissions
+	for _, protocol := range receivedShare.GetProtocols() {
+		if protocol.GetWebdavOptions().GetPermissions() != nil {
+			permissions = protocol.GetWebdavOptions().GetPermissions().GetPermissions()
 		}
-	*/
+	}
+	condition, err := federatedRoleConditionForResourceType(resourceInfo)
+	if err != nil {
+		return nil, err
+	}
+	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+		permissions,
+		condition,
+		true,
+	)
+	if role != nil {
+		permission.SetRoles([]string{role.GetId()})
+	} else {
+		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissions)
+		permission.SetLibreGraphPermissionsActions(actions)
+		permission.SetRoles(nil)
+	}
+
 	switch grantee := receivedShare.GetGrantee(); {
 	case grantee.GetType() == storageprovider.GranteeType_GRANTEE_TYPE_USER:
 		user, err := cs3UserIdToIdentity(ctx, identityCache, grantee.GetUserId())
