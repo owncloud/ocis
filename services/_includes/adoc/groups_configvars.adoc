@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-26-07-28-57]
+[#deprecation-note-2024-08-26-10-07-36]
 [caption=]
 .Deprecation notes for the groups service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -182,7 +182,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The bind address of the GRPC service.
 
-a|`GROUPS_GRPC_PROTOCOL` +
+a|`OCIS_GRPC_PROTOCOL` +
+`GROUPS_GRPC_PROTOCOL` +
 
 a| [subs=-attributes]
 ++pre5.0 ++

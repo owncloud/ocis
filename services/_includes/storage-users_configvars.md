@@ -16,7 +16,7 @@
 | STORAGE_USERS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | STORAGE_USERS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | STORAGE_USERS_GRPC_ADDR | string | 127.0.0.1:9157 | The bind address of the GRPC service.|
-| STORAGE_USERS_GRPC_PROTOCOL | string | tcp | The transport protocol of the GPRC service.|
+| OCIS_GRPC_PROTOCOL<br/>STORAGE_USERS_GRPC_PROTOCOL | string | tcp | The transport protocol of the GPRC service.|
 | STORAGE_USERS_HTTP_ADDR | string | 127.0.0.1:9158 | The bind address of the HTTP service.|
 | STORAGE_USERS_HTTP_PROTOCOL | string | tcp | The transport protocol of the HTTP service.|
 | OCIS_CORS_ALLOW_ORIGINS<br/>STORAGE_USERS_CORS_ALLOW_ORIGINS | []string | [https://localhost:9200] | A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.|

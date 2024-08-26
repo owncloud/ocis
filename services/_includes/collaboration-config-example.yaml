@@ -15,6 +15,7 @@ token_manager:
   jwt_secret: ""
 grpc:
   addr: 127.0.0.1:9301
+  protocol: tcp
 http:
   addr: 127.0.0.1:9300
   tls:

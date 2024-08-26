@@ -15,7 +15,7 @@
 | AUTH_APP_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | AUTH_APP_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-memory.|
 | AUTH_APP_GRPC_ADDR | string | 127.0.0.1:9246 | The bind address of the GRPC service.|
-| AUTH_APP_GRPC_PROTOCOL | string | tcp | The transport protocol of the GRPC service.|
+| OCIS_GRPC_PROTOCOL<br/>AUTH_APP_GRPC_PROTOCOL | string | tcp | The transport protocol of the GRPC service.|
 | AUTH_APP_HTTP_ADDR | string | 127.0.0.1:9247 | The bind address of the HTTP service.|
 | AUTH_APP_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | OCIS_CORS_ALLOW_ORIGINS<br/>AUTH_APP_CORS_ALLOW_ORIGINS | []string | [*] | A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.|

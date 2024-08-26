@@ -12,6 +12,7 @@
 | COLLABORATION_APP_PROOF_DURATION | string | 12h | Duration for the proof keys to be cached in memory, using time.ParseDuration format. If the duration can't be parsed, we'll use the default 12h as duration|
 | OCIS_JWT_SECRET<br/>COLLABORATION_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | COLLABORATION_GRPC_ADDR | string | 127.0.0.1:9301 | The bind address of the GRPC service.|
+| OCIS_GRPC_PROTOCOL<br/>COLLABORATION_GRPC_PROTOCOL | string | tcp | The transport protocol of the GRPC service.|
 | COLLABORATION_HTTP_ADDR | string | 127.0.0.1:9300 | The bind address of the HTTP service.|
 | OCIS_HTTP_TLS_ENABLED | bool | false | Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.|
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|

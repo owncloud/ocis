@@ -22,7 +22,7 @@
 | OCIS_CORS_ALLOW_HEADERS<br/>OCM_CORS_ALLOW_HEADERS | []string | [Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] | A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.|
 | OCIS_CORS_ALLOW_CREDENTIALS<br/>OCM_CORS_ALLOW_CREDENTIALS | bool | false | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | OCM_GRPC_ADDR | string | 127.0.0.1:9282 | The bind address of the GRPC service.|
-| OCM_GRPC_PROTOCOL | string |  | The transport protocol of the GRPC service.|
+| OCIS_GRPC_PROTOCOL<br/>OCM_GRPC_PROTOCOL | string |  | The transport protocol of the GRPC service.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>OCM_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>OCM_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | The CS3 gateway endpoint.|

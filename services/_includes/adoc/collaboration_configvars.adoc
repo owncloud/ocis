@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-26-07-28-57]
+[#deprecation-note-2024-08-26-10-07-36]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -147,6 +147,18 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The bind address of the GRPC service.
 
+a|`OCIS_GRPC_PROTOCOL` +
+`COLLABORATION_GRPC_PROTOCOL` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++tcp ++
+a| [subs=-attributes]
+The transport protocol of the GRPC service.
+
 a|`COLLABORATION_HTTP_ADDR` +
 
 a| [subs=-attributes]
@@ -227,7 +239,7 @@ Disable chat in the frontend.
 
 a|`OCIS_REVA_GATEWAY` +
 `COLLABORATION_CS3API_GATEWAY_NAME` +
-xref:deprecation-note-2024-08-26-07-28-57[Deprecation Note]
+xref:deprecation-note-2024-08-26-10-07-36[Deprecation Note]
 a| [subs=-attributes]
 ++6.0.0 ++
 a| [subs=-attributes]

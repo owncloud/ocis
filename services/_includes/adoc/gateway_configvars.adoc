@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-26-07-28-57]
+[#deprecation-note-2024-08-26-10-07-36]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -183,7 +183,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The bind address of the GRPC service.
 
-a|`GATEWAY_GRPC_PROTOCOL` +
+a|`OCIS_GRPC_PROTOCOL` +
+`GATEWAY_GRPC_PROTOCOL` +
 
 a| [subs=-attributes]
 ++pre5.0 ++
@@ -506,6 +507,160 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 a| [subs=-attributes]
 The public facing URL of the oCIS frontend.
+
+a|`GATEWAY_USERS_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.users ++
+a| [subs=-attributes]
+The endpoint of the users service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_GROUPS_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.groups ++
+a| [subs=-attributes]
+The endpoint of the groups service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_PERMISSIONS_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.settings ++
+a| [subs=-attributes]
+The endpoint of the permissions service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_SHARING_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.sharing ++
+a| [subs=-attributes]
+The endpoint of the shares service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_AUTH_APP_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.auth-app ++
+a| [subs=-attributes]
+The endpoint of the auth-app service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_AUTH_BASIC_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.auth-basic ++
+a| [subs=-attributes]
+The endpoint of the auth-basic service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_AUTH_BEARER_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the auth-bearer service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_AUTH_MACHINE_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.auth-machine ++
+a| [subs=-attributes]
+The endpoint of the auth-machine service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_AUTH_SERVICE_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.auth-service ++
+a| [subs=-attributes]
+The endpoint of the auth-service service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.storage-publiclink ++
+a| [subs=-attributes]
+The endpoint of the storage-publiclink service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_STORAGE_USERS_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.storage-users ++
+a| [subs=-attributes]
+The endpoint of the storage-users service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_STORAGE_SHARES_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.storage-shares ++
+a| [subs=-attributes]
+The endpoint of the storag-shares service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_APP_REGISTRY_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.app-registry ++
+a| [subs=-attributes]
+The endpoint of the app-registry service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+
+a|`GATEWAY_OCM_ENDPOINT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.ocm ++
+a| [subs=-attributes]
+The endpoint of the ocm service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
 
 a|`GATEWAY_STORAGE_REGISTRY_DRIVER` +
 

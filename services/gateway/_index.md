@@ -1,6 +1,6 @@
 ---
 title: Gateway
-date: 2024-08-26T07:29:00.853566417Z
+date: 2024-08-26T10:07:40.222256509Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/gateway
@@ -19,6 +19,7 @@ The gateway service is responsible for passing requests to the storage providers
 ## Table of Contents
 
 * [Caching](#caching)
+* [Service endpoints](#service-endpoints)
 * [Storage registry](#storage-registry)
 * [Example Yaml Config](#example-yaml-config)
 
@@ -50,6 +51,72 @@ Store specific notes:
   -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
   -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
   -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
+
+## Service endpoints
+
+The gateway acts as a proxy for other CS3 services. As such it has to forward requests to a lot of services and needs to establish connections by looking up the IP address using the service registry. Instead of using the service registry each endpoint can also be configured to use the grpc `dns://` or `kubernetes://` URLs, which might be useful when running in kubernetes.
+
+For a local single node deployment you might want to use `unix:` sockets as shown below. Using unix sockets will reduce the amount of service lookups and omit the TCP stack. For now, this is experimental and the services do not delete the socket on shutdown. PRs welcome.
+
+```console
+USERS_GRPC_PROTOCOL=unix"
+USERS_GRPC_ADDR=/var/run/ocis/users.sock"
+GATEWAY_USERS_ENDPOINT=unix:/var/run/ocis/users.sock"
+
+GROUPS_GRPC_PROTOCOL=unix"
+GROUPS_GRPC_ADDR=/var/run/ocis/groups.sock"
+GATEWAY_GROUPS_ENDPOINT=unix:/var/run/ocis/groups.sock"
+
+AUTH_APP_GRPC_PROTOCOL=unix"
+AUTH_APP_GRPC_ADDR=/var/run/ocis/auth-app.sock"
+GATEWAY_AUTH_APP_ENDPOINT=unix:/var/run/ocis/auth-app.sock"
+
+AUTH_BASIC_GRPC_PROTOCOL=unix"
+AUTH_BASIC_GRPC_ADDR=/var/run/ocis/auth-basic.sock"
+GATEWAY_AUTH_BASIC_ENDPOINT=unix:/var/run/ocis/auth-basic.sock"
+
+AUTH_MACHINE_GRPC_PROTOCOL=unix"
+AUTH_MACHINE_GRPC_ADDR=/var/run/ocis/auth-machine.sock"
+GATEWAY_AUTH_MACHINE_ENDPOINT=unix:/var/run/ocis/auth-machine.sock"
+
+AUTH_SERVICE_GRPC_PROTOCOL=unix"
+AUTH_SERVICE_GRPC_ADDR=/var/run/ocis/auth-service.sock"
+GATEWAY_AUTH_SERVICE_ENDPOINT=unix:/var/run/ocis/auth-service.sock"
+
+STORAGE_PUBLIC_LINK_GRPC_PROTOCOL=unix"
+STORAGE_PUBLIC_LINK_GRPC_ADDR=/var/run/ocis/storage-public-link.sock"
+GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT=unix:/var/run/ocis/storage-public-link.sock"
+
+STORAGE_USERS_GRPC_PROTOCOL=unix"
+STORAGE_USERS_GRPC_ADDR=/var/run/ocis/storage-users.sock"
+GATEWAY_STORAGE_USERS_ENDPOINT=unix:/var/run/ocis/storage-users.sock"
+// graph sometimes bypasses the gateway so we need to configure the socket here as wel
+GRAPH_SPACES_STORAGE_USERS_ADDRESS=unix:/var/run/ocis/storage-users.sock"
+
+STORAGE_SHARES_GRPC_PROTOCOL=unix"
+STORAGE_SHARES_GRPC_ADDR=/var/run/ocis/storage-shares.sock"
+GATEWAY_STORAGE_SHARES_ENDPOINT=unix:/var/run/ocis/storage-shares.sock"
+
+APP_REGISTRY_GRPC_PROTOCOL=unix"
+APP_REGISTRY_GRPC_ADDR=/var/run/ocis/app-registry.sock"
+GATEWAY_APP_REGISTRY_ENDPOINT=unix:/var/run/ocis/app-registry.sock"
+
+OCM_GRPC_PROTOCOL=unix"
+OCM_GRPC_ADDR=/var/run/ocis/ocm.sock"
+GATEWAY_OCM_ENDPOINT=unix:/var/run/ocis/ocm.sock"
+
+// storage system
+STORAGE_SYSTEM_GRPC_PROTOCOL="unix"
+STORAGE_SYSTEM_GRPC_ADDR="/var/run/ocis/storage-system.sock"
+STORAGE_GATEWAY_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
+STORAGE_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
+SHARING_USER_CS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
+SHARING_USER_JSONCS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
+SHARING_PUBLIC_CS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
+SHARING_PUBLIC_JSONCS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
+```
+
+
 
 ## Storage registry
 

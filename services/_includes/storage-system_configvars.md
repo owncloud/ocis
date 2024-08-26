@@ -15,7 +15,7 @@
 | STORAGE_SYSTEM_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | STORAGE_SYSTEM_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | STORAGE_SYSTEM_GRPC_ADDR | string | 127.0.0.1:9215 | The bind address of the GRPC service.|
-| STORAGE_SYSTEM_GRPC_PROTOCOL | string | tcp | The transport protocol of the GPRC service.|
+| OCIS_GRPC_PROTOCOL<br/>STORAGE_SYSTEM_GRPC_PROTOCOL | string | tcp | The transport protocol of the GPRC service.|
 | STORAGE_SYSTEM_HTTP_ADDR | string | 127.0.0.1:9216 | The bind address of the HTTP service.|
 | STORAGE_SYSTEM_HTTP_PROTOCOL | string | tcp | The transport protocol of the HTTP service.|
 | OCIS_JWT_SECRET<br/>STORAGE_SYSTEM_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
