@@ -232,8 +232,8 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0
       sass-loader:
-        specifier: ^10.5.2
-        version: 10.5.2(webpack@5.93.0)
+        specifier: ^16.0.1
+        version: 16.0.1(webpack@5.93.0)
       source-map-explorer:
         specifier: ^2.5.3
         version: 2.5.3
@@ -5219,20 +5219,25 @@ packages:
   sanitize.css@13.0.0:
     resolution: {integrity: sha512-ZRwKbh/eQ6w9vmTjkuG0Ioi3HBwPFce0O+v//ve+aOq1oeCy7jMV2qzzAlpsNuqpqCBjjriM1lbtZbF/Q8jVyA==}
 
-  sass-loader@10.5.2:
-    resolution: {integrity: sha512-vMUoSNOUKJILHpcNCCyD23X34gve1TS7Rjd9uXHeKqhvBG39x6XbswFDtpbTElj6XdMFezoWhkh5vtKudf2cgQ==}
-    engines: {node: '>= 10.13.0'}
+  sass-loader@16.0.1:
+    resolution: {integrity: sha512-xACl1ToTsKnL9Ce5yYpRxrLj9QUDCnwZNhzpC7tKiFyA8zXsd3Ap+HGVnbCgkdQcm43E+i6oKAWBsvGA6ZoiMw==}
+    engines: {node: '>= 18.12.0'}
     peerDependencies:
-      fibers: '>= 3.1.0'
+      '@rspack/core': 0.x || 1.x
       node-sass: ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
       sass: ^1.3.0
-      webpack: ^4.36.0 || ^5.0.0
+      sass-embedded: '*'
+      webpack: ^5.0.0
     peerDependenciesMeta:
-      fibers:
+      '@rspack/core':
         optional: true
       node-sass:
         optional: true
       sass:
+        optional: true
+      sass-embedded:
+        optional: true
+      webpack:
         optional: true
 
   scheduler@0.20.2:
@@ -12031,13 +12036,10 @@ snapshots:
 
   sanitize.css@13.0.0: {}
 
-  sass-loader@10.5.2(webpack@5.93.0):
+  sass-loader@16.0.1(webpack@5.93.0):
     dependencies:
-      klona: 2.0.6
-      loader-utils: 2.0.4
       neo-async: 2.6.2
-      schema-utils: 3.3.0
-      semver: 7.6.3
+    optionalDependencies:
       webpack: 5.93.0
 
   scheduler@0.20.2:
