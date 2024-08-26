@@ -1,9 +1,7 @@
 package oidc
 
 import (
-	"bytes"
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,7 +15,6 @@ import (
 
 	"github.com/MicahParks/keyfunc/v2"
 	goidc "github.com/coreos/go-oidc/v3/oidc"
-	"github.com/go-jose/go-jose/v3"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
@@ -95,6 +92,7 @@ func NewOIDCClient(opts ...Option) OIDCClient {
 		httpClient:              options.HTTPClient,
 		accessTokenVerifyMethod: options.AccessTokenVerifyMethod,
 		JWKSOptions:             options.JWKSOptions, // TODO I don't like that we pass down config options ...
+		JWKS:                    options.JWKS,
 		providerLock:            &sync.Mutex{},
 		jwksLock:                &sync.Mutex{},
 		remoteKeySet:            options.KeySet,
@@ -319,75 +317,46 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.M
 }
 
 func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*LogoutToken, error) {
+	var claims LogoutToken
 	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
 		return nil, err
 	}
-	jws, err := jose.ParseSigned(rawToken)
-	if err != nil {
-		return nil, err
-	}
-	// Throw out tokens with invalid claims before trying to verify the token. This lets
-	// us do cheap checks before possibly re-syncing keys.
-	payload, err := parseJWT(rawToken)
-	if err != nil {
-		return nil, fmt.Errorf("oidc: malformed jwt: %v", err)
-	}
-	var token LogoutToken
-	if err := json.Unmarshal(payload, &token); err != nil {
-		return nil, fmt.Errorf("oidc: failed to unmarshal claims: %v", err)
+	jwks := c.getKeyfunc()
+	if jwks == nil {
+		return nil, errors.New("error initializing jwks keyfunc")
 	}
 
-	//4. Verify that the Logout Token contains a sub Claim, a sid Claim, or both.
-	if token.Subject == "" && token.SessionId == "" {
-		return nil, fmt.Errorf("oidc: logout token must contain either sub or sid and MAY contain both")
-	}
-	//5. Verify that the Logout Token contains an events Claim whose value is JSON object containing the member name http://schemas.openid.net/event/backchannel-logout.
-	if token.Events.Event == nil {
-		return nil, fmt.Errorf("oidc: logout token must contain logout event")
-	}
-	//6. Verify that the Logout Token does not contain a nonce Claim.
-	var n struct {
-		Nonce *string `json:"nonce"`
-	}
-	json.Unmarshal(payload, &n)
-	if n.Nonce != nil {
-		return nil, fmt.Errorf("oidc: nonce on logout token MUST NOT be present")
-	}
-	// Check issuer.
-	if !c.skipIssuerValidation && token.Issuer != c.issuer {
-		return nil, fmt.Errorf("oidc: logout token issued by a different provider, expected %q got %q", c.issuer, token.Issuer)
-	}
-
-	switch len(jws.Signatures) {
-	case 0:
-		return nil, fmt.Errorf("oidc: logout token not signed")
-	case 1:
-		// do nothing
-	default:
-		return nil, fmt.Errorf("oidc: multiple signatures on logout token not supported")
-	}
-
-	sig := jws.Signatures[0]
+	// From the backchannel-logout spec: Like ID Tokens, selection of the
+	// algorithm used is governed by the id_token_signing_alg_values_supported
+	// Discovery parameter and the id_token_signed_response_alg Registration
+	// parameter when they are used; otherwise, the value SHOULD be the default
+	// of RS256
 	supportedSigAlgs := c.algorithms
 	if len(supportedSigAlgs) == 0 {
 		supportedSigAlgs = []string{RS256}
 	}
 
-	if !contains(supportedSigAlgs, sig.Header.Algorithm) {
-		return nil, fmt.Errorf("oidc: logout token signed with unsupported algorithm, expected %q got %q", supportedSigAlgs, sig.Header.Algorithm)
-	}
-
-	gotPayload, err := c.remoteKeySet.VerifySignature(goidc.ClientContext(ctx, c.httpClient), rawToken)
+	_, err := jwt.ParseWithClaims(rawToken, &claims, jwks.Keyfunc, jwt.WithValidMethods(supportedSigAlgs), jwt.WithIssuer(c.issuer))
 	if err != nil {
-		return nil, fmt.Errorf("failed to verify signature: %v", err)
+		c.Logger.Debug().Err(err).Msg("Failed to parse logout token")
+		return nil, err
+	}
+	// Basic token validation has happened in ParseWithClaims (signature,
+	// issuer, audience, ...). Now for some logout token specific checks.
+	// 1. Verify that the Logout Token contains a sub Claim, a sid Claim, or both.
+	if claims.Subject == "" && claims.SessionId == "" {
+		return nil, fmt.Errorf("oidc: logout token must contain either sub or sid and MAY contain both")
+	}
+	// 2. Verify that the Logout Token contains an events Claim whose value is JSON object containing the member name http://schemas.openid.net/event/backchannel-logout.
+	if claims.Events.Event == nil {
+		return nil, fmt.Errorf("oidc: logout token must contain logout event")
+	}
+	// 3. Verify that the Logout Token does not contain a nonce Claim.
+	if claims.Nonce != nil {
+		return nil, fmt.Errorf("oidc: nonce on logout token MUST NOT be present")
 	}
 
-	// Ensure that the payload returned by the square actually matches the payload parsed earlier.
-	if !bytes.Equal(gotPayload, payload) {
-		return nil, errors.New("oidc: internal error, payload parsed did not match previous payload")
-	}
-
-	return &token, nil
+	return &claims, nil
 }
 
 func unmarshalResp(r *http.Response, body []byte, v interface{}) error {
@@ -401,25 +370,4 @@ func unmarshalResp(r *http.Response, body []byte, v interface{}) error {
 		return fmt.Errorf("got Content-Type = application/json, but could not unmarshal as JSON: %v", err)
 	}
 	return fmt.Errorf("expected Content-Type = application/json, got %q: %v", ct, err)
-}
-
-func contains(sli []string, ele string) bool {
-	for _, s := range sli {
-		if s == ele {
-			return true
-		}
-	}
-	return false
-}
-
-func parseJWT(p string) ([]byte, error) {
-	parts := strings.Split(p, ".")
-	if len(parts) < 2 {
-		return nil, fmt.Errorf("oidc: malformed jwt, expected 3 parts got %d", len(parts))
-	}
-	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
-	if err != nil {
-		return nil, fmt.Errorf("oidc: malformed jwt payload: %v", err)
-	}
-	return payload, nil
 }

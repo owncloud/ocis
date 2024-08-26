@@ -59,35 +59,12 @@ type ProviderMetadata struct {
 
 // Logout Token defines an logout Token
 type LogoutToken struct {
-	// The URL of the server which issued this token. OpenID Connect
-	// requires this value always be identical to the URL used for
-	// initial discovery.
-	//
-	// Note: Because of a known issue with Google Accounts' implementation
-	// this value may differ when using Google.
-	//
-	// See: https://developers.google.com/identity/protocols/OpenIDConnect#obtainuserinfo
-	Issuer string `json:"iss"` // example "https://server.example.com"
-
-	// A unique string which identifies the end user.
-	Subject string `json:"sub"` //"248289761001"
-
-	// The client ID, or set of client IDs, that this token is issued for. For
-	// common uses, this is the client that initialized the auth flow.
-	//
-	// This package ensures the audience contains an expected value.
-	Audience jwt.ClaimStrings `json:"aud"` // "s6BhdRkqt3"
-
-	// When the token was issued by the provider.
-	IssuedAt *jwt.NumericDate `json:"iat"`
-
+	jwt.RegisteredClaims
 	// The Session Id
-	SessionId string `json:"sid"`
-
-	Events LogoutEvent `json:"events"`
-
-	// Jwt Id
-	JwtID string `json:"jti"`
+	SessionId string      `json:"sid"`
+	Events    LogoutEvent `json:"events"`
+	// Note: This is just here to be able to check for nonce being absent
+	Nonce *string `json:"nonce"`
 }
 
 // LogoutEvent defines a logout Event

@@ -2,152 +2,124 @@ package oidc_test
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
-	"fmt"
 	"testing"
 
-	goidc "github.com/coreos/go-oidc/v3/oidc"
-	"github.com/go-jose/go-jose/v3"
+	"github.com/MicahParks/keyfunc/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 )
 
 type signingKey struct {
-	keyID string // optional
-	priv  interface{}
-	pub   interface{}
-	alg   jose.SignatureAlgorithm
-}
-
-// sign creates a JWS using the private key from the provided payload.
-func (s *signingKey) sign(t testing.TB, payload []byte) string {
-	privKey := &jose.JSONWebKey{Key: s.priv, Algorithm: string(s.alg), KeyID: s.keyID}
-
-	signer, err := jose.NewSigner(jose.SigningKey{Algorithm: s.alg, Key: privKey}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	jws, err := signer.Sign(payload)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	data, err := jws.CompactSerialize()
-	if err != nil {
-		t.Fatal(err)
-	}
-	return data
-}
-
-func (s *signingKey) jwk() jose.JSONWebKey {
-	return jose.JSONWebKey{Key: s.pub, Use: "sig", Algorithm: string(s.alg), KeyID: s.keyID}
+	priv interface{}
+	jwks *keyfunc.JWKS
 }
 
 func TestLogoutVerify(t *testing.T) {
 	tests := []logoutVerificationTest{
 		{
 			name: "good token",
-			logoutToken: ` {
-							   "iss": "https://foo",
-							   "sub": "248289761001",
-							   "aud": "s6BhdRkqt3",
-							   "iat": 1471566154,
-							   "jti": "bWJq",
-							   "sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
-							   "events": {
-								 "http://schemas.openid.net/event/backchannel-logout": {}
-								 }
-							  }`,
+			logoutToken: jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+				"iss": "https://foo",
+				"sub": "248289761001",
+				"aud": "s6BhdRkqt3",
+				"iat": 1471566154,
+				"jti": "bWJq",
+				"sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
+				"events": map[string]interface{}{
+					"http://schemas.openid.net/event/backchannel-logout": struct{}{},
+				},
+			}),
 			signKey: newRSAKey(t),
 		},
 		{
-			name:        "invalid issuer",
-			issuer:      "https://bar",
-			logoutToken: `{"iss":"https://foo"}`,
-			config: goidc.Config{
-				SkipExpiryCheck: true,
-			},
+			name:   "invalid issuer",
+			issuer: "https://bar",
+			logoutToken: jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+				"iss": "https://foo1",
+				"sub": "248289761001",
+				"events": map[string]interface{}{
+					"http://schemas.openid.net/event/backchannel-logout": struct{}{},
+				},
+			}),
 			signKey: newRSAKey(t),
 			wantErr: true,
 		},
 		{
 			name: "invalid sig",
-			logoutToken: `{
-							   "iss": "https://foo",
-							   "sub": "248289761001",
-							   "aud": "s6BhdRkqt3",
-							   "iat": 1471566154,
-							   "jti": "bWJq",
-							   "sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
-							   "events": {
-								 "http://schemas.openid.net/event/backchannel-logout": {}
-								 }
-							  }`,
-			config: goidc.Config{
-				SkipExpiryCheck: true,
-			},
+			logoutToken: jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+				"iss": "https://foo",
+				"sub": "248289761001",
+				"aud": "s6BhdRkqt3",
+				"iat": 1471566154,
+				"jti": "bWJq",
+				"sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
+				"events": map[string]interface{}{
+					"http://schemas.openid.net/event/backchannel-logout": struct{}{},
+				},
+			}),
 			signKey:         newRSAKey(t),
 			verificationKey: newRSAKey(t),
 			wantErr:         true,
 		},
 		{
 			name: "no sid and no sub",
-			logoutToken: ` {
-								"iss": "https://foo",
-							   "aud": "s6BhdRkqt3",
-							   "iat": 1471566154,
-							   "jti": "bWJq",
-							   "events": {
-								 "http://schemas.openid.net/event/backchannel-logout": {}
-								 }
-							  }`,
+			logoutToken: jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+				"iss": "https://foo",
+				"aud": "s6BhdRkqt3",
+				"iat": 1471566154,
+				"jti": "bWJq",
+				"events": map[string]interface{}{
+					"http://schemas.openid.net/event/backchannel-logout": struct{}{},
+				},
+			}),
 			signKey: newRSAKey(t),
 			wantErr: true,
 		},
 		{
 			name: "Prohibited nonce present",
-			logoutToken: ` {
-							   	"iss": "https://foo",
-								"sub": "248289761001",
-							   	"aud": "s6BhdRkqt3",
-							   	"iat": 1471566154,
-							   	"jti": "bWJq",
-								"nonce" : "prohibited",
-							   	"events": {
-								 "http://schemas.openid.net/event/backchannel-logout": {}
-								 }
-							  }`,
+			logoutToken: jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+				"iss":   "https://foo",
+				"sub":   "248289761001",
+				"aud":   "s6BhdRkqt3",
+				"iat":   1471566154,
+				"jti":   "bWJq",
+				"sid":   "08a5019c-17e1-4977-8f42-65a12843ea02",
+				"nonce": "123",
+				"events": map[string]interface{}{
+					"http://schemas.openid.net/event/backchannel-logout": struct{}{},
+				},
+			}),
 			signKey: newRSAKey(t),
 			wantErr: true,
 		},
 		{
 			name: "Wrong Event string",
-			logoutToken: ` {
-							   "iss": "https://foo",
-							   "sub": "248289761001",
-							   "aud": "s6BhdRkqt3",
-							   "iat": 1471566154,
-							   "jti": "bWJq",
-							   "sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
-							   "events": {
-								 "not a logout event": {}
-								 }
-							  }`,
+			logoutToken: jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+				"iss": "https://foo",
+				"sub": "248289761001",
+				"aud": "s6BhdRkqt3",
+				"iat": 1471566154,
+				"jti": "bWJq",
+				"sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
+				"events": map[string]interface{}{
+					"http://blah.blah.blash/event/backchannel-logout": struct{}{},
+				},
+			}),
 			signKey: newRSAKey(t),
 			wantErr: true,
 		},
 		{
 			name: "No Event string",
-			logoutToken: ` {
-							   "iss": "https://foo",
-							   "sub": "248289761001",
-							   "aud": "s6BhdRkqt3",
-							   "iat": 1471566154,
-							   "jti": "bWJq",
-							   "sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
-							  }`,
+			logoutToken: jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+				"iss": "https://foo",
+				"sub": "248289761001",
+				"aud": "s6BhdRkqt3",
+				"iat": 1471566154,
+				"jti": "bWJq",
+				"sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
+			}),
 			signKey: newRSAKey(t),
 			wantErr: true,
 		},
@@ -165,7 +137,7 @@ type logoutVerificationTest struct {
 	issuer string
 
 	// JWT payload (just the claims).
-	logoutToken string
+	logoutToken *jwt.Token
 
 	// Key to sign the ID Token with.
 	signKey *signingKey
@@ -173,40 +145,31 @@ type logoutVerificationTest struct {
 	// testing invalid signatures.
 	verificationKey *signingKey
 
-	config  goidc.Config
 	wantErr bool
 }
 
-type testVerifier struct {
-	jwk jose.JSONWebKey
-}
-
-func (t *testVerifier) VerifySignature(ctx context.Context, jwt string) ([]byte, error) {
-	jws, err := jose.ParseSigned(jwt)
-	if err != nil {
-		return nil, fmt.Errorf("oidc: malformed jwt: %v", err)
-	}
-	return jws.Verify(&t.jwk)
-}
-
 func (v logoutVerificationTest) runGetToken(t *testing.T) (*oidc.LogoutToken, error) {
-	token := v.signKey.sign(t, []byte(v.logoutToken))
+	//	token := v.signKey.sign(t, []byte(v.logoutToken))
+	v.logoutToken.Header["kid"] = "1"
+	token, err := v.logoutToken.SignedString(v.signKey.priv)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	issuer := "https://foo"
-	var ks goidc.KeySet
+	var jwks *keyfunc.JWKS
 	if v.verificationKey == nil {
-		ks = &testVerifier{v.signKey.jwk()}
+		jwks = v.signKey.jwks
 	} else {
-		ks = &testVerifier{v.verificationKey.jwk()}
+		jwks = v.verificationKey.jwks
 	}
 
 	pm := oidc.ProviderMetadata{}
 	verifier := oidc.NewOIDCClient(
 		oidc.WithOidcIssuer(issuer),
-		oidc.WithKeySet(ks),
-		oidc.WithConfig(&v.config),
+		oidc.WithJWKS(jwks),
 		oidc.WithProviderMetadata(&pm),
 	)
 
@@ -228,13 +191,15 @@ func newRSAKey(t testing.TB) *signingKey {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return &signingKey{"", priv, priv.Public(), jose.RS256}
-}
+	givenKey := keyfunc.NewGivenRSA(
+		&priv.PublicKey,
+		keyfunc.GivenKeyOptions{Algorithm: jwt.SigningMethodRS256.Alg()},
+	)
+	jwks := keyfunc.NewGiven(
+		map[string]keyfunc.GivenKey{
+			"1": givenKey,
+		},
+	)
 
-func newECDSAKey(t *testing.T) *signingKey {
-	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return &signingKey{"", priv, priv.Public(), jose.ES256}
+	return &signingKey{priv, jwks}
 }
