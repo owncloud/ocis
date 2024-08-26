@@ -9,6 +9,7 @@ git config --global advice.detachedHead false
 
 if [ "$TEST_SOURCE" = "oc10" ]
 then
+    export ACCEPTANCE_TEST_TYPE='core-api'
     if [ "$STORAGE_DRIVER" = "ocis" ]
     then
         export OCIS_REVA_DATA_ROOT=''
@@ -67,17 +68,13 @@ fi
 
 ## RUN TEST
 
-if [ "$TEST_SOURCE" = "oc10" ]
+if [[ -z "$TEST_SOURCE" ]]
 then
-   sleep 10
-   make -C $OCIS_ROOT test-acceptance-from-core-api
-elif [ "$TEST_SOURCE" = "ocis" ]
-then
-    sleep 10
-    make -C $OCIS_ROOT test-acceptance-api
-else
     echo "non existing TEST_SOURCE selected"
     exit 1
+else
+    sleep 10
+    make -C $OCIS_ROOT test-acceptance-api
 fi
 
 chmod -R 777 vendor-bin/**/vendor vendor-bin/**/composer.lock tests/acceptance/output
