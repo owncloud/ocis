@@ -528,17 +528,20 @@ func GetLegacyName(role libregraph.UnifiedRoleDefinition) string {
 // CS3ResourcePermissionsToUnifiedRole tries to find the UnifiedRoleDefinition that matches the supplied
 // CS3 ResourcePermissions and constraints.
 func CS3ResourcePermissionsToUnifiedRole(p *provider.ResourcePermissions, constraints string, listFederatedRoles bool) *libregraph.UnifiedRoleDefinition {
-	actions := CS3ResourcePermissionsToLibregraphActions(p)
+	actionSet := map[string]struct{}{}
+	for _, action := range CS3ResourcePermissionsToLibregraphActions(p) {
+		actionSet[action] = struct{}{}
+	}
 
 	var res *libregraph.UnifiedRoleDefinition
 	for _, uRole := range GetBuiltinRoleDefinitionList() {
 		definitionMatch := false
-		for _, uPerm := range uRole.GetRolePermissions() {
 
+		for _, permission := range uRole.GetRolePermissions() {
 			// this is a dirty comparison because we are not really parsing the SDDL, but as long as we && the conditions we are good
-			isFederatedRole := strings.Contains(uPerm.GetCondition(), UnifiedRoleConditionFederatedUser)
+			isFederatedRole := strings.Contains(permission.GetCondition(), UnifiedRoleConditionFederatedUser)
 			switch {
-			case !strings.Contains(uPerm.GetCondition(), constraints):
+			case !strings.Contains(permission.GetCondition(), constraints):
 				continue
 			case listFederatedRoles && !isFederatedRole:
 				continue
@@ -547,13 +550,9 @@ func CS3ResourcePermissionsToUnifiedRole(p *provider.ResourcePermissions, constr
 			}
 
 			// if the actions converted from the ResourcePermissions equal the action the defined for the role, we have match
-			for i, action := range uPerm.GetAllowedResourceActions() {
-				if !slices.Contains(actions, action) {
-					break
-				}
-				if i == len(uPerm.GetAllowedResourceActions())-1 {
-					definitionMatch = true
-				}
+			if resourceActionsEqual(actionSet, permission.GetAllowedResourceActions()) {
+				definitionMatch = true
+				break
 			}
 		}
 		if definitionMatch {
