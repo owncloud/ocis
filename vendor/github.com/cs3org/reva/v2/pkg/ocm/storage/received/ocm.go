@@ -285,6 +285,7 @@ func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *oc
 		Mtime: &typepb.Timestamp{
 			Seconds: uint64(f.ModTime().Unix()),
 		},
+		Etag:          webdavFile.ETag(),
 		Owner:         share.Creator,
 		PermissionSet: webdavProtocol.Permissions.Permissions,
 		Checksum: &provider.ResourceChecksum{
