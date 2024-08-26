@@ -1743,7 +1743,7 @@ trait WebDav {
 	 * @param string $source
 	 * @param string $destination
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public function userHasUploadedAFileTo(string $user, string $source, string $destination):array {
 		$response = $this->uploadFile($user, $source, $destination, true);

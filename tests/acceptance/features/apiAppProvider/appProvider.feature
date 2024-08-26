@@ -1,7 +1,7 @@
 Feature: App Provider
   As a user
   I want to access files with collaboration service apps
-  So that I can get the content of the file
+  So that I can collaborate with other users
 
 
   Scenario Outline: open file with .odt extension with collaboration app
@@ -22,7 +22,7 @@ Feature: App Provider
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^https:\\/\\/fakeoffice\\.owncloud\\.test\\/not\\/relevant\\?WOPISrc=http%3A%2F%2Fwopiserver%3A9300%2Fwopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^https:\\/\\/(.*?)\\?WOPISrc=http%3A%2F%2F(.*?)%3A9300%2Fwopi%2Ffiles%2F[a-fA-F0-9]{64}$"
           },
           "method": {
             "const": "POST"
