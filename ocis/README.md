@@ -1,25 +1,21 @@
 # ocis
 
-The ocis package contains the Infinite Scale runtime and the commands for the Infinite Scale cli.
+The ocis package contains the Infinite Scale runtime and the commands for the Infinite Scale CLI.
 
-## Service registry
+## Service Registry
 
-This package also configures the service registry which will be used to look up the service addresses. It defaults to mDNS. Keep that in mind when using systems with mDNS disabled by default (i.e. SUSE).
+This package also configures the service registry which will be used to look up the service addresses.
 
 Available registries are:
 
--   nats
+-   nats-js-kv (default)
 -   kubernetes
--   etcd
--   consul
 -   memory
--   mdns (default)
+-   etcd (deprecated)
+-   consul (deprecated)
+-   mdns (deprecated)
 
 To configure which registry to use, you have to set the environment variable `MICRO_REGISTRY`, and for all except `memory` and `mdns` you also have to set the registry address via `MICRO_REGISTRY_ADDRESS`.
-
-### etcd
-
-To authenticate the connection to the etcd registry, you have to set `ETCD_USERNAME` and `ETCD_PASSWORD`.
 
 ## Memory limits
 

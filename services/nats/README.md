@@ -4,9 +4,15 @@ The nats service is the event broker of the system. It distributes events among 
 
 Services can `Publish` events to the nats service and nats will store these events on disk and distribute these events to other services eventually. Services can `Consume` events from the nats service by registering to a `ConsumerGroup`. Each `ConsumerGroup` is guaranteed to get each event exactly once. In most cases, each service will register its own `ConsumerGroup`. When there are multiple instances of a service, those instances will usually use that `ConsumerGroup` as common resource.
 
-## Underlying technology
+## Underlying Technology
 
 As the service name suggests, this service is based on [NATS](https://nats.io/) specifically on [NATS Jetstream](https://docs.nats.io/nats-concepts/jetstream) to enable persistence.
+
+## Default Registry
+
+By default, `nats-js-kv` is configured as embedded default registry via the `MICRO_REGISTRY` environment variable. If you do not want using the build-in nats registry, set `MICRO_REGISTRY_ADDRESS` to the address of the nats-js cluster, which is the same value as `OCIS_EVENTS_ENDPOINT`. Optionally use `MICRO_REGISTRY_AUTH_USERNAME` and `MICRO_REGISTRY_AUTH_PASSWORD` to authenticate with the external nats cluster.
+
+Note that when `MICRO_REGISTRY` is configured using `kubernetes`, the NATS service will not be used but the Kubernetes registry. In this case, the `MICRO_REGISTRY_ADDRESS` environment variable needs to be set to the url of the Kubernetes registry.
 
 ## Persistance
 
