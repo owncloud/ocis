@@ -252,6 +252,36 @@ Feature: collaboration (wopi)
       | /app/open?file_id=<<FILEID>>&app_name=FakeOffice |
       | /app/open?file_id=<<FILEID>>                     |
 
+
+  Scenario Outline: open file with non-existing file id
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And we save it into "FILEID"
+    And user "Alice" has deleted file "/simple.odt"
+    When user "Alice" sends HTTP method "POST" to URL "<app-endpoint>"
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "RESOURCE_NOT_FOUND"
+          },
+          "message": {
+            "const": "file does not exist"
+          }
+        }
+      }
+      """
+    Examples:
+      | app-endpoint                                     |
+      | /app/open?file_id=<<FILEID>>&app_name=FakeOffice |
+      | /app/open?file_id=<<FILEID>>                     |
+
   @issue-9495
   Scenario Outline: open file with .odt extension (open-with-web)
     Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
