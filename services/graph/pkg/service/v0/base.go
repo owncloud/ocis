@@ -85,7 +85,8 @@ func (g BaseGraphService) CS3ReceivedSharesToDriveItems(ctx context.Context, rec
 		return nil, err
 	}
 
-	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares)
+	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
+	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares, availableRoles)
 }
 
 func (g BaseGraphService) CS3ReceivedOCMSharesToDriveItems(ctx context.Context, receivedShares []*ocm.ReceivedShare) ([]libregraph.DriveItem, error) {
@@ -94,7 +95,8 @@ func (g BaseGraphService) CS3ReceivedOCMSharesToDriveItems(ctx context.Context, 
 		return nil, err
 	}
 
-	return cs3ReceivedOCMSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares)
+	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
+	return cs3ReceivedOCMSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares, availableRoles)
 }
 
 func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace, apiVersion APIVersion) []libregraph.Permission {
@@ -191,15 +193,27 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
 		}
 
-		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(perm, unifiedrole.UnifiedRoleConditionDrive, false); role != nil {
+		availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
+		if role := unifiedrole.CS3ResourcePermissionsToRole(
+			availableRoles,
+			perm,
+			unifiedrole.UnifiedRoleConditionDrive,
+			false,
+		); role != nil {
 			switch apiVersion {
 			case APIVersion_1:
-				if r := unifiedrole.GetLegacyName(*role); r != "" {
+				if r := unifiedrole.GetLegacyRoleName(*role); r != "" {
 					p.SetRoles([]string{r})
 				}
 			case APIVersion_1_Beta_1:
 				p.SetRoles([]string{role.GetId()})
 			}
+		}
+
+		// if there is no role, we need to set the actions as a fallback
+		// this could happen if a role is disabled or unknown
+		if !p.HasRoles() {
+			p.SetLibreGraphPermissionsActions(unifiedrole.CS3ResourcePermissionsToLibregraphActions(perm))
 		}
 
 		permissions = append(permissions, p)
@@ -456,7 +470,8 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 	if share.GetCtime() != nil {
 		perm.SetCreatedDateTime(cs3TimestampToTime(share.GetCtime()))
 	}
-	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+	role := unifiedrole.CS3ResourcePermissionsToRole(
+		unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...)),
 		share.GetPermissions().GetPermissions(),
 		roleCondition,
 		false,
@@ -540,7 +555,9 @@ func (g BaseGraphService) cs3OCMShareToPermission(ctx context.Context, share *oc
 		}
 	}
 
-	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
+	role := unifiedrole.CS3ResourcePermissionsToRole(
+		availableRoles,
 		permissions,
 		roleCondition,
 		true,
@@ -844,7 +861,7 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 	var permissionsUpdated, ok bool
 	if roles, ok = newPermission.GetRolesOk(); ok && len(roles) > 0 {
 		for _, roleID := range roles {
-			role, err := unifiedrole.NewUnifiedRoleFromID(roleID)
+			role, err := unifiedrole.GetRole(unifiedrole.RoleFilterIDs(roleID))
 			if err != nil {
 				g.logger.Debug().Err(err).Interface("role", role).Msg("unable to convert requested role")
 				return nil, err

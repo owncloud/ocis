@@ -1,13 +1,24 @@
 package unifiedrole_test
 
 import (
-	"testing"
+	"slices"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
-func TestUnifiedrole(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Unifiedrole Suite")
+func getRoleActions(definitions ...*libregraph.UnifiedRoleDefinition) []string {
+	var actions []string
+
+	for _, definition := range definitions {
+		for _, permission := range definition.GetRolePermissions() {
+			for _, action := range permission.GetAllowedResourceActions() {
+				if slices.Contains(actions, action) {
+					continue
+				}
+				actions = append(actions, action)
+			}
+		}
+	}
+
+	return actions
 }

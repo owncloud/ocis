@@ -7,6 +7,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -54,6 +55,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				OpaqueId: "user",
 			},
 		}
+		cache        identity.IdentityCache
 		statResponse *provider.StatResponse
 		driveItemId  *provider.ResourceId
 		ctx          context.Context
@@ -66,7 +68,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
 		gatewaySelector.On("Next").Return(gatewayClient, nil)
 
-		cache := identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
+		cache = identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
 		cfg := defaults.FullDefaultConfig()
 		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg)
@@ -169,13 +171,13 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewViewerUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID}
 
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(permission.GetRoles()).To(HaveLen(1))
-			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.NewViewerUnifiedRole().GetId()))
+			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.UnifiedRoleViewerID))
 		})
 
 		It("succeeds with folder roles (happy path)", func() {
@@ -185,20 +187,20 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewEditorUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleEditorID}
 
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(permission.GetRoles()).To(HaveLen(1))
-			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.NewEditorUnifiedRole().GetId()))
+			Expect(permission.GetRoles()[0]).To(Equal(unifiedrole.UnifiedRoleEditorID))
 		})
 
 		It("fails with when trying to set a space role on a file", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewManagerUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleManagerID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 
 			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
@@ -209,7 +211,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewEditorUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleEditorID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 
 			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
@@ -221,7 +223,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 			}
-			driveItemInvite.Roles = []string{unifiedrole.NewFileEditorUnifiedRole().GetId()}
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleFileEditorID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 
 			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
@@ -245,12 +247,27 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permission.GetLibreGraphPermissionsActions()).To(HaveLen(1))
 			Expect(permission.GetLibreGraphPermissionsActions()[0]).To(Equal(unifiedrole.DriveItemContentRead))
 		})
+
 		It("fails with a missing driveritem", func() {
 			statResponse.Status = status.NewNotFound(context.Background(), "not found")
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, "not found").WithOrigin(errorcode.ErrorOriginCS3)))
 			Expect(permission).To(BeZero())
+		})
+
+		It("fails with unknown or disable role", func() {
+			cfg := defaults.FullDefaultConfig()
+			slices.DeleteFunc(cfg.UnifiedRoles.AvailableRoles, func(s string) bool {
+				// SecureViewer is enabled in ci, we need to remove it in the unit test
+				return s != unifiedrole.UnifiedRoleSecureViewerID
+			})
+			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg)
+			Expect(err).ToNot(HaveOccurred())
+
+			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}
+			_, err = service.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).To(MatchError(unifiedrole.ErrUnknownRole))
 		})
 	})
 	Describe("SpaceRootInvite", func() {
@@ -829,7 +846,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 
-			driveItemPermission.SetRoles([]string{unifiedrole.NewSpaceViewerUnifiedRole().GetId()})
+			driveItemPermission.SetRoles([]string{unifiedrole.UnifiedRoleSpaceViewerID})
 			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), driveItemId, "permissionid", driveItemPermission)
 			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")))
 			Expect(res).To(BeZero())
@@ -846,7 +863,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 
-			driveItemPermission.SetRoles([]string{unifiedrole.NewFileEditorUnifiedRole().GetId()})
+			driveItemPermission.SetRoles([]string{unifiedrole.UnifiedRoleFileEditorID})
 			spaceId := &provider.ResourceId{
 				StorageId: "1",
 				SpaceId:   "2",
@@ -1015,7 +1032,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 		logger := log.NewLogger()
 
 		mockProvider = mocks.NewDriveItemPermissionsProvider(GinkgoT())
-		api, err := svc.NewDriveItemPermissionsApi(mockProvider, logger)
+		api, err := svc.NewDriveItemPermissionsApi(mockProvider, logger, defaults.FullDefaultConfig())
 		Expect(err).ToNot(HaveOccurred())
 
 		httpAPI = api
@@ -1029,7 +1046,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 					ObjectId:                libregraph.PtrString("1"),
 					LibreGraphRecipientType: libregraph.PtrString("user")},
 			},
-			Roles: []string{unifiedrole.NewViewerUnifiedRole().GetId()},
+			Roles: []string{unifiedrole.UnifiedRoleViewerID},
 		}
 	})
 
@@ -1097,6 +1114,22 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 
 			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
 		})
+
+		It("fails with unknown or disable role", func() {
+			rCTX.URLParams.Add("itemID", "1$2!3")
+			responseRecorder := httptest.NewRecorder()
+			invite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}
+			inviteJson, err := json.Marshal(invite)
+			Expect(err).ToNot(HaveOccurred())
+
+			request := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(inviteJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+			httpAPI.Invite(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
+		})
 	})
 	Describe("SpaceRootInvite", func() {
 		It("call the Invite provider with the correct arguments", func() {
@@ -1131,6 +1164,21 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			httpAPI.SpaceRootInvite(responseRecorder, request)
 
 			Expect(responseRecorder.Code).To(Equal(http.StatusUnprocessableEntity))
+		})
+
+		It("fails with unknown or disable role", func() {
+			responseRecorder := httptest.NewRecorder()
+			invite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}
+			inviteJson, err := json.Marshal(invite)
+			Expect(err).ToNot(HaveOccurred())
+
+			request := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(inviteJson)).
+				WithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+				)
+			httpAPI.SpaceRootInvite(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
 		})
 	})
 	Describe("ListPermissions", func() {

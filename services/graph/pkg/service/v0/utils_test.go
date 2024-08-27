@@ -5,17 +5,22 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	rConversions "github.com/cs3org/reva/v2/pkg/conversions"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
 var _ = Describe("Utils", func() {
@@ -103,5 +108,45 @@ var _ = Describe("Utils", func() {
 			StorageId: "123",
 			SpaceId:   "123",
 		}, false),
+	)
+
+	DescribeTable("_cs3ReceivedShareToLibreGraphPermissions",
+		func(permissionSet *provider.ResourcePermissions, match func(*libregraph.Permission)) {
+			permission, err := service.CS3ReceivedShareToLibreGraphPermissions(
+				context.Background(),
+				nil,
+				identity.IdentityCache{},
+				&collaboration.ReceivedShare{
+					Share: &collaboration.Share{
+						Permissions: &collaboration.SharePermissions{
+							Permissions: permissionSet,
+						},
+					},
+				}, &provider.ResourceInfo{
+					Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				},
+				unifiedrole.GetRoles(unifiedrole.RoleFilterAll()),
+			)
+			Expect(err).ToNot(HaveOccurred())
+			match(permission)
+		},
+		Entry(
+			"permissions match a role",
+			rConversions.NewViewerRole().CS3ResourcePermissions(),
+			func(p *libregraph.Permission) {
+				Expect(p.GetRoles()).To(HaveExactElements([]string{unifiedrole.UnifiedRoleViewerID}))
+				Expect(p.GetLibreGraphPermissionsActions()).To(BeNil())
+			},
+		),
+		Entry(
+			"permissions do not match any role",
+			&provider.ResourcePermissions{
+				AddGrant: true,
+			},
+			func(p *libregraph.Permission) {
+				Expect(p.GetRoles()).To(BeNil())
+				Expect(p.GetLibreGraphPermissionsActions()).To(HaveExactElements([]string{unifiedrole.DriveItemPermissionsCreate}))
+			},
+		),
 	)
 })

@@ -1341,10 +1341,10 @@ github.com/mattermost/xml-roundtrip-validator
 # github.com/mattn/go-colorable v0.1.13
 ## explicit; go 1.15
 github.com/mattn/go-colorable
-# github.com/mattn/go-isatty v0.0.19
+# github.com/mattn/go-isatty v0.0.20
 ## explicit; go 1.15
 github.com/mattn/go-isatty
-# github.com/mattn/go-runewidth v0.0.13
+# github.com/mattn/go-runewidth v0.0.15
 ## explicit; go 1.9
 github.com/mattn/go-runewidth
 # github.com/mattn/go-sqlite3 v1.14.22
@@ -1708,7 +1708,7 @@ github.com/rcrowley/go-metrics
 # github.com/riandyrn/otelchi v0.9.0
 ## explicit; go 1.21
 github.com/riandyrn/otelchi
-# github.com/rivo/uniseg v0.4.2
+# github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
 github.com/rivo/uniseg
 # github.com/rogpeppe/go-internal v1.12.0

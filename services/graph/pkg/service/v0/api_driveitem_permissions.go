@@ -25,6 +25,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	l10n_pkg "github.com/owncloud/ocis/v2/services/graph/pkg/l10n"
 
@@ -104,7 +105,12 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 
 	unifiedRolePermissions := []*libregraph.UnifiedRolePermission{{AllowedResourceActions: invite.LibreGraphPermissionsActions}}
 	for _, roleID := range invite.GetRoles() {
-		role, err := unifiedrole.NewUnifiedRoleFromID(roleID)
+		// only allow roles that are enabled in the config
+		if !slices.Contains(s.config.UnifiedRoles.AvailableRoles, roleID) {
+			return libregraph.Permission{}, unifiedrole.ErrUnknownRole
+		}
+
+		role, err := unifiedrole.GetRole(unifiedrole.RoleFilterIDs(roleID))
 		if err != nil {
 			s.logger.Debug().Err(err).Interface("role", invite.GetRoles()[0]).Msg("unable to convert requested role")
 			return libregraph.Permission{}, err
@@ -124,7 +130,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(unifiedRolePermissions)
 
 	permission := &libregraph.Permission{}
-	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(cs3ResourcePermissions, condition, false); role != nil {
+	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(s.config.UnifiedRoles.AvailableRoles...))
+	if role := unifiedrole.CS3ResourcePermissionsToRole(availableRoles, cs3ResourcePermissions, condition, false); role != nil {
 		permission.Roles = []string{role.GetId()}
 	}
 
@@ -345,7 +352,8 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 	collectionOfPermissions = libregraph.CollectionOfPermissionsWithAllowedValues{
 		LibreGraphPermissionsActionsAllowedValues: allowedActions,
 		LibreGraphPermissionsRolesAllowedValues: conversions.ToValueSlice(
-			unifiedrole.GetApplicableRoleDefinitionsForActions(
+			unifiedrole.GetRolesByPermissions(
+				unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(s.config.UnifiedRoles.AvailableRoles...)),
 				allowedActions,
 				condition,
 				listFederatedRoles,
@@ -555,18 +563,20 @@ func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Conte
 	return s.UpdatePermission(ctx, rootResourceID, permissionID, newPermission)
 }
 
-// DriveItemPermissionsService is the api that registers the http endpoints which expose needed operation to the graph api.
+// DriveItemPermissionsApi is the api that registers the http endpoints which expose needed operation to the graph api.
 // the business logic is delegated to the permissions service and further down to the cs3 client.
 type DriveItemPermissionsApi struct {
 	logger                      log.Logger
 	driveItemPermissionsService DriveItemPermissionsProvider
+	config                      *config.Config
 }
 
 // NewDriveItemPermissionsApi creates a new DriveItemPermissionsApi
-func NewDriveItemPermissionsApi(driveItemPermissionService DriveItemPermissionsProvider, logger log.Logger) (DriveItemPermissionsApi, error) {
+func NewDriveItemPermissionsApi(driveItemPermissionService DriveItemPermissionsProvider, logger log.Logger, c *config.Config) (DriveItemPermissionsApi, error) {
 	return DriveItemPermissionsApi{
 		logger:                      log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemApi").Logger()},
 		driveItemPermissionsService: driveItemPermissionService,
+		config:                      c,
 	}, nil
 }
 
@@ -586,15 +596,14 @@ func (api DriveItemPermissionsApi) Invite(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	ctx := r.Context()
-
+	ctx := validate.ContextWithAllowedRoleIDs(r.Context(), api.config.UnifiedRoles.AvailableRoles)
 	if err = validate.StructCtx(ctx, driveItemInvite); err != nil {
 		api.logger.Debug().Err(err).Interface("Body", r.Body).Msg("invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	permission, err := api.driveItemPermissionsService.Invite(ctx, &itemID, *driveItemInvite)
 
+	permission, err := api.driveItemPermissionsService.Invite(ctx, &itemID, *driveItemInvite)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -620,7 +629,7 @@ func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *htt
 		return
 	}
 
-	ctx := r.Context()
+	ctx := validate.ContextWithAllowedRoleIDs(r.Context(), api.config.UnifiedRoles.AvailableRoles)
 	if err = validate.StructCtx(ctx, driveItemInvite); err != nil {
 		api.logger.Debug().Err(err).Interface("Body", r.Body).Msg("invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
