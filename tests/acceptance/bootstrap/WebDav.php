@@ -3939,7 +3939,7 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theDownloadedPreviewContentShouldMatchWithFixturesPreviewContentFor(string $filename):void {
-		$expectedPreview = \file_get_contents(__DIR__ . "/../../fixtures/" . $filename);
+		$expectedPreview = \file_get_contents(__DIR__ . "/../fixtures/" . $filename);
 		Assert::assertEquals($expectedPreview, $this->responseBodyContent);
 	}
 
