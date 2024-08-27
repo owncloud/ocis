@@ -57,6 +57,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Activity Translations: [#9856](https://github.com/owncloud/ocis/pull/9856)
 * Bugfix - The user attributes `userType` and `memberOf` are readonly: [#9867](https://github.com/owncloud/ocis/pull/9867)
 * Bugfix - Use key to get specific trash item: [#9879](https://github.com/owncloud/ocis/pull/9879)
+* Bugfix - Fix response code when upload a file over locked: [#9894](https://github.com/owncloud/ocis/pull/9894)
 * Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
 * Enhancement - We now set the configured protocol transport for service metadata: [#9490](https://github.com/owncloud/ocis/pull/9490)
@@ -97,6 +98,14 @@ The following sections list the changes for unreleased.
    assemble a full trash listing.
 
    https://github.com/owncloud/ocis/pull/9879
+
+* Bugfix - Fix response code when upload a file over locked: [#9894](https://github.com/owncloud/ocis/pull/9894)
+
+   We fixed a bug where the response code was incorrect when uploading a file over
+   a locked file.
+
+   https://github.com/owncloud/ocis/issues/7638
+   https://github.com/owncloud/ocis/pull/9894
 
 * Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
 
