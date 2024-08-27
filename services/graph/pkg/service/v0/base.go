@@ -191,7 +191,7 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
 		}
 
-		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(perm, unifiedrole.UnifiedRoleConditionDrive); role != nil {
+		if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(perm, unifiedrole.UnifiedRoleConditionDrive, false); role != nil {
 			switch apiVersion {
 			case APIVersion_1:
 				if r := unifiedrole.GetLegacyName(*role); r != "" {
@@ -459,6 +459,7 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
 		share.GetPermissions().GetPermissions(),
 		roleCondition,
+		false,
 	)
 	if role != nil {
 		perm.SetRoles([]string{role.GetId()})
@@ -542,6 +543,7 @@ func (g BaseGraphService) cs3OCMShareToPermission(ctx context.Context, share *oc
 	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
 		permissions,
 		roleCondition,
+		true,
 	)
 	if role != nil {
 		perm.SetRoles([]string{role.GetId()})

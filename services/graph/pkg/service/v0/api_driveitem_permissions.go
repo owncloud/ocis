@@ -124,7 +124,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	cs3ResourcePermissions := unifiedrole.PermissionsToCS3ResourcePermissions(unifiedRolePermissions)
 
 	permission := &libregraph.Permission{}
-	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(cs3ResourcePermissions, condition); role != nil {
+	if role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(cs3ResourcePermissions, condition, false); role != nil {
 		permission.Roles = []string{role.GetId()}
 	}
 
