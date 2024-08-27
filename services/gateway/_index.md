@@ -1,6 +1,6 @@
 ---
 title: Gateway
-date: 2024-08-27T05:38:45.265269054Z
+date: 2024-08-27T06:35:50.033453999Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/gateway
@@ -19,8 +19,8 @@ The gateway service is responsible for passing requests to the storage providers
 ## Table of Contents
 
 * [Caching](#caching)
-* [Service endpoints](#service-endpoints)
-* [Storage registry](#storage-registry)
+* [Service Endpoints](#service-endpoints)
+* [Storage Registry](#storage-registry)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Caching
@@ -52,7 +52,10 @@ Store specific notes:
   -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
   -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
 
-## Service endpoints
+## Service Endpoints
+
+**IMPORTANT**\
+This functionality is currently experimental.
 
 The gateway acts as a proxy for other CS3 services. As such it has to forward requests to a lot of services and needs to establish connections by looking up the IP address using the service registry. Instead of using the service registry each endpoint can also be configured to use the grpc `dns://` or `kubernetes://` URLs, which might be useful when running in kubernetes.
 
@@ -116,9 +119,7 @@ SHARING_PUBLIC_CS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
 SHARING_PUBLIC_JSONCS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
 ```
 
-
-
-## Storage registry
+## Storage Registry
 
 In order to add another storage provider the CS3 storage registry that is running as part of the CS3 gateway hes to be made aware of it. The easiest cleanest way to do it is to set `GATEWAY_STORAGE_REGISTRY_CONFIG_JSON=/path/to/storages.json` and list all storage providers like this:
 
@@ -188,7 +189,8 @@ In order to add another storage provider the CS3 storage registry that is runnin
 }
 ```
 
-In the above replace `{storage-users-mount-uuid}` with the mount UUID that was generated for the storage-users service. You can find it in the `config.yaml` generated on by `ocis init`. The last entry `com.owncloud.api.storage-hello` and its `providerid` `"hello-storage-id"` are an example for in additional storage provider, in this case running `hellofs`, an example minimal storage driver.## Example Yaml Config
+In the above replace `{storage-users-mount-uuid}` with the mount UUID that was generated for the storage-users service. You can find it in the `config.yaml` generated on by `ocis init`. The last entry `com.owncloud.api.storage-hello` and its `providerid` `"hello-storage-id"` are an example for in additional storage provider, in this case running `hellofs`, an example minimal storage driver.
+## Example Yaml Config
 {{< include file="services/_includes/gateway-config-example.yaml"  language="yaml" >}}
 
 {{< include file="services/_includes/gateway_configvars.md" >}}
