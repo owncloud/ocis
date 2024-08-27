@@ -59,7 +59,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Use key to get specific trash item: [#9879](https://github.com/owncloud/ocis/pull/9879)
 * Bugfix - Fix response code when upload a file over locked: [#9894](https://github.com/owncloud/ocis/pull/9894)
 * Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
-* Bugfix - Add missing properties to when listing ocm shares: [#9920](https://github.com/owncloud/ocis/pull/9920)
+* Bugfix - Fix listing ocm shares: [#9925](https://github.com/owncloud/ocis/pull/9925)
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
 * Enhancement - We now set the configured protocol transport for service metadata: [#9490](https://github.com/owncloud/ocis/pull/9490)
 * Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
@@ -115,11 +115,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/9898
    https://github.com/owncloud/ocis/pull/9905
 
-* Bugfix - Add missing properties to when listing ocm shares: [#9920](https://github.com/owncloud/ocis/pull/9920)
+* Bugfix - Fix listing ocm shares: [#9925](https://github.com/owncloud/ocis/pull/9925)
 
    The libre graph API now returns an etag, the role and the creation time for ocm
-   shares.
+   shares. It also includes ocm shares in the sharedByMe endpoint.
 
+   https://github.com/owncloud/ocis/pull/9925
    https://github.com/owncloud/ocis/pull/9920
 
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
