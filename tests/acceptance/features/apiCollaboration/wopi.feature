@@ -171,3 +171,54 @@ Feature: collaboration (wopi)
       | app-endpoint                                     |
       | /app/open?file_id=<<FILEID>>&app_name=FakeOffice |
       | /app/open?file_id=<<FILEID>>                     |
+
+
+  Scenario Outline: public user opens file with .odt extension
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And we save it into "FILEID"
+    And user "Alice" has created the following resource link share:
+      | resource        | simple.odt |
+      | space           | Personal   |
+      | permissionsRole | view       |
+      | password        | %public%   |
+    When the public sends HTTP method "POST" to URL "<app-endpoint>" with password "%public%"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "app_url",
+          "method",
+          "form_parameters"
+        ],
+        "properties": {
+          "app_url": {
+            "type": "string",
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+          },
+          "method": {
+            "const": "POST"
+          },
+          "form_parameters": {
+            "type": "object",
+            "required": [
+              "access_token",
+              "access_token_ttl"
+            ],
+            "properties": {
+              "access_token": {
+                "type": "string"
+              },
+              "access_token_ttl": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | app-endpoint                                     |
+      | /app/open?file_id=<<FILEID>>&app_name=FakeOffice |
+      | /app/open?file_id=<<FILEID>>                     |
