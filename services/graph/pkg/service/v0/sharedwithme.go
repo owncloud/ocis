@@ -53,7 +53,7 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 			g.logger.Error().Err(err).Msg("listing shares failed")
 			return nil, err
 		}
-		ocmDriveItems, err := cs3ReceivedOCMSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedOCMSharesResponse.GetShares())
+		ocmDriveItems, err := cs3ReceivedOCMSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedOCMSharesResponse.GetShares(), availableRoles)
 		if err != nil {
 			g.logger.Error().Err(err).Msg("could not convert received shares to drive items")
 			return nil, err

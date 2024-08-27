@@ -159,7 +159,7 @@ func groupIdToIdentity(ctx context.Context, cache identity.IdentityCache, groupI
 // As permissions on space to not map to a cs3 share we need something else of the ids. So we just
 // construct the id for the id of the user or group that the permission applies to and prefix that
 // with a "u:" for userids and "g:" for group ids.
-func identitySetToSpacePermissionID(identitySet libregraph.SharePointIdentitySet, allowedRoleIDs []string) (id string) {
+func identitySetToSpacePermissionID(identitySet libregraph.SharePointIdentitySet) (id string) {
 	switch {
 	case identitySet.HasUser():
 		id = "u:" + identitySet.User.GetId()
@@ -523,7 +523,7 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 	logger *log.Logger,
 	gatewayClient gateway.GatewayAPIClient,
 	identityCache identity.IdentityCache,
-	receivedShares []*ocm.ReceivedShare) ([]libregraph.DriveItem, error) {
+	receivedShares []*ocm.ReceivedShare, availableRoles []*libregraph.UnifiedRoleDefinition) ([]libregraph.DriveItem, error) {
 
 	group := new(errgroup.Group)
 	// Set max concurrency
@@ -567,7 +567,7 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 				return errCode
 			}
 
-			driveItem, err := fillDriveItemPropertiesFromReceivedOCMShare(ctx, logger, identityCache, receivedShares, shareStat.GetInfo())
+			driveItem, err := fillDriveItemPropertiesFromReceivedOCMShare(ctx, logger, identityCache, receivedShares, shareStat.GetInfo(), availableRoles)
 			if err != nil {
 				return err
 			}
@@ -704,7 +704,7 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 
 func fillDriveItemPropertiesFromReceivedOCMShare(ctx context.Context, logger *log.Logger,
 	identityCache identity.IdentityCache, receivedShares []*ocm.ReceivedShare,
-	resourceInfo *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
+	resourceInfo *storageprovider.ResourceInfo, availableRoles []*libregraph.UnifiedRoleDefinition) (*libregraph.DriveItem, error) {
 
 	driveItem := libregraph.NewDriveItem()
 	permissions := make([]libregraph.Permission, 0, len(receivedShares))
@@ -718,7 +718,7 @@ func fillDriveItemPropertiesFromReceivedOCMShare(ctx context.Context, logger *lo
 			oldestReceivedShare = receivedShare
 		}
 
-		permission, err := cs3ReceivedOCMShareToLibreGraphPermissions(ctx, logger, identityCache, receivedShare, resourceInfo)
+		permission, err := cs3ReceivedOCMShareToLibreGraphPermissions(ctx, logger, identityCache, receivedShare, resourceInfo, availableRoles)
 		if err != nil {
 			return driveItem, err
 		}
@@ -783,7 +783,7 @@ func fillDriveItemPropertiesFromReceivedOCMShare(ctx context.Context, logger *lo
 
 func cs3ReceivedOCMShareToLibreGraphPermissions(ctx context.Context, logger *log.Logger,
 	identityCache identity.IdentityCache, receivedShare *ocm.ReceivedShare,
-	resourceInfo *storageprovider.ResourceInfo) (*libregraph.Permission, error) {
+	resourceInfo *storageprovider.ResourceInfo, availableRoles []*libregraph.UnifiedRoleDefinition) (*libregraph.Permission, error) {
 	permission := libregraph.NewPermission()
 	if id := receivedShare.GetId().GetOpaqueId(); id != "" {
 		permission.SetId(id)
@@ -807,7 +807,8 @@ func cs3ReceivedOCMShareToLibreGraphPermissions(ctx context.Context, logger *log
 	if err != nil {
 		return nil, err
 	}
-	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+	role := unifiedrole.CS3ResourcePermissionsToRole(
+		availableRoles,
 		permissions,
 		condition,
 		true,

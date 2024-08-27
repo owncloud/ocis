@@ -25,6 +25,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	l10n_pkg "github.com/owncloud/ocis/v2/services/graph/pkg/l10n"
 
@@ -227,7 +228,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	} else if IsSpaceRoot(statResponse.GetInfo().GetId()) {
 		// permissions on a space root are not handled by a share manager so
 		// they don't get a share-id
-		permission.SetId(identitySetToSpacePermissionID(permission.GetGrantedToV2(), s.config.UnifiedRoles.AvailableRoles))
+		permission.SetId(identitySetToSpacePermissionID(permission.GetGrantedToV2()))
 	}
 
 	if expiration != nil {

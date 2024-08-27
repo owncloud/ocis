@@ -69,7 +69,7 @@ func TestCS3ResourcePermissionsToRole(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			NewWithT(t).Expect(
-				unifiedrole.CS3ResourcePermissionsToRole(unifiedrole.BuildInRoles, tc.cs3ResourcePermissions, tc.constraints),
+				unifiedrole.CS3ResourcePermissionsToRole(unifiedrole.BuildInRoles, tc.cs3ResourcePermissions, tc.constraints, false),
 			).To(Equal(tc.unifiedRoleDefinition))
 		})
 	}

@@ -1,6 +1,8 @@
 package unifiedrole
 
 import (
+	"strings"
+
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/conversions"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -143,7 +145,7 @@ func CS3ResourcePermissionsToLibregraphActions(p *provider.ResourcePermissions) 
 }
 
 // CS3ResourcePermissionsToRole converts the provided cs3 ResourcePermissions to a libregraph UnifiedRoleDefinition
-func CS3ResourcePermissionsToRole(roleSet []*libregraph.UnifiedRoleDefinition, p *provider.ResourcePermissions, constraints string) *libregraph.UnifiedRoleDefinition {
+func CS3ResourcePermissionsToRole(roleSet []*libregraph.UnifiedRoleDefinition, p *provider.ResourcePermissions, constraints string, listFederatedRoles bool) *libregraph.UnifiedRoleDefinition {
 	actionSet := map[string]struct{}{}
 	for _, action := range CS3ResourcePermissionsToLibregraphActions(p) {
 		actionSet[action] = struct{}{}
@@ -151,20 +153,27 @@ func CS3ResourcePermissionsToRole(roleSet []*libregraph.UnifiedRoleDefinition, p
 
 	var res *libregraph.UnifiedRoleDefinition
 	for _, uRole := range roleSet {
-		matchFound := false
-		for _, uPerm := range uRole.GetRolePermissions() {
-			if uPerm.GetCondition() != constraints {
-				// the requested constraints don't match, this isn't our role
+		definitionMatch := false
+
+		for _, permission := range uRole.GetRolePermissions() {
+			// this is a dirty comparison because we are not really parsing the SDDL, but as long as we && the conditions we are good
+			isFederatedRole := strings.Contains(permission.GetCondition(), UnifiedRoleConditionFederatedUser)
+			switch {
+			case !strings.Contains(permission.GetCondition(), constraints):
+				continue
+			case listFederatedRoles && !isFederatedRole:
+				continue
+			case !listFederatedRoles && isFederatedRole:
 				continue
 			}
 
 			// if the actions converted from the ResourcePermissions equal the action the defined for the role, we have match
-			if resourceActionsEqual(actionSet, uPerm.GetAllowedResourceActions()) {
-				matchFound = true
+			if resourceActionsEqual(actionSet, permission.GetAllowedResourceActions()) {
+				definitionMatch = true
 				break
 			}
 		}
-		if matchFound {
+		if definitionMatch {
 			res = uRole
 			break
 		}

@@ -95,7 +95,8 @@ func (g BaseGraphService) CS3ReceivedOCMSharesToDriveItems(ctx context.Context, 
 		return nil, err
 	}
 
-	return cs3ReceivedOCMSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares)
+	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
+	return cs3ReceivedOCMSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares, availableRoles)
 }
 
 func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace, apiVersion APIVersion) []libregraph.Permission {
@@ -184,7 +185,7 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			} else {
 				identitySet.SetUser(identity)
 			}
-			p.SetId(identitySetToSpacePermissionID(identitySet, g.config.UnifiedRoles.AvailableRoles))
+			p.SetId(identitySetToSpacePermissionID(identitySet))
 			p.SetGrantedToV2(identitySet)
 		}
 
@@ -554,7 +555,9 @@ func (g BaseGraphService) cs3OCMShareToPermission(ctx context.Context, share *oc
 		}
 	}
 
-	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
+	role := unifiedrole.CS3ResourcePermissionsToRole(
+		availableRoles,
 		permissions,
 		roleCondition,
 		true,
