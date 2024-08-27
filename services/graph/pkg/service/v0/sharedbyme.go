@@ -25,6 +25,14 @@ func (g Graph) GetSharedByMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if g.config.IncludeOCMSharees {
+		driveItems, err = g.listOCMShares(ctx, nil, driveItems)
+		if err != nil {
+			errorcode.RenderError(w, r, err)
+			return
+		}
+	}
+
 	driveItems, err = g.listPublicShares(ctx, nil, driveItems)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
