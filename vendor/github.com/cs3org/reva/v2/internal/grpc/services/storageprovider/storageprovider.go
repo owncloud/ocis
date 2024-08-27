@@ -27,6 +27,7 @@ import (
 	"path"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -436,6 +437,8 @@ func (s *Service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 			st = status.NewInsufficientStorage(ctx, err, "insufficient storage")
 		case errtypes.PreconditionFailed:
 			st = status.NewFailedPrecondition(ctx, err, "failed precondition")
+		case errtypes.Locked:
+			st = status.NewLocked(ctx, "locked")
 		default:
 			st = status.NewInternal(ctx, "error getting upload id: "+err.Error())
 		}
@@ -880,8 +883,11 @@ func (s *Service) ListRecycleStream(req *provider.ListRecycleStreamRequest, ss p
 	ctx := ss.Context()
 	log := appctx.GetLogger(ctx)
 
-	key, itemPath := router.ShiftPath(req.Key)
-	items, err := s.Storage.ListRecycle(ctx, req.Ref, key, itemPath)
+	// if no slash is present in the key, do not pass a relative path to the storage
+	// when a path is passed to the storage, it will list the contents of the directory
+	key, relativePath := splitKeyAndPath(req.GetKey())
+	items, err := s.Storage.ListRecycle(ctx, req.Ref, key, relativePath)
+
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -924,8 +930,10 @@ func (s *Service) ListRecycleStream(req *provider.ListRecycleStreamRequest, ss p
 }
 
 func (s *Service) ListRecycle(ctx context.Context, req *provider.ListRecycleRequest) (*provider.ListRecycleResponse, error) {
-	key, itemPath := router.ShiftPath(req.Key)
-	items, err := s.Storage.ListRecycle(ctx, req.Ref, key, itemPath)
+	// if no slash is present in the key, do not pass a relative path to the storage
+	// when a path is passed to the storage, it will list the contents of the directory
+	key, relativePath := splitKeyAndPath(req.GetKey())
+	items, err := s.Storage.ListRecycle(ctx, req.Ref, key, relativePath)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -962,8 +970,8 @@ func (s *Service) RestoreRecycleItem(ctx context.Context, req *provider.RestoreR
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
 	// TODO(labkode): CRITICAL: fill recycle info with storage provider.
-	key, itemPath := router.ShiftPath(req.Key)
-	err := s.Storage.RestoreRecycleItem(ctx, req.Ref, key, itemPath, req.RestoreRef)
+	key, relativePath := splitKeyAndPath(req.GetKey())
+	err := s.Storage.RestoreRecycleItem(ctx, req.Ref, key, relativePath, req.RestoreRef)
 
 	res := &provider.RestoreRecycleItemResponse{
 		Status: status.NewStatusFromErrType(ctx, "restore recycle item", err),
@@ -980,9 +988,9 @@ func (s *Service) PurgeRecycle(ctx context.Context, req *provider.PurgeRecycleRe
 	}
 
 	// if a key was sent as opaque id purge only that item
-	key, itemPath := router.ShiftPath(req.Key)
+	key, relativePath := splitKeyAndPath(req.GetKey())
 	if key != "" {
-		if err := s.Storage.PurgeRecycleItem(ctx, req.Ref, key, itemPath); err != nil {
+		if err := s.Storage.PurgeRecycleItem(ctx, req.Ref, key, relativePath); err != nil {
 			st := status.NewStatusFromErrType(ctx, "error purging recycle item", err)
 			appctx.GetLogger(ctx).
 				Error().
@@ -1312,4 +1320,13 @@ func canLockPublicShare(ctx context.Context) bool {
 	u := ctxpkg.ContextMustGetUser(ctx)
 	psr := utils.ReadPlainFromOpaque(u.Opaque, "public-share-role")
 	return psr == "" || psr == conversions.RoleEditor
+}
+
+// splitKeyAndPath splits a key into a root and a relative path
+func splitKeyAndPath(key string) (string, string) {
+	root, relativePath := router.ShiftPath(key)
+	if relativePath == "/" && !strings.HasSuffix(key, "/") {
+		relativePath = ""
+	}
+	return root, relativePath
 }

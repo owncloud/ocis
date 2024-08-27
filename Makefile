@@ -57,7 +57,6 @@ OCIS_MODULES = \
 	services/storage-publiclink \
 	services/storage-shares \
 	services/storage-users \
-	services/store \
 	services/thumbnails \
 	services/userlog \
 	services/users \
@@ -221,7 +220,7 @@ go-coverage:
 
 .PHONY: protobuf
 protobuf:
-	@for mod in ./services/thumbnails ./services/store ./services/settings; do \
+	@for mod in ./services/thumbnails ./services/settings; do \
         echo -n "% protobuf $$mod: "; $(MAKE) --no-print-directory -C $$mod protobuf || exit 1; \
     done
 

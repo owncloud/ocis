@@ -345,7 +345,7 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 
 func listRecycle(ctx context.Context, client gateway.GatewayAPIClient, ref provider.Reference) (*provider.ListRecycleResponse, error) {
 	_retrievingErrorMsg := "trash-bin items retrieving error"
-	res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: &ref, Key: "/"})
+	res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: &ref, Key: ""})
 	if err != nil {
 		return nil, fmt.Errorf("%s %w", _retrievingErrorMsg, err)
 	}

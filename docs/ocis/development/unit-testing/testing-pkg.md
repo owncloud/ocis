@@ -1,7 +1,7 @@
 ---
 title: "Standard Library Testing"
 date: 2024-04-25T00:00:00+00:00
-weight: 15
+weight: 10
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/development/unit-testing
 geekdocFilePath: testing-pkg.md

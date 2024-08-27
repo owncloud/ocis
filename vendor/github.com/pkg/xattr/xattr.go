@@ -87,8 +87,8 @@ func get(path string, name string, getxattrFunc getxattrFunc) ([]byte, error) {
 		initialBufSize = 1024
 
 		// The theoretical maximum xattr value size on MacOS is 64 MB. On Linux it's
-		// much smaller at 64 KB. Unless the kernel is evil or buggy, we should never
-		// hit the limit.
+		// much smaller: documented at 64 KB. However, at least on TrueNAS SCALE, a
+		// Debian-based Linux distro, it can be larger.
 		maxBufSize = 64 * 1024 * 1024
 
 		// Function name as reported in error messages
@@ -102,14 +102,15 @@ func get(path string, name string, getxattrFunc getxattrFunc) ([]byte, error) {
 
 		// If the buffer was too small to fit the value, Linux and MacOS react
 		// differently:
-		// Linux: returns an ERANGE error and "-1" bytes.
+		// Linux: returns an ERANGE error and "-1" bytes. However, the TrueNAS
+		//   SCALE distro sometimes returns E2BIG.
 		// MacOS: truncates the value and returns "size" bytes. If the value
 		//   happens to be exactly as big as the buffer, we cannot know if it was
 		//   truncated, and we retry with a bigger buffer. Contrary to documentation,
 		//   MacOS never seems to return ERANGE!
 		// To keep the code simple, we always check both conditions, and sometimes
 		// double the buffer size without it being strictly necessary.
-		if err == syscall.ERANGE || read == size {
+		if err == syscall.ERANGE || err == syscall.E2BIG || read == size {
 			// The buffer was too small. Try again.
 			size <<= 1
 			if size >= maxBufSize {

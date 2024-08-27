@@ -43,7 +43,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	rstatus "github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 )
@@ -74,7 +73,7 @@ func (h *TrashbinHandler) Handler(s *svc) http.Handler {
 		}
 
 		var username string
-		username, r.URL.Path = router.ShiftPath(r.URL.Path)
+		username, r.URL.Path = splitSpaceAndKey(r.URL.Path)
 		if username == "" {
 			// listing is disabled, no auth will change that
 			w.WriteHeader(http.StatusMethodNotAllowed)
@@ -131,13 +130,12 @@ func (h *TrashbinHandler) Handler(s *svc) http.Handler {
 		}
 		ref := spacelookup.MakeRelativeReference(space, ".", false)
 
-		// key will be a base64 encoded cs3 path, it uniquely identifies a trash item & storage
-		var key string
-		key, r.URL.Path = router.ShiftPath(r.URL.Path)
+		// key will be a base64 encoded cs3 path, it uniquely identifies a trash item with an opaque id and an optional path
+		key := r.URL.Path
 
 		switch r.Method {
 		case MethodPropfind:
-			h.listTrashbin(w, r, s, ref, user.Username, key, r.URL.Path)
+			h.listTrashbin(w, r, s, ref, user.Username, key)
 		case MethodMove:
 			if key == "" {
 				http.Error(w, "501 Not implemented", http.StatusNotImplemented)
@@ -172,50 +170,55 @@ func (h *TrashbinHandler) Handler(s *svc) http.Handler {
 			dstRef := spacelookup.MakeRelativeReference(space, p, false)
 
 			log.Debug().Str("key", key).Str("dst", dst).Msg("restore")
-			h.restore(w, r, s, ref, dstRef, key, r.URL.Path)
+			h.restore(w, r, s, ref, dstRef, key)
 		case http.MethodDelete:
-			h.delete(w, r, s, ref, key, r.URL.Path)
+			h.delete(w, r, s, ref, key)
 		default:
 			http.Error(w, "501 Not implemented", http.StatusNotImplemented)
 		}
 	})
 }
 
-func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s *svc, ref *provider.Reference, refBase, key, itemPath string) {
+func (h *TrashbinHandler) getDepth(r *http.Request) (net.Depth, error) {
+	dh := r.Header.Get(net.HeaderDepth)
+	depth, err := net.ParseDepth(dh)
+	if err != nil || depth == net.DepthInfinity && !h.allowPropfindDepthInfinitiy {
+		return "", errors.ErrInvalidDepth
+	}
+	return depth, nil
+}
+
+func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s *svc, ref *provider.Reference, refBase, key string) {
 	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "list_trashbin")
 	defer span.End()
 
 	sublog := appctx.GetLogger(ctx).With().Logger()
 
-	dh := r.Header.Get(net.HeaderDepth)
-	depth, err := net.ParseDepth(dh)
+	depth, err := h.getDepth(r)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, "Invalid Depth header value")
 		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
-		sublog.Debug().Str("depth", dh).Msg(err.Error())
+		sublog.Debug().Str("depth", r.Header.Get(net.HeaderDepth)).Msg(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
-		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
+		m := fmt.Sprintf("Invalid Depth header value: %v", r.Header.Get(net.HeaderDepth))
 		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 		return
 	}
 
-	if depth == net.DepthInfinity && !h.allowPropfindDepthInfinitiy {
-		span.RecordError(errors.ErrInvalidDepth)
-		span.SetStatus(codes.Error, "DEPTH: infinity is not supported")
-		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
-		sublog.Debug().Str("depth", dh).Msg(errors.ErrInvalidDepth.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		m := fmt.Sprintf("Invalid Depth header value: %v", dh)
-		b, err := errors.Marshal(http.StatusBadRequest, m, "", "")
-		errors.HandleWebdavError(&sublog, w, b, err)
+	pf, status, err := propfind.ReadPropfind(r.Body)
+	if err != nil {
+		sublog.Debug().Err(err).Msg("error reading propfind request")
+		w.WriteHeader(status)
 		return
 	}
 
-	if depth == net.DepthZero {
-		rootHref := path.Join(refBase, key, itemPath)
-		propRes, err := h.formatTrashPropfind(ctx, s, ref.ResourceId.SpaceId, refBase, rootHref, nil, nil)
+	if key == "" && depth == net.DepthZero {
+		// we are listing the trash root, but without children
+		// so we just fake a root element without actually querying the gateway
+		rootHref := path.Join(refBase, key)
+		propRes, err := h.formatTrashPropfind(ctx, s, ref.ResourceId.SpaceId, refBase, rootHref, &pf, nil, true)
 		if err != nil {
 			sublog.Error().Err(err).Msg("error formatting propfind")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -232,11 +235,9 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 		return
 	}
 
-	pf, status, err := propfind.ReadPropfind(r.Body)
-	if err != nil {
-		sublog.Debug().Err(err).Msg("error reading propfind request")
-		w.WriteHeader(status)
-		return
+	if depth == net.DepthOne && key != "" && !strings.HasSuffix(key, "/") {
+		// when a key is provided and the depth is 1 we need to append a / to the key to list the children
+		key += "/"
 	}
 
 	client, err := s.gatewaySelector.Next()
@@ -246,7 +247,7 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 		return
 	}
 	// ask gateway for recycle items
-	getRecycleRes, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: ref, Key: path.Join(key, itemPath)})
+	getRecycleRes, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: ref, Key: key})
 	if err != nil {
 		sublog.Error().Err(err).Msg("error calling ListRecycle")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -270,7 +271,7 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 		for i := len(items) - 1; i >= 0; i-- {
 			// for i := range res.Infos {
 			if items[i].Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
-				stack = append(stack, items[i].Key)
+				stack = append(stack, items[i].Key+"/") // fetch children of the item
 			}
 		}
 
@@ -304,8 +305,8 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 		}
 	}
 
-	rootHref := path.Join(refBase, key, itemPath)
-	propRes, err := h.formatTrashPropfind(ctx, s, ref.ResourceId.SpaceId, refBase, rootHref, &pf, items)
+	rootHref := path.Join(refBase, key)
+	propRes, err := h.formatTrashPropfind(ctx, s, ref.ResourceId.SpaceId, refBase, rootHref, &pf, items, depth != net.DepthZero)
 	if err != nil {
 		sublog.Error().Err(err).Msg("error formatting propfind")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -321,29 +322,30 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 	}
 }
 
-func (h *TrashbinHandler) formatTrashPropfind(ctx context.Context, s *svc, spaceID, refBase, rootHref string, pf *propfind.XML, items []*provider.RecycleItem) ([]byte, error) {
+func (h *TrashbinHandler) formatTrashPropfind(ctx context.Context, s *svc, spaceID, refBase, rootHref string, pf *propfind.XML, items []*provider.RecycleItem, fakeRoot bool) ([]byte, error) {
 	responses := make([]*propfind.ResponseXML, 0, len(items)+1)
-	// add trashbin dir . entry
-	responses = append(responses, &propfind.ResponseXML{
-		Href: net.EncodePath(path.Join(ctx.Value(net.CtxKeyBaseURI).(string), rootHref) + "/"), // url encode response.Href TODO
-		Propstat: []propfind.PropstatXML{
-			{
-				Status: "HTTP/1.1 200 OK",
-				Prop: []prop.PropertyXML{
-					prop.Raw("d:resourcetype", "<d:collection/>"),
+	if fakeRoot {
+		responses = append(responses, &propfind.ResponseXML{
+			Href: net.EncodePath(path.Join(ctx.Value(net.CtxKeyBaseURI).(string), rootHref) + "/"), // url encode response.Href TODO
+			Propstat: []propfind.PropstatXML{
+				{
+					Status: "HTTP/1.1 200 OK",
+					Prop: []prop.PropertyXML{
+						prop.Raw("d:resourcetype", "<d:collection/>"),
+					},
+				},
+				{
+					Status: "HTTP/1.1 404 Not Found",
+					Prop: []prop.PropertyXML{
+						prop.NotFound("oc:trashbin-original-filename"),
+						prop.NotFound("oc:trashbin-original-location"),
+						prop.NotFound("oc:trashbin-delete-datetime"),
+						prop.NotFound("d:getcontentlength"),
+					},
 				},
 			},
-			{
-				Status: "HTTP/1.1 404 Not Found",
-				Prop: []prop.PropertyXML{
-					prop.NotFound("oc:trashbin-original-filename"),
-					prop.NotFound("oc:trashbin-original-location"),
-					prop.NotFound("oc:trashbin-delete-datetime"),
-					prop.NotFound("d:getcontentlength"),
-				},
-			},
-		},
-	})
+		})
+	}
 
 	for i := range items {
 		res, err := h.itemToPropResponse(ctx, s, spaceID, refBase, pf, items[i])
@@ -401,7 +403,7 @@ func (h *TrashbinHandler) itemToPropResponse(ctx context.Context, s *svc, spaceI
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-delete-datetime", dTime))
 		if item.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 			propstatOK.Prop = append(propstatOK.Prop, prop.Raw("d:resourcetype", "<d:collection/>"))
-			// TODO(jfd): decide if we can and want to list oc:size for folders
+			propstatOK.Prop = append(propstatOK.Prop, prop.Raw("oc:size", size))
 		} else {
 			propstatOK.Prop = append(propstatOK.Prop,
 				prop.Escaped("d:resourcetype", ""),
@@ -426,7 +428,7 @@ func (h *TrashbinHandler) itemToPropResponse(ctx context.Context, s *svc, spaceI
 				switch pf.Prop[i].Local {
 				case "oc:size":
 					if item.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
-						propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontentlength", size))
+						propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:size", size))
 					} else {
 						propstatNotFound.Prop = append(propstatNotFound.Prop, prop.NotFound("oc:size"))
 					}
@@ -480,7 +482,7 @@ func (h *TrashbinHandler) itemToPropResponse(ctx context.Context, s *svc, spaceI
 	return &response, nil
 }
 
-func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc, ref, dst *provider.Reference, key, itemPath string) {
+func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc, ref, dst *provider.Reference, key string) {
 	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "restore")
 	defer span.End()
 
@@ -566,7 +568,7 @@ func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc
 
 	req := &provider.RestoreRecycleItemRequest{
 		Ref:        ref,
-		Key:        path.Join(key, itemPath),
+		Key:        key,
 		RestoreRef: dst,
 	}
 
@@ -608,16 +610,15 @@ func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc
 }
 
 // delete has only a key
-func (h *TrashbinHandler) delete(w http.ResponseWriter, r *http.Request, s *svc, ref *provider.Reference, key, itemPath string) {
+func (h *TrashbinHandler) delete(w http.ResponseWriter, r *http.Request, s *svc, ref *provider.Reference, key string) {
 	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "erase")
 	defer span.End()
 
-	sublog := appctx.GetLogger(ctx).With().Interface("reference", ref).Str("key", key).Str("item_path", itemPath).Logger()
+	sublog := appctx.GetLogger(ctx).With().Interface("reference", ref).Str("key", key).Logger()
 
-	trashPath := path.Join(key, itemPath)
 	req := &provider.PurgeRecycleRequest{
 		Ref: ref,
-		Key: trashPath,
+		Key: key,
 	}
 
 	client, err := s.gatewaySelector.Next()
@@ -638,7 +639,7 @@ func (h *TrashbinHandler) delete(w http.ResponseWriter, r *http.Request, s *svc,
 	case rpc.Code_CODE_NOT_FOUND:
 		sublog.Debug().Interface("status", res.Status).Msg("resource not found")
 		w.WriteHeader(http.StatusConflict)
-		m := fmt.Sprintf("path %s not found", trashPath)
+		m := fmt.Sprintf("key %s not found", key)
 		b, err := errors.Marshal(http.StatusConflict, m, "", "")
 		errors.HandleWebdavError(&sublog, w, b, err)
 	case rpc.Code_CODE_PERMISSION_DENIED:

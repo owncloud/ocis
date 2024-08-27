@@ -526,7 +526,7 @@ func pingNats(cfg *ociscfg.Config) error {
 	return err
 }
 
-func pingGateway(_ *ociscfg.Config) error {
+func pingGateway(cfg *ociscfg.Config) error {
 	// init grpc connection
 	_, err := ogrpc.NewClient()
 	if err != nil {
@@ -536,7 +536,7 @@ func pingGateway(_ *ociscfg.Config) error {
 	b := backoff.NewExponentialBackOff()
 	o := func() error {
 		n := b.NextBackOff()
-		_, err := pool.GetGatewayServiceClient("com.owncloud.api.gateway")
+		_, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
 		if err != nil && n > time.Second {
 			logger.New().Error().Err(err).Msgf("can't connect to gateway service, retrying in %s", n)
 		}

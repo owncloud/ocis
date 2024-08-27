@@ -1050,8 +1050,9 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		// to get the folder we actually need to do a GetPath() request
 		//BreadcrumbFolderName: path.Dir(statRes.Info.Path),
 
-		fileinfo.KeyHostViewURL: wopiContext.ViewAppUrl,
-		fileinfo.KeyHostEditURL: wopiContext.EditAppUrl,
+		// TODO: these URLs must point to ocis, which is hosting the editor's iframe
+		//fileinfo.KeyHostViewURL: wopiContext.ViewAppUrl,
+		//fileinfo.KeyHostEditURL: wopiContext.EditAppUrl,
 
 		fileinfo.KeyEnableOwnerTermination:     true, // only for collabora
 		fileinfo.KeySupportsExtendedLockLength: true,
@@ -1061,7 +1062,6 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeySupportsDeleteFile:         true,
 		fileinfo.KeySupportsRename:             true,
 
-		//fileinfo.KeyUserCanNotWriteRelative: true,
 		fileinfo.KeyIsAnonymousUser:  isAnonymousUser,
 		fileinfo.KeyUserFriendlyName: userFriendlyName,
 		fileinfo.KeyUserID:           userId,

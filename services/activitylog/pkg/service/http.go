@@ -164,9 +164,8 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			continue
 		}
 
-		// FIXME: configurable default locale?
 		loc := l10n.MustGetUserLocale(r.Context(), activeUser.GetId().GetOpaqueId(), r.Header.Get(l10n.HeaderAcceptLanguage), s.valService)
-		t := l10n.NewTranslatorFromCommonConfig("en", _domain, "", _localeFS, _localeSubPath)
+		t := l10n.NewTranslatorFromCommonConfig(s.cfg.DefaultLanguage, _domain, s.cfg.TranslationPath, _localeFS, _localeSubPath)
 
 		resp.Activities = append(resp.Activities, NewActivity(t.Translate(message, loc), ts, e.GetId(), vars))
 	}

@@ -56,6 +56,16 @@ The following sections list the changes for unreleased.
 * Bugfix - Set capability response `disable_self_password_change` correctly: [#9853](https://github.com/owncloud/ocis/pull/9853)
 * Bugfix - Activity Translations: [#9856](https://github.com/owncloud/ocis/pull/9856)
 * Bugfix - The user attributes `userType` and `memberOf` are readonly: [#9867](https://github.com/owncloud/ocis/pull/9867)
+* Bugfix - Use key to get specific trash item: [#9879](https://github.com/owncloud/ocis/pull/9879)
+* Bugfix - Fix response code when upload a file over locked: [#9894](https://github.com/owncloud/ocis/pull/9894)
+* Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
+* Bugfix - Fix listing ocm shares: [#9925](https://github.com/owncloud/ocis/pull/9925)
+* Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
+* Enhancement - We now set the configured protocol transport for service metadata: [#9490](https://github.com/owncloud/ocis/pull/9490)
+* Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
+* Enhancement - Allow setting default locale of activitylog: [#9892](https://github.com/owncloud/ocis/pull/9892)
+* Enhancement - Graph translation path: [#9902](https://github.com/owncloud/ocis/pull/9902)
+* Enhancement - Bump reva: [#9920](https://github.com/owncloud/ocis/pull/9920)
 
 ## Details
 
@@ -80,6 +90,81 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9858
    https://github.com/owncloud/ocis/pull/9867
+
+* Bugfix - Use key to get specific trash item: [#9879](https://github.com/owncloud/ocis/pull/9879)
+
+   The activitylog and clientlog services now only fetch the specific trash item
+   instead of getting all items in trash and filtering them on their side. This
+   reduces the load on the storage users service because it no longer has to
+   assemble a full trash listing.
+
+   https://github.com/owncloud/ocis/pull/9879
+
+* Bugfix - Fix response code when upload a file over locked: [#9894](https://github.com/owncloud/ocis/pull/9894)
+
+   We fixed a bug where the response code was incorrect when uploading a file over
+   a locked file.
+
+   https://github.com/owncloud/ocis/issues/7638
+   https://github.com/owncloud/ocis/pull/9894
+
+* Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
+
+   The libre graph API now returns OCM shares when listing driveItem permissions.
+
+   https://github.com/owncloud/ocis/issues/9898
+   https://github.com/owncloud/ocis/pull/9905
+
+* Bugfix - Fix listing ocm shares: [#9925](https://github.com/owncloud/ocis/pull/9925)
+
+   The libre graph API now returns an etag, the role and the creation time for ocm
+   shares. It also includes ocm shares in the sharedByMe endpoint.
+
+   https://github.com/owncloud/ocis/pull/9925
+   https://github.com/owncloud/ocis/pull/9920
+
+* Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
+
+   We have removed the unused store service.
+
+   https://github.com/owncloud/ocis/issues/1357
+   https://github.com/owncloud/ocis/pull/9890
+
+* Enhancement - We now set the configured protocol transport for service metadata: [#9490](https://github.com/owncloud/ocis/pull/9490)
+
+   This allows configuring services to listan on `tcp` or `unix` sockets and
+   clients to use the `dns`, `kubernetes` or `unix` protocol URIs instead of
+   service names.
+
+   https://github.com/owncloud/ocis/pull/9490
+   https://github.com/cs3org/reva/pull/4744
+
+* Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
+
+   The `revisions purge` command would time out on big spaces. We have improved
+   performance by parallelizing the process.
+
+   https://github.com/owncloud/ocis/pull/9891
+
+* Enhancement - Allow setting default locale of activitylog: [#9892](https://github.com/owncloud/ocis/pull/9892)
+
+   Allows setting the default locale via `OCIS_DEFAULT_LANGUAGE` envvar
+
+   https://github.com/owncloud/ocis/pull/9892
+
+* Enhancement - Graph translation path: [#9902](https://github.com/owncloud/ocis/pull/9902)
+
+   Add `GRAPH_TRANSLATION_PATH` envvar like in other l10n services
+
+   https://github.com/owncloud/ocis/pull/9902
+
+* Enhancement - Bump reva: [#9920](https://github.com/owncloud/ocis/pull/9920)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/9920
+   https://github.com/owncloud/ocis/pull/9879
+   https://github.com/owncloud/ocis/pull/9860
 
 # Changelog for [6.3.0] (2024-08-20)
 

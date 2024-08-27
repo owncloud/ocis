@@ -11,7 +11,7 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/rs/zerolog"
@@ -31,8 +31,6 @@ type WopiContext struct {
 	FileReference *providerv1beta1.Reference
 	User          *userv1beta1.User
 	ViewMode      appproviderv1beta1.ViewMode
-	EditAppUrl    string
-	ViewAppUrl    string
 }
 
 // WopiContextAuthMiddleware will prepare an HTTP handler to be used as
@@ -67,11 +65,6 @@ func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handl
 		})
 
 		if err != nil {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
-		}
-
-		if err := claims.Valid(); err != nil {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}

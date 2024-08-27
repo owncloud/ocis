@@ -13,7 +13,7 @@ Feature: download multiple resources bundled into an archive
   @issue-4637
   Scenario Outline: download a single file
     Given user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
-    When user "Alice" downloads the archive of "/home/textfile0.txt" using the resource path and setting these headers
+    When user "Alice" downloads the <archive-type> archive of "/home/textfile0.txt" using the resource path and setting these headers:
       | header     | value        |
       | User-Agent | <user-agent> |
     Then the HTTP status code should be "200"
@@ -30,7 +30,7 @@ Feature: download multiple resources bundled into an archive
     Given user "Alice" has created folder "my_data"
     And user "Alice" has uploaded file with content "some data" to "/my_data/textfile0.txt"
     And user "Alice" has uploaded file with content "more data" to "/my_data/an_other_file.txt"
-    When user "Alice" downloads the archive of "/home/my_data" using the resource path and setting these headers
+    When user "Alice" downloads the <archive-type> archive of "/home/my_data" using the resource path and setting these headers:
       | header     | value        |
       | User-Agent | <user-agent> |
     Then the HTTP status code should be "200"
@@ -156,7 +156,7 @@ Feature: download multiple resources bundled into an archive
       | shareType       | user      |
       | permissionsRole | Viewer    |
     And user "Brian" has a share "more_data" synced
-    When user "Brian" downloads the archive of "/home/Shares" using the resource path and setting these headers
+    When user "Brian" downloads the <archive-type> archive of "/home/Shares" using the resource path and setting these headers:
       | header     | value        |
       | User-Agent | <user-agent> |
     Then the HTTP status code should be "200"

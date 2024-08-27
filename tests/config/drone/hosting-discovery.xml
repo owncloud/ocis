@@ -1,8 +1,12 @@
 <wopi-discovery>
-<net-zone name="external-http">
-<app favIconUrl="https://fakeoffice.owncloud.test/favicon.ico" name="wopitest">
-<action default="true" ext="wopitest" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
-<action default="true" ext="wopitest" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
-</app>
-</net-zone>
+    <net-zone name="external-http">
+        <app favIconUrl="https://fakeoffice.owncloud.test/favicon.ico" name="wopitest">
+            <action default="true" ext="wopitest" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="wopitest" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="odt" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="odt" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="txt" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="txt" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+        </app>
+    </net-zone>
 </wopi-discovery>

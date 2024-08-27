@@ -82,9 +82,7 @@ var _ = Describe("FileConnector", func() {
 				//	},
 				//},
 			},
-			ViewMode:   appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE,
-			EditAppUrl: "http://test.ex.prv/edit",
-			ViewAppUrl: "http://test.ex.prv/view",
+			ViewMode: appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE,
 		}
 	})
 
@@ -1546,8 +1544,6 @@ var _ = Describe("FileConnector", func() {
 				BaseFileName:               "test.txt",
 				BreadcrumbDocName:          "test.txt",
 				UserCanNotWriteRelative:    false,
-				HostViewURL:                "http://test.ex.prv/view",
-				HostEditURL:                "http://test.ex.prv/edit",
 				SupportsExtendedLockLength: true,
 				SupportsGetLock:            true,
 				SupportsLocks:              true,

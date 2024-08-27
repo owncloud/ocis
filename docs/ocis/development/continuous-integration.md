@@ -1,7 +1,7 @@
 ---
 title: "Continuous Integration"
 date: 2020-10-01T20:35:00+01:00
-weight: 100
+weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: continuous-integration.md

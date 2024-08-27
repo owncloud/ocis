@@ -197,6 +197,7 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			availableRoles,
 			perm,
 			unifiedrole.UnifiedRoleConditionDrive,
+			false,
 		); role != nil {
 			switch apiVersion {
 			case APIVersion_1:
@@ -287,6 +288,34 @@ func (g BaseGraphService) listUserShares(ctx context.Context, filters []*collabo
 	return driveItems, nil
 }
 
+func (g BaseGraphService) listOCMShares(ctx context.Context, filters []*ocm.ListOCMSharesRequest_Filter, driveItems driveItemsByResourceID) (driveItemsByResourceID, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not select next gateway client")
+		return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+
+	concreteFilters := []*ocm.ListOCMSharesRequest_Filter{}
+	concreteFilters = append(concreteFilters, filters...)
+
+	lsOCMSharesRequest := ocm.ListOCMSharesRequest{
+		Filters: concreteFilters,
+	}
+
+	lsOCMSharesResponse, err := gatewayClient.ListOCMShares(ctx, &lsOCMSharesRequest)
+	if err != nil {
+		return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+	if statusCode := lsOCMSharesResponse.GetStatus().GetCode(); statusCode != rpc.Code_CODE_OK {
+		return driveItems, errorcode.New(cs3StatusToErrCode(statusCode), lsOCMSharesResponse.Status.Message)
+	}
+	driveItems, err = g.cs3OCMSharesToDriveItems(ctx, lsOCMSharesResponse.Shares, driveItems)
+	if err != nil {
+		return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+	return driveItems, nil
+}
+
 func (g BaseGraphService) listPublicShares(ctx context.Context, filters []*link.ListPublicSharesRequest_Filter, driveItems driveItemsByResourceID) (driveItemsByResourceID, error) {
 
 	gatewayClient, err := g.gatewaySelector.Next()
@@ -355,6 +384,42 @@ func (g BaseGraphService) cs3UserSharesToDriveItems(ctx context.Context, shares 
 	}
 	return driveItems, nil
 }
+func (g BaseGraphService) cs3OCMSharesToDriveItems(ctx context.Context, shares []*ocm.Share, driveItems driveItemsByResourceID) (driveItemsByResourceID, error) {
+	for _, s := range shares {
+		g.logger.Debug().Interface("CS3 OCMShare", s).Msg("Got Share")
+		resIDStr := storagespace.FormatResourceID(s.ResourceId)
+		item, ok := driveItems[resIDStr]
+		if !ok {
+			itemptr, err := g.getDriveItem(ctx, &storageprovider.Reference{ResourceId: s.ResourceId})
+			if err != nil {
+				g.logger.Debug().Err(err).Interface("Share", s.ResourceId).Msg("could not stat ocm share, skipping")
+				continue
+			}
+			item = *itemptr
+		}
+
+		var condition string
+		switch {
+		case item.Folder != nil:
+			condition = unifiedrole.UnifiedRoleConditionFolderFederatedUser
+		case item.File != nil:
+			condition = unifiedrole.UnifiedRoleConditionFileFederatedUser
+		}
+		perm, err := g.cs3OCMShareToPermission(ctx, s, condition)
+
+		var errcode errorcode.Error
+		switch {
+		case errors.As(err, &errcode) && errcode.GetCode() == errorcode.ItemNotFound:
+			// The Grantee couldn't be found (user/group does not exist anymore)
+			continue
+		case err != nil:
+			return driveItems, err
+		}
+		item.Permissions = append(item.Permissions, *perm)
+		driveItems[resIDStr] = item
+	}
+	return driveItems, nil
+}
 
 func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *collaboration.Share, roleCondition string) (*libregraph.Permission, error) {
 	perm := libregraph.Permission{}
@@ -408,11 +473,96 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 		unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...)),
 		share.GetPermissions().GetPermissions(),
 		roleCondition,
+		false,
 	)
 	if role != nil {
 		perm.SetRoles([]string{role.GetId()})
 	} else {
 		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(share.GetPermissions().GetPermissions())
+		perm.SetLibreGraphPermissionsActions(actions)
+		perm.SetRoles(nil)
+	}
+	perm.SetGrantedToV2(grantedTo)
+	if share.GetCreator() != nil {
+		identity, err := cs3UserIdToIdentity(ctx, g.identityCache, share.GetCreator())
+		if err != nil {
+			return nil, errorcode.New(errorcode.GeneralException, err.Error())
+		}
+		perm.SetInvitation(
+			libregraph.SharingInvitation{
+				InvitedBy: &libregraph.IdentitySet{
+					User: &identity,
+				},
+			},
+		)
+	}
+	return &perm, nil
+}
+func (g BaseGraphService) cs3OCMShareToPermission(ctx context.Context, share *ocm.Share, roleCondition string) (*libregraph.Permission, error) {
+	perm := libregraph.Permission{}
+	perm.SetRoles([]string{})
+	if roleCondition != unifiedrole.UnifiedRoleConditionDrive {
+		perm.SetId(share.GetId().GetOpaqueId())
+	}
+	grantedTo := libregraph.SharePointIdentitySet{}
+	// hm or use share.GetShareType() to determine the type of share???
+	switch share.GetGrantee().GetType() {
+	case storageprovider.GranteeType_GRANTEE_TYPE_USER:
+		user, err := cs3UserIdToIdentity(ctx, g.identityCache, share.Grantee.GetUserId())
+		switch {
+		case errors.Is(err, identity.ErrNotFound):
+			g.logger.Warn().Str("userid", share.Grantee.GetUserId().GetOpaqueId()).Msg("User not found by id")
+			// User does not seem to exist anymore, don't add a permission for this
+			return nil, errorcode.New(errorcode.ItemNotFound, "grantee does not exist")
+		case err != nil:
+			return nil, errorcode.New(errorcode.GeneralException, err.Error())
+		default:
+			grantedTo.SetUser(user)
+			if roleCondition == unifiedrole.UnifiedRoleConditionDrive {
+				perm.SetId("u:" + user.GetId())
+			}
+		}
+	case storageprovider.GranteeType_GRANTEE_TYPE_GROUP:
+		group, err := groupIdToIdentity(ctx, g.identityCache, share.Grantee.GetGroupId().GetOpaqueId())
+		switch {
+		case errors.Is(err, identity.ErrNotFound):
+			g.logger.Warn().Str("groupid", share.Grantee.GetGroupId().GetOpaqueId()).Msg("Group not found by id")
+			// Group not seem to exist anymore, don't add a permission for this
+			return nil, errorcode.New(errorcode.ItemNotFound, "grantee does not exist")
+		case err != nil:
+			return nil, errorcode.New(errorcode.GeneralException, err.Error())
+		default:
+			grantedTo.SetGroup(group)
+			if roleCondition == unifiedrole.UnifiedRoleConditionDrive {
+				perm.SetId("g:" + group.GetId())
+			}
+		}
+	}
+
+	// set expiration date
+	if share.GetExpiration() != nil {
+		perm.SetExpirationDateTime(cs3TimestampToTime(share.GetExpiration()))
+	}
+	// set cTime
+	if share.GetCtime() != nil {
+		perm.SetCreatedDateTime(cs3TimestampToTime(share.GetCtime()))
+	}
+	var permissions *storageprovider.ResourcePermissions
+	for _, role := range share.GetAccessMethods() {
+		if role.GetWebdavOptions().GetPermissions() != nil {
+			permissions = role.GetWebdavOptions().GetPermissions()
+		}
+	}
+
+	role := unifiedrole.CS3ResourcePermissionsToUnifiedRole(
+		permissions,
+		roleCondition,
+		true,
+	)
+	if role != nil {
+		perm.SetRoles([]string{role.GetId()})
+	} else {
+		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(permissions)
 		perm.SetLibreGraphPermissionsActions(actions)
 		perm.SetRoles(nil)
 	}

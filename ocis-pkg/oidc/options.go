@@ -3,6 +3,7 @@ package oidc
 import (
 	"net/http"
 
+	"github.com/MicahParks/keyfunc/v2"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 
@@ -22,7 +23,14 @@ type Options struct {
 	OIDCIssuer string
 	// JWKSOptions to use when retrieving keys
 	JWKSOptions config.JWKS
-	// KeySet to use when verifiing signatures
+	// the JWKS keyset to use for verifying signatures of Access- and
+	// Logout-Tokens
+	// this option is mostly needed for unit test. To avoid fetching the keys
+	// from the issuer
+	JWKS *keyfunc.JWKS
+	// KeySet to use when verifiing signatures of jwt encoded
+	// user info responses
+	// TODO move userinfo verification to use jwt/keyfunc as well
 	KeySet KeySet
 	// AccessTokenVerifyMethod to use when verifying access tokens
 	// TODO pass a function or interface to verify? an AccessTokenVerifier?
@@ -77,6 +85,13 @@ func WithHTTPClient(val *http.Client) Option {
 func WithJWKSOptions(val config.JWKS) Option {
 	return func(o *Options) {
 		o.JWKSOptions = val
+	}
+}
+
+// WithJWKS provides a function to set the JWKS option (mainly useful for testing).
+func WithJWKS(val *keyfunc.JWKS) Option {
+	return func(o *Options) {
+		o.JWKS = val
 	}
 }
 

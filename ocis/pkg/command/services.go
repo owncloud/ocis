@@ -44,7 +44,6 @@ import (
 	storageshares "github.com/owncloud/ocis/v2/services/storage-shares/pkg/command"
 	storagesystem "github.com/owncloud/ocis/v2/services/storage-system/pkg/command"
 	storageusers "github.com/owncloud/ocis/v2/services/storage-users/pkg/command"
-	store "github.com/owncloud/ocis/v2/services/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/v2/services/thumbnails/pkg/command"
 	userlog "github.com/owncloud/ocis/v2/services/userlog/pkg/command"
 	users "github.com/owncloud/ocis/v2/services/users/pkg/command"
@@ -232,11 +231,6 @@ var svccmds = []register.Command{
 	func(cfg *config.Config) *cli.Command {
 		return ServiceCommand(cfg, cfg.StorageUsers.Service.Name, storageusers.GetCommands(cfg.StorageUsers), func(c *config.Config) {
 			cfg.StorageUsers.Commons = cfg.Commons
-		})
-	},
-	func(cfg *config.Config) *cli.Command {
-		return ServiceCommand(cfg, cfg.Store.Service.Name, store.GetCommands(cfg.Store), func(c *config.Config) {
-			cfg.Store.Commons = cfg.Commons
 		})
 	},
 	func(cfg *config.Config) *cli.Command {

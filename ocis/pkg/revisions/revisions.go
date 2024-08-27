@@ -2,12 +2,12 @@
 package revisions
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/shamaton/msgpack/v2"
@@ -26,25 +26,121 @@ type DelBlobstore interface {
 	Delete(node *node.Node) error
 }
 
+// Glob uses globbing to find all revision nodes in a storage provider.
+func Glob(pattern string) <-chan string {
+	ch := make(chan string)
+	go func() {
+		defer close(ch)
+		nodes, err := filepath.Glob(filepath.Join(pattern))
+		if err != nil {
+			fmt.Println("error globbing", pattern, err)
+			return
+		}
+
+		if len(nodes) == 0 {
+			fmt.Println("no nodes found. Double check storage path")
+			return
+		}
+
+		for _, n := range nodes {
+			if _versionRegex.MatchString(n) {
+				ch <- n
+			}
+		}
+	}()
+
+	return ch
+}
+
+// GlobWorkers uses multiple go routine to glob all revision nodes in a storage provider.
+func GlobWorkers(pattern string, depth string, remainder string) <-chan string {
+	wg := sync.WaitGroup{}
+	ch := make(chan string)
+	go func() {
+		defer close(ch)
+		nodes, err := filepath.Glob(pattern + depth)
+		if err != nil {
+			fmt.Println("error globbing", pattern, err)
+			return
+		}
+
+		if len(nodes) == 0 {
+			fmt.Println("no nodes found. Double check storage path")
+			return
+		}
+
+		for _, node := range nodes {
+			wg.Add(1)
+			go func(node string) {
+				defer wg.Done()
+				nodes, err := filepath.Glob(node + remainder)
+				if err != nil {
+					fmt.Println("error globbing", node, err)
+					return
+				}
+				for _, n := range nodes {
+					if _versionRegex.MatchString(n) {
+						ch <- n
+					}
+				}
+			}(node)
+		}
+
+		wg.Wait()
+	}()
+
+	return ch
+}
+
+// Walk walks the storage provider to find all revision nodes.
+func Walk(base string) <-chan string {
+	ch := make(chan string)
+	go func() {
+		defer close(ch)
+		err := filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				fmt.Println("error walking", base, err)
+				return err
+			}
+
+			if !_versionRegex.MatchString(info.Name()) {
+				return nil
+			}
+
+			ch <- path
+			return nil
+		})
+		if err != nil {
+			fmt.Println("error walking", base, err)
+			return
+		}
+
+	}()
+	return ch
+}
+
+// List uses directory listing to find all revision nodes in a storage provider.
+func List(base string, workers int) <-chan string {
+	ch := make(chan string)
+	go func() {
+		defer close(ch)
+		if err := listFolder(base, ch, make(chan struct{}, workers)); err != nil {
+			fmt.Println("error listing", base, err)
+			return
+		}
+	}()
+
+	return ch
+}
+
 // PurgeRevisions removes all revisions from a storage provider.
-func PurgeRevisions(pattern string, bs DelBlobstore, dryRun bool, verbose bool) error {
-	if verbose {
-		fmt.Println("Looking for nodes in", pattern)
-	}
-
-	nodes, err := filepath.Glob(pattern)
-	if err != nil {
-		return err
-	}
-
-	if len(nodes) == 0 {
-		return errors.New("no nodes found, double check storage path")
-	}
-
+func PurgeRevisions(nodes <-chan string, bs DelBlobstore, dryRun, verbose bool) (int, int, int) {
 	countFiles := 0
 	countBlobs := 0
 	countRevisions := 0
-	for _, d := range nodes {
+
+	var err error
+	for d := range nodes {
 		if !_versionRegex.MatchString(d) {
 			continue
 		}
@@ -106,14 +202,37 @@ func PurgeRevisions(pattern string, bs DelBlobstore, dryRun bool, verbose bool) 
 		}
 	}
 
-	switch {
-	case countFiles == 0 && countRevisions == 0 && countBlobs == 0:
-		fmt.Println("❎ No revisions found. Storage provider is clean.")
-	case !dryRun:
-		fmt.Printf("✅ Deleted %d revisions (%d files / %d blobs)\n", countRevisions, countFiles, countBlobs)
-	default:
-		fmt.Printf("👉 Would delete %d revisions (%d files / %d blobs)\n", countRevisions, countFiles, countBlobs)
+	return countFiles, countBlobs, countRevisions
+}
+
+func listFolder(path string, ch chan<- string, workers chan struct{}) error {
+	workers <- struct{}{}
+	wg := sync.WaitGroup{}
+
+	children, err := os.ReadDir(path)
+	if err != nil {
+		<-workers
+		return err
 	}
+
+	for _, child := range children {
+		if child.IsDir() {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				if err := listFolder(filepath.Join(path, child.Name()), ch, workers); err != nil {
+					fmt.Println("error listing", path, err)
+				}
+			}()
+		}
+
+		if _versionRegex.MatchString(child.Name()) {
+			ch <- filepath.Join(path, child.Name())
+		}
+
+	}
+	<-workers
+	wg.Wait()
 	return nil
 }
 

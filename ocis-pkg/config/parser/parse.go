@@ -58,7 +58,9 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.GRPCServiceTLS == nil {
 		cfg.GRPCServiceTLS = &shared.GRPCServiceTLS{}
 	}
-
+	if cfg.Reva == nil {
+		cfg.Reva = &shared.Reva{}
+	}
 }
 
 // EnsureCommons copies applicable parts of the oCIS config into the commons part
@@ -111,6 +113,8 @@ func EnsureCommons(cfg *config.Config) {
 	if cfg.OcisURL != "" {
 		cfg.Commons.OcisURL = cfg.OcisURL
 	}
+
+	cfg.Commons.Reva = structs.CopyOrZeroValue(cfg.Reva)
 }
 
 // Validate checks that all required configs are set. If a required config value

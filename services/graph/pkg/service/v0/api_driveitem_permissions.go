@@ -73,13 +73,13 @@ const (
 )
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
-func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, c *config.Config) (DriveItemPermissionsService, error) {
+func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config) (DriveItemPermissionsService, error) {
 	return DriveItemPermissionsService{
 		BaseGraphService: BaseGraphService{
 			logger:          &log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
 			gatewaySelector: gatewaySelector,
 			identityCache:   identityCache,
-			config:          c,
+			config:          config,
 		},
 	}, nil
 }
@@ -130,7 +130,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 
 	permission := &libregraph.Permission{}
 	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(s.config.UnifiedRoles.AvailableRoles...))
-	if role := unifiedrole.CS3ResourcePermissionsToRole(availableRoles, cs3ResourcePermissions, condition); role != nil {
+	if role := unifiedrole.CS3ResourcePermissionsToRole(availableRoles, cs3ResourcePermissions, condition, false); role != nil {
 		permission.Roles = []string{role.GetId()}
 	}
 
@@ -388,6 +388,17 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 		}, driveItems)
 		if err != nil {
 			return collectionOfPermissions, err
+		}
+		if s.config.IncludeOCMSharees {
+			driveItems, err = s.listOCMShares(ctx, []*ocm.ListOCMSharesRequest_Filter{
+				{
+					Type: ocm.ListOCMSharesRequest_Filter_TYPE_RESOURCE_ID,
+					Term: &ocm.ListOCMSharesRequest_Filter_ResourceId{ResourceId: itemID},
+				},
+			}, driveItems)
+			if err != nil {
+				return collectionOfPermissions, err
+			}
 		}
 	}
 	// finally get public shares, which are possible for spaceroots and "normal" resources

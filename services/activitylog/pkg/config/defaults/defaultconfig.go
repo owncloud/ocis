@@ -37,7 +37,8 @@ func DefaultConfig() *config.Config {
 			Database: "activitylog",
 			Table:    "",
 		},
-		RevaGateway: shared.DefaultRevaConfig().Address,
+		RevaGateway:     shared.DefaultRevaConfig().Address,
+		DefaultLanguage: "en",
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:0",
 			Root:      "/",

@@ -94,7 +94,7 @@ func Server(cfg *config.Config) *cli.Command {
 				sync.Trap(&gr, cancel)
 			}
 
-			grpcSvc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, cfg.GRPC.Addr, version.GetString())
+			grpcSvc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, cfg.GRPC.Protocol, cfg.GRPC.Addr, version.GetString())
 			if err := registry.RegisterService(ctx, grpcSvc, logger); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc service")
 			}

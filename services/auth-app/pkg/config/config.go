@@ -58,7 +58,7 @@ type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"AUTH_APP_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"%%NEXT%%"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
-	Protocol  string                 `yaml:"protocol" env:"AUTH_APP_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"%%NEXT%%"`
+	Protocol  string                 `yaml:"protocol" env:"OCIS_GRPC_PROTOCOL;AUTH_APP_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"%%NEXT%%"`
 }
 
 // HTTP defines the available http configuration.

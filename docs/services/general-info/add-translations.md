@@ -91,3 +91,6 @@ Translations have a `context` and a `translatable string`. The context is shown 
   l10n-clean:
   	rm -f $(TEMPLATE_FILE);
   ```
+
+* Add Description Text to README\
+  Add the full `Translations` and `Default Language` text blocks including their sub sections to the service readme. You can derive from the `activitylog` or `userlog` service for easy copy/paste.

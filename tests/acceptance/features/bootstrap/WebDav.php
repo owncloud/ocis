@@ -1743,15 +1743,16 @@ trait WebDav {
 	 * @param string $source
 	 * @param string $destination
 	 *
-	 * @return void
+	 * @return array
 	 */
-	public function userHasUploadedAFileTo(string $user, string $source, string $destination):void {
+	public function userHasUploadedAFileTo(string $user, string $source, string $destination):array {
 		$response = $this->uploadFile($user, $source, $destination, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$source' to '$destination' for user '$user'",
 			$response
 		);
+		return $response->getHeader('oc-fileid');
 	}
 
 	/**
