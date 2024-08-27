@@ -73,7 +73,7 @@ require (
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20240820135012-5fac8096ce9c
 	github.com/pkg/errors v0.9.1
-	github.com/pkg/xattr v0.4.9
+	github.com/pkg/xattr v0.4.10
 	github.com/prometheus/client_golang v1.20.1
 	github.com/r3labs/sse/v2 v2.10.0
 	github.com/riandyrn/otelchi v0.9.0
