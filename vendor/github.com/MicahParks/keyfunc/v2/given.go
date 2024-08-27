@@ -42,28 +42,14 @@ func NewGiven(givenKeys map[string]GivenKey) (jwks *JWKS) {
 	}
 }
 
-// NewGivenCustom creates a new GivenKey given an untyped variable. The key argument is expected to be a supported
+// NewGivenCustom creates a new GivenKey given an untyped variable. The key argument is expected to be a type supported
 // by the jwt package used.
-//
-// See the https://pkg.go.dev/github.com/golang-jwt/jwt/v4#RegisterSigningMethod function for registering an unsupported
-// signing method.
-//
-// Deprecated: This function does not allow the user to specify the JWT's signing algorithm. Use
-// NewGivenCustomWithOptions instead.
-func NewGivenCustom(key interface{}) (givenKey GivenKey) {
-	return GivenKey{
-		inter: key,
-	}
-}
-
-// NewGivenCustomWithOptions creates a new GivenKey given an untyped variable. The key argument is expected to be a type
-// supported by the jwt package used.
 //
 // Consider the options carefully as each field may have a security implication.
 //
-// See the https://pkg.go.dev/github.com/golang-jwt/jwt/v4#RegisterSigningMethod function for registering an unsupported
+// See the https://pkg.go.dev/github.com/golang-jwt/jwt/v5#RegisterSigningMethod function for registering an unsupported
 // signing method.
-func NewGivenCustomWithOptions(key interface{}, options GivenKeyOptions) (givenKey GivenKey) {
+func NewGivenCustom(key interface{}, options GivenKeyOptions) (givenKey GivenKey) {
 	return GivenKey{
 		algorithm: options.Algorithm,
 		inter:     key,
@@ -72,18 +58,8 @@ func NewGivenCustomWithOptions(key interface{}, options GivenKeyOptions) (givenK
 
 // NewGivenECDSA creates a new GivenKey given an ECDSA public key.
 //
-// Deprecated: This function does not allow the user to specify the JWT's signing algorithm. Use
-// NewGivenECDSACustomWithOptions instead.
-func NewGivenECDSA(key *ecdsa.PublicKey) (givenKey GivenKey) {
-	return GivenKey{
-		inter: key,
-	}
-}
-
-// NewGivenECDSACustomWithOptions creates a new GivenKey given an ECDSA public key.
-//
 // Consider the options carefully as each field may have a security implication.
-func NewGivenECDSACustomWithOptions(key *ecdsa.PublicKey, options GivenKeyOptions) (givenKey GivenKey) {
+func NewGivenECDSA(key *ecdsa.PublicKey, options GivenKeyOptions) (givenKey GivenKey) {
 	return GivenKey{
 		algorithm: options.Algorithm,
 		inter:     key,
@@ -92,18 +68,8 @@ func NewGivenECDSACustomWithOptions(key *ecdsa.PublicKey, options GivenKeyOption
 
 // NewGivenEdDSA creates a new GivenKey given an EdDSA public key.
 //
-// Deprecated: This function does not allow the user to specify the JWT's signing algorithm. Use
-// NewGivenEdDSACustomWithOptions instead.
-func NewGivenEdDSA(key ed25519.PublicKey) (givenKey GivenKey) {
-	return GivenKey{
-		inter: key,
-	}
-}
-
-// NewGivenEdDSACustomWithOptions creates a new GivenKey given an EdDSA public key.
-//
 // Consider the options carefully as each field may have a security implication.
-func NewGivenEdDSACustomWithOptions(key ed25519.PublicKey, options GivenKeyOptions) (givenKey GivenKey) {
+func NewGivenEdDSA(key ed25519.PublicKey, options GivenKeyOptions) (givenKey GivenKey) {
 	return GivenKey{
 		algorithm: options.Algorithm,
 		inter:     key,
@@ -112,18 +78,8 @@ func NewGivenEdDSACustomWithOptions(key ed25519.PublicKey, options GivenKeyOptio
 
 // NewGivenHMAC creates a new GivenKey given an HMAC key in a byte slice.
 //
-// Deprecated: This function does not allow the user to specify the JWT's signing algorithm. Use
-// NewGivenHMACCustomWithOptions instead.
-func NewGivenHMAC(key []byte) (givenKey GivenKey) {
-	return GivenKey{
-		inter: key,
-	}
-}
-
-// NewGivenHMACCustomWithOptions creates a new GivenKey given an HMAC key in a byte slice.
-//
 // Consider the options carefully as each field may have a security implication.
-func NewGivenHMACCustomWithOptions(key []byte, options GivenKeyOptions) (givenKey GivenKey) {
+func NewGivenHMAC(key []byte, options GivenKeyOptions) (givenKey GivenKey) {
 	return GivenKey{
 		algorithm: options.Algorithm,
 		inter:     key,
@@ -132,18 +88,8 @@ func NewGivenHMACCustomWithOptions(key []byte, options GivenKeyOptions) (givenKe
 
 // NewGivenRSA creates a new GivenKey given an RSA public key.
 //
-// Deprecated: This function does not allow the user to specify the JWT's signing algorithm. Use
-// NewGivenRSACustomWithOptions instead.
-func NewGivenRSA(key *rsa.PublicKey) (givenKey GivenKey) {
-	return GivenKey{
-		inter: key,
-	}
-}
-
-// NewGivenRSACustomWithOptions creates a new GivenKey given an RSA public key.
-//
 // Consider the options carefully as each field may have a security implication.
-func NewGivenRSACustomWithOptions(key *rsa.PublicKey, options GivenKeyOptions) (givenKey GivenKey) {
+func NewGivenRSA(key *rsa.PublicKey, options GivenKeyOptions) (givenKey GivenKey) {
 	return GivenKey{
 		algorithm: options.Algorithm,
 		inter:     key,

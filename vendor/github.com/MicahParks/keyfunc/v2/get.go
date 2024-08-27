@@ -49,11 +49,21 @@ func Get(jwksURL string, options Options) (jwks *JWKS, err error) {
 
 	err = jwks.refresh()
 	if err != nil {
-		return nil, err
+		if options.TolerateInitialJWKHTTPError {
+			if jwks.refreshErrorHandler != nil {
+				jwks.refreshErrorHandler(err)
+			}
+			jwks.keys = make(map[string]parsedJWK)
+		} else {
+			return nil, err
+		}
 	}
 
 	if jwks.refreshInterval != 0 || jwks.refreshUnknownKID {
-		jwks.ctx, jwks.cancel = context.WithCancel(context.Background())
+		if jwks.ctx == nil {
+			jwks.ctx = context.Background()
+		}
+		jwks.ctx, jwks.cancel = context.WithCancel(jwks.ctx)
 		jwks.refreshRequests = make(chan refreshRequest, 1)
 		go jwks.backgroundRefresh()
 	}

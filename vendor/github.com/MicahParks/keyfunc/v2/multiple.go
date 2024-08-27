@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // ErrMultipleJWKSSize is returned when the number of JWKS given are not enough to make a MultipleJWKS.
-var ErrMultipleJWKSSize = errors.New("multiple JWKS must have two or more remote JWK Set resources")
+var ErrMultipleJWKSSize = errors.New("multiple JWKS must have one or more remote JWK Set resources")
 
 // MultipleJWKS manages multiple JWKS and has a field for jwt.Keyfunc.
 type MultipleJWKS struct {
@@ -16,14 +16,14 @@ type MultipleJWKS struct {
 	sets        map[string]*JWKS // No lock is required because this map is read-only after initialization.
 }
 
-// GetMultiple creates a new MultipleJWKS. A map of length two or more JWKS URLs to Options is required.
+// GetMultiple creates a new MultipleJWKS. A map of length one or more JWKS URLs to Options is required.
 //
 // Be careful when choosing Options for each JWKS in the map. If RefreshUnknownKID is set to true for all JWKS in the
 // map then many refresh requests would take place each time a JWT is processed, this should be rate limited by
 // RefreshRateLimit.
 func GetMultiple(multiple map[string]Options, options MultipleOptions) (multiJWKS *MultipleJWKS, err error) {
-	if multiple == nil || len(multiple) < 2 {
-		return nil, fmt.Errorf("multiple JWKS must have two or more remote JWK Set resources: %w", ErrMultipleJWKSSize)
+	if len(multiple) < 1 {
+		return nil, fmt.Errorf("multiple JWKS must have one or more remote JWK Set resources: %w", ErrMultipleJWKSSize)
 	}
 
 	if options.KeySelector == nil {
@@ -46,6 +46,8 @@ func GetMultiple(multiple map[string]Options, options MultipleOptions) (multiJWK
 	return multiJWKS, nil
 }
 
+// JWKSets returns a copy of the map of JWK Sets. The map itself is a copy, but the JWKS are not and should be treated
+// as read-only.
 func (m *MultipleJWKS) JWKSets() map[string]*JWKS {
 	sets := make(map[string]*JWKS, len(m.sets))
 	for u, jwks := range m.sets {
@@ -54,6 +56,7 @@ func (m *MultipleJWKS) JWKSets() map[string]*JWKS {
 	return sets
 }
 
+// KeySelectorFirst returns the first key found in the multiple JWK Sets.
 func KeySelectorFirst(multiJWKS *MultipleJWKS, token *jwt.Token) (key interface{}, err error) {
 	kid, alg, err := kidAlg(token)
 	if err != nil {

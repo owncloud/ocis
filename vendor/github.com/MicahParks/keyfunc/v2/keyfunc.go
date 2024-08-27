@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var (
@@ -14,7 +14,7 @@ var (
 	ErrKID = errors.New("the JWT has an invalid kid")
 )
 
-// Keyfunc matches the signature of github.com/golang-jwt/jwt/v4's jwt.Keyfunc function.
+// Keyfunc matches the signature of github.com/golang-jwt/jwt/v5's jwt.Keyfunc function.
 func (j *JWKS) Keyfunc(token *jwt.Token) (interface{}, error) {
 	kid, alg, err := kidAlg(token)
 	if err != nil {
@@ -23,6 +23,7 @@ func (j *JWKS) Keyfunc(token *jwt.Token) (interface{}, error) {
 	return j.getKey(alg, kid)
 }
 
+// Keyfunc matches the signature of github.com/golang-jwt/jwt/v5's jwt.Keyfunc function.
 func (m *MultipleJWKS) Keyfunc(token *jwt.Token) (interface{}, error) {
 	return m.keySelector(m, token)
 }
