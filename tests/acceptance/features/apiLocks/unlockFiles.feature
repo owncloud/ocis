@@ -119,7 +119,7 @@ Feature: unlock locked items
       | spaces           | shared     |
       | spaces           | exclusive  |
 
-
+  @issue-7767
   Scenario Outline: trying to unlock a file inside the shared folder that has been locked by the file owner
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav-path-version> DAV path

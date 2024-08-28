@@ -124,7 +124,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/unlockFiles.feature:231](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L231)
 - [apiLocks/unlockFiles.feature:232](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/unlockFiles.feature#L232)
 
-#### [Trying to upload to a locked file gives 500](https://github.com/owncloud/ocis/issues/7638)
+#### [Folders can be locked and locking works partially](https://github.com/owncloud/ocis/issues/7641)
 
 - [apiLocks/lockFiles.feature:445](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L445)
 - [apiLocks/lockFiles.feature:446](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L446)
@@ -132,9 +132,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiLocks/lockFiles.feature:448](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L448)
 - [apiLocks/lockFiles.feature:449](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L449)
 - [apiLocks/lockFiles.feature:450](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L450)
-
-#### [Folders can be locked and locking works partially](https://github.com/owncloud/ocis/issues/7641)
-
 - [apiLocks/lockFiles.feature:419](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L419)
 - [apiLocks/lockFiles.feature:420](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L420)
 - [apiLocks/lockFiles.feature:421](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiLocks/lockFiles.feature#L421)
@@ -248,12 +245,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesShares/moveSpaces.feature:416](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L416)
 - [apiSpacesDavOperation/moveByFileId.feature:86](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L86)
 - [apiSpacesDavOperation/moveByFileId.feature:87](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L87)
-- [apiSpacesDavOperation/moveByFileId.feature:210](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L210)
 - [apiSpacesDavOperation/moveByFileId.feature:205](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L205)
 - [apiSpacesDavOperation/moveByFileId.feature:206](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L206)
 - [apiSpacesDavOperation/moveByFileId.feature:207](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L207)
 - [apiSpacesDavOperation/moveByFileId.feature:208](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L208)
 - [apiSpacesDavOperation/moveByFileId.feature:209](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L209)
+- [apiSpacesDavOperation/moveByFileId.feature:210](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L210)
 - [apiSpacesDavOperation/moveByFileId.feature:492](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L492)
 - [apiSpacesDavOperation/moveByFileId.feature:493](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L493)
 
