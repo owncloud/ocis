@@ -94,7 +94,7 @@ Feature: collaboration (wopi)
       }
       """
 
-
+  @issue-9928
   Scenario: open text file without app name in url query (MIME type not registered in app-registry)
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "lorem.txt"
     And we save it into "FILEID"
