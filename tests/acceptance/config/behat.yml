@@ -1,6 +1,6 @@
 default:
   autoload:
-    "": "%paths.base%/../features/bootstrap"
+    "": "%paths.base%/../bootstrap"
 
   suites:
     apiAccountsHashDifficulty:

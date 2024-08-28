@@ -33,7 +33,7 @@ class HttpLogger {
 	 * @return string
 	 */
 	public static function getLogDir(): string {
-		return __DIR__ . '/../acceptance/logs';
+		return __DIR__ . '/../logs';
 	}
 
 	/**

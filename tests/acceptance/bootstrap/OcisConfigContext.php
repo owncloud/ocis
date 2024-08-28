@@ -85,7 +85,7 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theConfigHasBeenSetPathTo(string $configVariable, string $path): void {
-		$path = \dirname(__FILE__) . "/../../../" . $path;
+		$path = \dirname(__FILE__) . "/../../" . $path;
 		$response =  OcisConfigHelper::reConfigureOcis(
 			[
 				$configVariable => $path

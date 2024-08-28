@@ -25,7 +25,7 @@ use Composer\Autoload\ClassLoader;
 
 $classLoader = new ClassLoader();
 
-$classLoader->addPsr4("TestHelpers\\", __DIR__ . "/../../../TestHelpers", true);
+$classLoader->addPsr4("TestHelpers\\", __DIR__ . "/../TestHelpers", true);
 
 $classLoader->register();
 

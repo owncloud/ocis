@@ -2453,7 +2453,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return string
 	 */
 	public function acceptanceTestsDirLocation(): string {
-		return \dirname(__FILE__) . "/../../";
+		return \dirname(__FILE__) . "/../";
 	}
 
 	/**
@@ -2857,9 +2857,9 @@ class FeatureContext extends BehatVariablesContext {
 	public static function isExpectedToFail(string $scenarioLine): bool {
 		$expectedFailFile = \getenv('EXPECTED_FAILURES_FILE');
 		if (!$expectedFailFile) {
-			$expectedFailFile = __DIR__ . '/../../expected-failures-localAPI-on-OCIS-storage.md';
+			$expectedFailFile = __DIR__ . '/../expected-failures-localAPI-on-OCIS-storage.md';
 			if (\strpos($scenarioLine, "coreApi") === 0) {
-				$expectedFailFile = __DIR__ . '/../../expected-failures-API-on-OCIS-storage.md';
+				$expectedFailFile = __DIR__ . '/../expected-failures-API-on-OCIS-storage.md';
 			}
 		}
 
