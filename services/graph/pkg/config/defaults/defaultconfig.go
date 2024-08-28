@@ -15,7 +15,7 @@ import (
 var (
 	// _disabledByDefaultUnifiedRoleRoleIDs contains all roles that are not enabled by default,
 	// but can be enabled by the user.
-	_disabledByDefaultUnifiedRoleRoleIDs = []string{unifiedrole.UnifiedRoleSecureViewerID}
+	_disabledByDefaultUnifiedRoleRoleIDs = []string{unifiedrole.UnifiedRoleSecureViewerID, unifiedrole.UnifiedRoleSpaceEditorWithoutVersionsID}
 )
 
 // FullDefaultConfig returns a fully initialized default configuration

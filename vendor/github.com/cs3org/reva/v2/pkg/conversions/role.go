@@ -43,6 +43,8 @@ const (
 	RoleEditor = "editor"
 	// RoleSpaceEditor grants editor permission on a space.
 	RoleSpaceEditor = "spaceeditor"
+	// RoleSpaceEditorWithoutVersions grants editor permission without list/restore versions on a space.
+	RoleSpaceEditorWithoutVersions = "spaceeditor-without-versions"
 	// RoleFileEditor grants editor permission on a single file.
 	RoleFileEditor = "file-editor"
 	// RoleCoowner grants co-owner permissions on a resource.
@@ -265,6 +267,28 @@ func NewSpaceEditorRole() *Role {
 			ListRecycle:          true,
 			Move:                 true,
 			RestoreFileVersion:   true,
+			RestoreRecycleItem:   true,
+			Stat:                 true,
+		},
+		ocsPermissions: PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete,
+	}
+}
+
+// NewSpaceEditorWithoutVersionsRole creates an editor without list/restore versions role
+func NewSpaceEditorWithoutVersionsRole() *Role {
+	return &Role{
+		Name: RoleSpaceEditorWithoutVersions,
+		cS3ResourcePermissions: &provider.ResourcePermissions{
+			CreateContainer:      true,
+			Delete:               true,
+			GetPath:              true,
+			GetQuota:             true,
+			InitiateFileDownload: true,
+			InitiateFileUpload:   true,
+			ListContainer:        true,
+			ListGrants:           true,
+			ListRecycle:          true,
+			Move:                 true,
 			RestoreRecycleItem:   true,
 			Stat:                 true,
 		},

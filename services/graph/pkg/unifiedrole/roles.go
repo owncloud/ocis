@@ -22,6 +22,8 @@ const (
 	UnifiedRoleEditorID = "fb6c3e19-e378-47e5-b277-9732f9de6e21"
 	// UnifiedRoleSpaceEditorID Unified role space editor id.
 	UnifiedRoleSpaceEditorID = "58c63c02-1d89-4572-916a-870abc5a1b7d"
+	// UnifiedRoleSpaceEditorWithoutVersionsID Unified role space editor without list/restore versions id.
+	UnifiedRoleSpaceEditorWithoutVersionsID = "3284f2d5-0070-4ad8-ac40-c247f7c1fb27"
 	// UnifiedRoleFileEditorID Unified role file editor id.
 	UnifiedRoleFileEditorID = "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
 	// UnifiedRoleEditorLiteID Unified role editor-lite id.
@@ -109,6 +111,12 @@ var (
 	// UnifiedRole SpaseEditor, Role DisplayName (resolves directly)
 	_spaceEditorUnifiedRoleDisplayName = l10n.Template("Can edit")
 
+	// UnifiedRole SpaseEditorWithoutVersions, Role Description (resolves directly)
+	_spaceEditorWithoutVersionsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and delete.")
+
+	// UnifiedRole SpaseEditorWithoutVersions, Role DisplayName (resolves directly)
+	_spaceEditorWithoutVersionsUnifiedRoleDisplayName = l10n.Template("Can edit without versions")
+
 	// UnifiedRole FileEditor, Role Description (resolves directly)
 	_fileEditorUnifiedRoleDescription = l10n.Template("View, download and edit.")
 
@@ -138,13 +146,14 @@ var (
 		UnifiedRoleViewerID: conversions.RoleViewer,
 		// one V1 api the "spaceviewer" role was call "viewer" and the "spaceeditor" was "editor",
 		// we need to stay compatible with that
-		UnifiedRoleSpaceViewerID:  "viewer",
-		UnifiedRoleSpaceEditorID:  "editor",
-		UnifiedRoleEditorID:       conversions.RoleEditor,
-		UnifiedRoleFileEditorID:   conversions.RoleFileEditor,
-		UnifiedRoleEditorLiteID:   conversions.RoleEditorLite,
-		UnifiedRoleManagerID:      conversions.RoleManager,
-		UnifiedRoleSecureViewerID: conversions.RoleSecureViewer,
+		UnifiedRoleSpaceViewerID:                "viewer",
+		UnifiedRoleSpaceEditorID:                "editor",
+		UnifiedRoleSpaceEditorWithoutVersionsID: conversions.RoleSpaceEditorWithoutVersions,
+		UnifiedRoleEditorID:                     conversions.RoleEditor,
+		UnifiedRoleFileEditorID:                 conversions.RoleFileEditor,
+		UnifiedRoleEditorLiteID:                 conversions.RoleEditorLite,
+		UnifiedRoleManagerID:                    conversions.RoleManager,
+		UnifiedRoleSecureViewerID:               conversions.RoleSecureViewer,
 	}
 
 	// buildInRoles contains the built-in roles.
@@ -153,6 +162,7 @@ var (
 		roleSpaceViewer,
 		roleEditor,
 		roleSpaceEditor,
+		roleSpaceEditorWithoutVersions,
 		roleFileEditor,
 		roleEditorLite,
 		roleManager,
@@ -232,6 +242,23 @@ var (
 		return &libregraph.UnifiedRoleDefinition{
 			Id:          proto.String(UnifiedRoleSpaceEditorID),
 			Description: proto.String(_spaceEditorUnifiedRoleDescription),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionDrive),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}()
+
+	// roleSpaceEditorWithoutVersions creates an editor without versions role
+	roleSpaceEditorWithoutVersions = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewSpaceEditorWithoutVersionsRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleSpaceEditorWithoutVersionsID),
+			Description: proto.String(_spaceEditorWithoutVersionsUnifiedRoleDescription),
 			DisplayName: proto.String(cs3RoleToDisplayName(r)),
 			RolePermissions: []libregraph.UnifiedRolePermission{
 				{
