@@ -1,6 +1,6 @@
 ---
 title: Nats
-date: 2024-08-28T05:51:01.436336625Z
+date: 2024-08-28T06:45:34.066851232Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/nats
@@ -20,14 +20,21 @@ Services can `Publish` events to the nats service and nats will store these even
 
 ## Table of Contents
 
-* [Underlying technology](#underlying-technology)
+* [Underlying Technology](#underlying-technology)
+* [Default Registry](#default-registry)
 * [Persistance](#persistance)
 * [TLS Encryption](#tls-encryption)
 * [Example Yaml Config](#example-yaml-config)
 
-## Underlying technology
+## Underlying Technology
 
 As the service name suggests, this service is based on [NATS](https://nats.io/) specifically on [NATS Jetstream](https://docs.nats.io/nats-concepts/jetstream) to enable persistence.
+
+## Default Registry
+
+By default, `nats-js-kv` is configured as embedded default registry via the `MICRO_REGISTRY` environment variable. If you do not want using the build-in nats registry, set `MICRO_REGISTRY_ADDRESS` to the address of the nats-js cluster, which is the same value as `OCIS_EVENTS_ENDPOINT`. Optionally use `MICRO_REGISTRY_AUTH_USERNAME` and `MICRO_REGISTRY_AUTH_PASSWORD` to authenticate with the external nats cluster.
+
+Note that when `MICRO_REGISTRY` is configured using `kubernetes`, the NATS service will not be used but the Kubernetes registry. In this case, the `MICRO_REGISTRY_ADDRESS` environment variable needs to be set to the url of the Kubernetes registry.
 
 ## Persistance
 
