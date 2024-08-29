@@ -182,7 +182,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				middlewares := loadMiddlewares(logger, cfg, userInfoCache, signingKeyStore, traceProvider, *m, userProvider, gatewaySelector, serviceSelector)
+				middlewares := loadMiddlewares(logger, cfg, userInfoCache, signingKeyStore, traceProvider, *m, userProvider, publisher, gatewaySelector, serviceSelector)
 
 				server, err := proxyHTTP.Server(
 					proxyHTTP.Handler(lh.Handler()),
@@ -236,8 +236,10 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 func loadMiddlewares(logger log.Logger, cfg *config.Config,
-	userInfoCache, signingKeyStore microstore.Store, traceProvider trace.TracerProvider, metrics metrics.Metrics,
-	userProvider backend.UserBackend, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], serviceSelector selector.Selector) alice.Chain {
+	userInfoCache, signingKeyStore microstore.Store,
+	traceProvider trace.TracerProvider, metrics metrics.Metrics,
+	userProvider backend.UserBackend, publisher events.Publisher,
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient], serviceSelector selector.Selector) alice.Chain {
 
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
 	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
@@ -354,6 +356,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
+			middleware.EventsPublisher(publisher),
 		),
 		middleware.SelectorCookie(
 			middleware.Logger(logger),

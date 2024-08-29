@@ -53,7 +53,7 @@ type OIDCAuthenticator struct {
 	TimeFunc                func() time.Time
 }
 
-func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
+func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, bool, error) {
 	var claims map[string]interface{}
 
 	// use a 64 bytes long hash to have 256-bit collision resistance.
@@ -69,16 +69,16 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 		if err = msgpack.UnmarshalAsMap(record[0].Value, &claims); err == nil {
 			m.Logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
 			if ok := verifyExpiresAt(claims, m.TimeFunc()); !ok {
-				return nil, jwt.ErrTokenExpired
+				return nil, false, jwt.ErrTokenExpired
 			}
-			return claims, nil
+			return claims, false, nil
 		}
 		m.Logger.Error().Err(err).Msg("could not unmarshal userinfo")
 	}
 
 	aClaims, claims, err := m.oidcClient.VerifyAccessToken(req.Context(), token)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to verify access token")
+		return nil, false, errors.Wrap(err, "failed to verify access token")
 	}
 
 	if !m.skipUserInfo {
@@ -91,10 +91,10 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 			oauth2.StaticTokenSource(oauth2Token),
 		)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to get userinfo")
+			return nil, false, errors.Wrap(err, "failed to get userinfo")
 		}
 		if err := userInfo.Claims(&claims); err != nil {
-			return nil, errors.Wrap(err, "failed to unmarshal userinfo claims")
+			return nil, false, errors.Wrap(err, "failed to unmarshal userinfo claims")
 		}
 	}
 
@@ -128,8 +128,12 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 		}
 	}()
 
+	// If we get here this was a new login (or a renewal of the token)
+	// add a flag about that to the claims, to be able to distinguish
+	// it in the accountresolver middleware
+
 	m.Logger.Debug().Interface("claims", claims).Msg("extracted claims")
-	return claims, nil
+	return claims, true, nil
 }
 
 // extractExpiration tries to extract the expriration time from the access token
@@ -180,7 +184,7 @@ func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 		return nil, false
 	}
 
-	claims, err := m.getClaims(token, r)
+	claims, newSession, err := m.getClaims(token, r)
 	if err != nil {
 		host, port, _ := net.SplitHostPort(r.RemoteAddr)
 		m.Logger.Error().
@@ -198,5 +202,11 @@ func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 		Str("authenticator", "oidc").
 		Str("path", r.URL.Path).
 		Msg("successfully authenticated request")
-	return r.WithContext(oidc.NewContext(r.Context(), claims)), true
+
+	ctx := r.Context()
+	if newSession {
+		ctx = oidc.NewContextSessionFlag(ctx, true)
+	}
+
+	return r.WithContext(oidc.NewContext(ctx, claims)), true
 }

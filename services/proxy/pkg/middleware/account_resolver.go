@@ -11,6 +11,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 )
@@ -37,6 +39,7 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 			userRoleAssigner:      options.UserRoleAssigner,
 			autoProvisionAccounts: options.AutoprovisionAccounts,
 			lastGroupSyncCache:    lastGroupSyncCache,
+			eventsPublisher:       options.EventsPublisher,
 		}
 	}
 }
@@ -53,6 +56,7 @@ type accountResolver struct {
 	// memberships was done for a specific user. This is used to trigger a sync
 	// with every single request.
 	lastGroupSyncCache *ttlcache.Cache[string, struct{}]
+	eventsPublisher    events.Publisher
 }
 
 func readUserIDClaim(path string, claims map[string]interface{}) (string, error) {
@@ -170,6 +174,17 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			m.logger.Error().Err(err).Msg("Could not get user roles")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
+		}
+
+		// If this is a new session, publish user login event
+		if newSession := oidc.NewSessionFlagFromContext(ctx); newSession && m.eventsPublisher != nil {
+			event := events.UserSignedIn{
+				Executant: user.Id,
+				Timestamp: utils.TimeToTS(time.Now()),
+			}
+			if err := events.Publish(req.Context(), m.eventsPublisher, event); err != nil {
+				m.logger.Error().Err(err).Msg("could not publish user signin event.")
+			}
 		}
 
 		// add user to context for selectors
