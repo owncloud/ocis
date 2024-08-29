@@ -47,8 +47,6 @@ const (
 	schoolPropertiesUpdated
 )
 
-const ldapDateFormat = "20060102150405Z0700"
-
 var (
 	errNotSet             = errors.New("attribute not set")
 	errSchoolNameExists   = errorcode.New(errorcode.NameAlreadyExists, "A school with that name is already present")

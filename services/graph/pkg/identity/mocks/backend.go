@@ -11,6 +11,8 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
+	time "time"
+
 	url "net/url"
 )
 
@@ -677,6 +679,54 @@ func (_c *Backend_UpdateGroupName_Call) Return(_a0 error) *Backend_UpdateGroupNa
 }
 
 func (_c *Backend_UpdateGroupName_Call) RunAndReturn(run func(context.Context, string, string) error) *Backend_UpdateGroupName_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateLastSignInDate provides a mock function with given fields: ctx, userID, timestamp
+func (_m *Backend) UpdateLastSignInDate(ctx context.Context, userID string, timestamp time.Time) error {
+	ret := _m.Called(ctx, userID, timestamp)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateLastSignInDate")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, time.Time) error); ok {
+		r0 = rf(ctx, userID, timestamp)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Backend_UpdateLastSignInDate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateLastSignInDate'
+type Backend_UpdateLastSignInDate_Call struct {
+	*mock.Call
+}
+
+// UpdateLastSignInDate is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID string
+//   - timestamp time.Time
+func (_e *Backend_Expecter) UpdateLastSignInDate(ctx interface{}, userID interface{}, timestamp interface{}) *Backend_UpdateLastSignInDate_Call {
+	return &Backend_UpdateLastSignInDate_Call{Call: _e.mock.On("UpdateLastSignInDate", ctx, userID, timestamp)}
+}
+
+func (_c *Backend_UpdateLastSignInDate_Call) Run(run func(ctx context.Context, userID string, timestamp time.Time)) *Backend_UpdateLastSignInDate_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(time.Time))
+	})
+	return _c
+}
+
+func (_c *Backend_UpdateLastSignInDate_Call) Return(_a0 error) *Backend_UpdateLastSignInDate_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Backend_UpdateLastSignInDate_Call) RunAndReturn(run func(context.Context, string, time.Time) error) *Backend_UpdateLastSignInDate_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -3,6 +3,7 @@ package identity
 import (
 	"context"
 	"net/url"
+	"time"
 
 	"github.com/CiscoM31/godata"
 	cs3group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -36,6 +37,7 @@ type Backend interface {
 	UpdateUser(ctx context.Context, nameOrID string, user libregraph.UserUpdate) (*libregraph.User, error)
 	GetUser(ctx context.Context, nameOrID string, oreq *godata.GoDataRequest) (*libregraph.User, error)
 	GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error)
+	UpdateLastSignInDate(ctx context.Context, userID string, timestamp time.Time) error
 
 	// CreateGroup creates the supplied group in the identity backend.
 	CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error)

@@ -13,7 +13,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/jellydator/ttlcache/v3"
 	"go-micro.dev/v4/client"
-	mevents "go-micro.dev/v4/events"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/types/known/emptypb"
 
@@ -27,11 +26,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 )
-
-// Publisher is the interface for events publisher
-type Publisher interface {
-	Publish(string, interface{}, ...mevents.PublishOption) error
-}
 
 // Permissions is the interface used to access the permissions service
 type Permissions interface {
@@ -68,6 +62,7 @@ type Graph struct {
 	valueService             settingssvc.ValueService
 	specialDriveItemsCache   *ttlcache.Cache[string, interface{}]
 	eventsPublisher          events.Publisher
+	eventsConsumer           events.Consumer
 	searchService            searchsvc.SearchProviderService
 	keycloakClient           keycloak.Client
 	historyClient            ehsvc.EventHistoryService

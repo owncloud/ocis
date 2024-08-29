@@ -49,11 +49,11 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
-	var publisher events.Stream
+	var eventsStream events.Stream
 
 	if options.Config.Events.Endpoint != "" {
 		var err error
-		publisher, err = stream.NatsFromConfig(options.Config.Service.Name, false, stream.NatsConfig(options.Config.Events))
+		eventsStream, err = stream.NatsFromConfig(options.Config.Service.Name, false, stream.NatsConfig(options.Config.Events))
 		if err != nil {
 			options.Logger.Error().
 				Err(err).
@@ -130,10 +130,12 @@ func Server(opts ...Option) (http.Service, error) {
 
 	var handle svc.Service
 	handle, err = svc.NewService(
+		svc.Context(options.Context),
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(middlewares...),
-		svc.EventsPublisher(publisher),
+		svc.EventsPublisher(eventsStream),
+		svc.EventsConsumer(eventsStream),
 		svc.WithRoleService(roleService),
 		svc.WithValueService(valueService),
 		svc.WithRequireAdminMiddleware(requireAdminMiddleware),

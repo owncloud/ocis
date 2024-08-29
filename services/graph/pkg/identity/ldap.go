@@ -8,6 +8,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
@@ -24,6 +25,7 @@ const (
 	_givenNameAttribute  = "givenname"
 	_surNameAttribute    = "sn"
 	_identitiesAttribute = "oCExternalIdentity"
+	ldapDateFormat       = "20060102150405Z0700"
 )
 
 // DisableUserMechanismType is used instead of directly using the string values from the configuration.
@@ -668,6 +670,38 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 		users = append(users, u)
 	}
 	return users, nil
+}
+
+// UpdateLastSignInDate implements the Backend Interface.
+func (i *LDAP) UpdateLastSignInDate(ctx context.Context, userID string, timestamp time.Time) error {
+	if !i.writeEnabled {
+		i.logger.Debug().Str("backend", "ldap").Msg("The LDAP Server is readonly. Skipping update of last sign in date")
+		return nil
+	}
+	e, err := i.getLDAPUserByID(userID)
+	switch {
+	case errors.Is(err, ErrNotFound):
+		i.logger.Warn().Err(err).Str("userID", userID).Msg("Failed to update last sign in date for user")
+		return nil
+	case err != nil:
+		return err
+	}
+
+	mr := ldap.ModifyRequest{DN: e.DN}
+	mr.Replace("oCLastSignInTimestamp", []string{timestamp.UTC().Format(ldapDateFormat)})
+	if err := i.conn.Modify(&mr); err != nil {
+		msg := "error updating last sign in date for user"
+		i.logger.Error().Err(err).Str("userid", userID).Msg(msg)
+		errMap := ldapResultToErrMap{
+			ldap.LDAPResultNoSuchObject:             errorcode.New(errorcode.ItemNotFound, msg),
+			ldap.LDAPResultUnwillingToPerform:       errorcode.New(errorcode.NotAllowed, msg),
+			ldap.LDAPResultInsufficientAccessRights: errorcode.New(errorcode.NotAllowed, msg),
+			ldapGenericErr:                          errorcode.New(errorcode.GeneralException, msg),
+		}
+		return i.mapLDAPError(err, errMap)
+	}
+
+	return nil
 }
 
 func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUserName string) (*ldap.Entry, error) {

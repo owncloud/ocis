@@ -3,6 +3,7 @@ package identity
 import (
 	"context"
 	"net/url"
+	"time"
 
 	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -109,6 +110,11 @@ func (i *CS3) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libr
 	}
 
 	return users, nil
+}
+
+// UpdateLastSignInDate implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) UpdateLastSignInDate(ctx context.Context, userID string, timestamp time.Time) error {
+	return errNotImplemented
 }
 
 // GetGroups implements the Backend Interface.

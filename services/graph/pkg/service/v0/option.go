@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"context"
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -22,6 +23,7 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
+	Context                  context.Context
 	Logger                   log.Logger
 	Config                   *config.Config
 	Middleware               []func(http.Handler) http.Handler
@@ -34,6 +36,7 @@ type Options struct {
 	ValueService             settingssvc.ValueService
 	RoleManager              *roles.Manager
 	EventsPublisher          events.Publisher
+	EventsConsumer           events.Consumer
 	SearchService            searchsvc.SearchProviderService
 	KeycloakClient           keycloak.Client
 	EventHistoryClient       ehsvc.EventHistoryService
@@ -49,6 +52,13 @@ func newOptions(opts ...Option) Options {
 	}
 
 	return opt
+}
+
+// Context provides a function to set the context option.
+func Context(ctx context.Context) Option {
+	return func(o *Options) {
+		o.Context = ctx
+	}
 }
 
 // Logger provides a function to set the logger option.
@@ -139,6 +149,13 @@ func RoleManager(val *roles.Manager) Option {
 func EventsPublisher(val events.Publisher) Option {
 	return func(o *Options) {
 		o.EventsPublisher = val
+	}
+}
+
+// EventsConsumer provides a function to set the EventsConsumer option.
+func EventsConsumer(val events.Consumer) Option {
+	return func(o *Options) {
+		o.EventsConsumer = val
 	}
 }
 
