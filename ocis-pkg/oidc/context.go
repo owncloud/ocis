@@ -5,6 +5,9 @@ import "context"
 // contextKey is the key for oidc claims in a context
 type contextKey struct{}
 
+// newSessionFlagKey is the key for the new session flag in a context
+type newSessionFlagKey struct{}
+
 // NewContext makes a new context that contains the OpenID connect claims in a map.
 func NewContext(parent context.Context, c map[string]interface{}) context.Context {
 	return context.WithValue(parent, contextKey{}, c)
@@ -13,5 +16,16 @@ func NewContext(parent context.Context, c map[string]interface{}) context.Contex
 // FromContext returns the claims map stored in a context, or nil if there isn't one.
 func FromContext(ctx context.Context) map[string]interface{} {
 	s, _ := ctx.Value(contextKey{}).(map[string]interface{})
+	return s
+}
+
+// NewContextSessionFlag makes a new context that contains the new session flag.
+func NewContextSessionFlag(ctx context.Context, flag bool) context.Context {
+	return context.WithValue(ctx, newSessionFlagKey{}, flag)
+}
+
+// NewSessionFlagFromContext returns the new session flag stored in a context.
+func NewSessionFlagFromContext(ctx context.Context) bool {
+	s, _ := ctx.Value(newSessionFlagKey{}).(bool)
 	return s
 }

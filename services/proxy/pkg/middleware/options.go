@@ -5,6 +5,7 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
@@ -69,7 +70,8 @@ type Options struct {
 	// TraceProvider sets the tracing provider.
 	TraceProvider trace.TracerProvider
 	// SkipUserInfo prevents the oidc middleware from querying the userinfo endpoint and read any claims directly from the access token instead
-	SkipUserInfo bool
+	SkipUserInfo    bool
+	EventsPublisher events.Publisher
 }
 
 // newOptions initializes the available default options.
@@ -234,5 +236,12 @@ func TraceProvider(tp trace.TracerProvider) Option {
 func SkipUserInfo(val bool) Option {
 	return func(o *Options) {
 		o.SkipUserInfo = val
+	}
+}
+
+// EventsPublisher sets the events publisher.
+func EventsPublisher(ep events.Publisher) Option {
+	return func(o *Options) {
+		o.EventsPublisher = ep
 	}
 }
