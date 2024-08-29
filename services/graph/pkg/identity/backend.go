@@ -125,10 +125,10 @@ func CreateUserModelFromCS3(u *cs3user.User) *libregraph.User {
 			IssuerAssignedId: &u.GetId().OpaqueId,
 		}},
 		UserType:                 &userType,
-		DisplayName:              u.DisplayName,
+		DisplayName:              u.GetDisplayName(),
 		Mail:                     &u.Mail,
-		OnPremisesSamAccountName: u.Username,
-		Id:                       &u.Id.OpaqueId,
+		OnPremisesSamAccountName: u.GetUsername(),
+		Id:                       &u.GetId().OpaqueId,
 	}
 	// decode the remote id if the user is federated
 	if u.GetId().GetType() == cs3user.UserType_USER_TYPE_FEDERATED {
