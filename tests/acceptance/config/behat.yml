@@ -11,7 +11,7 @@ default:
           ldapAdminPassword: admin
           ldapUsersOU: TestUsers
           ldapGroupsOU: TestGroups
-          ldapInitialUserFilePath: /../../config/ldap-users.ldif
+          ldapInitialUserFilePath: /../config/ldap-users.ldif
       contexts:
         - SettingsContext:
         - GraphContext:
