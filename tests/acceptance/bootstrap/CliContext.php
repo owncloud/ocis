@@ -23,7 +23,6 @@
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Context\Context;
 use PHPUnit\Framework\Assert;
-use Psr\Http\Message\ResponseInterface;
 use TestHelpers\CliHelper;
 use TestHelpers\OcisConfigHelper;
 
