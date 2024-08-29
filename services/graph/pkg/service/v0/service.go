@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
@@ -16,10 +17,13 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	microstore "go-micro.dev/v4/store"
 
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
+	"github.com/cs3org/reva/v2/pkg/utils"
 
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -148,6 +152,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		mux:                      m,
 		specialDriveItemsCache:   spacePropertiesCache,
 		eventsPublisher:          options.EventsPublisher,
+		eventsConsumer:           options.EventsConsumer,
 		searchService:            options.SearchService,
 		identityEducationBackend: options.IdentityEducationBackend,
 		keycloakClient:           options.KeycloakClient,
@@ -515,6 +520,39 @@ func setIdentityBackends(options Options, svc *Graph) error {
 		svc.identityBackend = options.IdentityBackend
 	}
 
+	return svc.StartListenForLogonEvents(options.Context, options.Logger)
+}
+
+func (g *Graph) StartListenForLogonEvents(ctx context.Context, l log.Logger) error {
+	if g.eventsConsumer == nil {
+		return nil
+	}
+	var _registeredEvents = []events.Unmarshaller{
+		events.UserSignedIn{},
+	}
+	evChannel, err := events.Consume(g.eventsConsumer, "graph", _registeredEvents...)
+	if err != nil {
+		l.Error().Err(err).Msg("cannot consume from nats")
+		return err
+	}
+	go func() {
+		for loop := true; loop; {
+			select {
+			case e := <-evChannel:
+				switch ev := e.Event.(type) {
+				default:
+					l.Error().Interface("event", e).Msg("unhandled event")
+				case events.UserSignedIn:
+					if err := g.identityBackend.UpdateLastSignInDate(ctx, ev.Executant.OpaqueId, utils.TSToTime(ev.Timestamp)); err != nil {
+						l.Error().Err(err).Str("userid", ev.Executant.OpaqueId).Msg("Error updating last sign in date")
+					}
+				}
+			case <-ctx.Done():
+				l.Info().Msg("context cancelled")
+				loop = false
+			}
+		}
+	}()
 	return nil
 }
 

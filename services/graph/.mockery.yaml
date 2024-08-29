@@ -12,8 +12,12 @@ packages:
             DriveItemPermissionsProvider:
             HTTPClient:
             Permissions:
-            Publisher:
             RoleService:
+    github.com/cs3org/reva/v2/pkg/events:
+        config:
+            dir: "mocks"
+        interfaces:
+            Publisher:
     github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool:
         config:
             dir: "mocks"
