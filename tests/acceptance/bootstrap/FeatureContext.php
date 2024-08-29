@@ -1282,6 +1282,34 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * @When the public sends HTTP method :method to URL :url with password :password
+	 *
+	 * @param string $method
+	 * @param string $url
+	 * @param string $password
+	 *
+	 * @return void
+	 */
+	public function thePublicSendsHttpMethodToUrlWithPassword(string $method, string $url, string $password): void {
+		$password = $this->getActualPassword($password);
+		$token = $this->shareNgGetLastCreatedLinkShareToken();
+		$fullUrl = $this->getBaseUrl() . $url;
+		$headers = [
+			'Public-Token' => $token
+		];
+		$this->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				$this->getStepLineRef(),
+				$method,
+				"public",
+				$password,
+				$headers
+			)
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" sends HTTP method "([^"]*)" to URL "([^"]*)" with headers$/
 	 *
 	 * @param string $user
