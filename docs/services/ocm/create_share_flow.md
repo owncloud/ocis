@@ -27,11 +27,11 @@ sequenceDiagram
     Note over usera: A shares a resource with B
     usera->>+httpa: CreateShare
         httpa->>+gwa: GetInfoByDomain
-        Note left of gwa: GetInfoByDomain<br/>(ocmproviderauthorizer)
+        Note left of gwa: GetInfoByDomain (ocmproviderauthorizer)
         gwa-->>-httpa: return
 
         httpa->>+gwa: GetAcceptedUser
-        Note left of gwa: GetAcceptedUser<br/>(ocminvitemanager)
+        Note left of gwa: GetAcceptedUser (ocminvitemanager)
         gwa-->>-httpa: return
 
         httpa->>+gwa: CreateOCMShare
@@ -40,14 +40,14 @@ sequenceDiagram
                 gwa-->>-osp: return
 
                 Note left of osp: store share in repo
-                
+
                 osp->>+httpb: POST /shares
                     httpb->>+gwb: IsProviderAllowed
-                    Note right of gwb: IsProviderAllowed<br/>(ocmproviderauthorizer)
+                    Note right of gwb: IsProviderAllowed (ocmproviderauthorizer)
                     gwb-->>-httpb: return
 
                     httpb->>+gwb: GetUser
-                    Note right of gwb: GetUser<br/>(userprovider)
+                    Note right of gwb: GetUser (userprovider)
                     gwb-->>-httpb: return
 
                     httpb->>+gwb: CreateOCMCoreShare
@@ -59,7 +59,7 @@ sequenceDiagram
             osp-->>-gwa: return
         gwa-->>-httpa: return
         httpa->>+gwa: Stat
-            Note left of gwa: Stat<br/>(storageprovider)
+            Note left of gwa: Stat (storageprovider)
         gwa-->>-httpa: return
     httpa-->>-usera: return
 {{< /mermaid >}}
