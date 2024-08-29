@@ -4,7 +4,10 @@ Feature: collaboration (wopi)
   So that I can collaborate with other users
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given these users have been created with default attributes and without skeleton files:
+      | username |
+      | Alice    |
+      | Brian    |
 
 
   Scenario Outline: open file with .odt extension
@@ -121,8 +124,7 @@ Feature: collaboration (wopi)
 
 
   Scenario Outline: sharee open file with .odt extension
-    Given user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
     And we save it into "FILEID"
     And user "Alice" has sent the following resource share invitation:
       | resource        | simple.odt |
@@ -412,6 +414,38 @@ Feature: collaboration (wopi)
       | permissionsRole | view       |
       | password        | %public%   |
     When the public sends HTTP method "POST" to URL "<app-endpoint>" with password "%public%"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+             "pattern": "%base_url%/external\\?<url-query>contextRouteName=files-spaces-personal&fileId=%uuidv4_pattern%%24%uuidv4_pattern%%21%uuidv4_pattern%$"
+          }
+        }
+      }
+      """
+    Examples:
+      | app-endpoint                                              | url-query       |
+      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice& |
+      | /app/open-with-web?file_id=<<FILEID>>                     |                 |
+
+
+  Scenario Outline: sharee open file with .odt extension (open-with-web)
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And we save it into "FILEID"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | simple.odt |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Brian" sends HTTP method "POST" to URL "<app-endpoint>"
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
