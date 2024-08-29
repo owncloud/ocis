@@ -10,7 +10,7 @@ default:
           ldapAdminPassword: admin
           ldapUsersOU: TestUsers
           ldapGroupsOU: TestGroups
-          ldapInitialUserFilePath: /../../config/ldap-users.ldif
+          ldapInitialUserFilePath: /../config/ldap-users.ldif
       contexts:
         - FeatureContext: &common_feature_context_params
             baseUrl: http://localhost:8080
