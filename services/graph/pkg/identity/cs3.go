@@ -61,14 +61,14 @@ func (i *CS3) GetUser(ctx context.Context, userID string, _ *godata.GoDataReques
 	case err != nil:
 		logger.Error().Str("backend", "cs3").Err(err).Str("userid", userID).Msg("error sending get user by claim id grpc request: transport error")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
-	case res.Status.Code != cs3rpc.Code_CODE_OK:
-		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
-			return nil, errorcode.New(errorcode.ItemNotFound, res.Status.Message)
+	case res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
+		if res.GetStatus().GetCode() == cs3rpc.Code_CODE_NOT_FOUND {
+			return nil, errorcode.New(errorcode.ItemNotFound, res.GetStatus().GetMessage())
 		}
 		logger.Debug().Str("backend", "cs3").Err(err).Str("userid", userID).Msg("error sending get user by claim id grpc request")
-		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
+		return nil, errorcode.New(errorcode.GeneralException, res.GetStatus().GetMessage())
 	}
-	return CreateUserModelFromCS3(res.User), nil
+	return CreateUserModelFromCS3(res.GetUser()), nil
 }
 
 // GetUsers implements the Backend Interface.
@@ -103,9 +103,9 @@ func (i *CS3) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libr
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
-	users := make([]*libregraph.User, 0, len(res.Users))
+	users := make([]*libregraph.User, 0, len(res.GetUsers()))
 
-	for _, user := range res.Users {
+	for _, user := range res.GetUsers() {
 		users = append(users, CreateUserModelFromCS3(user))
 	}
 
@@ -150,9 +150,9 @@ func (i *CS3) GetGroups(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
-	groups := make([]*libregraph.Group, 0, len(res.Groups))
+	groups := make([]*libregraph.Group, 0, len(res.GetGroups()))
 
-	for _, group := range res.Groups {
+	for _, group := range res.GetGroups() {
 		groups = append(groups, CreateGroupModelFromCS3(group))
 	}
 
@@ -191,7 +191,7 @@ func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Value
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
-	return CreateGroupModelFromCS3(res.Group), nil
+	return CreateGroupModelFromCS3(res.GetGroup()), nil
 }
 
 // DeleteGroup implements the Backend Interface. It's currently not supported for the CS3 backend
