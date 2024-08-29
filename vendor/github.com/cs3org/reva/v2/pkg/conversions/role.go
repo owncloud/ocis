@@ -37,16 +37,22 @@ type Role struct {
 const (
 	// RoleViewer grants non-editor role on a resource.
 	RoleViewer = "viewer"
+	// RoleViewerListGrants grants non-editor role on a resource.
+	RoleViewerListGrants = "viewer-list-grants"
 	// RoleSpaceViewer grants non-editor role on a space.
 	RoleSpaceViewer = "spaceviewer"
 	// RoleEditor grants editor permission on a resource, including folders.
 	RoleEditor = "editor"
+	// RoleEditorListGrants grants editor permission on a resource, including folders.
+	RoleEditorListGrants = "editor-list-grants"
 	// RoleSpaceEditor grants editor permission on a space.
 	RoleSpaceEditor = "spaceeditor"
 	// RoleSpaceEditorWithoutVersions grants editor permission without list/restore versions on a space.
 	RoleSpaceEditorWithoutVersions = "spaceeditor-without-versions"
 	// RoleFileEditor grants editor permission on a single file.
 	RoleFileEditor = "file-editor"
+	// RoleFileEditorListGrants grants editor permission on a single file.
+	RoleFileEditorListGrants = "file-editor-list-grants"
 	// RoleCoowner grants co-owner permissions on a resource.
 	RoleCoowner = "coowner"
 	// RoleEditorLite grants permission to upload and download to a resource.
@@ -157,14 +163,20 @@ func RoleFromName(name string) *Role {
 		return NewDeniedRole()
 	case RoleViewer:
 		return NewViewerRole()
+	case RoleViewerListGrants:
+		return NewViewerListGrantsRole()
 	case RoleSpaceViewer:
 		return NewSpaceViewerRole()
 	case RoleEditor:
 		return NewEditorRole()
+	case RoleEditorListGrants:
+		return NewEditorListGrantsRole()
 	case RoleSpaceEditor:
 		return NewSpaceEditorRole()
 	case RoleFileEditor:
 		return NewFileEditorRole()
+	case RoleFileEditorListGrants:
+		return NewFileEditorListGrantsRole()
 	case RoleUploader:
 		return NewUploaderRole()
 	case RoleManager:
@@ -211,6 +223,13 @@ func NewViewerRole() *Role {
 	}
 }
 
+// NewViewerListGrantsRole creates a viewer role. `sharing` indicates if sharing permission should be added
+func NewViewerListGrantsRole() *Role {
+	role := NewViewerRole()
+	role.cS3ResourcePermissions.ListGrants = true
+	return role
+}
+
 // NewSpaceViewerRole creates a spaceviewer role
 func NewSpaceViewerRole() *Role {
 	return &Role{
@@ -248,6 +267,13 @@ func NewEditorRole() *Role {
 		},
 		ocsPermissions: p,
 	}
+}
+
+// NewEditorListGrantsRole creates an editor role. `sharing` indicates if sharing permission should be added
+func NewEditorListGrantsRole() *Role {
+	role := NewEditorRole()
+	role.cS3ResourcePermissions.ListGrants = true
+	return role
 }
 
 // NewSpaceEditorRole creates an editor role
@@ -313,6 +339,13 @@ func NewFileEditorRole() *Role {
 		},
 		ocsPermissions: p,
 	}
+}
+
+// NewFileEditorListGrantsRole creates a file-editor role
+func NewFileEditorListGrantsRole() *Role {
+	role := NewFileEditorRole()
+	role.cS3ResourcePermissions.ListGrants = true
+	return role
 }
 
 // NewCoownerRole creates a coowner role.
@@ -559,7 +592,9 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 	if r.ocsPermissions.Contain(PermissionRead) {
 		if r.ocsPermissions.Contain(PermissionWrite) && r.ocsPermissions.Contain(PermissionCreate) && r.ocsPermissions.Contain(PermissionDelete) && r.ocsPermissions.Contain(PermissionShare) {
 			r.Name = RoleEditor
-
+			if rp.ListGrants {
+				r.Name = RoleEditorListGrants
+			}
 			if rp.RemoveGrant {
 				r.Name = RoleManager
 			}
@@ -567,6 +602,9 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 		}
 		if r.ocsPermissions == PermissionRead|PermissionShare {
 			r.Name = RoleViewer
+			if rp.ListGrants {
+				r.Name = RoleViewerListGrants
+			}
 			return r
 		}
 	} else if rp.Stat && rp.GetPath && rp.ListContainer && !rp.InitiateFileUpload && !rp.Delete && !rp.AddGrant {
