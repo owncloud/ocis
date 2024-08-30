@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Viktor Scharf, 2024
+# Jesús Recio <jrecio@solidgear.es>, 2024
 # 
 #, fuzzy
 msgid ""
@@ -13,50 +13,50 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL\n"
 "POT-Creation-Date: 2024-08-30 00:05+0000\n"
 "PO-Revision-Date: 2024-08-20 10:13+0000\n"
-"Last-Translator: Viktor Scharf, 2024\n"
-"Language-Team: Russian (https://app.transifex.com/owncloud-org/teams/6149/ru/)\n"
+"Last-Translator: Jesús Recio <jrecio@solidgear.es>, 2024\n"
+"Language-Team: Spanish (https://app.transifex.com/owncloud-org/teams/6149/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+"Language: es\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: pkg/service/response.go:23
 msgid "{user} added {resource} to {space}"
-msgstr "{user} добавил {resource} в {space}"
+msgstr "{user} añadió {resource} a {space}"
 
 #: pkg/service/response.go:31
 msgid "{user} added {sharee} as member of {space}"
-msgstr "{user} добавил {sharee} как участника {space}"
+msgstr "{user} añadió {sharee} como miembro de {space}"
 
 #: pkg/service/response.go:24
 msgid "{user} deleted {resource} from {space}"
-msgstr "{user} удалил {resource} из {space}"
+msgstr "{user} eliminó {resource} de {space}"
 
 #: pkg/service/response.go:25
 msgid "{user} moved {resource} to {space}"
-msgstr "{user} переместил {resource} в {space}"
+msgstr "{user} movió {resource} a {space}"
 
 #: pkg/service/response.go:30
 msgid "{user} removed link to {resource}"
-msgstr "{user} удалил ссылку на {resource}"
+msgstr "{user} eliminó enlace a {resource}"
 
 #: pkg/service/response.go:28
 msgid "{user} removed {sharee} from {resource}"
-msgstr "{user} удалил {sharee} из {resource}"
+msgstr "{user} eliminó {sharee} de {resource}"
 
 #: pkg/service/response.go:32
 msgid "{user} removed {sharee} from {space}"
-msgstr "{user} удалил {sharee} из {space}"
+msgstr "{user} eliminó {sharee} de {space}"
 
 #: pkg/service/response.go:26
 msgid "{user} renamed {oldResource} to {resource}"
-msgstr "{user} переименовал {oldResource} в {resource}"
+msgstr "{user} renombró {oldResource} a {resource}"
 
 #: pkg/service/response.go:29
 msgid "{user} shared {resource} via link"
-msgstr "{user} поделился {resource} через ссылку"
+msgstr "{user} compartió {resource} por enlace"
 
 #: pkg/service/response.go:27
 msgid "{user} shared {resource} with {sharee}"
-msgstr "{user} поделился {resource} с {sharee}"
+msgstr "{user} compartió {resource} con {sharee}"

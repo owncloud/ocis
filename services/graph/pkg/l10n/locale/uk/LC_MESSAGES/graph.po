@@ -4,9 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Martin <github@diemattels.at>, 2024
-# Laura Arjona Reina <larjona@larjona.net>, 2024
-# Jesús Recio <jrecio@solidgear.es>, 2024
+# Roman Perekhod, 2024
 # 
 #, fuzzy
 msgid ""
@@ -15,13 +13,13 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL\n"
 "POT-Creation-Date: 2024-08-30 00:05+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
-"Last-Translator: Jesús Recio <jrecio@solidgear.es>, 2024\n"
-"Language-Team: Spanish (https://app.transifex.com/owncloud-org/teams/6149/es/)\n"
+"Last-Translator: Roman Perekhod, 2024\n"
+"Language-Team: Ukrainian (https://app.transifex.com/owncloud-org/teams/6149/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 #. UnifiedRole Editor, Role DisplayName (resolves directly)
 #. UnifiedRole SpaseEditor, Role DisplayName (resolves directly)
@@ -29,62 +27,68 @@ msgstr ""
 #: pkg/unifiedrole/roles.go:104 pkg/unifiedrole/roles.go:110
 #: pkg/unifiedrole/roles.go:116
 msgid "Can edit"
-msgstr "Puede editar"
+msgstr "Може редагувати"
 
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:128
 msgid "Can manage"
-msgstr "Puede administrar"
+msgstr "Може керувати"
 
 #. UnifiedRole EditorLite, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:122
 msgid "Can upload"
-msgstr "Puede realizar subidas"
+msgstr "Може відвантажувати"
 
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
 #. UnifiedRole SpaseViewer, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:92 pkg/unifiedrole/roles.go:98
 msgid "Can view"
-msgstr "Puede ver"
+msgstr "Може переглядати"
 
 #. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:134
 msgid "Can view (secure)"
-msgstr "Puede ver (de manera segura)"
+msgstr "Може переглядати (безпечно)"
 
 #. default description for new spaces
 #: pkg/service/v0/spacetemplates.go:32
 msgid "Here you can add a description for this Space."
-msgstr "Aquí puede añadir una descripción para este espacio."
+msgstr "Тут ви можете додати опис цього Простору."
 
 #. UnifiedRole Viewer, Role Description (resolves directly)
 #. UnifiedRole SpaceViewer, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:89 pkg/unifiedrole/roles.go:95
 msgid "View and download."
-msgstr "Ver y descargar."
+msgstr "Переглядати та завантажувати."
 
 #. UnifiedRole SecureViewer, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:131
 msgid "View only documents, images and PDFs. Watermarks will be applied."
-msgstr "Ver solo documentos, imágenes y PDFs. Se aplicarán marcas de agua."
+msgstr ""
+"Переглядати лише документи, зображення та PDF файли. Будуть застосовані "
+"водяні знаки."
 
 #. UnifiedRole FileEditor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:113
 msgid "View, download and edit."
-msgstr "Ver, descargar y editar."
+msgstr "Переглядати, завантажувати та редагувати."
 
 #. UnifiedRole EditorLite, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:119
 msgid "View, download and upload."
-msgstr "Ver, descargar y subir."
+msgstr "Переглядати, завантажувати та відвантажувати."
 
 #. UnifiedRole Editor, Role Description (resolves directly)
 #. UnifiedRole SpaseEditor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:101 pkg/unifiedrole/roles.go:107
 msgid "View, download, upload, edit, add and delete."
-msgstr "Ver, descargar, subir, editar, añadir y borrar."
+msgstr ""
+"Переглядати, завантажувати, відвантажувати, редагувати, додавати та "
+"видаляти."
 
 #. UnifiedRole Manager, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:125
 msgid "View, download, upload, edit, add, delete and manage members."
-msgstr "Ver, descargar, subir, editar, añadir, borrar y administrar miembros."
+msgstr ""
+"Переглядати, завантажувати, відвантажувати, редагувати, додавати, видаляти "
+"та керувати учасниками."
