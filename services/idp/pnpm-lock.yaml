@@ -199,7 +199,7 @@ importers:
         specifier: 29.7.0
         version: 29.7.0(@types/node@20.14.11)(babel-plugin-macros@3.1.0)
       license-checker-rseidelsohn:
-        specifier: ^4.3.0
+        specifier: 4.3.0
         version: 4.3.0
       mini-css-extract-plugin:
         specifier: 1.6.2

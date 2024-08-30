@@ -135,7 +135,7 @@
     "i18next-conv": "^14.1.0",
     "i18next-parser": "^8.13.0",
     "jest": "29.7.0",
-    "license-checker-rseidelsohn": "^4.3.0",
+    "license-checker-rseidelsohn": "4.3.0",
     "mini-css-extract-plugin": "1.6.2",
     "pnp-webpack-plugin": "1.7.0",
     "postcss-flexbugs-fixes": "5.0.2",
