@@ -7,7 +7,6 @@ package locks
 
 import (
 	"encoding/json"
-	"strings"
 )
 
 // LockParser is the interface that wraps the ParseLock method
@@ -54,7 +53,7 @@ func (*NoopLockParser) ParseLock(id string) string {
 // If the JSON string is not in the expected format, the original lockID will be returned.
 func (*LegacyLockParser) ParseLock(id string) string {
 	var decodedValues map[string]interface{}
-	err := json.NewDecoder(strings.NewReader(id)).Decode(&decodedValues)
+	err := json.Unmarshal([]byte(id), &decodedValues)
 	if err != nil || len(decodedValues) == 0 {
 		return id
 	}

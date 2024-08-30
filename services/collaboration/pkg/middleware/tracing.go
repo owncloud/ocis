@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -27,7 +28,6 @@ func CollaborationTracingMiddleware(next http.Handler) http.Handler {
 		wopiMethod := r.Header.Get("X-WOPI-Override")
 
 		wopiFile := wopiContext.FileReference
-		wopiUser := wopiContext.User.GetId()
 
 		attrs := []attribute.KeyValue{
 			attribute.String("ocis.wopi.sessionid", r.Header.Get("X-WOPI-SessionId")),
@@ -36,9 +36,14 @@ func CollaborationTracingMiddleware(next http.Handler) http.Handler {
 			attribute.String("ocis.wopi.resource.id.opaque", wopiFile.GetResourceId().GetOpaqueId()),
 			attribute.String("ocis.wopi.resource.id.space", wopiFile.GetResourceId().GetSpaceId()),
 			attribute.String("ocis.wopi.resource.path", wopiFile.GetPath()),
-			attribute.String("ocis.wopi.user.idp", wopiUser.GetIdp()),
-			attribute.String("ocis.wopi.user.opaque", wopiUser.GetOpaqueId()),
-			attribute.String("ocis.wopi.user.type", wopiUser.GetType().String()),
+		}
+
+		if wopiUser, ok := ctxpkg.ContextGetUser(r.Context()); ok {
+			attrs = append(attrs, []attribute.KeyValue{
+				attribute.String("ocis.wopi.user.idp", wopiUser.GetId().GetIdp()),
+				attribute.String("ocis.wopi.user.opaque", wopiUser.GetId().GetOpaqueId()),
+				attribute.String("ocis.wopi.user.type", wopiUser.GetId().GetType().String()),
+			}...)
 		}
 		span.SetAttributes(attrs...)
 

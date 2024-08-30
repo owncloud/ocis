@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"strings"
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -15,16 +14,18 @@ import (
 )
 
 const (
-	HeaderWopiLock          string = "X-WOPI-Lock"
-	HeaderWopiOldLock       string = "X-WOPI-OldLock"
-	HeaderWopiST            string = "X-WOPI-SuggestedTarget"
-	HeaderWopiRT            string = "X-WOPI-RelativeTarget"
-	HeaderWopiOverwriteRT   string = "X-WOPI-OverwriteRelativeTarget"
-	HeaderWopiSize          string = "X-WOPI-Size"
-	HeaderWopiValidRT       string = "X-WOPI-ValidRelativeTarget"
-	HeaderWopiRequestedName string = "X-WOPI-RequestedName"
-	HeaderContentLength     string = "Content-Length"
-	HeaderContentType       string = "Content-Type"
+	HeaderWopiLock              string = "X-WOPI-Lock"
+	HeaderWopiOldLock           string = "X-WOPI-OldLock"
+	HeaderWopiLockFailureReason string = "X-WOPI-LockFailureReason"
+	HeaderWopiST                string = "X-WOPI-SuggestedTarget"
+	HeaderWopiRT                string = "X-WOPI-RelativeTarget"
+	HeaderWopiOverwriteRT       string = "X-WOPI-OverwriteRelativeTarget"
+	HeaderWopiSize              string = "X-WOPI-Size"
+	HeaderWopiValidRT           string = "X-WOPI-ValidRelativeTarget"
+	HeaderWopiRequestedName     string = "X-WOPI-RequestedName"
+	HeaderContentLength         string = "Content-Length"
+	HeaderContentType           string = "Content-Type"
+	HeaderWopiVersion           string = "X-WOPI-ItemVersion"
 )
 
 // HttpAdapter will adapt the responses from the connector to HTTP.
@@ -50,10 +51,8 @@ func NewHttpAdapter(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *Ht
 		),
 	}
 
+	// TODO: check if we can get rid of custom log parsing completely
 	httpAdapter.locks = &locks.NoopLockParser{}
-	if strings.ToLower(cfg.App.Name) == "microsoftofficeonline" {
-		httpAdapter.locks = &locks.LegacyLockParser{}
-	}
 	return httpAdapter
 }
 
