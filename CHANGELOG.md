@@ -62,6 +62,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix listing ocm shares: [#9925](https://github.com/owncloud/ocis/pull/9925)
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
 * Enhancement - We now set the configured protocol transport for service metadata: [#9490](https://github.com/owncloud/ocis/pull/9490)
+* Enhancement - Microsoft Office365 and Office Online support: [#9686](https://github.com/owncloud/ocis/pull/9686)
 * Enhancement - Unified Roles Management: [#9727](https://github.com/owncloud/ocis/pull/9727)
 * Enhancement - Added a new role space editor without versions: [#9880](https://github.com/owncloud/ocis/pull/9880)
 * Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
@@ -140,6 +141,17 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9490
    https://github.com/cs3org/reva/pull/4744
+
+* Enhancement - Microsoft Office365 and Office Online support: [#9686](https://github.com/owncloud/ocis/pull/9686)
+
+   Add support for Microsoft Office365 Cloud and Microsoft Office Online on
+   premises. You can use the cloud feature either within a Microsoft
+   [CSP](https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview)
+   partnership or via the ownCloud office365 proxy subscription. Please contact
+   sales@owncloud.com to get more information about the ownCloud office365 proxy
+   subscription.
+
+   https://github.com/owncloud/ocis/pull/9686
 
 * Enhancement - Unified Roles Management: [#9727](https://github.com/owncloud/ocis/pull/9727)
 
