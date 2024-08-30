@@ -25,7 +25,6 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\HttpRequestHelper;
 
-require_once 'bootstrap.php';
 /**
  * steps needed to re-configure oCIS server
  */
@@ -52,19 +51,19 @@ class CollaborationContext implements Context {
 	}
 
 	/**
-	 * @When user :user request information of file :file on space :space for :app
+	 * @When user :user checks the information of file :file of space :space using office :app
 	 *
-	 * @param $user
-	 * @param $file
-	 * @param $space
-	 * @param $app
+	 * @param string $user
+	 * @param string $file
+	 * @param string $space
+	 * @param string $app
 	 *
 	 * @return void
 	 *
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userRequestInformationOfFileOnSpaceFor($user, $file, $space, $app) : void {
+	public function userChecksTheInformationOfFileOfSpaceUsingOffice(string $user, string $file, string $space, string $app): void {
 		$fileId = $this->spacesContext->getFileId($user, $space, $file);
 		$response = \json_decode(
 			HttpRequestHelper::post(
@@ -90,5 +89,4 @@ class CollaborationContext implements Context {
 			)
 		);
 	}
-
 }

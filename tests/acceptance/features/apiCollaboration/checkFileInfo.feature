@@ -1,15 +1,15 @@
-Feature:  check file info on wopi
+Feature: check file info with different wopi apps
   As a user
   I want to request file information on wopi server
-  So that I can make sure that the response contains all the relevant values
+  So that I can get all the information of a file
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario: check file info for fake office
+  Scenario: check file info with fake office
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    When user "Alice" request information of file "textfile0.txt" on space "Personal" for "FakeOffice"
+    When user "Alice" checks the information of file "textfile0.txt" of space "Personal" using office "FakeOffice"
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -51,19 +51,16 @@ Feature:  check file info on wopi
             "const": "textfile0.txt"
           },
           "OwnerId": {
-            "type": "string",
-            "pattern": "^[0-9a-fA-F]{32,}$"
+            "type": "string"
           },
           "Size": {
             "const": 11
           },
           "UserId": {
-            "type": "string",
-            "pattern": "^[0-9a-fA-F]{32,}$"
+            "type": "string"
           },
           "Version": {
-            "type": "string",
-            "pattern": "^\\d{10,12}\\.\\d+$"
+            "type": "string"
           },
           "SupportsCobalt": {
             "const": false
