@@ -1,14 +1,15 @@
 package unifiedrole
 
 var (
-	RoleViewer       = roleViewer
-	RoleSpaceViewer  = roleSpaceViewer
-	RoleEditor       = roleEditor
-	RoleSpaceEditor  = roleSpaceEditor
-	RoleFileEditor   = roleFileEditor
-	RoleEditorLite   = roleEditorLite
-	RoleManager      = roleManager
-	RoleSecureViewer = roleSecureViewer
+	RoleViewer                     = roleViewer
+	RoleSpaceViewer                = roleSpaceViewer
+	RoleEditor                     = roleEditor
+	RoleSpaceEditor                = roleSpaceEditor
+	RoleSpaceEditorWithoutVersions = roleSpaceEditorWithoutVersions
+	RoleFileEditor                 = roleFileEditor
+	RoleEditorLite                 = roleEditorLite
+	RoleManager                    = roleManager
+	RoleSecureViewer               = roleSecureViewer
 
 	BuildInRoles = buildInRoles
 

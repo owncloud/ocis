@@ -210,6 +210,8 @@ func cs3RoleToDisplayName(role *conversions.Role) string {
 		return _editorUnifiedRoleDisplayName
 	case conversions.RoleSpaceEditor:
 		return _spaceEditorUnifiedRoleDisplayName
+	case conversions.RoleSpaceEditorWithoutVersions:
+		return _spaceEditorWithoutVersionsUnifiedRoleDisplayName
 	case conversions.RoleFileEditor:
 		return _fileEditorUnifiedRoleDisplayName
 	case conversions.RoleEditorLite:
