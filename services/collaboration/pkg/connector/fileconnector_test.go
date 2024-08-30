@@ -255,8 +255,7 @@ var _ = Describe("FileConnector", func() {
 				response, err := fc.Lock(ctx, "abcdef123", "")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(response.Status).To(Equal(200))
-				Expect(response.Headers).To(HaveLen(2))
-				Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("abcdef123"))
+				Expect(response.Headers).To(HaveLen(1))
 				Expect(response.Headers[connector.HeaderWopiVersion]).To(Equal("v123456789"))
 			})
 
@@ -437,8 +436,7 @@ var _ = Describe("FileConnector", func() {
 				response, err := fc.Lock(ctx, "abcdef123", "112233")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(response.Status).To(Equal(200))
-				Expect(response.Headers).To(HaveLen(2))
-				Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("abcdef123"))
+				Expect(response.Headers).To(HaveLen(1))
 				Expect(response.Headers[connector.HeaderWopiVersion]).To(Equal("v123456789"))
 			})
 

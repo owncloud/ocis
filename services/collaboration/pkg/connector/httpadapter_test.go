@@ -357,9 +357,7 @@ var _ = Describe("HttpAdapter", func() {
 			w := httptest.NewRecorder()
 
 			fc.On("UnLock", mock.Anything, "abc123").Times(1).Return(
-				connector.NewResponseWithVersion(200,
-					&typesv1beta1.Timestamp{Seconds: uint64(1234), Nanos: uint32(567)},
-				), nil)
+				connector.NewResponseWithVersion(&typesv1beta1.Timestamp{Seconds: uint64(1234), Nanos: uint32(567)}), nil)
 
 			httpAdapter.UnLock(w, req)
 			resp := w.Result()

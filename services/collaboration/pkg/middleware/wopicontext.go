@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -109,7 +110,7 @@ func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handl
 		ctx = wopiLogger.WithContext(ctx)
 
 		hashedRef := helpers.HashResourceId(claims.WopiContext.FileReference.GetResourceId())
-		fileID := helpers.ParseWopiFileID(cfg, r.URL.Path)
+		fileID := parseWopiFileID(cfg, r.URL.Path)
 		if fileID != hashedRef {
 			wopiLogger.Error().Msg("file reference in the URL doesn't match the one inside the access token")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -166,4 +167,37 @@ func GenerateWopiToken(wopiContext WopiContext, cfg *config.Config) (string, int
 	accessToken, err := token.SignedString([]byte(cfg.Wopi.Secret))
 
 	return accessToken, claims.ExpiresAt.UnixMilli(), err
+}
+
+// parseWopiFileID extracts the file id from a wopi path
+//
+// If the file id is a jwt, it will be decoded and the file id will be extracted from the jwt claims.
+// If the file id is not a jwt, it will be returned as is.
+func parseWopiFileID(cfg *config.Config, path string) string {
+	s := strings.Split(path, "/")
+	if len(s) < 4 || (s[1] != "wopi" && s[2] != "files") {
+		return path
+	}
+	// check if the fileid is a jwt
+	if strings.Contains(s[3], ".") {
+		token, err := jwt.Parse(s[3], func(_ *jwt.Token) (interface{}, error) {
+			return []byte(cfg.Wopi.ProxySecret), nil
+		})
+		if err != nil {
+			return s[3]
+		}
+
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			return s[3]
+		}
+
+		f, ok := claims["f"].(string)
+		if !ok {
+			return s[3]
+		}
+		return f
+	}
+	// fileid is not a jwt
+	return s[3]
 }

@@ -17,7 +17,6 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/propagation"
@@ -181,7 +180,7 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 		return NewConnectorError(500, "GetFile: Downloading the file failed")
 	}
 
-	helpers.SetVersionHeader(w, sResp.GetInfo().GetMtime())
+	w.Header().Set(HeaderWopiVersion, getVersion(sResp.GetInfo().GetMtime()))
 
 	// Copy the download into the writer
 	_, err = io.Copy(w, httpResp.Body)
@@ -404,5 +403,5 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 	}
 
 	logger.Debug().Msg("PutFile: success")
-	return NewResponseWithVersion(200, mtime), nil
+	return NewResponseWithVersion(mtime), nil
 }

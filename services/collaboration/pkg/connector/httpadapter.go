@@ -51,6 +51,7 @@ func NewHttpAdapter(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *Ht
 		),
 	}
 
+	// TODO: check if we can get rid of custom log parsing completely
 	httpAdapter.locks = &locks.NoopLockParser{}
 	return httpAdapter
 }

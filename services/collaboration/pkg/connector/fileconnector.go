@@ -259,7 +259,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (*Co
 	switch setOrRefreshStatus.GetCode() {
 	case rpcv1beta1.Code_CODE_OK:
 		logger.Debug().Msg("SetLock successful")
-		return NewResponseWithVersion(200, statResp.GetInfo().GetMtime()), nil
+		return NewResponseWithVersion(statResp.GetInfo().GetMtime()), nil
 
 	case rpcv1beta1.Code_CODE_FAILED_PRECONDITION, rpcv1beta1.Code_CODE_ABORTED:
 		// Code_CODE_FAILED_PRECONDITION -> Lock operation mismatched lock
@@ -300,7 +300,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (*Co
 			logger.Warn().
 				Str("LockID", resp.GetLock().GetLockId()).
 				Msg("SetLock lock refreshed instead")
-			return NewResponseWithVersionAndLock(200, statResp.GetInfo().GetMtime(), resp.GetLock().GetLockId()), nil
+			return NewResponseWithVersion(statResp.GetInfo().GetMtime()), nil
 		}
 
 		logger.Error().Msg("SetLock failed and could not refresh")
@@ -388,7 +388,7 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (*Connec
 		logger.Debug().Msg("RefreshLock successful")
 		// The current lock should not be returned in the headers on success
 		// https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/refreshlock#response-headers
-		return NewResponseWithVersion(200, statResp.GetInfo().GetMtime()), nil
+		return NewResponseWithVersion(statResp.GetInfo().GetMtime()), nil
 
 	case rpcv1beta1.Code_CODE_NOT_FOUND:
 		logger.Error().
@@ -428,7 +428,7 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (*Connec
 				Str("StatusCode", resp.GetStatus().GetCode().String()).
 				Str("StatusMsg", resp.GetStatus().GetMessage()).
 				Msg("RefreshLock failed, no lock on file")
-			return NewResponseConflictWithVersion(statResp.GetInfo().GetMtime(), "No lock on file"), nil
+			return NewResponseLockConflict("", "No lock on file"), nil
 		} else {
 			// lock is different than the one requested, otherwise we wouldn't reached this point
 			logger.Error().
@@ -510,7 +510,7 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (*ConnectorRe
 	switch resp.GetStatus().GetCode() {
 	case rpcv1beta1.Code_CODE_OK:
 		logger.Debug().Msg("Unlock successful")
-		return NewResponseWithVersion(200, statResp.GetInfo().GetMtime()), nil
+		return NewResponseWithVersion(statResp.GetInfo().GetMtime()), nil
 	case rpcv1beta1.Code_CODE_ABORTED:
 		// File isn't locked. Need to return 409 with empty lock
 		logger.Error().Err(err).Msg("Unlock failed, file isn't locked")
@@ -1114,7 +1114,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	infoMap := map[string]interface{}{
 		fileinfo.KeyOwnerID:           hexEncodedOwnerId,
 		fileinfo.KeySize:              int64(statRes.GetInfo().GetSize()),
-		fileinfo.KeyVersion:           helpers.GetVersion(statRes.GetInfo().GetMtime()),
+		fileinfo.KeyVersion:           getVersion(statRes.GetInfo().GetMtime()),
 		fileinfo.KeyBaseFileName:      path.Base(statRes.GetInfo().GetPath()),
 		fileinfo.KeyBreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request

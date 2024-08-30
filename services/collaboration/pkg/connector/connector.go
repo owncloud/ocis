@@ -1,8 +1,9 @@
 package connector
 
 import (
+	"strconv"
+
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 )
 
 // ConnectorResponse represent a response from the FileConnectorService.
@@ -57,24 +58,11 @@ func NewResponseLockConflict(lockID string, lockFailureReason string) *Connector
 
 // NewResponseWithVersion creates a new ConnectorResponse with the specified status
 // and the "X-WOPI-ItemVersion" header having the value in the mtime parameter.
-func NewResponseWithVersion(status int, mtime *types.Timestamp) *ConnectorResponse {
+func NewResponseWithVersion(mtime *types.Timestamp) *ConnectorResponse {
 	return &ConnectorResponse{
-		Status: status,
+		Status: 200,
 		Headers: map[string]string{
-			HeaderWopiVersion: helpers.GetVersion(mtime),
-		},
-	}
-}
-
-// NewResponseConflictWithVersion creates a new ConnectorResponse with the status 409
-// and the "X-WOPI-ItemVersion" header having the value in the mtime parameter.
-// The lockFailureReason parameter will be included in the "X-WOPI-LockFailureReason".
-func NewResponseConflictWithVersion(mtime *types.Timestamp, lockFailureReason string) *ConnectorResponse {
-	return &ConnectorResponse{
-		Status: 409,
-		Headers: map[string]string{
-			HeaderWopiVersion:           helpers.GetVersion(mtime),
-			HeaderWopiLockFailureReason: lockFailureReason,
+			HeaderWopiVersion: getVersion(mtime),
 		},
 	}
 }
@@ -86,7 +74,7 @@ func NewResponseWithVersionAndLock(status int, mtime *types.Timestamp, lockID st
 	r := &ConnectorResponse{
 		Status: status,
 		Headers: map[string]string{
-			HeaderWopiVersion: helpers.GetVersion(mtime),
+			HeaderWopiVersion: getVersion(mtime),
 			HeaderWopiLock:    lockID,
 		},
 	}
@@ -195,4 +183,10 @@ func (c *Connector) GetFileConnector() FileConnectorService {
 // GetContentConnector gets the content connector service associated to this connector
 func (c *Connector) GetContentConnector() ContentConnectorService {
 	return c.contentConnector
+}
+
+// getVersion returns a string representation of the timestamp
+func getVersion(timestamp *types.Timestamp) string {
+	return "v" + strconv.FormatUint(timestamp.GetSeconds(), 10) +
+		strconv.FormatUint(uint64(timestamp.GetNanos()), 10)
 }
