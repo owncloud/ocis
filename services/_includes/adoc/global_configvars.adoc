@@ -188,7 +188,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
 a| `OCIS_CACHE_STORE`
 
 a| [subs=-attributes]
@@ -325,7 +325,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Cache-Control] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -356,7 +356,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET] ++
+++[GET POST PUT PATCH DELETE OPTIONS] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
@@ -684,11 +684,11 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/gateway.adoc[gateway] +
@@ -701,7 +701,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the gateway GRPC address.
+The bind address of the GRPC service.
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
 a| [subs=-attributes]
@@ -934,7 +934,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Allow insecure connections to the WEBFINGER service.
 a| `OCIS_JWT_SECRET`
 
 a| [subs=-attributes]
@@ -1096,7 +1096,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=libregraph,ou=sysusers,o=libregraph-idm ++
+++uid=idp,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -1139,7 +1139,7 @@ a| [subs=-attributes]
 ++/var/lib/ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
 a| `OCIS_LDAP_DISABLED_USERS_GROUP_DN`
 
 a| [subs=-attributes]
@@ -1420,7 +1420,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+Url of the LDAP service to use as IDP.
 a| `OCIS_LDAP_USER_BASE_DN`
 
 a| [subs=-attributes]
@@ -1499,7 +1499,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
+LDAP User ObjectClass like 'inetOrgPerson'.
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
 a| [subs=-attributes]
@@ -1534,10 +1534,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++owncloudUUID ++
+++ownCloudUUID ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
+LDAP User UUID attribute like 'uid'.
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=-attributes]
@@ -1576,7 +1576,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
+LDAP User email attribute like 'mail'.
 a| `OCIS_LDAP_USER_SCHEMA_USERNAME`
 
 a| [subs=-attributes]
@@ -1593,10 +1593,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid ++
+++displayName ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for username of users.
+LDAP User name attribute like 'displayName'.
 a| `OCIS_LDAP_USER_SCHEMA_USER_TYPE`
 
 a| [subs=-attributes]
@@ -1907,7 +1907,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider href for the openid-discovery relation.
+The OIDC issuer URL to use.
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
 a| [subs=-attributes]
@@ -2042,7 +2042,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++memory ++
+++nats-js-kv ++
 
 a| [subs=-attributes]
 The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
@@ -2099,7 +2099,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[] ++
+++[127.0.0.1:9233] ++
 
 a| [subs=-attributes]
 A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
@@ -2121,7 +2121,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
 a| `OCIS_PERSISTENT_STORE_TTL`
 
 a| [subs=-attributes]
@@ -2137,10 +2137,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++336h0m0s ++
+++0s ++
 
 a| [subs=-attributes]
-Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
+Time to live for events in the store. See the Environment Variable Types description for more details.
 a| `OCIS_REVA_GATEWAY`
 
 a| [subs=-attributes]
@@ -2205,13 +2205,13 @@ a| [subs=attributes+]
 * xref:{s-path}/userlog.adoc[userlog] +
 
 a| [subs=-attributes]
-++string ++
+++[]string ++
 
 a| [subs=-attributes]
-++ ++
+++[service-user-id] ++
 
 a| [subs=-attributes]
-The ID of the service account the service should use. See the 'auth-service' service description for more details.
+The list of all service account IDs. These will be assigned the hidden 'service-account' role. Note: When using 'OCIS_SERVICE_ACCOUNT_ID' this will contain only one value while 'SETTINGS_SERVICE_ACCOUNT_IDS' can have multiple. See the 'auth-service' service description for more details about service accounts.
 a| `OCIS_SERVICE_ACCOUNT_SECRET`
 
 a| [subs=-attributes]
@@ -2305,7 +2305,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 a| `OCIS_SYSTEM_USER_API_KEY`
 
 a| [subs=-attributes]
@@ -2612,7 +2612,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=-attributes]
@@ -2665,7 +2665,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider href for the openid-discovery relation.
+The OIDC issuer URL to use.
 a| `OCIS_WOPI_DISABLE_CHAT`
 
 a| [subs=-attributes]
