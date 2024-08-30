@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-30-12-11-46]
+[#deprecation-note-2024-08-30-17-41-54]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -124,6 +124,17 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Duration for the proof keys to be cached in memory, using time.ParseDuration format. If the duration can't be parsed, we'll use the default 12h as duration
 
+a|`COLLABORATION_APP_LICENSE_CHECK_ENABLE` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable license check for edit. Needs to be enabled when using Microsoft365 with the business flow.
+
 a|`OCIS_JWT_SECRET` +
 `COLLABORATION_JWT_SECRET` +
 
@@ -235,11 +246,33 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Disable chat in the frontend.
+Disable chat in the frontend. This feature is available in OnlyOffice and Microsoft.
+
+a|`COLLABORATION_WOPI_PROXY_URL` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you need an office365 proxy subscription. If you become part of the Microsoft CSP program (\https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview), you can use the WebOffice without a proxy.
+
+a|`COLLABORATION_WOPI_PROXY_SECRET` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The secret to authenticate against the ownCloud Office365 WOPI proxy. Optional. This secret can be obtained from ownCloud via the office365 proxy subscription.
 
 a|`OCIS_REVA_GATEWAY` +
 `COLLABORATION_CS3API_GATEWAY_NAME` +
-xref:deprecation-note-2024-08-30-12-11-46[Deprecation Note]
+xref:deprecation-note-2024-08-30-17-41-54[Deprecation Note]
 a| [subs=-attributes]
 ++6.0.0 ++
 a| [subs=-attributes]

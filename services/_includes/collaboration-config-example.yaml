@@ -11,6 +11,7 @@ app:
   proofkeys:
     disable: false
     duration: 12h
+  licensecheckenable: false
 token_manager:
   jwt_secret: ""
 grpc:
@@ -26,6 +27,8 @@ wopi:
   wopisrc: https://localhost:9300
   secret: ""
   disable_chat: false
+  proxy_url: ""
+  proxy_secret: ""
 cs3api:
   gateway:
     name: com.owncloud.api.gateway

@@ -1,6 +1,6 @@
 ---
 title: Collaboration
-date: 2024-08-30T12:11:50.592281839Z
+date: 2024-08-30T17:42:01.170428941Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/collaboration
@@ -16,6 +16,8 @@ geekdocCollapseSection: true
 The collaboration service connects ocis with document servers such as Collabora and ONLYOFFICE using the WOPI protocol.
 
 Since this service requires an external document server, it won't start by default when using `ocis server`. You must start it manually with the `ocis collaboration server` command.
+
+This service needs to be part of the ocis service mesh. It is not intended to be used as a standalone service. You must share the common config variables like OCIS_URL, OCIS_JWT_SECRET and OCIS_REVA_GATEWAY betweed this service and the other ocis services. In addition to that, MICRO_REGISTRY_ADDRESS should point to the main ocis service registry.
 
 
 ## Table of Contents
@@ -37,6 +39,9 @@ If any of the named services above have not been started or are not reachable, t
 ## WOPI Configuration
 
 There are a few variables that you need to set:
+
+* `COLLABORATION_APP_NAME`:\
+  The name of the connected WebOffice app, either `Collabora`, `OnlyOffice`, `Microsoft365` or `MicrosoftOfficeOnline`.
 
 * `COLLABORATION_APP_ADDR`:\
   The URL of the collaborative editing app (onlyoffice, collabora, etc).\
