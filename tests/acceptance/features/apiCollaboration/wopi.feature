@@ -222,3 +222,32 @@ Feature: collaboration (wopi)
       | app-endpoint                                     |
       | /app/open?file_id=<<FILEID>>&app_name=FakeOffice |
       | /app/open?file_id=<<FILEID>>                     |
+
+  @issue-9928
+  Scenario Outline: open unsupported file format
+    Given user "Alice" has uploaded file "filesForUpload/simple.pdf" to "simple.pdf"
+    And we save it into "FILEID"
+    When user "Alice" sends HTTP method "POST" to URL "<app-endpoint>"
+    Then the HTTP status code should be "500"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "SERVER_ERROR"
+          },
+          "message": {
+            "const": "Error contacting the requested application, please use a different one or try again later"
+          }
+        }
+      }
+      """
+    Examples:
+      | app-endpoint                                     |
+      | /app/open?file_id=<<FILEID>>&app_name=FakeOffice |
+      | /app/open?file_id=<<FILEID>>                     |
