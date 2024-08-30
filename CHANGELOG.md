@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
 * Enhancement - We now set the configured protocol transport for service metadata: [#9490](https://github.com/owncloud/ocis/pull/9490)
 * Enhancement - Unified Roles Management: [#9727](https://github.com/owncloud/ocis/pull/9727)
+* Enhancement - Added a new role space editor without versions: [#9880](https://github.com/owncloud/ocis/pull/9880)
 * Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
 * Enhancement - Allow setting default locale of activitylog: [#9892](https://github.com/owncloud/ocis/pull/9892)
 * Enhancement - Graph translation path: [#9902](https://github.com/owncloud/ocis/pull/9902)
@@ -179,6 +180,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9698
    https://github.com/owncloud/ocis/pull/9727
+
+* Enhancement - Added a new role space editor without versions: [#9880](https://github.com/owncloud/ocis/pull/9880)
+
+   We add a new role space editor without list and restore version permissions.
+
+   https://github.com/owncloud/ocis/issues/9699
+   https://github.com/owncloud/ocis/pull/9880
 
 * Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
 
