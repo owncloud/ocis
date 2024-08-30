@@ -11,7 +11,7 @@ type App struct {
 	Insecure bool   `yaml:"insecure" env:"COLLABORATION_APP_INSECURE" desc:"Skip TLS certificate verification when connecting to the WOPI app" introductionVersion:"6.0.0"`
 
 	ProofKeys          ProofKeys `yaml:"proofkeys"`
-	LicenseCheckEnable bool      `yaml:"licensecheckenable" env:"COLLABORATION_APP_LICENSE_CHECK_ENABLE" desc:"Enable license check for edit" introductionVersion:"%%NEXT%%"`
+	LicenseCheckEnable bool      `yaml:"licensecheckenable" env:"COLLABORATION_APP_LICENSE_CHECK_ENABLE" desc:"Enable license check for edit. Needs to be enabled when using Microsoft365 with the business flow." introductionVersion:"%%NEXT%%"`
 }
 
 type ProofKeys struct {

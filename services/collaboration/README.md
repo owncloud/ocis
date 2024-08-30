@@ -4,6 +4,8 @@ The collaboration service connects ocis with document servers such as Collabora 
 
 Since this service requires an external document server, it won't start by default when using `ocis server`. You must start it manually with the `ocis collaboration server` command.
 
+This service needs to be part of the ocis service mesh. It is not intended to be used as a standalone service. You must share the common config variables like OCIS_URL, OCIS_JWT_SECRET and OCIS_REVA_GATEWAY betweed this service and the other ocis services. In addition to that, MICRO_REGISTRY_ADDRESS should point to the main ocis service registry.
+
 ## Requirements
 
 The collaboration service requires the target document server (ONLYOFFICE, Collabora, etc.) to be up and running. Additionally, some Infinite Scale services are also required to be running in order to register the GRPC service for the `open in app` action in the webUI. The following internal and external services need to be available:
@@ -17,6 +19,9 @@ If any of the named services above have not been started or are not reachable, t
 ## WOPI Configuration
 
 There are a few variables that you need to set:
+
+* `COLLABORATION_APP_NAME`:\
+  The name of the connected WebOffice app, either `Collabora`, `OnlyOffice`, `Microsoft365` or `MicrosoftOfficeOnline`.
 
 * `COLLABORATION_APP_ADDR`:\
   The URL of the collaborative editing app (onlyoffice, collabora, etc).\

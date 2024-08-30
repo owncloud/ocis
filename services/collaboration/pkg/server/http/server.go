@@ -121,7 +121,6 @@ func prepareRoutes(r *chi.Mux, options Options) {
 					// authentication and wopi context
 					return colabmiddleware.WopiContextAuthMiddleware(options.Config, h)
 				},
-
 				colabmiddleware.CollaborationTracingMiddleware,
 			)
 
