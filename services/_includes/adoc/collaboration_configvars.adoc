@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-08-30-18-17-15]
+[#deprecation-note-2024-08-31-00-05-52]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -272,7 +272,7 @@ The secret to authenticate against the ownCloud Office365 WOPI proxy. Optional. 
 
 a|`OCIS_REVA_GATEWAY` +
 `COLLABORATION_CS3API_GATEWAY_NAME` +
-xref:deprecation-note-2024-08-30-18-17-15[Deprecation Note]
+xref:deprecation-note-2024-08-31-00-05-52[Deprecation Note]
 a| [subs=-attributes]
 ++6.0.0 ++
 a| [subs=-attributes]
