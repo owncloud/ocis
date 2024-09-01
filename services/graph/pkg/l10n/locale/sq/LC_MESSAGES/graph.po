@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-07-23 00:01+0000\n"
+"POT-Creation-Date: 2024-09-01 00:04+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2024\n"
 "Language-Team: Albanian (https://app.transifex.com/owncloud-org/teams/6149/sq/)\n"
@@ -21,7 +21,80 @@ msgstr ""
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#. UnifiedRole Editor, Role DisplayName (resolves directly)
+#. UnifiedRole SpaseEditor, Role DisplayName (resolves directly)
+#. UnifiedRole FileEditor, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:106 pkg/unifiedrole/roles.go:112
+#: pkg/unifiedrole/roles.go:124
+msgid "Can edit"
+msgstr "Mund të përpunojë"
+
+#. UnifiedRole SpaseEditorWithoutVersions, Role DisplayName (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:118
+msgid "Can edit without versions"
+msgstr "Mund të përpunojë pa versione"
+
+#. UnifiedRole Manager, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:136
+msgid "Can manage"
+msgstr "Mund të administrojë"
+
+#. UnifiedRole EditorLite, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:130
+msgid "Can upload"
+msgstr "Mund të ngarkojë"
+
+#. UnifiedRole Viewer, Role DisplayName (resolves directly)
+#. UnifiedRole SpaseViewer, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:94 pkg/unifiedrole/roles.go:100
+msgid "Can view"
+msgstr "Mund të shohë"
+
+#. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:142
+msgid "Can view (secure)"
+msgstr "Mund të shohë (e siguruar)"
+
 #. default description for new spaces
-#: pkg/service/v0/spacetemplates.go:37
+#: pkg/service/v0/spacetemplates.go:32
 msgid "Here you can add a description for this Space."
 msgstr "Këtu mund të shtoni një përshkrim për këtë Hapësirë."
+
+#. UnifiedRole Viewer, Role Description (resolves directly)
+#. UnifiedRole SpaceViewer, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:91 pkg/unifiedrole/roles.go:97
+msgid "View and download."
+msgstr "Të shohë dhe shkarkojë."
+
+#. UnifiedRole SecureViewer, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:139
+msgid "View only documents, images and PDFs. Watermarks will be applied."
+msgstr ""
+"Të shohë vetëm dokumente, figura dhe PDF-ra. Do të aplikohen “watermarks”."
+
+#. UnifiedRole FileEditor, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:121
+msgid "View, download and edit."
+msgstr "Të shohë, shkarkojë dhe përpunojë. "
+
+#. UnifiedRole EditorLite, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:127
+msgid "View, download and upload."
+msgstr "Të shohë, shkarkojë dhe ngarkojë."
+
+#. UnifiedRole Editor, Role Description (resolves directly)
+#. UnifiedRole SpaseEditor, Role Description (resolves directly)
+#. UnifiedRole SpaseEditorWithoutVersions, Role Description (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:103 pkg/unifiedrole/roles.go:109
+#: pkg/unifiedrole/roles.go:115
+msgid "View, download, upload, edit, add and delete."
+msgstr "Të shohë, shkarkojë, ngarkojë, përpunojë, shtojë dhe fshijë."
+
+#. UnifiedRole Manager, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:133
+msgid "View, download, upload, edit, add, delete and manage members."
+msgstr ""
+"Të shohë, shkarkojë, ngarkojë, përpunojë, shtojë, fshijë dhe administrojë "
+"anëtarë."
