@@ -1,10 +1,16 @@
 # Collaboration
 
-The collaboration service connects ocis with document servers such as Collabora and ONLYOFFICE using the WOPI protocol.
+The collaboration service connects ocis with document servers such as Collabora, ONLYOFFICE or Microsoft using the WOPI protocol.
 
 Since this service requires an external document server, it won't start by default when using `ocis server`. You must start it manually with the `ocis collaboration server` command.
 
-This service needs to be part of the ocis service mesh. It is not intended to be used as a standalone service. You must share the common config variables like OCIS_URL, OCIS_JWT_SECRET and OCIS_REVA_GATEWAY betweed this service and the other ocis services. In addition to that, MICRO_REGISTRY_ADDRESS should point to the main ocis service registry.
+Because the collaboration service needs to be started manually, the following prerequisite applies: On collaboration service startup, particular environment variables are required to be popupated. If environment variables have a default like the `MICRO_REGISTRY_ADDRESS`, the default will be used, if not set otherwise. Use for all others the instance values as defined. If these environment variables are not provided or misconfigured, the collaboration service will not start up.
+
+Required environment variables:
+* `OCIS_URL`
+* `OCIS_JWT_SECRET`
+* `OCIS_REVA_GATEWAY`
+* `MICRO_REGISTRY_ADDRESS`
 
 ## Requirements
 
@@ -21,7 +27,8 @@ If any of the named services above have not been started or are not reachable, t
 There are a few variables that you need to set:
 
 * `COLLABORATION_APP_NAME`:\
-  The name of the connected WebOffice app, either `Collabora`, `OnlyOffice`, `Microsoft365` or `MicrosoftOfficeOnline`.
+  The name of the connected WebOffice app, which can be one of the following:\
+  `Collabora`, `OnlyOffice`, `Microsoft365` or `MicrosoftOfficeOnline`.
 
 * `COLLABORATION_APP_ADDR`:\
   The URL of the collaborative editing app (onlyoffice, collabora, etc).\
@@ -31,7 +38,7 @@ There are a few variables that you need to set:
   In case you are using a self signed certificate for the WOPI app you can tell the collaboration service to allow an insecure connection.
 
 * `COLLABORATION_APP_WOPISRC`:\
-  The external address of the collaboration service. The target app (onlyoffice, collabora, etc) will use this address to read and write files from Infinite Scale. \
+  The external address of the collaboration service. The target app (onlyoffice, collabora, etc) will use this address to read and write files from Infinite Scale.\
   For example: `https://wopi.example.com`.
 
 The application can be customized further by changing the `COLLABORATION_APP_*` options to better describe the application.
