@@ -103,7 +103,7 @@ type OCMInviteManagerDrivers struct {
 }
 
 type OCMInviteManagerJSONDriver struct {
-	File string `yaml:"file" env:"OCM_OCM_INVITE_MANAGER_JSON_FILE" desc:"Path to the JSON file where OCM invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage." introductionVersion:"5.0"`
+	File string `yaml:"file" env:"OCM_OCM_INVITE_MANAGER_JSON_FILE" desc:"Path to the JSON file where OCM invite data will be stored. This file is maintained by the instance and must not be changed manually. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage." introductionVersion:"5.0"`
 }
 
 type OCMProviderAuthorizerDrivers struct {
