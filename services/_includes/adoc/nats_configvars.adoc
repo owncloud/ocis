@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-09-02-07-37-56]
+[#deprecation-note-2024-09-02-09-16-18]
 [caption=]
 .Deprecation notes for the nats service
 [width="100%",cols="~,~,~,~",options="header"]
