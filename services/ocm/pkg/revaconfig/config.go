@@ -47,6 +47,14 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"gatewaysvc":         cfg.Reva.Address,
 					"mesh_directory_url": cfg.ScienceMesh.MeshDirectoryURL,
 					"provider_domain":    cfg.Commons.OcisURL,
+					"events": map[string]interface{}{
+						"natsaddress":          cfg.Events.Endpoint,
+						"natsclusterid":        cfg.Events.Cluster,
+						"tlsinsecure":          cfg.Events.TLSInsecure,
+						"tlsrootcacertificate": cfg.Events.TLSRootCACertificate,
+						"authusername":         cfg.Events.AuthUsername,
+						"authpassword":         cfg.Events.AuthPassword,
+					},
 				},
 				"ocmd": map[string]interface{}{
 					"prefix":                        cfg.OCMD.Prefix,

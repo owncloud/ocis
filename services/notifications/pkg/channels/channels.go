@@ -7,10 +7,11 @@ import (
 	stdmail "net/mail"
 	"strings"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	"github.com/pkg/errors"
 	mail "github.com/xhit/go-simple-mail/v2"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 )
 
 // Channel defines the methods of a communication channel.
@@ -108,7 +109,7 @@ func (m Mail) getMailClient() (*mail.SMTPClient, error) {
 }
 
 // SendMessage sends a message to all given users.
-func (m Mail) SendMessage(ctx context.Context, message *Message) error {
+func (m Mail) SendMessage(_ context.Context, message *Message) error {
 	if m.conf.Notifications.SMTP.Host == "" {
 		m.logger.Info().Str("mail", "SendMessage").Msg("failed to send a message. SMTP host is  not set")
 		return nil

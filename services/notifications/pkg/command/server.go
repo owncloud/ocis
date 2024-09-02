@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
@@ -21,7 +23,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/service"
-	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -82,6 +83,7 @@ func Server(cfg *config.Config) *cli.Command {
 				events.SpaceShared{},
 				events.SpaceUnshared{},
 				events.SpaceMembershipExpired{},
+				events.ScienceMeshInviteTokenGenerated{},
 			}
 			client, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Notifications.Events))
 			if err != nil {
