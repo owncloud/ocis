@@ -1,6 +1,6 @@
 ---
 title: OCM
-date: 2024-09-02T11:21:09.367879732Z
+date: 2024-09-02T12:07:04.014141019Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/ocm
@@ -37,11 +37,11 @@ Internal GRPC APIs:
 
 ## Enable OCM
 
-To enable OpenCloudMesh you have to set three environment variables. The path  `/etc/ocis` in the example below depends on the installation type and derives, if not otherwise defined from the `OCIS_CONFIG_DIR` envvar.
+To enable OpenCloudMesh, you have to set the following environment variables. The path  `/etc/ocis/` in the example below depends on the installation type and derives, if not otherwise defined, from the `OCIS_CONFIG_DIR` envvar.
+
 ```console
 export OCIS_ENABLE_OCM=true
 export OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE="/etc/ocis/ocmproviders.json"
-export OCIS_ADD_RUN_SERVICES="ocm"
 ```
 
 {{< hint info >}}
@@ -157,7 +157,8 @@ OCM Shares are currently created using the ocs API, just like regular shares. Th
 
 See [Create share flow](create_share_flow) for the according sequence diagram.
 
-The data backends of the `ocmshareprovider` and `ocmcore` services are configurable. The only supported backend currently is `json` which stores the data in a json file on disk.## Example Yaml Config
+The data backends of the `ocmshareprovider` and `ocmcore` services are configurable. The only supported backend currently is `json` which stores the data in a json file on disk.
+## Example Yaml Config
 {{< include file="services/_includes/ocm-config-example.yaml"  language="yaml" >}}
 
 {{< include file="services/_includes/ocm_configvars.md" >}}
