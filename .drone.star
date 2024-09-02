@@ -1234,7 +1234,7 @@ def dockerReleases(ctx):
     for arch in config["dockerReleases"]["architectures"]:
         pipelines.append(dockerRelease(ctx, arch))
 
-    manifest = releaseDockerManifest()
+    manifest = releaseDockerManifest(ctx)
     manifest["depends_on"] = getPipelineNames(pipelines)
     pipelines.append(manifest)
 
@@ -1247,7 +1247,7 @@ def dockerReleases(ctx):
 def dockerRelease(ctx, arch):
     build_args = [
         "REVISION=%s" % (ctx.build.commit),
-        "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
+        "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "stable"),
     ]
     depends_on = getPipelineNames(testOcisAndUploadResults(ctx) + testPipelines(ctx))
 
@@ -1590,18 +1590,28 @@ def licenseCheck(ctx):
         "volumes": [pipelineVolumeGo],
     }]
 
-def releaseDockerManifest():
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "manifest",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
+def releaseDockerManifest(ctx):
+    steps = [{
+        "name": "execute",
+        "image": PLUGINS_MANIFEST,
+        "settings": {
+            "username": {
+                "from_secret": "docker_username",
+            },
+            "password": {
+                "from_secret": "docker_password",
+            },
+            "spec": "ocis/docker/manifest.tmpl",
+            "auto_tag": True,
+            "ignore_missing": True,
         },
-        "steps": [
+    }]
+
+    # only create latest tag for stable releases
+    if len(ctx.build.ref.split("-")) == 1:
+        steps.append(
             {
-                "name": "execute",
+                "name": "execute-latest",
                 "image": PLUGINS_MANIFEST,
                 "settings": {
                     "username": {
@@ -1610,12 +1620,27 @@ def releaseDockerManifest():
                     "password": {
                         "from_secret": "docker_password",
                     },
-                    "spec": "ocis/docker/manifest.tmpl",
+                    "spec": "ocis/docker/manifest-latest.tmpl",
                     "auto_tag": True,
                     "ignore_missing": True,
                 },
+                "when": {
+                    "ref": [
+                        "refs/tags/v*",
+                    ],
+                },
             },
-        ],
+        )
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "manifest",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": steps,
         "trigger": {
             "ref": [
                 "refs/tags/v*",
@@ -1713,7 +1738,7 @@ def releaseDockerReadme(ctx):
                         "from_secret": "docker_password",
                     },
                     "PUSHRM_TARGET": "owncloud/${DRONE_REPO_NAME}",
-                    "PUSHRM_SHORT": "Docker images for %s" % (ctx.repo.name),
+                    "PUSHRM_SHORT": "Docker images for Infinite Scale stable releases",
                     "PUSHRM_FILE": "README.md",
                 },
             },
