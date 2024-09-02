@@ -10,7 +10,7 @@
 | COLLABORATION_APP_INSECURE | bool | false | Skip TLS certificate verification when connecting to the WOPI app|
 | COLLABORATION_APP_PROOF_DISABLE | bool | false | Disable the proof keys verification|
 | COLLABORATION_APP_PROOF_DURATION | string | 12h | Duration for the proof keys to be cached in memory, using time.ParseDuration format. If the duration can't be parsed, we'll use the default 12h as duration|
-| COLLABORATION_APP_LICENSE_CHECK_ENABLE | bool | false | Enable license check for edit. Needs to be enabled when using Microsoft365 with the business flow.|
+| COLLABORATION_APP_LICENSE_CHECK_ENABLE | bool | false | Enable license checking to edit files. Needs to be enabled when using Microsoft365 with the business flow.|
 | OCIS_JWT_SECRET<br/>COLLABORATION_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | COLLABORATION_GRPC_ADDR | string | 127.0.0.1:9301 | The bind address of the GRPC service.|
 | OCIS_GRPC_PROTOCOL<br/>COLLABORATION_GRPC_PROTOCOL | string | tcp | The transport protocol of the GRPC service.|
@@ -18,11 +18,11 @@
 | OCIS_HTTP_TLS_ENABLED | bool | false | Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.|
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
-| COLLABORATION_WOPI_SRC | string | https://localhost:9300 | The WOPISrc base URL containing schema, host and port. Set this to the schema and domain where the collaboration service is reachable for the wopi app, such as https://office.owncloud.test.|
+| COLLABORATION_WOPI_SRC | string | https://localhost:9300 | The WOPI source base URL containing schema, host and port. Set this to the schema and domain where the collaboration service is reachable for the wopi app, such as https://office.owncloud.test.|
 | COLLABORATION_WOPI_SECRET | string |  | Used to mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT token embedded in the WOPI JWT token.|
-| COLLABORATION_WOPI_DISABLE_CHAT<br/>OCIS_WOPI_DISABLE_CHAT | bool | false | Disable chat in the frontend. This feature is available in OnlyOffice and Microsoft.|
-| COLLABORATION_WOPI_PROXY_URL | string |  | The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you need an office365 proxy subscription. If you become part of the Microsoft CSP program (https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview), you can use the WebOffice without a proxy.|
-| COLLABORATION_WOPI_PROXY_SECRET | string |  | The secret to authenticate against the ownCloud Office365 WOPI proxy. Optional. This secret can be obtained from ownCloud via the office365 proxy subscription.|
+| COLLABORATION_WOPI_DISABLE_CHAT<br/>OCIS_WOPI_DISABLE_CHAT | bool | false | Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.|
+| COLLABORATION_WOPI_PROXY_URL | string |  | The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you need an office365 proxy subscription. If you become part of the Microsoft CSP program (https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview), you can use WebOffice without a proxy.|
+| COLLABORATION_WOPI_PROXY_SECRET | string |  | Optional, the secret to authenticate against the ownCloud Office365 WOPI proxy. This secret can be obtained from ownCloud via the office365 proxy subscription.|
 | OCIS_REVA_GATEWAY<br/>COLLABORATION_CS3API_GATEWAY_NAME | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata.|
 | COLLABORATION_CS3API_DATAGATEWAY_INSECURE | bool | false | Connect to the CS3API data gateway insecurely.|
 | OCIS_TRACING_ENABLED<br/>COLLABORATION_TRACING_ENABLED | bool | false | Activates tracing.|

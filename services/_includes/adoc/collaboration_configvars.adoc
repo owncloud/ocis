@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-09-02-09-16-18]
+[#deprecation-note-2024-09-02-09-55-20]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -133,7 +133,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Enable license check for edit. Needs to be enabled when using Microsoft365 with the business flow.
+Enable license checking to edit files. Needs to be enabled when using Microsoft365 with the business flow.
 
 a|`OCIS_JWT_SECRET` +
 `COLLABORATION_JWT_SECRET` +
@@ -223,7 +223,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++https://localhost:9300 ++
 a| [subs=-attributes]
-The WOPISrc base URL containing schema, host and port. Set this to the schema and domain where the collaboration service is reachable for the wopi app, such as \https://office.owncloud.test.
+The WOPI source base URL containing schema, host and port. Set this to the schema and domain where the collaboration service is reachable for the wopi app, such as \https://office.owncloud.test.
 
 a|`COLLABORATION_WOPI_SECRET` +
 
@@ -246,7 +246,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Disable chat in the frontend. This feature is available in OnlyOffice and Microsoft.
+Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.
 
 a|`COLLABORATION_WOPI_PROXY_URL` +
 
@@ -257,7 +257,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you need an office365 proxy subscription. If you become part of the Microsoft CSP program (\https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview), you can use the WebOffice without a proxy.
+The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you need an office365 proxy subscription. If you become part of the Microsoft CSP program (\https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview), you can use WebOffice without a proxy.
 
 a|`COLLABORATION_WOPI_PROXY_SECRET` +
 
@@ -268,11 +268,11 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The secret to authenticate against the ownCloud Office365 WOPI proxy. Optional. This secret can be obtained from ownCloud via the office365 proxy subscription.
+Optional, the secret to authenticate against the ownCloud Office365 WOPI proxy. This secret can be obtained from ownCloud via the office365 proxy subscription.
 
 a|`OCIS_REVA_GATEWAY` +
 `COLLABORATION_CS3API_GATEWAY_NAME` +
-xref:deprecation-note-2024-09-02-09-16-18[Deprecation Note]
+xref:deprecation-note-2024-09-02-09-55-20[Deprecation Note]
 a| [subs=-attributes]
 ++6.0.0 ++
 a| [subs=-attributes]
