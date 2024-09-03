@@ -15,6 +15,7 @@ package server
 
 import (
 	"bytes"
+	"cmp"
 	"crypto/sha256"
 	"crypto/tls"
 	"encoding/json"
@@ -22,7 +23,7 @@ import (
 	"math/rand"
 	"net"
 	"net/url"
-	"sort"
+	"slices"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -1730,9 +1731,7 @@ func (s *Server) getOutboundGatewayConnections(a *[]*client) {
 // Gateway write lock is held on entry
 func (g *srvGateway) orderOutboundConnectionsLocked() {
 	// Order the gateways by lowest RTT
-	sort.Slice(g.outo, func(i, j int) bool {
-		return g.outo[i].getRTTValue() < g.outo[j].getRTTValue()
-	})
+	slices.SortFunc(g.outo, func(i, j *client) int { return cmp.Compare(i.getRTTValue(), j.getRTTValue()) })
 }
 
 // Orders the array of outbound connections.
@@ -2131,7 +2130,7 @@ func (c *client) processGatewayRSub(arg []byte) error {
 // for queue subscriptions.
 // <Outbound connection: invoked when client message is published,
 // so from any client connection's readLoop>
-func (c *client) gatewayInterest(acc, subj string) (bool, *SublistResult) {
+func (c *client) gatewayInterest(acc string, subj []byte) (bool, *SublistResult) {
 	ei, accountInMap := c.gw.outsim.Load(acc)
 	// If there is an entry for this account and ei is nil,
 	// it means that the remote is not interested at all in
@@ -2152,14 +2151,14 @@ func (c *client) gatewayInterest(acc, subj string) (bool, *SublistResult) {
 		// but until e.ni is nil, use it to know if we
 		// should suppress interest or not.
 		if !c.gw.interestOnlyMode && e.ni != nil {
-			if _, inMap := e.ni[subj]; !inMap {
+			if _, inMap := e.ni[string(subj)]; !inMap {
 				psi = true
 			}
 		}
 		// If we are in modeInterestOnly (e.ni will be nil)
 		// or if we have queue subs, we also need to check sl.Match.
 		if e.ni == nil || e.qsubs > 0 {
-			r = e.sl.Match(subj)
+			r = e.sl.MatchBytes(subj)
 			if len(r.psubs) > 0 {
 				psi = true
 			}
@@ -2482,7 +2481,7 @@ func (g *srvGateway) shouldMapReplyForGatewaySend(acc *Account, reply []byte) bo
 	}
 	sl := sli.(*Sublist)
 	if sl.Count() > 0 {
-		if r := sl.Match(string(reply)); len(r.psubs)+len(r.qsubs) > 0 {
+		if sl.HasInterest(string(reply)) {
 			return true
 		}
 	}
@@ -2568,7 +2567,7 @@ func (c *client) sendMsgToGateways(acc *Account, msg, subject, reply []byte, qgr
 			}
 		} else {
 			// Plain sub interest and queue sub results for this account/subject
-			psi, qr := gwc.gatewayInterest(accName, string(subject))
+			psi, qr := gwc.gatewayInterest(accName, subject)
 			if !psi && qr == nil {
 				continue
 			}

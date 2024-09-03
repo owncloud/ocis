@@ -15,6 +15,7 @@ package server
 
 import (
 	"bytes"
+	"cmp"
 	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
@@ -29,6 +30,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"runtime/pprof"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -2724,15 +2726,16 @@ func (s *Server) accountInfo(accName string) (*AccountInfo, error) {
 
 // JSzOptions are options passed to Jsz
 type JSzOptions struct {
-	Account    string `json:"account,omitempty"`
-	Accounts   bool   `json:"accounts,omitempty"`
-	Streams    bool   `json:"streams,omitempty"`
-	Consumer   bool   `json:"consumer,omitempty"`
-	Config     bool   `json:"config,omitempty"`
-	LeaderOnly bool   `json:"leader_only,omitempty"`
-	Offset     int    `json:"offset,omitempty"`
-	Limit      int    `json:"limit,omitempty"`
-	RaftGroups bool   `json:"raft,omitempty"`
+	Account          string `json:"account,omitempty"`
+	Accounts         bool   `json:"accounts,omitempty"`
+	Streams          bool   `json:"streams,omitempty"`
+	Consumer         bool   `json:"consumer,omitempty"`
+	Config           bool   `json:"config,omitempty"`
+	LeaderOnly       bool   `json:"leader_only,omitempty"`
+	Offset           int    `json:"offset,omitempty"`
+	Limit            int    `json:"limit,omitempty"`
+	RaftGroups       bool   `json:"raft,omitempty"`
+	StreamLeaderOnly bool   `json:"stream_leader_only,omitempty"`
 }
 
 // HealthzOptions are options passed to Healthz
@@ -2749,8 +2752,9 @@ type HealthzOptions struct {
 
 // ProfilezOptions are options passed to Profilez
 type ProfilezOptions struct {
-	Name  string `json:"name"`
-	Debug int    `json:"debug"`
+	Name     string        `json:"name"`
+	Debug    int           `json:"debug"`
+	Duration time.Duration `json:"duration,omitempty"`
 }
 
 // StreamDetail shows information about the stream state and its consumers.
@@ -2806,7 +2810,7 @@ type JSInfo struct {
 	AccountDetails []*AccountDetail `json:"account_details,omitempty"`
 }
 
-func (s *Server) accountDetail(jsa *jsAccount, optStreams, optConsumers, optCfg, optRaft bool) *AccountDetail {
+func (s *Server) accountDetail(jsa *jsAccount, optStreams, optConsumers, optCfg, optRaft, optStreamLeader bool) *AccountDetail {
 	jsa.mu.RLock()
 	acc := jsa.account
 	name := acc.GetName()
@@ -2851,6 +2855,10 @@ func (s *Server) accountDetail(jsa *jsAccount, optStreams, optConsumers, optCfg,
 			if optCfg {
 				c := stream.config()
 				cfg = &c
+			}
+			// Skip if we are only looking for stream leaders.
+			if optStreamLeader && ci != nil && ci.Leader != s.Name() {
+				continue
 			}
 			sdet := StreamDetail{
 				Name:    stream.name(),
@@ -2907,7 +2915,7 @@ func (s *Server) JszAccount(opts *JSzOptions) (*AccountDetail, error) {
 	if !ok {
 		return nil, fmt.Errorf("account %q not jetstream enabled", acc)
 	}
-	return s.accountDetail(jsa, opts.Streams, opts.Consumer, opts.Config, opts.RaftGroups), nil
+	return s.accountDetail(jsa, opts.Streams, opts.Consumer, opts.Config, opts.RaftGroups, opts.StreamLeaderOnly), nil
 }
 
 // helper to get cluster info from node via dummy group
@@ -3012,9 +3020,7 @@ func (s *Server) Jsz(opts *JSzOptions) (*JSInfo, error) {
 		accounts = []*jsAccount{accounts[filterIdx]}
 	} else if opts.Accounts {
 		if opts.Offset != 0 {
-			sort.Slice(accounts, func(i, j int) bool {
-				return strings.Compare(accounts[i].acc().Name, accounts[j].acc().Name) < 0
-			})
+			slices.SortFunc(accounts, func(i, j *jsAccount) int { return cmp.Compare(i.acc().Name, j.acc().Name) })
 			if opts.Offset > len(accounts) {
 				accounts = []*jsAccount{}
 			} else {
@@ -3034,7 +3040,7 @@ func (s *Server) Jsz(opts *JSzOptions) (*JSInfo, error) {
 	}
 	// if wanted, obtain accounts/streams/consumer
 	for _, jsa := range accounts {
-		detail := s.accountDetail(jsa, opts.Streams, opts.Consumer, opts.Config, opts.RaftGroups)
+		detail := s.accountDetail(jsa, opts.Streams, opts.Consumer, opts.Config, opts.RaftGroups, opts.StreamLeaderOnly)
 		jsi.AccountDetails = append(jsi.AccountDetails, detail)
 	}
 	return jsi, nil
@@ -3078,16 +3084,22 @@ func (s *Server) HandleJsz(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sleader, err := decodeBool(w, r, "stream-leader-only")
+	if err != nil {
+		return
+	}
+
 	l, err := s.Jsz(&JSzOptions{
-		r.URL.Query().Get("acc"),
-		accounts,
-		streams,
-		consumers,
-		config,
-		leader,
-		offset,
-		limit,
-		rgroups,
+		Account:          r.URL.Query().Get("acc"),
+		Accounts:         accounts,
+		Streams:          streams,
+		Consumer:         consumers,
+		Config:           config,
+		LeaderOnly:       leader,
+		Offset:           offset,
+		Limit:            limit,
+		RaftGroups:       rgroups,
+		StreamLeaderOnly: sleader,
 	})
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -3724,21 +3736,36 @@ type ProfilezStatus struct {
 }
 
 func (s *Server) profilez(opts *ProfilezOptions) *ProfilezStatus {
-	if opts.Name == _EMPTY_ {
+	var buffer bytes.Buffer
+	switch opts.Name {
+	case _EMPTY_:
 		return &ProfilezStatus{
 			Error: "Profile name not specified",
 		}
-	}
-	profile := pprof.Lookup(opts.Name)
-	if profile == nil {
-		return &ProfilezStatus{
-			Error: fmt.Sprintf("Profile %q not found", opts.Name),
+	case "cpu":
+		if opts.Duration <= 0 || opts.Duration > 15*time.Second {
+			return &ProfilezStatus{
+				Error: fmt.Sprintf("Duration %s should be between 0s and 15s", opts.Duration),
+			}
 		}
-	}
-	var buffer bytes.Buffer
-	if err := profile.WriteTo(&buffer, opts.Debug); err != nil {
-		return &ProfilezStatus{
-			Error: fmt.Sprintf("Profile %q error: %s", opts.Name, err),
+		if err := pprof.StartCPUProfile(&buffer); err != nil {
+			return &ProfilezStatus{
+				Error: fmt.Sprintf("Failed to start CPU profile: %s", err),
+			}
+		}
+		time.Sleep(opts.Duration)
+		pprof.StopCPUProfile()
+	default:
+		profile := pprof.Lookup(opts.Name)
+		if profile == nil {
+			return &ProfilezStatus{
+				Error: fmt.Sprintf("Profile %q not found", opts.Name),
+			}
+		}
+		if err := profile.WriteTo(&buffer, opts.Debug); err != nil {
+			return &ProfilezStatus{
+				Error: fmt.Sprintf("Profile %q error: %s", opts.Name, err),
+			}
 		}
 	}
 	return &ProfilezStatus{
@@ -3787,8 +3814,14 @@ func (s *Server) HandleRaftz(w http.ResponseWriter, r *http.Request) {
 
 	gfilter := r.URL.Query().Get("group")
 	afilter := r.URL.Query().Get("acc")
-	if afilter == "" {
-		afilter = s.SystemAccount().Name
+	if afilter == _EMPTY_ {
+		if sys := s.SystemAccount(); sys != nil {
+			afilter = sys.Name
+		} else {
+			w.WriteHeader(404)
+			w.Write([]byte("System account not found, the server may be shutting down"))
+			return
+		}
 	}
 
 	groups := map[string]RaftNode{}
