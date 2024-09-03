@@ -89,3 +89,64 @@ which is the source of the texts provided by the code.
 ## Default Language
 
 The default language can be defined via the `OCIS_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.
+
+##  Unified Role Management
+
+Unified Roles are roles granted a user for sharing and can be enabled or disabled. A CLI command is provided to list existing roles and their state among other data.
+
+{{< hint info >}}
+Note that a disabled role does not lose previously assigned permissions. It only means that the role is not available for new assignments.
+{{< /hint >}}
+
+The following roles are **enabled** by default:
+
+- `UnifiedRoleViewerID`
+- `UnifiedRoleSpaceViewer`
+- `UnifiedRoleEditor`
+- `UnifiedRoleSpaceEditor`
+- `UnifiedRoleFileEditor`
+- `UnifiedRoleEditorLite`
+- `UnifiedRoleManager`
+
+The following role is **disabled** by default:
+
+- `UnifiedRoleSecureViewer`
+
+To enable disabled roles like the `UnifiedRoleSecureViewer`, you must provide the UID(s) by one of the following methods:
+
+- Using the `GRAPH_AVAILABLE_ROLES` environment variable.
+- Setting the `available_roles` configuration value.
+
+The following CLI command simplifies the process of finding out which UID belongs to which role:
+
+```bash
+ocis graph list-unified-roles
+```
+
+The output of this command includes the following information for each role:
+
+* `UID`\
+  The unique identifier of the role.
+* `Enabled`\
+  Whether the role is enabled or not.
+* `Description`\
+  A short description of the role.
+* `Condition`
+* `Allowed resource actions`
+
+**Example output (shortned)**
+
+```bash
++--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+|                 UID                  | ENABLED  |          DESCRIPTION           |           CONDITION            |         ALLOWED RESOURCE ACTIONS         |
++--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+| a8d5fe5e-96e3-418d-825b-534dbdf22b99 | enabled  | View and download.             | exists @Resource.Root          | libre.graph/driveItem/path/read          |
+|                                      |          |                                |                                | libre.graph/driveItem/quota/read         |
+|                                      |          |                                |                                | libre.graph/driveItem/content/read       |
+|                                      |          |                                |                                | libre.graph/driveItem/permissions/read   |
+|                                      |          |                                |                                | libre.graph/driveItem/children/read      |
+|                                      |          |                                |                                | libre.graph/driveItem/deleted/read       |
+|                                      |          |                                |                                | libre.graph/driveItem/basic/read         |
++--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+```
+

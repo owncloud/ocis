@@ -100,3 +100,38 @@ This command provides additional options:
 
 * `--dry-run` (default: `true`)\
 Do not remove any empty folders but print the empty folders that would be removed.
+
+### List Unified Roles
+
+This command simplifies the process of finding out which UID belongs to which role. The command is:
+
+```bash
+ocis graph list-unified-roles
+```
+
+The output of this command includes the following information for each role:
+
+* `uid`\
+  The unique identifier of the role.
+* `Description`\
+  A short description of the role.
+* `Enabled`\
+  Whether the role is enabled or not.
+* `Condition`
+* `Allowed Resource Action`
+
+**Example output (shortned)**
+
+```bash
++--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+|                 UID                  | ENABLED  |          DESCRIPTION           |           CONDITION            |         ALLOWED RESOURCE ACTIONS         |
++--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+| a8d5fe5e-96e3-418d-825b-534dbdf22b99 | enabled  | View and download.             | exists @Resource.Root          | libre.graph/driveItem/path/read          |
+|                                      |          |                                |                                | libre.graph/driveItem/quota/read         |
+|                                      |          |                                |                                | libre.graph/driveItem/content/read       |
+|                                      |          |                                |                                | libre.graph/driveItem/permissions/read   |
+|                                      |          |                                |                                | libre.graph/driveItem/children/read      |
+|                                      |          |                                |                                | libre.graph/driveItem/deleted/read       |
+|                                      |          |                                |                                | libre.graph/driveItem/basic/read         |
++--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+```
