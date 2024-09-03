@@ -24,6 +24,7 @@ use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\OcisConfigHelper;
+use TestHelpers\GraphHelper;
 use PHPUnit\Framework\Assert;
 
 /**
@@ -72,6 +73,31 @@ class OcisConfigContext implements Context {
 			200,
 			$response->getStatusCode(),
 			"Failed to set config $configVariable=$configValue"
+		);
+	}
+
+	/**
+	 * @Given the administrator has enabled the permissions role :role
+	 *
+	 * @param string $role
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasEnabledTheRole(string $role): void {
+		$roleId = GraphHelper::getPermissionsRoleIdByName($role);
+		$defaultRoles = array_values(GraphHelper::DEFAULT_PERMISSIONS_ROLES);
+
+		if (!\in_array($role, $defaultRoles)) {
+			$defaultRoles[] = $roleId;
+		}
+		$envs = [
+			"GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles),
+		];
+		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			"Failed to enable role $role"
 		);
 	}
 
