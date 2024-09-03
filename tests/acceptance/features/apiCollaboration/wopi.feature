@@ -307,3 +307,50 @@ Feature: collaboration (wopi)
       | app-endpoint                                              | url-query       |
       | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice& |
       | /app/open-with-web?file_id=<<FILEID>>                     |                 |
+
+
+  Scenario: open text file using open-with-web with app name in url query (MIME type not registered in app-registry)
+    Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "lorem.txt"
+    And we save it into "FILEID"
+    When user "Alice" sends HTTP method "POST" to URL "/app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+             "pattern": "%base_url%/external\\?app=FakeOffice&contextRouteName=files-spaces-personal&fileId=%uuidv4_pattern%%24%uuidv4_pattern%%21%uuidv4_pattern%$"
+          }
+        }
+      }
+      """
+
+  @issue-9928
+  Scenario: open text file using open-with-web without app name in url query (MIME type not registered in app-registry)
+    Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "lorem.txt"
+    And we save it into "FILEID"
+    When user "Alice" sends HTTP method "POST" to URL "/app/open-with-web?file_id=<<FILEID>>"
+    Then the HTTP status code should be "500"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "SERVER_ERROR"
+          },
+          "message": {
+            "const": "Error contacting the requested application, please use a different one or try again later"
+          }
+        }
+      }
+      """
