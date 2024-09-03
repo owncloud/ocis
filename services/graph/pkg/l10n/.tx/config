@@ -4,6 +4,7 @@ host = https://www.transifex.com
 [o:owncloud-org:p:owncloud:r:ocis-graph]
 file_filter = locale/<lang>/LC_MESSAGES/graph.po
 minimum_perc = 75
+resource_name = ocis-graph
 source_file = graph.pot
 source_lang = en
 type = PO

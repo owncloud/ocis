@@ -39,10 +39,12 @@ Translations have a `context` and a `translatable string`. The context is shown 
   [o:owncloud-org:p:owncloud:r:ocis-<service-name>]
   file_filter = locale/<lang>/LC_MESSAGES/<service-name>.po
   minimum_perc = 75
+  resource_name = ocis-<service-name>
   source_file = <service-name>.pot
   source_lang = en
   type = PO
   ```
+  Note: o: organsiation, p: project, r: resource
 
 * Create a go file like `templates.go` in `ocis/services/<service-name>/pkg/service` that will define your translation sources like the following:
   ```
@@ -57,6 +59,7 @@ Translations have a `context` and a `translatable string`. The context is shown 
   	services/notifications \
   	services/userlog \
   	services/graph \
+  	services/activitylog \
   	services/<service-name>
   ```
 

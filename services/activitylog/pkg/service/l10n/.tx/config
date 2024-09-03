@@ -4,6 +4,7 @@ host = https://www.transifex.com
 [o:owncloud-org:p:owncloud:r:ocis-activitylog]
 file_filter = locale/<lang>/LC_MESSAGES/activitylog.po
 minimum_perc = 75
+resource_name = ocis-activitylog
 source_file = activitylog.pot
 source_lang = en
 type = PO
