@@ -34,6 +34,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+	"unicode"
 
 	"github.com/klauspost/compress/s2"
 	"github.com/nats-io/jwt/v2"
@@ -1764,6 +1765,13 @@ func (c *client) processLeafNodeConnect(s *Server, arg []byte, lang string) erro
 		return err
 	}
 
+	// Reject a cluster that contains spaces or line breaks.
+	if proto.Cluster != _EMPTY_ && strings.ContainsFunc(proto.Cluster, unicode.IsSpace) {
+		c.sendErrAndErr(ErrClusterNameHasSpaces.Error())
+		c.closeConnection(ProtocolViolation)
+		return ErrClusterNameHasSpaces
+	}
+
 	// Check for cluster name collisions.
 	if cn := s.cachedClusterName(); cn != _EMPTY_ && proto.Cluster != _EMPTY_ && proto.Cluster == cn {
 		c.sendErrAndErr(ErrLeafNodeHasSameClusterName.Error())
@@ -2669,9 +2677,8 @@ func (c *client) processInboundLeafMsg(msg []byte) {
 	// Go back to the sublist data structure.
 	if !ok {
 		r = c.acc.sl.Match(subject)
-		c.in.results[subject] = r
 		// Prune the results cache. Keeps us from unbounded growth. Random delete.
-		if len(c.in.results) > maxResultCacheSize {
+		if len(c.in.results) >= maxResultCacheSize {
 			n := 0
 			for subj := range c.in.results {
 				delete(c.in.results, subj)
@@ -2680,6 +2687,8 @@ func (c *client) processInboundLeafMsg(msg []byte) {
 				}
 			}
 		}
+		// Then add the new cache entry.
+		c.in.results[subject] = r
 	}
 
 	// Collect queue names if needed.

@@ -236,6 +236,7 @@ type stream struct {
 	consumers map[string]*consumer    // The consumers for this stream.
 	numFilter int                     // The number of filtered consumers.
 	cfg       StreamConfig            // The stream's config.
+	cfgMu     sync.RWMutex            // Config mutex used to solve some races with consumer code
 	created   time.Time               // Time the stream was created.
 	stype     StorageType             // The storage type.
 	tier      string                  // The tier is the number of replicas for the stream (e.g. "R1" or "R3").
@@ -1018,6 +1019,9 @@ func (mset *stream) lastSeqAndCLFS() (uint64, uint64) {
 }
 
 func (mset *stream) getCLFS() uint64 {
+	if mset == nil {
+		return 0
+	}
 	mset.clMu.Lock()
 	defer mset.clMu.Unlock()
 	return mset.clfs
@@ -1950,7 +1954,14 @@ func (mset *stream) updateWithAdvisory(config *StreamConfig, sendAdvisory bool) 
 	}
 
 	// Now update config and store's version of our config.
+	// Although we are under the stream write lock, we will also assign the new
+	// configuration under mset.cfgMu lock. This is so that in places where
+	// mset.mu cannot be acquired (like many cases in consumer.go where code
+	// is under the consumer's lock), and the stream's configuration needs to
+	// be inspected, one can use mset.cfgMu's read lock to do that safely.
+	mset.cfgMu.Lock()
 	mset.cfg = *cfg
+	mset.cfgMu.Unlock()
 
 	// If we're changing retention and haven't errored because of consumer
 	// replicas by now, whip through and update the consumer retention.
@@ -1999,6 +2010,15 @@ func (mset *stream) updateWithAdvisory(config *StreamConfig, sendAdvisory bool) 
 	mset.store.UpdateConfig(cfg)
 
 	return nil
+}
+
+// Small helper to return the Name field from mset.cfg, protected by
+// the mset.cfgMu mutex. This is simply because we have several places
+// in consumer.go where we need it.
+func (mset *stream) getCfgName() string {
+	mset.cfgMu.RLock()
+	defer mset.cfgMu.RUnlock()
+	return mset.cfg.Name
 }
 
 // Purge will remove all messages from the stream and underlying store based on the request.
@@ -4369,7 +4389,6 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 		}
 
 		// Expected last sequence per subject.
-		// If we are clustered we have prechecked seq > 0.
 		if seq, exists := getExpectedLastSeqPerSubject(hdr); exists {
 			// TODO(dlc) - We could make a new store func that does this all in one.
 			var smv StoreMsg
@@ -4378,8 +4397,17 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 			if sm != nil {
 				fseq = sm.seq
 			}
-			if err == ErrStoreMsgNotFound && seq == 0 {
-				fseq, err = 0, nil
+			if err == ErrStoreMsgNotFound {
+				if seq == 0 {
+					fseq, err = 0, nil
+				} else if mset.isClustered() {
+					// Do not bump clfs in case message was not found and could have been deleted.
+					var ss StreamState
+					store.FastState(&ss)
+					if seq <= ss.LastSeq {
+						fseq, err = seq, nil
+					}
+				}
 			}
 			if err != nil || fseq != seq {
 				mset.mu.Unlock()
@@ -4521,7 +4549,7 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 		mset.lmsgId = msgId
 		// If we have a msgId make sure to save.
 		if msgId != _EMPTY_ {
-			mset.storeMsgIdLocked(&ddentry{msgId, seq, ts})
+			mset.storeMsgIdLocked(&ddentry{msgId, mset.lseq, ts})
 		}
 		if canRespond {
 			response = append(pubAck, strconv.FormatUint(mset.lseq, 10)...)
@@ -4573,6 +4601,8 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 				response, _ = json.Marshal(resp)
 				mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, nil, response, nil, 0))
 			}
+			mset.mu.Unlock()
+			return err
 		}
 	}
 
@@ -5069,6 +5099,10 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 
 	// Kick monitor and collect consumers first.
 	mset.mu.Lock()
+
+	// Mark closed.
+	mset.closed.Store(true)
+
 	// Signal to the monitor loop.
 	// Can't use qch here.
 	if mset.mqch != nil {
@@ -5128,9 +5162,6 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 	if deleteFlag && advisory {
 		mset.sendDeleteAdvisoryLocked()
 	}
-
-	// Mark closed.
-	mset.closed.Store(true)
 
 	// Quit channel, do this after sending the delete advisory
 	if mset.qch != nil {
@@ -5272,92 +5303,9 @@ func (mset *stream) checkInterestState() {
 		return
 	}
 
-	var zeroAcks []*consumer
-	var lowAckFloor uint64 = math.MaxUint64
-
 	for _, o := range mset.getConsumers() {
 		o.checkStateForInterestStream()
-
-		o.mu.Lock()
-		if o.isLeader() {
-			// We need to account for consumers with ack floor of zero.
-			// We will collect them and see if we need to check pending below.
-			if o.asflr == 0 {
-				zeroAcks = append(zeroAcks, o)
-			} else if o.asflr < lowAckFloor {
-				lowAckFloor = o.asflr
-			}
-		} else {
-			// We are a follower so only have the store state, so read that in.
-			state, err := o.store.State()
-			if err != nil {
-				// On error we will not have enough information to process correctly so bail.
-				o.mu.Unlock()
-				return
-			}
-			// We need to account for consumers with ack floor of zero.
-			if state.AckFloor.Stream == 0 {
-				zeroAcks = append(zeroAcks, o)
-			} else if state.AckFloor.Stream < lowAckFloor {
-				lowAckFloor = state.AckFloor.Stream
-			}
-			// We are a follower here but if we detect a drift from when we were previous leader correct here.
-			if o.asflr > state.AckFloor.Stream || o.sseq > state.Delivered.Stream+1 {
-				o.applyState(state)
-			}
-		}
-		o.mu.Unlock()
 	}
-
-	// If nothing was set we can bail.
-	if lowAckFloor == math.MaxUint64 {
-		return
-	}
-
-	// Capture our current state.
-	// ok to do so without lock.
-	var state StreamState
-	mset.store.FastState(&state)
-
-	if lowAckFloor <= state.FirstSeq {
-		return
-	}
-
-	// Do not want to hold stream lock if calculating numPending.
-	// Check if we had any zeroAcks, we will need to check them.
-	for _, o := range zeroAcks {
-		var np uint64
-		o.mu.RLock()
-		if o.isLeader() {
-			np = uint64(o.numPending())
-		} else {
-			np, _ = o.calculateNumPending()
-		}
-		o.mu.RUnlock()
-		// This means we have pending and can not remove anything at this time.
-		if np > 0 {
-			return
-		}
-	}
-
-	mset.mu.Lock()
-	defer mset.mu.Unlock()
-
-	// Check which purge we need to perform.
-	if lowAckFloor <= state.LastSeq || state.Msgs == 0 {
-		// Purge the stream to lowest ack floor + 1
-		mset.store.PurgeEx(_EMPTY_, lowAckFloor+1, 0)
-	} else {
-		// Here we have a low ack floor higher then our last seq.
-		// So we will just do normal purge.
-		mset.store.Purge()
-	}
-
-	// Make sure to reset our local lseq.
-	mset.store.FastState(&state)
-	mset.lseq = state.LastSeq
-	// Also make sure we clear any pending acks.
-	mset.clearAllPreAcksBelowFloor(state.FirstSeq)
 }
 
 func (mset *stream) isInterestRetention() bool {
