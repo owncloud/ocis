@@ -15,17 +15,11 @@ Internal GRPC APIs:
 
 ## Enable OCM
 
-To enable OpenCloudMesh, you have to set the following environment variables. The path  `/etc/ocis/` in the example below depends on the installation type and derives, if not otherwise defined, from the `OCIS_CONFIG_DIR` envvar.
+To enable OpenCloudMesh, you have to set the following environment variable.
 
 ```console
-export OCIS_ENABLE_OCM=true
-export OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE="/etc/ocis/ocmproviders.json"
+OCIS_ENABLE_OCM=true
 ```
-
-{{< hint info >}}
-Point `OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` to a file as described below.
-{{< /hint >}}
-
 
 ## Trust Between Instances
 
