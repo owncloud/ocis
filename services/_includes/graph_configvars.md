@@ -102,7 +102,7 @@
 | OCIS_EVENTS_ENABLE_TLS<br/>GRAPH_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_USERNAME<br/>GRAPH_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_PASSWORD<br/>GRAPH_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
-| GRAPH_AVAILABLE_ROLES | []string | [b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 a8d5fe5e-96e3-418d-825b-534dbdf22b99 fb6c3e19-e378-47e5-b277-9732f9de6e21 58c63c02-1d89-4572-916a-870abc5a1b7d 2d00ce52-1fc2-4dbc-8b95-a73b73395f5a 1c996275-f1c9-4e71-abdf-a42f6495e960 312c0871-5ef7-4b3a-85b6-0e4074c64049] | A list of roles that are available for assignment.|
+| GRAPH_AVAILABLE_ROLES | []string | [b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 a8d5fe5e-96e3-418d-825b-534dbdf22b99 fb6c3e19-e378-47e5-b277-9732f9de6e21 58c63c02-1d89-4572-916a-870abc5a1b7d 2d00ce52-1fc2-4dbc-8b95-a73b73395f5a 1c996275-f1c9-4e71-abdf-a42f6495e960 312c0871-5ef7-4b3a-85b6-0e4074c64049] | A comma separated list of roles that are available for assignment.|
 | OCIS_KEYCLOAK_BASE_PATH<br/>GRAPH_KEYCLOAK_BASE_PATH | string |  | The URL to access keycloak.|
 | OCIS_KEYCLOAK_CLIENT_ID<br/>GRAPH_KEYCLOAK_CLIENT_ID | string |  | The client id to authenticate with keycloak.|
 | OCIS_KEYCLOAK_CLIENT_SECRET<br/>GRAPH_KEYCLOAK_CLIENT_SECRET | string |  | The client secret to use in authentication.|
