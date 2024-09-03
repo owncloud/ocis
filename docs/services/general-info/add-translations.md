@@ -44,7 +44,7 @@ Translations have a `context` and a `translatable string`. The context is shown 
   source_lang = en
   type = PO
   ```
-  Note: o: organsiation, p: project, r: resource
+  Note: o: organization, p: project, r: resource
 
 * Create a go file like `templates.go` in `ocis/services/<service-name>/pkg/service` that will define your translation sources like the following:
   ```
