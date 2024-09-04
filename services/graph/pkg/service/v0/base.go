@@ -638,6 +638,10 @@ func (g BaseGraphService) getCS3PublicShareByID(ctx context.Context, permissionI
 			},
 		},
 	)
+	if err != nil {
+		return nil, err
+	}
+
 	if err := errorcode.FromCS3Status(getPublicShareResp.GetStatus(), err); err != nil {
 		return nil, err
 	}
@@ -661,6 +665,10 @@ func (g BaseGraphService) removePublicShare(ctx context.Context, permissionID st
 				},
 			},
 		})
+	if err != nil {
+		return err
+	}
+
 	if err := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); err != nil {
 		return err
 	}
@@ -685,6 +693,9 @@ func (g BaseGraphService) removeUserShare(ctx context.Context, permissionID stri
 				},
 			},
 		})
+	if err != nil {
+		return err
+	}
 
 	if err := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); err != nil {
 		return err
@@ -714,6 +725,9 @@ func (g BaseGraphService) removeSpacePermission(ctx context.Context, permissionI
 			},
 		},
 	})
+	if err != nil {
+		return err
+	}
 
 	if err := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); err != nil {
 		return err
@@ -747,6 +761,10 @@ func (g BaseGraphService) getCS3UserShareByID(ctx context.Context, permissionID 
 				},
 			},
 		})
+	if err != nil {
+		return nil, err
+	}
+
 	if err := errorcode.FromCS3Status(getShareResp.GetStatus(), err); err != nil {
 		return nil, err
 	}
@@ -897,6 +915,9 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 	}
 
 	updateUserShareResp, err := gatewayClient.UpdateShare(ctx, &cs3UpdateShareReq)
+	if err != nil {
+		return nil, err
+	}
 	if err := errorcode.FromCS3Status(updateUserShareResp.GetStatus(), err); err != nil {
 		return nil, err
 	}
