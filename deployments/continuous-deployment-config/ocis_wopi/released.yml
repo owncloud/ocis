@@ -32,7 +32,7 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: mbarz@owncloud.com
-          OCIS_DOCKER_TAG: 5.0.5
+          OCIS_DOCKER_TAG: 5.0.7
           OCIS_DOMAIN: ocis.ocis-wopi.released.owncloud.works
           COMPANION_DOMAIN: companion.ocis-wopi.released.owncloud.works
           COMPANION_IMAGE: owncloud/uppy-companion:3.12.13-owncloud
