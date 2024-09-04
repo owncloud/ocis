@@ -163,23 +163,6 @@ Feature: copying file using file id
       | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: copy a file from project to personal space
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "project-space" with the default quota using the Graph API
-    And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
-    And we save it into "FILEID"
-    When user "Alice" copies a file "/textfile.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
-    Then the HTTP status code should be "201"
-    And for user "Alice" folder "/" of the space "project-space" should contain these files:
-      | textfile.txt |
-    And for user "Alice" folder "/" of the space "Personal" should contain these files:
-      | textfile.txt |
-    Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
-
-
   Scenario Outline: copy a file from sub-folder to root folder inside Shares space
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folder"
@@ -264,26 +247,6 @@ Feature: copying file using file id
       | Editor          | /dav/spaces/<<FILEID>>            |
       | Viewer          | /dav/spaces/<<FILEID>>            |
       | Uploader        | /dav/spaces/<<FILEID>>            |
-
-
-  Scenario Outline: copy a file between two project spaces
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
-    And user "Alice" has created a space "second-project-space" with the default quota using the Graph API
-    And user "Alice" has uploaded a file inside space "first-project-space" with content "data from first project space" to "firstProjectSpacetextfile.txt"
-    And user "Alice" has uploaded a file inside space "second-project-space" with content "data from second project space" to "secondProjectSpacetextfile.txt"
-    And we save it into "FILEID"
-    When user "Alice" copies a file "/secondProjectSpacetextfile.txt" into "/" inside space "first-project-space" using file-id path "<dav-path>"
-    Then the HTTP status code should be "201"
-    And for user "Alice" folder "/" of the space "first-project-space" should contain these files:
-      | firstProjectSpacetextfile.txt  |
-      | secondProjectSpacetextfile.txt |
-    And for user "Alice" folder "/" of the space "second-project-space" should contain these files:
-      | secondProjectSpacetextfile.txt |
-    Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: sharee tries to copy a file from shares space with secure viewer to personal space
@@ -494,3 +457,192 @@ Feature: copying file using file id
       | Viewer          | Secure viewer | /dav/spaces/<<FILEID>>            |
       | Editor          | Secure viewer | /dav/spaces/<<FILEID>>            |
       | Uploader        | Secure viewer | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: copy a file from project to personal space
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "project-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has sent the following space share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
+    When user "Brian" copies a file "/textfile.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
+    Then the HTTP status code should be "201"
+    And for user "Brian" folder "/" of the space "project-space" should contain these files:
+      | textfile.txt |
+    And for user "Brian" folder "/" of the space "Personal" should contain these files:
+      | textfile.txt |
+    Examples:
+      | space-role   | dav-path                          |
+      | Manager      | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | /dav/spaces/<<FILEID>>            |
+      | Space Editor | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: copy a file between two project spaces
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
+    And user "Alice" has created a space "second-project-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "first-project-space" with content "first project space" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has sent the following space share invitation:
+      | space           | first-project-space |
+      | sharee          | Brian               |
+      | shareType       | user                |
+      | permissionsRole | <from-space-role>   |
+    And user "Alice" has sent the following space share invitation:
+      | space           | second-project-space |
+      | sharee          | Brian                |
+      | shareType       | user                 |
+      | permissionsRole | <to-space-role>      |
+    When user "Brian" copies a file "textfile.txt" into "/" inside space "second-project-space" using file-id path "<dav-path>"
+    Then the HTTP status code should be "201"
+    And for user "Brian" the space "second-project-space" should contain these entries:
+      | textfile.txt |
+    And for user "Brian" the space "first-project-space" should contain these entries:
+      | textfile.txt |
+    And for user "Alice" the space "second-project-space" should contain these entries:
+      | textfile.txt |
+    Examples:
+      | from-space-role | to-space-role | dav-path                          |
+      | Manager         | Manager       | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager         | Space Editor  | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor    | Manager       | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor    | Space Editor  | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer    | Manager       | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer    | Space Editor  | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager         | Manager       | /dav/spaces/<<FILEID>>            |
+      | Manager         | Space Editor  | /dav/spaces/<<FILEID>>            |
+      | Space Editor    | Manager       | /dav/spaces/<<FILEID>>            |
+      | Space Editor    | Space Editor  | /dav/spaces/<<FILEID>>            |
+      | Space Viewer    | Manager       | /dav/spaces/<<FILEID>>            |
+      | Space Viewer    | Space Editor  | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: try to copy a file from a project to another project space with read permission
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
+    And user "Alice" has created a space "second-project-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "first-project-space" with content "first project space" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has sent the following space share invitation:
+      | space           | first-project-space |
+      | sharee          | Brian               |
+      | shareType       | user                |
+      | permissionsRole | <from-space-role>   |
+    And user "Alice" has sent the following space share invitation:
+      | space           | second-project-space |
+      | sharee          | Brian                |
+      | shareType       | user                 |
+      | permissionsRole | <to-space-role>      |
+    When user "Brian" copies a file "textfile.txt" into "/" inside space "second-project-space" using file-id path "<dav-path>"
+    Then the HTTP status code should be "403"
+    And for user "Brian" the space "second-project-space" should not contain these entries:
+      | textfile.txt |
+    And for user "Brian" the space "first-project-space" should contain these entries:
+      | textfile.txt |
+    But for user "Alice" the space "second-project-space" should not contain these entries:
+      | textfile.txt |
+    Examples:
+      | from-space-role | to-space-role | dav-path                          |
+      | Manager         | Space Viewer  | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor    | Space Viewer  | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer    | Space Viewer  | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager         | Space Viewer  | /dav/spaces/<<FILEID>>            |
+      | Space Editor    | Space Viewer  | /dav/spaces/<<FILEID>>            |
+      | Space Viewer    | Space Viewer  | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: copy a file from project to shares space
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "project-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has sent the following space share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
+    And user "Alice" has created folder "testshare"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testshare     |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <permissions> |
+    And user "Brian" has a share "testshare" synced
+    When user "Brian" copies a file "textfile.txt" into "testshare" inside space "Shares" using file-id path "<dav-path>"
+    Then the HTTP status code should be "201"
+    And for user "Brian" folder "/" of the space "project-space" should contain these files:
+      | textfile.txt |
+    And for user "Brian" folder "testshare" of the space "Shares" should contain these files:
+      | textfile.txt |
+    And for user "Alice" folder "testshare" of the space "Personal" should contain these files:
+      | textfile.txt |
+    Examples:
+      | space-role   | permissions | dav-path                          |
+      | Manager      | Editor      | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | Uploader    | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | Editor      | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | Uploader    | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | Editor      | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | Uploader    | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | Editor      | /dav/spaces/<<FILEID>>            |
+      | Manager      | Uploader    | /dav/spaces/<<FILEID>>            |
+      | Space Editor | Editor      | /dav/spaces/<<FILEID>>            |
+      | Space Editor | Uploader    | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | Editor      | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | Uploader    | /dav/spaces/<<FILEID>>            |
+
+
+  Scenario Outline: try to copy a file from project to shares space with read permission
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "project-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has sent the following space share invitation:
+      | space           | project-space |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
+    And user "Alice" has created folder "testshare"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testshare     |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <permissions> |
+    And user "Brian" has a share "testshare" synced
+    When user "Brian" copies a file "textfile.txt" into "testshare" inside space "Shares" using file-id path "<dav-path>"
+    Then the HTTP status code should be "403"
+    And for user "Brian" folder "/" of the space "project-space" should contain these files:
+      | textfile.txt |
+    But for user "Brian" folder "testshare" of the space "Shares" should not contain these files:
+      | textfile.txt |
+    And for user "Alice" folder "testshare" of the space "Personal" should not contain these files:
+      | textfile.txt |
+    Examples:
+      | space-role   | permissions   | dav-path                          |
+      | Manager      | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | Secure viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | Secure viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | Secure viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | Viewer        | /dav/spaces/<<FILEID>>            |
+      | Manager      | Secure viewer | /dav/spaces/<<FILEID>>            |
+      | Space Editor | Viewer        | /dav/spaces/<<FILEID>>            |
+      | Space Editor | Secure viewer | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | Viewer        | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | Secure viewer | /dav/spaces/<<FILEID>>            |
