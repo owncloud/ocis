@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/types"
-	"github.com/stretchr/testify/require"
 
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -556,6 +557,33 @@ var testCases = []struct {
 			checkBaseAuditEvent(t, ev.AuditEvent, "", "0001-01-01T00:00:00Z", "user 'uid-123' deleted the space 'space-123' (storage: 'storage-1')", "space_deleted")
 			// AuditEventSpaces fields
 			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "storage-1$space-123")
+		},
+	},
+	{
+		Alias: "ScienceMesh - InviteTokenGenerated",
+		SystemEvent: events.Event{
+			Event: events.ScienceMeshInviteTokenGenerated{
+				Sharer:        userID("sharer-user-id"),
+				RecipientMail: "mail@ocis.test",
+				Token:         "token-123",
+				Description:   "some-description",
+				Expiration:    uint64(10e8),
+				InviteLink:    "http://ocis.test/invite",
+				Timestamp:     timestamp(10e8),
+			},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventScienceMeshInviteTokenGenerated{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "sharer-user-id", "2001-09-09T01:46:40Z", "user 'sharer-user-id' generated a ScienceMesh invite with token 'token-123'", "science_mesh_invite_token_generated")
+			// AuditEventScienceMeshInviteTokenGenerated fields
+			require.Equal(t, "mail@ocis.test", ev.RecipientMail)
+			require.Equal(t, "token-123", ev.Token)
+			require.Equal(t, "some-description", ev.Description)
+			require.Equal(t, uint64(10e8), ev.Expiration)
+			require.Equal(t, "http://ocis.test/invite", ev.InviteLink)
 		},
 	},
 }

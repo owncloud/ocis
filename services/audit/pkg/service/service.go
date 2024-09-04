@@ -109,6 +109,8 @@ func StartAuditLogger(ctx context.Context, ch <-chan events.Event, log log.Logge
 				auditEvent = types.GroupMemberAdded(ev)
 			case events.GroupMemberRemoved:
 				auditEvent = types.GroupMemberRemoved(ev)
+			case events.ScienceMeshInviteTokenGenerated:
+				auditEvent = types.ScienceMeshInviteTokenGenerated(ev)
 			default:
 				log.Error().Interface("event", ev).Msg(fmt.Sprintf("can't handle event of type '%T'", ev))
 				continue

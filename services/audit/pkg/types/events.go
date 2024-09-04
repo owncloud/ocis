@@ -40,5 +40,6 @@ func RegisteredEvents() []events.Unmarshaller {
 		events.GroupMemberAdded{},
 		events.GroupMemberRemoved{},
 		events.BackchannelLogout{},
+		events.ScienceMeshInviteTokenGenerated{},
 	}
 }

@@ -274,3 +274,13 @@ type AuditEventGroupMemberRemoved struct {
 	GroupID string
 	UserID  string
 }
+
+// AuditEventScienceMeshInviteTokenGenerated is the event logged when a ScienceMesh invite token is generated
+type AuditEventScienceMeshInviteTokenGenerated struct {
+	AuditEvent
+	RecipientMail string
+	Token         string
+	Description   string
+	Expiration    uint64
+	InviteLink    string
+}

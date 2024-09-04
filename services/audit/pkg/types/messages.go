@@ -51,6 +51,9 @@ const (
 	ActionGroupDeleted       = "group_deleted"
 	ActionGroupMemberAdded   = "group_member_added"
 	ActionGroupMemberRemoved = "group_member_removed"
+
+	// ScienceMesh
+	ActionScienceMeshInviteTokenGenerated = "science_mesh_invite_token_generated"
 )
 
 // MessageShareCreated returns the human-readable string that describes the action
@@ -233,4 +236,9 @@ func MessageGroupMemberAdded(executant, userID, groupID string) string {
 // MessageGroupMemberRemoved returns the human-readable string that describes the action
 func MessageGroupMemberRemoved(executant, userID, groupID string) string {
 	return fmt.Sprintf("user '%s' added user '%s' was removed from group '%s'", executant, userID, groupID)
+}
+
+// MessageScienceMeshInviteTokenGenerated returns the human-readable string that describes the action
+func MessageScienceMeshInviteTokenGenerated(user, token string) string {
+	return fmt.Sprintf("user '%s' generated a ScienceMesh invite with token '%s'", user, token)
 }
