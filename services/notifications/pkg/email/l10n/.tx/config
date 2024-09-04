@@ -4,6 +4,7 @@ host = https://www.transifex.com
 [o:owncloud-org:p:owncloud:r:ocis-notifications]
 file_filter = locale/<lang>/LC_MESSAGES/notifications.po
 minimum_perc = 75
+resource_name = ocis-notifications
 source_file = notifications.pot
 source_lang = en
 type = PO
