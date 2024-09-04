@@ -71,6 +71,7 @@ const (
 	Public
 	User
 	Space
+	OCM
 )
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
@@ -463,6 +464,13 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 		}
 	}
 
+	if sharedResourceID == nil && s.config.IncludeOCMSharees {
+		sharedResourceID, err = s.getOCMPermissionResourceID(ctx, permissionID)
+		if err == nil {
+			permissionType = OCM
+		}
+	}
+
 	switch {
 	case err != nil:
 		return err
@@ -486,6 +494,8 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 		return s.removePublicShare(ctx, permissionID)
 	case Space:
 		return s.removeSpacePermission(ctx, permissionID, sharedResourceID)
+	case OCM:
+		return s.removeOCMPermission(ctx, permissionID)
 	}
 
 	// This should never be reached

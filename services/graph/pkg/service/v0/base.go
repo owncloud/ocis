@@ -154,17 +154,17 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 		// will have the same id.
 		tmp := id
 		isGroup := false
-		var identity libregraph.Identity
+		var cs3Identity libregraph.Identity
 		var err error
 		var p libregraph.Permission
 		if _, ok := groupsMap[id]; ok {
-			identity, err = groupIdToIdentity(ctx, g.identityCache, tmp)
+			cs3Identity, err = groupIdToIdentity(ctx, g.identityCache, tmp)
 			if err != nil {
 				g.logger.Warn().Str("groupid", tmp).Msg("Group not found by id")
 			}
 			isGroup = true
 		} else {
-			identity, err = userIdToIdentity(ctx, g.identityCache, tmp)
+			cs3Identity, err = userIdToIdentity(ctx, g.identityCache, tmp)
 			if err != nil {
 				g.logger.Warn().Str("userid", tmp).Msg("User not found by id")
 			}
@@ -173,17 +173,19 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 		case APIVersion_1:
 			var identitySet libregraph.IdentitySet
 			if isGroup {
-				identitySet.SetGroup(identity)
+				identitySet.SetGroup(cs3Identity)
 			} else {
-				identitySet.SetUser(identity)
+				identitySet.SetUser(cs3Identity)
 			}
+			p.SetGrantedToV2(libregraph.SharePointIdentitySet{User: identitySet.User, Group: identitySet.Group})
+			// FIXME: needs to be removed
 			p.SetGrantedToIdentities([]libregraph.IdentitySet{identitySet})
 		case APIVersion_1_Beta_1:
 			var identitySet libregraph.SharePointIdentitySet
 			if isGroup {
-				identitySet.SetGroup(identity)
+				identitySet.SetGroup(cs3Identity)
 			} else {
-				identitySet.SetUser(identity)
+				identitySet.SetUser(cs3Identity)
 			}
 			p.SetId(identitySetToSpacePermissionID(identitySet))
 			p.SetGrantedToV2(identitySet)
@@ -485,14 +487,14 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 	}
 	perm.SetGrantedToV2(grantedTo)
 	if share.GetCreator() != nil {
-		identity, err := cs3UserIdToIdentity(ctx, g.identityCache, share.GetCreator())
+		cs3Identity, err := cs3UserIdToIdentity(ctx, g.identityCache, share.GetCreator())
 		if err != nil {
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
 		}
 		perm.SetInvitation(
 			libregraph.SharingInvitation{
 				InvitedBy: &libregraph.IdentitySet{
-					User: &identity,
+					User: &cs3Identity,
 				},
 			},
 		)
@@ -571,14 +573,14 @@ func (g BaseGraphService) cs3OCMShareToPermission(ctx context.Context, share *oc
 	}
 	perm.SetGrantedToV2(grantedTo)
 	if share.GetCreator() != nil {
-		identity, err := cs3UserIdToIdentity(ctx, g.identityCache, share.GetCreator())
+		cs3Identity, err := cs3UserIdToIdentity(ctx, g.identityCache, share.GetCreator())
 		if err != nil {
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
 		}
 		perm.SetInvitation(
 			libregraph.SharingInvitation{
 				InvitedBy: &libregraph.IdentitySet{
-					User: &identity,
+					User: &cs3Identity,
 				},
 			},
 		)
@@ -613,11 +615,11 @@ func (g BaseGraphService) cs3PublicSharesToDriveItems(ctx context.Context, share
 }
 
 func (g BaseGraphService) getLinkPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
-	share, err := g.getCS3PublicShareByID(ctx, permissionID)
+	cs3Share, err := g.getCS3PublicShareByID(ctx, permissionID)
 	if err != nil {
 		return nil, err
 	}
-	return share.GetResourceId(), nil
+	return cs3Share.GetResourceId(), nil
 }
 
 func (g BaseGraphService) getCS3PublicShareByID(ctx context.Context, permissionID string) (*link.PublicShare, error) {
@@ -646,6 +648,34 @@ func (g BaseGraphService) getCS3PublicShareByID(ctx context.Context, permissionI
 		return nil, err
 	}
 	return getPublicShareResp.GetShare(), nil
+}
+
+func (g BaseGraphService) removeOCMPermission(ctx context.Context, permissionID string) error {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return err
+	}
+
+	removePublicShareResp, err := gatewayClient.RemoveOCMShare(ctx,
+		&ocm.RemoveOCMShareRequest{
+			Ref: &ocm.ShareReference{
+				Spec: &ocm.ShareReference_Id{
+					Id: &ocm.ShareId{
+						OpaqueId: permissionID,
+					},
+				},
+			},
+		})
+	if err != nil {
+		return err
+	}
+
+	if err := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); err != nil {
+		return err
+	}
+	// We need to return an untyped nil here otherwise the error==nil check won't work
+	return nil
 }
 
 func (g BaseGraphService) removePublicShare(ctx context.Context, permissionID string) error {
@@ -736,12 +766,47 @@ func (g BaseGraphService) removeSpacePermission(ctx context.Context, permissionI
 	return nil
 }
 
-func (g BaseGraphService) getUserPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
-	share, err := g.getCS3UserShareByID(ctx, permissionID)
+func (g BaseGraphService) getOCMPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
+	cs3Share, err := g.getCS3OCMShareByID(ctx, permissionID)
 	if err != nil {
 		return nil, err
 	}
-	return share.GetResourceId(), nil
+	return cs3Share.GetResourceId(), nil
+}
+
+func (g BaseGraphService) getCS3OCMShareByID(ctx context.Context, permissionID string) (*ocm.Share, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return nil, err
+	}
+
+	getShareResp, err := gatewayClient.GetOCMShare(ctx,
+		&ocm.GetOCMShareRequest{
+			Ref: &ocm.ShareReference{
+				Spec: &ocm.ShareReference_Id{
+					Id: &ocm.ShareId{
+						OpaqueId: permissionID,
+					},
+				},
+			},
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	if err := errorcode.FromCS3Status(getShareResp.GetStatus(), err); err != nil {
+		return nil, err
+	}
+	return getShareResp.GetShare(), nil
+}
+
+func (g BaseGraphService) getUserPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
+	cs3Share, err := g.getCS3UserShareByID(ctx, permissionID)
+	if err != nil {
+		return nil, err
+	}
+	return cs3Share.GetResourceId(), nil
 }
 
 func (g BaseGraphService) getCS3UserShareByID(ctx context.Context, permissionID string) (*collaboration.Share, error) {
@@ -806,7 +871,7 @@ func (g BaseGraphService) getPermissionByID(ctx context.Context, permissionID st
 		}
 	case errors.As(err, &errcode) && errcode.GetCode() == errorcode.ItemNotFound:
 		// there is no public link with that id, check if this is a user share
-		share, err := g.getCS3UserShareByID(ctx, permissionID)
+		cs3Share, err := g.getCS3UserShareByID(ctx, permissionID)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -818,11 +883,11 @@ func (g BaseGraphService) getPermissionByID(ctx context.Context, permissionID st
 		if err != nil {
 			return nil, nil, err
 		}
-		permission, err := g.cs3UserShareToPermission(ctx, share, condition)
+		permission, err := g.cs3UserShareToPermission(ctx, cs3Share, condition)
 		if err != nil {
 			return nil, nil, err
 		}
-		return permission, share.GetResourceId(), nil
+		return permission, cs3Share.GetResourceId(), nil
 	}
 
 	return nil, nil, err
