@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-09-03-04-49-27]
+[#deprecation-note-2024-09-04-00-40-16]
 [caption=]
 .Deprecation notes for the storage-shares service
 [width="100%",cols="~,~,~,~",options="header"]
