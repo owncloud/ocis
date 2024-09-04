@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-08-31 00:04+0000\n"
+"POT-Creation-Date: 2024-09-04 00:37+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Flávio Veras <flaviove@gmail.com>, 2024\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/owncloud-org/teams/6149/pt_BR/)\n"
@@ -33,7 +33,7 @@ msgstr "Pode editar"
 #. directly)
 #: pkg/unifiedrole/roles.go:118
 msgid "Can edit without versions"
-msgstr ""
+msgstr "Pode editar sem versões"
 
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:136
