@@ -46,7 +46,7 @@ Feature: search federation users
                 },
                 "id": {
                   "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+                  "pattern": "^%federated_user_id_pattern%$"
                 },
                 "userType": {
                   "type": "string",
@@ -108,7 +108,7 @@ Feature: search federation users
                 },
                 "id": {
                   "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+                  "pattern": "^%federated_user_id_pattern%$"
                 },
                 "userType": {
                   "type": "string",
@@ -126,7 +126,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "https://federation-ocis-server:10200"
+                        "const": "federation-ocis-server:10200"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -176,7 +176,7 @@ Feature: search federation users
                 },
                 "id": {
                   "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+                  "pattern": "^%federated_user_id_pattern%$"
                 },
                 "userType": {
                   "type": "string",
@@ -238,7 +238,7 @@ Feature: search federation users
                 },
                 "id": {
                   "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+                  "pattern": "^%federated_user_id_pattern%$"
                 },
                 "userType": {
                   "type": "string",
@@ -256,7 +256,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "https://federation-ocis-server:10200"
+                        "const": "federation-ocis-server:10200"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -460,7 +460,7 @@ Feature: search federation users
                 },
                 "id": {
                   "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+                  "pattern": "^%federated_user_id_pattern%$"
                 },
                 "mail": {
                   "const": "alice@example.org"
@@ -525,7 +525,7 @@ Feature: search federation users
                 },
                 "id": {
                   "type": "string",
-                  "pattern": "^%user_id_pattern%$"
+                  "pattern": "^%federated_user_id_pattern%$"
                 },
                 "mail": {
                   "const": "brian@example.org"
@@ -545,7 +545,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "https://federation-ocis-server:10200"
+                        "const": "federation-ocis-server:10200"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -672,7 +672,7 @@ Feature: search federation users
                     },
                     "id": {
                       "type": "string",
-                      "pattern": "^%user_id_pattern%$"
+                      "pattern": "^%federated_user_id_pattern%$"
                     },
                     "mail": {
                       "const": "brian@example.org"
@@ -692,7 +692,7 @@ Feature: search federation users
                         ],
                         "properties": {
                           "issuer": {
-                            "const": "https://federation-ocis-server:10200"
+                            "const": "federation-ocis-server:10200"
                           },
                           "issuerAssignedId": {
                             "type": "string",

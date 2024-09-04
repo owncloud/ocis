@@ -21,13 +21,13 @@ package sciencemesh
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/rhttp/global"
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
-	"github.com/cs3org/reva/v2/pkg/smtpclient"
 	"github.com/cs3org/reva/v2/pkg/utils/cfg"
-	"github.com/go-chi/chi/v5"
-	"github.com/rs/zerolog"
 )
 
 func init() {
@@ -60,14 +60,23 @@ func (s *svc) Close() error {
 }
 
 type config struct {
-	Prefix           string                      `mapstructure:"prefix"`
-	SMTPCredentials  *smtpclient.SMTPCredentials `mapstructure:"smtp_credentials"   validate:"required"`
-	GatewaySvc       string                      `mapstructure:"gatewaysvc"         validate:"required"`
-	ProviderDomain   string                      `mapstructure:"provider_domain"    validate:"required"`
-	MeshDirectoryURL string                      `mapstructure:"mesh_directory_url"`
-	SubjectTemplate  string                      `mapstructure:"subject_template"`
-	BodyTemplatePath string                      `mapstructure:"body_template_path"`
-	OCMMountPoint    string                      `mapstructure:"ocm_mount_point"`
+	Prefix           string       `mapstructure:"prefix"`
+	GatewaySvc       string       `mapstructure:"gatewaysvc"         validate:"required"`
+	ProviderDomain   string       `mapstructure:"provider_domain"    validate:"required"`
+	MeshDirectoryURL string       `mapstructure:"mesh_directory_url"`
+	OCMMountPoint    string       `mapstructure:"ocm_mount_point"`
+	Events           EventOptions `mapstructure:"events"`
+}
+
+// EventOptions are the configurable options for events
+type EventOptions struct {
+	Endpoint             string `mapstructure:"natsaddress"`
+	Cluster              string `mapstructure:"natsclusterid"`
+	TLSInsecure          bool   `mapstructure:"tlsinsecure"`
+	TLSRootCACertificate string `mapstructure:"tlsrootcacertificate"`
+	EnableTLS            bool   `mapstructure:"enabletls"`
+	AuthUsername         string `mapstructure:"authusername"`
+	AuthPassword         string `mapstructure:"authpassword"`
 }
 
 func (c *config) ApplyDefaults() {

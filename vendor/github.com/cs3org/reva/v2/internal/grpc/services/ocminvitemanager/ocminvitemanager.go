@@ -32,6 +32,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/ocm/client"
 	"github.com/cs3org/reva/v2/pkg/ocm/invite"
 	"github.com/cs3org/reva/v2/pkg/ocm/invite/repository/registry"
+	ocmuser "github.com/cs3org/reva/v2/pkg/ocm/user"
 	"github.com/cs3org/reva/v2/pkg/rgrpc"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -210,6 +211,9 @@ func (s *service) ForwardInvite(ctx context.Context, req *invitepb.ForwardInvite
 		OpaqueId: remoteUser.UserID,
 	}
 
+	// we need to use a unique identifier for federated users
+	remoteUserID = ocmuser.FederatedID(remoteUserID)
+
 	if err := s.repo.AddRemoteUser(ctx, user.Id, &userpb.User{
 		Id:          remoteUserID,
 		Mail:        remoteUser.Email,
@@ -266,7 +270,11 @@ func (s *service) AcceptInvite(ctx context.Context, req *invitepb.AcceptInviteRe
 		}, nil
 	}
 
-	if err := s.repo.AddRemoteUser(ctx, token.GetUserId(), req.GetRemoteUser()); err != nil {
+	remoteUser := req.GetRemoteUser()
+	// we need to use a unique identifier for federated users
+	remoteUser.Id = ocmuser.FederatedID(remoteUser.Id)
+
+	if err := s.repo.AddRemoteUser(ctx, token.GetUserId(), remoteUser); err != nil {
 		if errors.Is(err, invite.ErrUserAlreadyAccepted) {
 			return &invitepb.AcceptInviteResponse{
 				Status: status.NewAlreadyExists(ctx, err, err.Error()),

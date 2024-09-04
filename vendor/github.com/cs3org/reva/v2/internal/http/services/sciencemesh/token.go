@@ -21,7 +21,6 @@ package sciencemesh
 import (
 	"encoding/json"
 	"errors"
-	"html/template"
 	"mime"
 	"net/http"
 
@@ -30,21 +29,21 @@ import (
 	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
 	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+
 	"github.com/cs3org/reva/v2/internal/http/services/reqres"
 	"github.com/cs3org/reva/v2/pkg/appctx"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/smtpclient"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/cs3org/reva/v2/pkg/utils/list"
 )
 
 type tokenHandler struct {
 	gatewayClient    gateway.GatewayAPIClient
-	smtpCredentials  *smtpclient.SMTPCredentials
 	meshDirectoryURL string
 	providerDomain   string
-	tplSubj          *template.Template
-	tplBody          *template.Template
+	eventStream      events.Stream
 }
 
 func (h *tokenHandler) init(c *config) error {
@@ -54,19 +53,15 @@ func (h *tokenHandler) init(c *config) error {
 		return err
 	}
 
-	if c.SMTPCredentials != nil {
-		h.smtpCredentials = smtpclient.NewSMTPCredentials(c.SMTPCredentials)
-	}
-
 	h.meshDirectoryURL = c.MeshDirectoryURL
 	h.providerDomain = c.ProviderDomain
 
-	if err := h.initSubjectTemplate(c.SubjectTemplate); err != nil {
-		return err
-	}
-
-	if err := h.initBodyTemplate(c.BodyTemplatePath); err != nil {
-		return err
+	if c.Events.Endpoint != "" {
+		es, err := stream.NatsFromConfig("sciencemesh-token-handler", false, stream.NatsConfig(c.Events))
+		if err != nil {
+			return err
+		}
+		h.eventStream = es
 	}
 
 	return nil
@@ -83,39 +78,75 @@ type token struct {
 // will send an email containing the link the user will use to accept the
 // invitation.
 func (h *tokenHandler) Generate(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	query := r.URL.Query()
-	token, err := h.gatewayClient.GenerateInviteToken(ctx, &invitepb.GenerateInviteTokenRequest{
-		Description: query.Get("description"),
-	})
+	req, err := getGenerateRequest(r)
 	if err != nil {
-		reqres.WriteError(w, r, reqres.APIErrorServerError, "error generating token", err)
+		reqres.WriteError(w, r, reqres.APIErrorInvalidParameter, "missing parameters in request", err)
 		return
 	}
 
-	user := ctxpkg.ContextMustGetUser(ctx)
-	recipient := query.Get("recipient")
-	if recipient != "" && h.smtpCredentials != nil {
-		templObj := &emailParams{
-			User:             user,
-			Token:            token.InviteToken.Token,
-			MeshDirectoryURL: h.meshDirectoryURL,
-		}
-		if err := h.sendEmail(recipient, templObj); err != nil {
-			reqres.WriteError(w, r, reqres.APIErrorServerError, "error sending token by mail", err)
-			return
-		}
+	ctx := r.Context()
+	genTokenRes, err := h.gatewayClient.GenerateInviteToken(ctx, &invitepb.GenerateInviteTokenRequest{
+		Description: req.Description,
+	})
+	switch {
+	case err != nil:
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error generating token", err)
+		return
+	case genTokenRes.GetStatus().GetCode() == rpc.Code_CODE_NOT_FOUND:
+		reqres.WriteError(w, r, reqres.APIErrorNotFound, genTokenRes.GetStatus().GetMessage(), nil)
+		return
+	case genTokenRes.GetStatus().GetCode() != rpc.Code_CODE_OK:
+		reqres.WriteError(w, r, reqres.APIErrorServerError, genTokenRes.GetStatus().GetMessage(), errors.New(genTokenRes.GetStatus().GetMessage()))
+		return
 	}
 
-	tknRes := h.prepareGenerateTokenResponse(token.InviteToken)
+	tknRes := h.prepareGenerateTokenResponse(genTokenRes.GetInviteToken())
 	if err := json.NewEncoder(w).Encode(tknRes); err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorServerError, "error marshalling token data", err)
 		return
 	}
 
+	if h.eventStream != nil {
+		if err := events.Publish(ctx, h.eventStream, events.ScienceMeshInviteTokenGenerated{
+			Sharer:        genTokenRes.GetInviteToken().GetUserId(),
+			RecipientMail: req.Recipient,
+			Token:         tknRes.Token,
+			Description:   tknRes.Description,
+			Expiration:    tknRes.Expiration,
+			InviteLink:    tknRes.InviteLink,
+			Timestamp:     utils.TSNow(),
+		}); err != nil {
+			log := appctx.GetLogger(ctx)
+			log.Error().Err(err).
+				Msg("failed to publish the science-mesh invite token generated event")
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+}
+
+// generateRequest is the request body for the Generate endpoint.
+type generateRequest struct {
+	Description string `json:"description"`
+	Recipient   string `json:"recipient" validate:"omitempty,email"`
+}
+
+func getGenerateRequest(r *http.Request) (*generateRequest, error) {
+	var req generateRequest
+	contentType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err == nil && contentType == "application/json" {
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			return nil, err
+		}
+	}
+
+	// validate the request
+	if err := validate.Struct(req); err != nil {
+		return nil, err
+	}
+
+	return &req, nil
 }
 
 func (h *tokenHandler) prepareGenerateTokenResponse(tkn *invitepb.InviteToken) *token {
