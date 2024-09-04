@@ -19,12 +19,15 @@ func TestPermissionsToCS3ResourcePermissions(t *testing.T) {
 		unifiedRoleDefinition *libregraph.UnifiedRoleDefinition
 		match                 bool
 	}{
-		cs3Conversions.RoleViewer:       {cs3Conversions.NewViewerRole(), unifiedrole.RoleViewer, true},
-		cs3Conversions.RoleEditor:       {cs3Conversions.NewEditorRole(), unifiedrole.RoleEditor, true},
-		cs3Conversions.RoleFileEditor:   {cs3Conversions.NewFileEditorRole(), unifiedrole.RoleFileEditor, true},
-		cs3Conversions.RoleManager:      {cs3Conversions.NewManagerRole(), unifiedrole.RoleManager, true},
-		cs3Conversions.RoleSecureViewer: {cs3Conversions.NewSecureViewerRole(), unifiedrole.RoleSecureViewer, true},
-		"no match":                      {cs3Conversions.NewFileEditorRole(), unifiedrole.RoleManager, false},
+		cs3Conversions.RoleViewer:               {cs3Conversions.NewViewerRole(), unifiedrole.RoleViewer, true},
+		cs3Conversions.RoleViewerListGrants:     {cs3Conversions.NewViewerListGrantsRole(), unifiedrole.RoleViewerListGrants, true},
+		cs3Conversions.RoleEditor:               {cs3Conversions.NewEditorRole(), unifiedrole.RoleEditor, true},
+		cs3Conversions.RoleEditorListGrants:     {cs3Conversions.NewEditorListGrantsRole(), unifiedrole.RoleEditorListGrants, true},
+		cs3Conversions.RoleFileEditor:           {cs3Conversions.NewFileEditorRole(), unifiedrole.RoleFileEditor, true},
+		cs3Conversions.RoleFileEditorListGrants: {cs3Conversions.NewFileEditorListGrantsRole(), unifiedrole.RoleFileEditorListGrants, true},
+		cs3Conversions.RoleManager:              {cs3Conversions.NewManagerRole(), unifiedrole.RoleManager, true},
+		cs3Conversions.RoleSecureViewer:         {cs3Conversions.NewSecureViewerRole(), unifiedrole.RoleSecureViewer, true},
+		"no match":                              {cs3Conversions.NewFileEditorRole(), unifiedrole.RoleManager, false},
 	}
 
 	for name, tc := range tests {
