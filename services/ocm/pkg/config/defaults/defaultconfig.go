@@ -85,6 +85,10 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "ocm",
 		},
+		Events: config.Events{
+			Endpoint: "127.0.0.1:9233",
+			Cluster:  "ocis-cluster",
+		},
 		ScienceMesh: config.ScienceMesh{
 			Prefix: "sciencemesh",
 		},

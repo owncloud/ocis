@@ -13,6 +13,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 )
 
@@ -502,6 +503,20 @@ func GroupMemberRemoved(ev events.GroupMemberRemoved) AuditEventGroupMemberRemov
 		AuditEvent: base,
 		GroupID:    ev.GroupID,
 		UserID:     ev.UserID,
+	}
+}
+
+// ScienceMeshInviteTokenGenerated converts a ScienceMeshInviteTokenGenerated event to an AuditEventScienceMeshInviteTokenGenerated
+func ScienceMeshInviteTokenGenerated(ev events.ScienceMeshInviteTokenGenerated) AuditEventScienceMeshInviteTokenGenerated {
+	msg := MessageScienceMeshInviteTokenGenerated(ev.Sharer.GetOpaqueId(), ev.Token)
+	base := BasicAuditEvent(ev.Sharer.GetOpaqueId(), formatTime(ev.Timestamp), msg, ActionScienceMeshInviteTokenGenerated)
+	return AuditEventScienceMeshInviteTokenGenerated{
+		AuditEvent:    base,
+		RecipientMail: ev.RecipientMail,
+		Token:         ev.Token,
+		Description:   ev.Description,
+		Expiration:    ev.Expiration,
+		InviteLink:    ev.InviteLink,
 	}
 }
 

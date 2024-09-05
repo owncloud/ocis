@@ -72,18 +72,39 @@ You might still have access through your other groups or direct membership.`),
 
 Even though this membership has expired you still might have access through other shares and/or space memberships`),
 	}
+
+	ScienceMeshInviteTokenGenerated = MessageTemplate{
+		textTemplate: "templates/text/email.text.tmpl",
+		htmlTemplate: "templates/html/email.html.tmpl",
+		// ScienceMeshInviteTokenGenerated email template, Subject field (resolves directly)
+		Subject: l10n.Template(`ScienceMesh: {InitiatorName} wants to collaborate with you`),
+		// ScienceMeshInviteTokenGenerated email template, resolves via {{ .Greeting }}
+		Greeting: l10n.Template(`Hi,`),
+		// ScienceMeshInviteTokenGenerated email template, resolves via {{ .MessageBody }}
+		MessageBody: l10n.Template(`{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.
+{{if .ShareLink }}To accept the invite, please visit the following URL:
+{ShareLink}
+
+Alternatively, you can{{else}}
+Please{{end}} visit your federation provider and use the following details:
+  Token: {Token}
+  ProviderDomain: {ProviderDomain}`),
+	}
 )
 
 // holds the information to turn the raw template into a parseable go template
 var _placeholders = map[string]string{
-	"{ShareSharer}":  "{{ .ShareSharer }}",
-	"{ShareFolder}":  "{{ .ShareFolder }}",
-	"{ShareGrantee}": "{{ .ShareGrantee }}",
-	"{ShareLink}":    "{{ .ShareLink }}",
-	"{SpaceName}":    "{{ .SpaceName }}",
-	"{SpaceGrantee}": "{{ .SpaceGrantee }}",
-	"{SpaceSharer}":  "{{ .SpaceSharer }}",
-	"{ExpiredAt}":    "{{ .ExpiredAt }}",
+	"{ShareSharer}":     "{{ .ShareSharer }}",
+	"{ShareFolder}":     "{{ .ShareFolder }}",
+	"{ShareGrantee}":    "{{ .ShareGrantee }}",
+	"{ShareLink}":       "{{ .ShareLink }}",
+	"{SpaceName}":       "{{ .SpaceName }}",
+	"{SpaceGrantee}":    "{{ .SpaceGrantee }}",
+	"{SpaceSharer}":     "{{ .SpaceSharer }}",
+	"{ExpiredAt}":       "{{ .ExpiredAt }}",
+	"{ShareSharerMail}": "{{ .ShareSharerMail }}",
+	"{ProviderDomain}":  "{{ .ProviderDomain }}",
+	"{Token}":           "{{ .Token }}",
 }
 
 // MessageTemplate is the data structure for the email

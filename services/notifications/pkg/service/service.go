@@ -16,6 +16,10 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/go-playground/validator/v10"
+	"go-micro.dev/v4/metadata"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
+
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
@@ -25,9 +29,14 @@ import (
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
-	"go-micro.dev/v4/metadata"
-	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
+
+// validate is the package level validator instance
+var validate *validator.Validate
+
+func init() {
+	validate = validator.New()
+}
 
 // Service should be named `Runner`
 type Service interface {
@@ -92,6 +101,8 @@ func (s eventsNotifier) Run() error {
 					s.handleShareCreated(e)
 				case events.ShareExpired:
 					s.handleShareExpired(e)
+				case events.ScienceMeshInviteTokenGenerated:
+					s.handleScienceMeshInviteTokenGenerated(e)
 				}
 			}()
 		case <-s.signals:

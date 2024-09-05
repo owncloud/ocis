@@ -25,7 +25,7 @@ var (
 	imgDir = filepath.Join("templates", "html", "img")
 )
 
-// RenderEmailTemplate renders the email template for a new share
+// RenderEmailTemplate is responsible to prepare a message which than can be used to notify the user via email.
 func RenderEmailTemplate(mt MessageTemplate, locale, defaultLocale string, emailTemplatePath string, translationPath string, vars map[string]string) (*channels.Message, error) {
 	textMt, err := NewTextTemplate(mt, locale, defaultLocale, translationPath, vars)
 	if err != nil {
