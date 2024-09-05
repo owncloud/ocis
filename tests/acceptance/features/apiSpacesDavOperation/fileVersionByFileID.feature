@@ -175,3 +175,34 @@ Feature: checking file versions using file id
       | permissionsRole | Space Editor Without Versions |
     When user "Brian" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
     Then the HTTP status code should be "403"
+
+
+  Scenario Outline: public tries to check the versions of a file in a project space shared via link as viewer/editor
+    Given user "Alice" has created the following space link share:
+      | space           | Project1           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    When the public tries to get the number of versions of file "/text.txt" with password "%public%" using file-id path "/meta/<<FILEID>>/v"
+    Then the HTTP status code should be "401"
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
+
+
+  Scenario Outline: public tries to check the versions of a file in a personal space shared via link as viewer/editor
+    Given user "Alice" has created folder "PARENT"
+    And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
+    And user "Alice" has uploaded file with content "some updated data" to "/PARENT/parent.txt"
+    And we save it into "FILEID"
+    And user "Alice" has created the following resource link share:
+      | resource           | PARENT             |
+      | space              | Personal           |
+      | permissionsRole    | <permissions-role> |
+      | password           | %public%           |
+    When the public tries to get the number of versions of file "/parent.txt" with password "%public%" using file-id path "/meta/<<FILEID>>/v"
+    Then the HTTP status code should be "401"
+    Examples:
+      | permissions-role |
+      | view             |
+      | edit             |
