@@ -98,10 +98,10 @@ Feature: collaboration (wopi)
       """
 
   @issue-9928
-  Scenario: open text file without app name in url query (MIME type not registered in app-registry)
+  Scenario: user tries to open text file without app name in url query (MIME type not registered in app-registry)
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "lorem.txt"
     And we save it into "FILEID"
-    When user "Alice" sends HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>"
+    When user "Alice" tries to send HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>"
     Then the HTTP status code should be "500"
     And the JSON data of the response should match
       """
@@ -226,10 +226,10 @@ Feature: collaboration (wopi)
       | /app/open?file_id=<<FILEID>>                     |
 
   @issue-9928
-  Scenario Outline: open unsupported file format
+  Scenario Outline: user tries to open unsupported file format
     Given user "Alice" has uploaded file "filesForUpload/simple.pdf" to "simple.pdf"
     And we save it into "FILEID"
-    When user "Alice" sends HTTP method "POST" to URL "<app-endpoint>"
+    When user "Alice" tries to send HTTP method "POST" to URL "<app-endpoint>"
     Then the HTTP status code should be "500"
     And the JSON data of the response should match
       """
@@ -255,11 +255,11 @@ Feature: collaboration (wopi)
       | /app/open?file_id=<<FILEID>>                     |
 
 
-  Scenario Outline: open file with non-existing file id
+  Scenario Outline: user tries to open deleted file
     Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
     And we save it into "FILEID"
     And user "Alice" has deleted file "/simple.odt"
-    When user "Alice" sends HTTP method "POST" to URL "<app-endpoint>"
+    When user "Alice" tries to send HTTP method "POST" to URL "<app-endpoint>"
     Then the HTTP status code should be "404"
     And the JSON data of the response should match
       """
@@ -380,10 +380,10 @@ Feature: collaboration (wopi)
       """
 
   @issue-9928
-  Scenario: open text file using open-with-web without app name in url query (MIME type not registered in app-registry)
+  Scenario: user tries to open text file using open-with-web without app name in url query (MIME type not registered in app-registry)
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "lorem.txt"
     And we save it into "FILEID"
-    When user "Alice" sends HTTP method "POST" to URL "/app/open-with-web?file_id=<<FILEID>>"
+    When user "Alice" tries to send HTTP method "POST" to URL "/app/open-with-web?file_id=<<FILEID>>"
     Then the HTTP status code should be "500"
     And the JSON data of the response should match
       """
@@ -495,10 +495,10 @@ Feature: collaboration (wopi)
       | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice&view_mode=write |
 
   @issue-9928
-  Scenario Outline: open unsupported file format (open-with-web)
+  Scenario Outline: user tries to open unsupported file format (open-with-web)
     Given user "Alice" has uploaded file "filesForUpload/simple.pdf" to "simple.pdf"
     And we save it into "FILEID"
-    When user "Alice" sends HTTP method "POST" to URL "<app-endpoint>"
+    When user "Alice" tries to send HTTP method "POST" to URL "<app-endpoint>"
     Then the HTTP status code should be "500"
     And the JSON data of the response should match
       """
@@ -514,6 +514,36 @@ Feature: collaboration (wopi)
           },
           "message": {
             "const": "Error contacting the requested application, please use a different one or try again later"
+          }
+        }
+      }
+      """
+    Examples:
+      | app-endpoint                                              |
+      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice |
+      | /app/open-with-web?file_id=<<FILEID>>                     |
+
+
+  Scenario Outline: user tries to open deleted file (open-with-web)
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And we save it into "FILEID"
+    And user "Alice" has deleted file "/simple.odt"
+    When user "Alice" tries to send HTTP method "POST" to URL "<app-endpoint>"
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "RESOURCE_NOT_FOUND"
+          },
+          "message": {
+            "const": "file does not exist"
           }
         }
       }
