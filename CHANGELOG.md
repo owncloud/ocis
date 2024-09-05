@@ -68,8 +68,8 @@ The following sections list the changes for unreleased.
 * Enhancement - Improve revisions purge: [#9891](https://github.com/owncloud/ocis/pull/9891)
 * Enhancement - Allow setting default locale of activitylog: [#9892](https://github.com/owncloud/ocis/pull/9892)
 * Enhancement - Graph translation path: [#9902](https://github.com/owncloud/ocis/pull/9902)
-* Enhancement - Bump reva: [#9920](https://github.com/owncloud/ocis/pull/9920)
 * Enhancement - Added a new roles viewer/editor with ListGrants: [#9943](https://github.com/owncloud/ocis/pull/9943)
+* Enhancement - Bump reva: [#9981](https://github.com/owncloud/ocis/pull/9981)
 
 ## Details
 
@@ -220,20 +220,21 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9902
 
-* Enhancement - Bump reva: [#9920](https://github.com/owncloud/ocis/pull/9920)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/9920
-   https://github.com/owncloud/ocis/pull/9879
-   https://github.com/owncloud/ocis/pull/9860
-
 * Enhancement - Added a new roles viewer/editor with ListGrants: [#9943](https://github.com/owncloud/ocis/pull/9943)
 
    We add a new roles space viewer/editor with ListGrants permissions.
 
    https://github.com/owncloud/ocis/issues/9701
    https://github.com/owncloud/ocis/pull/9943
+
+* Enhancement - Bump reva: [#9981](https://github.com/owncloud/ocis/pull/9981)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/9981
+   https://github.com/owncloud/ocis/pull/9920
+   https://github.com/owncloud/ocis/pull/9879
+   https://github.com/owncloud/ocis/pull/9860
 
 # Changelog for [6.3.0] (2024-08-20)
 
