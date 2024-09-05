@@ -100,10 +100,12 @@ func (h *tokenHandler) Generate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK) // FIXME this should be a 201 created status. Tracked in https://github.com/cs3org/reva/issues/4838
+
 	tknRes := h.prepareGenerateTokenResponse(genTokenRes.GetInviteToken())
 	if err := json.NewEncoder(w).Encode(tknRes); err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorServerError, "error marshalling token data", err)
-		return
 	}
 
 	if h.eventStream != nil {
@@ -122,8 +124,6 @@ func (h *tokenHandler) Generate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 }
 
 // generateRequest is the request body for the Generate endpoint.
