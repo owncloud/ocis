@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow setting default locale of activitylog: [#9892](https://github.com/owncloud/ocis/pull/9892)
 * Enhancement - Graph translation path: [#9902](https://github.com/owncloud/ocis/pull/9902)
 * Enhancement - Added a new roles viewer/editor with ListGrants: [#9943](https://github.com/owncloud/ocis/pull/9943)
+* Enhancement - Handle OCM invite generated event: [#9966](https://github.com/owncloud/ocis/pull/9966)
 * Enhancement - Bump reva: [#9981](https://github.com/owncloud/ocis/pull/9981)
 
 ## Details
@@ -226,6 +227,18 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9701
    https://github.com/owncloud/ocis/pull/9943
+
+* Enhancement - Handle OCM invite generated event: [#9966](https://github.com/owncloud/ocis/pull/9966)
+
+   Both the notification and audit services now handle the OCM invite generated
+   event.
+
+   - The notification service is responsible for sending an email to the invited
+   user. - The audit service is responsible for logging the event.
+
+   https://github.com/owncloud/ocis/issues/9583
+   https://github.com/owncloud/ocis/pull/9966
+   https://github.com/cs3org/reva/pull/4832
 
 * Enhancement - Bump reva: [#9981](https://github.com/owncloud/ocis/pull/9981)
 
