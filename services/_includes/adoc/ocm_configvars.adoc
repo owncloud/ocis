@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-09-05-15-24-02]
+[#deprecation-note-2024-09-05-16-10-14]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -298,6 +298,90 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The service account secret.
+
+a|`OCIS_EVENTS_ENDPOINT` +
+`OCM_EVENTS_ENDPOINT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+
+a|`OCIS_EVENTS_CLUSTER` +
+`OCM_EVENTS_CLUSTER` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis-cluster ++
+a| [subs=-attributes]
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+
+a|`OCIS_INSECURE` +
+`OCM_EVENTS_TLS_INSECURE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+
+a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`OCM_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided OCM_EVENTS_TLS_INSECURE will be seen as false.
+
+a|`OCIS_EVENTS_ENABLE_TLS` +
+`OCM_EVENTS_ENABLE_TLS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_USERNAME` +
+`OCM_EVENTS_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_PASSWORD` +
+`OCM_EVENTS_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
 a|`OCIS_REVA_GATEWAY` +
 
