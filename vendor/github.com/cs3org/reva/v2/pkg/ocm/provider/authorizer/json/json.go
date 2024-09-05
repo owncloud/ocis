@@ -28,17 +28,22 @@ import (
 	"sync"
 
 	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
+	"github.com/pkg/errors"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/ocm/provider"
 	"github.com/cs3org/reva/v2/pkg/ocm/provider/authorizer/registry"
 	"github.com/cs3org/reva/v2/pkg/utils/cfg"
-	"github.com/pkg/errors"
 )
 
 func init() {
 	registry.Register("json", New)
 }
+
+var (
+	ErrNoIP = errtypes.NotSupported("No IP provided")
+)
 
 // New returns a new authorizer object.
 func New(m map[string]interface{}) (provider.Authorizer, error) {
@@ -99,10 +104,10 @@ func normalizeDomain(d string) (string, error) {
 		return "", err
 	}
 
-	return u.Hostname(), nil
+	return u.Host, nil
 }
 
-func (a *authorizer) GetInfoByDomain(ctx context.Context, domain string) (*ocmprovider.ProviderInfo, error) {
+func (a *authorizer) GetInfoByDomain(_ context.Context, domain string) (*ocmprovider.ProviderInfo, error) {
 	normalizedDomain, err := normalizeDomain(domain)
 	if err != nil {
 		return nil, err
@@ -140,7 +145,7 @@ func (a *authorizer) IsProviderAllowed(ctx context.Context, pi *ocmprovider.Prov
 	case !a.conf.VerifyRequestHostname:
 		return nil
 	case len(pi.Services) == 0:
-		return errtypes.NotSupported("No IP provided")
+		return ErrNoIP
 	}
 
 	var ocmHost string

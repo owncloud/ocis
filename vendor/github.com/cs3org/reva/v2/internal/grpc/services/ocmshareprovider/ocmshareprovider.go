@@ -20,7 +20,6 @@ package ocmshareprovider
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"path/filepath"
 	"strings"
@@ -35,11 +34,13 @@ import (
 	providerpb "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/ocmd"
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/ocm/client"
 	"github.com/cs3org/reva/v2/pkg/ocm/share"
 	"github.com/cs3org/reva/v2/pkg/ocm/share/repository/registry"
+	ocmuser "github.com/cs3org/reva/v2/pkg/ocm/user"
 	"github.com/cs3org/reva/v2/pkg/rgrpc"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -155,10 +156,6 @@ func getOCMEndpoint(originProvider *ocmprovider.ProviderInfo) (string, error) {
 		}
 	}
 	return "", errors.New("ocm endpoint not specified for mesh provider")
-}
-
-func formatOCMUser(u *userpb.UserId) string {
-	return fmt.Sprintf("%s@%s", u.OpaqueId, u.Idp)
 }
 
 func getResourceType(info *providerpb.ResourceInfo) string {
@@ -288,6 +285,7 @@ func (s *service) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareReq
 		Nanos:   uint32(now % 1000000000),
 	}
 
+	// 1. persist the share in the repository
 	ocmshare := &ocm.Share{
 		Token:         tkn,
 		Name:          filepath.Base(info.Path),
@@ -314,6 +312,8 @@ func (s *service) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareReq
 		}, nil
 	}
 
+	// 2. create the share on the remote provider
+	// 2.a get the ocm endpoint of the remote provider
 	ocmEndpoint, err := getOCMEndpoint(req.RecipientMeshProvider)
 	if err != nil {
 		return &ocm.CreateOCMShareResponse{
@@ -321,18 +321,20 @@ func (s *service) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareReq
 		}, nil
 	}
 
+	// 2.b replace outgoing user ids with ocm user ids
+	// unpack the federated user id
+	shareWith := ocmuser.FormatOCMUser(ocmuser.RemoteID(req.GetGrantee().GetUserId()))
+
+	// wrap the local user id in a federated user id
+	owner := ocmuser.FormatOCMUser(ocmuser.FederatedID(info.Owner))
+	sender := ocmuser.FormatOCMUser(ocmuser.FederatedID(user.Id))
+
 	newShareReq := &client.NewShareRequest{
-		ShareWith:  formatOCMUser(req.Grantee.GetUserId()),
-		Name:       ocmshare.Name,
-		ProviderID: ocmshare.Id.OpaqueId,
-		Owner: formatOCMUser(&userpb.UserId{
-			OpaqueId: info.Owner.OpaqueId,
-			Idp:      s.conf.ProviderDomain,
-		}),
-		Sender: formatOCMUser(&userpb.UserId{
-			OpaqueId: user.Id.OpaqueId,
-			Idp:      s.conf.ProviderDomain,
-		}),
+		ShareWith:         shareWith,
+		Name:              ocmshare.Name,
+		ProviderID:        ocmshare.Id.OpaqueId,
+		Owner:             owner,
+		Sender:            sender,
 		SenderDisplayName: user.DisplayName,
 		ShareType:         "user",
 		ResourceType:      getResourceType(info),
@@ -343,8 +345,14 @@ func (s *service) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareReq
 		newShareReq.Expiration = req.Expiration.Seconds
 	}
 
+	// 2.c make POST /shares request
 	newShareRes, err := s.client.NewShare(ctx, ocmEndpoint, newShareReq)
 	if err != nil {
+		err2 := s.repo.DeleteShare(ctx, user, &ocm.ShareReference{Spec: &ocm.ShareReference_Id{Id: ocmshare.Id}})
+		if err2 != nil {
+			appctx.GetLogger(ctx).Error().Err(err2).Str("shareid", ocmshare.GetId().GetOpaqueId()).Msg("could not delete local ocm share")
+		}
+		// TODO remove the share from the local storage
 		switch {
 		case errors.Is(err, client.ErrInvalidParameters):
 			return &ocm.CreateOCMShareResponse{

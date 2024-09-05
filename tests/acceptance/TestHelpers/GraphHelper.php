@@ -87,6 +87,15 @@ class GraphHelper {
 	public static function getEtagRegex(): string {
 		return "^\\\"[a-f0-9:.]{1,32}\\\"$";
 	}
+	/**
+	 * Federated users have a base64 encoded string of {remoteid}@{provider} as their id
+	 * This regex matches only non empty base64 encoded strings
+	 *
+	 * @return string
+	 */
+	public static function getFederatedUserRegex(): string {
+		return '^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$';
+	}
 
 	/**
 	 * Key name can consist of @@@
