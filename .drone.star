@@ -1129,12 +1129,13 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "BEHAT_FILTER_TAGS": filterTags,
                              "DIVIDE_INTO_NUM_PARTS": number_of_parts,
                              "RUN_PART": part_number,
+                             "ACCEPTANCE_TEST_TYPE": "core-api",
                              "EXPECTED_FAILURES_FILE": expectedFailuresFile,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                              "OCIS_WRAPPER_URL": "http://ocis-server:5200",
                          },
                          "commands": [
-                             "make -C %s test-acceptance-from-core-api" % (dirs["base"]),
+                             "make -C %s test-acceptance-api" % (dirs["base"]),
                          ],
                      },
                  ] +
