@@ -11,6 +11,7 @@ PRODUCTION_RELEASE_TAGS = ["5.0", "7.0.0"]
 ALPINE_GIT = "alpine/git:latest"
 APACHE_TIKA = "apache/tika:2.8.0.0"
 CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
+COLLABORA_CODE = "collabora/code:24.04.5.1.1"
 INBUCKET_INBUCKET = "inbucket/inbucket"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
@@ -25,6 +26,7 @@ OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
 OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.2.1"
 OC_LITMUS = "owncloudci/litmus:latest"
 OC_UBUNTU = "owncloud/ubuntu:20.04"
+ONLYOFFICE_DOCUMENT_SERVER = "onlyoffice/documentserver:7.5.1"
 PLUGINS_CODACY = "plugins/codacy:1"
 PLUGINS_DOCKER = "plugins/docker:latest"
 PLUGINS_GH_PAGES = "plugins/gh-pages:1"
@@ -95,6 +97,7 @@ config = {
             "skip": False,
         },
         "apiAccountsHashDifficulty": {
+            "skip": False,
             "suites": [
                 "apiAccountsHashDifficulty",
             ],
@@ -160,10 +163,6 @@ config = {
             ],
             "skip": False,
             "collaborationServiceNeeded": True,
-            "extraCollaborationEnvironment": {
-                "COLLABORATION_APP_NAME": "FakeOffice",
-                "COLLABORATION_APP_ADDR": "http://fakeoffice:8080",
-            },
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
             },
@@ -892,14 +891,18 @@ def localApiTestPipeline(ctx):
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      (tikaService() if params["tikaNeeded"] else []) +
+                                     (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
                                      ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
-                                     (collaborationService(params["extraCollaborationEnvironment"]) if params["collaborationServiceNeeded"] else []) +
+                                     ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
+                                     (waitForServices("wopi", ["wopi-collabora:9300", "wopi-onlyoffice:9300", "wopi-fakeoffice:9300"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      logRequests(),
-                            "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [] + fakeOffice() if params["collaborationServiceNeeded"] else [],
+                            "services": (emailService() if params["emailNeeded"] else []) +
+                                        (clamavService() if params["antivirusNeeded"] else []) +
+                                        ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
                             "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
@@ -995,7 +998,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
     if wopiServerType == "cs3":
         wopiServer = [
             {
-                "name": "wopiserver",
+                "name": "wopi-fakeoffice",
                 "image": "cs3org/wopiserver:v10.4.0",
                 "detach": True,
                 "commands": [
@@ -1004,25 +1007,13 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                     "/app/wopiserver.py",
                 ],
             },
-            {
-                "name": "wait-for-wopi-server",
-                "image": OC_CI_WAIT_FOR,
-                "commands": [
-                    "wait-for -it wopiserver:9300 -t 300",
-                ],
-            },
         ]
     else:
         extra_server_environment = {
             "OCIS_EXCLUDE_RUN_SERVICES": "app-provider",
         }
 
-        extra_environment = {
-            "COLLABORATION_APP_NAME": "FakeOffice",
-            "COLLABORATION_APP_ADDR": "http://fakeoffice:8080",
-        }
-
-        wopiServer = collaborationService(extra_environment)
+        wopiServer = wopiCollaborationService("fakeoffice")
 
     wopiTestCases = dirs["base"] + "/tests/config/drone/wopiValidatorCustomTestCases.xml"
     for testgroup in testgroups:
@@ -1068,8 +1059,10 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  fakeOffice() +
+                 waitForServices("fake-office", ["fakeoffice:8080"]) +
                  ocisServer(storage, accounts_hash_difficulty, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
                  wopiServer +
+                 waitForServices("wopi-fakeoffice", ["wopi-fakeoffice:9300"]) +
                  [
                      {
                          "name": "prepare-test-file",
@@ -1085,7 +1078,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                              "cat open.json",
                              "cat open.json | jq .form_parameters.access_token | tr -d '\"' > accesstoken",
                              "cat open.json | jq .form_parameters.access_token_ttl | tr -d '\"' > accesstokenttl",
-                             "echo -n 'http://wopiserver:9300/wopi/files/' > wopisrc",
+                             "echo -n 'http://wopi-fakeoffice:9300/wopi/files/' > wopisrc",
                              "cat open.json | jq .app_url | sed -n -e 's/^.*files%2F//p' | tr -d '\"' >> wopisrc",
                          ],
                      },
@@ -2105,7 +2098,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         environment["APP_PROVIDER_WOPI_APP_NAME"] = "FakeOffice"
         environment["APP_PROVIDER_WOPI_APP_URL"] = "http://fakeoffice:8080"
         environment["APP_PROVIDER_WOPI_INSECURE"] = "true"
-        environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopiserver:9300"
+        environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopi-fakeoffice:9300"
         environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = OCIS_URL
 
     if deploy_type == "federation":
@@ -2888,48 +2881,46 @@ def fakeOffice():
                 "sh %s/tests/config/drone/serve-hosting-discovery.sh" % (dirs["base"]),
             ],
         },
-        {
-            "name": "wait-for-fakeoffice",
-            "image": OC_CI_WAIT_FOR,
-            "commands": [
-                "wait-for -it fakeoffice:8080 -t 300",
-            ],
-        },
     ]
 
-def collaborationService(extra_environment = {}):
+def wopiCollaborationService(name):
+    service_name = "wopi-%s" % name
+
     environment = {
         "MICRO_REGISTRY": "nats-js-kv",
         "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
         "COLLABORATION_LOG_LEVEL": "debug",
-        "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
         "COLLABORATION_GRPC_ADDR": "0.0.0.0:9301",
+        "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
         "COLLABORATION_APP_PROOF_DISABLE": "true",
         "COLLABORATION_APP_INSECURE": "true",
-        "COLLABORATION_WOPI_SRC": "http://wopiserver:9300",
-        "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
         "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+        "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
     }
 
-    for item in extra_environment:
-        environment[item] = extra_environment[item]
+    if name == "collabora":
+        environment["COLLABORATION_APP_NAME"] = "Collabora"
+        environment["COLLABORATION_APP_ADDR"] = "https://collabora:9980"
+        environment["COLLABORATION_APP_ICON"] = "https://collabora:9980/favicon.ico"
+    elif name == "onlyoffice":
+        environment["COLLABORATION_APP_NAME"] = "OnlyOffice"
+        environment["COLLABORATION_APP_ADDR"] = "https://onlyoffice"
+        environment["COLLABORATION_APP_ICON"] = "https://onlyoffice/web-apps/apps/documenteditor/main/resources/img/favicon.ico"
+    elif name == "fakeoffice":
+        environment["COLLABORATION_APP_NAME"] = "FakeOffice"
+        environment["COLLABORATION_APP_ADDR"] = "http://fakeoffice:8080"
+
+    environment["COLLABORATION_WOPI_SRC"] = "http://%s:9300" % service_name
 
     return [
         {
-            "name": "wopiserver",
+            "name": service_name,
             "image": OC_CI_GOLANG,
             "detach": True,
             "environment": environment,
             "commands": [
                 "ocis/bin/ocis collaboration server",
-            ],
-        },
-        {
-            "name": "wait-for-wopi-server",
-            "image": OC_CI_WAIT_FOR,
-            "commands": [
-                "wait-for -it wopiserver:9300 -t 300",
             ],
         },
     ]
@@ -3040,3 +3031,54 @@ def k6LoadTests(ctx):
             ],
         },
     }]
+
+def waitForServices(name, services = []):
+    services = ",".join(services)
+    return [{
+        "name": "wait-for-%s" % name,
+        "image": OC_CI_WAIT_FOR,
+        "commands": [
+            "wait-for -it %s -t 300" % services,
+        ],
+    }]
+
+def collaboraService():
+    return [
+        {
+            "name": "collabora",
+            "type": "docker",
+            "image": COLLABORA_CODE,
+            "detach": True,
+            "environment": {
+                "DONT_GEN_SSL_CERT": "set",
+                "extra_params": "--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=https://ocis-server:9200",
+            },
+            "commands": [
+                "coolconfig generate-proof-key",
+                "bash /start-collabora-online.sh",
+            ],
+        },
+    ]
+
+def onlyofficeService():
+    return [
+        {
+            "name": "onlyoffice",
+            "type": "docker",
+            "image": ONLYOFFICE_DOCUMENT_SERVER,
+            "detach": True,
+            "environment": {
+                "WOPI_ENABLED": "true",
+                "USE_UNAUTHORIZED_STORAGE": "true",  # self signed certificates
+            },
+            "commands": [
+                "cp %s/tests/config/drone/only-office.json /etc/onlyoffice/documentserver/local.json" % dirs["base"],
+                "openssl req -x509 -newkey rsa:4096 -keyout onlyoffice.key -out onlyoffice.crt -sha256 -days 365 -batch -nodes",
+                "mkdir -p /var/www/onlyoffice/Data/certs",
+                "cp onlyoffice.key /var/www/onlyoffice/Data/certs/",
+                "cp onlyoffice.crt /var/www/onlyoffice/Data/certs/",
+                "chmod 400 /var/www/onlyoffice/Data/certs/onlyoffice.key",
+                "/app/ds/run-document-server.sh",
+            ],
+        },
+    ]
