@@ -526,7 +526,14 @@ func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Conte
 func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
 	oldPermission, sharedResourceID, err := s.getPermissionByID(ctx, permissionID, itemID)
 	if err != nil {
-		return libregraph.Permission{}, err
+		if s.config.IncludeOCMSharees {
+			oldPermission, sharedResourceID, err = s.getOCMPermissionByID(ctx, permissionID, itemID)
+			if err != nil {
+				return libregraph.Permission{}, err
+			}
+		} else {
+			return libregraph.Permission{}, err
+		}
 	}
 
 	// The resourceID of the shared resource need to match the item ID from the Request Path
@@ -547,10 +554,19 @@ func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemI
 
 	// This is a user share
 	updatedPermission, err := s.updateUserShare(ctx, permissionID, sharedResourceID, &newPermission)
-	if err != nil {
-		return libregraph.Permission{}, err
+	if err == nil {
+		return *updatedPermission, nil
 	}
-	return *updatedPermission, nil
+
+	// This is an ocm share
+	if s.config.IncludeOCMSharees {
+		updatePermission, err := s.updateOCMPermission(ctx, permissionID, itemID, &newPermission)
+		if err == nil {
+			return *updatePermission, err
+		}
+	}
+	return libregraph.Permission{}, err
+
 }
 
 // UpdateSpaceRootPermission updates a permission on the root item of a project space

@@ -836,6 +836,31 @@ func (g BaseGraphService) getCS3UserShareByID(ctx context.Context, permissionID 
 	return getShareResp.GetShare(), nil
 }
 
+func (g BaseGraphService) getOCMPermissionByID(ctx context.Context, permissionID string, itemID *storageprovider.ResourceId) (*libregraph.Permission, *storageprovider.ResourceId, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelevtor failed")
+		return nil, nil, err
+	}
+	ocmShare, err := g.getCS3OCMShareByID(ctx, permissionID)
+	if err != nil {
+		return nil, nil, err
+	}
+	resourceInfo, err := utils.GetResourceByID(ctx, itemID, gatewayClient)
+	if err != nil {
+		return nil, nil, err
+	}
+	condition, err := roleConditionForResourceType(resourceInfo)
+	if err != nil {
+		return nil, nil, err
+	}
+	permission, err := g.cs3OCMShareToPermission(ctx, ocmShare, condition)
+	if err != nil {
+		return nil, nil, err
+	}
+	return permission, ocmShare.GetResourceId(), nil
+}
+
 func (g BaseGraphService) getPermissionByID(ctx context.Context, permissionID string, itemID *storageprovider.ResourceId) (*libregraph.Permission, *storageprovider.ResourceId, error) {
 	var errcode errorcode.Error
 	gatewayClient, err := g.gatewaySelector.Next()
@@ -891,6 +916,109 @@ func (g BaseGraphService) getPermissionByID(ctx context.Context, permissionID st
 	}
 
 	return nil, nil, err
+}
+
+func (g BaseGraphService) updateOCMPermission(ctx context.Context, permissionID string, itemID *storageprovider.ResourceId, newPermission *libregraph.Permission) (*libregraph.Permission, error) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		return nil, err
+	}
+
+	resourceInfo, err := utils.GetResourceByID(ctx, itemID, gatewayClient)
+	if err != nil {
+		return nil, err
+	}
+	condition, err := roleConditionForResourceType(resourceInfo)
+	if err != nil {
+		return nil, err
+	}
+	var cs3UpdateOCMShareReq ocm.UpdateOCMShareRequest
+	cs3UpdateOCMShareReq.Ref = &ocm.ShareReference{
+		Spec: &ocm.ShareReference_Id{
+			Id: &ocm.ShareId{
+				OpaqueId: permissionID,
+			},
+		},
+	}
+	if expiration, ok := newPermission.GetExpirationDateTimeOk(); ok {
+		cs3UpdateOCMShareReq.Field = append(cs3UpdateOCMShareReq.Field, &ocm.UpdateOCMShareRequest_UpdateField{
+			Field: &ocm.UpdateOCMShareRequest_UpdateField_Expiration{
+				Expiration: utils.TimeToTS(*expiration),
+			},
+		},
+		)
+	}
+
+	var allowedResourceActions []string
+	var permissionsUpdated bool
+	if roles, ok := newPermission.GetRolesOk(); ok {
+		if len(roles) > 0 {
+			for _, roleID := range roles {
+				role, err := unifiedrole.GetRole(unifiedrole.RoleFilterIDs(roleID))
+				if err != nil {
+					g.logger.Debug().Err(err).Interface("role", role).Msg("unable to convert requested role")
+					return nil, err
+				}
+
+				allowedResourceActions = unifiedrole.GetAllowedResourceActions(role, condition)
+				if len(allowedResourceActions) == 0 {
+					return nil, errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")
+				}
+			}
+			permissionsUpdated = true
+
+		} else if allowedResourceActions, ok = newPermission.GetLibreGraphPermissionsActionsOk(); ok && len(allowedResourceActions) > 0 {
+			permissionsUpdated = true
+		}
+
+		if permissionsUpdated {
+			cs3UpdateOCMShareReq.Field = append(cs3UpdateOCMShareReq.Field, &ocm.UpdateOCMShareRequest_UpdateField{
+				Field: &ocm.UpdateOCMShareRequest_UpdateField_AccessMethods{
+					AccessMethods: &ocm.AccessMethod{
+						Term: &ocm.AccessMethod_WebdavOptions{
+							WebdavOptions: &ocm.WebDAVAccessMethod{
+								Permissions: unifiedrole.PermissionsToCS3ResourcePermissions(
+									[]*libregraph.UnifiedRolePermission{
+										{
+
+											AllowedResourceActions: allowedResourceActions,
+										},
+									},
+								),
+							},
+						},
+					},
+				},
+			})
+		}
+	}
+
+	updateOCMShareResp, err := gatewayClient.UpdateOCMShare(ctx, &cs3UpdateOCMShareReq)
+	if err != nil {
+		return nil, err
+	}
+	if err := errorcode.FromCS3Status(updateOCMShareResp.GetStatus(), err); err != nil {
+		return nil, err
+	}
+
+	ocmShareResp, err := gatewayClient.GetOCMShare(ctx, &ocm.GetOCMShareRequest{
+		Ref: &ocm.ShareReference{
+			Spec: &ocm.ShareReference_Id{
+				Id: &ocm.ShareId{
+					OpaqueId: permissionID,
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	permission, err := g.cs3OCMShareToPermission(ctx, ocmShareResp.GetShare(), condition)
+	if err != nil {
+		return nil, err
+	}
+	return permission, nil
 }
 
 func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID string, itemID *storageprovider.ResourceId, newPermission *libregraph.Permission) (*libregraph.Permission, error) {
