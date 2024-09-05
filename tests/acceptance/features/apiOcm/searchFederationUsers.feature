@@ -64,7 +64,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "ocis-server"
+                        "const": "ocis-server:9200"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -194,7 +194,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "ocis-server"
+                        "const": "ocis-server:9200"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -346,7 +346,7 @@ Feature: search federation users
             },
             "idp": {
               "type": "string",
-              "const": "federation-ocis-server"
+              "const": "federation-ocis-server:10200"
             },
             "mail": {
               "type": "string",
@@ -354,7 +354,7 @@ Feature: search federation users
             },
             "user_id": {
               "type": "string",
-              "pattern": "^%fed_invitation_token_pattern%$"
+              "pattern": "^%federated_user_id_pattern%$"
             }
           }
         }
@@ -385,14 +385,14 @@ Feature: search federation users
                   "const": "Alice Hansen"
                 },
                 "idp": {
-                  "const": "https://ocis-server:9200"
+                  "const": "ocis-server:9200"
                 },
                 "mail": {
                   "pattern": "alice@example.org"
                 },
                 "user_id": {
                   "type": "string",
-                  "pattern": "^%fed_invitation_token_pattern%$"
+                  "pattern": "^%federated_user_id_pattern%$"
                 }
               }
             },
@@ -409,14 +409,14 @@ Feature: search federation users
                   "const": "Carol King"
                 },
                 "idp": {
-                  "const": "https://ocis-server:9200"
+                  "const": "ocis-server:9200"
                 },
                 "mail": {
                   "pattern": "carol@example.org"
                 },
                 "user_id": {
                   "type": "string",
-                  "pattern": "^%fed_invitation_token_pattern%$"
+                  "pattern": "^%federated_user_id_pattern%$"
                 }
               }
             }
@@ -480,7 +480,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "ocis-server"
+                        "const": "ocis-server:9200"
                       },
                       "issuerAssignedId": {
                         "type": "string",

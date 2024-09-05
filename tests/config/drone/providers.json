@@ -3,7 +3,7 @@
           "name": "ocis-server",
           "full_name": "first-ocis-instance",
           "organization": "Owncloud",
-          "domain": "ocis-server",
+          "domain": "ocis-server:9200",
           "homepage": "https://owncloud.com",
           "services": [
                   {
@@ -25,7 +25,7 @@
           "name": "federation-ocis-server",
           "full_name": "Federation ocis",
           "organization": "Owncloud",
-          "domain": "federation-ocis-server",
+          "domain": "federation-ocis-server:10200",
           "homepage": "https://owncloud.com",
           "services": [
                   {
