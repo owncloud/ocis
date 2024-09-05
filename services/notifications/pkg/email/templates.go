@@ -81,12 +81,12 @@ Even though this membership has expired you still might have access through othe
 		// ScienceMeshInviteTokenGenerated email template, resolves via {{ .Greeting }}
 		Greeting: l10n.Template(`Hi,`),
 		// ScienceMeshInviteTokenGenerated email template, resolves via {{ .MessageBody }}
-		MessageBody: l10n.Template(`{ShareSharer} ({ShareSharerMail}) wants to start sharing OCM resources with you.
+		MessageBody: l10n.Template(`{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.
 {{if .ShareLink }}To accept the invite, please visit the following URL:
 {ShareLink}
 
 Alternatively, you can{{else}}
-Please{{end}} visit your mesh provider and use the following details:
+Please{{end}} visit your federation provider and use the following details:
   Token: {Token}
   ProviderDomain: {ProviderDomain}`),
 	}
