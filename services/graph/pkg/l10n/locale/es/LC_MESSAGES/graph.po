@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-08-31 00:04+0000\n"
+"POT-Creation-Date: 2024-09-05 03:47+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Jesús Recio <jrecio@solidgear.es>, 2024\n"
 "Language-Team: Spanish (https://app.transifex.com/owncloud-org/teams/6149/es/)\n"
@@ -24,37 +24,42 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #. UnifiedRole Editor, Role DisplayName (resolves directly)
+#. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
 #. UnifiedRole SpaseEditor, Role DisplayName (resolves directly)
 #. UnifiedRole FileEditor, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:106 pkg/unifiedrole/roles.go:112
-#: pkg/unifiedrole/roles.go:124
+#. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:118 pkg/unifiedrole/roles.go:124
+#: pkg/unifiedrole/roles.go:130 pkg/unifiedrole/roles.go:142
+#: pkg/unifiedrole/roles.go:148
 msgid "Can edit"
 msgstr "Puede editar"
 
 #. UnifiedRole SpaseEditorWithoutVersions, Role DisplayName (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:118
+#: pkg/unifiedrole/roles.go:136
 msgid "Can edit without versions"
 msgstr ""
 
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:136
+#: pkg/unifiedrole/roles.go:160
 msgid "Can manage"
 msgstr "Puede administrar"
 
 #. UnifiedRole EditorLite, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:130
+#: pkg/unifiedrole/roles.go:154
 msgid "Can upload"
 msgstr "Puede realizar subidas"
 
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
+#. UnifiedRole Viewer, Role DisplayName (resolves directly)
 #. UnifiedRole SpaseViewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:94 pkg/unifiedrole/roles.go:100
+#: pkg/unifiedrole/roles.go:100 pkg/unifiedrole/roles.go:106
+#: pkg/unifiedrole/roles.go:112
 msgid "Can view"
 msgstr "Puede ver"
 
 #. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:142
+#: pkg/unifiedrole/roles.go:166
 msgid "Can view (secure)"
 msgstr "Puede ver (de manera segura)"
 
@@ -65,35 +70,50 @@ msgstr "Aquí puede añadir una descripción para este espacio."
 
 #. UnifiedRole Viewer, Role Description (resolves directly)
 #. UnifiedRole SpaceViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:91 pkg/unifiedrole/roles.go:97
+#: pkg/unifiedrole/roles.go:97 pkg/unifiedrole/roles.go:109
 msgid "View and download."
 msgstr "Ver y descargar."
 
 #. UnifiedRole SecureViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:139
+#: pkg/unifiedrole/roles.go:163
 msgid "View only documents, images and PDFs. Watermarks will be applied."
 msgstr "Ver solo documentos, imágenes y PDFs. Se aplicarán marcas de agua."
 
 #. UnifiedRole FileEditor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:121
+#: pkg/unifiedrole/roles.go:139
 msgid "View, download and edit."
 msgstr "Ver, descargar y editar."
 
+#. UnifiedRole ViewerListGrants, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:103
+msgid "View, download and show all invited people."
+msgstr ""
+
 #. UnifiedRole EditorLite, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:127
+#: pkg/unifiedrole/roles.go:151
 msgid "View, download and upload."
 msgstr "Ver, descargar y subir."
+
+#. UnifiedRole FileEditorListGrants, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:145
+msgid "View, download, edit and show all invited people."
+msgstr ""
 
 #. UnifiedRole Editor, Role Description (resolves directly)
 #. UnifiedRole SpaseEditor, Role Description (resolves directly)
 #. UnifiedRole SpaseEditorWithoutVersions, Role Description (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:103 pkg/unifiedrole/roles.go:109
-#: pkg/unifiedrole/roles.go:115
+#: pkg/unifiedrole/roles.go:115 pkg/unifiedrole/roles.go:127
+#: pkg/unifiedrole/roles.go:133
 msgid "View, download, upload, edit, add and delete."
 msgstr "Ver, descargar, subir, editar, añadir y borrar."
 
 #. UnifiedRole Manager, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:133
+#: pkg/unifiedrole/roles.go:157
 msgid "View, download, upload, edit, add, delete and manage members."
 msgstr "Ver, descargar, subir, editar, añadir, borrar y administrar miembros."
+
+#. UnifiedRoleListGrants Editor, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:121
+msgid "View, download, upload, edit, add, delete and show all invited people."
+msgstr ""
