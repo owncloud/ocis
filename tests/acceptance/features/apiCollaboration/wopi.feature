@@ -466,3 +466,30 @@ Feature: collaboration (wopi)
       | app-endpoint                                              | url-query       |
       | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice& |
       | /app/open-with-web?file_id=<<FILEID>>                     |                 |
+
+
+  Scenario Outline: open file with .odt extension with different view mode (open-with-web)
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And we save it into "FILEID"
+    When user "Alice" sends HTTP method "POST" to URL "<app-endpoint>"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+             "pattern": "%base_url%/external\\?app=FakeOffice&contextRouteName=files-spaces-personal&fileId=%uuidv4_pattern%%24%uuidv4_pattern%%21%uuidv4_pattern%$"
+          }
+        }
+      }
+      """
+    Examples:
+      | app-endpoint                                                              |
+      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice&view_mode=view  |
+      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice&view_mode=read  |
+      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice&view_mode=write |
