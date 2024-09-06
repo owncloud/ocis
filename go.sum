@@ -255,8 +255,6 @@ github.com/crewjam/saml v0.4.14 h1:g9FBNx62osKusnFzs3QTN5L9CVA/Egfgm+stJShzw/c=
 github.com/crewjam/saml v0.4.14/go.mod h1:UVSZCf18jJkk6GpWNVqcyQJMD5HsRugBPf4I1nl2mME=
 github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb h1:KmYZDReplv/yfwc1LNYpDcVhVujC3Pasv6WjXx1haSU=
 github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb/go.mod h1:yyP8PRo0EZou3nSH7H4qjlzQwaydPeIRNgX50npQHpE=
-github.com/cs3org/reva/v2 v2.23.1-0.20240905133054-2de6ff31c4e3 h1:L1fD7ShX6W17e5YMgWpcmCq2KVHQy48gFrnc261iohQ=
-github.com/cs3org/reva/v2 v2.23.1-0.20240905133054-2de6ff31c4e3/go.mod h1:p7CHBXcg6sSqB+0JMNDfC1S7TSh9FghXkw1kTV3KcJI=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
 github.com/cyphar/filepath-securejoin v0.2.4 h1:Ugdm7cg7i6ZK6x3xDF1oEu1nfkyfH53EtKeQYTC3kyg=
 github.com/cyphar/filepath-securejoin v0.2.4/go.mod h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=
@@ -291,6 +289,8 @@ github.com/dnaeon/go-vcr v1.0.1/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyG
 github.com/dnsimple/dnsimple-go v0.63.0/go.mod h1:O5TJ0/U6r7AfT8niYNlmohpLbCSG+c71tQlGr9SeGrg=
 github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4=
 github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
+github.com/dragonchaser/reva/v2 v2.4.1-0.20240906050800-d68d37964295 h1:/fGWgMqZ6YZ3979MJ3UgQRHNDZIxzCX1vlY2008f3d8=
+github.com/dragonchaser/reva/v2 v2.4.1-0.20240906050800-d68d37964295/go.mod h1:p7CHBXcg6sSqB+0JMNDfC1S7TSh9FghXkw1kTV3KcJI=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=

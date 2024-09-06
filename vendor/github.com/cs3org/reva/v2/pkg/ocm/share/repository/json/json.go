@@ -381,8 +381,97 @@ func receivedShareEqual(ref *ocm.ShareReference, s *ocm.ReceivedShare) bool {
 	return false
 }
 
-func (m *mgr) UpdateShare(ctx context.Context, user *userpb.User, ref *ocm.ShareReference, f ...*ocm.UpdateOCMShareRequest_UpdateField) (*ocm.Share, error) {
-	return nil, errtypes.NotSupported("not yet implemented")
+// UpdateShare updates the share with the given fields.
+func (m *mgr) UpdateShare(ctx context.Context, user *userpb.User, ref *ocm.ShareReference, fields ...*ocm.UpdateOCMShareRequest_UpdateField) (*ocm.Share, error) {
+	m.Lock()
+	defer m.Unlock()
+	if err := m.load(); err != nil {
+		return nil, err
+	}
+	for _, s := range m.model.Shares {
+		if sharesEqual(ref, s) {
+			if utils.UserEqual(user.Id, s.Owner) || utils.UserEqual(user.Id, s.Creator) {
+
+				for _, f := range fields {
+					if exp := f.GetExpiration(); exp != nil {
+						s.Expiration = exp
+					}
+					if am := f.GetAccessMethods(); am != nil {
+						var (
+							webdavOptions   *ocm.WebDAVAccessMethod
+							webappOptions   *ocm.WebappAccessMethod
+							transferOptions *ocm.TransferAccessMethod
+							// TODO: *AccessMethod_GenericOptions
+
+							newWebdavOptions   *ocm.WebDAVAccessMethod
+							newWebappOptions   *ocm.WebappAccessMethod
+							newTransferOptions *ocm.TransferAccessMethod
+							// TODO: *AccessMethod_GenericOptions
+						)
+
+						for _, sm := range s.GetAccessMethods() {
+							webdavOptions = sm.GetWebdavOptions()
+							webappOptions = sm.GetWebappOptions()
+							transferOptions = sm.GetTransferOptions()
+						}
+
+						newWebdavOptions = am.GetWebdavOptions()
+						newWebappOptions = am.GetWebappOptions()
+						newTransferOptions = am.GetTransferOptions()
+
+						newAccesMethods := []*ocm.AccessMethod{}
+
+						if newWebdavOptions != nil {
+							newAccesMethods = append(newAccesMethods, &ocm.AccessMethod{
+								Term: &ocm.AccessMethod_WebdavOptions{
+									WebdavOptions: newWebdavOptions,
+								},
+							})
+						} else if webdavOptions != nil {
+							newAccesMethods = append(newAccesMethods, &ocm.AccessMethod{
+								Term: &ocm.AccessMethod_WebdavOptions{
+									WebdavOptions: webdavOptions,
+								},
+							})
+						}
+
+						if newWebappOptions != nil {
+							newAccesMethods = append(newAccesMethods, &ocm.AccessMethod{
+								Term: &ocm.AccessMethod_WebappOptions{
+									WebappOptions: newWebappOptions,
+								},
+							})
+						} else if webappOptions != nil {
+							newAccesMethods = append(newAccesMethods, &ocm.AccessMethod{
+								Term: &ocm.AccessMethod_WebappOptions{
+									WebappOptions: webappOptions,
+								},
+							})
+						}
+
+						if newTransferOptions != nil {
+							newAccesMethods = append(newAccesMethods, &ocm.AccessMethod{
+								Term: &ocm.AccessMethod_TransferOptions{
+									TransferOptions: newTransferOptions,
+								},
+							})
+						} else if transferOptions != nil {
+							newAccesMethods = append(newAccesMethods, &ocm.AccessMethod{
+								Term: &ocm.AccessMethod_TransferOptions{
+									TransferOptions: transferOptions,
+								},
+							})
+						}
+						s.AccessMethods = newAccesMethods
+					}
+				}
+
+				return s, nil
+			}
+		}
+	}
+
+	return nil, errtypes.NotFound(ref.String())
 }
 
 func (m *mgr) ListShares(ctx context.Context, user *userpb.User, filters []*ocm.ListOCMSharesRequest_Filter) ([]*ocm.Share, error) {

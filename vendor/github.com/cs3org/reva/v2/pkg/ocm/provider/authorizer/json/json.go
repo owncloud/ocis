@@ -104,7 +104,11 @@ func normalizeDomain(d string) (string, error) {
 		return "", err
 	}
 
-	return u.Host, nil
+	normalizedDomain := u.Hostname()
+	if port := u.Port(); port != "" {
+		normalizedDomain += ":" + port
+	}
+	return normalizedDomain, nil
 }
 
 func (a *authorizer) GetInfoByDomain(_ context.Context, domain string) (*ocmprovider.ProviderInfo, error) {
