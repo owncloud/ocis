@@ -554,7 +554,7 @@ func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemI
 
 	// This is a user share
 	updatedPermission, err := s.updateUserShare(ctx, permissionID, sharedResourceID, &newPermission)
-	if err == nil {
+	if err == nil && updatedPermission != nil {
 		return *updatedPermission, nil
 	}
 
