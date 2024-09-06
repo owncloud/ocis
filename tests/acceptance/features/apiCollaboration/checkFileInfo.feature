@@ -7,7 +7,7 @@ Feature: check file info with different wopi apps
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario: check file info with fake office
+  Scenario: check file info with fakeOffice
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     When user "Alice" checks the information of file "textfile0.txt" of space "Personal" using office "FakeOffice"
     Then the HTTP status code should be "200"
@@ -133,6 +133,158 @@ Feature: check file info with different wopi apps
           },
           "BreadcrumbDocName": {
             "const": "textfile0.txt"
+          }
+        }
+      }
+      """
+
+
+  Scenario: check file info with collabora
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    When user "Alice" checks the information of file "textfile0.txt" of space "Personal" using office "Collabora"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "DisablePrint",
+          "OwnerId",
+          "PostMessageOrigin",
+          "Size",
+          "UserCanWrite",
+          "UserCanNotWriteRelative",
+          "UserId",
+          "UserFriendlyName",
+          "EnableOwnerTermination",
+          "SupportsLocks",
+          "SupportsRename",
+          "UserCanRename",
+          "BreadcrumbDocName"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "textfile0.txt"
+          },
+          "PostMessageOrigin": {
+            "const": "https://localhost:9200"
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "OwnerId": {
+            "type": "string"
+          },
+          "Size": {
+            "const": 11
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "EnableOwnerTermination": {
+            "const": true
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "BreadcrumbDocName": {
+            "const": "textfile0.txt"
+          }
+        }
+      }
+      """
+
+
+  Scenario: check file info with onlyOffice
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    When user "Alice" checks the information of file "textfile0.txt" of space "Personal" using office "OnlyOffice"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "Version",
+          "BreadcrumbDocName",
+          "BreadcrumbFolderName",
+          "BreadcrumbFolderUrl",
+          "PostMessageOrigin",
+          "DisablePrint",
+          "UserFriendlyName",
+          "UserId",
+          "ReadOnly",
+          "UserCanNotWriteRelative",
+          "UserCanRename",
+          "UserCanWrite",
+          "SupportsLocks",
+          "SupportsRename",
+          "SupportsUpdate"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "textfile0.txt"
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "SupportsUpdate": {
+            "const": true
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "ReadOnly": {
+            "const": false
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "BreadcrumbDocName": {
+            "const": "textfile0.txt"
+          },
+          "BreadcrumbFolderName": {
+            "const": "Alice Hansen"
+          },
+          "BreadcrumbFolderUrl": {
+            "type": "string"
+          },
+          "PostMessageOrigin": {
+            "type": "string"
           }
         }
       }
