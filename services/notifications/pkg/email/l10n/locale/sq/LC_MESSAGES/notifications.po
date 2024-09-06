@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-08-20 01:20+0000\n"
+"POT-Creation-Date: 2024-09-06 00:03+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2024\n"
 "Language-Team: Albanian (https://app.transifex.com/owncloud-org/teams/6149/sq/)\n"
@@ -50,10 +50,22 @@ msgstr "Tungjatjeta {ShareGrantee},"
 msgid "Hello {SpaceGrantee},"
 msgstr "Tungjatjeta {SpaceGrantee},"
 
+#. ScienceMeshInviteTokenGenerated email template, resolves via {{ .Greeting
+#. }}
+#: pkg/email/templates.go:82
+msgid "Hi,"
+msgstr ""
+
 #. MembershipExpired email template, Subject field (resolves directly)
 #: pkg/email/templates.go:67
 msgid "Membership of '{SpaceName}' expired at {ExpiredAt}"
 msgstr "Anëtarësia në “{SpaceName}” skadoi më {ExpiredAt}"
+
+#. ScienceMeshInviteTokenGenerated email template, Subject field (resolves
+#. directly)
+#: pkg/email/templates.go:80
+msgid "ScienceMesh: {InitiatorName} wants to collaborate with you"
+msgstr ""
 
 #. ShareExpired email template, Subject field (resolves directly)
 #: pkg/email/templates.go:25
@@ -81,6 +93,20 @@ msgstr ""
 "Pjesa juaj te {ShareFolder} ka skaduar më {ExpiredAt}\n"
 "\n"
 "Edhe pse kjo pjesë është shfuqizuar, mundet që ende të keni hyrje në të përmes ndarjesh dhe/ose anëtarësish hapësirash të tjera."
+
+#. ScienceMeshInviteTokenGenerated email template, resolves via {{
+#. .MessageBody }}
+#: pkg/email/templates.go:84
+msgid ""
+"{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.\n"
+"{{if .ShareLink }}To accept the invite, please visit the following URL:\n"
+"{ShareLink}\n"
+"\n"
+"Alternatively, you can{{else}}\n"
+"Please{{end}} visit your federation provider and use the following details:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+msgstr ""
 
 #. ShareCreated email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:16
