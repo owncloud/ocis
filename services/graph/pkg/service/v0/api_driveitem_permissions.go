@@ -562,7 +562,7 @@ func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemI
 	if s.config.IncludeOCMSharees {
 		updatePermission, err := s.updateOCMPermission(ctx, permissionID, itemID, &newPermission)
 		if err == nil {
-			return *updatePermission, err
+			return *updatePermission, nil
 		}
 	}
 	return libregraph.Permission{}, err
