@@ -17,7 +17,7 @@ services:
     command: ["-c", "ocis init || true; ocis server"]
     environment:
       # enable the notifications service as it is not started automatically
-      OCIS_ADD_RUN_SERVICES": "notifications"
+      OCIS_ADD_RUN_SERVICES: "notifications"
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${LOG_LEVEL:-info}
       OCIS_LOG_COLOR: "${LOG_PRETTY:-false}"
