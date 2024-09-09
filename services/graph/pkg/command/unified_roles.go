@@ -62,7 +62,7 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 					case 0:
 						rows[0] = append(rows[0], row...)
 					default:
-						rows = append(rows, append(slices.Clone(rows[0][:len(rows[0])-len(row)]), row...))
+						rows[0][3] = rows[0][3] + "\n" + rolePermission.GetCondition()
 					}
 				}
 

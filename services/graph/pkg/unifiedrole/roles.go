@@ -120,7 +120,7 @@ var (
 	_editorListGrantsUnifiedRoleDisplayName = l10n.Template("Can edit")
 
 	// UnifiedRole SpaseEditor, Role Description (resolves directly)
-	_spaceEditorUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and delete.")
+	_spaceEditorUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, delete including the history.")
 
 	// UnifiedRole SpaseEditor, Role DisplayName (resolves directly)
 	_spaceEditorUnifiedRoleDisplayName = l10n.Template("Can edit")
