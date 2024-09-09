@@ -3,6 +3,7 @@ directives:
     - '''self'''
   connect-src:
     - '''self'''
+    - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
   default-src:
     - '''none'''

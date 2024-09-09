@@ -3,6 +3,7 @@ directives:
     - '''self'''
   connect-src:
     - '''self'''
+    - 'blob:'
     - 'https://${COMPANION_DOMAIN|companion.owncloud.test}/'
     - 'wss://${COMPANION_DOMAIN|companion.owncloud.test}/'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
