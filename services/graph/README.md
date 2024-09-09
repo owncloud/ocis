@@ -90,7 +90,7 @@ which is the source of the texts provided by the code.
 
 The default language can be defined via the `OCIS_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.
 
-##  Unified Role Management
+## Unified Role Management
 
 Unified Roles are roles granted a user for sharing and can be enabled or disabled. A CLI command is provided to list existing roles and their state among other data.
 
