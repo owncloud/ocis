@@ -72,6 +72,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Handle OCM invite generated event: [#9966](https://github.com/owncloud/ocis/pull/9966)
 * Enhancement - Bump reva: [#9981](https://github.com/owncloud/ocis/pull/9981)
 * Enhancement - Update web to v10.2.0: [#9988](https://github.com/owncloud/ocis/pull/9988)
+* Enhancement - Allow blob as connect-src in default CSP: [#9993](https://github.com/owncloud/ocis/pull/9993)
 
 ## Details
 
@@ -270,6 +271,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9988
    https://github.com/owncloud/web/releases/tag/v10.2.0
+
+* Enhancement - Allow blob as connect-src in default CSP: [#9993](https://github.com/owncloud/ocis/pull/9993)
+
+   We added 'blob:' to the default connect-src items in the default CSP rules.
+
+   https://github.com/owncloud/ocis/pull/9993
 
 # Changelog for [6.3.0] (2024-08-20)
 
