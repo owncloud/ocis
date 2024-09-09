@@ -214,8 +214,8 @@ importers:
         specifier: 4.3.0
         version: 4.3.0(postcss@8.4.39)(webpack@5.94.0)
       postcss-normalize:
-        specifier: 10.0.1
-        version: 10.0.1(browserslist@4.23.2)(postcss@8.4.39)
+        specifier: 13.0.0
+        version: 13.0.0(browserslist@4.23.2)(postcss@8.4.39)
       postcss-preset-env:
         specifier: 10.0.2
         version: 10.0.2(postcss@8.4.39)
@@ -4741,9 +4741,9 @@ packages:
     peerDependencies:
       postcss: ^8.4.31
 
-  postcss-normalize@10.0.1:
-    resolution: {integrity: sha512-+5w18/rDev5mqERcG3W5GZNMJa1eoYYNGo8gB7tEwaos0ajk3ZXAI4mHGcNT47NE+ZnZD1pEpUOFLvltIwmeJA==}
-    engines: {node: '>= 12'}
+  postcss-normalize@13.0.0:
+    resolution: {integrity: sha512-EdlY4gQiS8DluldxUsgsgzMA1+4mRd4FQ7x8yGT934X3IBTJ0ZW3OG6xNneaHTv2BNzwnQ5mrnmrA/7yxVvnYw==}
+    engines: {node: '>= 18'}
     peerDependencies:
       browserslist: '>= 4'
       postcss: '>= 8'
@@ -11395,7 +11395,7 @@ snapshots:
       postcss: 8.4.39
       postcss-value-parser: 4.2.0
 
-  postcss-normalize@10.0.1(browserslist@4.23.2)(postcss@8.4.39):
+  postcss-normalize@13.0.0(browserslist@4.23.2)(postcss@8.4.39):
     dependencies:
       '@csstools/normalize.css': 12.1.1
       browserslist: 4.23.2
