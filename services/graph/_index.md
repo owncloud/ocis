@@ -1,6 +1,6 @@
 ---
 title: Graph
-date: 2024-09-09T00:39:37.850773434Z
+date: 2024-09-09T06:39:14.608397914Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/graph
@@ -26,7 +26,7 @@ The graph service provides the Graph API which is a RESTful web API used to acce
 * [Translations](#translations)
   * [Translation Rules](#translation-rules)
 * [Default Language](#default-language)
-* [ Unified Role Management](#-unified-role-management)
+* [Unified Role Management](#unified-role-management)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Manual Filters
@@ -117,7 +117,7 @@ which is the source of the texts provided by the code.
 
 The default language can be defined via the `OCIS_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.
 
-##  Unified Role Management
+## Unified Role Management
 
 Unified Roles are roles granted a user for sharing and can be enabled or disabled. A CLI command is provided to list existing roles and their state among other data.
 
