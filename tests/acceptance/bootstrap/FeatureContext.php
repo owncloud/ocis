@@ -214,24 +214,6 @@ class FeatureContext extends BehatVariablesContext {
 		return $this->useSharingNG;
 	}
 
-	private string $oCSelector;
-
-	/**
-	 * @param string $selector
-	 *
-	 * @return void
-	 */
-	public function setOCSelector(string $selector): void {
-		$this->oCSelector = $selector;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getOCSelector(): string {
-		return $this->oCSelector;
-	}
-
 	/**
 	 * @param string|null $httpStatusCode
 	 *
@@ -501,9 +483,6 @@ class FeatureContext extends BehatVariablesContext {
 		$this->currentServer = 'LOCAL';
 		$this->cookieJar = new CookieJar();
 		$this->ocPath = $ocPath;
-
-		// PARALLEL DEPLOYMENT: ownCloud selector
-		$this->oCSelector = "oc10";
 
 		// These passwords are referenced in tests and can be overridden by
 		// setting environment variables.

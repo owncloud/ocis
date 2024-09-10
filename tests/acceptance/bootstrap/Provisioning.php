@@ -352,13 +352,6 @@ trait Provisioning {
 		$this->ldap->bind();
 
 		$ldifFile = __DIR__ . $suiteParameters['ldapInitialUserFilePath'];
-		if (OcisHelper::isTestingParallelDeployment()) {
-			$behatYml = \getenv("BEHAT_YML");
-			if ($behatYml) {
-				$configPath = \dirname($behatYml);
-				$ldifFile = $configPath . "/" . \basename($ldifFile);
-			}
-		}
 		if (!$this->skipImportLdif) {
 			$this->importLdifFile($ldifFile);
 		}
@@ -456,10 +449,6 @@ trait Provisioning {
 		if (!OcisHelper::isTestingOnReva()) {
 			$entry['objectclass'][] = 'ownCloud';
 			$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
-		}
-
-		if (OcisHelper::isTestingParallelDeployment()) {
-			$entry['ownCloudSelector'] = $this->getOCSelector();
 		}
 
 		if ($this->federatedServerExists()) {

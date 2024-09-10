@@ -41,13 +41,6 @@ class OcisHelper {
 	}
 
 	/**
-	 * @return bool
-	 */
-	public static function isTestingParallelDeployment(): bool {
-		return (\getenv("TEST_PARALLEL_DEPLOYMENT") === "true");
-	}
-
-	/**
 	 * @return bool|string false if no command given or the command as string
 	 */
 	public static function getDeleteUserDataCommand() {
