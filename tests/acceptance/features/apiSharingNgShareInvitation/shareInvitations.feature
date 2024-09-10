@@ -2248,7 +2248,6 @@ Feature: Send a sharing invitations
       | Space Viewer     | role not applicable to this resource                                                               |
       | Space Editor     | role not applicable to this resource                                                               |
       | Manager          | role not applicable to this resource                                                               |
-      | Co Owner         | Key: 'DriveItemInvite.Roles' Error:Field validation for 'Roles' failed on the 'available_role' tag |
 
 
   Scenario Outline: try to send share invitation with different re-sharing permissions

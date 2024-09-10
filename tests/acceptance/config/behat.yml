@@ -315,6 +315,7 @@ default:
         - FilesVersionsContext:
         - SharingNgContext:
         - SettingsContext:
+        - OcisConfigContext:
 
     apiLocks:
       paths:

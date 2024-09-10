@@ -16,6 +16,21 @@ use Psr\Http\Message\ResponseInterface;
  * A helper class for managing Graph API requests
  */
 class GraphHelper {
+	public const DEFAULT_PERMISSIONS_ROLES = [
+		'Viewer' => 'b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5',
+		'Editor' => 'fb6c3e19-e378-47e5-b277-9732f9de6e21',
+		'File Editor' => '2d00ce52-1fc2-4dbc-8b95-a73b73395f5a',
+		'Uploader' => '1c996275-f1c9-4e71-abdf-a42f6495e960',
+		'Space Viewer' => 'a8d5fe5e-96e3-418d-825b-534dbdf22b99',
+		'Space Editor' => '58c63c02-1d89-4572-916a-870abc5a1b7d',
+		'Manager' => '312c0871-5ef7-4b3a-85b6-0e4074c64049',
+	];
+
+	public const ADDITIONAL_PERMISSIONS_ROLES = [
+		'Secure viewer' => 'aa97fe03-7980-45ac-9e50-b325749fd7e6',
+		'Space Editor Without Versions' => '3284f2d5-0070-4ad8-ac40-c247f7c1fb27',
+	];
+
 	/**
 	 * @return string[]
 	 */
@@ -1657,31 +1672,13 @@ class GraphHelper {
 	 *
 	 * @throws \Exception
 	 */
-	public static function getPermissionsRoleIdByName(
-		string $permissionsRole
-	): string {
-		switch ($permissionsRole) {
-			case 'Viewer':
-				return 'b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5';
-			case 'Space Viewer':
-				return 'a8d5fe5e-96e3-418d-825b-534dbdf22b99';
-			case 'Editor':
-				return 'fb6c3e19-e378-47e5-b277-9732f9de6e21';
-			case 'Space Editor':
-				return '58c63c02-1d89-4572-916a-870abc5a1b7d';
-			case 'File Editor':
-				return '2d00ce52-1fc2-4dbc-8b95-a73b73395f5a';
-			case 'Co Owner':
-				return '3a4ba8e9-6a0d-4235-9140-0e7a34007abe';
-			case 'Uploader':
-				return '1c996275-f1c9-4e71-abdf-a42f6495e960';
-			case 'Manager':
-				return '312c0871-5ef7-4b3a-85b6-0e4074c64049';
-			case 'Secure viewer':
-				return 'aa97fe03-7980-45ac-9e50-b325749fd7e6';
-			default:
-				throw new \Exception('Role ' . $permissionsRole . ' not found');
+	public static function getPermissionsRoleIdByName(string $permissionsRole): string {
+		$allPermissionsRoles = array_merge(self::DEFAULT_PERMISSIONS_ROLES, self::ADDITIONAL_PERMISSIONS_ROLES);
+		if (\array_key_exists($permissionsRole, $allPermissionsRoles)) {
+			return $allPermissionsRoles[$permissionsRole];
 		}
+
+		throw new \Exception("Role '$permissionsRole' not found");
 	}
 
 	/**
@@ -1693,29 +1690,13 @@ class GraphHelper {
 	 *
 	 * @throws \Exception
 	 */
-	public static function getPermissionNameByPermissionRoleId(
-		string $permissionsRoleId
-	): string {
-		switch ($permissionsRoleId) {
-			case 'b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5':
-				return 'Viewer';
-			case 'fb6c3e19-e378-47e5-b277-9732f9de6e21':
-				return 'Editor';
-			case '2d00ce52-1fc2-4dbc-8b95-a73b73395f5a':
-				return 'File Editor';
-			case '1c996275-f1c9-4e71-abdf-a42f6495e960':
-				return 'Uploader';
-			case 'a8d5fe5e-96e3-418d-825b-534dbdf22b99':
-				return 'Space Viewer';
-			case '58c63c02-1d89-4572-916a-870abc5a1b7d':
-				return 'Space Editor';
-			case '312c0871-5ef7-4b3a-85b6-0e4074c64049':
-				return 'Manager';
-			case 'aa97fe03-7980-45ac-9e50-b325749fd7e6':
-				return 'Secure viewer';
-			default:
-				throw new \Exception('Permission role id: ' . $permissionsRoleId . ' not found');
+	public static function getPermissionNameByPermissionRoleId(string $permissionsRoleId): string {
+		$allPermissionsRoles = array_merge(self::DEFAULT_PERMISSIONS_ROLES, self::ADDITIONAL_PERMISSIONS_ROLES);
+		$roleName = array_search($permissionsRoleId, $allPermissionsRoles);
+		if ($roleName) {
+			return $roleName;
 		}
+		throw new \Exception("Permission role id: '$permissionsRoleId' not found");
 	}
 
 	/**

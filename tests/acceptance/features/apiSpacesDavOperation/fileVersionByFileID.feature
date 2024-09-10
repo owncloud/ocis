@@ -164,3 +164,14 @@ Feature: checking file versions using file id
       | source  | destination |
       | /       | folder/     |
       | folder/ | /           |
+
+  @env-config
+  Scenario: check the versions of a file in a shared space as editor without versions role
+    Given the administrator has enabled the permissions role "Space Editor Without Versions"
+    And user "Alice" has sent the following space share invitation:
+      | space           | Project1                      |
+      | sharee          | Brian                         |
+      | shareType       | user                          |
+      | permissionsRole | Space Editor Without Versions |
+    When user "Brian" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
+    Then the HTTP status code should be "403"
