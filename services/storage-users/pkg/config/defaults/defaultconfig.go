@@ -143,6 +143,7 @@ func DefaultConfig() *config.Config {
 			},
 			Posix: config.PosixDriver{
 				UseSpaceGroups:            false,
+				Root:                      filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				PersonalSpacePathTemplate: "users/{{.User.Username}}",
 				GeneralSpacePathTemplate:  "projects/{{.SpaceId}}",
 				PermissionsEndpoint:       "com.owncloud.api.settings",
