@@ -283,7 +283,7 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add and delete."
+                      "const": "View, download, upload, edit, add, delete including the history."
                     },
                     "displayName": {
                       "const": "Can edit"
@@ -416,7 +416,7 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add and delete."
+                      "const": "View, download, upload, edit, add, delete including the history."
                     },
                     "displayName": {
                       "const": "Can edit"
@@ -1104,7 +1104,7 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add and delete."
+                      "const": "View, download, upload, edit, add, delete including the history."
                     },
                     "displayName": {
                       "const": "Can edit"
@@ -1226,7 +1226,7 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add and delete."
+                      "const": "View, download, upload, edit, add, delete including the history."
                     },
                     "displayName": {
                       "const": "Can edit"
@@ -1508,7 +1508,7 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add and delete."
+                      "const": "View, download, upload, edit, add, delete including the history."
                     },
                     "displayName": {
                       "const": "Can edit"
@@ -1846,7 +1846,7 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add and delete."
+                      "const": "View, download, upload, edit, add, delete including the history."
                     },
                     "displayName": {
                       "const": "Can edit"

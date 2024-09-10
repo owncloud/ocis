@@ -296,7 +296,7 @@ Feature: permissions role definitions
                   "const": 0
                 },
                 "description": {
-                  "const": "View, download, upload, edit, add and delete."
+                  "const": "View, download, upload, edit, add, delete including the history."
                 },
                 "displayName": {
                   "const": "Can edit"
