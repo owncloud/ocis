@@ -2,32 +2,45 @@
 services:
   ocis:
     environment:
-      NOTIFICATIONS_SMTP_HOST: inbucket
-      NOTIFICATIONS_SMTP_PORT: 2500
-      NOTIFICATIONS_SMTP_SENDER: oCIS notifications <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>
-      NOTIFICATIONS_SMTP_USERNAME: notifications@${OCIS_DOMAIN:-ocis.owncloud.test}
-      # the mail catcher uses self signed certificates
-      NOTIFICATIONS_SMTP_INSECURE: "true"
+      OCIS_LDAP_URI: ldaps://ldap-server:1636
+      OCIS_LDAP_INSECURE: "true"
+      OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
+      OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
+      OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
+      OCIS_LDAP_USER_FILTER: "(objectclass=owncloud)"
+      OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
+      LDAP_LOGIN_ATTRIBUTES: "uid"
+      IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
+      IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
+      IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
+      GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is writable
+      GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
 
-  inbucket:
-    image: inbucket/inbucket
+  ldap-server:
+    image: bitnami/openldap:2.6.8
     networks:
-      - ocis-net
-    entrypoint:
-      - /bin/sh
-    command: [ "-c", "apk add openssl; openssl req -subj '/CN=inbucket.test' -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/server.key -out /tmp/server.crt; /start-inbucket.sh" ]
+      ocis-net:
+    entrypoint: ["/bin/sh", "/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh", "/opt/bitnami/scripts/openldap/run.sh" ]
     environment:
-      INBUCKET_SMTP_TLSENABLED: "true"
-      INBUCKET_SMTP_TLSPRIVKEY: /tmp/server.key
-      INBUCKET_SMTP_TLSCERT: /tmp/server.crt
-      INBUCKET_STORAGE_MAILBOXMSGCAP: 1000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.inbucket.entrypoints=https"
-      - "traefik.http.routers.inbucket.rule=Host(`${INBUCKET_DOMAIN:-mail.owncloud.test}`)"
-      - "traefik.http.routers.inbucket.tls.certresolver=http"
-      - "traefik.http.routers.inbucket.service=inbucket"
-      - "traefik.http.services.inbucket.loadbalancer.server.port=9000"
+      BITNAMI_DEBUG: true
+      LDAP_TLS_VERIFY_CLIENT: never
+      LDAP_ENABLE_TLS: "yes"
+      LDAP_TLS_CA_FILE: /opt/bitnami/openldap/share/openldap.crt
+      LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/share/openldap.crt
+      LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/share/openldap.key
+      LDAP_ROOT: "dc=owncloud,dc=com"
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+    volumes:
+      - ./config/ldap/ldif:/ldifs
+      - ./config/ldap/schemas:/schemas
+      - ./config/ldap/docker-entrypoint-override.sh:/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh
+      - ldap-certs:/opt/bitnami/openldap/share
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
+
+volumes:
+  ldap-certs:
