@@ -640,13 +640,10 @@ func (g BaseGraphService) getCS3PublicShareByID(ctx context.Context, permissionI
 			},
 		},
 	)
-	if err != nil {
-		return nil, err
-	}
-
 	if err := errorcode.FromCS3Status(getPublicShareResp.GetStatus(), err); err != nil {
 		return nil, err
 	}
+
 	return getPublicShareResp.GetShare(), nil
 }
 
@@ -666,14 +663,12 @@ func (g BaseGraphService) removeOCMPermission(ctx context.Context, permissionID 
 					},
 				},
 			},
-		})
-	if err != nil {
-		return err
-	}
-
+		},
+	)
 	if err := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); err != nil {
 		return err
 	}
+
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
 }
@@ -694,14 +689,12 @@ func (g BaseGraphService) removePublicShare(ctx context.Context, permissionID st
 					},
 				},
 			},
-		})
-	if err != nil {
-		return err
-	}
-
+		},
+	)
 	if err := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); err != nil {
 		return err
 	}
+
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
 }
@@ -722,14 +715,12 @@ func (g BaseGraphService) removeUserShare(ctx context.Context, permissionID stri
 					},
 				},
 			},
-		})
-	if err != nil {
-		return err
-	}
-
+		},
+	)
 	if err := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); err != nil {
 		return err
 	}
+
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
 }
@@ -755,13 +746,10 @@ func (g BaseGraphService) removeSpacePermission(ctx context.Context, permissionI
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
-
 	if err := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); err != nil {
 		return err
 	}
+
 	// We need to return an untyped nil here otherwise the error==nil check won't work
 	return nil
 }
@@ -771,6 +759,7 @@ func (g BaseGraphService) getOCMPermissionResourceID(ctx context.Context, permis
 	if err != nil {
 		return nil, err
 	}
+
 	return cs3Share.GetResourceId(), nil
 }
 
@@ -790,14 +779,12 @@ func (g BaseGraphService) getCS3OCMShareByID(ctx context.Context, permissionID s
 					},
 				},
 			},
-		})
-	if err != nil {
-		return nil, err
-	}
-
+		},
+	)
 	if err := errorcode.FromCS3Status(getShareResp.GetStatus(), err); err != nil {
 		return nil, err
 	}
+
 	return getShareResp.GetShare(), nil
 }
 
@@ -806,6 +793,7 @@ func (g BaseGraphService) getUserPermissionResourceID(ctx context.Context, permi
 	if err != nil {
 		return nil, err
 	}
+
 	return cs3Share.GetResourceId(), nil
 }
 
@@ -825,14 +813,12 @@ func (g BaseGraphService) getCS3UserShareByID(ctx context.Context, permissionID 
 					},
 				},
 			},
-		})
-	if err != nil {
-		return nil, err
-	}
-
+		},
+	)
 	if err := errorcode.FromCS3Status(getShareResp.GetStatus(), err); err != nil {
 		return nil, err
 	}
+
 	return getShareResp.GetShare(), nil
 }
 
@@ -842,22 +828,27 @@ func (g BaseGraphService) getOCMPermissionByID(ctx context.Context, permissionID
 		g.logger.Debug().Err(err).Msg("selecting gatewaySelevtor failed")
 		return nil, nil, err
 	}
+
 	ocmShare, err := g.getCS3OCMShareByID(ctx, permissionID)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	resourceInfo, err := utils.GetResourceByID(ctx, itemID, gatewayClient)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	condition, err := roleConditionForResourceType(resourceInfo)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	permission, err := g.cs3OCMShareToPermission(ctx, ocmShare, condition)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	return permission, ocmShare.GetResourceId(), nil
 }
 
@@ -900,18 +891,22 @@ func (g BaseGraphService) getPermissionByID(ctx context.Context, permissionID st
 		if err != nil {
 			return nil, nil, err
 		}
+
 		resourceInfo, err := utils.GetResourceByID(ctx, itemID, gatewayClient)
 		if err != nil {
 			return nil, nil, err
 		}
+
 		condition, err := roleConditionForResourceType(resourceInfo)
 		if err != nil {
 			return nil, nil, err
 		}
+
 		permission, err := g.cs3UserShareToPermission(ctx, cs3Share, condition)
 		if err != nil {
 			return nil, nil, err
 		}
+
 		return permission, cs3Share.GetResourceId(), nil
 	}
 
@@ -929,10 +924,12 @@ func (g BaseGraphService) updateOCMPermission(ctx context.Context, permissionID 
 	if err != nil {
 		return nil, err
 	}
+
 	condition, err := roleConditionForResourceType(resourceInfo)
 	if err != nil {
 		return nil, err
 	}
+
 	var cs3UpdateOCMShareReq ocm.UpdateOCMShareRequest
 	cs3UpdateOCMShareReq.Ref = &ocm.ShareReference{
 		Spec: &ocm.ShareReference_Id{
@@ -941,12 +938,15 @@ func (g BaseGraphService) updateOCMPermission(ctx context.Context, permissionID 
 			},
 		},
 	}
+
 	if expiration, ok := newPermission.GetExpirationDateTimeOk(); ok {
-		cs3UpdateOCMShareReq.Field = append(cs3UpdateOCMShareReq.Field, &ocm.UpdateOCMShareRequest_UpdateField{
-			Field: &ocm.UpdateOCMShareRequest_UpdateField_Expiration{
-				Expiration: utils.TimeToTS(*expiration),
+		cs3UpdateOCMShareReq.Field = append(
+			cs3UpdateOCMShareReq.Field,
+			&ocm.UpdateOCMShareRequest_UpdateField{
+				Field: &ocm.UpdateOCMShareRequest_UpdateField_Expiration{
+					Expiration: utils.TimeToTS(*expiration),
+				},
 			},
-		},
 		)
 	}
 
@@ -981,7 +981,6 @@ func (g BaseGraphService) updateOCMPermission(ctx context.Context, permissionID 
 								Permissions: unifiedrole.PermissionsToCS3ResourcePermissions(
 									[]*libregraph.UnifiedRolePermission{
 										{
-
 											AllowedResourceActions: allowedResourceActions,
 										},
 									},
@@ -995,9 +994,6 @@ func (g BaseGraphService) updateOCMPermission(ctx context.Context, permissionID 
 	}
 
 	updateOCMShareResp, err := gatewayClient.UpdateOCMShare(ctx, &cs3UpdateOCMShareReq)
-	if err != nil {
-		return nil, err
-	}
 	if err := errorcode.FromCS3Status(updateOCMShareResp.GetStatus(), err); err != nil {
 		return nil, err
 	}
@@ -1011,13 +1007,15 @@ func (g BaseGraphService) updateOCMPermission(ctx context.Context, permissionID 
 			},
 		},
 	})
-	if err != nil {
+	if err := errorcode.FromCS3Status(ocmShareResp.GetStatus(), err); err != nil {
 		return nil, err
 	}
+
 	permission, err := g.cs3OCMShareToPermission(ctx, ocmShareResp.GetShare(), condition)
 	if err != nil {
 		return nil, err
 	}
+
 	return permission, nil
 }
 
@@ -1108,9 +1106,6 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 	}
 
 	updateUserShareResp, err := gatewayClient.UpdateShare(ctx, &cs3UpdateShareReq)
-	if err != nil {
-		return nil, err
-	}
 	if err := errorcode.FromCS3Status(updateUserShareResp.GetStatus(), err); err != nil {
 		return nil, err
 	}
