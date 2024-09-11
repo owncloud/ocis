@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix response code when upload a file over locked: [#9894](https://github.com/owncloud/ocis/pull/9894)
 * Bugfix - List OCM permissions as graph drive item permissions: [#9905](https://github.com/owncloud/ocis/pull/9905)
 * Bugfix - Fix listing ocm shares: [#9925](https://github.com/owncloud/ocis/pull/9925)
+* Bugfix - Allow update of ocm shares: [#9980](https://github.com/owncloud/ocis/pull/9980)
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
 * Enhancement - We now set the configured protocol transport for service metadata: [#9490](https://github.com/owncloud/ocis/pull/9490)
 * Enhancement - Microsoft Office365 and Office Online support: [#9686](https://github.com/owncloud/ocis/pull/9686)
@@ -70,7 +71,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Graph translation path: [#9902](https://github.com/owncloud/ocis/pull/9902)
 * Enhancement - Added a new roles viewer/editor with ListGrants: [#9943](https://github.com/owncloud/ocis/pull/9943)
 * Enhancement - Handle OCM invite generated event: [#9966](https://github.com/owncloud/ocis/pull/9966)
-* Enhancement - Bump reva: [#9981](https://github.com/owncloud/ocis/pull/9981)
+* Enhancement - Bump reva: [#9980](https://github.com/owncloud/ocis/pull/9980)
 * Enhancement - Update web to v10.2.0: [#9988](https://github.com/owncloud/ocis/pull/9988)
 * Enhancement - Allow blob as connect-src in default CSP: [#9993](https://github.com/owncloud/ocis/pull/9993)
 
@@ -129,6 +130,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9925
    https://github.com/owncloud/ocis/pull/9920
+
+* Bugfix - Allow update of ocm shares: [#9980](https://github.com/owncloud/ocis/pull/9980)
+
+   We fixed a bug that prevented ocm shares to be updated or removed.
+
+   https://github.com/owncloud/ocis/issues/9926
+   https://github.com/owncloud/ocis/pull/9980
 
 * Change - Remove store service: [#9890](https://github.com/owncloud/ocis/pull/9890)
 
@@ -242,10 +250,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9966
    https://github.com/cs3org/reva/pull/4832
 
-* Enhancement - Bump reva: [#9981](https://github.com/owncloud/ocis/pull/9981)
+* Enhancement - Bump reva: [#9980](https://github.com/owncloud/ocis/pull/9980)
 
    Bumps reva version
 
+   https://github.com/owncloud/ocis/pull/9980
+   https://github.com/owncloud/ocis/pull/9981
    https://github.com/owncloud/ocis/pull/9981
    https://github.com/owncloud/ocis/pull/9920
    https://github.com/owncloud/ocis/pull/9879
