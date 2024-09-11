@@ -71,9 +71,9 @@ The following sections list the changes for unreleased.
 * Enhancement - Graph translation path: [#9902](https://github.com/owncloud/ocis/pull/9902)
 * Enhancement - Added a new roles viewer/editor with ListGrants: [#9943](https://github.com/owncloud/ocis/pull/9943)
 * Enhancement - Handle OCM invite generated event: [#9966](https://github.com/owncloud/ocis/pull/9966)
-* Enhancement - Bump reva: [#9980](https://github.com/owncloud/ocis/pull/9980)
 * Enhancement - Update web to v10.2.0: [#9988](https://github.com/owncloud/ocis/pull/9988)
 * Enhancement - Allow blob as connect-src in default CSP: [#9993](https://github.com/owncloud/ocis/pull/9993)
+* Enhancement - Bump reva to v2.24.1: [#10028](https://github.com/owncloud/ocis/pull/10028)
 
 ## Details
 
@@ -250,17 +250,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/9966
    https://github.com/cs3org/reva/pull/4832
 
-* Enhancement - Bump reva: [#9980](https://github.com/owncloud/ocis/pull/9980)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/9980
-   https://github.com/owncloud/ocis/pull/9981
-   https://github.com/owncloud/ocis/pull/9981
-   https://github.com/owncloud/ocis/pull/9920
-   https://github.com/owncloud/ocis/pull/9879
-   https://github.com/owncloud/ocis/pull/9860
-
 * Enhancement - Update web to v10.2.0: [#9988](https://github.com/owncloud/ocis/pull/9988)
 
    Tags: web
@@ -287,6 +276,27 @@ The following sections list the changes for unreleased.
    We added 'blob:' to the default connect-src items in the default CSP rules.
 
    https://github.com/owncloud/ocis/pull/9993
+
+* Enhancement - Bump reva to v2.24.1: [#10028](https://github.com/owncloud/ocis/pull/10028)
+
+  *   Bugfix [cs3org/reva#4843](https://github.com/cs3org/reva/pull/4843): Allow update of ocm shares
+  *   Bugfix [cs3org/reva#4820](https://github.com/cs3org/reva/pull/4820): Fix response code when upload a file over locked
+  *   Bugfix [cs3org/reva#4837](https://github.com/cs3org/reva/pull/4837): Fix OCM userid encoding
+  *   Bugfix [cs3org/reva#4823](https://github.com/cs3org/reva/pull/4823): Return etag for ocm shares
+  *   Bugfix [cs3org/reva#4822](https://github.com/cs3org/reva/pull/4822): Allow listing directory trash items by key
+  *   Enhancement [cs3org/reva#4816](https://github.com/cs3org/reva/pull/4816): Ignore resharing requests
+  *   Enhancement [cs3org/reva#4817](https://github.com/cs3org/reva/pull/4817): Added a new role space editor without versions
+  *   Enhancement [cs3org/reva#4829](https://github.com/cs3org/reva/pull/4829): Added a new roles viewer/editor with ListGrants
+  *   Enhancement [cs3org/reva#4828](https://github.com/cs3org/reva/pull/4828): New event: UserSignedIn
+  *   Enhancement [cs3org/reva#4836](https://github.com/cs3org/reva/pull/4836): Publish an event when an OCM invite is generated
+
+   https://github.com/owncloud/ocis/pull/10028
+   https://github.com/owncloud/ocis/pull/9980
+   https://github.com/owncloud/ocis/pull/9981
+   https://github.com/owncloud/ocis/pull/9981
+   https://github.com/owncloud/ocis/pull/9920
+   https://github.com/owncloud/ocis/pull/9879
+   https://github.com/owncloud/ocis/pull/9860
 
 # Changelog for [6.3.0] (2024-08-20)
 
