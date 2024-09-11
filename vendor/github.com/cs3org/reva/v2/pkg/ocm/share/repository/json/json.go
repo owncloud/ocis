@@ -31,14 +31,15 @@ import (
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
+	"google.golang.org/genproto/protobuf/field_mask"
+
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/ocm/share"
 	"github.com/cs3org/reva/v2/pkg/ocm/share/repository/registry"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/cs3org/reva/v2/pkg/utils/cfg"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
-	"google.golang.org/genproto/protobuf/field_mask"
 )
 
 func init() {
@@ -466,7 +467,17 @@ func (m *mgr) UpdateShare(ctx context.Context, user *userpb.User, ref *ocm.Share
 					}
 				}
 
-				return s, nil
+				clone, err := cloneShare(s)
+				if err != nil {
+					return nil, err
+				}
+				m.model.Shares[s.Id.OpaqueId] = clone
+
+				if err := m.save(); err != nil {
+					return nil, errors.Wrap(err, "error saving share")
+				}
+
+				return clone, nil
 			}
 		}
 	}

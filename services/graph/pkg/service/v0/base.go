@@ -925,7 +925,7 @@ func (g BaseGraphService) updateOCMPermission(ctx context.Context, permissionID 
 		return nil, err
 	}
 
-	condition, err := roleConditionForResourceType(resourceInfo)
+	condition, err := federatedRoleConditionForResourceType(resourceInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -1030,10 +1030,12 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 	if err != nil {
 		return nil, err
 	}
+
 	condition, err := roleConditionForResourceType(resourceInfo)
 	if err != nil {
 		return nil, err
 	}
+
 	var cs3UpdateShareReq collaboration.UpdateShareRequest
 	// When updating a space root we need to reference the share by resourceId and grantee
 	if IsSpaceRoot(itemID) {
