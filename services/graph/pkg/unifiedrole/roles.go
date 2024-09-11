@@ -38,10 +38,6 @@ const (
 	UnifiedRoleManagerID = "312c0871-5ef7-4b3a-85b6-0e4074c64049"
 	// UnifiedRoleSecureViewerID Unified role secure viewer id.
 	UnifiedRoleSecureViewerID = "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-	// UnifiedRoleFederatedViewerID Unified role federated viewer id.
-	UnifiedRoleFederatedViewerID = "be531789-063c-48bf-a9fe-857e6fbee7da"
-	// UnifiedRoleFederatedEditorID Unified role federated editor id.
-	UnifiedRoleFederatedEditorID = "36279a93-e4e3-4bbb-8a23-53b05b560963"
 
 	// Wile the below conditions follow the SDDL syntax, they are not parsed anywhere. We use them as strings to
 	// represent the constraints that a role definition applies to. For the actual syntax, see the SDDL documentation

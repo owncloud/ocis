@@ -16,15 +16,16 @@ import (
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/publicshare"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	l10n_pkg "github.com/owncloud/ocis/v2/services/graph/pkg/l10n"
@@ -71,6 +72,7 @@ const (
 	Public
 	User
 	Space
+	OCM
 )
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
@@ -463,6 +465,13 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 		}
 	}
 
+	if sharedResourceID == nil && s.config.IncludeOCMSharees {
+		sharedResourceID, err = s.getOCMPermissionResourceID(ctx, permissionID)
+		if err == nil {
+			permissionType = OCM
+		}
+	}
+
 	switch {
 	case err != nil:
 		return err
@@ -486,10 +495,12 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 		return s.removePublicShare(ctx, permissionID)
 	case Space:
 		return s.removeSpacePermission(ctx, permissionID, sharedResourceID)
+	case OCM:
+		return s.removeOCMPermission(ctx, permissionID)
+	default:
+		// This should never be reached
+		return errorcode.New(errorcode.GeneralException, "failed to delete permission")
 	}
-
-	// This should never be reached
-	return errorcode.New(errorcode.GeneralException, "failed to delete permission")
 }
 
 // DeleteSpaceRootPermission deletes a permission on the root item of a project space
@@ -515,6 +526,13 @@ func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Conte
 // UpdatePermission updates a permission on a drive item
 func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
 	oldPermission, sharedResourceID, err := s.getPermissionByID(ctx, permissionID, itemID)
+
+	// try to get the permission from ocm if the permission was not found first place
+	if err != nil && s.config.IncludeOCMSharees {
+		oldPermission, sharedResourceID, err = s.getOCMPermissionByID(ctx, permissionID, itemID)
+	}
+
+	// if we still can't find the permission, return an error
 	if err != nil {
 		return libregraph.Permission{}, err
 	}
@@ -537,10 +555,20 @@ func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemI
 
 	// This is a user share
 	updatedPermission, err := s.updateUserShare(ctx, permissionID, sharedResourceID, &newPermission)
-	if err != nil {
-		return libregraph.Permission{}, err
+	if err == nil && updatedPermission != nil {
+		return *updatedPermission, nil
 	}
-	return *updatedPermission, nil
+
+	// This is an ocm share
+	if s.config.IncludeOCMSharees {
+		updatePermission, err := s.updateOCMPermission(ctx, permissionID, itemID, &newPermission)
+		if err == nil {
+			return *updatePermission, nil
+		}
+	}
+
+	return libregraph.Permission{}, err
+
 }
 
 // UpdateSpaceRootPermission updates a permission on the root item of a project space
