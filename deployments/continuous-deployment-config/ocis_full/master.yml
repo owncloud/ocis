@@ -1,8 +1,8 @@
 ---
 - name: continuous-deployment-ocis-master
   server:
-    server_type: cx21
-    image: ubuntu-22.04
+    server_type: cx22
+    image: ubuntu-24.04
     location: nbg1
     initial_ssh_key_names:
       - owncloud-ocis@drone.owncloud.com
