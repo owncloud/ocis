@@ -1,3 +1,5 @@
+// FIXME: remove eslint-disable when pnpm in CI has been updated
+/* eslint-disable react/no-is-mounted */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
