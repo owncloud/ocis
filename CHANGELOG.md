@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 6.4.0](#changelog-for-640-2024-09-12)
 * [Changelog for 6.3.0](#changelog-for-630-2024-08-20)
 * [Changelog for 6.2.0](#changelog-for-620-2024-07-30)
@@ -44,6 +45,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v6.4.0...master
+
+## Summary
+
+* Bugfix - Fixed activity filter depth: [#10031](https://github.com/owncloud/ocis/pull/10031)
+
+## Details
+
+* Bugfix - Fixed activity filter depth: [#10031](https://github.com/owncloud/ocis/pull/10031)
+
+   Fixed activity filter 'depth:-1'
+
+   https://github.com/owncloud/ocis/issues/9850
+   https://github.com/owncloud/ocis/pull/10031
 
 # Changelog for [6.4.0] (2024-09-12)
 
