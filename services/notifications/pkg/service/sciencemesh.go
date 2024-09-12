@@ -57,8 +57,13 @@ func (s eventsNotifier) handleScienceMeshInviteTokenGenerated(e events.ScienceMe
 		}
 	}
 
+	emailTpl := email.ScienceMeshInviteTokenGenerated
+	if e.InviteLink == "" {
+		emailTpl = email.ScienceMeshInviteTokenGeneratedWithoutShareLink
+	}
+
 	msg, err := email.RenderEmailTemplate(
-		email.ScienceMeshInviteTokenGenerated,
+		emailTpl,
 		s.defaultLanguage, // fixMe: the recipient is unknown, should it be the defaultLocale?,
 		s.defaultLanguage, // fixMe: the defaultLocale is not set by default, shouldn't it be?,
 		s.emailTemplatePath,

@@ -82,11 +82,24 @@ Even though this membership has expired you still might have access through othe
 		Greeting: l10n.Template(`Hi,`),
 		// ScienceMeshInviteTokenGenerated email template, resolves via {{ .MessageBody }}
 		MessageBody: l10n.Template(`{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.
-{{if .ShareLink }}To accept the invite, please visit the following URL:
+To accept the invite, please visit the following URL:
 {ShareLink}
 
-Alternatively, you can{{else}}
-Please{{end}} visit your federation provider and use the following details:
+Alternatively, you can visit your federation provider and use the following details:
+  Token: {Token}
+  ProviderDomain: {ProviderDomain}`),
+	}
+
+	ScienceMeshInviteTokenGeneratedWithoutShareLink = MessageTemplate{
+		textTemplate: "templates/text/email.text.tmpl",
+		htmlTemplate: "templates/html/email.html.tmpl",
+		// ScienceMeshInviteTokenGeneratedWithoutShareLink email template, Subject field (resolves directly)
+		Subject: l10n.Template(`ScienceMesh: {InitiatorName} wants to collaborate with you`),
+		// ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves via {{ .Greeting }}
+		Greeting: l10n.Template(`Hi,`),
+		// ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves via {{ .MessageBody }}
+		MessageBody: l10n.Template(`{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.
+Please visit your federation provider and use the following details:
   Token: {Token}
   ProviderDomain: {ProviderDomain}`),
 	}
