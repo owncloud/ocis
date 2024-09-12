@@ -148,13 +148,23 @@ config = {
             ],
             "skip": False,
             "federationServer": True,
+            "emailNeeded": True,
+            "extraEnvironment": {
+                "EMAIL_HOST": "email",
+                "EMAIL_PORT": "9000",
+            },
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm",
+                "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
                 "OCIS_ENABLE_OCM": True,
                 "OCM_OCM_INVITE_MANAGER_INSECURE": True,
                 "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
                 "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
                 "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
+                # mail notifications
+                "NOTIFICATIONS_SMTP_HOST": "email",
+                "NOTIFICATIONS_SMTP_PORT": "2500",
+                "NOTIFICATIONS_SMTP_INSECURE": "true",
+                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
             },
         },
         "apiWopi": {
