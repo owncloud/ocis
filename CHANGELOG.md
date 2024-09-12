@@ -54,9 +54,16 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fixed the ocm email template: [#10030](https://github.com/owncloud/ocis/pull/10030)
 * Bugfix - Fixed activity filter depth: [#10031](https://github.com/owncloud/ocis/pull/10031)
 
 ## Details
+
+* Bugfix - Fixed the ocm email template: [#10030](https://github.com/owncloud/ocis/pull/10030)
+
+   The golang conditional construction moved out from the transifex template.
+
+   https://github.com/owncloud/ocis/pull/10030
 
 * Bugfix - Fixed activity filter depth: [#10031](https://github.com/owncloud/ocis/pull/10031)
 
