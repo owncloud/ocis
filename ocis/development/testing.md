@@ -196,12 +196,6 @@ make -C tests/acceptance/docker clean
 
 ## Testing With Test Suite Natively Installed
 
-We have two sets of tests:
-
-- `test-acceptance-api` set was created for oCIS. Mainly for testing spaces features.
-
-- `test-acceptance-from-core-api` set was transferred from [ownCloud core](https://github.com/owncloud/core) repository. The suite name of all tests transferred from the ownCloud core repository starts with `coreApi`
-
 ### Run oCIS
 
 Create an up-to-date oCIS binary by [building oCIS]({{< ref "build" >}})
@@ -218,17 +212,10 @@ ocis/bin/ocis server
 
 `PROXY_ENABLE_BASIC_AUTH` will allow the acceptance tests to make requests against the provisioning api (and other endpoints) using basic auth.
 
-#### Run Local oCIS Tests (prefix `api`)
+#### Run Local oCIS Tests (prefix `api`) and Tests Transferred From ownCloud Core (prefix `coreApi`)
 
 ```bash
 make test-acceptance-api \
-TEST_SERVER_URL=https://localhost:9200 \
-```
-
-#### Run Tests Transferred From ownCloud Core (prefix `coreApi`)
-
-```bash
-make test-acceptance-from-core-api \
 TEST_SERVER_URL=https://localhost:9200 \
 ```
 
@@ -270,7 +257,7 @@ A specific scenario from a feature can be run by adding `:<line-number>` at the 
 
 ### Use Existing Tests for BDD
 
-As a lot of scenarios from `test-acceptance-from-core-api` are written for oC10, we can use those tests for Behaviour driven development in oCIS.
+As a lot of scenarios are written for oC10, we can use those tests for Behaviour driven development in oCIS.
 Every scenario that does not work in oCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-API-on-OCIS-storage.md` with a link to the related issue.
 
 Those scenarios are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
@@ -285,7 +272,7 @@ If you want to work on a specific issue
    E.g.:
 
    ```bash
-   make test-acceptance-from-core-api \
+   make test-acceptance-api \
    TEST_SERVER_URL=https://localhost:9200 \
    STORAGE_DRIVER=OCIS \
    BEHAT_FEATURE='tests/acceptance/features/coreApiVersions/fileVersions.feature:141'
