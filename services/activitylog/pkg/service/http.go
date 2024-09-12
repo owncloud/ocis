@@ -240,6 +240,9 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 				if err != nil {
 					return nil, limit, nil, nil, sortby, err
 				}
+				if depth == -1 {
+					break
+				}
 
 				prefilters = append(prefilters, func(a RawActivity) bool {
 					return a.Depth <= depth
