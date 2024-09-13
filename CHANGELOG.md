@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fixed the ocm email template: [#10030](https://github.com/owncloud/ocis/pull/10030)
 * Bugfix - Fixed activity filter depth: [#10031](https://github.com/owncloud/ocis/pull/10031)
+* Bugfix - Fixed the ocm tocken: [#10050](https://github.com/owncloud/ocis/pull/10050)
 
 ## Details
 
@@ -71,6 +72,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9850
    https://github.com/owncloud/ocis/pull/10031
+
+* Bugfix - Fixed the ocm tocken: [#10050](https://github.com/owncloud/ocis/pull/10050)
+
+   We now pass the JWT secret to the reva runtime.
+
+   https://github.com/owncloud/ocis/pull/10050
 
 # Changelog for [6.4.0] (2024-09-12)
 
