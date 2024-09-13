@@ -1247,6 +1247,7 @@ class FeatureContext extends BehatVariablesContext {
 
 	/**
 	 * @When /^user "([^"]*)" sends HTTP method "([^"]*)" to URL "([^"]*)"$/
+	 * @When /^user "([^"]*)" tries to send HTTP method "([^"]*)" to URL "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $verb
