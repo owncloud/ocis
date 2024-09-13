@@ -11,6 +11,7 @@ import (
 func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]interface{} {
 	return map[string]interface{}{
 		"shared": map[string]interface{}{
+			"jwt_secret":          cfg.TokenManager.JWTSecret,
 			"gatewaysvc":          cfg.Reva.Address, // Todo or address?
 			"grpc_client_options": cfg.Reva.GetGRPCClientConfig(),
 		},
