@@ -133,7 +133,6 @@ Feature: create invitation
       Hi,
 
       Alice Hansen (alice@example.org) wants to start sharing collaboration resources with you.
-
       Please visit your federation provider and use the following details:
         Token: %fed_invitation_token%
         ProviderDomain: https://ocis-server:9200
