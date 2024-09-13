@@ -28,7 +28,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 a| `OCIS_ADMIN_USER_ID`
 
 a| [subs=-attributes]
@@ -90,7 +90,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
+The password to use for authentication. Only applies when using the 'nats-js-kv' store type.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=-attributes]
@@ -116,7 +116,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
+The username to use for authentication. Only applies when using the 'nats-js-kv' store type.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=-attributes]
@@ -136,14 +136,14 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++cache-userinfo ++
+++cache-stat ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
 a| `OCIS_CACHE_DISABLE_PERSISTENCE`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -164,7 +164,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.
 a| `OCIS_CACHE_SIZE`
 
 a| [subs=-attributes]
@@ -188,7 +188,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+Max number of entries to hold in the cache.
 a| `OCIS_CACHE_STORE`
 
 a| [subs=-attributes]
@@ -263,10 +263,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++10s ++
+++5m0s ++
 
 a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
 a| [subs=-attributes]
@@ -325,7 +325,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[] ++
+++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -356,7 +356,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[] ++
+++[OPTIONS HEAD GET PUT POST PATCH DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
@@ -428,7 +428,7 @@ The propagator used for decomposedfs. At the moment, only 'sync' is fully suppor
 a| `OCIS_DEFAULT_LANGUAGE`
 
 a| [subs=-attributes]
-++5.0 ++
+++next ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -441,7 +441,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ ++
+++en ++
 
 a| [subs=-attributes]
 The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.
@@ -566,7 +566,7 @@ The username to authenticate with the events broker. The events broker is the oc
 a| `OCIS_EVENTS_CLUSTER`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -598,7 +598,7 @@ The clusterID of the event system. The event system is the message queuing servi
 a| `OCIS_EVENTS_ENABLE_TLS`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -631,7 +631,7 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a| `OCIS_EVENTS_ENDPOINT`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -694,7 +694,7 @@ The root CA certificate used to validate the server's TLS certificate. If provid
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/gateway.adoc[gateway] +
@@ -707,7 +707,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the gateway GRPC address.
+The bind address of the GRPC service.
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
 a| [subs=-attributes]
@@ -941,7 +941,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether the server should skip the client certificate verification during the TLS handshake.
+Allow insecure connections to the frontend.
 a| `OCIS_JWT_SECRET`
 
 a| [subs=-attributes]
@@ -1890,7 +1890,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary to access resources from other services.
+The machine auth API key used to validate internal requests necessary to access resources from other services.
 a| `OCIS_OIDC_ISSUER`
 
 a| [subs=-attributes]
@@ -2128,7 +2128,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
 a| `OCIS_PERSISTENT_STORE_TTL`
 
 a| [subs=-attributes]
@@ -2378,7 +2378,7 @@ IDP of the oCIS STORAGE-SYSTEM system user.
 a| `OCIS_TRACING_COLLECTOR`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2435,7 +2435,7 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a| `OCIS_TRACING_ENABLED`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2492,7 +2492,7 @@ Activates tracing.
 a| `OCIS_TRACING_ENDPOINT`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2549,7 +2549,7 @@ The endpoint of the tracing agent.
 a| `OCIS_TRACING_TYPE`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2623,7 +2623,7 @@ Transfer secret for signing file up- and download requests.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++next ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2672,7 +2672,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+The public facing URL of the oCIS frontend.
 a| `OCIS_WOPI_DISABLE_CHAT`
 
 a| [subs=-attributes]
