@@ -391,6 +391,8 @@ default:
         - SharingNgContext:
         - SpacesContext:
         - OcisConfigContext:
+        - NotificationContext:
+        - SettingsContext:
 
     apiActivities:
       paths:
