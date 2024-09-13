@@ -162,6 +162,7 @@ class FeatureContext extends BehatVariablesContext {
 	public TUSContext $tusContext;
 	public GraphContext $graphContext;
 	public SpacesContext $spacesContext;
+	public OcmContext $ocmContext;
 
 	/**
 	 * The codes are stored as strings, even though they are numbers
@@ -2319,10 +2320,10 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
-				"code" => "%fed_invitation_token_pattern%",
+				"code" => "%fed_invitation_token%",
 				"function" => [
-					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
+					$this->ocmContext,
+					"getLastFederatedInvitationToken"
 				],
 				"parameter" => []
 			],
@@ -2531,12 +2532,14 @@ class FeatureContext extends BehatVariablesContext {
 		$this->ocsContext = new OCSContext();
 		$this->authContext = new AuthContext();
 		$this->tusContext = new TUSContext();
+		$this->ocmContext = new OcmContext();
 		$this->ocsContext->before($scope);
 		$this->authContext->setUpScenario($scope);
 		$this->tusContext->setUpScenario($scope);
 		$environment->registerContext($this->ocsContext);
 		$environment->registerContext($this->authContext);
 		$environment->registerContext($this->tusContext);
+		$environment->registerContext($this->ocmContext);
 		$scenarioLine = $scope->getScenario()->getLine();
 		$featureFile = $scope->getFeature()->getFile();
 		$suiteName = $scope->getSuite()->getName();

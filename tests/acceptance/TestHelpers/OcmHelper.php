@@ -58,7 +58,7 @@ class OcmHelper {
 		?string $email = null,
 		?string $description = null
 	): ResponseInterface {
-		$body['params'] = [
+		$body = [
 		  "description" => $description,
 		  "recipient" => $email
 		];

@@ -69,6 +69,13 @@ class OcmContext implements Context {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getLastFederatedInvitationToken():string {
+		return $this->invitationToken;
+	}
+
+	/**
 	 * @param string $url
 	 *
 	 * @return string
@@ -151,7 +158,7 @@ class OcmContext implements Context {
 			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$token ? $token : $this->invitationToken,
+			$token ? $token : $this->getLastFederatedInvitationToken(),
 			$providerDomain
 		);
 	}

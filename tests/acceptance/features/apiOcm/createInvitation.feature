@@ -26,7 +26,7 @@ Feature: create invitation
           },
           "token": {
             "type": "string",
-            "pattern": "^%fed_invitation_token_pattern%$"
+            "pattern": "%fed_invitation_token%"
           }
         }
       }
@@ -52,7 +52,7 @@ Feature: create invitation
             },
             "token": {
               "type": "string",
-              "pattern": "^%fed_invitation_token_pattern%$"
+              "pattern": "%fed_invitation_token%"
             }
           }
         }
@@ -81,17 +81,18 @@ Feature: create invitation
           },
           "token": {
             "type": "string",
-            "pattern": "^%fed_invitation_token_pattern%$"
+            "pattern": "%fed_invitation_token%"
           },
           "description": {
             "const": "a share invitation from Alice"
           },
-          "recipient": {
+          "description": {
             "const": "brian@example.com"
           }
         }
       }
       """
+    When "Alice" lists the created invitations
     And the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -103,7 +104,8 @@ Feature: create invitation
           "type": "object",
           "required": [
             "expiration",
-            "token"
+            "token",
+            "description"
           ],
           "properties": {
             "expiration": {
@@ -112,17 +114,28 @@ Feature: create invitation
             },
             "token": {
               "type": "string",
-              "pattern": "^%fed_invitation_token_pattern%$"
+              "pattern": "%fed_invitation_token%"
             },
             "description": {
               "const": "a share invitation from Alice"
-            },
-            "recipient": {
-              "const": "brian@example.com"
             }
           }
         }
       }
+      """
+
+  @email
+  Scenario: federated user gets an email notification if their email was specified when creating the federation share invitation
+    Given using server "LOCAL"
+    When "Alice" has created the federation share invitation with email "brian@example.com" and description "a share invitation from Alice"
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Hi,
+
+      Alice Hansen (alice@example.org) wants to start sharing collaboration resources with you.
+      Please visit your federation provider and use the following details:
+        Token: %fed_invitation_token%
+        ProviderDomain: https://ocis-server:9200
       """
 
   @env-config
@@ -146,7 +159,7 @@ Feature: create invitation
           },
           "token": {
             "type": "string",
-            "pattern": "^%fed_invitation_token_pattern%$"
+            "pattern": "%fed_invitation_token%"
           }
         }
       }
