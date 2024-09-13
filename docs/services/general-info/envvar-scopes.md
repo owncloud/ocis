@@ -58,6 +58,10 @@ For the documentation to show the correct value for the `IV` (introduction versi
 
 During the releasing process for a production release, the placeholder `%%NEXT%%` has to be replaced with the new production version number like `%%NEXT%%` → `7.0.0`.
 
+### Adding Envvars to Existing Ones
+
+If an envvar has been introduced with a particular version, the `introductionVersion` gets a value accordingly. If an additional envvar like a global one is added to this existing envvar later on, the introduction version will *not* be changed.
+
 ### Deprecate Existing Envvars
 
 See the [deprecation rules]({{< ref "./deprecating-variables.md" >}}) documentation for more details.
