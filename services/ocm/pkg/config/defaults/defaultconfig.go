@@ -165,6 +165,14 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Reva = structs.CopyOrZeroValue(cfg.Commons.Reva)
 	}
 
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
 	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}

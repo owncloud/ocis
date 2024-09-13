@@ -27,6 +27,7 @@ type Config struct {
 	ServiceAccount ServiceAccount        `yaml:"service_account"`
 	Events         Events                `yaml:"-"`
 
+	TokenManager                 *TokenManager                `yaml:"token_manager"`
 	Reva                         *shared.Reva                 `yaml:"reva"`
 	OCMD                         OCMD                         `yaml:"ocmd"`
 	ScienceMesh                  ScienceMesh                  `yaml:"sciencemesh"`
