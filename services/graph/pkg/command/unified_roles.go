@@ -14,6 +14,23 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
+var (
+	unifiedRolesNames = map[string]string{
+		unifiedrole.UnifiedRoleViewerID:                     "Viewer",
+		unifiedrole.UnifiedRoleViewerListGrantsID:           "ViewerListGrants",
+		unifiedrole.UnifiedRoleSpaceViewerID:                "SpaceViewer",
+		unifiedrole.UnifiedRoleEditorID:                     "Editor",
+		unifiedrole.UnifiedRoleEditorListGrantsID:           "EditorListGrants",
+		unifiedrole.UnifiedRoleSpaceEditorID:                "SpaceEditor",
+		unifiedrole.UnifiedRoleSpaceEditorWithoutVersionsID: "SpaceEditorWithoutVersions",
+		unifiedrole.UnifiedRoleFileEditorID:                 "FileEditor",
+		unifiedrole.UnifiedRoleFileEditorListGrantsID:       "FileEditorListGrants",
+		unifiedrole.UnifiedRoleEditorLiteID:                 "EditorLite",
+		unifiedrole.UnifiedRoleManagerID:                    "SpaceManager",
+		unifiedrole.UnifiedRoleSecureViewerID:               "SecureViewer",
+	}
+)
+
 // UnifiedRoles bundles available commands for unified roles
 func UnifiedRoles(cfg *config.Config) cli.Commands {
 	cmds := cli.Commands{
@@ -41,7 +58,7 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 			tbl.SetRowLine(true)
 			tbl.SetAutoMergeCellsByColumnIndex([]int{0}) // rowspan should only affect the first column
 
-			headers := []string{"UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
+			headers := []string{"Name", "UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
 			tbl.SetHeader(headers)
 
 			for _, definition := range unifiedrole.GetRoles(unifiedrole.RoleFilterAll()) {
@@ -49,10 +66,10 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 				const disabled = "disabled"
 
 				rows := [][]string{
-					{definition.GetId(), disabled, definition.GetDescription()},
+					{unifiedRolesNames[definition.GetId()], definition.GetId(), disabled, definition.GetDescription()},
 				}
 				if slices.Contains(cfg.UnifiedRoles.AvailableRoles, definition.GetId()) {
-					rows[0][1] = enabled
+					rows[0][2] = enabled
 				}
 
 				for i, rolePermission := range definition.GetRolePermissions() {
@@ -62,7 +79,7 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 					case 0:
 						rows[0] = append(rows[0], row...)
 					default:
-						rows = append(rows, append(slices.Clone(rows[0][:len(rows[0])-len(row)]), row...))
+						rows[0][4] = rows[0][4] + "\n" + rolePermission.GetCondition()
 					}
 				}
 

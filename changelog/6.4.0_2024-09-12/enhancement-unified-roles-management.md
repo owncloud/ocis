@@ -37,5 +37,6 @@ The output of this command includes the following information for each role:
 - Description: A short description of the role.
 - Enabled: Whether the role is enabled or not.
 
+https://github.com/owncloud/ocis/pull/10013
 https://github.com/owncloud/ocis/pull/9727
 https://github.com/owncloud/ocis/issues/9698
