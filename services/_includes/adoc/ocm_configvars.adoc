@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-09-13-13-19-29]
+[#deprecation-note-2024-09-13-14-11-37]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -382,6 +382,18 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_JWT_SECRET` +
+`OCM_JWT_SECRET` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 

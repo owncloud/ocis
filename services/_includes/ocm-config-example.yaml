@@ -73,6 +73,8 @@ grpc_client_tls: null
 service_account:
   service_account_id: ""
   service_account_secret: ""
+token_manager:
+  jwt_secret: ""
 reva:
   address: com.owncloud.api.gateway
   tls:
