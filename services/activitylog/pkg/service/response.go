@@ -11,7 +11,6 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -21,18 +20,20 @@ import (
 
 // Translations
 var (
-	MessageResourceCreated = l10n.Template("{user} added {resource} to {space}")
-	MessageResourceUpdated = l10n.Template("{user} updated {resource} in {folder}")
-	MessageResourceTrashed = l10n.Template("{user} deleted {resource} from {space}")
-	MessageResourceMoved   = l10n.Template("{user} moved {resource} to {space}")
-	MessageResourceRenamed = l10n.Template("{user} renamed {oldResource} to {resource}")
-	MessageShareCreated    = l10n.Template("{user} shared {resource} with {sharee}")
-	MessageShareDeleted    = l10n.Template("{user} removed {sharee} from {resource}")
-	MessageLinkCreated     = l10n.Template("{user} shared {resource} via link")
+	MessageResourceInSpaceCreated  = l10n.Template("{user} added {resource} to {space}")
+	MessageResourceInSpaceTrashed  = l10n.Template("{user} deleted {resource} from {space}")
+	MessageResourceInSpaceMoved    = l10n.Template("{user} moved {resource} to {space}")
+	MessageResourceInFolderCreated = l10n.Template("{user} added {resource} to {folder}")
+	MessageResourceInFolderTrashed = l10n.Template("{user} deleted {resource} from {folder}")
+	MessageResourceInFolderMoved   = l10n.Template("{user} moved {resource} to {folder}")
+	MessageResourceRenamed         = l10n.Template("{user} renamed {oldResource} to {resource}")
+	MessageShareCreated            = l10n.Template("{user} shared {resource} with {sharee}")
+	MessageShareDeleted            = l10n.Template("{user} removed {sharee} from {resource}")
+	MessageLinkCreated             = l10n.Template("{user} shared {resource} via link")
 	MessageLinkUpdated     = l10n.Template("{user} updated {field} for a link {token} on {resource}")
-	MessageLinkDeleted     = l10n.Template("{user} removed link to {resource}")
-	MessageSpaceShared     = l10n.Template("{user} added {sharee} as member of {space}")
-	MessageSpaceUnshared   = l10n.Template("{user} removed {sharee} from {space}")
+	MessageLinkDeleted             = l10n.Template("{user} removed link to {resource}")
+	MessageSpaceShared             = l10n.Template("{user} added {sharee} as member of {space}")
+	MessageSpaceUnshared           = l10n.Template("{user} removed {sharee} from {space}")
 )
 
 // GetActivitiesResponse is the response on GET activities requests
