@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-09-06 00:03+0000\n"
+"POT-Creation-Date: 2024-09-13 00:08+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: Hugo Blackwood, 2023\n"
 "Language-Team: Korean (https://app.transifex.com/owncloud-org/teams/6149/ko/)\n"
@@ -52,7 +52,9 @@ msgstr "안녕하세요, {SpaceGrantee} 님,"
 
 #. ScienceMeshInviteTokenGenerated email template, resolves via {{ .Greeting
 #. }}
-#: pkg/email/templates.go:82
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
+#. via {{ .Greeting }}
+#: pkg/email/templates.go:82 pkg/email/templates.go:99
 msgid "Hi,"
 msgstr ""
 
@@ -63,7 +65,9 @@ msgstr "'{SpaceName}' 멤버십이 {ExpiredAt} 일자에 만료됨"
 
 #. ScienceMeshInviteTokenGenerated email template, Subject field (resolves
 #. directly)
-#: pkg/email/templates.go:80
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, Subject
+#. field (resolves directly)
+#: pkg/email/templates.go:80 pkg/email/templates.go:97
 msgid "ScienceMesh: {InitiatorName} wants to collaborate with you"
 msgstr ""
 
@@ -94,16 +98,25 @@ msgstr ""
 "\n"
 "멤버십이 만료되더라도 다른 공유 및/또는 스페이스 멤버십에 접근이 가능할 수도 있습니다."
 
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
+#. via {{ .MessageBody }}
+#: pkg/email/templates.go:101
+msgid ""
+"{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.\n"
+"Please visit your federation provider and use the following details:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+msgstr ""
+
 #. ScienceMeshInviteTokenGenerated email template, resolves via {{
 #. .MessageBody }}
 #: pkg/email/templates.go:84
 msgid ""
 "{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.\n"
-"{{if .ShareLink }}To accept the invite, please visit the following URL:\n"
+"To accept the invite, please visit the following URL:\n"
 "{ShareLink}\n"
 "\n"
-"Alternatively, you can{{else}}\n"
-"Please{{end}} visit your federation provider and use the following details:\n"
+"Alternatively, you can visit your federation provider and use the following details:\n"
 "  Token: {Token}\n"
 "  ProviderDomain: {ProviderDomain}"
 msgstr ""

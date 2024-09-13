@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-09-06 00:03+0000\n"
+"POT-Creation-Date: 2024-09-13 00:08+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: Michael Barz <mbarz@owncloud.com>, 2023\n"
 "Language-Team: German (Germany) (https://app.transifex.com/owncloud-org/teams/6149/de_DE/)\n"
@@ -53,7 +53,9 @@ msgstr "Hallo {SpaceGrantee},"
 
 #. ScienceMeshInviteTokenGenerated email template, resolves via {{ .Greeting
 #. }}
-#: pkg/email/templates.go:82
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
+#. via {{ .Greeting }}
+#: pkg/email/templates.go:82 pkg/email/templates.go:99
 msgid "Hi,"
 msgstr ""
 
@@ -64,7 +66,9 @@ msgstr "Mitgliedschaft in '{SpaceName}' abgelaufen am {ExpiredAt}"
 
 #. ScienceMeshInviteTokenGenerated email template, Subject field (resolves
 #. directly)
-#: pkg/email/templates.go:80
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, Subject
+#. field (resolves directly)
+#: pkg/email/templates.go:80 pkg/email/templates.go:97
 msgid "ScienceMesh: {InitiatorName} wants to collaborate with you"
 msgstr ""
 
@@ -95,16 +99,25 @@ msgstr ""
 "\n"
 "Obwohl die Freigabe zurückgezogen wurde, haben Sie vielleicht noch Zugriff durch andere Freigaben oder Space-Mitgliedschaften.."
 
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
+#. via {{ .MessageBody }}
+#: pkg/email/templates.go:101
+msgid ""
+"{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.\n"
+"Please visit your federation provider and use the following details:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+msgstr ""
+
 #. ScienceMeshInviteTokenGenerated email template, resolves via {{
 #. .MessageBody }}
 #: pkg/email/templates.go:84
 msgid ""
 "{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.\n"
-"{{if .ShareLink }}To accept the invite, please visit the following URL:\n"
+"To accept the invite, please visit the following URL:\n"
 "{ShareLink}\n"
 "\n"
-"Alternatively, you can{{else}}\n"
-"Please{{end}} visit your federation provider and use the following details:\n"
+"Alternatively, you can visit your federation provider and use the following details:\n"
 "  Token: {Token}\n"
 "  ProviderDomain: {ProviderDomain}"
 msgstr ""
