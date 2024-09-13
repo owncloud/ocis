@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-09-13-08-55-14]
+[#deprecation-note-2024-09-13-08-55-46]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -638,7 +638,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++com.owncloud.api.storage-shares ++
 a| [subs=-attributes]
-The endpoint of the storag-shares service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+The endpoint of the storage-shares service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
 
 a|`GATEWAY_APP_REGISTRY_ENDPOINT` +
 

@@ -54,7 +54,7 @@
 | GATEWAY_AUTH_SERVICE_ENDPOINT | string | com.owncloud.api.auth-service | The endpoint of the auth-service service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.|
 | GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT | string | com.owncloud.api.storage-publiclink | The endpoint of the storage-publiclink service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.|
 | GATEWAY_STORAGE_USERS_ENDPOINT | string | com.owncloud.api.storage-users | The endpoint of the storage-users service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.|
-| GATEWAY_STORAGE_SHARES_ENDPOINT | string | com.owncloud.api.storage-shares | The endpoint of the storag-shares service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.|
+| GATEWAY_STORAGE_SHARES_ENDPOINT | string | com.owncloud.api.storage-shares | The endpoint of the storage-shares service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.|
 | GATEWAY_APP_REGISTRY_ENDPOINT | string | com.owncloud.api.app-registry | The endpoint of the app-registry service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.|
 | GATEWAY_OCM_ENDPOINT | string | com.owncloud.api.ocm | The endpoint of the ocm service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.|
 | GATEWAY_STORAGE_REGISTRY_DRIVER | string | spaces | The driver name of the storage registry to use.|
