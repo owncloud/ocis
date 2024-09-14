@@ -52,22 +52,29 @@ class CollaborationContext implements Context {
 
 	/**
 	 * @When user :user checks the information of file :file of space :space using office :app
+	 * @When user :user checks the information of file :file of space :space using office :app with view mode :view
 	 *
 	 * @param string $user
 	 * @param string $file
 	 * @param string $space
 	 * @param string $app
+	 * @param string|null $viewMode
 	 *
 	 * @return void
 	 *
 	 * @throws GuzzleException
-	 * @throws JsonException
 	 */
-	public function userChecksTheInformationOfFileOfSpaceUsingOffice(string $user, string $file, string $space, string $app): void {
+	public function userChecksTheInformationOfFileOfSpaceUsingOffice(string $user, string $file, string $space, string $app, string $viewMode = null): void {
 		$fileId = $this->spacesContext->getFileId($user, $space, $file);
+		$url = $this->featureContext->getBaseUrl() . "/app/open?app_name=$app&file_id=$fileId";
+
+		if ($viewMode) {
+			$url .= "&view_mode=$viewMode";
+		}
+
 		$response = \json_decode(
 			HttpRequestHelper::post(
-				$this->featureContext->getBaseUrl() . "/app/open?app_name=$app&file_id=$fileId",
+				$url,
 				$this->featureContext->getStepLineRef(),
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
