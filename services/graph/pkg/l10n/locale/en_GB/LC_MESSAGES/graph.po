@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-09-12 00:42+0000\n"
+"POT-Creation-Date: 2024-09-14 00:44+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Andi Chandler <andi@gowling.com>, 2024\n"
 "Language-Team: English (United Kingdom) (https://app.transifex.com/owncloud-org/teams/6149/en_GB/)\n"
@@ -99,11 +99,9 @@ msgid "View, download, edit and show all invited people."
 msgstr "View, download, edit and show all invited people."
 
 #. UnifiedRole Editor, Role Description (resolves directly)
-#. UnifiedRole SpaseEditor, Role Description (resolves directly)
 #. UnifiedRole SpaseEditorWithoutVersions, Role Description (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:111 pkg/unifiedrole/roles.go:123
-#: pkg/unifiedrole/roles.go:129
+#: pkg/unifiedrole/roles.go:111 pkg/unifiedrole/roles.go:129
 msgid "View, download, upload, edit, add and delete."
 msgstr "View, download, upload, edit, add and delete."
 
@@ -117,3 +115,8 @@ msgstr "View, download, upload, edit, add, delete and manage members."
 msgid "View, download, upload, edit, add, delete and show all invited people."
 msgstr ""
 "View, download, upload, edit, add, delete and show all invited people."
+
+#. UnifiedRole SpaseEditor, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:123
+msgid "View, download, upload, edit, add, delete including the history."
+msgstr ""
