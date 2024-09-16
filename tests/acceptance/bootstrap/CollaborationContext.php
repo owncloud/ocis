@@ -96,4 +96,27 @@ class CollaborationContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @When user :user creates a file :file inside folder :folder in space :space using wopi endpoint
+	 * @When user :user tries to create a file :file inside folder :folder in space :space using wopi endpoint
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $folder
+	 * @param string $space
+	 *
+	 * @return void
+	 */
+	public function userCreatesFileInsideFolderInSpaceUsingWopiEndpoint(string $user, string $file, string $folder, string $space): void {
+		$parent_container_id = $this->spacesContext->getResourceId($user, $space, $folder);
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				$this->featureContext->getBaseUrl() . "/app/new?parent_container_id=$parent_container_id&filename=$file",
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user)
+			)
+		);
+	}
 }

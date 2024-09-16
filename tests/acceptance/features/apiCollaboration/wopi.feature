@@ -552,3 +552,189 @@ Feature: collaboration (wopi)
       | app-endpoint                                              |
       | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice |
       | /app/open-with-web?file_id=<<FILEID>>                     |
+
+
+  Scenario: create a text file using wopi endpoint in Personal space
+    Given user "Alice" has created folder "testFolder"
+    When user "Alice" creates a file "testfile.txt" inside folder "testFolder" in space "Personal" using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          }
+        }
+      }
+      """
+    And as "Alice" file "testFolder/testfile.txt" should exist
+
+
+  Scenario Outline: sharee with permission Editor/Uploader creates text file inside shared folder
+    Given user "Alice" has created folder "testFolder"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testFolder         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Brian" creates a file "testFile.txt" inside folder "testFolder" in space "Shares" using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          }
+        }
+      }
+      """
+    And as "Alice" file "testFolder/testFile.txt" should exist
+    And as "Brian" file "Shares/testFolder/testFile.txt" should exist
+    Examples:
+      | permissions-role |
+      | Editor           |
+      | Uploader         |
+
+
+  Scenario: sharee with permission Viewer tries to create text file inside shared folder
+    Given user "Alice" has created folder "testFolder"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testFolder |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Brian" tries to create a file "testFile.txt" inside folder "testFolder" in space "Shares" using wopi endpoint
+    Then the HTTP status code should be "500"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "SERVER_ERROR"
+          },
+          "message": {
+            "const": "error calling InitiateFileUpload"
+          }
+        }
+      }
+      """
+    And as "Alice" file "testFolder/testFile.txt" should not exist
+    And as "Brian" file "Shares/testFolder/testFile.txt" should not exist
+
+
+  Scenario: space admin creates a text file in project space using wopi endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "testFolder" in space "new-space"
+    When user "Alice" creates a file "testFile.txt" inside folder "testFolder" in space "new-space" using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          }
+        }
+      }
+      """
+    And for user "Alice" folder "testFolder" of the space "new-space" should contain these files:
+      | testFile.txt |
+
+
+  Scenario Outline: user with Space Editor/Manager role creates a text file inside shared project space using wopi endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "testFolder" in space "new-space"
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Brian" creates a file "testFile.txt" inside folder "testFolder" in space "new-space" using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          }
+        }
+      }
+      """
+    And for user "Alice" folder "testFolder" of the space "new-space" should contain these files:
+      | testFile.txt |
+    And for user "Brian" folder "testFolder" of the space "new-space" should contain these files:
+      | testFile.txt |
+    Examples:
+      | permissions-role |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario: user with Viewer role tries to create a text file inside shared project space using wopi endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "testFolder" in space "new-space"
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
+    When user "Brian" tries to create a file "testFile.txt" inside folder "testFolder" in space "new-space" using wopi endpoint
+    Then the HTTP status code should be "500"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "SERVER_ERROR"
+          },
+          "message": {
+            "const": "error calling InitiateFileUpload"
+          }
+        }
+      }
+      """
+    And for user "Alice" folder "testFolder" of the space "new-space" should not contain these files:
+      | testFile.txt |
+    And for user "Brian" folder "testFolder" of the space "new-space" should not contain these files:
+      | testFile.txt |
