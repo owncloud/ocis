@@ -200,6 +200,7 @@ default:
         - SettingsContext:
         - OcisConfigContext:
         - SharingNgContext:
+        - OcmContext:
 
     apiAntivirus:
       paths:
