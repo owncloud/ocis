@@ -42,7 +42,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -162,7 +162,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -299,7 +299,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -405,7 +405,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -539,48 +539,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
-                        },
-                        "variables": {
-                          "type": "object",
-                          "required": ["resource","space","user"],
-                          "properties": {
-                            "resource": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
-                              }
-                            },
-                            "space": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
-                              }
-                            },
-                            "user": {
-                              "type": "object",
-                              "required": ["id","displayName"],
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice"
-                                }
-                              }
-                            }
-                          }
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -618,7 +577,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -639,7 +598,7 @@ Feature: check share activity
                               "properties": {
                                 "id": {
                                   "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
+                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
                                 },
                                 "name": {
                                   "const": "Alice Hansen"
@@ -678,7 +637,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} updated {resource} in {folder}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -699,7 +658,7 @@ Feature: check share activity
                               "properties": {
                                 "id": {
                                   "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
+                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
                                 },
                                 "name": {
                                   "const": "Alice Hansen"
@@ -738,7 +697,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} deleted {resource} from {space}"
+                          "const": "{user} deleted {resource} from {folder}"
                         },
                         "variables": {
                           "type": "object",
