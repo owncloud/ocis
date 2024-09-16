@@ -588,3 +588,14 @@ Feature: check file info with different wopi apps
       | view  | true          | false          | false           |
       | read  | false         | false          | false           |
       | write | false         | true           | true            |
+
+
+  Scenario Outline: try to get file info using invalid file id with office suites
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    When user "Alice" tries to check the information of file "textfile0.txt" of space "Personal" using office "<office-suites>" with invalid file-id
+    Then the HTTP status code should be "401"
+    Examples:
+      | office-suites |
+      | Collabora     |
+      | FakeOffice    |
+      | OnlyOffice    |
