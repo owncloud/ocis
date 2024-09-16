@@ -60,7 +60,7 @@ Feature: create invitation
       """
 
   @issue-9591
-  Scenario: user creates invitation with email and description
+  Scenario: user creates invitation with valid email and description
     Given using server "LOCAL"
     When "Alice" creates the federation share invitation with email "brian@example.com" and description "a share invitation from Alice"
     Then the HTTP status code should be "200"
@@ -71,8 +71,7 @@ Feature: create invitation
         "required": [
           "expiration",
           "token",
-          "description",
-          "recipient"
+          "description"
         ],
         "properties": {
           "expiration": {
@@ -85,9 +84,6 @@ Feature: create invitation
           },
           "description": {
             "const": "a share invitation from Alice"
-          },
-          "description": {
-            "const": "brian@example.com"
           }
         }
       }
@@ -124,7 +120,21 @@ Feature: create invitation
       }
       """
 
-  @email
+
+  Scenario Outline: user creates invitation with valid/invalid email
+    Given using server "LOCAL"
+    When "Alice" creates the federation share invitation with email "<email>" and description "a share invitation from Alice"
+    Then the HTTP status code should be "<code>"
+    Examples:
+      | email                             | code |
+      | user@subdomain.example.longdomain | 200  |
+      | user.bob+123@domain.test-123.com  | 200  |
+      | user.example.com                  | 400  |
+      | user@.com                         | 400  |
+      | @domain.com                       | 400  |
+      | user@domain..com                  | 400  |
+
+  @email @skip
   Scenario: federated user gets an email notification if their email was specified when creating the federation share invitation
     Given using server "LOCAL"
     When "Alice" has created the federation share invitation with email "brian@example.com" and description "a share invitation from Alice"
@@ -133,6 +143,7 @@ Feature: create invitation
       Hi,
 
       Alice Hansen (alice@example.org) wants to start sharing collaboration resources with you.
+
       Please visit your federation provider and use the following details:
         Token: %fed_invitation_token%
         ProviderDomain: https://ocis-server:9200

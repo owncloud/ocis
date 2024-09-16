@@ -70,8 +70,12 @@ class OcmContext implements Context {
 
 	/**
 	 * @return string
+	 * @throws Exception
 	 */
 	public function getLastFederatedInvitationToken():string {
+		if (empty($this->invitationToken)) {
+			throw new Exception(__METHOD__ . " token not found");
+		}
 		return $this->invitationToken;
 	}
 
@@ -107,8 +111,6 @@ class OcmContext implements Context {
 		$responseData = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 		if (isset($responseData["token"])) {
 			$this->invitationToken = $responseData["token"];
-		} else {
-			throw new Exception(__METHOD__ . " response doesn't contain token");
 		}
 		return $response;
 	}
