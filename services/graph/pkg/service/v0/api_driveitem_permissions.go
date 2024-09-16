@@ -325,6 +325,14 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
 	}
 
+	if s.config.IncludeOCMSharees && len(invite.GetRecipients()) > 0 {
+		objectID := invite.GetRecipients()[0].GetObjectId()
+		_, err := s.identityCache.GetAcceptedUser(ctx, objectID)
+		if err == nil {
+			return libregraph.Permission{}, errorcode.New(errorcode.NotAllowed, "federated user can not become a space member")
+		}
+	}
+
 	rootResourceID := space.GetRoot()
 	return s.Invite(ctx, rootResourceID, invite)
 }
