@@ -20,20 +20,17 @@ import (
 
 // Translations
 var (
-	MessageResourceInSpaceCreated  = l10n.Template("{user} added {resource} to {space}")
-	MessageResourceInSpaceTrashed  = l10n.Template("{user} deleted {resource} from {space}")
-	MessageResourceInSpaceMoved    = l10n.Template("{user} moved {resource} to {space}")
-	MessageResourceInFolderCreated = l10n.Template("{user} added {resource} to {folder}")
-	MessageResourceInFolderTrashed = l10n.Template("{user} deleted {resource} from {folder}")
-	MessageResourceInFolderMoved   = l10n.Template("{user} moved {resource} to {folder}")
-	MessageResourceRenamed         = l10n.Template("{user} renamed {oldResource} to {resource}")
-	MessageShareCreated            = l10n.Template("{user} shared {resource} with {sharee}")
-	MessageShareDeleted            = l10n.Template("{user} removed {sharee} from {resource}")
-	MessageLinkCreated             = l10n.Template("{user} shared {resource} via link")
+	MessageResourceCreated = l10n.Template("{user} added {resource} to {folder}")
+	MessageResourceTrashed = l10n.Template("{user} deleted {resource} from {folder}")
+	MessageResourceMoved   = l10n.Template("{user} moved {resource} to {folder}")
+	MessageResourceRenamed = l10n.Template("{user} renamed {oldResource} to {resource}")
+	MessageShareCreated    = l10n.Template("{user} shared {resource} with {sharee}")
+	MessageShareDeleted    = l10n.Template("{user} removed {sharee} from {resource}")
+	MessageLinkCreated     = l10n.Template("{user} shared {resource} via link")
 	MessageLinkUpdated     = l10n.Template("{user} updated {field} for a link {token} on {resource}")
-	MessageLinkDeleted             = l10n.Template("{user} removed link to {resource}")
-	MessageSpaceShared             = l10n.Template("{user} added {sharee} as member of {space}")
-	MessageSpaceUnshared           = l10n.Template("{user} removed {sharee} from {space}")
+	MessageLinkDeleted     = l10n.Template("{user} removed link to {resource}")
+	MessageSpaceShared     = l10n.Template("{user} added {sharee} as member of {space}")
+	MessageSpaceUnshared   = l10n.Template("{user} removed {sharee} from {space}")
 )
 
 // GetActivitiesResponse is the response on GET activities requests

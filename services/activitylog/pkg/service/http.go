@@ -120,35 +120,19 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			// error already logged in unwrapEvent
 			continue
 		case events.UploadReady:
-			if ev.FileRef.GetPath() == "/" {
-				message = MessageResourceInSpaceCreated
-			} else {
-				message = MessageResourceInFolderCreated
-			}
+			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
 			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, true), WithUser(ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName()), WithSpace(toSpace(ev.FileRef)))
 		case events.FileTouched:
-			if ev.Ref.GetPath() == "/" {
-				message = MessageResourceInSpaceCreated
-			} else {
-				message = MessageResourceInFolderCreated
-			}
+			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
 			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""), WithSpace(toSpace(ev.Ref)))
 		case events.ContainerCreated:
-			if ev.Ref.GetPath() == "/" {
-				message = MessageResourceInSpaceCreated
-			} else {
-				message = MessageResourceInFolderCreated
-			}
+			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
 			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""), WithSpace(toSpace(ev.Ref)))
 		case events.ItemTrashed:
-			if ev.Ref.GetPath() == "/" {
-				message = MessageResourceInSpaceTrashed
-			} else {
-				message = MessageResourceInFolderTrashed
-			}
+			message = MessageResourceTrashed
 			ts = utils.TSToTime(ev.Timestamp)
 			vars, err = s.GetVars(ctx, WithTrashedResource(ev.Ref, ev.ID), WithUser(ev.Executant, ""), WithSpace(toSpace(ev.Ref)))
 		case events.ItemMoved:
@@ -157,11 +141,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 				message = MessageResourceRenamed
 				vars, err = s.GetVars(ctx, WithResource(ev.Ref, false), WithOldResource(ev.OldReference), WithUser(ev.Executant, ""))
 			case false:
-				if ev.Ref.GetPath() == "/" {
-					message = MessageResourceInSpaceMoved
-				} else {
-					message = MessageResourceInFolderMoved
-				}
+				message = MessageResourceMoved
 				vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, ""), WithSpace(toSpace(ev.Ref)))
 			}
 			ts = utils.TSToTime(ev.Timestamp)
