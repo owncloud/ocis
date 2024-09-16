@@ -738,3 +738,124 @@ Feature: collaboration (wopi)
       | testFile.txt |
     And for user "Brian" folder "testFolder" of the space "new-space" should not contain these files:
       | testFile.txt |
+
+
+  Scenario: create a odt file using app endpoint in Personal space
+    Given user "Alice" has created folder "testFolder"
+    When user "Alice" creates a file "simple.odt" inside folder "testFolder" in space "Personal" using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          }
+        }
+      }
+      """
+    And as "Alice" file "testFolder/simple.odt" should exist
+
+
+  Scenario: space admin creates a odt file in project space using wopi endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "testFolder" in space "new-space"
+    When user "Alice" creates a file "simple.odt" inside folder "testFolder" in space "new-space" using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          }
+        }
+      }
+      """
+    And for user "Alice" folder "testFolder" of the space "new-space" should contain these files:
+      | simple.odt |
+
+
+  Scenario Outline: user with Space Editor/Manager role creates a odt file inside shared project space using wopi endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "testFolder" in space "new-space"
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Brian" creates a file "simple.odt" inside folder "testFolder" in space "new-space" using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          }
+        }
+      }
+      """
+    And for user "Alice" folder "testFolder" of the space "new-space" should contain these files:
+      | simple.odt |
+    And for user "Brian" folder "testFolder" of the space "new-space" should contain these files:
+      | simple.odt |
+    Examples:
+      | permissions-role |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario: user with Viewer role tries to create a text file inside shared project space using wopi endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "testFolder" in space "new-space"
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
+    When user "Brian" tries to create a file "simple.odt" inside folder "testFolder" in space "new-space" using wopi endpoint
+    Then the HTTP status code should be "500"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "SERVER_ERROR"
+          },
+          "message": {
+            "const": "error calling InitiateFileUpload"
+          }
+        }
+      }
+      """
+    And for user "Alice" folder "testFolder" of the space "new-space" should not contain these files:
+      | simple.odt |
+    And for user "Brian" folder "testFolder" of the space "new-space" should not contain these files:
+      | simple.odt |
