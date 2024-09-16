@@ -134,20 +134,20 @@ Feature: create invitation
       | @domain.com                       | 400  |
       | user@domain..com                  | 400  |
 
-  # @email
-  # Scenario: federated user gets an email notification if their email was specified when creating the federation share invitation
-  #   Given using server "LOCAL"
-  #   When "Alice" has created the federation share invitation with email "brian@example.com" and description "a share invitation from Alice"
-  #   And user "Brian" should have received the following email from user "Alice"
-  #     """
-  #     Hi,
+  @email @skip
+  Scenario: federated user gets an email notification if their email was specified when creating the federation share invitation
+    Given using server "LOCAL"
+    When "Alice" has created the federation share invitation with email "brian@example.com" and description "a share invitation from Alice"
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Hi,
 
-  #     Alice Hansen (alice@example.org) wants to start sharing collaboration resources with you.
+      Alice Hansen (alice@example.org) wants to start sharing collaboration resources with you.
 
-  #     Please visit your federation provider and use the following details:
-  #       Token: %fed_invitation_token%
-  #       ProviderDomain: https://ocis-server:9200
-  #     """
+      Please visit your federation provider and use the following details:
+        Token: %fed_invitation_token%
+        ProviderDomain: https://ocis-server:9200
+      """
 
   @env-config
   Scenario: user cannot see expired invitation tokens
