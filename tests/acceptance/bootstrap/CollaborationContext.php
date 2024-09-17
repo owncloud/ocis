@@ -24,6 +24,8 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\HttpRequestHelper;
+use TestHelpers\WebDavHelper;
+use TestHelpers\CollaborationHelper;
 
 /**
  * steps needed to re-configure oCIS server
@@ -66,19 +68,15 @@ class CollaborationContext implements Context {
 	 */
 	public function userChecksTheInformationOfFileOfSpaceUsingOffice(string $user, string $file, string $space, string $app, string $viewMode = null): void {
 		$fileId = $this->spacesContext->getFileId($user, $space, $file);
-		$url = $this->featureContext->getBaseUrl() . "/app/open?app_name=$app&file_id=$fileId";
-
-		if ($viewMode) {
-			$url .= "&view_mode=$viewMode";
-		}
-
 		$response = \json_decode(
-			HttpRequestHelper::post(
-				$url,
-				$this->featureContext->getStepLineRef(),
+			CollaborationHelper::sendPOSTRequestToAppOpen(
+				$fileId,
+				$app,
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
-				['Content-Type' => 'application/json']
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$viewMode
 			)->getBody()->getContents()
 		);
 
@@ -116,6 +114,48 @@ class CollaborationContext implements Context {
 				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user)
+			)
+		);
+	}
+
+	/**
+	 * @When user :user tries to check the information of file :file of space :space using office :app with invalid file-id
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $space
+	 * @param string $app
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userTriesToCheckTheInformationOfFileOfSpaceUsingOfficeWithInvalidFileId(string $user, string $file, string $space, string $app): void {
+		$response = \json_decode(
+			CollaborationHelper::sendPOSTRequestToAppOpen(
+				$this->spacesContext->getFileId($user, $space, $file),
+				$app,
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef()
+			)->getBody()->getContents()
+		);
+		$accessToken = $response->form_parameters->access_token;
+
+		// Extract the WOPISrc from the app_url
+		$parsedUrl = parse_url($response->app_url);
+		parse_str($parsedUrl['query'], $queryParams);
+		$wopiSrc = $queryParams['WOPISrc'];
+		$position = strpos($wopiSrc, '/files/') + \strlen('/files/');
+
+		// Extract the base URL up to and including '/files/'
+		$fullUrl = substr($wopiSrc, 0, $position) . WebDavHelper::generateUUIDv4();
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$fullUrl . "?access_token=$accessToken",
+				$this->featureContext->getStepLineRef()
 			)
 		);
 	}
