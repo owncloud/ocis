@@ -22,6 +22,7 @@ import (
 var (
 	MessageResourceCreated = l10n.Template("{user} added {resource} to {folder}")
 	MessageResourceTrashed = l10n.Template("{user} deleted {resource} from {folder}")
+	MessageResourceUpdated = l10n.Template("{user} updated {resource} in {space}")
 	MessageResourceMoved   = l10n.Template("{user} moved {resource} to {folder}")
 	MessageResourceRenamed = l10n.Template("{user} renamed {oldResource} to {resource}")
 	MessageShareCreated    = l10n.Template("{user} shared {resource} with {sharee}")
