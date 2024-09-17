@@ -986,3 +986,29 @@ Feature: collaboration (wopi)
       }
       """
     And as "Alice" file "publicFolder/simple.odt" should not exist
+
+
+  Scenario: user tries to create odt file inside deleted parent folder using wopi endpoint
+    Given user "Alice" has created folder "testFolder"
+    And user "Alice" has stored id of folder "testFolder"
+    And user "Alice" has deleted folder "testFolder"
+    When user "Alice" tries to create a file "simple.odt" inside deleted folder using wopi endpoint
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "RESOURCE_NOT_FOUND"
+          },
+          "message": {
+            "const": "the parent container is not accessible or does not exist"
+          }
+        }
+      }
+      """
