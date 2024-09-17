@@ -64,4 +64,35 @@ class CollaborationHelper {
 			['Content-Type' => 'application/json']
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $parentContainerId
+	 * @param string $file
+	 * @param array|null $headers
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function createFile(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $parentContainerId,
+		string $file,
+		?array $headers = null
+	): ResponseInterface {
+		$url = $baseUrl . "/app/new?parent_container_id=$parentContainerId&filename=$file";
+		return HttpRequestHelper::post(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			$headers
+		);
+	}
 }
