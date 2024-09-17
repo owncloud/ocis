@@ -25,6 +25,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
 use TestHelpers\WebDavHelper;
+use TestHelpers\HttpRequestHelper;
 
 require_once 'bootstrap.php';
 
@@ -102,16 +103,24 @@ class SearchContext implements Context {
 			$body .= "	</a:prop>";
 		}
 		$body .= "	</oc:search-files>";
-		$response = WebDavHelper::makeDavRequest(
-			$baseUrl,
+		$davPathVersionToUse = $this->featureContext->getDavPathVersion();
+		$davPath = WebDavHelper::getDavPath($doDavRequestAsUser ?? $user, $davPathVersionToUse, 'files');
+
+		if ($davPathVersionToUse == WebDavHelper::DAV_VERSION_NEW) {
+			// Removes the last component('username' in this case) from the WebDAV path by going up one level in the directory structure.
+			// e.g. remote.php/dav/files/Alice ==> remote.php/dav/files/
+			$davPath = \dirname($davPath, 1);
+		}
+
+		$fullUrl = WebDavHelper::sanitizeUrl("$baseUrl/$davPath");
+		$response = HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			'REPORT',
 			$user,
 			$password,
-			"REPORT",
-			"/",
 			null,
-			$this->featureContext->getStepLineRef(),
-			$body,
-			$this->featureContext->getDavPathVersion()
+			$body
 		);
 		$this->featureContext->setResponse($response);
 	}
