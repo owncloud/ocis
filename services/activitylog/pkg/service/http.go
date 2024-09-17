@@ -109,6 +109,9 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			continue
 		case events.UploadReady:
 			message = MessageResourceCreated
+			if ev.IsVersion {
+				message = MessageResourceUpdated
+			}
 			ts = utils.TSToTime(ev.Timestamp)
 			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, true), WithUser(ev.ExecutingUser.GetId(), ev.ExecutingUser.GetDisplayName()), WithSpace(toSpace(ev.FileRef)))
 		case events.FileTouched:
