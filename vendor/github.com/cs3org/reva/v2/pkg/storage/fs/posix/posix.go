@@ -36,6 +36,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/blobstore"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/options"
+	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/timemanager"
+	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/trashbin"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/tree"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs"
@@ -68,24 +70,39 @@ func New(m map[string]interface{}, stream events.Stream) (storage.FS, error) {
 		return nil, err
 	}
 
-	bs, err := blobstore.New(o.Root)
-	if err != nil {
-		return nil, err
-	}
-
+	fs := &posixFS{}
 	um := usermapper.NewUnixMapper()
 
 	var lu *lookup.Lookup
 	switch o.MetadataBackend {
 	case "xattrs":
-		lu = lookup.New(metadata.NewXattrsBackend(o.Root, o.FileMetadataCache), um, o)
+		lu = lookup.New(metadata.NewXattrsBackend(o.Root, o.FileMetadataCache), um, o, &timemanager.Manager{})
 	case "messagepack":
-		lu = lookup.New(metadata.NewMessagePackBackend(o.Root, o.FileMetadataCache), um, o)
+		lu = lookup.New(metadata.NewMessagePackBackend(o.Root, o.FileMetadataCache), um, o, &timemanager.Manager{})
 	default:
 		return nil, fmt.Errorf("unknown metadata backend %s, only 'messagepack' or 'xattrs' (default) supported", o.MetadataBackend)
 	}
 
-	tp, err := tree.New(lu, bs, um, o, stream, store.Create(
+	trashbin, err := trashbin.New(o, lu)
+	if err != nil {
+		return nil, err
+	}
+	err = trashbin.Setup(fs)
+	if err != nil {
+		return nil, err
+	}
+
+	bs, err := blobstore.New(o.Root)
+	if err != nil {
+		return nil, err
+	}
+
+	switch o.IDCache.Store {
+	case "", "memory", "noop":
+		return nil, fmt.Errorf("the posix driver requires a shared id cache, e.g. nats-js-kv or redis")
+	}
+
+	tp, err := tree.New(lu, bs, um, trashbin, o, stream, store.Create(
 		store.Store(o.IDCache.Store),
 		store.TTL(o.IDCache.TTL),
 		store.Size(o.IDCache.Size),
@@ -113,6 +130,7 @@ func New(m map[string]interface{}, stream events.Stream) (storage.FS, error) {
 		EventStream:       stream,
 		UserMapper:        um,
 		DisableVersioning: true,
+		Trashbin:          trashbin,
 	}
 
 	dfs, err := decomposedfs.New(&o.Options, aspects)
@@ -154,10 +172,8 @@ func New(m map[string]interface{}, stream events.Stream) (storage.FS, error) {
 	}
 
 	mw := middleware.NewFS(dfs, hooks...)
-	fs := &posixFS{
-		FS: mw,
-		um: um,
-	}
+	fs.FS = mw
+	fs.um = um
 
 	return fs, nil
 }

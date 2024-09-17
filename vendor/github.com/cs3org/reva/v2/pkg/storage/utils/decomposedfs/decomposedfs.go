@@ -49,6 +49,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/permissions"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/spaceidindex"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/timemanager"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/trashbin"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/usermapper"
@@ -110,6 +112,7 @@ type SessionStore interface {
 type Decomposedfs struct {
 	lu           node.PathLookup
 	tp           node.Tree
+	trashbin     trashbin.Trashbin
 	o            *options.Options
 	p            permissions.Permissions
 	um           usermapper.Mapper
@@ -133,9 +136,9 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 	var lu *lookup.Lookup
 	switch o.MetadataBackend {
 	case "xattrs":
-		lu = lookup.New(metadata.NewXattrsBackend(o.Root, o.FileMetadataCache), o)
+		lu = lookup.New(metadata.NewXattrsBackend(o.Root, o.FileMetadataCache), o, &timemanager.Manager{})
 	case "messagepack":
-		lu = lookup.New(metadata.NewMessagePackBackend(o.Root, o.FileMetadataCache), o)
+		lu = lookup.New(metadata.NewMessagePackBackend(o.Root, o.FileMetadataCache), o, &timemanager.Manager{})
 	default:
 		return nil, fmt.Errorf("unknown metadata backend %s, only 'messagepack' or 'xattrs' (default) supported", o.MetadataBackend)
 	}
@@ -162,6 +165,7 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 		Permissions:       permissions.NewPermissions(node.NewPermissions(lu), permissionsSelector),
 		EventStream:       es,
 		DisableVersioning: o.DisableVersioning,
+		Trashbin:          &DecomposedfsTrashbin{},
 	}
 
 	return New(o, aspects)
@@ -209,6 +213,9 @@ func New(o *options.Options, aspects aspects.Aspects) (storage.FS, error) {
 		return nil, err
 	}
 
+	if aspects.Trashbin == nil {
+		return nil, errors.New("need trashbin")
+	}
 	// set a null usermapper if we don't have one
 	if aspects.UserMapper == nil {
 		aspects.UserMapper = &usermapper.NullMapper{}
@@ -217,6 +224,7 @@ func New(o *options.Options, aspects aspects.Aspects) (storage.FS, error) {
 	fs := &Decomposedfs{
 		tp:              aspects.Tree,
 		lu:              aspects.Lookup,
+		trashbin:        aspects.Trashbin,
 		o:               o,
 		p:               aspects.Permissions,
 		um:              aspects.UserMapper,
@@ -228,6 +236,9 @@ func New(o *options.Options, aspects aspects.Aspects) (storage.FS, error) {
 		spaceTypeIndex:  spaceTypeIndex,
 	}
 	fs.sessionStore = upload.NewSessionStore(fs, aspects, o.Root, o.AsyncFileUploads, o.Tokens)
+	if err = fs.trashbin.Setup(fs); err != nil {
+		return nil, err
+	}
 
 	if o.AsyncFileUploads {
 		if fs.stream == nil {
@@ -347,6 +358,14 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 
 			fs.sessionStore.Cleanup(ctx, session, revertNodeMetadata, keepUpload, unmarkPostprocessing)
 
+			var isVersion bool
+			if session.NodeExists() {
+				info, err := session.GetInfo(ctx)
+				if err == nil && info.MetaData["versionsPath"] != "" {
+					isVersion = true
+				}
+			}
+
 			if err := events.Publish(
 				ctx,
 				fs.stream,
@@ -365,6 +384,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 					},
 					Timestamp:  utils.TimeToTS(now),
 					SpaceOwner: n.SpaceOwnerOrManager(ctx),
+					IsVersion:  isVersion,
 				},
 			); err != nil {
 				sublog.Error().Err(err).Msg("Failed to publish UploadReady event")
@@ -1200,4 +1220,17 @@ func (fs *Decomposedfs) Unlock(ctx context.Context, ref *provider.Reference, loc
 	}
 
 	return node.Unlock(ctx, lock)
+}
+
+func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference, key, relativePath string) ([]*provider.RecycleItem, error) {
+	return fs.trashbin.ListRecycle(ctx, ref, key, relativePath)
+}
+func (fs *Decomposedfs) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) error {
+	return fs.trashbin.RestoreRecycleItem(ctx, ref, key, relativePath, restoreRef)
+}
+func (fs *Decomposedfs) PurgeRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string) error {
+	return fs.trashbin.PurgeRecycleItem(ctx, ref, key, relativePath)
+}
+func (fs *Decomposedfs) EmptyRecycle(ctx context.Context, ref *provider.Reference) error {
+	return fs.trashbin.EmptyRecycle(ctx, ref)
 }

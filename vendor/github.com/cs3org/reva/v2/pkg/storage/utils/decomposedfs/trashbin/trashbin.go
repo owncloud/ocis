@@ -16,23 +16,20 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-package aspects
+package trashbin
 
 import (
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/permissions"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/trashbin"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/usermapper"
+	"context"
+
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/storage"
 )
 
-// Aspects holds dependencies for handling aspects of the decomposedfs
-type Aspects struct {
-	Lookup            node.PathLookup
-	Tree              node.Tree
-	Trashbin          trashbin.Trashbin
-	Permissions       permissions.Permissions
-	EventStream       events.Stream
-	DisableVersioning bool
-	UserMapper        usermapper.Mapper
+type Trashbin interface {
+	Setup(storage.FS) error
+
+	ListRecycle(ctx context.Context, ref *provider.Reference, key, relativePath string) ([]*provider.RecycleItem, error)
+	RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) error
+	PurgeRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string) error
+	EmptyRecycle(ctx context.Context, ref *provider.Reference) error
 }

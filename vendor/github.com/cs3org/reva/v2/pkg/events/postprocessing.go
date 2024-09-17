@@ -180,8 +180,9 @@ type UploadReady struct {
 	SpaceOwner    *user.UserId
 	ExecutingUser *user.User
 	FileRef       *provider.Reference
-	Failed        bool
 	Timestamp     *types.Timestamp
+	Failed        bool
+	IsVersion     bool
 	// add reference here? We could use it to inform client pp is finished
 }
 

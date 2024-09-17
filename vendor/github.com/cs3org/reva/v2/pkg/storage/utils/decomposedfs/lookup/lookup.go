@@ -55,13 +55,15 @@ type Lookup struct {
 	Options *options.Options
 
 	metadataBackend metadata.Backend
+	tm              node.TimeManager
 }
 
 // New returns a new Lookup instance
-func New(b metadata.Backend, o *options.Options) *Lookup {
+func New(b metadata.Backend, o *options.Options, tm node.TimeManager) *Lookup {
 	return &Lookup{
 		Options:         o,
 		metadataBackend: b,
+		tm:              tm,
 	}
 }
 
@@ -70,23 +72,34 @@ func (lu *Lookup) MetadataBackend() metadata.Backend {
 	return lu.metadataBackend
 }
 
-// ReadBlobSizeAttr reads the blobsize from the xattrs
-func (lu *Lookup) ReadBlobSizeAttr(ctx context.Context, path string) (int64, error) {
-	blobSize, err := lu.metadataBackend.GetInt64(ctx, path, prefixes.BlobsizeAttr)
-	if err != nil {
-		return 0, errors.Wrapf(err, "error reading blobsize xattr")
+func (lu *Lookup) ReadBlobIDAndSizeAttr(ctx context.Context, path string, attrs node.Attributes) (string, int64, error) {
+	blobID := ""
+	blobSize := int64(0)
+	var err error
+
+	if attrs != nil {
+		blobID = attrs.String(prefixes.BlobIDAttr)
+		if blobID != "" {
+			blobSize, err = attrs.Int64(prefixes.BlobsizeAttr)
+			if err != nil {
+				return "", 0, err
+			}
+		}
+	} else {
+		attrs, err := lu.metadataBackend.All(ctx, path)
+		if err != nil {
+			return "", 0, errors.Wrapf(err, "error reading blobid xattr")
+		}
+		nodeAttrs := node.Attributes(attrs)
+		blobID = nodeAttrs.String(prefixes.BlobIDAttr)
+		blobSize, err = nodeAttrs.Int64(prefixes.BlobsizeAttr)
+		if err != nil {
+			return "", 0, errors.Wrapf(err, "error reading blobsize xattr")
+		}
 	}
-	return blobSize, nil
+	return blobID, blobSize, nil
 }
 
-// ReadBlobIDAttr reads the blobsize from the xattrs
-func (lu *Lookup) ReadBlobIDAttr(ctx context.Context, path string) (string, error) {
-	attr, err := lu.metadataBackend.Get(ctx, path, prefixes.BlobIDAttr)
-	if err != nil {
-		return "", errors.Wrapf(err, "error reading blobid xattr")
-	}
-	return string(attr), nil
-}
 func readChildNodeFromLink(path string) (string, error) {
 	link, err := os.Readlink(path)
 	if err != nil {
@@ -367,6 +380,11 @@ func (lu *Lookup) CopyMetadataWithSourceLock(ctx context.Context, sourcePath, ta
 	}
 
 	return lu.MetadataBackend().SetMultiple(ctx, targetPath, newAttrs, acquireTargetLock)
+}
+
+// TimeManager returns the time manager
+func (lu *Lookup) TimeManager() node.TimeManager {
+	return lu.tm
 }
 
 // DetectBackendOnDisk returns the name of the metadata backend being used on disk

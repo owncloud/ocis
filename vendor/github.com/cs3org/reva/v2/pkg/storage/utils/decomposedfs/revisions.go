@@ -86,7 +86,7 @@ func (fs *Decomposedfs) ListRevisions(ctx context.Context, ref *provider.Referen
 					Key:   n.ID + node.RevisionIDDelimiter + parts[1],
 					Mtime: uint64(mtime.Unix()),
 				}
-				blobSize, err := fs.lu.ReadBlobSizeAttr(ctx, items[i])
+				_, blobSize, err := fs.lu.ReadBlobIDAndSizeAttr(ctx, items[i], nil)
 				if err != nil {
 					appctx.GetLogger(ctx).Error().Err(err).Str("name", fi.Name()).Msg("error reading blobsize xattr, using 0")
 				}
@@ -148,13 +148,9 @@ func (fs *Decomposedfs) DownloadRevision(ctx context.Context, ref *provider.Refe
 
 	contentPath := fs.lu.InternalPath(spaceID, revisionKey)
 
-	blobid, err := fs.lu.ReadBlobIDAttr(ctx, contentPath)
+	blobid, blobsize, err := fs.lu.ReadBlobIDAndSizeAttr(ctx, contentPath, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Decomposedfs: could not read blob id of revision '%s' for node '%s'", n.ID, revisionKey)
-	}
-	blobsize, err := fs.lu.ReadBlobSizeAttr(ctx, contentPath)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Decomposedfs: could not read blob size of revision '%s' for node '%s'", n.ID, revisionKey)
+		return nil, errors.Wrapf(err, "Decomposedfs: could not read blob id and size for revision '%s' of node '%s'", n.ID, revisionKey)
 	}
 
 	revisionNode := node.Node{SpaceID: spaceID, BlobID: blobid, Blobsize: blobsize} // blobsize is needed for the s3ng blobstore
@@ -238,7 +234,7 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 			if err := os.Remove(newRevisionPath); err != nil {
 				log.Error().Err(err).Str("revision", filepath.Base(newRevisionPath)).Msg("could not clean up revision node")
 			}
-			if err := fs.lu.MetadataBackend().Purge(newRevisionPath); err != nil {
+			if err := fs.lu.MetadataBackend().Purge(ctx, newRevisionPath); err != nil {
 				log.Error().Err(err).Str("revision", filepath.Base(newRevisionPath)).Msg("could not clean up revision node")
 			}
 		}
@@ -299,7 +295,7 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 	if err := os.Remove(fs.lu.MetadataBackend().LockfilePath(restoredRevisionPath)); err != nil {
 		log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not delete old revision metadata lockfile, continuing")
 	}
-	if err := fs.lu.MetadataBackend().Purge(restoredRevisionPath); err != nil {
+	if err := fs.lu.MetadataBackend().Purge(ctx, restoredRevisionPath); err != nil {
 		log.Warn().Err(err).Interface("ref", ref).Str("originalnode", kp[0]).Str("revisionKey", revisionKey).Msg("could not purge old revision from cache, continuing")
 	}
 

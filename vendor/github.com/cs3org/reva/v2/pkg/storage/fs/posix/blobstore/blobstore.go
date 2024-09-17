@@ -41,6 +41,11 @@ func New(root string) (*Blobstore, error) {
 
 // Upload stores some data in the blobstore under the given key
 func (bs *Blobstore) Upload(node *node.Node, source string) error {
+	path := node.InternalPath()
+
+	// preserve the mtime of the file
+	fi, _ := os.Stat(path)
+
 	file, err := os.Open(source)
 	if err != nil {
 		return errors.Wrap(err, "Decomposedfs: oCIS blobstore: Can not open source file to upload")
@@ -59,7 +64,15 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 		return errors.Wrapf(err, "could not write blob '%s'", node.InternalPath())
 	}
 
-	return w.Flush()
+	err = w.Flush()
+	if err != nil {
+		return err
+	}
+
+	if fi != nil {
+		return os.Chtimes(path, fi.ModTime(), fi.ModTime())
+	}
+	return nil
 }
 
 // Download retrieves a blob from the blobstore for reading

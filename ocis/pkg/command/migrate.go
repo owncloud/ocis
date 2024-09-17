@@ -20,6 +20,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/share/manager/jsoncs3/providercache"
 	"github.com/cs3org/reva/v2/pkg/share/manager/jsoncs3/shareid"
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
+	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/timemanager"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/migrator"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
@@ -242,7 +243,7 @@ func MigrateDecomposedfs(cfg *config.Config) *cli.Command {
 			lu := lookup.New(backend, &options.Options{
 				Root:            rootFlag,
 				MetadataBackend: bod,
-			})
+			}, &timemanager.Manager{})
 
 			m := migrator.New(lu, log)
 
@@ -269,7 +270,7 @@ func ListDecomposedfsMigrations(cfg *config.Config) *cli.Command {
 			lu := lookup.New(backend, &options.Options{
 				Root:            rootFlag,
 				MetadataBackend: bod,
-			})
+			}, &timemanager.Manager{})
 
 			m := migrator.New(lu, logger())
 			migrationStates, err := m.Migrations()

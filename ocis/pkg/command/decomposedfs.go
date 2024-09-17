@@ -14,6 +14,7 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
+	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/timemanager"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
@@ -325,7 +326,7 @@ func getBackend(c *cli.Context) (*lookup.Lookup, metadata.Backend) {
 	lu := lookup.New(backend, &options.Options{
 		Root:            rootFlag,
 		MetadataBackend: bod,
-	})
+	}, &timemanager.Manager{})
 	return lu, backend
 }
 

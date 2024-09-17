@@ -59,6 +59,9 @@ start:
 			if err != nil {
 				continue
 			}
+			if isLockFile(ev.Path) || isTrash(ev.Path) {
+				continue
+			}
 			switch ev.Event {
 			case "CREATE":
 				go func() { _ = w.tree.Scan(ev.Path, ActionCreate, false, false) }()

@@ -739,7 +739,7 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 		}
 
 		// invalidate cache
-		if err := fs.lu.MetadataBackend().Purge(n.InternalPath()); err != nil {
+		if err := fs.lu.MetadataBackend().Purge(ctx, n.InternalPath()); err != nil {
 			return err
 		}
 
