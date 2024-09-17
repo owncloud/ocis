@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fixed activity filter depth: [#10031](https://github.com/owncloud/ocis/pull/10031)
 * Bugfix - Fixed the ocm tocken: [#10050](https://github.com/owncloud/ocis/pull/10050)
 * Bugfix - Fix ocm space sharing: [#10060](https://github.com/owncloud/ocis/pull/10060)
+* Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 
 ## Details
 
@@ -86,6 +87,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10051
    https://github.com/owncloud/ocis/pull/10060
+
+* Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/9817
 
 # Changelog for [6.4.0] (2024-09-12)
 
