@@ -37,7 +37,7 @@ use TestHelpers\GraphHelper;
  * WebDav functions
  */
 trait WebDav {
-	private bool $currentDAVPath = WebDavHelper::DAV_VERSION_SPACES;
+	private int $currentDAVPath = WebDavHelper::DAV_VERSION_SPACES;
 
 	/**
 	 * @var ResponseInterface[]
