@@ -18,7 +18,7 @@ The following image gives an overview of the scenario when a client requests to 
 
 The graph service provides endpoints for querying users and groups. It features two different backend implementations:
   * `ldap`: This is currently the default backend. It queries user and group information from an
-    LDAP server. Depending on the configuration it can also be used to manage (create, update,
+    LDAP server. Depending on the configuration, it can also be used to manage (create, update,
     delete) users and groups provided by an LDAP server.
   * `cs3`: This backend queries users and groups using the CS3 identity APIs as implemented by the
     `users` and `groups` service. This backend is currently still experimental and only implements a
@@ -30,18 +30,18 @@ The LDAP backend is configured using a set of environment variables. A detailed 
 available configuration options can be found in the [documentation](https://owncloud.dev/services/graph/configuration/#environment-variables).
 The LDAP related options are prefixed with `OCIS_LDAP_` (or `GRAPH_LDAP_` for settings specific to graph service).
 
-#### Read-only access to existing LDAP servers
+#### Read-Only Access to Existing LDAP Servers
 
-To connect the graph service to an existing LDAP server set `OCIS_LDAP_SERVER_WRITE_ENABLED` to
+To connect the graph service to an existing LDAP server, set `OCIS_LDAP_SERVER_WRITE_ENABLED` to
 `false` to prevent the graph service from sending write operations to the LDAP server. Also set the
 various `OCIS_LDAP_*` environment variables to match the configuration of the LDAP server you are connecting
 to. An example configuration for connecting oCIS to an instance of Microsoft Active Directory is
-available [here](https://owncloud.dev/ocis/identity-provider/ldap-active-directory/)
+available [here](https://owncloud.dev/ocis/identity-provider/ldap-active-directory/).
 
-#### Using a write enabled LDAP server
+#### Using a Write Enabled LDAP Server
 
-To use the graph service for managing (create, update, delete) users and groups a write enabled LDAP
-server is required. In the default configuration the graph service will use the simple LDAP server
+To use the graph service for managing (create, update, delete) users and groups, a write enabled LDAP
+server is required. In the default configuration, the graph service will use the simple LDAP server
 that is bundled with oCIS in the `idm` service which provides all the required features.
 It is also possible to setup up an external LDAP server with write access for use with oCIS. It is
 recommend to use OpenLDAP for this. The LDAP server needs to fulfill a couple of requirements with
@@ -50,13 +50,13 @@ respect to the available schema:
     object class for groups.
   * The graph service maintains a few additional attributes for users and groups that are not
     available in the standard LDAP schema. An schema file, ready to use with OpenLDAP, defining those
-    additional attributes is available [here](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_ldap/config/ldap/schemas/10_owncloud_schema.ldif)
+    additional attributes is available [here](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_ldap/config/ldap/schemas/10_owncloud_schema.ldif).
 
-## Query filters provided by the Graph API
+## Query Filters Provided by the Graph API
 
 Some API endpoints provided by the graph service allow to specify query filters. The filter syntax
 is based on the [OData Specification](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionfilter).
-See the e.g. [Libre Graph API](https://owncloud.dev/libre-graph-api/#/users/ListUsers) for examples
+See the [Libre Graph API](https://owncloud.dev/libre-graph-api/#/users/ListUsers) for examples
 on the filters supported when querying users.
 
 ## Caching
