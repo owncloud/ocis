@@ -73,7 +73,7 @@ class WebDavLockingContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		if ($public === true) {
-			$type = "public-files-new";
+			$type = "public-files";
 			$password = $this->featureContext->getActualPassword("%public%");
 		} else {
 			$type = "files";
@@ -603,7 +603,7 @@ class WebDavLockingContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
 		if ($public === true) {
-			$type = "public-files-new";
+			$type = "public-files";
 			$password = $this->featureContext->getActualPassword("%public%");
 		} else {
 			$type = "files";

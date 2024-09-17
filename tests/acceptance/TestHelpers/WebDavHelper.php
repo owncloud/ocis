@@ -49,6 +49,20 @@ class WebDavHelper {
 	/**
 	 * clear space id reference for user
 	 *
+	 * @param string $urlPath
+	 *
+	 * @return string
+	 */
+	public static function withRemotePhp(string $urlPath): string {
+		if (\getenv("WITH_REMOTE_PHP") === "true"){
+			return "remote.php/$urlPath";
+		}
+		return $urlPath;
+	}
+
+	/**
+	 * clear space id reference for user
+	 *
 	 * @param string|null $user
 	 *
 	 * @return void
@@ -534,7 +548,7 @@ class WebDavHelper {
 		if ($json === null) {
 			// the graph endpoint did not give a useful answer
 			// try getting the information from the webdav endpoint
-			$fullUrl = $trimmedBaseUrl . '/remote.php/webdav';
+			$fullUrl = $trimmedBaseUrl . self::getDavPath($user, self::DAV_VERSION_OLD);
 			$response = HttpRequestHelper::sendRequest(
 				$fullUrl,
 				$xRequestId,
@@ -739,7 +753,7 @@ class WebDavHelper {
 			$user = null;
 			$password = null;
 		}
-		if ($type === "public-files-new") {
+		if ($type === "public-files") {
 			if ($password === null || $password === "") {
 				$user = null;
 			} else {
@@ -785,67 +799,66 @@ class WebDavHelper {
 	/**
 	 * get the dav path
 	 *
-	 * @param string|null $user
-	 * @param int|null $davPathVersionToUse (1|2)
+	 * @param string|null $userOrToken
+	 * @param int|null $davPathVersionToUse (1|2|3)
 	 * @param string|null $type
 	 * @param string|null $spaceId
 	 *
 	 * @return string
 	 */
 	public static function getDavPath(
-		?string $user,
+		?string $userOrToken, # merge to userOrTokenOrId
 		?int $davPathVersionToUse = null,
 		?string $type = "files",
 		?string $spaceId = null
 	):string {
-		$newTrashbinDavPath = "remote.php/dav/trash-bin/$user/";
-
 		switch ($type) {
-			case 'public-files':
-			case 'public-files-old':
-				return "public.php/webdav/";
-			case 'public-files-new':
-				return "remote.php/dav/public-files/$user/";
 			case 'archive':
-				return "remote.php/dav/archive/$user/files";
+				return self::withRemotePhp("dav/archive/$userOrToken/files");
 			case 'versions':
-			case 'customgroups':
-				return "remote.php/dav/";
+				return self::withRemotePhp("dav/meta");
+			case 'comments':
+				return self::withRemotePhp("dav/comments/files");
 			default:
 				break;
 		}
 
 		if ($davPathVersionToUse === self::DAV_VERSION_SPACES) {
+			if ($type === "trash-bin") {
+				if ($spaceId === null) {
+					throw new InvalidArgumentException("Space ID is required for trash-bin endpoint");
+				}
+				return self::withRemotePhp("dav/spaces/trash-bin/$spaceId");
+			} elseif ($type === "public-files") {
+				// spaces DAV path doesn't have own public-files endpoint
+				return self::withRemotePhp("dav/public-files/$userOrToken");
+			}
 			// return spaces root path if spaceid is null
 			// REPORT request uses spaces root path
 			if ($spaceId === null) {
-				return "remote.php/dav/spaces/";
+				return self::withRemotePhp("dav/spaces");
 			}
-			if ($type === "trash-bin") {
-				return "remote.php/dav/spaces/trash-bin/" . $spaceId . '/';
-			}
-			return "remote.php/dav/spaces/" . $spaceId . '/';
+			return self::withRemotePhp("dav/spaces/$spaceId");
 		} else {
+			if ($type === "trash-bin") {
+				// Since there is no trash bin endpoint for old dav version,
+				// new dav version's endpoint is used here.
+				return self::withRemotePhp("dav/trash-bin/$userOrToken");
+			}
 			if ($davPathVersionToUse === self::DAV_VERSION_OLD) {
-				if ($type === "trash-bin") {
-					// Since there is no trash bin endpoint for old dav version, new dav version's endpoint is used here.
-					return $newTrashbinDavPath;
+				if ($type === "public-files") {
+					return "public.php/webdav";
 				}
-				return "remote.php/webdav/";
+				return self::withRemotePhp("webdav");
 			} elseif ($davPathVersionToUse === self::DAV_VERSION_NEW) {
 				if ($type === "files") {
-					$path = 'remote.php/dav/files/';
-					return $path . $user . '/';
-				} elseif ($type === "trash-bin") {
-					return $newTrashbinDavPath;
-				} else {
-					return "remote.php/dav";
+					return self::withRemotePhp("dav/files/$userOrToken");
+				} elseif ($type === "public-files") {
+					return self::withRemotePhp("dav/public-files/$userOrToken");
 				}
-			} else {
-				throw new InvalidArgumentException(
-					"DAV path version $davPathVersionToUse is unknown"
-				);
+				return self::withRemotePhp("dav");
 			}
+			throw new InvalidArgumentException("Invalid DAV path: $davPathVersionToUse");
 		}
 	}
 
@@ -913,11 +926,12 @@ class WebDavHelper {
 		?string $xRequestId = '',
 		?int $davVersionToUse = self::DAV_VERSION_NEW
 	):string {
+		$path = self::getDavPath($token, $davVersionToUse, "public-files");
 		$response = self::propfind(
 			$baseUrl,
 			null,
 			null,
-			"/public-files/$token/$fileName",
+			"{$path}/{$fileName}",
 			['d:getlastmodified'],
 			$xRequestId,
 			'1',

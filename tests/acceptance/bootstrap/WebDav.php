@@ -37,9 +37,7 @@ use TestHelpers\GraphHelper;
  * WebDav functions
  */
 trait WebDav {
-	private string $davPath = "remote.php/webdav";
-	private bool $usingOldDavPath = true;
-	private bool $usingSpacesDavPath = false;
+	private bool $currentDAVPath = WebDavHelper::DAV_VERSION_SPACES;
 
 	/**
 	 * @var ResponseInterface[]
@@ -52,12 +50,6 @@ trait WebDav {
 	private $storedFileID = null;
 
 	private ?int $lastUploadDeleteTime = null;
-
-	/**
-	 * a variable that contains the DAV path without "remote.php/(web)dav"
-	 * when setting $this->davPath directly by usingDavPath()
-	 */
-	private ?string $customDavPath = null;
 
 	/**
 	 * response content parsed from XML to an array
@@ -203,83 +195,33 @@ trait WebDav {
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getOldDavPath():string {
-		return "remote.php/webdav";
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getNewDavPath():string {
-		return "remote.php/dav";
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getSpacesDavPath():string {
-		return "dav/spaces";
-	}
-
-	/**
-	 * @Given /^using (old|new|spaces) (?:dav|DAV) path$/
+	 * @Given /^using (old|new|spaces) DAV path$/
 	 *
 	 * @param string $davChoice
 	 *
 	 * @return void
 	 */
-	public function usingOldOrNewDavPath(string $davChoice):void {
-		if ($davChoice === 'old') {
-			$this->usingOldDavPath();
-		} elseif ($davChoice === 'new') {
-			$this->usingNewDavPath();
-		} else {
-			$this->usingSpacesDavPath();
+	public function usingOldOrNewOrSpacesDavPath(string $davChoice):void {
+		switch ($davChoice) {
+			case 'old':
+				$this->currentDAVPath = WebDavHelper::DAV_VERSION_OLD;
+				break;
+			case 'new':
+				$this->currentDAVPath = WebDavHelper::DAV_VERSION_NEW;
+				break;
+			case 'spaces':
+				$this->currentDAVPath = WebDavHelper::DAV_VERSION_SPACES;
+				break;
+			default:
+				throw new Exception("Invalid DAV path: $davChoice");
+				break;
 		}
-	}
-
-	/**
-	 * Select the old DAV path as the default for later scenario steps
-	 *
-	 * @return void
-	 */
-	public function usingOldDavPath():void {
-		$this->davPath = $this->getOldDavPath();
-		$this->usingOldDavPath = true;
-		$this->customDavPath = null;
-		$this->usingSpacesDavPath = false;
-	}
-
-	/**
-	 * Select the new DAV path as the default for later scenario steps
-	 *
-	 * @return void
-	 */
-	public function usingNewDavPath():void {
-		$this->davPath = $this->getNewDavPath();
-		$this->usingOldDavPath = false;
-		$this->customDavPath = null;
-		$this->usingSpacesDavPath = false;
-	}
-
-	/**
-	 * Select the spaces dav path as the default for later scenario steps
-	 *
-	 * @return void
-	 */
-	public function usingSpacesDavPath():void {
-		$this->davPath = $this->getSpacesDavPath();
-		$this->usingOldDavPath = false;
-		$this->customDavPath = null;
-		$this->usingSpacesDavPath = true;
 	}
 
 	/**
 	 * gives the DAV path of a file including the subfolder of the webserver
 	 * e.g. when the server runs in `http://localhost/owncloud/`
-	 * this function will return `owncloud/remote.php/webdav/prueba.txt`
+	 * this function will return `owncloud/webdav/prueba.txt`
 	 *
 	 * @param string $user
 	 * @param string $spaceId
@@ -296,21 +238,20 @@ trait WebDav {
 				$this->getStepLineRef()
 			);
 		}
-		$path = $this->getBasePath() . "/" .
-			WebDavHelper::getDavPath($user, $this->getDavPathVersion(), "files", $spaceId);
+		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion(), "files", $spaceId);
+		$path = "{$this->getBasePath()}/{$davPath}";
 		$path = WebDavHelper::sanitizeUrl($path);
 		return \ltrim($path, "/");
 	}
 
 	/**
 	 * @param string $token
-	 * @param string $type
 	 *
 	 * @return string
 	 */
-	public function getPublicLinkDavPath(string $token, string $type):string {
-		$path = $this->getBasePath() . "/" .
-			WebDavHelper::getDavPath($token, $this->getDavPathVersion(), $type);
+	public function getPublicLinkDavPath(string $token):string {
+		$davPath = WebDavHelper::getDavPath($token, $this->getDavPathVersion(), "public-files");
+		$path = "{$this->getBasePath()}/{$davPath}";
 		$path = WebDavHelper::sanitizeUrl($path);
 		return \ltrim($path, "/");
 	}
@@ -326,45 +267,12 @@ trait WebDav {
 	 * @return int DAV path version (1, 2 or 3) selected, or appropriate for the endpoint
 	 */
 	public function getDavPathVersion(?string $for = null):?int {
-		if ($this->usingSpacesDavPath) {
-			return WebDavHelper::DAV_VERSION_SPACES;
-		}
-		if ($for === 'systemtags') {
-			// systemtags only exists since DAV v2
+		if (\in_array($for, ['systemtags', 'file_versions'])) {
+			// 'systemtags' only exists since new DAV
+			// 'file_versions' only exists since new DAV
 			return WebDavHelper::DAV_VERSION_NEW;
 		}
-		if ($for === 'file_versions') {
-			// file_versions only exists since DAV v2
-			return WebDavHelper::DAV_VERSION_NEW;
-		}
-		if ($this->usingOldDavPath === true) {
-			return WebDavHelper::DAV_VERSION_OLD;
-		} else {
-			return WebDavHelper::DAV_VERSION_NEW;
-		}
-	}
-
-	/**
-	 * Select a suitable DAV path.
-	 * Some endpoints have only existed since a certain point in time, so for
-	 * those make sure to return a DAV path that works for that endpoint.
-	 * Otherwise return the currently selected DAV path.
-	 *
-	 * @param string|null $for the category of endpoint that the DAV path will be used for
-	 *
-	 * @return string DAV path selected, or appropriate for the endpoint
-	 */
-	public function getDavPath(?string $for = null):string {
-		$davPathVersion = $this->getDavPathVersion($for);
-		if ($davPathVersion === WebDavHelper::DAV_VERSION_OLD) {
-			return $this->getOldDavPath();
-		}
-
-		if ($davPathVersion === WebDavHelper::DAV_VERSION_NEW) {
-			return $this->getNewDavPath();
-		}
-
-		return $this->getSpacesDavPath();
+		return $this->currentDAVPath;
 	}
 
 	/**
@@ -404,9 +312,6 @@ trait WebDav {
 		?bool $isGivenStep = false
 	):ResponseInterface {
 		$user = $this->getActualUsername($user);
-		if ($this->customDavPath !== null) {
-			$path = $this->customDavPath . $path;
-		}
 
 		if ($davPathVersion === null) {
 			$davPathVersion = $this->getDavPathVersion();
@@ -1199,7 +1104,8 @@ trait WebDav {
 	 */
 	public function publicGetsSizeOfLastSharedPublicLinkUsingTheWebdavApi():void {
 		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
-		$url = $this->getBaseUrl() . "/remote.php/dav/public-files/$token";
+		$davPath = WebDavHelper::getDavPath($token, $this->getDavPathVersion(), "public-files");
+		$url = "{$this->getBaseUrl()}/{$davPath}";
 		$this->response = HttpRequestHelper::sendRequest(
 			$url,
 			$this->getStepLineRef(),
@@ -1532,10 +1438,6 @@ trait WebDav {
 		?string $spaceId = null,
 		string $type = "files"
 	):ResponseInterface {
-		if ($this->customDavPath !== null) {
-			$path = $this->customDavPath . $path;
-		}
-
 		return WebDavHelper::listFolder(
 			$this->getBaseUrl(),
 			$this->getActualUsername($user),
@@ -1844,9 +1746,9 @@ trait WebDav {
 			$noOfChunks,
 			"What does it mean to have $noOfChunks chunks?"
 		);
-		//use the chunking version that works with the set DAV version
+		// use the chunking version that works with the set DAV version
 		if ($chunkingVersion === null) {
-			if ($this->usingOldDavPath || $this->usingSpacesDavPath) {
+			if (\in_array($this->currentDAVPath, [WebDavHelper::DAV_VERSION_OLD, WebDavHelper::DAV_VERSION_SPACES])) {
 				$chunkingVersion = "v1";
 			} else {
 				$chunkingVersion = "v2";
@@ -4478,10 +4380,10 @@ trait WebDav {
 	public function theLastPublicDavResponseShouldContainTheseNodes(TableNode $table):void {
 		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$this->verifyTableNodeColumns($table, ["name"]);
-		$type = $this->usingOldDavPath ? "public-files" : "public-files-new";
+
 		foreach ($table->getHash() as $row) {
 			$path = $this->substituteInLineCodes($row['name']);
-			$res = $this->findEntryFromPropfindResponse($path, $token, $type);
+			$res = $this->findEntryFromPropfindResponse($path, $token, "public-files");
 			Assert::assertNotFalse($res, "expected $path to be in DAV response but was not found");
 		}
 	}
@@ -4497,10 +4399,10 @@ trait WebDav {
 	public function theLastPublicDavResponseShouldNotContainTheseNodes(TableNode $table):void {
 		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$this->verifyTableNodeColumns($table, ["name"]);
-		$type = $this->usingOldDavPath ? "public-files" : "public-files-new";
+
 		foreach ($table->getHash() as $row) {
 			$path = $this->substituteInLineCodes($row['name']);
-			$res = $this->findEntryFromPropfindResponse($path, $token, $type);
+			$res = $this->findEntryFromPropfindResponse($path, $token, "public-files");
 			Assert::assertFalse($res, "expected $path to not be in DAV response but was found");
 		}
 	}
@@ -4520,8 +4422,7 @@ trait WebDav {
 			'/',
 			$depth,
 			null,
-			null,
-			$this->usingOldDavPath ? "public-files" : "public-files-new"
+			"public-files"
 		);
 		$this->setResponse($response);
 		$this->setResponseXml(HttpRequestHelper::parseResponseAsXml($this->response));
@@ -4648,16 +4549,13 @@ trait WebDav {
 		}
 		// url encode for spaces and brackets that may appear in the filePath
 		$folderPath = $this->escapePath($folderPath);
-		// topWebDavPath should be something like /remote.php/webdav/ or
-		// /remote.php/dav/files/alice/
+		// topWebDavPath should be something like '/webdav/' or '/dav/files/{user}/'
 		$topWebDavPath = "/" . $this->getFullDavFilesPath($user, $spaceId) . "/" . $folderPath;
 		switch ($type) {
 			case "files":
 				break;
 			case "public-files":
-			case "public-files-old":
-			case "public-files-new":
-				$topWebDavPath = "/" . $this->getPublicLinkDavPath($user, $type) . "/";
+				$topWebDavPath = "/" . $this->getPublicLinkDavPath($user) . "/";
 				break;
 			default:
 				throw new Exception("error");
