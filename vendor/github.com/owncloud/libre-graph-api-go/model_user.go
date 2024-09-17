@@ -48,7 +48,8 @@ type User struct {
 	// The user`s type. This can be either \"Member\" for regular user, \"Guest\" for guest users or \"Federated\" for users imported from a federated instance.
 	UserType *string `json:"userType,omitempty"`
 	// Represents the users language setting, ISO-639-1 Code
-	PreferredLanguage *string `json:"preferredLanguage,omitempty"`
+	PreferredLanguage *string         `json:"preferredLanguage,omitempty"`
+	SignInActivity    *SignInActivity `json:"signInActivity,omitempty"`
 }
 
 type _User User
@@ -536,6 +537,38 @@ func (o *User) SetPreferredLanguage(v string) {
 	o.PreferredLanguage = &v
 }
 
+// GetSignInActivity returns the SignInActivity field value if set, zero value otherwise.
+func (o *User) GetSignInActivity() SignInActivity {
+	if o == nil || IsNil(o.SignInActivity) {
+		var ret SignInActivity
+		return ret
+	}
+	return *o.SignInActivity
+}
+
+// GetSignInActivityOk returns a tuple with the SignInActivity field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *User) GetSignInActivityOk() (*SignInActivity, bool) {
+	if o == nil || IsNil(o.SignInActivity) {
+		return nil, false
+	}
+	return o.SignInActivity, true
+}
+
+// HasSignInActivity returns a boolean if a field has been set.
+func (o *User) HasSignInActivity() bool {
+	if o != nil && !IsNil(o.SignInActivity) {
+		return true
+	}
+
+	return false
+}
+
+// SetSignInActivity gets a reference to the given SignInActivity and assigns it to the SignInActivity field.
+func (o *User) SetSignInActivity(v SignInActivity) {
+	o.SignInActivity = &v
+}
+
 func (o User) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -586,6 +619,9 @@ func (o User) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.PreferredLanguage) {
 		toSerialize["preferredLanguage"] = o.PreferredLanguage
+	}
+	if !IsNil(o.SignInActivity) {
+		toSerialize["signInActivity"] = o.SignInActivity
 	}
 	return toSerialize, nil
 }

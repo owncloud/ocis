@@ -24,21 +24,21 @@ var _ MappedNullable = &AppRoleAssignment{}
 type AppRoleAssignment struct {
 	// The unique identifier for the object. 12345678-9abc-def0-1234-56789abcde. The value of the ID property is often, but not exclusively, in the form of a GUID. The value should be treated as an opaque identifier and not based in being a GUID. Null values are not allowed. Read-only.
 	Id              *string    `json:"id,omitempty"`
-	DeletedDateTime *time.Time `json:"deletedDateTime,omitempty"`
+	DeletedDateTime *time.Time `json:"deletedDateTime,omitempty" validate:"regexp=^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?([Zz]|[+-][0-9][0-9]:[0-9][0-9])$"`
 	// The identifier (id) for the app role which is assigned to the user. Required on create.
-	AppRoleId string `json:"appRoleId"`
+	AppRoleId string `json:"appRoleId" validate:"regexp=^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"`
 	// The time when the app role assignment was created. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Read-only.
-	CreatedDateTime NullableTime `json:"createdDateTime,omitempty"`
+	CreatedDateTime NullableTime `json:"createdDateTime,omitempty" validate:"regexp=^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$"`
 	// The display name of the user, group, or service principal that was granted the app role assignment. Read-only.
 	PrincipalDisplayName NullableString `json:"principalDisplayName,omitempty"`
 	// The unique identifier (id) for the user, security group, or service principal being granted the app role. Security groups with dynamic memberships are supported. Required on create.
-	PrincipalId NullableString `json:"principalId"`
+	PrincipalId NullableString `json:"principalId" validate:"regexp=^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"`
 	// The type of the assigned principal. This can either be User, Group, or ServicePrincipal. Read-only.
 	PrincipalType NullableString `json:"principalType,omitempty"`
 	// The display name of the resource app's service principal to which the assignment is made.
 	ResourceDisplayName NullableString `json:"resourceDisplayName,omitempty"`
 	// The unique identifier (id) for the resource service principal for which the assignment is made. Required on create.
-	ResourceId NullableString `json:"resourceId"`
+	ResourceId NullableString `json:"resourceId" validate:"regexp=^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"`
 }
 
 type _AppRoleAssignment AppRoleAssignment

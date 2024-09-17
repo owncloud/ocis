@@ -28,7 +28,7 @@ type AppRole struct {
 	// Display name for the permission that appears in the app role assignment and consent experiences.
 	DisplayName NullableString `json:"displayName,omitempty"`
 	// Unique role identifier inside the appRoles collection. When creating a new app role, a new GUID identifier must be provided.
-	Id string `json:"id"`
+	Id string `json:"id" validate:"regexp=^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"`
 }
 
 type _AppRole AppRole

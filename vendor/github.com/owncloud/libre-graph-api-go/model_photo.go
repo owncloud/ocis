@@ -37,7 +37,7 @@ type Photo struct {
 	// The orientation value from the camera. Read-only.
 	Orientation *int32 `json:"orientation,omitempty"`
 	// Represents the date and time the photo was taken. Read-only.
-	TakenDateTime *time.Time `json:"takenDateTime,omitempty"`
+	TakenDateTime *time.Time `json:"takenDateTime,omitempty" validate:"regexp=^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?([Zz]|[+-][0-9][0-9]:[0-9][0-9])$"`
 }
 
 // NewPhoto instantiates a new Photo object
