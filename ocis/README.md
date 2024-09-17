@@ -111,27 +111,28 @@ ocis graph list-unified-roles
 
 The output of this command includes the following information for each role:
 
-* `uid`\
+* `Name`\
+  The human readable name of the role.
+* `UID`\
   The unique identifier of the role.
-* `Description`\
-  A short description of the role.
 * `Enabled`\
   Whether the role is enabled or not.
+* `Description`\
+  A short description of the role.
 * `Condition`
 * `Allowed Resource Action`
 
 **Example output (shortned)**
 
 ```bash
-+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
-|                 UID                  | ENABLED  |          DESCRIPTION           |           CONDITION            |         ALLOWED RESOURCE ACTIONS         |
-+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
-| a8d5fe5e-96e3-418d-825b-534dbdf22b99 | enabled  | View and download.             | exists @Resource.Root          | libre.graph/driveItem/path/read          |
-|                                      |          |                                |                                | libre.graph/driveItem/quota/read         |
-|                                      |          |                                |                                | libre.graph/driveItem/content/read       |
-|                                      |          |                                |                                | libre.graph/driveItem/permissions/read   |
-|                                      |          |                                |                                | libre.graph/driveItem/children/read      |
-|                                      |          |                                |                                | libre.graph/driveItem/deleted/read       |
-|                                      |          |                                |                                | libre.graph/driveItem/basic/read         |
-+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
++----------------------------+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+|            NAME            |                 UID                  | ENABLED  |          DESCRIPTION           |           CONDITION            |         ALLOWED RESOURCE ACTIONS         |
++----------------------------+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+| Viewer                     | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 | enabled  | View and download.             | exists @Resource.File          | libre.graph/driveItem/path/read          |
+|                            |                                      |          |                                | exists @Resource.Folder        | libre.graph/driveItem/quota/read         |
+|                            |                                      |          |                                | exists @Resource.File &&       | libre.graph/driveItem/content/read       |
+|                            |                                      |          |                                | @Subject.UserType=="Federated" | libre.graph/driveItem/children/read      |
+|                            |                                      |          |                                | exists @Resource.Folder &&     | libre.graph/driveItem/deleted/read       |
+|                            |                                      |          |                                | @Subject.UserType=="Federated" | libre.graph/driveItem/basic/read         |
++----------------------------+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
 ```
