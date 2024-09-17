@@ -54,7 +54,7 @@ class WebDavHelper {
 	 * @return string
 	 */
 	public static function withRemotePhp(string $urlPath): string {
-		if (\getenv("WITH_REMOTE_PHP") === "true"){
+		if (\getenv("WITH_REMOTE_PHP") === "true") {
 			return "remote.php/$urlPath";
 		}
 		return $urlPath;
@@ -746,7 +746,7 @@ class WebDavHelper {
 			$urlParameter = \http_build_query($urlParameter, '', '&');
 			$path .= '?' . $urlParameter;
 		}
-		$fullUrl = self::sanitizeUrl($baseUrl . "/$davPath" . $path);
+		$fullUrl = self::sanitizeUrl("{$baseUrl}/{$davPath}/{$path}");
 
 		if ($authType === 'bearer') {
 			$headers['Authorization'] = 'Bearer ' . $password;
@@ -807,7 +807,7 @@ class WebDavHelper {
 	 * @return string
 	 */
 	public static function getDavPath(
-		?string $userOrToken, # merge to userOrTokenOrId
+		?string $userOrToken, // merge to userOrTokenOrId
 		?int $davPathVersionToUse = null,
 		?string $type = "files",
 		?string $spaceId = null
