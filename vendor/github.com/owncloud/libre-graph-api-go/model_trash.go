@@ -22,7 +22,7 @@ var _ MappedNullable = &Trash{}
 type Trash struct {
 	TrashedBy *IdentitySet `json:"trashedBy,omitempty"`
 	// The UTC date and time the folder was marked as trashed.
-	TrashedDateTime *time.Time `json:"trashedDateTime,omitempty"`
+	TrashedDateTime *time.Time `json:"trashedDateTime,omitempty" validate:"regexp=^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?([Zz]|[+-][0-9][0-9]:[0-9][0-9])$"`
 }
 
 // NewTrash instantiates a new Trash object

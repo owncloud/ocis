@@ -22,7 +22,7 @@ var _ MappedNullable = &RemoteItem{}
 type RemoteItem struct {
 	CreatedBy *IdentitySet `json:"createdBy,omitempty"`
 	// Date and time of item creation. Read-only.
-	CreatedDateTime *time.Time      `json:"createdDateTime,omitempty"`
+	CreatedDateTime *time.Time      `json:"createdDateTime,omitempty" validate:"regexp=^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$"`
 	File            *OpenGraphFile  `json:"file,omitempty"`
 	FileSystemInfo  *FileSystemInfo `json:"fileSystemInfo,omitempty"`
 	Folder          *Folder         `json:"folder,omitempty"`
@@ -37,7 +37,7 @@ type RemoteItem struct {
 	Image          *Image       `json:"image,omitempty"`
 	LastModifiedBy *IdentitySet `json:"lastModifiedBy,omitempty"`
 	// Date and time the item was last modified. Read-only.
-	LastModifiedDateTime *time.Time `json:"lastModifiedDateTime,omitempty"`
+	LastModifiedDateTime *time.Time `json:"lastModifiedDateTime,omitempty" validate:"regexp=^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$"`
 	// Optional. Filename of the remote item. Read-only.
 	Name *string `json:"name,omitempty"`
 	// ETag for the item. Read-only.

@@ -72,7 +72,7 @@ func (a *ActivitiesApiService) GetActivitiesExecute(r ApiGetActivitiesRequest) (
 	localVarFormParams := url.Values{}
 
 	if r.kql != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "kql", r.kql, "")
+		parameterAddToHeaderOrQuery(localVarQueryParams, "kql", r.kql, "form", "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}

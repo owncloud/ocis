@@ -21,11 +21,11 @@ var _ MappedNullable = &FileSystemInfo{}
 // FileSystemInfo File system information on client. Read-write.
 type FileSystemInfo struct {
 	// The UTC date and time the file was created on a client.
-	CreatedDateTime *time.Time `json:"createdDateTime,omitempty"`
+	CreatedDateTime *time.Time `json:"createdDateTime,omitempty" validate:"regexp=^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?([Zz]|[+-][0-9][0-9]:[0-9][0-9])$"`
 	// The UTC date and time the file was last accessed. Available for the recent file list only.
-	LastAccessedDateTime *time.Time `json:"lastAccessedDateTime,omitempty"`
+	LastAccessedDateTime *time.Time `json:"lastAccessedDateTime,omitempty" validate:"regexp=^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?([Zz]|[+-][0-9][0-9]:[0-9][0-9])$"`
 	// The UTC date and time the file was last modified on a client.
-	LastModifiedDateTime *time.Time `json:"lastModifiedDateTime,omitempty"`
+	LastModifiedDateTime *time.Time `json:"lastModifiedDateTime,omitempty" validate:"regexp=^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?([Zz]|[+-][0-9][0-9]:[0-9][0-9])$"`
 }
 
 // NewFileSystemInfo instantiates a new FileSystemInfo object
