@@ -1012,3 +1012,71 @@ Feature: collaboration (wopi)
         }
       }
       """
+
+  @issue-8691
+  Scenario Outline: public user with permission edit/upload/createOnly creates odt file inside folder of public space using wopi endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "testFolder" in space "new-space"
+    And user "Alice" has created the following space link share:
+      | space           | new-space          |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    When the public creates a file "simple.odt" inside folder "testFolder" in the last shared public link space with password "%public%" using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          }
+        }
+      }
+      """
+    And for user "Alice" folder "testFolder" of the space "new-space" should contain these files:
+      | simple.odt |
+    Examples:
+      | permissions-role |
+      | edit             |
+      | upload           |
+      | createOnly       |
+
+  @issue-8691
+  Scenario: public user with permission view tries to create odt file inside folder of public space using wopi endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "testFolder" in space "new-space"
+    And user "Alice" has created the following space link share:
+      | space           | new-space |
+      | permissionsRole | view      |
+      | password        | %public%  |
+    When the public tries to create a file "simple.odt" inside folder "testFolder" in the last shared public link space with password "%public%" using wopi endpoint
+    Then the HTTP status code should be "500"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "SERVER_ERROR"
+          },
+          "message": {
+            "const": "error calling InitiateFileUpload"
+          }
+        }
+      }
+      """
+    And for user "Alice" folder "testFolder" of the space "new-space" should not contain these files:
+      | simple.odt |

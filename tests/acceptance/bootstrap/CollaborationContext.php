@@ -122,18 +122,16 @@ class CollaborationContext implements Context {
 	}
 
 	/**
-	 * @When the public creates a file :file inside the last shared public link folder with password :password using wopi endpoint
-	 * @When the public tries to create a file :file inside the last shared public link folder with password :password using wopi endpoint
-	 *
 	 * @param string $file
 	 * @param string $password
+	 * @param string $folder
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function thePublicCreatesAFileInsideTheLastSharedPublicLinkFolderWithPasswordUsingWopiEndpoint(string $file, string $password): void {
+	public function createFile(string $file, string $password, string $folder = ""): void {
 		$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
-		$davPath = WebDavHelper::getDavPath($token, null, "public-files-new");
+		$davPath = WebDavHelper::getDavPath($token, null, "public-files-new") . "/$folder";
 		$response = HttpRequestHelper::sendRequest(
 			$this->featureContext->getBaseUrl() . "/$davPath",
 			$this->featureContext->getStepLineRef(),
@@ -162,6 +160,35 @@ class CollaborationContext implements Context {
 				$headers
 			)
 		);
+	}
+
+	/**
+	 * @When the public creates a file :file inside the last shared public link folder with password :password using wopi endpoint
+	 * @When the public tries to create a file :file inside the last shared public link folder with password :password using wopi endpoint
+	 *
+	 * @param string $file
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function thePublicCreatesAFileInsideTheLastSharedPublicLinkFolderWithPasswordUsingWopiEndpoint(string $file, string $password): void {
+		$this->createFile($file, $password);
+	}
+
+	/**
+	 * @When the public creates a file :file inside folder :folder in the last shared public link space with password :password using wopi endpoint
+	 * @When the public tries to create a file :file inside folder :folder in the last shared public link space with password :password using wopi endpoint
+	 *
+	 * @param string $file
+	 * @param string $folder
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function thePublicCreatesAFileInsideFolderInTheLastSharedPublicLinkSpaceWithPasswordUsingWopiEndpoint(string $file, string $folder, string $password): void {
+		$this->createFile($file, $password, $folder);
 	}
 
 	/**
