@@ -59,6 +59,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fixed the ocm tocken: [#10050](https://github.com/owncloud/ocis/pull/10050)
 * Bugfix - Fix ocm space sharing: [#10060](https://github.com/owncloud/ocis/pull/10060)
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
+* Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 
 ## Details
 
@@ -93,6 +94,14 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/9817
+
+* Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
+
+   When the LDAP identity backend is configured to have write access to the
+   database we're now able to maintain the ocLastSignInTimestamp attribute for the
+   users.
+
+   https://github.com/owncloud/ocis/pull/9942
 
 # Changelog for [6.4.0] (2024-09-12)
 
