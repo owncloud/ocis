@@ -25,8 +25,8 @@ Feature: propagation of etags when restoring a file or folder from trash
       | Alice | /upload/sub |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: restoring a file to an other location changes the etags of all parents
@@ -48,8 +48,8 @@ Feature: propagation of etags when restoring a file or folder from trash
       | Alice | /restore/sub |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: restoring a folder to its original location changes the etags of all parents
@@ -69,8 +69,8 @@ Feature: propagation of etags when restoring a file or folder from trash
       | Alice | /upload/sub |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: restoring a folder to an other location changes the etags of all parents
@@ -92,5 +92,5 @@ Feature: propagation of etags when restoring a file or folder from trash
       | Alice | /restore/sub |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
+      | spaces           |

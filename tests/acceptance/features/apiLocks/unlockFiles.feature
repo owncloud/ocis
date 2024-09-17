@@ -21,7 +21,7 @@ Feature: unlock locked items
       | new              |
       | spaces           |
 
-  @issue-7761
+  @issue-7761 @issue-10331
   Scenario Outline: public tries to unlock a file in a share that was locked by the file owner
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -247,24 +247,20 @@ Feature: unlock locked items
       | exclusive  |
 
 
-  Scenario Outline: unlock a file using file-id
+  Scenario: unlock a file using file-id
     Given using spaces DAV path
     And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    And user "Alice" has locked file "textfile.txt" using file-id path "<dav-path>" setting the following properties
+    And user "Alice" has locked file "textfile.txt" using file-id "<<FILEID>>" setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
-    When user "Alice" unlocks the last created lock of file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API
+    When user "Alice" unlocks the last created lock of file "textfile.txt" using file-id "<<FILEID>>" using the WebDAV API
     Then the HTTP status code should be "204"
     And 0 locks should be reported for file "textfile.txt" of user "Alice" by the WebDAV API
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile.txt"
-    Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: unlock a file in project space using file-id
+  Scenario: unlock a file in project space using file-id
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "Project" with the default quota using the Graph API
@@ -273,17 +269,13 @@ Feature: unlock locked items
     And user "Alice" has locked file "textfile.txt" inside the space "Project" setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
-    When user "Alice" unlocks the last created lock of file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API
+    When user "Alice" unlocks the last created lock of file "textfile.txt" using file-id "<<FILEID>>" using the WebDAV API
     Then the HTTP status code should be "204"
     And 0 locks should be reported for file "textfile.txt" inside the space "Project" of user "Alice"
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile.txt"
-    Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
 
 
-  Scenario Outline: unlock a file in the shares using file-id
+  Scenario: unlock a file in the shares using file-id
     Given user "Brian" has been created with default attributes and without skeleton files
     And using spaces DAV path
     And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
@@ -295,22 +287,18 @@ Feature: unlock locked items
       | shareType       | user         |
       | permissionsRole | File Editor  |
     And user "Brian" has a share "textfile.txt" synced
-    And user "Brian" has locked file "textfile.txt" using file-id path "<dav-path>" setting the following properties
+    And user "Brian" has locked file "textfile.txt" using file-id "<<FILEID>>" setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
-    When user "Brian" unlocks the last created lock of file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API
+    When user "Brian" unlocks the last created lock of file "textfile.txt" using file-id "<<FILEID>>" using the WebDAV API
     Then the HTTP status code should be "204"
     And 0 locks should be reported for file "textfile.txt" inside the space "Personal" of user "Alice"
     And 0 locks should be reported for file "textfile.txt" inside the space "Shares" of user "Brian"
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile.txt"
     And using new DAV path
     And user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/textfile.txt"
-    Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
 
-
+  @issue-10331
   Scenario Outline: unlock a file as an anonymous user
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -329,8 +317,6 @@ Feature: unlock locked items
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "PARENT/textfile0.txt"
     Examples:
       | dav-path-version | lock-scope |
-      | old              | shared     |
-      | old              | exclusive  |
       | new              | shared     |
       | new              | exclusive  |
       | spaces           | shared     |

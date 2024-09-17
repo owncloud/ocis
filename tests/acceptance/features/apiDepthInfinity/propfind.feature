@@ -70,7 +70,7 @@ Feature: PROPFIND with depth:infinity
       | new              |
       | spaces           |
 
-
+  @issue-10331
   Scenario: get the list of resources in a folder shared through public link with depth infinity
     Given using new DAV path
     And using SharingNG
@@ -121,7 +121,7 @@ Feature: PROPFIND with depth:infinity
       | new              |
       | spaces           |
 
-
+  @issue-10331
   Scenario: get the list of resources in a folder shared through public link with depth infinity when depth infinity is not allowed
     Given the following configs have been set:
       | config                                       | value |

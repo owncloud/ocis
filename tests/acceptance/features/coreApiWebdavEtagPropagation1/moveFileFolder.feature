@@ -284,7 +284,7 @@ Feature: propagation of etags when moving files or folders
       | old              |
       | new              |
 
-  @skipOnReva
+  @skipOnReva @issue-10331
   Scenario Outline: renaming a file in a publicly shared folder changes its etag for the sharer
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"
@@ -309,7 +309,7 @@ Feature: propagation of etags when moving files or folders
       | new              |
       | spaces           |
 
-  @skipOnReva
+  @skipOnReva @issue-10331
   Scenario Outline: renaming a folder in a publicly shared folder changes its etag for the sharer
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload"

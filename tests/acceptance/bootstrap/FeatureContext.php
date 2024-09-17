@@ -492,8 +492,7 @@ class FeatureContext extends BehatVariablesContext {
 		$this->alternateAdminPassword = "IHave99LotsOfPriv";
 		$this->publicLinkSharePassword = "publicPwd:1";
 
-		// in case of CI deployment we take the server url from the environment
-		$testServerUrl = \getenv('TEST_SERVER_URL');
+		$testServerUrl = OcisHelper::getServerUrl();
 		if ($testServerUrl !== false) {
 			$this->baseUrl = \rtrim($testServerUrl, '/');
 			$this->localBaseUrl = $this->baseUrl;
@@ -806,15 +805,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getOCSPath(string $ocsApiVersion): string {
 		return \ltrim($this->getBasePath() . "/ocs/v$ocsApiVersion.php", "/");
-	}
-
-	/**
-	 * returns the complete DAV path including the base path e.g. owncloud-core/remote.php/dav
-	 *
-	 * @return string
-	 */
-	public function getDAVPathIncludingBasePath(): string {
-		return \ltrim($this->getBasePath() . "/" . $this->getDavPath(), "/");
 	}
 
 	/**
@@ -1339,8 +1329,8 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function userSendsHTTPMethodToUrl(string $user, string $verb, string $url): void {
 		$user = $this->getActualUsername($user);
-		$url = $this->substituteInLineCodes($url, $user);
-		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url));
+		$endpoint = $this->substituteInLineCodes($url, $user);
+		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $endpoint));
 	}
 
 	/**
@@ -1458,7 +1448,11 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws GuzzleException
 	 */
 	public function sendingToWithDirectUrl(string $user, string $verb, string $url, ?string $body = null, ?string $password = null, ?array $headers = null): ResponseInterface {
-		$fullUrl = $this->getBaseUrl() . $url;
+		$url = \ltrim($url, '/');
+		if (WebdavHelper::isDAVRequest($url)) {
+			$url = WebdavHelper::withRemotePhp($url);
+		}
+		$fullUrl = $this->getBaseUrl() . "/$url";
 
 		if ($password === null) {
 			$password = $this->getPasswordForUser($user);
@@ -1947,8 +1941,6 @@ class FeatureContext extends BehatVariablesContext {
 		}
 	}
 
-	// TODO do similar for other usernames for e.g. %regularuser% or %test-user-1%
-
 	/**
 	 * @param string|null $functionalUsername
 	 *
@@ -2119,7 +2111,8 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getCommentUrlRegExp(): string {
 		$basePath = \ltrim($this->getBasePath() . "/", "/");
-		return "/{$basePath}remote.php/dav/comments/files/([0-9]+)";
+		$commentsPath = WebDAVHelper::getDavPath(WebDavHelper::DAV_VERSION_NEW, null, "comments");
+		return "/{$basePath}/{$commentsPath}/([0-9]+)";
 	}
 
 	/**
@@ -2223,14 +2216,6 @@ class FeatureContext extends BehatVariablesContext {
 				"function" => [
 					$this,
 					"getBasePath"
-				],
-				"parameter" => []
-			],
-			[
-				"code" => "%dav_path%",
-				"function" => [
-					$this,
-					"getDAVPathIncludingBasePath"
 				],
 				"parameter" => []
 			],

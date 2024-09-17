@@ -56,7 +56,7 @@ class OcmContext implements Context {
 	 * @return string
 	 */
 	public function getOcisDomain(): string {
-		return $this->extractDomain(\getenv('TEST_SERVER_URL'));
+		return $this->extractDomain(OcisHelper::getServerUrl());
 	}
 
 	/**

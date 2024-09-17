@@ -49,13 +49,13 @@ class SpacesContext implements Context {
 	private FavoritesContext $favoritesContext;
 	private ChecksumContext $checksumContext;
 	private FilesVersionsContext $filesVersionsContext;
+	private ArchiverContext $archiverContext;
 
 	/**
 	 * key is space name and value is the username that created the space
 	 */
 	private array $createdSpaces;
 	private string $ocsApiUrl = '/ocs/v2.php/apps/files_sharing/api/v1/shares';
-	private string $davSpacesUrl = '/remote.php/dav/spaces/';
 
 	/**
 	 * @var array map with user as key, spaces and file etags as value
@@ -267,7 +267,9 @@ class SpacesContext implements Context {
 	 */
 	public function getFileData(string $user, string $spaceName, string $fileName): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->featureContext->getBaseUrl() . $this->davSpacesUrl . $space["id"] . "/" . $fileName;
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$fullUrl = "{$baseUrl}/{$davPath}/{$fileName}";
 
 		return HttpRequestHelper::get(
 			$fullUrl,
@@ -310,7 +312,12 @@ class SpacesContext implements Context {
 		if ($folderName === $space["name"]) {
 			$folderName = '';
 		}
-		$fullUrl = $space["root"]["webDavUrl"] . "/" . \rawurlencode($folderName);
+
+		$encodedName = \rawurlencode($folderName);
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
@@ -400,6 +407,7 @@ class SpacesContext implements Context {
 		$this->favoritesContext = BehatHelper::getContext($scope, $environment, 'FavoritesContext');
 		$this->checksumContext = BehatHelper::getContext($scope, $environment, 'ChecksumContext');
 		$this->filesVersionsContext = BehatHelper::getContext($scope, $environment, 'FilesVersionsContext');
+		$this->archiverContext = BehatHelper::getContext($scope, $environment, 'ArchiverContext');
 	}
 
 	/**
@@ -1690,7 +1698,11 @@ class SpacesContext implements Context {
 			$spaceName
 		);
 
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
+		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+
 		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 	}
 
@@ -1717,8 +1729,11 @@ class SpacesContext implements Context {
 		);
 		$headers['Overwrite'] = 'F';
 
-		$fileSource = $this->escapePath(\trim($fileSource, "/"));
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . $fileSource;
+		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+
 		return $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
 	}
 
@@ -1831,7 +1846,11 @@ class SpacesContext implements Context {
 			}
 		}
 
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
+		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+
 		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 	}
 
@@ -1859,7 +1878,12 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
 		$headers['Overwrite'] = 'T';
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
+
+		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+
 		if ($action === 'copying') {
 			$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 		} else {
@@ -1922,7 +1946,12 @@ class SpacesContext implements Context {
 	):void {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . \ltrim($fileSource, "/");
+
+		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+
 		$this->featureContext->setResponse($this->moveFilesAndFoldersRequest($user, $fullUrl, $headers));
 		$this->featureContext->pushToLastHttpStatusCodesArray();
 	}
@@ -1941,12 +1970,9 @@ class SpacesContext implements Context {
 	public function destinationHeaderValueWithSpaceName(string $user, string $fileDestination, string $spaceName, string $endPath = null):string {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fileDestination = $this->escapePath(\ltrim($fileDestination, "/"));
-		if ($endPath && str_contains($endPath, 'remote.php')) {
-			// this is a check for when we want to test with the endpoint having `remote.php` in space webdav
-			// by default spaces webdav is '/dav/spaces'
-			return $this->featureContext->getBaseUrl() . '/remote.php/dav/spaces/' . $space['id'] . '/' . $fileDestination;
-		}
-		return $space["root"]["webDavUrl"] . '/' . $fileDestination;
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		return "{$baseUrl}/{$davPath}/{$fileDestination}";
 	}
 
 	/**
@@ -1971,19 +1997,19 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (copies|moves|renames) a file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id path "([^"]*)"$/
+	 * @When /^user "([^"]*)" (copies|moves|renames) a file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $actionType
 	 * @param string $sourceFile
 	 * @param string $destinationFile
 	 * @param string $toSpaceName
-	 * @param string $url
+	 * @param string $fileId
 	 *
 	 * @throws GuzzleException
 	 * @return void
 	 */
-	public function userCopiesOrMovesFileWithFileIdFromAndToSpaceBetweenSpaces(string $user, string $actionType, string $sourceFile, string $destinationFile, string $toSpaceName, string $url): void {
+	public function userCopiesMovesFileIntoInsideSpaceUsingFileId(string $user, string $actionType, string $sourceFile, string $destinationFile, string $toSpaceName, string $fileId): void {
 		// split the source when there are sub-folders
 		$sourceFile = \trim($sourceFile, "/");
 		$sourceFile = \explode("/", $sourceFile);
@@ -1995,15 +2021,17 @@ class SpacesContext implements Context {
 		} elseif ($actionType === 'renames') {
 			$fileDestination = $destinationFile;
 		}
+
 		$baseUrl = $this->featureContext->getBaseUrl();
+		$sourceDavPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		if ($toSpaceName === 'Shares') {
 			$sharesPath = $this->featureContext->getSharesMountPath($user, $fileDestination);
-			$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
-			$headers['Destination'] = $baseUrl . "/$davPath" . $sharesPath;
+			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion());
+			$headers['Destination'] = "$baseUrl/$davPath/$sharesPath";
 		} else {
-			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $url);
+			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $fileId);
 		}
-		$fullUrl = $baseUrl . $url;
+		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
 		if ($actionType === 'copies') {
 			$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 		} elseif ($actionType === 'moves' || $actionType === 'renames') {
@@ -2012,15 +2040,14 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" tries to move (?:file|folder) "([^"]*)" of space "([^"]*)" to (space|folder) "([^"]*)" using its id in destination path "([^"]*)"$/
-	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" of space "([^"]*)" to (folder) "([^"]*)" using its id in destination path "([^"]*)"$/
+	 * @When /^user "([^"]*)" tries to move (?:file|folder) "([^"]*)" of space "([^"]*)" to (space|folder) "([^"]*)" using its id in destination path$/
+	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" of space "([^"]*)" to (folder) "([^"]*)" using its id in destination path$/
 	 *
 	 * @param string $user
 	 * @param string $source
 	 * @param string $sourceSpace
 	 * @param string $destinationType
 	 * @param string $destinationName
-	 * @param string $destinationPath
 	 *
 	 * @throws GuzzleException
 	 * @return void
@@ -2030,23 +2057,25 @@ class SpacesContext implements Context {
 		string $source,
 		string $sourceSpace,
 		string $destinationType,
-		string $destinationName,
-		string $destinationPath
+		string $destinationName
 	): void {
 		$source = \trim($source, "/");
 		$baseUrl = $this->featureContext->getBaseUrl();
-		$suffix = "";
-		if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
-			$suffix = $this->getSpaceIdByName($user, $sourceSpace) . "/";
+		$davPathVersion = $this->featureContext->getDavPathVersion();
+		$uniquePath = $user;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$uniquePath = $this->getSpaceIdByName($user, $sourceSpace);
 		}
-		$fullUrl = $baseUrl . \rtrim($destinationPath, "/") . "/$suffix$source";
+		$sourceDavPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath);
+		$fullUrl = "$baseUrl/$sourceDavPath/$source";
 
 		if ($destinationType === "space") {
 			$destinationId = $this->getSpaceIdByName($user, $destinationName);
 		} else {
 			$destinationId = $this->getResourceId($user, $sourceSpace, $destinationName);
 		}
-		$headers['Destination'] = $baseUrl . \rtrim($destinationPath, "/") . "/$destinationId";
+		$destinationDavPath = WebDavHelper::getDavPath($davPathVersion);
+		$headers['Destination'] = "$baseUrl/$destinationDavPath/$destinationId";
 
 		$response = $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
 		$this->featureContext->setResponse($response);
@@ -2520,9 +2549,14 @@ class SpacesContext implements Context {
 		string $spaceName
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$spaceWebDavUrl = $space["root"]["webDavUrl"] . '/' . ltrim($object, "/");
+
+		$encodedName = \rawurlencode(ltrim($object, "/"));
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+
 		return HttpRequestHelper::delete(
-			$spaceWebDavUrl,
+			$fullUrl,
 			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
@@ -2783,7 +2817,9 @@ class SpacesContext implements Context {
 		string $spaceName
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->featureContext->getBaseUrl() . $this->davSpacesUrl . "trash-bin/" . $space["id"];
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"], "trash-bin");
+		$fullUrl = "{$baseUrl}/{$davPath}";
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
@@ -2826,7 +2862,9 @@ class SpacesContext implements Context {
 	): void {
 		// get space by admin user
 		$space = $this->getSpaceByName($this->featureContext->getAdminUserName(), $spaceName);
-		$fullUrl = $this->featureContext->getBaseUrl() . $this->davSpacesUrl . "trash-bin/" . $space["id"];
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"], "trash-bin");
+		$fullUrl = "{$baseUrl}/{$davPath}";
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest($fullUrl, $this->featureContext->getStepLineRef(), 'PROPFIND', $user, $this->featureContext->getPasswordForUser($user))
 		);
@@ -2839,7 +2877,7 @@ class SpacesContext implements Context {
 	 * and return array like:
 	 * 	[1] => Array
 	 *       (
-	 *             [href] => /remote.php/dav/spaces/trash-bin/spaceId/objectId/
+	 *             [href] => /dav/spaces/trash-bin/spaceId/objectId/
 	 *             [name] => deleted folder
 	 *             [mtime] => 1649147272
 	 *             [original-location] => deleted folder
@@ -2931,10 +2969,12 @@ class SpacesContext implements Context {
 			throw new Exception(__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'");
 		}
 
-		$destination = $this->featureContext->getBaseUrl() . $this->davSpacesUrl . $space["id"] . $destination;
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$destination = "{$baseUrl}/{$davPath}/{$destination}";
 		$header = ["Destination" => $destination, "Overwrite" => "F"];
 
-		$fullUrl = $this->featureContext->getBaseUrl() . $pathToDeletedObject;
+		$fullUrl = $baseUrl . $pathToDeletedObject;
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
@@ -3025,8 +3065,9 @@ class SpacesContext implements Context {
 		$urlParameters = \http_build_query($urlParameters, '', '&');
 		$space = $this->getSpaceByName($user, $spaceName);
 
-		$fullUrl = $this->featureContext->getBaseUrl() . $this->davSpacesUrl . $space['id'] . '/' . $fileName . '?' . $urlParameters;
-
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$fullUrl = "{$baseUrl}/{$davPath}/{$fileName}?{$urlParameters}";
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$fullUrl,
@@ -3602,11 +3643,18 @@ class SpacesContext implements Context {
 			$splitSpaceName = explode("/", $spaceName);
 			$space = $this->getSpaceByName($user, $splitSpaceName[1]);
 			$splitSpaceId = explode("$", $space['id']);
-			$topWebDavPath = "/remote.php/dav/spaces/" . str_replace('!', '%21', $splitSpaceId[1]);
+			$spaceId = str_replace('!', '%21', $splitSpaceId[1]);
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
-			$topWebDavPath = "/remote.php/dav/spaces/" . $space['id'];
+			$spaceId = $space['id'];
 		}
+		$uniquePath = $user;
+		$davPathVersion = $this->featureContext->getDavPathVersion();
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$uniquePath = $spaceId;
+		}
+
+		$topWebDavPath = "/" . WebDavHelper::getDavPath($davPathVersion, $uniquePath);
 
 		$spaceFound = false;
 		foreach ($responseArray as $value) {
@@ -3938,13 +3986,13 @@ class SpacesContext implements Context {
 			$resource,
 			'0',
 			['oc:fileid'],
-			$this->featureContext->getDavPathVersion() === 1 ? "public-files" : "public-files-new"
+			"public-files"
 		);
 		$resourceId = json_decode(json_encode($response->xpath("//d:response/d:propstat/d:prop/oc:fileid")), true, 512, JSON_THROW_ON_ERROR);
 		$queryString = 'public-token=' . $token . '&id=' . $resourceId[0][0];
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
-				$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
+				$this->archiverContext->getArchiverUrl($queryString),
 				$this->featureContext->getStepLineRef(),
 				'',
 				'',
@@ -4033,7 +4081,7 @@ class SpacesContext implements Context {
 	 */
 	public function userDownloadsTheSpaceUsingTheWebdavApi(string $user, string $spaceName, string $owner = ''):void {
 		$space = $this->getSpaceByName($owner ?: $user, $spaceName);
-		$url = $this->featureContext->getBaseUrl() . '/archiver?id=' . $space['id'];
+		$url = $this->archiverContext->getArchiverUrl('id=' . $space['id']);
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$url,

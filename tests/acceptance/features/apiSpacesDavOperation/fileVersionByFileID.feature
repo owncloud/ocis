@@ -24,10 +24,10 @@ Feature: checking file versions using file id
       | shareType       | user     |
       | permissionsRole | <role>   |
     And user "Brian" has a share "text.txt" synced
-    When user "Alice" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Alice" gets the number of versions of file "/text.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
-    When user "Brian" tries to get the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Brian" tries to get the number of versions of file "/text.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "403"
     Examples:
       | role        |
@@ -41,10 +41,10 @@ Feature: checking file versions using file id
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | <space-role> |
-    When user "Alice" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Alice" gets the number of versions of file "/text.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
-    When user "Brian" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Brian" gets the number of versions of file "/text.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
     Examples:
@@ -59,7 +59,7 @@ Feature: checking file versions using file id
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
-    When user "Brian" tries to get the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Brian" tries to get the number of versions of file "/text.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "403"
 
   @issue-7738
@@ -73,10 +73,10 @@ Feature: checking file versions using file id
       | permissionsRole | <role>   |
     And user "Brian" has a share "text.txt" synced
     And user "Alice" has moved file "text.txt" to "/testFolder/movedText.txt" in space "Project1"
-    When user "Alice" gets the number of versions of file "/testFolder/movedText.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Alice" gets the number of versions of file "/testFolder/movedText.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
-    When user "Brian" tries to get the number of versions of file "/Shares/testFolder/movedText.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Brian" tries to get the number of versions of file "/Shares/testFolder/movedText.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "403"
     Examples:
       | role        |
@@ -99,7 +99,7 @@ Feature: checking file versions using file id
       | shareType       | user     |
       | permissionsRole | Manager  |
     And user "Alice" has moved file "text.txt" to "/testFolder/movedText.txt" in space "Project1"
-    When user "Brian" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Brian" gets the number of versions of file "/text.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
 
@@ -110,7 +110,7 @@ Feature: checking file versions using file id
     And user "Alice" has uploaded file with content "some data - edited" to "<source>textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has moved file "<source>textfile.txt" to "<destination>textfile.txt" in space "Personal"
-    When user "Alice" gets the number of versions of file "<destination>textfile.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Alice" gets the number of versions of file "<destination>textfile.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
     Examples:
@@ -124,9 +124,10 @@ Feature: checking file versions using file id
     And user "Alice" has uploaded file with content "some data" to "<source>textfile.txt"
     And user "Alice" has uploaded file with content "some data - edited" to "<source>textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "<source>textfile.txt" into "<destination>" inside space "Personal" using file-id path "/dav/spaces/<<FILEID>>"
+    And using spaces DAV path
+    When user "Alice" moves a file "<source>textfile.txt" into "<destination>" inside space "Personal" using file-id "<<FILEID>>"
     Then the HTTP status code should be "201"
-    When user "Alice" gets the number of versions of file "<destination>textfile.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Alice" gets the number of versions of file "<destination>textfile.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
     Examples:
@@ -141,7 +142,7 @@ Feature: checking file versions using file id
     And user "Alice" has uploaded a file inside space "Project1" with content "some data - edited" to "<source>textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has moved file "<source>textfile.txt" to "<destination>textfile.txt" in space "Project1"
-    When user "Alice" gets the number of versions of file "<source>textfile.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Alice" gets the number of versions of file "<source>textfile.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
     Examples:
@@ -155,9 +156,9 @@ Feature: checking file versions using file id
     And user "Alice" has uploaded a file inside space "Project1" with content "some data" to "<source>textfile.txt"
     And user "Alice" has uploaded a file inside space "Project1" with content "some data - edited" to "<source>textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "<source>textfile.txt" into "<destination>" inside space "Project1" using file-id path "/dav/spaces/<<FILEID>>"
+    When user "Alice" moves a file "<source>textfile.txt" into "<destination>" inside space "Project1" using file-id "<<FILEID>>"
     Then the HTTP status code should be "201"
-    When user "Alice" gets the number of versions of file "<destination>textfile.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Alice" gets the number of versions of file "<destination>textfile.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
     Examples:
@@ -173,7 +174,7 @@ Feature: checking file versions using file id
       | sharee          | Brian                         |
       | shareType       | user                          |
       | permissionsRole | Space Editor Without Versions |
-    When user "Brian" gets the number of versions of file "/text.txt" using file-id path "/meta/<<FILEID>>/v"
+    When user "Brian" gets the number of versions of file "/text.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "403"
 
 
@@ -182,7 +183,7 @@ Feature: checking file versions using file id
       | space           | Project1           |
       | permissionsRole | <permissions-role> |
       | password        | %public%           |
-    When the public tries to get the number of versions of file "/text.txt" with password "%public%" using file-id path "/meta/<<FILEID>>/v"
+    When the public tries to get the number of versions of file "/text.txt" with password "%public%" using file-id "<<FILEID>>"
     Then the HTTP status code should be "401"
     Examples:
       | permissions-role |
@@ -200,7 +201,7 @@ Feature: checking file versions using file id
       | space              | Personal           |
       | permissionsRole    | <permissions-role> |
       | password           | %public%           |
-    When the public tries to get the number of versions of file "/parent.txt" with password "%public%" using file-id path "/meta/<<FILEID>>/v"
+    When the public tries to get the number of versions of file "/parent.txt" with password "%public%" using file-id "<<FILEID>>"
     Then the HTTP status code should be "401"
     Examples:
       | permissions-role |

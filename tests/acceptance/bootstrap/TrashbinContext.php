@@ -148,13 +148,25 @@ class TrashbinContext implements Context {
 	public function listTopOfTrashbinFolder(?string $user, string $depth = "1"):array {
 		$password = $this->featureContext->getPasswordForUser($user);
 		$davPathVersion = $this->featureContext->getDavPathVersion();
+
+		$uniquePath = $user;
+		$spaceId = null;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$spaceId = WebDavHelper::getPersonalSpaceIdForUser(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$password,
+				$this->featureContext->getStepLineRef()
+			);
+			$uniquePath = $spaceId;
+		}
 		$response = WebDavHelper::listFolder(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$password,
 			"",
 			$depth,
-			null,
+			$spaceId,
 			$this->featureContext->getStepLineRef(),
 			[
 				'oc:trashbin-original-filename',
@@ -176,8 +188,9 @@ class TrashbinContext implements Context {
 		// filter root element
 		$files = \array_filter(
 			$files,
-			static function ($element) use ($user) {
-				return ($element['href'] !== "/remote.php/dav/trash-bin/$user/");
+			static function ($element) use ($davPathVersion, $uniquePath) {
+				$davPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath, "trash-bin");
+				return ($element['href'] !== "/" . $davPath . "/");
 			}
 		);
 		return $files;
@@ -247,17 +260,16 @@ class TrashbinContext implements Context {
 
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
-		// set endpoint according to webdav request (2 = new, 3 = spaces)
-		$endpoint = "/remote.php/dav/trash-bin/$user";
-		if ($davPathVersion === 3) {
-			$space_id = WebDavHelper::getPersonalSpaceIdForUser(
+		$uniquePath = $user;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$uniquePath = WebDavHelper::getPersonalSpaceIdForUser(
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$this->featureContext->getStepLineRef()
 			);
-			$endpoint = "/remote.php/dav/spaces/trash-bin/$space_id";
 		}
+		$endpoint = WebDavHelper::getDavPath($davPathVersion, $uniquePath, "trash-bin");
 
 		// filter out the collection itself, we only want to return the members
 		$files = \array_filter(
@@ -267,7 +279,7 @@ class TrashbinContext implements Context {
 				if ($path !== "") {
 					$path = $path . "/";
 				}
-				return ($element['href'] !== "$endpoint/$path");
+				return ($element['href'] !== "/$endpoint/$path");
 			}
 		);
 
@@ -276,13 +288,8 @@ class TrashbinContext implements Context {
 			// avoid "common" situations that could cause infinite recursion.
 			$trashbinRef = $file["href"];
 			$trimmedTrashbinRef = \trim($trashbinRef, "/");
-			if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-				$expectedStart = "remote.php/dav/spaces/trash-bin";
-			} else {
-				$expectedStart = "remote.php/dav/trash-bin/$user";
-			}
-			$expectedStartLength = \strlen($expectedStart);
-			if ((\substr($trimmedTrashbinRef, 0, $expectedStartLength) !== $expectedStart)
+			$expectedStartLength = \strlen($endpoint);
+			if ((\substr($trimmedTrashbinRef, 0, $expectedStartLength) !== $endpoint)
 				|| (\strlen($trimmedTrashbinRef) === $expectedStartLength)
 			) {
 				// A top href (maybe without even the username) has been returned
@@ -338,7 +345,7 @@ class TrashbinContext implements Context {
 	 */
 	public function theTrashbinDavResponseShouldNotContainTheseNodes(TableNode $table):void {
 		$this->featureContext->verifyTableNodeColumns($table, ['name']);
-		$responseXml = $this->featureContext->getResponseXmlObject();
+		$responseXml = $this->featureContext->getResponseXml();
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
 		foreach ($table->getHash() as $row) {
@@ -361,7 +368,7 @@ class TrashbinContext implements Context {
 	 */
 	public function theTrashbinDavResponseShouldContainTheseNodes(TableNode $table):void {
 		$this->featureContext->verifyTableNodeColumns($table, ['name']);
-		$responseXml = $this->featureContext->getResponseXmlObject();
+		$responseXml = $this->featureContext->getResponseXml();
 
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
@@ -387,16 +394,16 @@ class TrashbinContext implements Context {
 	 * @param string|null $asUser - To send request as another user
 	 * @param string|null $password
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function sendTrashbinListRequest(string $user, ?string $asUser = null, ?string $password = null):void {
+	public function sendTrashbinListRequest(string $user, ?string $asUser = null, ?string $password = null): ResponseInterface {
 		$asUser = $asUser ?? $user;
 		$password = $password ?? $this->featureContext->getPasswordForUser($asUser);
-		$davPathVersion = $this->featureContext->getDavPathVersion();
-		$response = WebDavHelper::propfind(
+
+		return WebDavHelper::propfind(
 			$this->featureContext->getBaseUrl(),
-			$asUser,
+			$user,
 			$password,
 			null,
 			[
@@ -409,19 +416,9 @@ class TrashbinContext implements Context {
 			'1',
 			null,
 			'trash-bin',
-			$davPathVersion,
-			$user
+			$this->featureContext->getDavPathVersion(),
+			$asUser
 		);
-		$this->featureContext->setResponse($response);
-		try {
-			$responseXmlObject = HttpRequestHelper::getResponseXml(
-				$response,
-				__METHOD__
-			);
-			$this->featureContext->setResponseXmlObject($responseXmlObject);
-		} catch (Exception $e) {
-			$this->featureContext->clearResponseXmlObject();
-		}
 	}
 
 	/**
@@ -436,7 +433,8 @@ class TrashbinContext implements Context {
 	public function userTriesToListTheTrashbinContentForUser(string $asUser, string $user) {
 		$user = $this->featureContext->getActualUsername($user);
 		$asUser = $this->featureContext->getActualUsername($asUser);
-		$this->sendTrashbinListRequest($user, $asUser);
+		$response = $this->sendTrashbinListRequest($user, $asUser);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -450,7 +448,8 @@ class TrashbinContext implements Context {
 	 * @throws Exception
 	 */
 	public function userTriesToListTheTrashbinContentForUserUsingPassword(string $asUser, string $user, string $password):void {
-		$this->sendTrashbinListRequest($user, $asUser, $password);
+		$response = $this->sendTrashbinListRequest($user, $asUser, $password);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -461,7 +460,7 @@ class TrashbinContext implements Context {
 	 * @return void
 	 */
 	public function theLastWebdavResponseShouldContainFollowingElements(TableNode $elements):void {
-		$files = $this->getTrashbinContentFromResponseXml($this->featureContext->getResponseXmlObject());
+		$files = $this->getTrashbinContentFromResponseXml($this->featureContext->getResponseXml());
 		$elementRows = $elements->getHash();
 		foreach ($elementRows as $expectedElement) {
 			$found = false;
@@ -485,7 +484,7 @@ class TrashbinContext implements Context {
 	 * @throws Exception
 	 */
 	public function theLastWebdavResponseShouldNotContainFollowingElements(TableNode $elements):void {
-		$files = $this->getTrashbinContentFromResponseXml($this->featureContext->getResponseXmlObject());
+		$files = $this->getTrashbinContentFromResponseXml($this->featureContext->getResponseXml());
 
 		// 'user' is also allowed in the table even though it is not used anywhere
 		// This for better readability in feature files
@@ -576,7 +575,7 @@ class TrashbinContext implements Context {
 	}
 
 	/**
-	 * converts the trashItemHRef from /<base>/remote.php/dav/trash-bin/<user>/<item_id>/ to /trash-bin/<user>/<item_id>
+	 * converts the trashItemHRef from /<base>/dav/trash-bin/<user>/<item_id>/ to /trash-bin/<user>/<item_id>
 	 *
 	 * @param string $href
 	 *
@@ -787,24 +786,43 @@ class TrashbinContext implements Context {
 	 */
 	private function sendUndeleteRequest(string $user, string $trashItemHRef, string $destinationPath, ?string $asUser = null, ?string $password = null):ResponseInterface {
 		$asUser = $asUser ?? $user;
+		$password = $password ?? $this->featureContext->getPasswordForUser($asUser);
 		$destinationPath = \trim($destinationPath, '/');
-		$destinationValue = $this->featureContext->getBaseUrl() . "/remote.php/dav/files/$user/$destinationPath";
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPathVersion = $this->featureContext->getDavPathVersion();
 
-		$trashItemHRef = $this->convertTrashbinHref($trashItemHRef);
-		$headers['Destination'] = $destinationValue;
+		$uniquePath = $asUser;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			if (\str_starts_with($destinationPath, "Shares/")) {
+				$uniquePath = $this->featureContext->spacesContext->getSpaceIdByName($user, "Shares");
+				$destinationPath = \str_replace("Shares/", "", $destinationPath);
+			} else {
+				$uniquePath = WebDavHelper::getPersonalSpaceIdForUser(
+					$baseUrl,
+					$asUser,
+					$password,
+					$this->featureContext->getStepLineRef()
+				);
+			}
+		}
+		$destinationDavPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath);
+		$destination = "{$baseUrl}/{$destinationDavPath}/{$destinationPath}";
+
+		$trashItemHRef = \ltrim($this->convertTrashbinHref($trashItemHRef), "/");
+		$headers['Destination'] = $destination;
 		return $this->featureContext->makeDavRequest(
-			$asUser,
+			$user,
 			'MOVE',
 			$trashItemHRef,
 			$headers,
 			null,
 			null,
 			'trash-bin',
-			'2',
+			$davPathVersion,
 			false,
 			$password,
 			[],
-			$user
+			$asUser
 		);
 	}
 
@@ -1133,7 +1151,7 @@ class TrashbinContext implements Context {
 	 */
 	public function theDeletedFileFolderShouldHaveCorrectDeletionMtimeInTheResponse(string $resource):void {
 		$files = $this->getTrashbinContentFromResponseXml(
-			$this->featureContext->getResponseXmlObject()
+			$this->featureContext->getResponseXml()
 		);
 
 		$found = false;
