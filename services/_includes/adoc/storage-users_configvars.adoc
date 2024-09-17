@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-09-17-11-47-48]
+[#deprecation-note-2024-09-17-12-59-22]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -973,9 +973,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++/var/lib/ocis/storage/users ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud.
+The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
 
 a|`STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE` +
 
@@ -1021,6 +1021,17 @@ a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
 Enable asynchronous file uploads.
+
+a|`STORAGE_USERS_POSIX_SCAN_DEBOUNCE_DELAY` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++1s ++
+a| [subs=-attributes]
+The time in milliseconds to wait before scanning the filesystem for changes after a change has been detected.
 
 a|`STORAGE_USERS_POSIX_USE_SPACE_GROUPS` +
 

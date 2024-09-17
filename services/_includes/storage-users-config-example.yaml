@@ -134,11 +134,12 @@ drivers:
     db_name: owncloud
     users_provider_endpoint: com.owncloud.api.users
   posix:
-    root: ""
+    root: /var/lib/ocis/storage/users
     personalspacepath_template: users/{{.User.Username}}
     generalspacepath_template: projects/{{.SpaceId}}
     permissions_endpoint: com.owncloud.api.settings
     async_uploads: true
+    scan_debounce_delay: 1s
     use_space_groups: false
     watch_type: ""
     watch_path: ""

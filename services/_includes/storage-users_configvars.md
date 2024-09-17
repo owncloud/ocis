@@ -85,11 +85,12 @@
 | STORAGE_USERS_OWNCLOUDSQL_DB_PORT | int | 3306 | Port that the database server is listening on.|
 | STORAGE_USERS_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the database to be used.|
 | STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT | string | com.owncloud.api.users | Endpoint of the users provider.|
-| STORAGE_USERS_POSIX_ROOT | string |  | The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud.|
+| STORAGE_USERS_POSIX_ROOT | string | /var/lib/ocis/storage/users | The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.|
 | STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE | string | users/{{.User.Username}} | Template string to construct the paths of the personal space roots.|
 | STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE | string | projects/{{.SpaceId}} | Template string to construct the paths of the projects space roots.|
 | STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT | string | com.owncloud.api.settings | Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'.|
 | OCIS_ASYNC_UPLOADS | bool | true | Enable asynchronous file uploads.|
+| STORAGE_USERS_POSIX_SCAN_DEBOUNCE_DELAY | Duration | 1s | The time in milliseconds to wait before scanning the filesystem for changes after a change has been detected.|
 | STORAGE_USERS_POSIX_USE_SPACE_GROUPS | bool | false | Use space groups to manage permissions on spaces.|
 | STORAGE_USERS_POSIX_WATCH_TYPE | string |  | Type of the watcher to use for getting notified about changes to the filesystem. Currently available options are 'inotifywait' (default), 'gpfswatchfolder' and 'gpfsfileauditlogging'.|
 | STORAGE_USERS_POSIX_WATCH_PATH | string |  | Path to the watch directory/file. Only applies to the 'gpfsfileauditlogging' and 'inotifywait' watcher, in which case it is the path of the file audit log file/base directory to watch.|
