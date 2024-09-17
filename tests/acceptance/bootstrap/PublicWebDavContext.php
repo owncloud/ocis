@@ -37,6 +37,11 @@ require_once 'bootstrap.php';
 class PublicWebDavContext implements Context {
 	private FeatureContext $featureContext;
 
+	/**
+	 * @param string $versionString (old|new)
+	 *
+	 * @return int
+	 */
 	public function getPublicDavVersion(string $versionString): int {
 		if ($versionString === "old") {
 			return WebDavHelper::DAV_VERSION_OLD;
@@ -1585,7 +1590,7 @@ class PublicWebDavContext implements Context {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			$token,
-			$this-featureContext->getDavPathVersion(),
+			$this - featureContext->getDavPathVersion(),
 			"public-files"
 		);
 		$url = $this->featureContext->getBaseUrl() . "/$davPath";
