@@ -43,4 +43,4 @@
 | OCIS_TRANSLATION_PATH<br/>ACTIVITYLOG_TRANSLATION_PATH | string |  | (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.|
 | OCIS_DEFAULT_LANGUAGE | string | en | The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>ACTIVITYLOG_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
-| OCIS_SERVICE_ACCOUNT_SECRET<br/>ACTIVITYOG_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
+| OCIS_SERVICE_ACCOUNT_SECRET<br/>ACTIVITYLOG_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|

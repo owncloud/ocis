@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-09-17-12-59-22]
+[#deprecation-note-2024-09-17-14-34-58]
 [caption=]
 .Deprecation notes for the activitylog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -504,7 +504,7 @@ a| [subs=-attributes]
 The ID of the service account the service should use. See the 'auth-service' service description for more details.
 
 a|`OCIS_SERVICE_ACCOUNT_SECRET` +
-`ACTIVITYOG_SERVICE_ACCOUNT_SECRET` +
+`ACTIVITYLOG_SERVICE_ACCOUNT_SECRET` +
 
 a| [subs=-attributes]
 ++5.0 ++
