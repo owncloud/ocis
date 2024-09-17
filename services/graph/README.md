@@ -1,10 +1,9 @@
 # Graph
 
-The graph service provides the Graph API which is a RESTful web API used to access Infinite Scale resources. It is inspired by the [Microsoft Graph API](https://learn.microsoft.com/en-us/graph/use-the-api) and can be used by clients or other services or extensions.
-
-## Manual Filters
-
-Using the API, you can manually filter like for users. See the [Libre Graph API](https://owncloud.dev/libre-graph-api/#/users/ListUsers) for examples in the [developer documentation](https://owncloud.dev). Note that you can use `and` and `or` to refine results.
+The graph service provides the Graph API which is a RESTful web API used to access Infinite Scale
+resources. It is inspired by the [Microsoft Graph API](https://learn.microsoft.com/en-us/graph/use-the-api)
+and can be used by clients or other services or extensions. Visit the [Libre Graph API](https://owncloud.dev/libre-graph-api/)
+for a detailed specification of the API implemented by the graph service.
 
 ## Sequence Diagram
 
@@ -14,6 +13,51 @@ The following image gives an overview of the scenario when a client requests to 
 <!-- The image source needs to be the raw source !! -->
 
 <img src="https://raw.githubusercontent.com/owncloud/ocis/master/services/graph/images/mermaid-graph.svg" width="500" />
+
+## Users and Groups API
+
+The graph service provides endpoints for querying users and groups. It features two different backend implementations:
+  * `ldap`: This is currently the default backend. It queries user and group information from an
+    LDAP server. Depending on the configuration, it can also be used to manage (create, update,
+    delete) users and groups provided by an LDAP server.
+  * `cs3`: This backend queries users and groups using the CS3 identity APIs as implemented by the
+    `users` and `groups` service. This backend is currently still experimental and only implements a
+    subset of the Libre Graph API. It should not be used in production.
+
+### LDAP Configuration
+
+The LDAP backend is configured using a set of environment variables. A detailed list of all the
+available configuration options can be found in the [documentation](https://owncloud.dev/services/graph/configuration/#environment-variables).
+The LDAP related options are prefixed with `OCIS_LDAP_` (or `GRAPH_LDAP_` for settings specific to graph service).
+
+#### Read-Only Access to Existing LDAP Servers
+
+To connect the graph service to an existing LDAP server, set `OCIS_LDAP_SERVER_WRITE_ENABLED` to
+`false` to prevent the graph service from sending write operations to the LDAP server. Also set the
+various `OCIS_LDAP_*` environment variables to match the configuration of the LDAP server you are connecting
+to. An example configuration for connecting oCIS to an instance of Microsoft Active Directory is
+available [here](https://owncloud.dev/ocis/identity-provider/ldap-active-directory/).
+
+#### Using a Write Enabled LDAP Server
+
+To use the graph service for managing (create, update, delete) users and groups, a write enabled LDAP
+server is required. In the default configuration, the graph service will use the simple LDAP server
+that is bundled with oCIS in the `idm` service which provides all the required features.
+It is also possible to setup up an external LDAP server with write access for use with oCIS. It is
+recommend to use OpenLDAP for this. The LDAP server needs to fulfill a couple of requirements with
+respect to the available schema:
+  * The LDAP server must provide the `inetOrgPerson` object class for users and the `groupOfNames`
+    object class for groups.
+  * The graph service maintains a few additional attributes for users and groups that are not
+    available in the standard LDAP schema. An schema file, ready to use with OpenLDAP, defining those
+    additional attributes is available [here](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_ldap/config/ldap/schemas/10_owncloud_schema.ldif).
+
+## Query Filters Provided by the Graph API
+
+Some API endpoints provided by the graph service allow to specify query filters. The filter syntax
+is based on the [OData Specification](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionfilter).
+See the [Libre Graph API](https://owncloud.dev/libre-graph-api/#/users/ListUsers) for examples
+on the filters supported when querying users.
 
 ## Caching
 
