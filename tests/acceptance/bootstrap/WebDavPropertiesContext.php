@@ -272,7 +272,7 @@ class WebDavPropertiesContext implements Context {
 			'0',
 			$properties,
 			null,
-			$this->featureContext->getDavPathVersion() === 1 ? "public-files" : "public-files-new"
+			"public-files"
 		);
 	}
 
@@ -769,8 +769,8 @@ class WebDavPropertiesContext implements Context {
 		);
 
 		// The expected value can contain /%base_path%/ which can be empty some time
-		// This will result in urls such as //remote.php, so replace that
-		$expectedValue = preg_replace("/\/\/remote\.php/i", "/remote.php", $expectedValue);
+		// This will result in urls starting from '//', so replace that with single'/'
+		$expectedValue = preg_replace("/^\/\//i", "/", $expectedValue);
 		Assert::assertEquals(
 			$expectedValue,
 			$value,
@@ -811,9 +811,9 @@ class WebDavPropertiesContext implements Context {
 		);
 
 		// The expected value can contain /%base_path%/ which can be empty some time
-		// This will result in urls such as //remote.php, so replace that
-		$expectedValue1 = preg_replace("/\/\/remote\.php/i", "/remote.php", $expectedValue1);
-		$expectedValue2 = preg_replace("/\/\/remote\.php/i", "/remote.php", $expectedValue2);
+		// This will result in urls starting from '//', so replace that with single'/'
+		$expectedValue1 = preg_replace("/^\/\//i", "/", $expectedValue1);
+		$expectedValue2 = preg_replace("/^\/\//i", "/", $expectedValue2);
 		$expectedValues = [$expectedValue1, $expectedValue2];
 		$isExpectedValueInMessage = \in_array($value, $expectedValues);
 		Assert::assertTrue($isExpectedValueInMessage, "The actual value \"$value\" is not one of the expected values: \"$expectedValue1\" or \"$expectedValue2\"");
@@ -909,16 +909,13 @@ class WebDavPropertiesContext implements Context {
 			);
 			$value = $xmlPart[0]->__toString();
 			$decodedValue = \rawurldecode($value);
-			// for folders, decoded value will be like: "/owncloud/core/remote.php/webdav/strängé folder/"
-			// expected href should be like: "remote.php/webdav/strängé folder/"
-			// for files, decoded value will be like: "/owncloud/core/remote.php/webdav/strängé folder/file.txt"
-			// expected href should be like: "remote.php/webdav/strängé folder/file.txt"
 			$explodeDecoded = \explode('/', $decodedValue);
 			// get the first item of the expected href.
-			// i.e. remote.php from "remote.php/webdav/strängé folder/file.txt"
-			// or dav from "dav/spaces/%spaceid%/C++ file.cpp"
-			$explodeExpected = \explode('/', $expectedHref);
-			$remotePhpIndex = \array_search($explodeExpected[0], $explodeDecoded);
+			// 'dav' from "dav/spaces/%spaceid%/C++ file.cpp"
+			$explodeExpected = \explode('/', $expectedHref)[0];
+
+			// TODO: check if the following code is needed
+			$remotePhpIndex = \array_search($explodeExpected, $explodeDecoded);
 			if ($remotePhpIndex) {
 				$explodedHrefPartArray = \array_slice($explodeDecoded, $remotePhpIndex);
 				$actualHrefPart = \implode('/', $explodedHrefPartArray);

@@ -809,15 +809,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * returns the complete DAV path including the base path e.g. owncloud-core/remote.php/dav
-	 *
-	 * @return string
-	 */
-	public function getDAVPathIncludingBasePath(): string {
-		return \ltrim($this->getBasePath() . "/" . $this->getDavPath(), "/");
-	}
-
-	/**
 	 * returns the base URL but without "http(s)://" in front of it
 	 *
 	 * @return string
@@ -2119,7 +2110,8 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getCommentUrlRegExp(): string {
 		$basePath = \ltrim($this->getBasePath() . "/", "/");
-		return "/{$basePath}remote.php/dav/comments/files/([0-9]+)";
+		$commentsPath = WebDAVHelper::getDavPath(null, null, "comments");
+		return "/{$basePath}/{$commentsPath}/([0-9]+)";
 	}
 
 	/**
@@ -2223,14 +2215,6 @@ class FeatureContext extends BehatVariablesContext {
 				"function" => [
 					$this,
 					"getBasePath"
-				],
-				"parameter" => []
-			],
-			[
-				"code" => "%dav_path%",
-				"function" => [
-					$this,
-					"getDAVPathIncludingBasePath"
 				],
 				"parameter" => []
 			],

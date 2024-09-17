@@ -37,6 +37,15 @@ require_once 'bootstrap.php';
 class PublicWebDavContext implements Context {
 	private FeatureContext $featureContext;
 
+	public function getPublicDavVersion(string $versionString): int {
+		if ($versionString === "old") {
+			return WebDavHelper::DAV_VERSION_OLD;
+		} elseif ($versionString === "new") {
+			return WebDavHelper::DAV_VERSION_NEW;
+		}
+		throw new Exception("Unknown public WebDAV version: $versionString");
+	}
+
 	/**
 	 * @param string $range ignore if empty
 	 * @param string $publicWebDAVAPIVersion
@@ -132,8 +141,8 @@ class PublicWebDavContext implements Context {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			$token,
-			0,
-			"public-files-new"
+			$this->getPublicDavVersion($publicWebDAVAPIVersion),
+			"public-files"
 		);
 		$password = $this->featureContext->getActualPassword($password);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath$fileName";
@@ -212,8 +221,8 @@ class PublicWebDavContext implements Context {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			$token,
-			0,
-			"public-files-$publicWebDAVAPIVersion"
+			$this->getPublicDavVersion($publicWebDAVAPIVersion),
+			"public-files"
 		);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath$fileName";
 		$password = $this->featureContext->getActualPassword($password);
@@ -327,8 +336,8 @@ class PublicWebDavContext implements Context {
 
 		$davPath = WebDavHelper::getDavPath(
 			$token,
-			0,
-			"public-files-new"
+			$this->featureContext->getDavPathVersion(),
+			"public-files"
 		);
 
 		$username = $this->featureContext->getActualUsername($user);
@@ -367,8 +376,8 @@ class PublicWebDavContext implements Context {
 		}
 		$davPath = WebDavHelper::getDavPath(
 			$token,
-			0,
-			"public-files-$publicWebDAVAPIVersion"
+			$this->getPublicDavVersion($publicWebDAVAPIVersion),
+			"public-files"
 		);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath$path";
 		$userName = $this->getUsernameForPublicWebdavApi(
@@ -471,8 +480,8 @@ class PublicWebDavContext implements Context {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			$token,
-			0,
-			"public-files-$publicWebDAVAPIVersion"
+			$this->getPublicDavVersion($publicWebDAVAPIVersion),
+			"public-files"
 		);
 		$baseUrl = $this->featureContext->getLocalBaseUrl() . '/' . $davPath;
 
@@ -1576,8 +1585,8 @@ class PublicWebDavContext implements Context {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			$token,
-			0,
-			"public-files-new"
+			$this-featureContext->getDavPathVersion(),
+			"public-files"
 		);
 		$url = $this->featureContext->getBaseUrl() . "/$davPath";
 		$password = $this->featureContext->getActualPassword($password);
@@ -1732,8 +1741,8 @@ class PublicWebDavContext implements Context {
 		}
 		$davPath = WebDavHelper::getDavPath(
 			$token,
-			0,
-			"public-files-new"
+			$this->getPublicDavVersion($publicWebDAVAPIVersion),
+			"public-files"
 		);
 		$url = $this->featureContext->getBaseUrl() . "/$davPath";
 		$userName = $this->getUsernameForPublicWebdavApi(
@@ -1837,8 +1846,8 @@ class PublicWebDavContext implements Context {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			null,
-			null,
-			"public-files-$publicWebDAVAPIVersion"
+			$this->getPublicDavVersion($publicWebDAVAPIVersion),
+			"public-files"
 		);
 		$password = $this->featureContext->getActualPassword($password);
 		$username = $this->getUsernameForPublicWebdavApi(
