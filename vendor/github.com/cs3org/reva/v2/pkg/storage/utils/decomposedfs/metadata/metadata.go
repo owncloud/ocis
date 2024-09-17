@@ -51,7 +51,7 @@ type Backend interface {
 	Remove(ctx context.Context, path, key string, acquireLock bool) error
 
 	Lock(path string) (UnlockFunc, error)
-	Purge(path string) error
+	Purge(ctx context.Context, path string) error
 	Rename(oldPath, newPath string) error
 	IsMetaFile(path string) bool
 	MetadataPath(path string) string
@@ -111,7 +111,7 @@ func (NullBackend) Lock(path string) (UnlockFunc, error) {
 func (NullBackend) IsMetaFile(path string) bool { return false }
 
 // Purge purges the data of a given path from any cache that might hold it
-func (NullBackend) Purge(purges string) error { return errUnconfiguredError }
+func (NullBackend) Purge(_ context.Context, purges string) error { return errUnconfiguredError }
 
 // Rename moves the data for a given path to a new path
 func (NullBackend) Rename(oldPath, newPath string) error { return errUnconfiguredError }

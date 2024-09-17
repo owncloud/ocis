@@ -733,7 +733,7 @@ func (t *Tree) removeNode(ctx context.Context, path, timeSuffix string, n *node.
 		return err
 	}
 
-	if err := t.lookup.MetadataBackend().Purge(path); err != nil {
+	if err := t.lookup.MetadataBackend().Purge(ctx, path); err != nil {
 		logger.Error().Err(err).Str("path", t.lookup.MetadataBackend().MetadataPath(path)).Msg("error purging node metadata")
 		return err
 	}
@@ -757,7 +757,7 @@ func (t *Tree) removeNode(ctx context.Context, path, timeSuffix string, n *node.
 			continue
 		}
 
-		bID, err := t.lookup.ReadBlobIDAttr(ctx, rev)
+		bID, _, err := t.lookup.ReadBlobIDAndSizeAttr(ctx, rev, nil)
 		if err != nil {
 			logger.Error().Err(err).Str("revision", rev).Msg("error reading blobid attribute")
 			return err

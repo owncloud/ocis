@@ -78,6 +78,11 @@ func NewScanDebouncer(d time.Duration, f func(item scanItem)) *ScanDebouncer {
 
 // Debounce restarts the debounce timer for the given space
 func (d *ScanDebouncer) Debounce(item scanItem) {
+	if d.after == 0 {
+		d.f(item)
+		return
+	}
+
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -213,7 +218,7 @@ func (t *Tree) Scan(path string, action EventAction, isDir bool, recurse bool) e
 func (t *Tree) HandleFileDelete(path string) error {
 	// purge metadata
 	_ = t.lookup.(*lookup.Lookup).IDCache.DeleteByPath(context.Background(), path)
-	_ = t.lookup.MetadataBackend().Purge(path)
+	_ = t.lookup.MetadataBackend().Purge(context.Background(), path)
 
 	// send event
 	owner, spaceID, nodeID, parentID, err := t.getOwnerAndIDs(filepath.Dir(path))
@@ -333,56 +338,75 @@ func (t *Tree) assimilate(item scanItem) error {
 	id, err = t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.IDAttr)
 	if err == nil {
 		previousPath, ok := t.lookup.(*lookup.Lookup).GetCachedID(context.Background(), spaceID, string(id))
-
-		// This item had already been assimilated in the past. Update the path
-		_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), spaceID, string(id), item.Path)
-
 		previousParentID, _ := t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.ParentidAttr)
 
-		fi, err := t.updateFile(item.Path, string(id), spaceID)
-		if err != nil {
-			return err
-		}
-
-		// was it moved?
+		// was it moved or copied/restored with a clashing id?
 		if ok && len(previousParentID) > 0 && previousPath != item.Path {
-			// purge original metadata. Only delete the path entry using DeletePath(reverse lookup), not the whole entry pair.
-			_ = t.lookup.(*lookup.Lookup).IDCache.DeletePath(context.Background(), previousPath)
-			_ = t.lookup.MetadataBackend().Purge(previousPath)
+			_, err := os.Stat(previousPath)
+			if err == nil {
+				// this id clashes with an existing id -> clear metadata and re-assimilate
 
-			if fi.IsDir() {
-				// if it was moved and it is a directory we need to propagate the move
-				go func() { _ = t.WarmupIDCache(item.Path, false) }()
-			}
+				_ = t.lookup.MetadataBackend().Purge(context.Background(), item.Path)
+				go func() {
+					_ = t.assimilate(scanItem{Path: item.Path, ForceRescan: true})
+				}()
+			} else {
+				// this is a move
+				_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), spaceID, string(id), item.Path)
+				_, err := t.updateFile(item.Path, string(id), spaceID)
+				if err != nil {
+					return err
+				}
 
-			parentID, err := t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.ParentidAttr)
-			if err == nil && len(parentID) > 0 {
-				ref := &provider.Reference{
-					ResourceId: &provider.ResourceId{
-						StorageId: t.options.MountID,
-						SpaceId:   spaceID,
-						OpaqueId:  string(parentID),
-					},
-					Path: filepath.Base(item.Path),
+				// purge original metadata. Only delete the path entry using DeletePath(reverse lookup), not the whole entry pair.
+				_ = t.lookup.(*lookup.Lookup).IDCache.DeletePath(context.Background(), previousPath)
+				_ = t.lookup.MetadataBackend().Purge(context.Background(), previousPath)
+
+				fi, err := os.Stat(item.Path)
+				if err != nil {
+					return err
 				}
-				oldRef := &provider.Reference{
-					ResourceId: &provider.ResourceId{
-						StorageId: t.options.MountID,
-						SpaceId:   spaceID,
-						OpaqueId:  string(previousParentID),
-					},
-					Path: filepath.Base(previousPath),
+				if fi.IsDir() {
+					// if it was moved and it is a directory we need to propagate the move
+					go func() { _ = t.WarmupIDCache(item.Path, false) }()
 				}
-				t.PublishEvent(events.ItemMoved{
-					SpaceOwner:   user,
-					Executant:    user,
-					Owner:        user,
-					Ref:          ref,
-					OldReference: oldRef,
-					Timestamp:    utils.TSNow(),
-				})
+
+				parentID, err := t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.ParentidAttr)
+				if err == nil && len(parentID) > 0 {
+					ref := &provider.Reference{
+						ResourceId: &provider.ResourceId{
+							StorageId: t.options.MountID,
+							SpaceId:   spaceID,
+							OpaqueId:  string(parentID),
+						},
+						Path: filepath.Base(item.Path),
+					}
+					oldRef := &provider.Reference{
+						ResourceId: &provider.ResourceId{
+							StorageId: t.options.MountID,
+							SpaceId:   spaceID,
+							OpaqueId:  string(previousParentID),
+						},
+						Path: filepath.Base(previousPath),
+					}
+					t.PublishEvent(events.ItemMoved{
+						SpaceOwner:   user,
+						Executant:    user,
+						Owner:        user,
+						Ref:          ref,
+						OldReference: oldRef,
+						Timestamp:    utils.TSNow(),
+					})
+				}
 			}
-			// }
+		} else {
+			// This item had already been assimilated in the past. Update the path
+			_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), spaceID, string(id), item.Path)
+
+			_, err := t.updateFile(item.Path, string(id), spaceID)
+			if err != nil {
+				return err
+			}
 		}
 	} else {
 		// assimilate new file
@@ -472,10 +496,6 @@ assimilate:
 		prefixes.IDAttr:   []byte(id),
 		prefixes.NameAttr: []byte(filepath.Base(path)),
 	}
-	prevMtime, err := previousAttribs.Time(prefixes.MTimeAttr)
-	if err != nil || prevMtime.Before(fi.ModTime()) {
-		attributes[prefixes.MTimeAttr] = []byte(fi.ModTime().Format(time.RFC3339Nano))
-	}
 	if len(parentID) > 0 {
 		attributes[prefixes.ParentidAttr] = []byte(parentID)
 	}
@@ -496,25 +516,15 @@ assimilate:
 		attributes[prefixes.PropagationAttr] = []byte("1")
 	} else {
 		attributes.SetInt64(prefixes.TypeAttr, int64(provider.ResourceType_RESOURCE_TYPE_FILE))
-		attributes.SetString(prefixes.BlobIDAttr, id)
-		attributes.SetInt64(prefixes.BlobsizeAttr, fi.Size())
-
-		// propagate the change
-		sizeDiff := fi.Size()
-		if previousAttribs != nil && previousAttribs[prefixes.BlobsizeAttr] != nil {
-			oldSize, err := attributes.Int64(prefixes.BlobsizeAttr)
-			if err == nil {
-				sizeDiff -= oldSize
-			}
-		}
-
-		n := node.New(spaceID, id, parentID, filepath.Base(path), fi.Size(), "", provider.ResourceType_RESOURCE_TYPE_FILE, nil, t.lookup)
-		n.SpaceRoot = &node.Node{SpaceID: spaceID, ID: spaceID}
-		err = t.Propagate(context.Background(), n, sizeDiff)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to propagate")
-		}
 	}
+
+	n := node.New(spaceID, id, parentID, filepath.Base(path), fi.Size(), "", provider.ResourceType_RESOURCE_TYPE_FILE, nil, t.lookup)
+	n.SpaceRoot = &node.Node{SpaceID: spaceID, ID: spaceID}
+	err = t.Propagate(context.Background(), n, 0)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to propagate")
+	}
+
 	err = t.lookup.MetadataBackend().SetMultiple(context.Background(), path, attributes, false)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to set attributes")
@@ -547,13 +557,13 @@ func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
 
 	sizes := make(map[string]int64)
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
 		// skip lock files
 		if isLockFile(path) {
 			return nil
+		}
+
+		if err != nil {
+			return err
 		}
 
 		// calculate tree sizes
@@ -593,6 +603,16 @@ func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
 
 			id, ok := attribs[prefixes.IDAttr]
 			if ok {
+				// Check if the item on the previous still exists. In this case it might have been a copy with extended attributes -> set new ID
+				previousPath, ok := t.lookup.(*lookup.Lookup).GetCachedID(context.Background(), string(spaceID), string(id))
+				if ok && previousPath != path {
+					// this id clashes with an existing id -> clear metadata and re-assimilate
+					_, err := os.Stat(previousPath)
+					if err == nil {
+						_ = t.lookup.MetadataBackend().Purge(context.Background(), path)
+						_ = t.assimilate(scanItem{Path: path, ForceRescan: true})
+					}
+				}
 				_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), string(spaceID), string(id), path)
 			}
 		} else if assimilate {
@@ -600,12 +620,14 @@ func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
 		}
 		return nil
 	})
-	if err != nil {
-		return err
-	}
 
 	for dir, size := range sizes {
 		_ = t.lookup.MetadataBackend().Set(context.Background(), dir, prefixes.TreesizeAttr, []byte(fmt.Sprintf("%d", size)))
 	}
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -178,7 +178,7 @@ func (s *svc) Handler() http.Handler {
 
 		var head string
 		head, r.URL.Path = router.ShiftPath(r.URL.Path)
-		log.Debug().Str("head", head).Str("tail", r.URL.Path).Msg("http routing")
+		log.Debug().Str("method", r.Method).Str("head", head).Str("tail", r.URL.Path).Msg("http routing")
 		switch head {
 		case "status.php", "status":
 			s.doStatus(w, r)

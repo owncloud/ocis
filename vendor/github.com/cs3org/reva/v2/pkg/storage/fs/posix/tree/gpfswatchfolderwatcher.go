@@ -41,7 +41,7 @@ func (w *GpfsWatchFolderWatcher) Watch(topic string) {
 			continue
 		}
 
-		if isLockFile(lwev.Path) {
+		if isLockFile(lwev.Path) || isTrash(lwev.Path) {
 			continue
 		}
 

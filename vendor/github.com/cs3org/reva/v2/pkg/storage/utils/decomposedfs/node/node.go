@@ -23,6 +23,7 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"hash"
 	"hash/adler32"
@@ -84,6 +85,29 @@ const (
 	ProcessingStatus = "processing:"
 )
 
+type TimeManager interface {
+	// OverrideMTime overrides the mtime of the node, either on the node itself or in the given attributes, depending on the implementation
+	OverrideMtime(ctx context.Context, n *Node, attrs *Attributes, mtime time.Time) error
+
+	// MTime returns the mtime of the node
+	MTime(ctx context.Context, n *Node) (time.Time, error)
+	// SetMTime sets the mtime of the node
+	SetMTime(ctx context.Context, n *Node, mtime *time.Time) error
+
+	// TMTime returns the tmtime of the node
+	TMTime(ctx context.Context, n *Node) (time.Time, error)
+	// SetTMTime sets the tmtime of the node
+	SetTMTime(ctx context.Context, n *Node, tmtime *time.Time) error
+
+	// CTime returns the ctime of the node
+	CTime(ctx context.Context, n *Node) (time.Time, error)
+
+	// DTime returns the deletion time of the node
+	DTime(ctx context.Context, n *Node) (time.Time, error)
+	// SetDTime sets the deletion time of the node
+	SetDTime(ctx context.Context, n *Node, mtime *time.Time) error
+}
+
 // Tree is used to manage a tree hierarchy
 type Tree interface {
 	Setup() error
@@ -125,8 +149,8 @@ type PathLookup interface {
 	InternalPath(spaceID, nodeID string) string
 	Path(ctx context.Context, n *Node, hasPermission PermissionFunc) (path string, err error)
 	MetadataBackend() metadata.Backend
-	ReadBlobSizeAttr(ctx context.Context, path string) (int64, error)
-	ReadBlobIDAttr(ctx context.Context, path string) (string, error)
+	TimeManager() TimeManager
+	ReadBlobIDAndSizeAttr(ctx context.Context, path string, attrs Attributes) (string, int64, error)
 	TypeFromPath(ctx context.Context, path string) provider.ResourceType
 	CopyMetadataWithSourceLock(ctx context.Context, sourcePath, targetPath string, filter func(attributeName string, value []byte) (newValue []byte, copy bool), lockedSource *lockedfile.File, acquireTargetLock bool) (err error)
 	CopyMetadata(ctx context.Context, src, target string, filter func(attributeName string, value []byte) (newValue []byte, copy bool), acquireTargetLock bool) (err error)
@@ -170,6 +194,26 @@ func New(spaceID, id, parentID, name string, blobsize int64, blobID string, t pr
 		BlobID:   blobID,
 		nodeType: &t,
 	}
+}
+
+func (n *Node) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Name     string `json:"name"`
+		ID       string `json:"id"`
+		SpaceID  string `json:"spaceID"`
+		ParentID string `json:"parentID"`
+		BlobID   string `json:"blobID"`
+		BlobSize int64  `json:"blobSize"`
+		Exists   bool   `json:"exists"`
+	}{
+		Name:     n.Name,
+		ID:       n.ID,
+		SpaceID:  n.SpaceID,
+		ParentID: n.ParentID,
+		BlobID:   n.BlobID,
+		BlobSize: n.Blobsize,
+		Exists:   n.Exists,
+	})
 }
 
 // Type returns the node's resource type
@@ -351,22 +395,12 @@ func ReadNode(ctx context.Context, lu PathLookup, spaceID, nodeID string, canLis
 	}
 
 	if revisionSuffix == "" {
-		n.BlobID = attrs.String(prefixes.BlobIDAttr)
-		if n.BlobID != "" {
-			blobSize, err := attrs.Int64(prefixes.BlobsizeAttr)
-			if err != nil {
-				return nil, err
-			}
-			n.Blobsize = blobSize
-		}
-	} else {
-		n.BlobID, err = lu.ReadBlobIDAttr(ctx, nodePath+revisionSuffix)
+		n.BlobID, n.Blobsize, err = lu.ReadBlobIDAndSizeAttr(ctx, nodePath, attrs)
 		if err != nil {
 			return nil, err
 		}
-
-		// Lookup blobsize
-		n.Blobsize, err = lu.ReadBlobSizeAttr(ctx, nodePath+revisionSuffix)
+	} else {
+		n.BlobID, n.Blobsize, err = lu.ReadBlobIDAndSizeAttr(ctx, nodePath+revisionSuffix, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -899,55 +933,6 @@ func (n *Node) HasPropagation(ctx context.Context) (propagation bool) {
 	return false
 }
 
-// GetTMTime reads the tmtime from the extended attributes, falling back to GetMTime()
-func (n *Node) GetTMTime(ctx context.Context) (time.Time, error) {
-	b, err := n.XattrString(ctx, prefixes.TreeMTimeAttr)
-	if err == nil {
-		return time.Parse(time.RFC3339Nano, b)
-	}
-
-	// no tmtime, use mtime
-	return n.GetMTime(ctx)
-}
-
-// GetMTime reads the mtime from the extended attributes, falling back to disk
-func (n *Node) GetMTime(ctx context.Context) (time.Time, error) {
-	b, err := n.XattrString(ctx, prefixes.MTimeAttr)
-	if err != nil {
-		fi, err := os.Lstat(n.InternalPath())
-		if err != nil {
-			return time.Time{}, err
-		}
-		return fi.ModTime(), nil
-	}
-	return time.Parse(time.RFC3339Nano, b)
-}
-
-// SetTMTime writes the UTC tmtime to the extended attributes or removes the attribute if nil is passed
-func (n *Node) SetTMTime(ctx context.Context, t *time.Time) (err error) {
-	if t == nil {
-		return n.RemoveXattr(ctx, prefixes.TreeMTimeAttr, true)
-	}
-	return n.SetXattrString(ctx, prefixes.TreeMTimeAttr, t.UTC().Format(time.RFC3339Nano))
-}
-
-// GetDTime reads the dtime from the extended attributes
-func (n *Node) GetDTime(ctx context.Context) (tmTime time.Time, err error) {
-	b, err := n.XattrString(ctx, prefixes.DTimeAttr)
-	if err != nil {
-		return time.Time{}, err
-	}
-	return time.Parse(time.RFC3339Nano, b)
-}
-
-// SetDTime writes the UTC dtime to the extended attributes or removes the attribute if nil is passed
-func (n *Node) SetDTime(ctx context.Context, t *time.Time) (err error) {
-	if t == nil {
-		return n.RemoveXattr(ctx, prefixes.DTimeAttr, true)
-	}
-	return n.SetXattrString(ctx, prefixes.DTimeAttr, t.UTC().Format(time.RFC3339Nano))
-}
-
 // IsDisabled returns true when the node has a dmtime attribute set
 // only used to check if a space is disabled
 // FIXME confusing with the trash logic
@@ -1377,4 +1362,29 @@ func CalculateChecksums(ctx context.Context, path string) (hash.Hash, hash.Hash,
 	}
 
 	return sha1h, md5h, adler32h, nil
+}
+
+// GetMTime reads the mtime from the extended attributes
+func (n *Node) GetMTime(ctx context.Context) (time.Time, error) {
+	return n.lu.TimeManager().MTime(ctx, n)
+}
+
+// GetTMTime reads the tmtime from the extended attributes
+func (n *Node) GetTMTime(ctx context.Context) (time.Time, error) {
+	return n.lu.TimeManager().TMTime(ctx, n)
+}
+
+// SetTMTime writes the UTC tmtime to the extended attributes or removes the attribute if nil is passed
+func (n *Node) SetTMTime(ctx context.Context, t *time.Time) (err error) {
+	return n.lu.TimeManager().SetTMTime(ctx, n, t)
+}
+
+// GetDTime reads the dmtime from the extended attributes
+func (n *Node) GetDTime(ctx context.Context) (time.Time, error) {
+	return n.lu.TimeManager().DTime(ctx, n)
+}
+
+// SetDTime writes the UTC dmtime to the extended attributes or removes the attribute if nil is passed
+func (n *Node) SetDTime(ctx context.Context, t *time.Time) (err error) {
+	return n.lu.TimeManager().SetDTime(ctx, n, t)
 }

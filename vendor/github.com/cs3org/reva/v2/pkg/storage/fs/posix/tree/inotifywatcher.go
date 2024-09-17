@@ -42,7 +42,7 @@ func (iw *InotifyWatcher) Watch(path string) {
 		select {
 		case event := <-events:
 			for _, e := range event.Events {
-				if isLockFile(event.Filename) {
+				if isLockFile(event.Filename) || isTrash(event.Filename) {
 					continue
 				}
 				switch e {

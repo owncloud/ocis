@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/filelocks"
 	"github.com/pkg/errors"
 	"github.com/pkg/xattr"
@@ -213,7 +214,24 @@ func (b XattrsBackend) Remove(ctx context.Context, path string, key string, acqu
 func (XattrsBackend) IsMetaFile(path string) bool { return strings.HasSuffix(path, ".meta.lock") }
 
 // Purge purges the data of a given path
-func (b XattrsBackend) Purge(path string) error {
+func (b XattrsBackend) Purge(ctx context.Context, path string) error {
+	_, err := os.Stat(path)
+	if err == nil {
+		attribs, err := b.getAll(ctx, path, true)
+		if err != nil {
+			return err
+		}
+
+		for attr := range attribs {
+			if strings.HasPrefix(attr, prefixes.OcisPrefix) {
+				err := xattr.Remove(path, attr)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
 	return b.metaCache.RemoveMetadata(b.cacheKey(path))
 }
 

@@ -72,15 +72,17 @@ type Lookup struct {
 	IDCache         IDCache
 	metadataBackend metadata.Backend
 	userMapper      usermapper.Mapper
+	tm              node.TimeManager
 }
 
 // New returns a new Lookup instance
-func New(b metadata.Backend, um usermapper.Mapper, o *options.Options) *Lookup {
+func New(b metadata.Backend, um usermapper.Mapper, o *options.Options, tm node.TimeManager) *Lookup {
 	lu := &Lookup{
 		Options:         o,
 		metadataBackend: b,
 		IDCache:         NewStoreIDCache(&o.Options),
 		userMapper:      um,
+		tm:              tm,
 	}
 
 	return lu
@@ -122,22 +124,12 @@ func (lu *Lookup) MetadataBackend() metadata.Backend {
 	return lu.metadataBackend
 }
 
-// ReadBlobSizeAttr reads the blobsize from the xattrs
-func (lu *Lookup) ReadBlobSizeAttr(ctx context.Context, path string) (int64, error) {
-	blobSize, err := lu.metadataBackend.GetInt64(ctx, path, prefixes.BlobsizeAttr)
+func (lu *Lookup) ReadBlobIDAndSizeAttr(ctx context.Context, path string, _ node.Attributes) (string, int64, error) {
+	fi, err := os.Stat(path)
 	if err != nil {
-		return 0, errors.Wrapf(err, "error reading blobsize xattr")
+		return "", 0, errors.Wrap(err, "error stating file")
 	}
-	return blobSize, nil
-}
-
-// ReadBlobIDAttr reads the blobsize from the xattrs
-func (lu *Lookup) ReadBlobIDAttr(ctx context.Context, path string) (string, error) {
-	attr, err := lu.metadataBackend.Get(ctx, path, prefixes.BlobIDAttr)
-	if err != nil {
-		return "", errors.Wrapf(err, "error reading blobid xattr")
-	}
-	return string(attr), nil
+	return "", fi.Size(), nil
 }
 
 // TypeFromPath returns the type of the node at the given path
@@ -420,4 +412,9 @@ func (lu *Lookup) GenerateSpaceID(spaceType string, owner *user.User) (string, e
 	default:
 		return "", fmt.Errorf("unsupported space type: %s", spaceType)
 	}
+}
+
+// TimeManager returns the time manager
+func (lu *Lookup) TimeManager() node.TimeManager {
+	return lu.tm
 }

@@ -367,7 +367,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.24.1
+# github.com/cs3org/reva/v2 v2.24.2-0.20240917121936-fb394587b472
 ## explicit; go 1.21
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -670,6 +670,8 @@ github.com/cs3org/reva/v2/pkg/storage/fs/posix
 github.com/cs3org/reva/v2/pkg/storage/fs/posix/blobstore
 github.com/cs3org/reva/v2/pkg/storage/fs/posix/lookup
 github.com/cs3org/reva/v2/pkg/storage/fs/posix/options
+github.com/cs3org/reva/v2/pkg/storage/fs/posix/timemanager
+github.com/cs3org/reva/v2/pkg/storage/fs/posix/trashbin
 github.com/cs3org/reva/v2/pkg/storage/fs/posix/tree
 github.com/cs3org/reva/v2/pkg/storage/fs/registry
 github.com/cs3org/reva/v2/pkg/storage/fs/s3
@@ -693,6 +695,8 @@ github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/permissions
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/spaceidindex
+github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/timemanager
+github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/trashbin
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree/propagator
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload
