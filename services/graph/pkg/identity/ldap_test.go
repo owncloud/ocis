@@ -116,14 +116,14 @@ func TestCreateUser(t *testing.T) {
 
 	ar := ldap.NewAddRequest(fmt.Sprintf("uid=user,%s", lconfig.UserBaseDN), nil)
 	ar.Attribute(lconfig.UserDisplayNameAttribute, []string{displayName})
-	ar.Attribute(lconfig.UserNameAttribute, []string{userName})
 	ar.Attribute(lconfig.UserEmailAttribute, []string{mail})
+	ar.Attribute(lconfig.UserNameAttribute, []string{userName})
 	ar.Attribute("sn", []string{surname})
 	ar.Attribute("givenname", []string{givenName})
-	ar.Attribute("objectClass", []string{"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"})
-	ar.Attribute("cn", []string{userName})
 	ar.Attribute(lconfig.UserEnabledAttribute, []string{"TRUE"})
 	ar.Attribute(lconfig.UserTypeAttribute, []string{"Member"})
+	ar.Attribute("cn", []string{userName})
+	ar.Attribute("objectClass", []string{"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"})
 
 	l := &mocks.Client{}
 	l.On("Search", mock.Anything).
