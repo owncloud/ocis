@@ -205,4 +205,27 @@ class CollaborationContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @When user :user tries to create a file :file inside deleted folder using wopi endpoint
+	 *
+	 * @param string $user
+	 * @param string $file
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userTriesToCreateAFileInsideDeletedFolderUsingWopiEndpoint(string $user, string $file): void {
+		$parentContainerId = $this->featureContext->getStoredFileID();
+		$this->featureContext->setResponse(
+			CollaborationHelper::createFile(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$parentContainerId,
+				$file
+			)
+		);
+	}
 }
