@@ -11,6 +11,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -28,6 +29,7 @@ var (
 	MessageShareCreated    = l10n.Template("{user} shared {resource} with {sharee}")
 	MessageShareDeleted    = l10n.Template("{user} removed {sharee} from {resource}")
 	MessageLinkCreated     = l10n.Template("{user} shared {resource} via link")
+	MessageLinkUpdated     = l10n.Template("{user} updated {field} for a link {token} on {resource}")
 	MessageLinkDeleted     = l10n.Template("{user} removed link to {resource}")
 	MessageSpaceShared     = l10n.Template("{user} added {sharee} as member of {space}")
 	MessageSpaceUnshared   = l10n.Template("{user} removed {sharee} from {space}")
@@ -212,6 +214,33 @@ func WithSpace(spaceid *provider.StorageSpaceId) ActivityOption {
 			Name: s.GetName(),
 		}
 
+		return nil
+	}
+}
+
+func WithLinkFieldUpdated(e *events.LinkUpdated) ActivityOption {
+	return func(_ context.Context, _ gateway.GatewayAPIClient, vars map[string]interface{}) error {
+		f := "some field"
+		switch e.FieldUpdated {
+		case "TYPE_PERMISSIONS":
+			f = "permission"
+		case "TYPE_PASSWORD":
+			f = "password"
+		case "TYPE_EXPIRATION":
+			f = "expiration date"
+		case "TYPE_DISPLAYNAME":
+			f = "display name"
+		case "TYPE_DESCRIPTION":
+			f = "description"
+		}
+		vars["field"] = Resource{
+			ID:   e.ItemID.GetOpaqueId(),
+			Name: f,
+		}
+		vars["token"] = Resource{
+			ID:   e.ItemID.GetOpaqueId(),
+			Name: e.Token,
+		}
 		return nil
 	}
 }
