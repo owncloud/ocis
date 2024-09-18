@@ -1,6 +1,6 @@
 ---
 title: Policies
-date: 2024-09-18T08:24:02.945690942Z
+date: 2024-09-18T08:50:51.161273487Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/policies
