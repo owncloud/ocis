@@ -22,6 +22,7 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
@@ -33,6 +34,7 @@ use TestHelpers\CollaborationHelper;
 class CollaborationContext implements Context {
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
+	private string $storeLastAppEndpointResponse;
 
 	/**
 	 * This will run before EVERY scenario.
@@ -50,6 +52,22 @@ class CollaborationContext implements Context {
 		// Get all the contexts you need in this context from here
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->spacesContext = $environment->getContext('SpacesContext');
+	}
+
+	/**
+	 * @param string $appData
+	 *
+	 * @return void
+	 */
+	public function storeLastAppEndpointResponse(string $appData): void {
+		$this->storeLastAppEndpointResponse = $appData;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLastAppEndpointResponse(): string {
+		return $this->storeLastAppEndpointResponse;
 	}
 
 	/**
@@ -252,6 +270,55 @@ class CollaborationContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$parentContainerId,
 				$file
+			)
+		);
+	}
+
+	/**
+	 * @Given user :user has sent POST request on app endpoint:
+	 *
+	 * @param string $user
+	 * @param TableNode $items
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasSentPostRequestOnAppEndpoint(string $user, TableNode $items): void {
+		$rows = $items->getRowsHash();
+		$appResponse = CollaborationHelper::sendPOSTRequestToAppOpen(
+			$this->spacesContext->getFileId($user, $rows['space'], $rows['resource']),
+			$rows['suites'],
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef()
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $appResponse);
+		$this->storeLastAppEndpointResponse($appResponse->getBody()->getContents());
+	}
+
+	/**
+	 * @When user :user tries to get the file information of file using wopi endpoint
+	 * @When user :user gets the file information of file using wopi endpoint
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userTriesToCheckTheInformationOfDeletedFileUsingWopiEndpoint(string $user):void {
+		$response = json_decode($this->getLastAppEndpointResponse());
+		$accessToken = $response->form_parameters->access_token;
+
+		// Extract the WOPISrc from the app_url
+		$parsedUrl = parse_url($response->app_url);
+		parse_str($parsedUrl['query'], $queryParams);
+		$wopiSrc = $queryParams['WOPISrc'];
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$wopiSrc . "?access_token=$accessToken",
+				$this->featureContext->getStepLineRef()
 			)
 		);
 	}
