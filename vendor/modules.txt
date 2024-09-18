@@ -1187,7 +1187,7 @@ github.com/hashicorp/consul/api/watch
 # github.com/hashicorp/go-cleanhttp v0.5.2
 ## explicit; go 1.13
 github.com/hashicorp/go-cleanhttp
-# github.com/hashicorp/go-hclog v1.6.2
+# github.com/hashicorp/go-hclog v1.6.3
 ## explicit; go 1.13
 github.com/hashicorp/go-hclog
 # github.com/hashicorp/go-immutable-radix v1.3.1
@@ -1195,7 +1195,7 @@ github.com/hashicorp/go-hclog
 github.com/hashicorp/go-immutable-radix
 # github.com/hashicorp/go-msgpack v1.1.5
 ## explicit; go 1.13
-# github.com/hashicorp/go-plugin v1.6.0
+# github.com/hashicorp/go-plugin v1.6.1
 ## explicit; go 1.17
 github.com/hashicorp/go-plugin
 github.com/hashicorp/go-plugin/internal/cmdrunner
@@ -1679,7 +1679,7 @@ github.com/prometheus/alertmanager/asset
 github.com/prometheus/alertmanager/pkg/labels
 github.com/prometheus/alertmanager/template
 github.com/prometheus/alertmanager/types
-# github.com/prometheus/client_golang v1.20.1
+# github.com/prometheus/client_golang v1.20.2
 ## explicit; go 1.20
 github.com/prometheus/client_golang/internal/github.com/golang/gddo/httputil
 github.com/prometheus/client_golang/internal/github.com/golang/gddo/httputil/header
@@ -1891,7 +1891,7 @@ github.com/trustelem/zxcvbn/internal/mathutils
 github.com/trustelem/zxcvbn/match
 github.com/trustelem/zxcvbn/matching
 github.com/trustelem/zxcvbn/scoring
-# github.com/tus/tusd/v2 v2.4.0
+# github.com/tus/tusd/v2 v2.5.0
 ## explicit; go 1.20
 github.com/tus/tusd/v2/pkg/handler
 # github.com/unrolled/secure v1.14.0 => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
@@ -2288,8 +2288,8 @@ golang.org/x/tools/internal/versions
 ## explicit; go 1.17
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
-# google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de
-## explicit; go 1.19
+# google.golang.org/genproto v0.0.0-20240823204242-4ba0660f739c
+## explicit; go 1.21
 google.golang.org/genproto/protobuf/field_mask
 # google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1
 ## explicit; go 1.21

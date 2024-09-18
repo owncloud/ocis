@@ -199,7 +199,6 @@ func (handler *UnroutedHandler) Middleware(h http.Handler) http.Handler {
 		if origin := r.Header.Get("Origin"); !cors.Disable && origin != "" {
 			originIsAllowed := cors.AllowOrigin.MatchString(origin)
 			if !originIsAllowed {
-				fmt.Println("ORIGIN IS NOT ALLOWED", origin)
 				handler.sendError(c, ErrOriginNotAllowed)
 				return
 			}
@@ -397,7 +396,7 @@ func (handler *UnroutedHandler) PostFile(w http.ResponseWriter, r *http.Request)
 
 	handler.Metrics.incUploadsCreated()
 	c.log = c.log.With("id", id)
-	c.log.Info("UploadCreated", "id", id, "size", size, "url", url)
+	c.log.Info("UploadCreated", "size", size, "url", url)
 
 	if handler.config.NotifyCreatedUploads {
 		handler.CreatedUploads <- newHookEvent(c, info)
@@ -411,8 +410,10 @@ func (handler *UnroutedHandler) PostFile(w http.ResponseWriter, r *http.Request)
 		}
 		info.Offset = size
 
-		if handler.config.NotifyCompleteUploads {
-			handler.CompleteUploads <- newHookEvent(c, info)
+		resp, err = handler.emitFinishEvents(c, resp, info)
+		if err != nil {
+			handler.sendError(c, err)
+			return
 		}
 	}
 
@@ -692,14 +693,12 @@ func (handler *UnroutedHandler) HeadFile(w http.ResponseWriter, r *http.Request)
 // PatchFile adds a chunk to an upload. This operation is only allowed
 // if enough space in the upload is left.
 func (handler *UnroutedHandler) PatchFile(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("PATCH FILE")
 	c := handler.getContext(w, r)
 
 	isTusV1 := !handler.usesIETFDraft(r)
 
 	// Check for presence of application/offset+octet-stream
 	if isTusV1 && r.Header.Get("Content-Type") != "application/offset+octet-stream" {
-		fmt.Println("WRONG CONTENT TYPE")
 		handler.sendError(c, ErrInvalidContentType)
 		return
 	}
@@ -707,14 +706,12 @@ func (handler *UnroutedHandler) PatchFile(w http.ResponseWriter, r *http.Request
 	// Check for presence of a valid Upload-Offset Header
 	offset, err := strconv.ParseInt(r.Header.Get("Upload-Offset"), 10, 64)
 	if err != nil || offset < 0 {
-		fmt.Println("WRONG OFFSET")
 		handler.sendError(c, ErrInvalidOffset)
 		return
 	}
 
 	id, err := extractIDFromPath(r.URL.Path)
 	if err != nil {
-		fmt.Println("WRONG ID")
 		handler.sendError(c, err)
 		return
 	}
@@ -723,7 +720,6 @@ func (handler *UnroutedHandler) PatchFile(w http.ResponseWriter, r *http.Request
 	if handler.composer.UsesLocker {
 		lock, err := handler.lockUpload(c, id)
 		if err != nil {
-			fmt.Println("WRONG LOCK")
 			handler.sendError(c, err)
 			return
 		}
@@ -733,27 +729,23 @@ func (handler *UnroutedHandler) PatchFile(w http.ResponseWriter, r *http.Request
 
 	upload, err := handler.composer.Core.GetUpload(c, id)
 	if err != nil {
-		fmt.Println("WRONG UPLOAD")
 		handler.sendError(c, err)
 		return
 	}
 
 	info, err := upload.GetInfo(c)
 	if err != nil {
-		fmt.Println("WRONG INFO")
 		handler.sendError(c, err)
 		return
 	}
 
 	// Modifying a final upload is not allowed
 	if info.IsFinal {
-		fmt.Println("WRONG FINAL")
 		handler.sendError(c, ErrModifyFinal)
 		return
 	}
 
 	if offset != info.Offset {
-		fmt.Println("WRONG INFO OFFSET")
 		handler.sendError(c, ErrMismatchOffset)
 		return
 	}
@@ -770,32 +762,27 @@ func (handler *UnroutedHandler) PatchFile(w http.ResponseWriter, r *http.Request
 	// Do not proxy the call to the data store if the upload is already completed
 	if !info.SizeIsDeferred && info.Offset == info.Size {
 		resp.Header["Upload-Offset"] = strconv.FormatInt(offset, 10)
-		fmt.Println("UPLOAD ALREADY COMPLETED")
 		handler.sendResp(c, resp)
 		return
 	}
 
 	if r.Header.Get("Upload-Length") != "" {
 		if !handler.composer.UsesLengthDeferrer {
-			fmt.Println("UPLOAD LENGTH DEFERRER")
 			handler.sendError(c, ErrNotImplemented)
 			return
 		}
 		if !info.SizeIsDeferred {
-			fmt.Println("UPLOAD LENGTH NOT DEFERED")
 			handler.sendError(c, ErrInvalidUploadLength)
 			return
 		}
 		uploadLength, err := strconv.ParseInt(r.Header.Get("Upload-Length"), 10, 64)
 		if err != nil || uploadLength < 0 || uploadLength < info.Offset || (handler.config.MaxSize > 0 && uploadLength > handler.config.MaxSize) {
-			fmt.Println("UPLOAD LENGTH INVALID")
 			handler.sendError(c, ErrInvalidUploadLength)
 			return
 		}
 
 		lengthDeclarableUpload := handler.composer.LengthDeferrer.AsLengthDeclarableUpload(upload)
 		if err := lengthDeclarableUpload.DeclareLength(c, uploadLength); err != nil {
-			fmt.Println("UPLOAD LENGTH DECLARED")
 			handler.sendError(c, err)
 			return
 		}
@@ -806,7 +793,6 @@ func (handler *UnroutedHandler) PatchFile(w http.ResponseWriter, r *http.Request
 
 	resp, err = handler.writeChunk(c, resp, upload, info)
 	if err != nil {
-		fmt.Println("CANT WRITE CHUNK")
 		handler.sendError(c, err)
 		return
 	}
@@ -815,7 +801,6 @@ func (handler *UnroutedHandler) PatchFile(w http.ResponseWriter, r *http.Request
 	if willCompleteUpload && info.SizeIsDeferred {
 		info, err = upload.GetInfo(c)
 		if err != nil {
-			fmt.Println("CANT GET INFO")
 			handler.sendError(c, err)
 			return
 		}
@@ -824,7 +809,6 @@ func (handler *UnroutedHandler) PatchFile(w http.ResponseWriter, r *http.Request
 
 		lengthDeclarableUpload := handler.composer.LengthDeferrer.AsLengthDeclarableUpload(upload)
 		if err := lengthDeclarableUpload.DeclareLength(c, uploadLength); err != nil {
-			fmt.Println("CANT UPLOAD LENGTH")
 			handler.sendError(c, err)
 			return
 		}
@@ -834,14 +818,12 @@ func (handler *UnroutedHandler) PatchFile(w http.ResponseWriter, r *http.Request
 
 		resp, err = handler.finishUploadIfComplete(c, resp, upload, info)
 		if err != nil {
-			fmt.Println("CANT COMPLETE")
 			handler.sendError(c, err)
 			return
 		}
 	}
 
 	handler.sendResp(c, resp)
-	fmt.Println("PATCH COMPLETE")
 }
 
 // writeChunk reads the body from the requests r and appends it to the upload
@@ -956,31 +938,42 @@ func (handler *UnroutedHandler) writeChunk(c *httpContext, resp HTTPResponse, up
 
 // finishUploadIfComplete checks whether an upload is completed (i.e. upload offset
 // matches upload size) and if so, it will call the data store's FinishUpload
-// function and send the necessary message on the CompleteUpload channel.
+// function and emit the necessary events for the hooks.
 func (handler *UnroutedHandler) finishUploadIfComplete(c *httpContext, resp HTTPResponse, upload Upload, info FileInfo) (HTTPResponse, error) {
 	// If the upload is completed, ...
 	if !info.SizeIsDeferred && info.Offset == info.Size {
+		var err error
 		// ... allow the data storage to finish and cleanup the upload
-		if err := upload.FinishUpload(c); err != nil {
+		if err = upload.FinishUpload(c); err != nil {
 			return resp, err
 		}
 
-		// ... allow the hook callback to run before sending the response
-		if handler.config.PreFinishResponseCallback != nil {
-			resp2, err := handler.config.PreFinishResponseCallback(newHookEvent(c, info))
-			if err != nil {
-				return resp, err
-			}
-			resp = resp.MergeWith(resp2)
+		// ... and call pre-finish callback and send post-finish notification.
+		resp, err = handler.emitFinishEvents(c, resp, info)
+		if err != nil {
+			return resp, err
 		}
+	}
 
-		c.log.Info("UploadFinished", "size", info.Size)
-		handler.Metrics.incUploadsFinished()
+	return resp, nil
+}
 
-		// ... send the info out to the channel
-		if handler.config.NotifyCompleteUploads {
-			handler.CompleteUploads <- newHookEvent(c, info)
+// emitFinishEvents calls the PreFinishResponseCallback function and sends
+// the necessary message on the CompleteUpload channel.
+func (handler *UnroutedHandler) emitFinishEvents(c *httpContext, resp HTTPResponse, info FileInfo) (HTTPResponse, error) {
+	if handler.config.PreFinishResponseCallback != nil {
+		resp2, err := handler.config.PreFinishResponseCallback(newHookEvent(c, info))
+		if err != nil {
+			return resp, err
 		}
+		resp = resp.MergeWith(resp2)
+	}
+
+	c.log.Info("UploadFinished", "size", info.Size)
+	handler.Metrics.incUploadsFinished()
+
+	if handler.config.NotifyCompleteUploads {
+		handler.CompleteUploads <- newHookEvent(c, info)
 	}
 
 	return resp, nil
@@ -1565,7 +1558,7 @@ func getRequestId(r *http.Request) string {
 	return reqId
 }
 
-// validateUploadId checks whether an ID included in a FileInfoChange struct is allowed.
+// validateUploadId checks whether an ID included in a FileInfoChanges struct is allowed.
 func validateUploadId(newId string) error {
 	if newId == "" {
 		// An empty ID from FileInfoChanges is allowed. The store will then

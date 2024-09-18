@@ -74,7 +74,7 @@ require (
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20240820135012-5fac8096ce9c
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.10
-	github.com/prometheus/client_golang v1.20.1
+	github.com/prometheus/client_golang v1.20.2
 	github.com/r3labs/sse/v2 v2.10.0
 	github.com/riandyrn/otelchi v0.9.0
 	github.com/rogpeppe/go-internal v1.12.0
@@ -88,7 +88,7 @@ require (
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.5
 	github.com/tidwall/gjson v1.17.3
-	github.com/tus/tusd/v2 v2.4.0
+	github.com/tus/tusd/v2 v2.5.0
 	github.com/unrolled/secure v1.14.0
 	github.com/urfave/cli/v2 v2.27.4
 	github.com/xhit/go-simple-mail/v2 v2.16.0
@@ -237,10 +237,10 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/hashicorp/consul/api v1.25.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-hclog v1.6.2 // indirect
+	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-msgpack v1.1.5 // indirect
-	github.com/hashicorp/go-plugin v1.6.0 // indirect
+	github.com/hashicorp/go-plugin v1.6.1 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/hashicorp/golang-lru v0.6.0 // indirect
 	github.com/hashicorp/serf v0.10.1 // indirect
@@ -347,7 +347,7 @@ require (
 	golang.org/x/time v0.6.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
+	google.golang.org/genproto v0.0.0-20240823204242-4ba0660f739c // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
