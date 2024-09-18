@@ -53,11 +53,23 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
+	gwc, err := s.gws.Next()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	rid, limit, rawActivityAccepted, activityAccepted, sort, err := s.getFilters(r.URL.Query().Get("kql"))
 	if err != nil {
 		s.log.Info().Str("query", r.URL.Query().Get("kql")).Err(err).Msg("error getting filters")
 		_, _ = w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	_, err = utils.GetResourceByID(ctx, rid, gwc)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
