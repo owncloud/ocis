@@ -315,3 +315,32 @@ Feature: previews of files downloaded through the webdav API
       | old              |
       | new              |
       | spaces           |
+
+
+  Scenario Outline: try to download preview of an image with preview set to 0
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "/testavatar.jpg"
+    When user "Alice" tries to download the preview of "/testavatar.jpg" with width "32" and height "32" and preview set to 0 using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded image should be "1240" pixels wide and "648" pixels high
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: try to download preview of a text file with preview set to 0
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "to preview" to "textfile.txt"
+    When user "Alice" tries to download the preview of "textfile.txt" with width "32" and height "32" and preview set to 0 using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the content in the response should match the following content:
+      """
+      to preview
+      """
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |

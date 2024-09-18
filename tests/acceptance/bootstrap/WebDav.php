@@ -3692,6 +3692,38 @@ trait WebDav {
 	}
 
 	/**
+	 * @When user :user tries to download the preview of :path with width :width and height :height and preview set to 0 using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $width
+	 * @param string $height
+	 *
+	 * @return void
+	 */
+	public function userDownloadsThePreviewOfWithPreviewZero(string $user, string $path, string $width, string $height) {
+		$user = $this->getActualUsername($user);
+		$urlParameter = [
+			'x' => $width,
+			'y' => $height,
+			'preview' => '0'
+		];
+		$response = $this->makeDavRequest(
+			$user,
+			"GET",
+			$path,
+			[],
+			null,
+			"files",
+			null,
+			false,
+			null,
+			$urlParameter,
+		);
+		$this->setResponse($response);
+	}
+
+	/**
 	 * @When user :user downloads the preview of shared resource :path with width :width and height :height using the WebDAV API
 	 *
 	 * @param string $user
