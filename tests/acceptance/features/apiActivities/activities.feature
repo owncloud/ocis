@@ -1356,7 +1356,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1390,7 +1390,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1424,7 +1424,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
