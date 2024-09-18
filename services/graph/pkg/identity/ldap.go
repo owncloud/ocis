@@ -22,10 +22,11 @@ import (
 )
 
 const (
-	_givenNameAttribute  = "givenname"
-	_surNameAttribute    = "sn"
-	_identitiesAttribute = "oCExternalIdentity"
-	ldapDateFormat       = "20060102150405Z0700"
+	givenNameAttribute  = "givenname"
+	surNameAttribute    = "sn"
+	identitiesAttribute = "oCExternalIdentity"
+	lastSignAttribute   = "oCLastSignInTimestamp"
+	ldapDateFormat      = "20060102150405Z0700"
 )
 
 // DisableUserMechanismType is used instead of directly using the string values from the configuration.
@@ -115,10 +116,10 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		mail:           config.UserEmailAttribute,
 		userName:       config.UserNameAttribute,
 		accountEnabled: config.UserEnabledAttribute,
-		givenName:      _givenNameAttribute,
-		surname:        _surNameAttribute,
+		givenName:      givenNameAttribute,
+		surname:        surNameAttribute,
 		userType:       config.UserTypeAttribute,
-		identities:     _identitiesAttribute,
+		identities:     identitiesAttribute,
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -404,25 +405,13 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 }
 
 func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
-	attrs := []string{
-		i.userAttributeMap.displayName,
-		i.userAttributeMap.id,
-		i.userAttributeMap.mail,
-		i.userAttributeMap.userName,
-		i.userAttributeMap.surname,
-		i.userAttributeMap.givenName,
-		i.userAttributeMap.accountEnabled,
-		i.userAttributeMap.userType,
-		i.userAttributeMap.identities,
-	}
-
 	filter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
 
 	if i.userFilter != "" {
 		filter = fmt.Sprintf("(&%s(%s))", filter, i.userFilter)
 	}
 
-	return i.getEntryByDN(dn, attrs, filter)
+	return i.getEntryByDN(dn, i.getUserAttrTypesForSearch(), filter)
 }
 
 func (i *LDAP) getEntryByDN(dn string, attrs []string, filter string) (*ldap.Entry, error) {
@@ -531,18 +520,7 @@ func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
 
 func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.userObjectClass, filter)
-	attrs := []string{
-		i.userAttributeMap.displayName,
-		i.userAttributeMap.id,
-		i.userAttributeMap.mail,
-		i.userAttributeMap.userName,
-		i.userAttributeMap.surname,
-		i.userAttributeMap.givenName,
-		i.userAttributeMap.accountEnabled,
-		i.userAttributeMap.userType,
-		i.userAttributeMap.identities,
-	}
-	return i.searchLDAPEntryByFilter(i.userBaseDN, attrs, filter)
+	return i.searchLDAPEntryByFilter(i.userBaseDN, i.getUserAttrTypesForSearch(), filter)
 }
 
 // GetUser implements the Backend Interface.
@@ -611,17 +589,7 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 	searchRequest := ldap.NewSearchRequest(
 		i.userBaseDN, i.userScope, ldap.NeverDerefAliases, 0, 0, false,
 		userFilter,
-		[]string{
-			i.userAttributeMap.displayName,
-			i.userAttributeMap.id,
-			i.userAttributeMap.mail,
-			i.userAttributeMap.userName,
-			i.userAttributeMap.surname,
-			i.userAttributeMap.givenName,
-			i.userAttributeMap.accountEnabled,
-			i.userAttributeMap.userType,
-			i.userAttributeMap.identities,
-		},
+		i.getUserAttrTypesForSearch(),
 		nil,
 	)
 	logger.Debug().Str("backend", "ldap").
@@ -688,7 +656,7 @@ func (i *LDAP) UpdateLastSignInDate(ctx context.Context, userID string, timestam
 	}
 
 	mr := ldap.ModifyRequest{DN: e.DN}
-	mr.Replace("oCLastSignInTimestamp", []string{timestamp.UTC().Format(ldapDateFormat)})
+	mr.Replace(lastSignAttribute, []string{timestamp.UTC().Format(ldapDateFormat)})
 	if err := i.conn.Modify(&mr); err != nil {
 		msg := "error updating last sign in date for user"
 		i.logger.Error().Err(err).Str("userid", userID).Msg(msg)
@@ -935,21 +903,22 @@ func (i *LDAP) identityToLDAPAttrValue(identity libregraph.ObjectIdentity) (stri
 	return identityStr, nil
 }
 
-func (i *LDAP) getUserAttrTypes() []string {
+func (i *LDAP) getUserAttrTypesForSearch() []string {
 	return []string{
 		i.userAttributeMap.displayName,
-		i.userAttributeMap.userName,
+		i.userAttributeMap.id,
 		i.userAttributeMap.mail,
+		i.userAttributeMap.userName,
 		i.userAttributeMap.surname,
 		i.userAttributeMap.givenName,
-		"objectClass",
-		"cn",
-		"owncloudUUID",
-		"userPassword",
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
 		i.userAttributeMap.identities,
 	}
+}
+
+func (i *LDAP) getUserAttrTypes() []string {
+	return append(i.getUserAttrTypesForSearch(), "cn", "userPassword", "objectClass")
 }
 
 func (i *LDAP) getUserLDAPDN(user libregraph.User) string {
