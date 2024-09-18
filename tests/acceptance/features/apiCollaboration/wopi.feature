@@ -924,3 +924,65 @@ Feature: collaboration (wopi)
       """
     And as "Alice" file "testFolder/simple.odt" should not exist
     And as "Brian" file "Shares/testFolder/simple.odt" should not exist
+
+
+  Scenario Outline: public user with permission edit/upload/createOnly creates odt file inside public folder using wopi endpoint
+    Given user "Alice" has created folder "publicFolder"
+    And user "Alice" has created the following resource link share:
+      | resource        | publicFolder       |
+      | space           | Personal           |
+      | permissionsRole | <permissions-role> |
+      | password        | %public%           |
+    When the public creates a file "simple.odt" inside the last shared public link folder with password "%public%" using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "pattern": "^%file_id_pattern%$"
+          }
+        }
+      }
+      """
+    And as "Alice" file "publicFolder/simple.odt" should exist
+    Examples:
+      | permissions-role |
+      | edit             |
+      | upload           |
+      | createOnly       |
+
+
+  Scenario: public user with permission view tries to creates odt file inside public folder using wopi endpoint
+    Given user "Alice" has created folder "publicFolder"
+    And user "Alice" has created the following resource link share:
+      | resource        | publicFolder |
+      | space           | Personal     |
+      | permissionsRole | view         |
+      | password        | %public%     |
+    When the public tries to create a file "simple.odt" inside the last shared public link folder with password "%public%" using wopi endpoint
+    Then the HTTP status code should be "500"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "SERVER_ERROR"
+          },
+          "message": {
+            "const": "error calling InitiateFileUpload"
+          }
+        }
+      }
+      """
+    And as "Alice" file "publicFolder/simple.odt" should not exist

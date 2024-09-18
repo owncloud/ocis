@@ -105,15 +105,61 @@ class CollaborationContext implements Context {
 	 * @param string $space
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userCreatesFileInsideFolderInSpaceUsingWopiEndpoint(string $user, string $file, string $folder, string $space): void {
-		$parent_container_id = $this->spacesContext->getResourceId($user, $space, $folder);
+		$parentContainerId = $this->spacesContext->getResourceId($user, $space, $folder);
 		$this->featureContext->setResponse(
-			HttpRequestHelper::post(
-				$this->featureContext->getBaseUrl() . "/app/new?parent_container_id=$parent_container_id&filename=$file",
+			CollaborationHelper::createFile(
+				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$user,
-				$this->featureContext->getPasswordForUser($user)
+				$this->featureContext->getPasswordForUser($user),
+				$parentContainerId,
+				$file
+			)
+		);
+	}
+
+	/**
+	 * @When the public creates a file :file inside the last shared public link folder with password :password using wopi endpoint
+	 * @When the public tries to create a file :file inside the last shared public link folder with password :password using wopi endpoint
+	 *
+	 * @param string $file
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function thePublicCreatesAFileInsideTheLastSharedPublicLinkFolderWithPasswordUsingWopiEndpoint(string $file, string $password): void {
+		$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
+		$davPath = WebDavHelper::getDavPath($token, null, "public-files-new");
+		$response = HttpRequestHelper::sendRequest(
+			$this->featureContext->getBaseUrl() . "/$davPath",
+			$this->featureContext->getStepLineRef(),
+			"PROPFIND",
+			"public",
+			$this->featureContext->getActualPassword($password)
+		);
+		$responseXml = HttpRequestHelper::getResponseXml(
+			$response,
+			__METHOD__
+		);
+		$xmlPart = $responseXml->xpath("//d:prop/oc:fileid");
+		$parentContainerId = (string) $xmlPart[0];
+
+		$headers = [
+			"Public-Token" => $token
+		];
+		$this->featureContext->setResponse(
+			CollaborationHelper::createFile(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				"public",
+				$this->featureContext->getActualPassword($password),
+				$parentContainerId,
+				$file,
+				$headers
 			)
 		);
 	}
