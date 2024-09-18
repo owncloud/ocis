@@ -492,8 +492,7 @@ class FeatureContext extends BehatVariablesContext {
 		$this->alternateAdminPassword = "IHave99LotsOfPriv";
 		$this->publicLinkSharePassword = "publicPwd:1";
 
-		// in case of CI deployment we take the server url from the environment
-		$testServerUrl = \getenv('TEST_SERVER_URL');
+		$testServerUrl = OcisHelper::getServerUrl();
 		if ($testServerUrl !== false) {
 			$this->baseUrl = \rtrim($testServerUrl, '/');
 			$this->localBaseUrl = $this->baseUrl;

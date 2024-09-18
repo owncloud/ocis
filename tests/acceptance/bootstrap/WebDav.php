@@ -37,7 +37,8 @@ use TestHelpers\GraphHelper;
  * WebDav functions
  */
 trait WebDav {
-	private int $currentDAVPath = WebDavHelper::DAV_VERSION_SPACES;
+	// TODO: make spaces path the default one
+	private int $currentDAVPath = WebDavHelper::DAV_VERSION_NEW;
 
 	/**
 	 * @var ResponseInterface[]
@@ -393,7 +394,6 @@ trait WebDav {
 		$urlParameter = [
 			'x' => $width,
 			'y' => $height,
-			'forceIcon' => '0',
 			'preview' => '1'
 		];
 		return $this->makeDavRequest(
@@ -3666,7 +3666,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userDownloadsThePreviewOfSharedResourceWithWidthAndHeightUsingTheWebdavApi(string $user, string $path, string $width, string $height): void {
-		if ($this->getDavPathVersion() === 3) {
+		if ($this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
 			$this->setResponse($this->downloadSharedFilePreview($user, $path, $width, $height));
 		} else {
 			$this->setResponse($this->downloadPreviews($user, $path, null, $width, $height));
@@ -3719,7 +3719,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userHasDownloadedThePreviewOfSharedResourceWithWidthAndHeight(string $user, string $path, string $width, string $height): void {
-		if ($this->getDavPathVersion() === 3) {
+		if ($this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
 			$response = $this->downloadSharedFilePreview($user, $path, $width, $height);
 		} else {
 			$response = $this->downloadPreviews($user, $path, null, $width, $height);
@@ -3743,7 +3743,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function asUserThePreviewOfSharedResourceWithWidthAndHeightShouldHaveBeenChanged(string $user, string $path, string $width, string $height):void {
-		if ($this->getDavPathVersion() === 3) {
+		if ($this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
 			$response = $this->downloadSharedFilePreview($user, $path, $width, $height);
 		} else {
 			$response = $this->downloadPreviews($user, $path, null, $width, $height);
@@ -3772,7 +3772,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userUploadsFileWithContentSharedResourceToUsingTheWebdavApi(string $user, string $content, string $destination): void {
-		if ($this->getDavPathVersion() === 3) {
+		if ($this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
 			$this->setResponse($this->uploadToSharedFolder($user, $destination, $content));
 		} else {
 			$this->setResponse($this->uploadFileWithContent($user, $content, $destination, null));
@@ -3838,7 +3838,7 @@ trait WebDav {
 		$sharesPath = $this->getSharesMountPath($user, $path) . '/?' . $urlParameter;
 
 		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
-		$fullUrl = $this->getBaseUrl() . "/$davPath" . $sharesPath;
+		$fullUrl = $this->getBaseUrl() . "/$davPath/$sharesPath";
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
@@ -3865,7 +3865,7 @@ trait WebDav {
 		$sharesPath = $this->getSharesMountPath($user, $destination);
 
 		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
-		$fullUrl = $this->getBaseUrl() . "/$davPath" . $sharesPath;
+		$fullUrl = $this->getBaseUrl() . "/$davPath/$sharesPath";
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
@@ -4417,10 +4417,12 @@ trait WebDav {
 	 */
 	public function thePublicListsTheResourcesInTheLastCreatedPublicLinkWithDepthUsingTheWebdavApi(string $depth):void {
 		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
+		// https://drone.owncloud.com/owncloud/ocis/39693/29/6
 		$response = $this->listFolder(
 			$token,
 			'/',
 			$depth,
+			null,
 			null,
 			"public-files"
 		);
@@ -4603,7 +4605,7 @@ trait WebDav {
 		if ($entryNameToSearch !== null) {
 			$entryNameToSearch = \trim($entryNameToSearch, "/");
 		}
-		$spacesBaseUrl = "/" . webDavHelper::getDavPath(null, webDavHelper::DAV_VERSION_SPACES, 'files', $spaceId);
+		$spacesBaseUrl = "/" . WebDavHelper::getDavPath(null, WebDavHelper::DAV_VERSION_SPACES, 'files', $spaceId);
 		$searchResults = $this->getResponseXml()->xpath("//d:multistatus/d:response");
 		$results = [];
 		foreach ($searchResults as $item) {
