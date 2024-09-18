@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fixed activity filter depth: [#10031](https://github.com/owncloud/ocis/pull/10031)
 * Bugfix - Fixed the ocm tocken: [#10050](https://github.com/owncloud/ocis/pull/10050)
 * Bugfix - Fix ocm space sharing: [#10060](https://github.com/owncloud/ocis/pull/10060)
+* Bugfix - Fix Activities leak: [#10092](https://github.com/owncloud/ocis/pull/10092)
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 
@@ -88,6 +89,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10051
    https://github.com/owncloud/ocis/pull/10060
+
+* Bugfix - Fix Activities leak: [#10092](https://github.com/owncloud/ocis/pull/10092)
+
+   Fix activities endpoint by preventing unauthorized users to get activities
+
+   https://github.com/owncloud/ocis/pull/10092
 
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 
