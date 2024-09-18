@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"path/filepath"
 	"time"
 
