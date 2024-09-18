@@ -31,6 +31,7 @@ use TestHelpers\OcsApiHelper;
 use TestHelpers\SharingHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\TranslationHelper;
+use TestHelpers\WebDavHelper;
 use GuzzleHttp\Exception\GuzzleException;
 
 /**
@@ -3247,7 +3248,7 @@ trait Sharing {
 	public function getPublicPreviewOfFile(string $fileName, string $token):ResponseInterface {
 		$baseUrl = $this->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath($token, $this->getDavPathVersion(), "public-files");
-		$url = "{$baseUrl}{$davPath}/$fileName?preview=1";
+		$url = "{$baseUrl}/{$davPath}/$fileName?preview=1";
 		return HttpRequestHelper::get(
 			$url,
 			$this->getStepLineRef()

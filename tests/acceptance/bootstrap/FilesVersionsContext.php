@@ -37,13 +37,14 @@ require_once 'bootstrap.php';
 class FilesVersionsContext implements Context {
 	private FeatureContext $featureContext;
 
+	// TODO: check if this can be removed
 	/**
 	 * @param string $fileId
 	 *
 	 * @return string
 	 */
 	private function getVersionsPathForFileId(string $fileId):string {
-		return "/meta/$fileId/v";
+		return "$fileId/v";
 	}
 
 	/**
@@ -127,31 +128,29 @@ class FilesVersionsContext implements Context {
 			null,
 			null,
 			$spaceId,
-			null,
-			'2'
+			"versions"
 		);
 	}
 
 	/**
-	 * @When user :user gets the number of versions of file :resource using file-id path :endpoint
-	 * @When user :user tries to get the number of versions of file :resource using file-id path :endpoint
+	 * @When user :user gets the number of versions of file :resource using file-id :fileId
+	 * @When user :user tries to get the number of versions of file :resource using file-id :fileId
 	 *
 	 * @param string $user
-	 * @param string $endpoint
+	 * @param string $fileId
 	 *
 	 * @return void
 	 */
-	public function userGetsTheNumberOfVersionsOfFileOfTheSpace(string $user, string $endpoint):void {
+	public function userGetsTheNumberOfVersionsOfFileOfTheSpace(string $user, string $fileId):void {
 		$this->featureContext->setResponse(
 			$this->featureContext->makeDavRequest(
 				$user,
 				"PROPFIND",
-				$endpoint,
+				$this->getVersionsPathForFileId($fileId),
 				null,
 				null,
 				null,
-				"versions",
-				(string)$this->featureContext->getDavPathVersion()
+				"versions"
 			)
 		);
 	}
@@ -194,8 +193,7 @@ class FilesVersionsContext implements Context {
 			null,
 			$body,
 			null,
-			null,
-			'2'
+			"versions",
 		);
 	}
 
@@ -306,7 +304,7 @@ class FilesVersionsContext implements Context {
 	):void {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
-		Assert::assertNotNull($fileId, __METHOD__ . " file '$path' for user '$user' not found (the file may not exist)");
+		Assert::assertNotNull($fileId, __METHOD__ . ". file '$path' for user '$user' not found (the file may not exist)");
 		$this->assertFileVersionsCount($user, $fileId, $count);
 	}
 
