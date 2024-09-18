@@ -14,7 +14,7 @@ default:
           ldapInitialUserFilePath: /../config/ldap-users.ldif
       contexts:
         - FeatureContext: &common_feature_context_params
-            baseUrl: http://localhost:8080
+            baseUrl: http://localhost:8080 # TODO: clean me
             adminUsername: admin
             adminPassword: admin
             regularUserPassword: 123456

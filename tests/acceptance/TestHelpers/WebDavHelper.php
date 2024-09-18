@@ -716,7 +716,7 @@ class WebDavHelper {
 		}
 
 		// get space id if testing with spaces dav
-		if ($spaceId === null && $davPathVersionToUse === self::DAV_VERSION_SPACES) {
+		if ($spaceId === null && $davPathVersionToUse === self::DAV_VERSION_SPACES && $type !== "public-files") {
 			$path = \ltrim($path, "/");
 			if (\str_starts_with($path, "Shares/")) {
 				$spaceId = self::getSharesSpaceIdForUser(
@@ -807,7 +807,7 @@ class WebDavHelper {
 	 * @return string
 	 */
 	public static function getDavPath(
-		?string $userOrToken, // merge to userOrTokenOrId
+		?string $userOrToken, // TODO: merge to userOrTokenOrSpaceId
 		?int $davPathVersionToUse = null,
 		?string $type = "files",
 		?string $spaceId = null

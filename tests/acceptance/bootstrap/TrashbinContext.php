@@ -248,17 +248,16 @@ class TrashbinContext implements Context {
 
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
-		// set endpoint according to webdav request (2 = new, 3 = spaces)
-		$endpoint = WebDavHelper::getDavPath($user, $davPathVersion, "trash-bin");
+		$spaceId = null;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$space_id = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
+			$spaceId = WebDavHelper::getPersonalSpaceIdForUser(
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$this->featureContext->getStepLineRef()
 			);
-			$endpoint = WebDavHelper::getDavPath($user, $davPathVersion, "trash-bin", $space_id);
 		}
+		$endpoint = WebDavHelper::getDavPath($user, $davPathVersion, "trash-bin", $spaceId);
 
 		// filter out the collection itself, we only want to return the members
 		$files = \array_filter(
@@ -786,7 +785,7 @@ class TrashbinContext implements Context {
 		$destinationPath = \trim($destinationPath, '/');
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
-		$destinationValue = "{$baseUrl}/{$daPath}/{$destinationPath}";
+		$destinationValue = "{$baseUrl}/{$davPath}/{$destinationPath}";
 
 		$trashItemHRef = $this->convertTrashbinHref($trashItemHRef);
 		$headers['Destination'] = $destinationValue;

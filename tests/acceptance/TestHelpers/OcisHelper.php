@@ -34,6 +34,16 @@ use GuzzleHttp\Exception\GuzzleException;
  */
 class OcisHelper {
 	/**
+	 * @return string
+	 */
+	public static function getServerUrl(): string {
+		if (\getenv('TEST_SERVER_URL')) {
+			return \getenv('TEST_SERVER_URL');
+		}
+		return 'https://localhost:9200';
+	}
+
+	/**
 	 * @return bool
 	 */
 	public static function isTestingOnReva():bool {

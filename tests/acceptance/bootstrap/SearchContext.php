@@ -105,6 +105,7 @@ class SearchContext implements Context {
 		}
 		$body .= "	</oc:search-files>";
 		$davPathVersionToUse = $this->featureContext->getDavPathVersion();
+		// TODO: need to fix for spaces
 		$davPath = WebDavHelper::getDavPath($doDavRequestAsUser ?? $user, $davPathVersionToUse, 'files', null);
 
 		if ($davPathVersionToUse == WebDavHelper::DAV_VERSION_NEW) {
