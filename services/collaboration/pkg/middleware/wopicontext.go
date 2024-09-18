@@ -45,8 +45,23 @@ type WopiContext struct {
 // and the WopiContext
 func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		// include additional info in the context's logger
+		// we might need to check https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/common-headers
+		// although some headers might not be sent depending on the client.
+		logger := zerolog.Ctx(ctx)
+		wopiLogger := logger.With().
+			Str("WopiSessionId", r.Header.Get("X-WOPI-SessionId")).
+			Str("WopiOverride", r.Header.Get("X-WOPI-Override")).
+			Str("WopiProof", r.Header.Get("X-WOPI-Proof")).
+			Str("WopiProofOld", r.Header.Get("X-WOPI-ProofOld")).
+			Str("WopiStamp", r.Header.Get("X-WOPI-TimeStamp")).
+			Logger()
+
 		accessToken := r.URL.Query().Get("access_token")
 		if accessToken == "" {
+			wopiLogger.Error().Msg("missing access token")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -62,14 +77,14 @@ func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handl
 		})
 
 		if err != nil {
+			wopiLogger.Error().Err(err).Msg("failed to parse jwt token")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 
-		ctx := r.Context()
-
 		wopiContextAccessToken, err := DecryptAES([]byte(cfg.Wopi.Secret), claims.WopiContext.AccessToken)
 		if err != nil {
+			wopiLogger.Error().Err(err).Msg("failed to decrypt reva access token")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -78,11 +93,13 @@ func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handl
 			"expires": int64(24 * 60 * 60),
 		})
 		if err != nil {
+			wopiLogger.Error().Err(err).Msg("failed to get a reva token manager")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 		user, _, err := tokenManager.DismantleToken(ctx, wopiContextAccessToken)
 		if err != nil {
+			wopiLogger.Error().Err(err).Msg("failed to dismantle reva token manager")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -94,15 +111,7 @@ func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handl
 		ctx = ctxpkg.ContextSetUser(ctx, user)
 
 		// include additional info in the context's logger
-		// we might need to check https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/common-headers
-		// although some headers might not be sent depending on the client.
-		logger := zerolog.Ctx(ctx)
-		wopiLogger := logger.With().
-			Str("WopiSessionId", r.Header.Get("X-WOPI-SessionId")).
-			Str("WopiOverride", r.Header.Get("X-WOPI-Override")).
-			Str("WopiProof", r.Header.Get("X-WOPI-Proof")).
-			Str("WopiProofOld", r.Header.Get("X-WOPI-ProofOld")).
-			Str("WopiStamp", r.Header.Get("X-WOPI-TimeStamp")).
+		wopiLogger = wopiLogger.With().
 			Str("FileReference", claims.WopiContext.FileReference.String()).
 			Str("ViewMode", claims.WopiContext.ViewMode.String()).
 			Str("Requester", user.GetId().String()).
