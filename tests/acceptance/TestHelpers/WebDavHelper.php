@@ -40,7 +40,6 @@ class WebDavHelper {
 	public const DAV_VERSION_OLD = 1;
 	public const DAV_VERSION_NEW = 2;
 	public const DAV_VERSION_SPACES = 3;
-	public static string $SPACE_ID_FROM_OCIS = '';
 
 	/**
 	 * @var array of users with their different space ids
@@ -82,6 +81,7 @@ class WebDavHelper {
 	 * @param string|null $user
 	 * @param string|null $password
 	 * @param string|null $path
+	 * @param string|null $spaceId
 	 * @param string|null $xRequestId
 	 * @param int|null $davPathVersionToUse
 	 *
@@ -93,6 +93,7 @@ class WebDavHelper {
 		?string $user,
 		?string $password,
 		?string $path,
+		?string $spaceId = null,
 		?string $xRequestId = '',
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW
 	): string {
@@ -110,6 +111,7 @@ class WebDavHelper {
 			"PROPFIND",
 			$path,
 			null,
+			$spaceId,
 			$xRequestId,
 			$body,
 			$davPathVersionToUse
@@ -190,6 +192,7 @@ class WebDavHelper {
 	 *        if an associative array is used, then the key will be used as namespace
 	 * @param string|null $xRequestId
 	 * @param string|null $folderDepth
+	 * @param string|null $spaceId
 	 * @param string|null $type
 	 * @param int|null $davPathVersionToUse
 	 * @param string|null $doDavRequestAsUser
@@ -207,6 +210,7 @@ class WebDavHelper {
 		?array $properties,
 		?string $xRequestId = '',
 		?string $folderDepth = '1',
+		?string $spaceId = null,
 		?string $type = "files",
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 		?string $doDavRequestAsUser = null,
@@ -228,6 +232,7 @@ class WebDavHelper {
 			"PROPFIND",
 			$path,
 			$headers,
+			$spaceId,
 			$xRequestId,
 			$body,
 			$davPathVersionToUse,
@@ -255,6 +260,7 @@ class WebDavHelper {
 	 *                                     e.g "x1='http://whatever.org/ns'"
 	 * @param int|null $davPathVersionToUse
 	 * @param string|null $type
+	 * @param string|null $spaceId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -269,7 +275,8 @@ class WebDavHelper {
 		?string $xRequestId = '',
 		?string $namespaceString = null,
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
-		?string $type="files"
+		?string $type="files",
+		?string $spaceId = null,
 	):ResponseInterface {
 		if ($namespaceString !== null) {
 			$ns = self::parseNamespace($namespaceString);
@@ -294,6 +301,7 @@ class WebDavHelper {
 			"PROPPATCH",
 			$path,
 			[],
+			$spaceId,
 			$xRequestId,
 			$body,
 			$davPathVersionToUse,
@@ -392,6 +400,7 @@ class WebDavHelper {
 			"PROPPATCH",
 			$path,
 			[],
+			null,
 			$xRequestId,
 			$body,
 			$davPathVersion,
@@ -407,6 +416,7 @@ class WebDavHelper {
 	 * @param string|null $password
 	 * @param string|null $path
 	 * @param string|null $folderDepth
+	 * @param string|null $spaceId
 	 * @param string|null $xRequestId
 	 * @param string[] $properties
 	 * @param string|null $type
@@ -421,6 +431,7 @@ class WebDavHelper {
 		?string $password,
 		?string $path,
 		?string $folderDepth,
+		?string $spaceId = null,
 		?string $xRequestId = '',
 		?array $properties = null,
 		?string $type = "files",
@@ -439,6 +450,7 @@ class WebDavHelper {
 			$properties,
 			$xRequestId,
 			$folderDepth,
+			$spaceId,
 			$type,
 			$davPathVersionToUse
 		);
@@ -641,6 +653,7 @@ class WebDavHelper {
 	 * @param string|null $method PUT, GET, DELETE, etc.
 	 * @param string|null $path
 	 * @param array|null $headers
+	 * @param string|null $spaceId
 	 * @param string|null $xRequestId
 	 * @param string|null|resource|StreamInterface $body
 	 * @param int|null $davPathVersionToUse (1|2|3)
@@ -666,6 +679,7 @@ class WebDavHelper {
 		?string $method,
 		?string $path,
 		?array $headers,
+		?string $spaceId = null,
 		?string $xRequestId = '',
 		$body = null,
 		?int $davPathVersionToUse = self::DAV_VERSION_OLD,
@@ -677,7 +691,7 @@ class WebDavHelper {
 		?Client $client = null,
 		?array $urlParameter = [],
 		?string $doDavRequestAsUser = null,
-		?bool $isGivenStep = false
+		?bool $isGivenStep = false,
 	):ResponseInterface {
 		$baseUrl = self::sanitizeUrl($baseUrl, true);
 
@@ -688,7 +702,7 @@ class WebDavHelper {
 		}
 
 		// get space id if testing with spaces dav
-		if (self::$SPACE_ID_FROM_OCIS === '' && $davPathVersionToUse === self::DAV_VERSION_SPACES) {
+		if ($spaceId === null && $davPathVersionToUse === self::DAV_VERSION_SPACES) {
 			$path = \ltrim($path, "/");
 			if (\str_starts_with($path, "Shares/")) {
 				$spaceId = self::getSharesSpaceIdForUser(
@@ -706,8 +720,6 @@ class WebDavHelper {
 					$xRequestId
 				);
 			}
-		} else {
-			$spaceId = self::$SPACE_ID_FROM_OCIS;
 		}
 
 		$davPath = self::getDavPath($doDavRequestAsUser ?? $user, $davPathVersionToUse, $type, $spaceId);
@@ -753,8 +765,6 @@ class WebDavHelper {
 			}
 		}
 
-		//Clear the space ID from ocis after each request
-		self::$SPACE_ID_FROM_OCIS = '';
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$xRequestId,
@@ -911,6 +921,7 @@ class WebDavHelper {
 			['d:getlastmodified'],
 			$xRequestId,
 			'1',
+			'',
 			null,
 			$davVersionToUse
 		);
@@ -932,6 +943,7 @@ class WebDavHelper {
 	 * @param string|null $resource
 	 * @param string|null $xRequestId
 	 * @param int|null $davPathVersionToUse
+	 * @param string|null $spaceId
 	 *
 	 * @return string
 	 * @throws Exception
@@ -943,7 +955,8 @@ class WebDavHelper {
 		?string $baseUrl,
 		?string $resource,
 		?string $xRequestId = '',
-		?int $davPathVersionToUse = self::DAV_VERSION_NEW
+		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
+		?string $spaceId = null,
 	):string {
 		$response = self::propfind(
 			$baseUrl,
@@ -953,6 +966,7 @@ class WebDavHelper {
 			["d:getlastmodified"],
 			$xRequestId,
 			"0",
+			$spaceId,
 			"files",
 			$davPathVersionToUse
 		);

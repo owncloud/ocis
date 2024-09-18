@@ -149,6 +149,7 @@ class OcisHelper {
 				"MKCOL",
 				$destination,
 				[],
+				null,
 				$xRequestId
 			);
 			if ($response->getStatusCode() !== 201) {

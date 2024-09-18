@@ -163,10 +163,11 @@ class ChecksumContext implements Context {
 	/**
 	 * @param string $user
 	 * @param string $path
+	 * @param string|null $spaceId
 	 *
 	 * @return ResponseInterface
 	 */
-	public function propfindResourceChecksum(string $user, string $path) : ResponseInterface {
+	public function propfindResourceChecksum(string $user, string $path, ?string $spaceId = null) : ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$body = '<?xml version="1.0"?>
 			<d:propfind  xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
@@ -182,6 +183,7 @@ class ChecksumContext implements Context {
 			'PROPFIND',
 			$path,
 			null,
+			$spaceId,
 			$this->featureContext->getStepLineRef(),
 			$body,
 			$this->featureContext->getDavPathVersion()

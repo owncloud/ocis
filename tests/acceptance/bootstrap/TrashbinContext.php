@@ -51,6 +51,7 @@ class TrashbinContext implements Context {
 			'DELETE',
 			null,
 			[],
+			null,
 			$this->featureContext->getStepLineRef(),
 			null,
 			$davPathVersion,
@@ -152,6 +153,7 @@ class TrashbinContext implements Context {
 			$password,
 			"",
 			$depth,
+			null,
 			$this->featureContext->getStepLineRef(),
 			[
 				'oc:trashbin-original-filename',
@@ -220,6 +222,7 @@ class TrashbinContext implements Context {
 			$password,
 			$collectionPath,
 			$depth,
+			null,
 			$this->featureContext->getStepLineRef(),
 			[
 				'oc:trashbin-original-filename',
@@ -246,7 +249,7 @@ class TrashbinContext implements Context {
 		// set endpoint according to webdav request (2 = new, 3 = spaces)
 		$endpoint = "/remote.php/dav/trash-bin/$user";
 		if ($davPathVersion === 3) {
-			$space_id = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
+			$space_id = WebDavHelper::getPersonalSpaceIdForUser(
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
@@ -403,6 +406,7 @@ class TrashbinContext implements Context {
 			],
 			$this->featureContext->getStepLineRef(),
 			'1',
+			null,
 			'trash-bin',
 			$davPathVersion,
 			$user
@@ -793,6 +797,7 @@ class TrashbinContext implements Context {
 			$trashItemHRef,
 			$headers,
 			null,
+			null,
 			'trash-bin',
 			'2',
 			false,
@@ -863,6 +868,7 @@ class TrashbinContext implements Context {
 					$trashItemHRef,
 					[],
 					null,
+					'',
 					'trash-bin'
 				);
 				$this->featureContext->setResponse($response);

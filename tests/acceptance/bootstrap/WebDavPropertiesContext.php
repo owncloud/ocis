@@ -89,6 +89,7 @@ class WebDavPropertiesContext implements Context {
 	/**
 	 * @param string $user
 	 * @param string $path
+	 * @param string|null $spaceId
 	 * @param TableNode|null $propertiesTable
 	 *
 	 * @return ResponseInterface
@@ -97,6 +98,7 @@ class WebDavPropertiesContext implements Context {
 	public function getPropertiesOfFolder(
 		string $user,
 		string $path,
+		?string $spaceId,
 		TableNode $propertiesTable
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
@@ -110,7 +112,8 @@ class WebDavPropertiesContext implements Context {
 			$user,
 			$path,
 			"1",
-			$properties
+			$properties,
+			$spaceId,
 		);
 	}
 
@@ -129,7 +132,7 @@ class WebDavPropertiesContext implements Context {
 		string $path,
 		TableNode $propertiesTable
 	):void {
-		$response = $this->getPropertiesOfFolder($user, $path, $propertiesTable);
+		$response = $this->getPropertiesOfFolder($user, $path, null, $propertiesTable);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastStatusCodesArrays();
 	}
@@ -147,6 +150,7 @@ class WebDavPropertiesContext implements Context {
 		$response = $this->getPropertiesOfFolder(
 			$this->featureContext->getCurrentUser(),
 			$path,
+			null,
 			$propertiesTable
 		);
 		$this->featureContext->setResponse($response);
@@ -205,6 +209,7 @@ class WebDavPropertiesContext implements Context {
 			$properties,
 			$this->featureContext->getStepLineRef(),
 			"0",
+			null,
 			"files",
 			$this->featureContext->getDavPathVersion()
 		);
@@ -264,6 +269,7 @@ class WebDavPropertiesContext implements Context {
 			$path,
 			'0',
 			$properties,
+			'',
 			$this->featureContext->getDavPathVersion() === 1 ? "public-files" : "public-files-new"
 		);
 	}
@@ -1000,6 +1006,7 @@ class WebDavPropertiesContext implements Context {
 		$response = $this->getPropertiesOfFolder(
 			$user,
 			$path,
+			null,
 			$propertiesTable
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe('207', '', $response);
@@ -1055,6 +1062,7 @@ class WebDavPropertiesContext implements Context {
 	 * @param string $property
 	 * @param string $expectedValue
 	 * @param string|null $altExpectedValue
+	 * @param string|null $spaceId
 	 *
 	 * @return void
 	 */
@@ -1063,13 +1071,15 @@ class WebDavPropertiesContext implements Context {
 		string $path,
 		string $property,
 		string $expectedValue,
-		?string $altExpectedValue = null
+		?string $altExpectedValue = null,
+		?string $spaceId = null,
 	):void {
 		$response = $this->featureContext->listFolder(
 			$user,
 			$path,
 			'0',
-			[$property]
+			[$property],
+			$spaceId,
 		);
 		if ($altExpectedValue === null) {
 			$altExpectedValue = $expectedValue;
@@ -1153,11 +1163,12 @@ class WebDavPropertiesContext implements Context {
 	 * @param string $user
 	 * @param string $path
 	 * @param string|null $storePath
+	 * @param string|null $spaceId
 	 *
 	 * @return SimpleXMLElement
 	 * @throws Exception
 	 */
-	public function storeEtagOfElement(string $user, string $path, ?string $storePath = ""):SimpleXMLElement {
+	public function storeEtagOfElement(string $user, string $path, ?string $storePath = "", ?string  $spaceId = null):SimpleXMLElement {
 		if ($storePath === "") {
 			$storePath = $path;
 		}
@@ -1166,6 +1177,7 @@ class WebDavPropertiesContext implements Context {
 		$response = $this->getPropertiesOfFolder(
 			$user,
 			$path,
+			$spaceId,
 			$propertiesTable
 		);
 		$xmlObject = $this->featureContext->getResponseXml($response);
@@ -1315,6 +1327,7 @@ class WebDavPropertiesContext implements Context {
 		$response = $this->getPropertiesOfFolder(
 			$user,
 			$path,
+			null,
 			$propertiesTable
 		);
 		return $this->featureContext->getEtagFromResponseXmlObject($this->featureContext->getResponseXml($response));
