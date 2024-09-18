@@ -152,6 +152,13 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			message = MessageShareCreated
 			ts = utils.TSToTime(ev.CTime)
 			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
+		case events.ShareUpdated:
+			if ev.Sharer != nil && ev.ItemID != nil && ev.Sharer.GetOpaqueId() == ev.ItemID.GetSpaceId() {
+				continue
+			}
+			message = MessageShareUpdated
+			ts = utils.TSToTime(ev.MTime)
+			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""), WithFieldMask(ev.UpdateMask))
 		case events.ShareRemoved:
 			message = MessageShareDeleted
 			ts = ev.Timestamp
@@ -165,7 +172,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 				continue
 			}
 			message = MessageLinkUpdated
-			ts = utils.TSToTime(ev.CTime)
+			ts = utils.TSToTime(ev.MTime)
 			vars, err = s.GetVars(ctx,
 				WithResource(toRef(ev.ItemID), false),
 				WithUser(ev.Executant, ""),

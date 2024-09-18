@@ -32,12 +32,12 @@ import (
 )
 
 type providersHandler struct {
-	gatewaySelector *pool.Selector[gateway.GatewayAPIClient]
+	gatewayClient gateway.GatewayAPIClient
 }
 
 func (h *providersHandler) init(c *config) error {
 	var err error
-	h.gatewaySelector, err = pool.GatewaySelector(c.GatewaySvc)
+	h.gatewayClient, err = pool.GetGatewayServiceClient(c.GatewaySvc)
 	if err != nil {
 		return err
 	}
@@ -55,12 +55,7 @@ func (h *providersHandler) ListProviders(w http.ResponseWriter, r *http.Request)
 	ctx := r.Context()
 	term := strings.ToLower(r.URL.Query().Get("search"))
 
-	gc, err := h.gatewaySelector.Next()
-	if err != nil {
-		reqres.WriteError(w, r, reqres.APIErrorServerError, "error selecting gateway client", err)
-		return
-	}
-	listRes, err := gc.ListAllProviders(ctx, &providerpb.ListAllProvidersRequest{})
+	listRes, err := h.gatewayClient.ListAllProviders(ctx, &providerpb.ListAllProvidersRequest{})
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorServerError, "error listing all providers", err)
 		return

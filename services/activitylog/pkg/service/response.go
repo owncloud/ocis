@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"path/filepath"
+	"strings"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -27,6 +28,7 @@ var (
 	MessageResourceMoved   = l10n.Template("{user} moved {resource} to {folder}")
 	MessageResourceRenamed = l10n.Template("{user} renamed {oldResource} to {resource}")
 	MessageShareCreated    = l10n.Template("{user} shared {resource} with {sharee}")
+	MessageShareUpdated    = l10n.Template("{user} updated {field} for the {resource}")
 	MessageShareDeleted    = l10n.Template("{user} removed {sharee} from {resource}")
 	MessageLinkCreated     = l10n.Template("{user} shared {resource} via link")
 	MessageLinkUpdated     = l10n.Template("{user} updated {field} for a link {token} on {resource}")
@@ -251,6 +253,19 @@ func WithLinkFieldUpdated(e *events.LinkUpdated) ActivityOption {
 		vars["token"] = Resource{
 			ID:   e.ItemID.GetOpaqueId(),
 			Name: e.Token,
+		}
+		return nil
+	}
+}
+
+func WithFieldMask(mask []string) ActivityOption {
+	return func(_ context.Context, _ gateway.GatewayAPIClient, vars map[string]interface{}) error {
+		f := "some field"
+		if len(mask) > 0 {
+			f = strings.Join(mask, ", ")
+		}
+		vars["field"] = Resource{
+			Name: f,
 		}
 		return nil
 	}

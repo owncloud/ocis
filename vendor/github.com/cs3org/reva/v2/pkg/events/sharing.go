@@ -84,8 +84,9 @@ type ShareUpdated struct {
 	Sharer         *user.UserId
 	MTime          *types.Timestamp
 
-	// indicates what was updated - one of "displayname", "permissions"
-	Updated string
+	Updated string // Deprecated
+	// indicates what was updated
+	UpdateMask []string
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -165,7 +166,7 @@ type LinkUpdated struct {
 	DisplayName       string
 	Expiration        *types.Timestamp
 	PasswordProtected bool
-	CTime             *types.Timestamp
+	MTime             *types.Timestamp
 	Token             string
 
 	FieldUpdated string

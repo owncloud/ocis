@@ -35,13 +35,13 @@ import (
 )
 
 type appsHandler struct {
-	gatewaySelector *pool.Selector[gateway.GatewayAPIClient]
-	ocmMountPoint   string
+	gatewayClient gateway.GatewayAPIClient
+	ocmMountPoint string
 }
 
 func (h *appsHandler) init(c *config) error {
 	var err error
-	h.gatewaySelector, err = pool.GatewaySelector(c.GatewaySvc)
+	h.gatewayClient, err = pool.GetGatewayServiceClient(c.GatewaySvc)
 	if err != nil {
 		return err
 	}
@@ -99,11 +99,7 @@ func (h *appsHandler) OpenInApp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *appsHandler) webappTemplate(ctx context.Context, id *ocmpb.ShareId) (string, error) {
-	gc, err := h.gatewaySelector.Next()
-	if err != nil {
-		return "", err
-	}
-	res, err := gc.GetReceivedOCMShare(ctx, &ocmpb.GetReceivedOCMShareRequest{
+	res, err := h.gatewayClient.GetReceivedOCMShare(ctx, &ocmpb.GetReceivedOCMShareRequest{
 		Ref: &ocmpb.ShareReference{
 			Spec: &ocmpb.ShareReference_Id{
 				Id: id,

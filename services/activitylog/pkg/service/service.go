@@ -110,13 +110,17 @@ func (a *ActivitylogService) Run() {
 			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ShareCreated:
 			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
+		case events.ShareUpdated:
+			if ev.Sharer != nil && ev.ItemID != nil && ev.Sharer.GetOpaqueId() != ev.ItemID.GetSpaceId() {
+				err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.MTime))
+			}
 		case events.ShareRemoved:
 			err = a.AddActivity(toRef(ev.ItemID), e.ID, ev.Timestamp)
 		case events.LinkCreated:
 			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
 		case events.LinkUpdated:
 			if ev.Sharer != nil && ev.ItemID != nil && ev.Sharer.GetOpaqueId() != ev.ItemID.GetSpaceId() {
-				err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
+				err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.MTime))
 			}
 		case events.LinkRemoved:
 			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.Timestamp))

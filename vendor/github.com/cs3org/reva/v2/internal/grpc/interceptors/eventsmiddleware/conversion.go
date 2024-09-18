@@ -78,12 +78,6 @@ func ShareRemoved(r *collaboration.RemoveShareResponse, req *collaboration.Remov
 
 // ShareUpdated converts the response to an event
 func ShareUpdated(r *collaboration.UpdateShareResponse, req *collaboration.UpdateShareRequest, executant *user.UserId) events.ShareUpdated {
-	updated := ""
-	if req.Field.GetPermissions() != nil {
-		updated = "permissions"
-	} else if req.Field.GetDisplayName() != "" {
-		updated = "displayname"
-	}
 	return events.ShareUpdated{
 		Executant:      executant,
 		ShareID:        r.Share.Id,
@@ -93,7 +87,7 @@ func ShareUpdated(r *collaboration.UpdateShareResponse, req *collaboration.Updat
 		GranteeGroupID: r.Share.GetGrantee().GetGroupId(),
 		Sharer:         r.Share.Creator,
 		MTime:          r.Share.Mtime,
-		Updated:        updated,
+		UpdateMask:     req.GetUpdateMask().GetPaths(),
 	}
 }
 
@@ -139,7 +133,7 @@ func LinkUpdated(r *link.UpdatePublicShareResponse, req *link.UpdatePublicShareR
 		DisplayName:       r.Share.DisplayName,
 		Expiration:        r.Share.Expiration,
 		PasswordProtected: r.Share.PasswordProtected,
-		CTime:             r.Share.Ctime,
+		MTime:             r.Share.Mtime,
 		Token:             r.Share.Token,
 		FieldUpdated:      link.UpdatePublicShareRequest_Update_Type_name[int32(req.Update.GetType())],
 	}
