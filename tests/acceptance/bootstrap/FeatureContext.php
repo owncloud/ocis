@@ -145,7 +145,6 @@ class FeatureContext extends BehatVariablesContext {
 	private int $ocsApiVersion = 1;
 	private ?ResponseInterface $response = null;
 	private string $responseUser = '';
-	private ?string $responseBodyContent = null;
 	public array $emailRecipients = [];
 	private CookieJar $cookieJar;
 	private string $requestToken;

@@ -344,3 +344,25 @@ Feature: previews of files downloaded through the webdav API
       | old              |
       | new              |
       | spaces           |
+
+
+  Scenario Outline: download previews of an image with different processors
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "/testimage.jpg"
+    When user "Alice" downloads the preview of "/testimage.jpg" with width "32" and height "32" and processor <processor> using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded preview content should match with <expected-image> fixtures preview content
+    Examples:
+      | dav-path-version | processor | expected-image |
+      | old              | fit       | fit.png        |
+      | old              | fill      | fill.png       |
+      | old              | resize    | resize.png     |
+      | old              | thumbnail | thumbnail.png  |
+      | new              | fit       | fit.png        |
+      | new              | fill      | fill.png       |
+      | new              | resize    | resize.png     |
+      | new              | thumbnail | thumbnail.png  |
+      | spaces           | fit       | fit.png        |
+      | spaces           | fill      | fill.png       |
+      | spaces           | resize    | resize.png     |
+      | spaces           | thumbnail | thumbnail.png  |
