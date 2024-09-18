@@ -61,6 +61,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix Activities leak: [#10092](https://github.com/owncloud/ocis/pull/10092)
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
+* Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
 
 ## Details
 
@@ -109,6 +110,12 @@ The following sections list the changes for unreleased.
    users.
 
    https://github.com/owncloud/ocis/pull/9942
+
+* Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
+
+   Previously FileUpdated has also triggered a FileAdded Activity
+
+   https://github.com/owncloud/ocis/pull/10072
 
 # Changelog for [6.4.0] (2024-09-12)
 
