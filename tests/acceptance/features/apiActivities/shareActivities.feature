@@ -639,7 +639,7 @@ Feature: check share activity
                               "properties": {
                                 "id": {
                                   "type": "string",
-                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
+                                  "pattern": "^%file_id_pattern%$"
                                 },
                                 "name": {
                                   "const": "Alice Hansen"
@@ -699,7 +699,7 @@ Feature: check share activity
                               "properties": {
                                 "id": {
                                   "type": "string",
-                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
+                                  "pattern": "^%file_id_pattern%$"
                                 },
                                 "name": {
                                   "const": "Alice Hansen"
