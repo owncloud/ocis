@@ -21,6 +21,7 @@ func CollaborationTracingMiddleware(next http.Handler) http.Handler {
 		if err != nil {
 			// if we can't get the context, skip this middleware
 			next.ServeHTTP(w, r)
+			return
 		}
 
 		span := trace.SpanFromContext(r.Context())
