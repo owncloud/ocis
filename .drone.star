@@ -191,7 +191,7 @@ config = {
     },
     "e2eTests": {
         "part": {
-            "skip": True, # TODO: reenable them as soon as the test is fixed in web
+            "skip": True,  # TODO: reenable them as soon as the test is fixed in web
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc"],  # suites to skip
         },

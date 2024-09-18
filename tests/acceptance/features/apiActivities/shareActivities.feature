@@ -678,7 +678,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} updated {resource} in {space}"
+                          "const": "{user} updated {resource} in {folder}"
                         },
                         "variables": {
                           "type": "object",
