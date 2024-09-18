@@ -540,6 +540,47 @@ Feature: check share activity
                       "properties": {
                         "message": {
                           "const": "{user} added {resource} to {space}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["resource","space","user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "space": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice"
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -598,7 +639,7 @@ Feature: check share activity
                               "properties": {
                                 "id": {
                                   "type": "string",
-                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
+                                  "pattern": "^%file_id_pattern%$"
                                 },
                                 "name": {
                                   "const": "Alice Hansen"
@@ -637,7 +678,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} updated {resource} in {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -658,7 +699,7 @@ Feature: check share activity
                               "properties": {
                                 "id": {
                                   "type": "string",
-                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
+                                  "pattern": "^%file_id_pattern%$"
                                 },
                                 "name": {
                                   "const": "Alice Hansen"
