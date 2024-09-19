@@ -46,7 +46,6 @@ cache:
 driver: ocis
 drivers:
   ocis:
-    metadata_backend: messagepack
     root: /var/lib/ocis/storage/metadata
     max_acquire_lock_cycles: 20
     lock_cycle_duration_factor: 30

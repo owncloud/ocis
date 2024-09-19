@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-09-19-11-39-31]
+[#deprecation-note-2024-09-19-12-57-15]
 [caption=]
 .Deprecation notes for the storage-system service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -399,18 +399,6 @@ a| [subs=-attributes]
 ++ocis ++
 a| [subs=-attributes]
 The driver which should be used by the service.
-
-a|`OCIS_DECOMPOSEDFS_METADATA_BACKEND` +
-`STORAGE_SYSTEM_OCIS_METADATA_BACKEND` +
-
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++messagepack ++
-a| [subs=-attributes]
-The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
 
 a|`STORAGE_SYSTEM_OCIS_ROOT` +
 

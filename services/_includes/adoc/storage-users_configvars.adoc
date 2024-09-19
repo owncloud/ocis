@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-09-19-11-39-31]
+[#deprecation-note-2024-09-19-12-57-15]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -377,18 +377,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The storage driver which should be used by the service. Defaults to 'ocis', Supported values are: 'ocis', 's3ng' and 'owncloudsql'. The 'ocis' driver stores all data (blob and meta data) in an POSIX compliant volume. The 's3ng' driver stores metadata in a POSIX compliant volume and uploads blobs to the s3 bucket.
 
-a|`OCIS_DECOMPOSEDFS_METADATA_BACKEND` +
-`STORAGE_USERS_OCIS_METADATA_BACKEND` +
-
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++messagepack ++
-a| [subs=-attributes]
-The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
-
 a|`OCIS_DECOMPOSEDFS_PROPAGATOR` +
 `STORAGE_USERS_OCIS_PROPAGATOR` +
 
@@ -567,17 +555,6 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.
-
-a|`STORAGE_USERS_S3NG_METADATA_BACKEND` +
-
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++messagepack ++
-a| [subs=-attributes]
-The backend to use for storing metadata. Supported values are 'xattrs' and 'messagepack'. The setting 'xattrs' uses extended attributes to store file metadata while 'messagepack' uses a dedicated file to store file metadata. Defaults to 'xattrs'.
 
 a|`OCIS_DECOMPOSEDFS_PROPAGATOR` +
 `STORAGE_USERS_S3NG_PROPAGATOR` +

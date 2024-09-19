@@ -76,7 +76,6 @@ graceful_shutdown_timeout: 30
 driver: ocis
 drivers:
   ocis:
-    metadata_backend: messagepack
     propagator: sync
     async_propagator_options:
       propagation_delay: 0s
@@ -95,7 +94,6 @@ drivers:
     max_quota: 0
     disable_versioning: false
   s3ng:
-    metadata_backend: messagepack
     propagator: sync
     async_propagator_options:
       propagation_delay: 0s

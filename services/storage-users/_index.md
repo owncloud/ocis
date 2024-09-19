@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2024-09-19T11:39:38.866853396Z
+date: 2024-09-19T12:57:19.957175996Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -18,7 +18,6 @@ Purpose and description to be added
 
 ## Table of Contents
 
-* [Deprecated Metadata Backend](#deprecated-metadata-backend)
 * [Graceful Shutdown](#graceful-shutdown)
 * [CLI Commands](#cli-commands)
   * [Manage Unfinished Uploads](#manage-unfinished-uploads)
@@ -29,10 +28,6 @@ Purpose and description to be added
     * [List and Restore Trash-Bins Items](#list-and-restore-trash-bins-items)
 * [Caching](#caching)
 * [Example Yaml Config](#example-yaml-config)
-
-## Deprecated Metadata Backend
-
-Starting with ocis version 3.0.0, the default backend for metadata switched to messagepack. If the setting `STORAGE_USERS_OCIS_METADATA_BACKEND` has not been defined manually, the backend will be migrated to `messagepack` automatically. Though still possible to manually configure `xattrs`, this setting should not be used anymore as it will be removed in a later version.
 
 ## Graceful Shutdown
 
