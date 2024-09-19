@@ -2,10 +2,6 @@
 
 Purpose and description to be added
 
-## Deprecated Metadata Backend
-
-Starting with ocis version 3.0.0, the default backend for metadata switched to messagepack. If the setting `STORAGE_USERS_OCIS_METADATA_BACKEND` has not been defined manually, the backend will be migrated to `messagepack` automatically. Though still possible to manually configure `xattrs`, this setting should not be used anymore as it will be removed in a later version.
-
 ## Graceful Shutdown
 
 Starting with Infinite Scale version 3.1, you can define a graceful shutdown period for the `storage-users` service.
