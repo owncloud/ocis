@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix ocm space sharing: [#10060](https://github.com/owncloud/ocis/pull/10060)
 * Bugfix - Added LinkUpdated activity: [#10085](https://github.com/owncloud/ocis/pull/10085)
 * Bugfix - Fix Activities leak: [#10092](https://github.com/owncloud/ocis/pull/10092)
+* Bugfix - Include additional logs in the collaboration service: [#10101](https://github.com/owncloud/ocis/pull/10101)
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 * Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
@@ -104,6 +105,14 @@ The following sections list the changes for unreleased.
    Fix activities endpoint by preventing unauthorized users to get activities
 
    https://github.com/owncloud/ocis/pull/10092
+
+* Bugfix - Include additional logs in the collaboration service: [#10101](https://github.com/owncloud/ocis/pull/10101)
+
+   More logs have been added in the middlware of the collaboration service to debug
+   401 error codes. Any error that happens in that middleware should have its
+   corresponding log entry
+
+   https://github.com/owncloud/ocis/pull/10101
 
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 
