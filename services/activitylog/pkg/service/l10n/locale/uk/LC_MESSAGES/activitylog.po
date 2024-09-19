@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-08-30 00:05+0000\n"
+"POT-Creation-Date: 2024-09-19 00:42+0000\n"
 "PO-Revision-Date: 2024-08-20 10:13+0000\n"
 "Last-Translator: Roman Perekhod, 2024\n"
 "Language-Team: Ukrainian (https://app.transifex.com/owncloud-org/teams/6149/uk/)\n"
@@ -21,42 +21,50 @@ msgstr ""
 "Language: uk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: pkg/service/response.go:23
+#: pkg/service/response.go:24
 msgid "{user} added {resource} to {space}"
 msgstr "{user} додав {resource} до {space}"
 
-#: pkg/service/response.go:31
+#: pkg/service/response.go:34
 msgid "{user} added {sharee} as member of {space}"
 msgstr "{user} додав {sharee} як учасника {space}"
 
-#: pkg/service/response.go:24
+#: pkg/service/response.go:26
 msgid "{user} deleted {resource} from {space}"
 msgstr "{user} видалив {resource} із {space}"
 
-#: pkg/service/response.go:25
+#: pkg/service/response.go:27
 msgid "{user} moved {resource} to {space}"
 msgstr "{user} перемістив {resource} до {space}"
 
-#: pkg/service/response.go:30
+#: pkg/service/response.go:33
 msgid "{user} removed link to {resource}"
 msgstr "{user} видалив посилання на {resource}"
 
-#: pkg/service/response.go:28
+#: pkg/service/response.go:30
 msgid "{user} removed {sharee} from {resource}"
 msgstr "{user} видалив {sharee} із {resource}"
 
-#: pkg/service/response.go:32
+#: pkg/service/response.go:35
 msgid "{user} removed {sharee} from {space}"
 msgstr "{user} видалив {sharee} із {space}"
 
-#: pkg/service/response.go:26
+#: pkg/service/response.go:28
 msgid "{user} renamed {oldResource} to {resource}"
 msgstr "{user} перейменував {oldResource} на {resource}"
 
-#: pkg/service/response.go:29
+#: pkg/service/response.go:31
 msgid "{user} shared {resource} via link"
 msgstr "{user} поділився {resource} через посилання"
 
-#: pkg/service/response.go:27
+#: pkg/service/response.go:29
 msgid "{user} shared {resource} with {sharee}"
 msgstr "{user} поділився {ресурсом} з {sharee}"
+
+#: pkg/service/response.go:32
+msgid "{user} updated {field} for a link {token} on {resource}"
+msgstr ""
+
+#: pkg/service/response.go:25
+msgid "{user} updated {resource} in {folder}"
+msgstr ""

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-09-11 00:38+0000\n"
+"POT-Creation-Date: 2024-09-19 00:42+0000\n"
 "PO-Revision-Date: 2024-08-20 10:13+0000\n"
 "Last-Translator: Flávio Veras <flaviove@gmail.com>, 2024\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/owncloud-org/teams/6149/pt_BR/)\n"
@@ -21,42 +21,50 @@ msgstr ""
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: pkg/service/response.go:23
+#: pkg/service/response.go:24
 msgid "{user} added {resource} to {space}"
 msgstr "{user} adicionou {resource} para {space}"
 
-#: pkg/service/response.go:31
+#: pkg/service/response.go:34
 msgid "{user} added {sharee} as member of {space}"
 msgstr "{user} adicionou {sharee} como membro de {space}"
 
-#: pkg/service/response.go:24
+#: pkg/service/response.go:26
 msgid "{user} deleted {resource} from {space}"
 msgstr "{user} excluiu {resource} de {space}"
 
-#: pkg/service/response.go:25
+#: pkg/service/response.go:27
 msgid "{user} moved {resource} to {space}"
 msgstr "{user} moveu {resource} para {space}"
 
-#: pkg/service/response.go:30
+#: pkg/service/response.go:33
 msgid "{user} removed link to {resource}"
 msgstr "{user} removeu link para {resource}"
 
-#: pkg/service/response.go:28
+#: pkg/service/response.go:30
 msgid "{user} removed {sharee} from {resource}"
 msgstr "{user} removeu {sharee} de {resource}"
 
-#: pkg/service/response.go:32
+#: pkg/service/response.go:35
 msgid "{user} removed {sharee} from {space}"
 msgstr "{user} removeu {sharee} de {space}"
 
-#: pkg/service/response.go:26
+#: pkg/service/response.go:28
 msgid "{user} renamed {oldResource} to {resource}"
 msgstr "{usuário} renomeado {oldResource} para {resource}"
 
-#: pkg/service/response.go:29
+#: pkg/service/response.go:31
 msgid "{user} shared {resource} via link"
 msgstr "{usuário} compartilhou {recurso} via link"
 
-#: pkg/service/response.go:27
+#: pkg/service/response.go:29
 msgid "{user} shared {resource} with {sharee}"
 msgstr "{usuário} compartilhou {recurso} com {sharee}"
+
+#: pkg/service/response.go:32
+msgid "{user} updated {field} for a link {token} on {resource}"
+msgstr ""
+
+#: pkg/service/response.go:25
+msgid "{user} updated {resource} in {folder}"
+msgstr ""

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-09-12 00:42+0000\n"
+"POT-Creation-Date: 2024-09-19 00:42+0000\n"
 "PO-Revision-Date: 2024-08-20 10:13+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2024\n"
 "Language-Team: Albanian (https://app.transifex.com/owncloud-org/teams/6149/sq/)\n"
@@ -21,42 +21,50 @@ msgstr ""
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: pkg/service/response.go:23
+#: pkg/service/response.go:24
 msgid "{user} added {resource} to {space}"
 msgstr "{user} shtoi {resource} te {space}"
 
-#: pkg/service/response.go:31
+#: pkg/service/response.go:34
 msgid "{user} added {sharee} as member of {space}"
 msgstr "{user} shtoi {sharee} si anëtar të {space}"
 
-#: pkg/service/response.go:24
+#: pkg/service/response.go:26
 msgid "{user} deleted {resource} from {space}"
 msgstr "{user} fshiu {resource} nga {space}"
 
-#: pkg/service/response.go:25
+#: pkg/service/response.go:27
 msgid "{user} moved {resource} to {space}"
 msgstr "{user} e shpuri {resource} te {space}"
 
-#: pkg/service/response.go:30
+#: pkg/service/response.go:33
 msgid "{user} removed link to {resource}"
 msgstr "{user} hoqi lidhjen për te {resource}"
 
-#: pkg/service/response.go:28
+#: pkg/service/response.go:30
 msgid "{user} removed {sharee} from {resource}"
 msgstr "{user} hoqi {sharee} nga {resource}"
 
-#: pkg/service/response.go:32
+#: pkg/service/response.go:35
 msgid "{user} removed {sharee} from {space}"
 msgstr "{user} hoqi {sharee} nga {space}"
 
-#: pkg/service/response.go:26
+#: pkg/service/response.go:28
 msgid "{user} renamed {oldResource} to {resource}"
 msgstr "{user} riemërtoi {oldResource} si {resource}"
 
-#: pkg/service/response.go:29
+#: pkg/service/response.go:31
 msgid "{user} shared {resource} via link"
 msgstr "{user} ndau me të tjerët {resource} përmes lidhjeje"
 
-#: pkg/service/response.go:27
+#: pkg/service/response.go:29
 msgid "{user} shared {resource} with {sharee}"
 msgstr "{user} ndau {resource} me {sharee}"
+
+#: pkg/service/response.go:32
+msgid "{user} updated {field} for a link {token} on {resource}"
+msgstr ""
+
+#: pkg/service/response.go:25
+msgid "{user} updated {resource} in {folder}"
+msgstr ""
