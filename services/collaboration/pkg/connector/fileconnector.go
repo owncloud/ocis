@@ -1058,6 +1058,10 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 			Str("StatusCode", statRes.GetStatus().GetCode().String()).
 			Str("StatusMsg", statRes.GetStatus().GetMessage()).
 			Msg("CheckFileInfo: stat failed with unexpected status")
+
+		if statRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_NOT_FOUND {
+			return NewResponse(404), nil
+		}
 		return NewResponse(500), nil
 	}
 
