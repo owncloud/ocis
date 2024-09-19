@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-09-19 00:42+0000\n"
+"POT-Creation-Date: 2024-09-19 15:03+0000\n"
 "PO-Revision-Date: 2024-08-20 10:13+0000\n"
 "Last-Translator: Martin <github@diemattels.at>, 2024\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
@@ -63,8 +63,8 @@ msgstr "{user} hat {resource} mit {sharee} geteilt"
 
 #: pkg/service/response.go:32
 msgid "{user} updated {field} for a link {token} on {resource}"
-msgstr ""
+msgstr "{user} hat {field} für einen Link {token} bei {resource} aktualisiert"
 
 #: pkg/service/response.go:25
 msgid "{user} updated {resource} in {folder}"
-msgstr ""
+msgstr "{user} hat {resource} im {folder} aktualisiert"

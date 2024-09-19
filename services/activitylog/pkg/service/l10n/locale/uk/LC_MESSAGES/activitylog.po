@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-09-19 00:42+0000\n"
+"POT-Creation-Date: 2024-09-19 15:03+0000\n"
 "PO-Revision-Date: 2024-08-20 10:13+0000\n"
 "Last-Translator: Roman Perekhod, 2024\n"
 "Language-Team: Ukrainian (https://app.transifex.com/owncloud-org/teams/6149/uk/)\n"
@@ -59,7 +59,7 @@ msgstr "{user} поділився {resource} через посилання"
 
 #: pkg/service/response.go:29
 msgid "{user} shared {resource} with {sharee}"
-msgstr "{user} поділився {ресурсом} з {sharee}"
+msgstr "{user} поділився {resource} з {sharee}"
 
 #: pkg/service/response.go:32
 msgid "{user} updated {field} for a link {token} on {resource}"
