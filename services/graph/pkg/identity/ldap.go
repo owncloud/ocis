@@ -86,6 +86,7 @@ type userAttributeMap struct {
 	accountEnabled string
 	userType       string
 	identities     string
+	lastSignIn     string
 }
 
 type ldapAttributeValues map[string][]string
@@ -120,6 +121,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		surname:        surNameAttribute,
 		userType:       config.UserTypeAttribute,
 		identities:     identitiesAttribute,
+		lastSignIn:     lastSignAttribute,
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -831,6 +833,17 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 		if len(identities) > 0 {
 			user.SetIdentities(identities)
 		}
+
+		lastSignIn, err := i.getLastSignTime(e)
+		switch {
+		case err == nil:
+			signinActivity := libregraph.SignInActivity{
+				LastSuccessfulSignInDateTime: lastSignIn,
+			}
+			user.SetSignInActivity(signinActivity)
+		case !errors.Is(err, errNotSet):
+			i.logger.Warn().Err(err).Str("dn", e.DN).Msg("Error getting last signin timestamp")
+		}
 		return user
 	}
 	i.logger.Warn().Str("dn", e.DN).Msg("Invalid User. Missing username or id attribute")
@@ -914,6 +927,7 @@ func (i *LDAP) getUserAttrTypesForSearch() []string {
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
 		i.userAttributeMap.identities,
+		i.userAttributeMap.lastSignIn,
 	}
 }
 
@@ -1257,6 +1271,19 @@ func (i *LDAP) mapLDAPError(err error, errmap ldapResultToErrMap) errorcode.Erro
 		return res
 	}
 	return errorcode.New(errorcode.GeneralException, err.Error())
+}
+
+func (i *LDAP) getLastSignTime(e *ldap.Entry) (*time.Time, error) {
+	dateString := e.GetEqualFoldAttributeValue(i.userAttributeMap.lastSignIn)
+	if dateString == "" {
+		return nil, errNotSet
+	}
+	t, err := time.Parse(ldapDateFormat, dateString)
+	if err != nil {
+		err = fmt.Errorf("error parsing LDAP date: '%s': %w", dateString, err)
+		return nil, err
+	}
+	return &t, nil
 }
 
 func isUserEnabledUpdate(user libregraph.UserUpdate) bool {
