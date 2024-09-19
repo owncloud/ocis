@@ -19,6 +19,8 @@ var (
 	ErrReadOnly = errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	// ErrNotFound signals that the requested resource was not found.
 	ErrNotFound = errorcode.New(errorcode.ItemNotFound, "not found")
+	// ErrUnsupportedFilter signals that the requested filter is not supported by the backend.
+	ErrUnsupportedFilter = godata.NotImplementedError("unsupported filter")
 )
 
 const (
@@ -37,6 +39,8 @@ type Backend interface {
 	UpdateUser(ctx context.Context, nameOrID string, user libregraph.UserUpdate) (*libregraph.User, error)
 	GetUser(ctx context.Context, nameOrID string, oreq *godata.GoDataRequest) (*libregraph.User, error)
 	GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error)
+	// FilterUsers returns a list of users that match the filter
+	FilterUsers(ctx context.Context, oreq *godata.GoDataRequest, filter *godata.ParseNode) ([]*libregraph.User, error)
 	UpdateLastSignInDate(ctx context.Context, userID string, timestamp time.Time) error
 
 	// CreateGroup creates the supplied group in the identity backend.

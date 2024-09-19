@@ -510,7 +510,7 @@ func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
 	idString, err := filterEscapeUUID(i.userIDisOctetString, nameOrID)
 	// err != nil just means that this is not an uuid, so we can skip the uuid filter part
 	// and just filter by name
-	filter := ""
+	var filter string
 	if err == nil {
 		filter = fmt.Sprintf("(|(%s=%s)(%s=%s))", i.userAttributeMap.userName, ldap.EscapeFilter(nameOrID), i.userAttributeMap.id, idString)
 	} else {
@@ -564,8 +564,18 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, oreq *godata.GoData
 
 // GetUsers implements the Backend Interface.
 func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error) {
+	return i.FilterUsers(ctx, oreq, nil)
+}
+
+// FilterUsers implements the Backend Interface.
+func (i *LDAP) FilterUsers(ctx context.Context, oreq *godata.GoDataRequest, filter *godata.ParseNode) ([]*libregraph.User, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetUsers")
+
+	queryFilter, err := i.oDataFilterToLDAPFilter(filter)
+	if err != nil {
+		return nil, err
+	}
 
 	search, err := GetSearchValues(oreq.Query)
 	if err != nil {
@@ -587,7 +597,7 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 			i.userAttributeMap.displayName, search,
 		)
 	}
-	userFilter = fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.userObjectClass, userFilter)
+	userFilter = fmt.Sprintf("(&%s(objectClass=%s)%s%s)", i.userFilter, i.userObjectClass, queryFilter, userFilter)
 	searchRequest := ldap.NewSearchRequest(
 		i.userBaseDN, i.userScope, ldap.NeverDerefAliases, 0, 0, false,
 		userFilter,
@@ -612,13 +622,16 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 		return nil, i.mapLDAPError(err, errMap)
 	}
 
-	users := make([]*libregraph.User, 0, len(res.Entries))
-	usersEnabledState, err := i.usersEnabledState(res.Entries)
+	return i.usersFromLDAPEntries(res.Entries, exp)
+}
+
+func (i *LDAP) usersFromLDAPEntries(entries []*ldap.Entry, exp []string) ([]*libregraph.User, error) {
+	usersEnabledState, err := i.usersEnabledState(entries)
 	if err != nil {
 		return nil, err
 	}
-
-	for _, e := range res.Entries {
+	users := make([]*libregraph.User, 0, len(entries))
+	for _, e := range entries {
 		u := i.createUserModelFromLDAP(e)
 		// Skip invalid LDAP users
 		if u == nil {
@@ -1284,6 +1297,55 @@ func (i *LDAP) getLastSignTime(e *ldap.Entry) (*time.Time, error) {
 		return nil, err
 	}
 	return &t, nil
+}
+
+func (i *LDAP) oDataFilterToLDAPFilter(filter *godata.ParseNode) (string, error) {
+	if filter == nil {
+		return "", nil
+	}
+
+	if filter.Token.Type != godata.ExpressionTokenLogical {
+		return "", ErrUnsupportedFilter
+	}
+
+	if filter.Token.Value != "le" {
+		return "", ErrUnsupportedFilter
+	}
+
+	if !isLastSuccessFullSignInDateTimeFilter(filter.Children[0]) {
+		return "", ErrUnsupportedFilter
+	}
+
+	if filter.Children[1].Token.Type != godata.ExpressionTokenDateTime {
+		return "", ErrUnsupportedFilter
+	}
+	parsed, err := time.Parse(time.RFC3339, filter.Children[1].Token.Value)
+	if err != nil {
+		return "", godata.BadRequestError("invalid date format")
+	}
+
+	ldapDateTime := parsed.UTC().Format(ldapDateFormat)
+	return fmt.Sprintf("(%s<=%s)", i.userAttributeMap.lastSignIn, ldap.EscapeFilter(ldapDateTime)), nil
+}
+
+func isLastSuccessFullSignInDateTimeFilter(node *godata.ParseNode) bool {
+	if node.Token.Type != godata.ExpressionTokenNav {
+		return false
+	}
+
+	if len(node.Children) != 2 {
+		return false
+	}
+
+	if node.Children[0].Token.Value != "signInActivity" {
+		return false
+	}
+
+	if node.Children[1].Token.Value != "lastSuccessfulSignInDateTime" {
+		return false
+	}
+
+	return true
 }
 
 func isUserEnabledUpdate(user libregraph.UserUpdate) bool {

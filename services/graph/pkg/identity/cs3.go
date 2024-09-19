@@ -95,12 +95,12 @@ func (i *CS3) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libr
 	case err != nil:
 		logger.Error().Str("backend", "cs3").Err(err).Str("search", search).Msg("error sending find users grpc request: transport error")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
-	case res.Status.Code != cs3rpc.Code_CODE_OK:
-		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
-			return nil, errorcode.New(errorcode.ItemNotFound, res.Status.Message)
+	case res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
+		if res.GetStatus().GetCode() == cs3rpc.Code_CODE_NOT_FOUND {
+			return nil, errorcode.New(errorcode.ItemNotFound, res.GetStatus().GetMessage())
 		}
 		logger.Debug().Str("backend", "cs3").Err(err).Str("search", search).Msg("error sending find users grpc request")
-		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
+		return nil, errorcode.New(errorcode.GeneralException, res.GetStatus().GetMessage())
 	}
 
 	users := make([]*libregraph.User, 0, len(res.GetUsers()))
@@ -110,6 +110,11 @@ func (i *CS3) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libr
 	}
 
 	return users, nil
+}
+
+// FilterUsers implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) FilterUsers(_ context.Context, _ *godata.GoDataRequest, _ *godata.ParseNode) ([]*libregraph.User, error) {
+	return nil, errNotImplemented
 }
 
 // UpdateLastSignInDate implements the Backend Interface. It's currently not supported for the CS3 backend
