@@ -270,7 +270,7 @@ Feature: download file
     Then the HTTP status code should be "200"
     And the following headers should be set
       | header                            | value                                                    |
-      | Content-Disposition               | attachment; filename*=UTF-8''"<file>"; filename="<file>" |
+      | Content-Disposition               | attachment; filename*=UTF-8''<encoded>; filename="<file>" |
       | Content-Security-Policy           | default-src 'none';                                      |
       | X-Content-Type-Options            | nosniff                                                  |
       | X-Download-Options                | noopen                                                   |
@@ -280,20 +280,20 @@ Feature: download file
       | X-XSS-Protection                  | 1; mode=block                                            |
     And the downloaded content should be "test file"
     Examples:
-      | dav-path-version | file               |
-      | old              | textfile.txt       |
-      | old              | comma,.txt         |
-      | old              | 'quote'single'.txt |
-      | new              | textfile.txt       |
-      | new              | comma,.txt         |
-      | new              | 'quote'single'.txt |
+      | dav-path-version | file               | encoded                  |
+      | old              | textfile.txt       | textfile.txt             |
+      | old              | comma,.txt         | comma%2C.txt             |
+      | old              | 'quote'single'.txt | %27quote%27single%27.txt |
+      | new              | textfile.txt       | textfile.txt             |
+      | new              | comma,.txt         | comma%2C.txt             |
+      | new              | 'quote'single'.txt | %27quote%27single%27.txt |
 
     @skipOnRevaMaster
     Examples:
-      | dav-path-version | file               |
-      | spaces           | textfile.txt       |
-      | spaces           | comma,.txt         |
-      | spaces           | 'quote'single'.txt |
+      | dav-path-version | file               | encoded                  |
+      | spaces           | textfile.txt       | textfile.txt             |
+      | spaces           | comma,.txt         | comma%2C.txt             |
+      | spaces           | 'quote'single'.txt | %27quote%27single%27.txt |
 
   @smokeTest @issue-8361
   Scenario Outline: downloading a file should serve security headers (file with doubel quotes)
@@ -302,15 +302,15 @@ Feature: download file
     When user "Alice" downloads file '/"quote"double".txt' using the WebDAV API
     Then the HTTP status code should be "200"
     And the following headers should be set
-      | header                            | value                                                                            |
-      | Content-Disposition               | attachment; filename*=UTF-8''""quote"double".txt"; filename=""quote"double".txt" |
-      | Content-Security-Policy           | default-src 'none';                                                              |
-      | X-Content-Type-Options            | nosniff                                                                          |
-      | X-Download-Options                | noopen                                                                           |
-      | X-Frame-Options                   | SAMEORIGIN                                                                       |
-      | X-Permitted-Cross-Domain-Policies | none                                                                             |
-      | X-Robots-Tag                      | none                                                                             |
-      | X-XSS-Protection                  | 1; mode=block                                                                    |
+      | header                            | value                                                                                |
+      | Content-Disposition               | attachment; filename*=UTF-8''%22quote%22double%22.txt; filename=""quote"double".txt" |
+      | Content-Security-Policy           | default-src 'none';                                                                  |
+      | X-Content-Type-Options            | nosniff                                                                              |
+      | X-Download-Options                | noopen                                                                               |
+      | X-Frame-Options                   | SAMEORIGIN                                                                           |
+      | X-Permitted-Cross-Domain-Policies | none                                                                                 |
+      | X-Robots-Tag                      | none                                                                                 |
+      | X-XSS-Protection                  | 1; mode=block                                                                        |
     And the downloaded content should be "test file"
     Examples:
       | dav-path-version |
