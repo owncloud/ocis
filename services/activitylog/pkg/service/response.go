@@ -71,6 +71,16 @@ func WithResource(ref *provider.Reference, addSpace bool) ActivityOption {
 			Name: info.GetName(),
 		}
 
+		parent, err := utils.GetResourceByID(ctx, info.GetParentId(), gwc)
+		if err != nil {
+			return err
+		}
+
+		vars["folder"] = Resource{
+			ID:   info.GetParentId().GetOpaqueId(),
+			Name: parent.GetName(),
+		}
+
 		if addSpace {
 			vars["space"] = Resource{
 				ID:   info.GetSpace().GetId().GetOpaqueId(),
