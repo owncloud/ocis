@@ -513,17 +513,41 @@ class NotificationContext implements Context {
 		$this->assertEmailContains($user, $expectedEmailBodyContent);
 	}
 
+	/**
+	 * @Then user :user should have received the following email from user :sender ignoring whitespaces
+	 *
+	 * @param string $user
+	 * @param string $sender
+	 * @param PyStringNode $content
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userShouldHaveReceivedTheFollowingEmailFromUserIgnoringWhitespaces(string $user, string $sender, PyStringNode $content):void {
+		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
+		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
+			$rawExpectedEmailBodyContent,
+			$sender
+		);
+		$this->assertEmailContains($user, $expectedEmailBodyContent, true);
+	}
+
 	/***
 	 * @param string $user
 	 * @param string $expectedEmailBodyContent
+	 * @param bool $ignoreWhiteSpace
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function assertEmailContains(string $user, string $expectedEmailBodyContent):void {
+	public function assertEmailContains(string $user, string $expectedEmailBodyContent, $ignoreWhiteSpace = false):void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
 		$this->featureContext->pushEmailRecipientAsMailBox($address);
 		$actualEmailBodyContent = EmailHelper::getBodyOfLastEmail($address, $this->featureContext->getStepLineRef());
+		if ($ignoreWhiteSpace) {
+			$expectedEmailBodyContent = preg_replace('/\s+/', '', $expectedEmailBodyContent);
+			$actualEmailBodyContent = preg_replace('/\s+/', '', $actualEmailBodyContent);
+		}
 		Assert::assertStringContainsString(
 			$expectedEmailBodyContent,
 			$actualEmailBodyContent,
