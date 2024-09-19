@@ -30,6 +30,7 @@ import (
 	"strings"
 	"time"
 
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -38,6 +39,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/golang-jwt/jwt"
 	"github.com/pkg/errors"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
@@ -178,14 +180,23 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 			return err
 		}
 
+		var iu *userpb.User
+		if utils.ExistsInOpaque(u.Opaque, "impersonating-user") {
+			iu = &userpb.User{}
+			if err := utils.ReadJSONFromOpaque(u.Opaque, "impersonating-user", iu); err != nil {
+				return err
+			}
+		}
+
 		if err := events.Publish(ctx, session.store.pub, events.BytesReceived{
-			UploadID:      session.ID(),
-			URL:           s,
-			SpaceOwner:    n.SpaceOwnerOrManager(session.Context(ctx)),
-			ExecutingUser: u,
-			ResourceID:    &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID},
-			Filename:      session.Filename(),
-			Filesize:      uint64(session.Size()),
+			UploadID:          session.ID(),
+			URL:               s,
+			SpaceOwner:        n.SpaceOwnerOrManager(session.Context(ctx)),
+			ExecutingUser:     u,
+			ResourceID:        &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID},
+			Filename:          session.Filename(),
+			Filesize:          uint64(session.Size()),
+			ImpersonatingUser: iu,
 		}); err != nil {
 			return err
 		}

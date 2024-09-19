@@ -25,7 +25,6 @@ import (
 
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	userprovider "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
@@ -34,6 +33,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/auth/scope"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
@@ -132,7 +132,7 @@ func (m *manager) Authenticate(ctx context.Context, token, secret string) (*user
 	if publicShareResponse.GetShare().GetOwner().GetType() == 8 {
 		owner = &user.User{Id: publicShareResponse.GetShare().GetOwner(), DisplayName: "Public", Username: "public"}
 	} else {
-		getUserResponse, err := gwConn.GetUser(ctx, &userprovider.GetUserRequest{
+		getUserResponse, err := gwConn.GetUser(ctx, &user.GetUserRequest{
 			UserId: publicShareResponse.GetShare().GetCreator(),
 		})
 		switch {
@@ -172,6 +172,9 @@ func (m *manager) Authenticate(ctx context.Context, token, secret string) (*user
 			},
 		},
 	}
+
+	u := &user.User{Id: &user.UserId{OpaqueId: token, Idp: "public", Type: user.UserType_USER_TYPE_GUEST}, DisplayName: "Public", Username: "public"}
+	owner.Opaque = utils.AppendJSONToOpaque(owner.Opaque, "impersonating-user", u)
 
 	return owner, scope, nil
 }

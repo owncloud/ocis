@@ -382,9 +382,10 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 						},
 						Path: utils.MakeRelativePath(filepath.Join(session.Dir(), session.Filename())),
 					},
-					Timestamp:  utils.TimeToTS(now),
-					SpaceOwner: n.SpaceOwnerOrManager(ctx),
-					IsVersion:  isVersion,
+					Timestamp:         utils.TimeToTS(now),
+					SpaceOwner:        n.SpaceOwnerOrManager(ctx),
+					IsVersion:         isVersion,
+					ImpersonatingUser: ev.ImpersonatingUser,
 				},
 			); err != nil {
 				sublog.Error().Err(err).Msg("Failed to publish UploadReady event")

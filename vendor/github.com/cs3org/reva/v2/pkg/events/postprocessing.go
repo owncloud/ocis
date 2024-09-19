@@ -57,14 +57,15 @@ var (
 
 // BytesReceived is emitted by the server when it received all bytes of an upload
 type BytesReceived struct {
-	UploadID      string
-	SpaceOwner    *user.UserId
-	ExecutingUser *user.User
-	ResourceID    *provider.ResourceId
-	Filename      string
-	Filesize      uint64
-	URL           string
-	Timestamp     *types.Timestamp
+	UploadID          string
+	SpaceOwner        *user.UserId
+	ExecutingUser     *user.User
+	ResourceID        *provider.ResourceId
+	Filename          string
+	Filesize          uint64
+	URL               string
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -85,8 +86,9 @@ type StartPostprocessingStep struct {
 	ResourceID    *provider.ResourceId // for file retrieval in after upload case
 	RevaToken     string               // for file retrieval in after upload case
 
-	StepToStart Postprocessingstep
-	Timestamp   *types.Timestamp
+	StepToStart       Postprocessingstep
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -141,13 +143,14 @@ type VirusscanResult struct {
 
 // PostprocessingFinished is emitted by *some* service which can decide that
 type PostprocessingFinished struct {
-	UploadID      string
-	Filename      string
-	SpaceOwner    *user.UserId
-	ExecutingUser *user.User
-	Result        map[Postprocessingstep]interface{} // it is a map[step]Event
-	Outcome       PostprocessingOutcome
-	Timestamp     *types.Timestamp
+	UploadID          string
+	Filename          string
+	SpaceOwner        *user.UserId
+	ExecutingUser     *user.User
+	Result            map[Postprocessingstep]interface{} // it is a map[step]Event
+	Outcome           PostprocessingOutcome
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -175,14 +178,15 @@ func (PostprocessingRetry) Unmarshal(v []byte) (interface{}, error) {
 
 // UploadReady is emitted by the storage provider when postprocessing is finished
 type UploadReady struct {
-	UploadID      string
-	Filename      string
-	SpaceOwner    *user.UserId
-	ExecutingUser *user.User
-	FileRef       *provider.Reference
-	Timestamp     *types.Timestamp
-	Failed        bool
-	IsVersion     bool
+	UploadID          string
+	Filename          string
+	SpaceOwner        *user.UserId
+	ExecutingUser     *user.User
+	ImpersonatingUser *user.User
+	FileRef           *provider.Reference
+	Timestamp         *types.Timestamp
+	Failed            bool
+	IsVersion         bool
 	// add reference here? We could use it to inform client pp is finished
 }
 
