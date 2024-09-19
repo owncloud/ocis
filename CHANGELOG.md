@@ -64,6 +64,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 * Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
+* Enhancement - Remove METADATA_BACKEND: [#10113](https://github.com/owncloud/ocis/pull/10113)
 
 ## Details
 
@@ -133,6 +134,12 @@ The following sections list the changes for unreleased.
    Previously FileUpdated has also triggered a FileAdded Activity
 
    https://github.com/owncloud/ocis/pull/10072
+
+* Enhancement - Remove METADATA_BACKEND: [#10113](https://github.com/owncloud/ocis/pull/10113)
+
+   Removes the deprecated XXX_METADATA_BACKEND envvars
+
+   https://github.com/owncloud/ocis/pull/10113
 
 # Changelog for [6.4.0] (2024-09-12)
 
