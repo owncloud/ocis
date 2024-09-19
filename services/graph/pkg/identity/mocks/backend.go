@@ -289,6 +289,66 @@ func (_c *Backend_DeleteUser_Call) RunAndReturn(run func(context.Context, string
 	return _c
 }
 
+// FilterUsers provides a mock function with given fields: ctx, oreq, filter
+func (_m *Backend) FilterUsers(ctx context.Context, oreq *godata.GoDataRequest, filter *godata.ParseNode) ([]*libregraph.User, error) {
+	ret := _m.Called(ctx, oreq, filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FilterUsers")
+	}
+
+	var r0 []*libregraph.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *godata.GoDataRequest, *godata.ParseNode) ([]*libregraph.User, error)); ok {
+		return rf(ctx, oreq, filter)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *godata.GoDataRequest, *godata.ParseNode) []*libregraph.User); ok {
+		r0 = rf(ctx, oreq, filter)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*libregraph.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *godata.GoDataRequest, *godata.ParseNode) error); ok {
+		r1 = rf(ctx, oreq, filter)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Backend_FilterUsers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FilterUsers'
+type Backend_FilterUsers_Call struct {
+	*mock.Call
+}
+
+// FilterUsers is a helper method to define mock.On call
+//   - ctx context.Context
+//   - oreq *godata.GoDataRequest
+//   - filter *godata.ParseNode
+func (_e *Backend_Expecter) FilterUsers(ctx interface{}, oreq interface{}, filter interface{}) *Backend_FilterUsers_Call {
+	return &Backend_FilterUsers_Call{Call: _e.mock.On("FilterUsers", ctx, oreq, filter)}
+}
+
+func (_c *Backend_FilterUsers_Call) Run(run func(ctx context.Context, oreq *godata.GoDataRequest, filter *godata.ParseNode)) *Backend_FilterUsers_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*godata.GoDataRequest), args[2].(*godata.ParseNode))
+	})
+	return _c
+}
+
+func (_c *Backend_FilterUsers_Call) Return(_a0 []*libregraph.User, _a1 error) *Backend_FilterUsers_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Backend_FilterUsers_Call) RunAndReturn(run func(context.Context, *godata.GoDataRequest, *godata.ParseNode) ([]*libregraph.User, error)) *Backend_FilterUsers_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetGroup provides a mock function with given fields: ctx, nameOrID, queryParam
 func (_m *Backend) GetGroup(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.Group, error) {
 	ret := _m.Called(ctx, nameOrID, queryParam)

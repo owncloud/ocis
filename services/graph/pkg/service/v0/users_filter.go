@@ -137,6 +137,8 @@ func (g Graph) applyFilterLogical(ctx context.Context, req *godata.GoDataRequest
 		return g.applyFilterLogicalOr(ctx, req, root.Children[0], root.Children[1])
 	case "eq":
 		return g.applyFilterEq(ctx, req, root.Children[0], root.Children[1])
+	case "le":
+		return g.applyFilterLessOrEqual(ctx, req, root)
 	}
 	logger.Debug().Str("Token", root.Token.Value).Msg("unsupported logical filter")
 	return users, unsupportedFilterError()
@@ -243,6 +245,11 @@ func (g Graph) applyFilterEq(ctx context.Context, req *godata.GoDataRequest, ope
 		return g.searchOCMAcceptedUsers(ctx, req)
 	}
 	return users, unsupportedFilterError()
+}
+
+func (g Graph) applyFilterLessOrEqual(ctx context.Context, req *godata.GoDataRequest, filterRoot *godata.ParseNode) (users []*libregraph.User, err error) {
+	// Assume that our identity backend is able to apply this filter
+	return g.identityBackend.FilterUsers(ctx, req, filterRoot)
 }
 
 func (g Graph) applyFilterLambda(ctx context.Context, req *godata.GoDataRequest, nodes []*godata.ParseNode) (users []*libregraph.User, err error) {
