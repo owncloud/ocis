@@ -106,7 +106,6 @@ func DefaultConfig() *config.Config {
 				UsersProviderEndpoint: "com.owncloud.api.users",
 			},
 			S3NG: config.S3NGDriver{
-				MetadataBackend:            "messagepack",
 				Propagator:                 "sync",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				ShareFolder:                "/Shares",
@@ -126,7 +125,6 @@ func DefaultConfig() *config.Config {
 				DisableMultipart:           true,
 			},
 			OCIS: config.OCISDriver{
-				MetadataBackend:            "messagepack",
 				Propagator:                 "sync",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				ShareFolder:                "/Shares",

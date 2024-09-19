@@ -116,7 +116,6 @@ type AsyncPropagatorOptions struct {
 
 // OCISDriver is the storage driver configuration when using 'ocis' storage driver
 type OCISDriver struct {
-	MetadataBackend        string                 `yaml:"metadata_backend" env:"OCIS_DECOMPOSEDFS_METADATA_BACKEND;STORAGE_USERS_OCIS_METADATA_BACKEND" desc:"The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'." introductionVersion:"pre5.0"`
 	Propagator             string                 `yaml:"propagator" env:"OCIS_DECOMPOSEDFS_PROPAGATOR;STORAGE_USERS_OCIS_PROPAGATOR" desc:"The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option." introductionVersion:"pre5.0"`
 	AsyncPropagatorOptions AsyncPropagatorOptions `yaml:"async_propagator_options"`
 	// Root is the absolute path to the location of the data
@@ -143,7 +142,6 @@ type OCISDriver struct {
 
 // S3NGDriver is the storage driver configuration when using 's3ng' storage driver
 type S3NGDriver struct {
-	MetadataBackend        string                 `yaml:"metadata_backend" env:"STORAGE_USERS_S3NG_METADATA_BACKEND" desc:"The backend to use for storing metadata. Supported values are 'xattrs' and 'messagepack'. The setting 'xattrs' uses extended attributes to store file metadata while 'messagepack' uses a dedicated file to store file metadata. Defaults to 'xattrs'." introductionVersion:"pre5.0"`
 	Propagator             string                 `yaml:"propagator" env:"OCIS_DECOMPOSEDFS_PROPAGATOR;STORAGE_USERS_S3NG_PROPAGATOR" desc:"The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option." introductionVersion:"pre5.0"`
 	AsyncPropagatorOptions AsyncPropagatorOptions `yaml:"async_propagator_options"`
 	// Root is the absolute path to the location of the data

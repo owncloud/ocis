@@ -150,7 +150,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 func metadataDrivers(localEndpoint string, cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"ocis": map[string]interface{}{
-			"metadata_backend":           cfg.Drivers.OCIS.MetadataBackend,
+			"metadata_backend":           "messagepack",
 			"root":                       cfg.Drivers.OCIS.Root,
 			"user_layout":                "{{.Id.OpaqueId}}",
 			"treetime_accounting":        false,

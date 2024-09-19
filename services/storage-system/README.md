@@ -2,10 +2,6 @@
 
 Purpose and description to be added
 
-## Deprecated Metadata Backend
-
-Starting with ocis version 3.0.0, the default backend for metadata switched to messagepack. If the setting `STORAGE_SYSTEM_OCIS_METADATA_BACKEND` has not been defined manually, the backend will be migrated to `messagepack` automatically. Though still possible to manually configure `xattrs`, this setting should not be used anymore as it will be removed in a later version.
-
 ## Caching
 
 The `storage-system` service caches file metadata via the configured store in `STORAGE_SYSTEM_CACHE_STORE`. Possible stores are:
