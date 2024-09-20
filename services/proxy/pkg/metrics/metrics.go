@@ -46,7 +46,7 @@ func New() *Metrics {
 			Subsystem: Subsystem,
 			Name:      "build_info",
 			Help:      "Build Information",
-		}, []string{"versions"}),
+		}, []string{"version"}),
 	}
 
 	_ = prometheus.Register(m.Requests)
