@@ -291,3 +291,114 @@ Feature: Search
     When user "Alice" searches for 'AND mediatype:document' using the WebDAV API
     Then the HTTP status code should be "400"
     And the value of the item "/d:error/s:message" in the response should be "error: bad request: the expression can't begin from a binary operator: 'AND'"
+
+
+  Scenario Outline: search a file globally (in all drives)
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created a folder "AlicePersonal" in space "Personal"
+    And user "Alice" has uploaded a file inside space "Personal" with content "inside Alice personal space" to "AlicePersonal/insideAlicePersonal.txt"
+    And user "Brian" has created a folder "BrianPersonal" in space "Personal"
+    And user "Brian" has uploaded file with content "inside Brian personal space" to "BrianPersonal/insideBrianPersonal.txt"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BrianPersonal |
+      | space           | Personal      |
+      | sharee          | Alice         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has a share "BrianPersonal" synced
+    When user "Alice" searches for "*inside*" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "3" entries
+    And the search result of user "Alice" should contain these entries:
+      | AlicePersonal/insideAlicePersonal.txt                |
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
+      | BrianPersonal/insideBrianPersonal.txt                |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: search a file within Personal drive
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created a folder "AlicePersonal" in space "Personal"
+    And user "Alice" has uploaded a file inside space "Personal" with content "inside Alice personal space" to "AlicePersonal/insideAlicePersonal.txt"
+    And user "Brian" has created a folder "BrianPersonal" in space "Personal"
+    And user "Brian" has uploaded file with content "inside Brian personal space" to "BrianPersonal/insideBrianPersonal.txt"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BrianPersonal |
+      | space           | Personal      |
+      | sharee          | Alice         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has a share "BrianPersonal" synced
+    When user "Alice" searches for "*inside*" inside folder "AlicePersonal" in space "Personal" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these entries:
+      | AlicePersonal/insideAlicePersonal.txt |
+    But the search result of user "Alice" should not contain these entries:
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
+      | BrianPersonal/insideBrianPersonal.txt                |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: search a file within Project drive
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created a folder "AlicePersonal" in space "Personal"
+    And user "Alice" has uploaded a file inside space "Personal" with content "inside Alice personal space" to "AlicePersonal/insideAlicePersonal.txt"
+    And user "Brian" has created a folder "BrianPersonal" in space "Personal"
+    And user "Brian" has uploaded file with content "inside Brian personal space" to "BrianPersonal/insideBrianPersonal.txt"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BrianPersonal |
+      | space           | Personal      |
+      | sharee          | Alice         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has a share "BrianPersonal" synced
+    When user "Alice" searches for "*inside*" inside folder "folderMain" in space "project101" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these entries:
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
+    But the search result of user "Alice" should not contain these entries:
+      | AlicePersonal/insideAlicePersonal.txt |
+      | BrianPersonal/insideBrianPersonal.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: search a file within Shares drive
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created a folder "AlicePersonal" in space "Personal"
+    And user "Alice" has uploaded a file inside space "Personal" with content "inside Alice personal space" to "AlicePersonal/insideAlicePersonal.txt"
+    And user "Brian" has created a folder "BrianPersonal" in space "Personal"
+    And user "Brian" has uploaded file with content "inside Brian personal space" to "BrianPersonal/insideBrianPersonal.txt"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | BrianPersonal |
+      | space           | Personal      |
+      | sharee          | Alice         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has a share "BrianPersonal" synced
+    When user "Alice" searches for "*inside*" inside folder "BrianPersonal" in space "Shares" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these entries:
+      | BrianPersonal/insideBrianPersonal.txt |
+    But the search result of user "Alice" should not contain these entries:
+      | AlicePersonal/insideAlicePersonal.txt                |
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
