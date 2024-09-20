@@ -35,7 +35,7 @@ Feature: check activities
                   "required": ["message","variables"],
                   "properties": {
                     "message": {
-                      "const": "{user} added {resource} to {space}"
+                      "const": "{user} added {resource} to {folder}"
                     },
                     "variables": {
                       "type": "object",
@@ -125,7 +125,7 @@ Feature: check activities
                   "required": ["message","variables"],
                   "properties": {
                     "message": {
-                      "const": "{user} added {resource} to {space}"
+                      "const": "{user} added {resource} to {folder}"
                     },
                     "variables": {
                       "type": "object",
@@ -221,7 +221,7 @@ Feature: check activities
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -251,7 +251,7 @@ Feature: check activities
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -285,7 +285,7 @@ Feature: check activities
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} deleted {resource} from {space}"
+                          "const": "{user} deleted {resource} from {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -359,7 +359,7 @@ Feature: check activities
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} deleted {resource} from {space}"
+                          "const": "{user} deleted {resource} from {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -458,7 +458,7 @@ Feature: check activities
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -477,7 +477,7 @@ Feature: check activities
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} moved {resource} to {space}"
+                          "const": "{user} moved {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -568,7 +568,7 @@ Feature: check activities
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -587,7 +587,7 @@ Feature: check activities
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} moved {resource} to {space}"
+                          "const": "{user} moved {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -685,7 +685,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -794,7 +794,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -916,7 +916,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -946,7 +946,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -976,7 +976,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1006,7 +1006,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1036,7 +1036,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} moved {resource} to {space}"
+                          "const": "{user} moved {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1066,7 +1066,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} moved {resource} to {space}"
+                          "const": "{user} moved {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1174,7 +1174,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} deleted {resource} from {space}"
+                          "const": "{user} deleted {resource} from {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1204,7 +1204,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} deleted {resource} from {space}"
+                          "const": "{user} deleted {resource} from {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1261,7 +1261,7 @@ Feature: check activities
                   "required": ["message","variables"],
                   "properties": {
                     "message": {
-                      "const": "{user} hat {resource} zu {space} hinzugefügt"
+                      "const": "{user} hat {resource} zu {folder} hinzugefügt"
                     },
                     "variables": {
                       "type": "object",
@@ -1356,7 +1356,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1390,7 +1390,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1424,7 +1424,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1485,7 +1485,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1519,7 +1519,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1580,7 +1580,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -1614,7 +1614,7 @@ Feature: check activities
                       "required": ["message", "variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",

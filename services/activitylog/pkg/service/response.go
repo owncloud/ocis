@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"path/filepath"
 	"time"
 
@@ -11,7 +12,6 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -21,10 +21,10 @@ import (
 
 // Translations
 var (
-	MessageResourceCreated = l10n.Template("{user} added {resource} to {space}")
+	MessageResourceCreated = l10n.Template("{user} added {resource} to {folder}")
 	MessageResourceUpdated = l10n.Template("{user} updated {resource} in {folder}")
-	MessageResourceTrashed = l10n.Template("{user} deleted {resource} from {space}")
-	MessageResourceMoved   = l10n.Template("{user} moved {resource} to {space}")
+	MessageResourceTrashed = l10n.Template("{user} deleted {resource} from {folder}")
+	MessageResourceMoved   = l10n.Template("{user} moved {resource} to {folder}")
 	MessageResourceRenamed = l10n.Template("{user} renamed {oldResource} to {resource}")
 	MessageShareCreated    = l10n.Template("{user} shared {resource} with {sharee}")
 	MessageShareDeleted    = l10n.Template("{user} removed {sharee} from {resource}")
@@ -69,6 +69,16 @@ func WithResource(ref *provider.Reference, addSpace bool) ActivityOption {
 		vars["resource"] = Resource{
 			ID:   storagespace.FormatResourceID(info.GetId()),
 			Name: info.GetName(),
+		}
+
+		parent, err := utils.GetResourceByID(ctx, info.GetParentId(), gwc)
+		if err != nil {
+			return err
+		}
+
+		vars["folder"] = Resource{
+			ID:   info.GetParentId().GetOpaqueId(),
+			Name: parent.GetName(),
 		}
 
 		if addSpace {
@@ -218,6 +228,7 @@ func WithSpace(spaceid *provider.StorageSpaceId) ActivityOption {
 	}
 }
 
+// WithLinkFieldUpdated sets the field and token variables for an activity
 func WithLinkFieldUpdated(e *events.LinkUpdated) ActivityOption {
 	return func(_ context.Context, _ gateway.GatewayAPIClient, vars map[string]interface{}) error {
 		f := "some field"

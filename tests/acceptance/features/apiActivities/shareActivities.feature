@@ -42,7 +42,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -162,7 +162,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -299,7 +299,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -405,7 +405,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         }
                       }
                     }
@@ -539,7 +539,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -618,7 +618,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} added {resource} to {space}"
+                          "const": "{user} added {resource} to {folder}"
                         },
                         "variables": {
                           "type": "object",
@@ -738,7 +738,7 @@ Feature: check share activity
                       "required": ["message","variables"],
                       "properties": {
                         "message": {
-                          "const": "{user} deleted {resource} from {space}"
+                          "const": "{user} deleted {resource} from {folder}"
                         },
                         "variables": {
                           "type": "object",
