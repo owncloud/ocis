@@ -100,6 +100,7 @@ func ServiceAccountPermissions() provider.ResourcePermissions {
 		RestoreRecycleItem:   true, // for cli restore command
 		Delete:               true, // for cli restore command with replace option
 		CreateContainer:      true, // for space provisioning
+		AddGrant:             true, // for initial project space member assignment
 	}
 }
 

@@ -26,6 +26,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/google/renameio/v2"
+	"github.com/rogpeppe/go-internal/lockedfile"
 	tusd "github.com/tus/tusd/pkg/handler"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -73,7 +75,13 @@ func (s *OcisSession) executantUser() *userpb.User {
 
 // Purge deletes the upload session metadata and written binary data
 func (s *OcisSession) Purge(ctx context.Context) error {
-	if err := os.Remove(sessionPath(s.store.root, s.info.ID)); err != nil {
+	sessionPath := sessionPath(s.store.root, s.info.ID)
+	f, err := lockedfile.OpenFile(sessionPath+".lock", os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if err := os.Remove(sessionPath); err != nil {
 		return err
 	}
 	if err := os.Remove(s.binPath()); err != nil {
@@ -92,10 +100,12 @@ func (s *OcisSession) TouchBin() error {
 }
 
 // Persist writes the upload session metadata to disk
+// events can update the scan outcome and the finished event might read an empty file because of race conditions
+// so we need to lock the file while writing and use atomic writes
 func (s *OcisSession) Persist(ctx context.Context) error {
-	uploadPath := sessionPath(s.store.root, s.info.ID)
+	sessionPath := sessionPath(s.store.root, s.info.ID)
 	// create folder structure (if needed)
-	if err := os.MkdirAll(filepath.Dir(uploadPath), 0700); err != nil {
+	if err := os.MkdirAll(filepath.Dir(sessionPath), 0700); err != nil {
 		return err
 	}
 
@@ -104,8 +114,12 @@ func (s *OcisSession) Persist(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-
-	return os.WriteFile(uploadPath, d, 0600)
+	f, err := lockedfile.OpenFile(sessionPath+".lock", os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return renameio.WriteFile(sessionPath, d, 0600)
 }
 
 // ToFileInfo returns tus compatible FileInfo so the tus handler can access the upload offset
