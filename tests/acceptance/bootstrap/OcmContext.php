@@ -124,6 +124,7 @@ class OcmContext implements Context {
 		$responseData = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 		if (isset($responseData["token"])) {
 			$this->invitationToken = $responseData["token"];
+      print_r($this->invitationToken . " token");
 		}
 		return $response;
 	}
