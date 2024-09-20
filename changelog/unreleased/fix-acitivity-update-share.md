@@ -1,4 +1,4 @@
-go Bugfix: Added ShareUpdate activity
+Bugfix: Added ShareUpdate activity
 
 Added the ShareUpdate activity in the space context.
 

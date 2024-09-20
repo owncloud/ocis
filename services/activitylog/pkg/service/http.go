@@ -115,6 +115,9 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			vars    map[string]interface{}
 		)
 
+		loc := l10n.MustGetUserLocale(r.Context(), activeUser.GetId().GetOpaqueId(), r.Header.Get(l10n.HeaderAcceptLanguage), s.valService)
+		t := l10n.NewTranslatorFromCommonConfig(s.cfg.DefaultLanguage, _domain, s.cfg.TranslationPath, _localeFS, _localeSubPath)
+
 		switch ev := s.unwrapEvent(e).(type) {
 		case nil:
 			// error already logged in unwrapEvent
@@ -158,7 +161,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			}
 			message = MessageShareUpdated
 			ts = utils.TSToTime(ev.MTime)
-			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""), WithFieldMask(ev.UpdateMask))
+			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, ""), WithTranslation(&t, loc, "field", ev.UpdateMask))
 		case events.ShareRemoved:
 			message = MessageShareDeleted
 			ts = ev.Timestamp
@@ -176,7 +179,8 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			vars, err = s.GetVars(ctx,
 				WithResource(toRef(ev.ItemID), false),
 				WithUser(ev.Executant, ""),
-				WithLinkFieldUpdated(&ev))
+				WithTranslation(&t, loc, "field", []string{ev.FieldUpdated}),
+				WithVar("token", ev.ItemID.GetOpaqueId(), ev.Token))
 		case events.LinkRemoved:
 			message = MessageLinkDeleted
 			ts = utils.TSToTime(ev.Timestamp)
@@ -195,9 +199,6 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			s.log.Error().Err(err).Msg("error getting response data")
 			continue
 		}
-
-		loc := l10n.MustGetUserLocale(r.Context(), activeUser.GetId().GetOpaqueId(), r.Header.Get(l10n.HeaderAcceptLanguage), s.valService)
-		t := l10n.NewTranslatorFromCommonConfig(s.cfg.DefaultLanguage, _domain, s.cfg.TranslationPath, _localeFS, _localeSubPath)
 
 		resp.Activities = append(resp.Activities, NewActivity(t.Translate(message, loc), ts, e.GetId(), vars))
 	}

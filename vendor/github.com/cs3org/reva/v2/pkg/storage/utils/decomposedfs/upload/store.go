@@ -119,7 +119,7 @@ func (store OcisStore) List(ctx context.Context) ([]*OcisSession, error) {
 
 // Get returns the upload session for the given upload id
 func (store OcisStore) Get(ctx context.Context, id string) (*OcisSession, error) {
-	sessionPath := filepath.Join(store.root, "uploads", id+".info")
+	sessionPath := sessionPath(store.root, id)
 	match := _idRegexp.FindStringSubmatch(sessionPath)
 	if match == nil || len(match) < 2 {
 		return nil, fmt.Errorf("invalid upload path")
@@ -129,6 +129,15 @@ func (store OcisStore) Get(ctx context.Context, id string) (*OcisSession, error)
 		store: store,
 		info:  tusd.FileInfo{},
 	}
+	lock, err := lockedfile.Open(sessionPath + ".lock")
+	if err != nil {
+		if errors.Is(err, iofs.ErrNotExist) {
+			// Interpret os.ErrNotExist as 404 Not Found
+			err = tusd.ErrNotFound
+		}
+		return nil, err
+	}
+	defer lock.Close()
 	data, err := os.ReadFile(sessionPath)
 	if err != nil {
 		if errors.Is(err, iofs.ErrNotExist) {
@@ -137,6 +146,8 @@ func (store OcisStore) Get(ctx context.Context, id string) (*OcisSession, error)
 		}
 		return nil, err
 	}
+	lock.Close() // release lock asap
+
 	if err := json.Unmarshal(data, &session.info); err != nil {
 		return nil, err
 	}

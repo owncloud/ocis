@@ -40,7 +40,7 @@ import (
 )
 
 type tokenHandler struct {
-	gatewayClient    gateway.GatewayAPIClient
+	gatewaySelector  *pool.Selector[gateway.GatewayAPIClient]
 	meshDirectoryURL string
 	providerDomain   string
 	eventStream      events.Stream
@@ -48,7 +48,7 @@ type tokenHandler struct {
 
 func (h *tokenHandler) init(c *config) error {
 	var err error
-	h.gatewayClient, err = pool.GetGatewayServiceClient(c.GatewaySvc)
+	h.gatewaySelector, err = pool.GatewaySelector(c.GatewaySvc)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,12 @@ func (h *tokenHandler) Generate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	genTokenRes, err := h.gatewayClient.GenerateInviteToken(ctx, &invitepb.GenerateInviteTokenRequest{
+	gc, err := h.gatewaySelector.Next()
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error selecting gateway client", err)
+		return
+	}
+	genTokenRes, err := gc.GenerateInviteToken(ctx, &invitepb.GenerateInviteTokenRequest{
 		Description: req.Description,
 	})
 	switch {
@@ -185,7 +190,12 @@ func (h *tokenHandler) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	providerInfo, err := h.gatewayClient.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
+	gc, err := h.gatewaySelector.Next()
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error selecting gateway client", err)
+		return
+	}
+	providerInfo, err := gc.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
 		Domain: req.ProviderDomain,
 	})
 	if err != nil {
@@ -197,13 +207,18 @@ func (h *tokenHandler) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	gc, err = h.gatewaySelector.Next()
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error selecting gateway client", err)
+		return
+	}
 	forwardInviteReq := &invitepb.ForwardInviteRequest{
 		InviteToken: &invitepb.InviteToken{
 			Token: req.Token,
 		},
 		OriginSystemProvider: providerInfo.ProviderInfo,
 	}
-	forwardInviteResponse, err := h.gatewayClient.ForwardInvite(ctx, forwardInviteReq)
+	forwardInviteResponse, err := gc.ForwardInvite(ctx, forwardInviteReq)
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorServerError, "error sending a grpc forward invite request", err)
 		return
@@ -258,7 +273,12 @@ type remoteUser struct {
 func (h *tokenHandler) FindAccepted(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	res, err := h.gatewayClient.FindAcceptedUsers(ctx, &invitepb.FindAcceptedUsersRequest{})
+	gc, err := h.gatewaySelector.Next()
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error selecting gateway client", err)
+		return
+	}
+	res, err := gc.FindAcceptedUsers(ctx, &invitepb.FindAcceptedUsersRequest{})
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorServerError, "error sending a grpc find accepted users request", err)
 		return
@@ -292,7 +312,12 @@ func (h *tokenHandler) DeleteAccepted(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := h.gatewayClient.DeleteAcceptedUser(ctx, &invitepb.DeleteAcceptedUserRequest{
+	gc, err := h.gatewaySelector.Next()
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error selecting gateway client", err)
+		return
+	}
+	res, err := gc.DeleteAcceptedUser(ctx, &invitepb.DeleteAcceptedUserRequest{
 		RemoteUserId: &userpb.UserId{
 			Idp:      req.Idp,
 			OpaqueId: req.UserID,
@@ -331,7 +356,12 @@ func getDeleteAcceptedRequest(r *http.Request) (*deleteAcceptedRequest, error) {
 func (h *tokenHandler) ListInvite(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	res, err := h.gatewayClient.ListInviteTokens(ctx, &invitepb.ListInviteTokensRequest{})
+	gc, err := h.gatewaySelector.Next()
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error selecting gateway client", err)
+		return
+	}
+	res, err := gc.ListInviteTokens(ctx, &invitepb.ListInviteTokensRequest{})
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorServerError, "error listing tokens", err)
 		return
