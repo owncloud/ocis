@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fixed the ocm email template: [#10030](https://github.com/owncloud/ocis/pull/10030)
 * Bugfix - Fixed activity filter depth: [#10031](https://github.com/owncloud/ocis/pull/10031)
+* Bugfix - Fixed proxy build info: [#10039](https://github.com/owncloud/ocis/pull/10039)
 * Bugfix - Fixed the ocm tocken: [#10050](https://github.com/owncloud/ocis/pull/10050)
 * Bugfix - Fix ocm space sharing: [#10060](https://github.com/owncloud/ocis/pull/10060)
 * Bugfix - Added LinkUpdated activity: [#10085](https://github.com/owncloud/ocis/pull/10085)
@@ -81,6 +82,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/9850
    https://github.com/owncloud/ocis/pull/10031
+
+* Bugfix - Fixed proxy build info: [#10039](https://github.com/owncloud/ocis/pull/10039)
+
+   The version string for the proxy service has been changed to 'version'.
+
+   https://github.com/owncloud/ocis/pull/10039
 
 * Bugfix - Fixed the ocm tocken: [#10050](https://github.com/owncloud/ocis/pull/10050)
 
