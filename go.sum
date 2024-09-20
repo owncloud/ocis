@@ -928,8 +928,8 @@ github.com/onsi/gomega v1.7.1/go.mod h1:XdKZgCCFLUoM/7CFJVPcG8C1xQ1AJ0vpAezJrB7J
 github.com/onsi/gomega v1.10.1/go.mod h1:iN09h71vgCQne3DLsj+A5owkum+a2tYe+TOCB1ybHNo=
 github.com/onsi/gomega v1.34.1 h1:EUMJIKUjM8sKjYbtxQI9A4z2o+rruxnzNvpknOXie6k=
 github.com/onsi/gomega v1.34.1/go.mod h1:kU1QgUvBDLXBJq618Xvm2LUX6rSAfRaFRTcdOeDLwwY=
-github.com/open-policy-agent/opa v0.67.1 h1:rzy26J6g1X+CKknAcx0Vfbt41KqjuSzx4E0A8DAZf3E=
-github.com/open-policy-agent/opa v0.67.1/go.mod h1:aqKlHc8E2VAAylYE9x09zJYr/fYzGX+JKne89UGqFzk=
+github.com/open-policy-agent/opa v0.68.0 h1:Jl3U2vXRjwk7JrHmS19U3HZO5qxQRinQbJ2eCJYSqJQ=
+github.com/open-policy-agent/opa v0.68.0/go.mod h1:5E5SvaPwTpwt2WM177I9Z3eT7qUpmOGjk1ZdHs+TZ4w=
 github.com/opencontainers/runtime-spec v1.1.0 h1:HHUyrt9mwHUjtasSbXSMvs4cyFxh+Bll4AjJ9odEGpg=
 github.com/opencontainers/runtime-spec v1.1.0/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
