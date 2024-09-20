@@ -1634,6 +1634,19 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Body).To(BeNil())
 		})
 
+		It("Stat fails status not found", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewNotFound(ctx, "something not found"),
+			}, nil)
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(404))
+			Expect(response.Body).To(BeNil())
+		})
+
 		It("Stat success", func() {
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 			u := &userv1beta1.User{
