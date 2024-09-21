@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-09-19 15:03+0000\n"
+"POT-Creation-Date: 2024-09-21 00:44+0000\n"
 "PO-Revision-Date: 2024-08-20 10:13+0000\n"
 "Last-Translator: Flávio Veras <flaviove@gmail.com>, 2024\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/owncloud-org/teams/6149/pt_BR/)\n"
@@ -22,20 +22,20 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: pkg/service/response.go:24
-msgid "{user} added {resource} to {space}"
-msgstr "{user} adicionou {resource} para {space}"
+msgid "{user} added {resource} to {folder}"
+msgstr ""
 
 #: pkg/service/response.go:34
 msgid "{user} added {sharee} as member of {space}"
 msgstr "{user} adicionou {sharee} como membro de {space}"
 
 #: pkg/service/response.go:26
-msgid "{user} deleted {resource} from {space}"
-msgstr "{user} excluiu {resource} de {space}"
+msgid "{user} deleted {resource} from {folder}"
+msgstr ""
 
 #: pkg/service/response.go:27
-msgid "{user} moved {resource} to {space}"
-msgstr "{user} moveu {resource} para {space}"
+msgid "{user} moved {resource} to {folder}"
+msgstr ""
 
 #: pkg/service/response.go:33
 msgid "{user} removed link to {resource}"
