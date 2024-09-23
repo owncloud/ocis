@@ -32,7 +32,6 @@ use TestHelpers\WebDavHelper;
  */
 class OcmContext implements Context {
 	private FeatureContext $featureContext;
-	private NotificationContext $notificationContext;
 	private string $invitationToken;
 
 	/**
@@ -53,18 +52,6 @@ class OcmContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
 		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->notificationContext = $environment->getContext('NotificationContext');
-	}
-
-	/**
-	 * Delete all the inbucket emails
-	 *
-	 * @AfterScenario @email
-	 *
-	 * @return void
-	 */
-	public function clearInbucketMessages():void {
-		$this->notificationContext->clearInbucketMessages();
 	}
 
 	/**
