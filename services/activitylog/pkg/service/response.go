@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"path/filepath"
+	"strings"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -27,12 +27,29 @@ var (
 	MessageResourceMoved   = l10n.Template("{user} moved {resource} to {folder}")
 	MessageResourceRenamed = l10n.Template("{user} renamed {oldResource} to {resource}")
 	MessageShareCreated    = l10n.Template("{user} shared {resource} with {sharee}")
+	MessageShareUpdated    = l10n.Template("{user} updated {field} for the {resource}")
 	MessageShareDeleted    = l10n.Template("{user} removed {sharee} from {resource}")
 	MessageLinkCreated     = l10n.Template("{user} shared {resource} via link")
 	MessageLinkUpdated     = l10n.Template("{user} updated {field} for a link {token} on {resource}")
 	MessageLinkDeleted     = l10n.Template("{user} removed link to {resource}")
 	MessageSpaceShared     = l10n.Template("{user} added {sharee} as member of {space}")
 	MessageSpaceUnshared   = l10n.Template("{user} removed {sharee} from {space}")
+
+	StrSomeField      = l10n.Template(_someField)
+	StrPermission     = l10n.Template(_permission)
+	StrPassword       = l10n.Template(_password)
+	StrExpirationDate = l10n.Template(_expirationDate)
+	StrDisplayName    = l10n.Template(_displayName)
+	StrDescription    = l10n.Template(_description)
+)
+
+const (
+	_someField      = "some field"
+	_permission     = "permission"
+	_password       = "password"
+	_expirationDate = "expiration date"
+	_displayName    = "display name"
+	_description    = "description"
 )
 
 // GetActivitiesResponse is the response on GET activities requests
@@ -228,29 +245,29 @@ func WithSpace(spaceid *provider.StorageSpaceId) ActivityOption {
 	}
 }
 
-// WithLinkFieldUpdated sets the field and token variables for an activity
-func WithLinkFieldUpdated(e *events.LinkUpdated) ActivityOption {
+// WithTranslation sets a variable that translation is needed for
+func WithTranslation(t *l10n.Translator, locale string, key string, values []string) ActivityOption {
 	return func(_ context.Context, _ gateway.GatewayAPIClient, vars map[string]interface{}) error {
-		f := "some field"
-		switch e.FieldUpdated {
-		case "TYPE_PERMISSIONS":
-			f = "permission"
-		case "TYPE_PASSWORD":
-			f = "password"
-		case "TYPE_EXPIRATION":
-			f = "expiration date"
-		case "TYPE_DISPLAYNAME":
-			f = "display name"
-		case "TYPE_DESCRIPTION":
-			f = "description"
+		f := t.Translate(StrSomeField, locale)
+		if len(values) > 0 {
+			for i := range values {
+				values[i] = t.Translate(mapField(values[i]), locale)
+			}
+			f = strings.Join(values, ", ")
 		}
-		vars["field"] = Resource{
-			ID:   e.ItemID.GetOpaqueId(),
+		vars[key] = Resource{
 			Name: f,
 		}
-		vars["token"] = Resource{
-			ID:   e.ItemID.GetOpaqueId(),
-			Name: e.Token,
+		return nil
+	}
+}
+
+// WithVar sets a variable for an activity
+func WithVar(key, id, name string) ActivityOption {
+	return func(_ context.Context, _ gateway.GatewayAPIClient, vars map[string]interface{}) error {
+		vars[key] = Resource{
+			ID:   id,
+			Name: name,
 		}
 		return nil
 	}
@@ -283,4 +300,20 @@ func (s *ActivitylogService) GetVars(ctx context.Context, opts ...ActivityOption
 	}
 
 	return vars, nil
+}
+
+func mapField(val string) string {
+	switch val {
+	case "TYPE_PERMISSIONS", "permission":
+		return _permission
+	case "TYPE_PASSWORD", "password":
+		return _password
+	case "TYPE_EXPIRATION", "expiration":
+		return _expirationDate
+	case "TYPE_DISPLAYNAME":
+		return _displayName
+	case "TYPE_DESCRIPTION":
+		return _description
+	}
+	return _someField
 }

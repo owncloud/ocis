@@ -35,6 +35,7 @@ var _registeredEvents = []events.Unmarshaller{
 	events.ItemPurged{},
 	events.ItemMoved{},
 	events.ShareCreated{},
+	events.ShareUpdated{},
 	events.ShareRemoved{},
 	events.LinkCreated{},
 	events.LinkUpdated{},

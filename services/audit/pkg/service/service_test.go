@@ -123,7 +123,7 @@ var testCases = []struct {
 				Sharer:            userID("sharing-userid"),
 				ItemID:            resourceID("provider-1", "storage-1", "itemid-1"),
 				Permissions:       linkPermissions("stat"),
-				CTime:             timestamp(10e8),
+				MTime:             timestamp(10e8),
 				DisplayName:       "link",
 				Expiration:        timestamp(10e8 + 10e5),
 				PasswordProtected: true,

@@ -146,6 +146,9 @@ func TSToUnixNano(ts *types.Timestamp) uint64 {
 
 // TSToTime converts a protobuf Timestamp to Go's time.Time.
 func TSToTime(ts *types.Timestamp) time.Time {
+	if ts == nil {
+		return time.Time{}
+	}
 	return time.Unix(int64(ts.Seconds), int64(ts.Nanos))
 }
 

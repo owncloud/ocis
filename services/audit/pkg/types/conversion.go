@@ -115,7 +115,7 @@ func ShareUpdated(ev events.ShareUpdated) AuditEventShareUpdated {
 func LinkUpdated(ev events.LinkUpdated) AuditEventShareUpdated {
 	uid := ev.Sharer.OpaqueId
 	with, typ := "", _linktype
-	base := BasicAuditEvent(uid, formatTime(ev.CTime), MessageLinkUpdated(uid, ev.ShareID.OpaqueId, ev.FieldUpdated), updateType(ev.FieldUpdated))
+	base := BasicAuditEvent(uid, formatTime(ev.MTime), MessageLinkUpdated(uid, ev.ShareID.GetOpaqueId(), ev.FieldUpdated), updateType(ev.FieldUpdated))
 	return AuditEventShareUpdated{
 		AuditEventSharing: SharingAuditEvent(ev.ShareID.GetOpaqueId(), ev.ItemID.OpaqueId, uid, base),
 		ShareOwner:        uid,
