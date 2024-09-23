@@ -166,7 +166,7 @@ Feature: check activities
                               "pattern": "%user_id_pattern%"
                             },
                             "displayName": {
-                              "const": "Alice"
+                              "const": "Alice Hansen"
                             }
                           }
                         }
@@ -326,7 +326,7 @@ Feature: check activities
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "displayName": {
-                                  "const": "Alice"
+                                  "const": "Alice Hansen"
                                 }
                               }
                             }
@@ -400,7 +400,7 @@ Feature: check activities
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "displayName": {
-                                  "const": "Alice"
+                                  "const": "Alice Hansen"
                                 }
                               }
                             }
@@ -518,7 +518,7 @@ Feature: check activities
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "displayName": {
-                                  "const": "Alice"
+                                  "const": "Alice Hansen"
                                 }
                               }
                             }
@@ -628,7 +628,7 @@ Feature: check activities
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "displayName": {
-                                  "const": "Alice"
+                                  "const": "Alice Hansen"
                                 }
                               }
                             }
@@ -744,7 +744,7 @@ Feature: check activities
                                   "pattern": "^%user_id_pattern%$"
                                 },
                                 "displayName": {
-                                  "const": "Alice"
+                                  "const": "Alice Hansen"
                                 }
                               }
                             }
@@ -853,7 +853,7 @@ Feature: check activities
                                   "pattern": "^%user_id_pattern%$"
                                 },
                                 "displayName": {
-                                  "const": "Alice"
+                                  "const": "Alice Hansen"
                                 }
                               }
                             }
@@ -1302,7 +1302,7 @@ Feature: check activities
                               "pattern": "%user_id_pattern%"
                             },
                             "displayName": {
-                              "const": "Alice"
+                              "const": "Alice Hansen"
                             }
                           }
                         }
