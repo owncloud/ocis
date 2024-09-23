@@ -67,8 +67,14 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
-	_, err = utils.GetResourceByID(ctx, rid, gwc)
+	info, err := utils.GetResourceByID(ctx, rid, gwc)
 	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	// you need ListGrants to see activities
+	if !info.GetPermissionSet().GetListGrants() {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
