@@ -1,7 +1,9 @@
 package defaults
 
 import (
+	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -331,6 +333,14 @@ func Sanitize(cfg *config.Config) {
 
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
+	}
+
+	// if the CSP config file path is not set, we check if the default file exists and set it if it does
+	if cfg.CSPConfigFileLocation == "" {
+		defaultCSPConfigFilePath := filepath.Join(defaults.BaseDataPath(), "proxy", "csp.yaml")
+		if _, err := os.Stat(defaultCSPConfigFilePath); err == nil {
+			cfg.CSPConfigFileLocation = defaultCSPConfigFilePath
+		}
 	}
 }
 
