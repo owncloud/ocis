@@ -2,6 +2,7 @@ package otelchi
 
 import (
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/felixge/httpsnoop"
@@ -40,29 +41,31 @@ func Middleware(serverName string, opts ...Option) func(next http.Handler) http.
 
 	return func(handler http.Handler) http.Handler {
 		return traceware{
-			serverName:             serverName,
-			tracer:                 tracer,
-			propagators:            cfg.Propagators,
-			handler:                handler,
-			chiRoutes:              cfg.ChiRoutes,
-			reqMethodInSpanName:    cfg.RequestMethodInSpanName,
-			filters:                cfg.Filters,
-			traceResponseHeaderKey: cfg.TraceResponseHeaderKey,
-			publicEndpointFn:       cfg.PublicEndpointFn,
+			serverName:                    serverName,
+			tracer:                        tracer,
+			propagators:                   cfg.Propagators,
+			handler:                       handler,
+			chiRoutes:                     cfg.ChiRoutes,
+			reqMethodInSpanName:           cfg.RequestMethodInSpanName,
+			filters:                       cfg.Filters,
+			traceIDResponseHeaderKey:      cfg.TraceIDResponseHeaderKey,
+			traceSampledResponseHeaderKey: cfg.TraceSampledResponseHeaderKey,
+			publicEndpointFn:              cfg.PublicEndpointFn,
 		}
 	}
 }
 
 type traceware struct {
-	serverName             string
-	tracer                 oteltrace.Tracer
-	propagators            propagation.TextMapPropagator
-	handler                http.Handler
-	chiRoutes              chi.Routes
-	reqMethodInSpanName    bool
-	filters                []Filter
-	traceResponseHeaderKey string
-	publicEndpointFn       func(r *http.Request) bool
+	serverName                    string
+	tracer                        oteltrace.Tracer
+	propagators                   propagation.TextMapPropagator
+	handler                       http.Handler
+	chiRoutes                     chi.Routes
+	reqMethodInSpanName           bool
+	filters                       []Filter
+	traceIDResponseHeaderKey      string
+	traceSampledResponseHeaderKey string
+	publicEndpointFn              func(r *http.Request) bool
 }
 
 type recordingResponseWriter struct {
@@ -175,9 +178,10 @@ func (tw traceware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx, span := tw.tracer.Start(ctx, spanName, spanOpts...)
 	defer span.End()
 
-	// put trace_id to response header only when WithTraceResponseHeaderKey is used
-	if len(tw.traceResponseHeaderKey) > 0 && span.SpanContext().HasTraceID() {
-		w.Header().Add(tw.traceResponseHeaderKey, span.SpanContext().TraceID().String())
+	// put trace_id to response header only when `WithTraceIDResponseHeader` is used
+	if len(tw.traceIDResponseHeaderKey) > 0 && span.SpanContext().HasTraceID() {
+		w.Header().Add(tw.traceIDResponseHeaderKey, span.SpanContext().TraceID().String())
+		w.Header().Add(tw.traceSampledResponseHeaderKey, strconv.FormatBool(span.SpanContext().IsSampled()))
 	}
 
 	// get recording response writer
