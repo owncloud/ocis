@@ -62,6 +62,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Added LinkUpdated activity: [#10085](https://github.com/owncloud/ocis/pull/10085)
 * Bugfix - Fix Activities leak: [#10092](https://github.com/owncloud/ocis/pull/10092)
 * Bugfix - Include additional logs in the collaboration service: [#10101](https://github.com/owncloud/ocis/pull/10101)
+* Bugfix - Added ShareUpdate activity: [#10104](https://github.com/owncloud/ocis/pull/10104)
 * Bugfix - CheckFileInfo will return a 404 error if the target file isn't found: [#10112](https://github.com/owncloud/ocis/pull/10112)
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
@@ -122,6 +123,13 @@ The following sections list the changes for unreleased.
    corresponding log entry
 
    https://github.com/owncloud/ocis/pull/10101
+
+* Bugfix - Added ShareUpdate activity: [#10104](https://github.com/owncloud/ocis/pull/10104)
+
+   Added the ShareUpdate activity in the space context.
+
+   https://github.com/owncloud/ocis/issues/10011
+   https://github.com/owncloud/ocis/pull/10104
 
 * Bugfix - CheckFileInfo will return a 404 error if the target file isn't found: [#10112](https://github.com/owncloud/ocis/pull/10112)
 
