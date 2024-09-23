@@ -136,9 +136,11 @@ Feature: create invitation
 
   @email @issue-10059
   Scenario: federated user gets an email notification if their email was specified when creating the federation share invitation
-    Given using server "LOCAL"
-    When "Alice" has created the federation share invitation with email "brian@example.com" and description "a share invitation from Alice"
-    And user "Brian" should have received the following email from user "Alice" ignoring whitespaces
+    Given using server "REMOTE"
+    And user "David" has been created with default attributes and without skeleton files
+    And using server "LOCAL"
+    When "Alice" has created the federation share invitation with email "david@example.com" and description "a share invitation from Alice"
+    And user "David" should have received the following email from user "Alice" ignoring whitespaces
       """
       Hi,
 
