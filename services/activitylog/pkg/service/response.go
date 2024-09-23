@@ -155,23 +155,31 @@ func WithTrashedResource(ref *provider.Reference, rid *provider.ResourceId) Acti
 }
 
 // WithUser sets the user variable for an Activity
-func WithUser(uid *user.UserId, username string) ActivityOption {
-	return func(_ context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
-		if username == "" {
-			u, err := utils.GetUser(uid, gwc)
+func WithUser(uid *user.UserId, u *user.User, impersonator *user.User) ActivityOption {
+	return func(ctx context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
+		var target *user.User
+		switch {
+		case impersonator != nil:
+			target = impersonator
+		case u != nil:
+			target = u
+		case uid != nil:
+			us, err := utils.GetUserWithContext(ctx, uid, gwc)
+			target = us
+
 			if err != nil {
-				vars["user"] = Actor{
-					ID:          uid.GetOpaqueId(),
+				target = &user.User{
+					Id:          uid,
 					DisplayName: "DeletedUser",
 				}
-				return err
 			}
-			username = u.GetUsername()
+		default:
+			return fmt.Errorf("no user provided")
 		}
 
 		vars["user"] = Actor{
-			ID:          uid.GetOpaqueId(),
-			DisplayName: username,
+			ID:          target.GetId().GetOpaqueId(),
+			DisplayName: target.GetDisplayName(),
 		}
 
 		return nil

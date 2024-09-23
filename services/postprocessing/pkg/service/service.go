@@ -95,14 +95,15 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 	switch ev := e.Event.(type) {
 	case events.BytesReceived:
 		pp = &postprocessing.Postprocessing{
-			ID:          ev.UploadID,
-			URL:         ev.URL,
-			User:        ev.ExecutingUser,
-			Filename:    ev.Filename,
-			Filesize:    ev.Filesize,
-			ResourceID:  ev.ResourceID,
-			Steps:       pps.steps,
-			InitiatorID: e.InitiatorID,
+			ID:                ev.UploadID,
+			URL:               ev.URL,
+			User:              ev.ExecutingUser,
+			Filename:          ev.Filename,
+			Filesize:          ev.Filesize,
+			ResourceID:        ev.ResourceID,
+			Steps:             pps.steps,
+			InitiatorID:       e.InitiatorID,
+			ImpersonatingUser: ev.ImpersonatingUser,
 		}
 		next = pp.Init(ev)
 	case events.PostprocessingStepFinished:
@@ -124,13 +125,14 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 			go func() {
 				time.Sleep(backoff)
 				retryEvent := events.StartPostprocessingStep{
-					UploadID:      pp.ID,
-					URL:           pp.URL,
-					ExecutingUser: pp.User,
-					Filename:      pp.Filename,
-					Filesize:      pp.Filesize,
-					ResourceID:    pp.ResourceID,
-					StepToStart:   pp.Status.CurrentStep,
+					UploadID:          pp.ID,
+					URL:               pp.URL,
+					ExecutingUser:     pp.User,
+					Filename:          pp.Filename,
+					Filesize:          pp.Filesize,
+					ResourceID:        pp.ResourceID,
+					StepToStart:       pp.Status.CurrentStep,
+					ImpersonatingUser: pp.ImpersonatingUser,
 				}
 				err := events.Publish(ctx, pps.pub, retryEvent)
 				if err != nil {

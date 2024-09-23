@@ -12,17 +12,18 @@ import (
 
 // Postprocessing handles postprocessing of a file
 type Postprocessing struct {
-	ID          string
-	URL         string
-	User        *user.User
-	Filename    string
-	Filesize    uint64
-	ResourceID  *provider.ResourceId
-	Steps       []events.Postprocessingstep
-	Status      Status
-	Failures    int
-	InitiatorID string
-	Finished    bool
+	ID                string
+	URL               string
+	User              *user.User
+	ImpersonatingUser *user.User
+	Filename          string
+	Filesize          uint64
+	ResourceID        *provider.ResourceId
+	Steps             []events.Postprocessingstep
+	Status            Status
+	Failures          int
+	InitiatorID       string
+	Finished          bool
 
 	config config.Postprocessing
 }
@@ -97,13 +98,14 @@ func (pp *Postprocessing) next(current events.Postprocessingstep) interface{} {
 func (pp *Postprocessing) step(next events.Postprocessingstep) events.StartPostprocessingStep {
 	pp.Status.CurrentStep = next
 	return events.StartPostprocessingStep{
-		UploadID:      pp.ID,
-		URL:           pp.URL,
-		ExecutingUser: pp.User,
-		Filename:      pp.Filename,
-		Filesize:      pp.Filesize,
-		ResourceID:    pp.ResourceID,
-		StepToStart:   next,
+		UploadID:          pp.ID,
+		URL:               pp.URL,
+		ExecutingUser:     pp.User,
+		Filename:          pp.Filename,
+		Filesize:          pp.Filesize,
+		ResourceID:        pp.ResourceID,
+		StepToStart:       next,
+		ImpersonatingUser: pp.ImpersonatingUser,
 	}
 }
 
@@ -111,10 +113,11 @@ func (pp *Postprocessing) finished(outcome events.PostprocessingOutcome) events.
 	pp.Status.CurrentStep = events.PPStepFinished
 	pp.Status.Outcome = outcome
 	return events.PostprocessingFinished{
-		UploadID:      pp.ID,
-		ExecutingUser: pp.User,
-		Filename:      pp.Filename,
-		Outcome:       outcome,
+		UploadID:          pp.ID,
+		ExecutingUser:     pp.User,
+		Filename:          pp.Filename,
+		Outcome:           outcome,
+		ImpersonatingUser: pp.ImpersonatingUser,
 	}
 }
 
