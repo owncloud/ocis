@@ -34,6 +34,7 @@ cs3api:
     name: com.owncloud.api.gateway
   datagateway:
     insecure: false
+  grpc_client_tls: null
 tracing:
   enabled: false
   type: ""
