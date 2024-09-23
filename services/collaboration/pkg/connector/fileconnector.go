@@ -689,7 +689,7 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		// try to put the file. It mustn't return a 400 or 409
 		putResponse, err := ccs.PutFile(newCtx, stream, streamLength, "")
 		if err != nil {
-			newLogger.Error().Err(err).Msg("PutRelativeFileSuggested: put file failed")
+			newLogger.Error().Err(err).Msg("PutRelativeFileSuggested: put file failed") // fails here
 			return nil, err
 		}
 
@@ -799,7 +799,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 	// try to put the file
 	putResponse, err := ccs.PutFile(newCtx, stream, streamLength, "")
 	if err != nil {
-		newLogger.Error().Err(err).Msg("PutRelativeFileRelative: put file failed")
+		newLogger.Error().Err(err).Msg("PutRelativeFileRelative: put file failed") // or here
 		return nil, err
 	}
 
@@ -849,7 +849,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 		newLogger.Error().
 			Str("LockID", lockID).
 			Msg("PutRelativeFileRelative: put file failed with unhandled status")
-		return NewResponse(500), nil
+		return nil, NewConnectorError(putResponse.Status, "put file failed with unhandled status")
 	}
 
 	if err := f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {

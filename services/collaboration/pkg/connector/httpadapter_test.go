@@ -477,6 +477,26 @@ var _ = Describe("HttpAdapter", func() {
 			httpAdapter.PutFile(w, req)
 			resp := w.Result()
 			Expect(resp.StatusCode).To(Equal(500))
+
+			content, _ := io.ReadAll(resp.Body)
+			Expect(content).To(Equal([]byte("")))
+		})
+
+		It("Connector error", func() {
+			contentBody := "this is the new fake content"
+			req := httptest.NewRequest("GET", "/wopi/files/abcdef/contents", strings.NewReader(contentBody))
+			req.Header.Set(connector.HeaderWopiLock, "abc123")
+
+			w := httptest.NewRecorder()
+
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(nil, connector.NewConnectorError(500, "Something happened"))
+
+			httpAdapter.PutFile(w, req)
+			resp := w.Result()
+			Expect(resp.StatusCode).To(Equal(500))
+
+			content, _ := io.ReadAll(resp.Body)
+			Expect(content).To(Equal([]byte("")))
 		})
 
 		It("Conflict", func() {
@@ -511,6 +531,66 @@ var _ = Describe("HttpAdapter", func() {
 				), nil)
 
 			httpAdapter.PutFile(w, req)
+			resp := w.Result()
+			Expect(resp.StatusCode).To(Equal(200))
+			Expect(resp.Header.Get(connector.HeaderWopiLock)).To(Equal("abc123"))
+			Expect(resp.Header.Get(connector.HeaderWopiVersion)).To(Equal("v1234567"))
+		})
+	})
+
+	Describe("PutRelativeFile", func() {
+		It("Connector error", func() {
+			contentBody := "this is the new fake content"
+			req := httptest.NewRequest("GET", "/wopi/files/abcdef/contents", strings.NewReader(contentBody))
+			req.Header.Set(connector.HeaderWopiLock, "abc123")
+			req.Header.Set(connector.HeaderWopiRT, "relativetarget.docx")
+
+			w := httptest.NewRecorder()
+
+			fc.On("PutRelativeFileRelative", mock.Anything, mock.Anything, mock.Anything, int64(len(contentBody)), "relativetarget.docx").Times(1).Return(nil, connector.NewConnectorError(500, "Something happened"))
+
+			httpAdapter.PutRelativeFile(w, req)
+			resp := w.Result()
+			Expect(resp.StatusCode).To(Equal(500))
+
+			content, _ := io.ReadAll(resp.Body)
+			Expect(content).To(Equal([]byte("")))
+		})
+
+		It("Conflict", func() {
+			contentBody := "this is the new fake content"
+			req := httptest.NewRequest("GET", "/wopi/files/abcdef/contents", strings.NewReader(contentBody))
+			req.Header.Set(connector.HeaderWopiLock, "abc123")
+			req.Header.Set(connector.HeaderWopiRT, "relativetarget.docx")
+
+			w := httptest.NewRecorder()
+
+			fc.On("PutRelativeFileRelative", mock.Anything, mock.Anything, mock.Anything, int64(len(contentBody)), "relativetarget.docx").Times(1).Return(
+				connector.NewResponseLockConflict("zzz111", "Lock Conflict"), nil)
+
+			httpAdapter.PutRelativeFile(w, req)
+			resp := w.Result()
+			Expect(resp.StatusCode).To(Equal(409))
+			Expect(resp.Header.Get(connector.HeaderWopiLock)).To(Equal("zzz111"))
+			Expect(resp.Header.Get(connector.HeaderWopiLockFailureReason)).To(Equal("Lock Conflict"))
+		})
+
+		It("Success", func() {
+			contentBody := "this is the new fake content"
+			req := httptest.NewRequest("GET", "/wopi/files/abcdef/contents", strings.NewReader(contentBody))
+			req.Header.Set(connector.HeaderWopiLock, "abc123")
+			req.Header.Set(connector.HeaderWopiRT, "relativetarget.docx")
+
+			w := httptest.NewRecorder()
+
+			fc.On("PutRelativeFileRelative", mock.Anything, mock.Anything, mock.Anything, int64(len(contentBody)), "relativetarget.docx").Times(1).Return(
+				connector.NewResponseWithVersionAndLock(
+					200,
+					&typesv1beta1.Timestamp{Seconds: uint64(1234), Nanos: uint32(567)},
+					"abc123",
+				), nil)
+
+			httpAdapter.PutRelativeFile(w, req)
 			resp := w.Result()
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get(connector.HeaderWopiLock)).To(Equal("abc123"))
