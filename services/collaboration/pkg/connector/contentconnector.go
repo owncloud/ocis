@@ -15,6 +15,7 @@ import (
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
@@ -42,14 +43,14 @@ type ContentConnectorService interface {
 // uploads (PutFile)
 // Note that operations might return any kind of error, not just ConnectorError
 type ContentConnector struct {
-	gwc gatewayv1beta1.GatewayAPIClient
+	gws pool.Selectable[gatewayv1beta1.GatewayAPIClient]
 	cfg *config.Config
 }
 
 // NewContentConnector creates a new content connector
-func NewContentConnector(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *ContentConnector {
+func NewContentConnector(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config) *ContentConnector {
 	return &ContentConnector{
-		gwc: gwc,
+		gws: gws,
 		cfg: cfg,
 	}
 }
@@ -76,7 +77,11 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 		Logger()
 	logger.Debug().Msg("GetFile: start")
 
-	sResp, err := c.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+	gwc, err := c.gws.Next()
+	if err != nil {
+		return err
+	}
+	sResp, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
@@ -94,7 +99,11 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 	if wopiContext.ViewMode == appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY && wopiContext.ViewOnlyToken != "" {
 		ctx = revactx.ContextSetToken(ctx, wopiContext.ViewOnlyToken)
 	}
-	resp, err := c.gwc.InitiateFileDownload(ctx, req)
+	gwc, err = c.gws.Next()
+	if err != nil {
+		return err
+	}
+	resp, err := gwc.InitiateFileDownload(ctx, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("GetFile: InitiateFileDownload failed")
 		return err
@@ -227,9 +236,13 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		Logger()
 	logger.Debug().Msg("PutFile: start")
 
+	gwc, err := c.gws.Next()
+	if err != nil {
+		return nil, err
+	}
 	// We need a stat call on the target file in order to get both the lock
 	// (if any) and the current size of the file
-	statRes, err := c.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+	statRes, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
@@ -286,8 +299,12 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		},
 	}
 
+	gwc, err = c.gws.Next()
+	if err != nil {
+		return nil, err
+	}
 	// Initiate the upload request
-	resp, err := c.gwc.InitiateFileUpload(ctx, req)
+	resp, err := gwc.InitiateFileUpload(ctx, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("UploadHelper: InitiateFileUpload failed")
 		return nil, err
@@ -383,9 +400,13 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 				Msg("UploadHelper: Put request to the upload endpoint failed with unexpected status")
 			return NewResponse(500), nil
 		}
+		gwc, err = c.gws.Next()
+		if err != nil {
+			return nil, err
+		}
 		// We need a stat call on the target file after the upload to get the
 		// new mtime
-		statResAfter, err := c.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+		statResAfter, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 			Ref: wopiContext.FileReference,
 		})
 		if err != nil {

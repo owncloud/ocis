@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 )
 
@@ -92,6 +93,9 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
+	}
+	if cfg.CS3Api.GRPCClientTLS == nil && cfg.Commons != nil {
+		cfg.CS3Api.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
 }
 

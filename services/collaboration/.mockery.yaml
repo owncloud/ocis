@@ -15,3 +15,10 @@ packages:
             dir: "mocks"
         interfaces:
             LockParser:
+    github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool:
+        config:
+            dir: "mocks"
+        interfaces:
+            Selectable:
+                config:
+                    filename: "gateway_selector.go"

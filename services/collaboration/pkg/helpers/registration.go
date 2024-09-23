@@ -8,6 +8,7 @@ import (
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/mime"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -32,7 +33,7 @@ func RegisterAppProvider(
 	ctx context.Context,
 	cfg *config.Config,
 	logger log.Logger,
-	gwc gatewayv1beta1.GatewayAPIClient,
+	gws pool.Selectable[gatewayv1beta1.GatewayAPIClient],
 	appUrls map[string]map[string]string,
 ) error {
 	mimeTypesMap := make(map[string]bool)
@@ -65,7 +66,10 @@ func RegisterAppProvider(
 			MimeTypes:   mimeTypes,
 		},
 	}
-
+	gwc, err := gws.Next()
+	if err != nil {
+		return err
+	}
 	resp, err := gwc.AddAppProvider(ctx, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("AddAppProvider failed")

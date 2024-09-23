@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
@@ -23,16 +24,18 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
+	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/stretchr/testify/mock"
 )
 
 var _ = Describe("FileConnector", func() {
 	var (
-		fc            *connector.FileConnector
-		ccs           *collabmocks.ContentConnectorService
-		gatewayClient *cs3mocks.GatewayAPIClient
-		cfg           *config.Config
-		wopiCtx       middleware.WopiContext
+		fc              *connector.FileConnector
+		ccs             *collabmocks.ContentConnectorService
+		gatewayClient   *cs3mocks.GatewayAPIClient
+		gatewaySelector *mocks.Selectable[gateway.GatewayAPIClient]
+		cfg             *config.Config
+		wopiCtx         middleware.WopiContext
 	)
 
 	BeforeEach(func() {
@@ -49,8 +52,12 @@ var _ = Describe("FileConnector", func() {
 			},
 		}
 		ccs = &collabmocks.ContentConnectorService{}
-		gatewayClient = &cs3mocks.GatewayAPIClient{}
-		fc = connector.NewFileConnector(gatewayClient, cfg)
+
+		gatewayClient = cs3mocks.NewGatewayAPIClient(GinkgoT())
+
+		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
+		gatewaySelector.On("Next").Return(gatewayClient, nil)
+		fc = connector.NewFileConnector(gatewaySelector, cfg)
 
 		wopiCtx = middleware.WopiContext{
 			// a real token is needed for the PutRelativeFileSuggested tests
@@ -70,6 +77,7 @@ var _ = Describe("FileConnector", func() {
 
 	Describe("GetLock", func() {
 		It("No valid context", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			ctx := context.Background()
 			response, err := fc.GetLock(ctx)
 			Expect(err).To(HaveOccurred())
@@ -125,6 +133,7 @@ var _ = Describe("FileConnector", func() {
 	Describe("Lock", func() {
 		Describe("Lock", func() {
 			It("No valid context", func() {
+				gatewaySelector.EXPECT().Next().Unset()
 				ctx := context.Background()
 				response, err := fc.Lock(ctx, "newLock", "")
 				Expect(err).To(HaveOccurred())
@@ -132,6 +141,7 @@ var _ = Describe("FileConnector", func() {
 			})
 
 			It("Empty lockId", func() {
+				gatewaySelector.EXPECT().Next().Unset()
 				ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
 				response, err := fc.Lock(ctx, "", "")
@@ -314,6 +324,7 @@ var _ = Describe("FileConnector", func() {
 
 		Describe("Unlock and relock", func() {
 			It("No valid context", func() {
+				gatewaySelector.EXPECT().Next().Unset()
 				ctx := context.Background()
 				response, err := fc.Lock(ctx, "newLock", "oldLock")
 				Expect(err).To(HaveOccurred())
@@ -321,6 +332,7 @@ var _ = Describe("FileConnector", func() {
 			})
 
 			It("Empty lockId", func() {
+				gatewaySelector.EXPECT().Next().Unset()
 				ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
 				response, err := fc.Lock(ctx, "", "oldLock")
@@ -496,6 +508,7 @@ var _ = Describe("FileConnector", func() {
 
 	Describe("RefreshLock", func() {
 		It("No valid context", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			ctx := context.Background()
 
 			response, err := fc.RefreshLock(ctx, "")
@@ -504,6 +517,7 @@ var _ = Describe("FileConnector", func() {
 		})
 
 		It("Empty lockId", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
 			response, err := fc.RefreshLock(ctx, "")
@@ -668,6 +682,7 @@ var _ = Describe("FileConnector", func() {
 
 	Describe("Unlock", func() {
 		It("No valid context", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			ctx := context.Background()
 
 			response, err := fc.UnLock(ctx, "")
@@ -676,6 +691,7 @@ var _ = Describe("FileConnector", func() {
 		})
 
 		It("Empty lockId", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
 			response, err := fc.UnLock(ctx, "")
@@ -845,6 +861,7 @@ var _ = Describe("FileConnector", func() {
 
 	Describe("PutRelativeFileSuggested", func() {
 		It("No valid context", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			ctx := context.Background()
 			stream := strings.NewReader("This is the content of a file")
 			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
@@ -1098,6 +1115,7 @@ var _ = Describe("FileConnector", func() {
 
 	Describe("PutRelativeFileRelative", func() {
 		It("No valid context", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			ctx := context.Background()
 			stream := strings.NewReader("This is the content of a file")
 			response, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "newFile.txt")
@@ -1285,6 +1303,7 @@ var _ = Describe("FileConnector", func() {
 
 	Describe("DeleteFile", func() {
 		It("No valid context", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			ctx := context.Background()
 			response, err := fc.DeleteFile(ctx, "lock")
 			Expect(err).To(HaveOccurred())
@@ -1299,9 +1318,7 @@ var _ = Describe("FileConnector", func() {
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
 
-			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
-				Status: status.NewInternal(ctx, "something failed"),
-			}, targetErr)
+			gatewayClient.EXPECT().Stat(mock.Anything, mock.Anything).Unset()
 
 			response, err := fc.DeleteFile(ctx, "newlock")
 			Expect(err).To(HaveOccurred())
@@ -1312,11 +1329,11 @@ var _ = Describe("FileConnector", func() {
 		It("Delete fails status not ok, get lock fails", func() {
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
-			targetErr := errors.New("Something went wrong")
 			gatewayClient.On("Delete", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.DeleteResponse{
 				Status: status.NewInternal(ctx, "something failed"),
 			}, nil)
 
+			targetErr := errors.New("Something went wrong")
 			gatewayClient.On("GetLock", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.GetLockResponse{
 				Status: status.NewInternal(ctx, "something failed"),
 			}, targetErr)
@@ -1330,14 +1347,9 @@ var _ = Describe("FileConnector", func() {
 		It("Delete fails file missing", func() {
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
-			targetErr := errors.New("Something went wrong")
 			gatewayClient.On("Delete", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.DeleteResponse{
 				Status: status.NewNotFound(ctx, "something failed"),
 			}, nil)
-
-			gatewayClient.On("GetLock", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.GetLockResponse{
-				Status: status.NewInternal(ctx, "something failed"),
-			}, targetErr)
 
 			response, err := fc.DeleteFile(ctx, "newlock")
 			Expect(err).ToNot(HaveOccurred())
@@ -1416,6 +1428,7 @@ var _ = Describe("FileConnector", func() {
 
 	Describe("RenameFile", func() {
 		It("No valid context", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			ctx := context.Background()
 			response, err := fc.RenameFile(ctx, "lockid", "newFile.doc")
 			Expect(err).To(HaveOccurred())
@@ -1601,6 +1614,7 @@ var _ = Describe("FileConnector", func() {
 
 	Describe("CheckFileInfo", func() {
 		It("No valid context", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			ctx := context.Background()
 			response, err := fc.CheckFileInfo(ctx)
 			Expect(err).To(HaveOccurred())

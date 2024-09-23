@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	registry "github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config/parser"
@@ -44,17 +46,24 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			gwc, err := helpers.GetCS3apiClient(cfg, false)
+			tm, err := pool.StringToTLSMode(cfg.Commons.GRPCClientTLS.Mode)
 			if err != nil {
 				return err
 			}
+			gatewaySelector, err := pool.GatewaySelector(
+				cfg.CS3Api.Gateway.Name,
+				pool.WithTLSCACert(cfg.Commons.GRPCClientTLS.CACert),
+				pool.WithTLSMode(tm),
+				pool.WithRegistry(registry.GetRegistry()),
+				pool.WithTracerProvider(traceProvider),
+			)
 
 			appUrls, err := helpers.GetAppURLs(cfg, logger)
 			if err != nil {
 				return err
 			}
 
-			if err := helpers.RegisterAppProvider(ctx, cfg, logger, gwc, appUrls); err != nil {
+			if err := helpers.RegisterAppProvider(ctx, cfg, logger, gatewaySelector, appUrls); err != nil {
 				return err
 			}
 
@@ -101,7 +110,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			// start HTTP server
 			httpServer, err := http.Server(
-				http.Adapter(connector.NewHttpAdapter(gwc, cfg)),
+				http.Adapter(connector.NewHttpAdapter(gatewaySelector, cfg)),
 				http.Logger(logger),
 				http.Config(cfg),
 				http.Context(ctx),
