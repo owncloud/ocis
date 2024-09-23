@@ -29,14 +29,14 @@ func (d *decoder) asFloat32WithCode(code byte, k reflect.Kind) (float32, error) 
 	case d.isPositiveFixNum(code), code == def.Uint8, code == def.Uint16, code == def.Uint32, code == def.Uint64:
 		v, err := d.asUintWithCode(code, k)
 		if err != nil {
-			break
+			return 0, err
 		}
 		return float32(v), nil
 
 	case d.isNegativeFixNum(code), code == def.Int8, code == def.Int16, code == def.Int32, code == def.Int64:
 		v, err := d.asIntWithCode(code, k)
 		if err != nil {
-			break
+			return 0, err
 		}
 		return float32(v), nil
 
@@ -75,14 +75,14 @@ func (d *decoder) asFloat64WithCode(code byte, k reflect.Kind) (float64, error) 
 	case d.isPositiveFixNum(code), code == def.Uint8, code == def.Uint16, code == def.Uint32, code == def.Uint64:
 		v, err := d.asUintWithCode(code, k)
 		if err != nil {
-			break
+			return 0, err
 		}
 		return float64(v), nil
 
 	case d.isNegativeFixNum(code), code == def.Int8, code == def.Int16, code == def.Int32, code == def.Int64:
 		v, err := d.asIntWithCode(code, k)
 		if err != nil {
-			break
+			return 0, err
 		}
 		return float64(v), nil
 

@@ -7,8 +7,10 @@ import (
 )
 
 func (d *decoder) asBool(offset int, k reflect.Kind) (bool, int, error) {
-	code := d.data[offset]
-	offset++
+	code, offset, err := d.readSize1(offset)
+	if err != nil {
+		return false, 0, err
+	}
 
 	switch code {
 	case def.True:

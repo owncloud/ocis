@@ -95,7 +95,7 @@ func (e *encoder) calcStructArray(rv reflect.Value) (int, error) {
 		ret += def.Byte4
 	} else {
 		// not supported error
-		return 0, fmt.Errorf("not support this array length : %d", l)
+		return 0, fmt.Errorf("array length %d is %w", l, def.ErrUnsupportedLength)
 	}
 	return ret, nil
 }
@@ -142,7 +142,7 @@ func (e *encoder) calcStructMap(rv reflect.Value) (int, error) {
 		ret += def.Byte4
 	} else {
 		// not supported error
-		return 0, fmt.Errorf("not support this array length : %d", l)
+		return 0, fmt.Errorf("map length %d is %w", l, def.ErrUnsupportedLength)
 	}
 	return ret, nil
 }

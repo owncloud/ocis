@@ -28,22 +28,31 @@ func (d *decoder) asBin(offset int, k reflect.Kind) ([]byte, int, error) {
 		if err != nil {
 			return emptyBytes, 0, err
 		}
-		o := offset + int(uint8(l))
-		return d.data[offset:o], o, nil
+		v, offset, err := d.readSizeN(offset, int(uint8(l)))
+		if err != nil {
+			return emptyBytes, 0, err
+		}
+		return v, offset, nil
 	case def.Bin16:
 		bs, offset, err := d.readSize2(offset)
-		o := offset + int(binary.BigEndian.Uint16(bs))
 		if err != nil {
 			return emptyBytes, 0, err
 		}
-		return d.data[offset:o], o, nil
+		v, offset, err := d.readSizeN(offset, int(binary.BigEndian.Uint16(bs)))
+		if err != nil {
+			return emptyBytes, 0, err
+		}
+		return v, offset, nil
 	case def.Bin32:
 		bs, offset, err := d.readSize4(offset)
-		o := offset + int(binary.BigEndian.Uint32(bs))
 		if err != nil {
 			return emptyBytes, 0, err
 		}
-		return d.data[offset:o], o, nil
+		v, offset, err := d.readSizeN(offset, int(binary.BigEndian.Uint32(bs)))
+		if err != nil {
+			return emptyBytes, 0, err
+		}
+		return v, offset, nil
 	}
 
 	return emptyBytes, 0, d.errorTemplate(code, k)

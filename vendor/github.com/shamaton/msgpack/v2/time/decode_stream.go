@@ -3,17 +3,16 @@ package time
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/shamaton/msgpack/v2/def"
-	"github.com/shamaton/msgpack/v2/ext"
 	"reflect"
 	"time"
+
+	"github.com/shamaton/msgpack/v2/def"
+	"github.com/shamaton/msgpack/v2/ext"
 )
 
 var StreamDecoder = new(timeStreamDecoder)
 
-type timeStreamDecoder struct {
-	ext.DecoderStreamCommon
-}
+type timeStreamDecoder struct{}
 
 var _ ext.StreamDecoder = (*timeStreamDecoder)(nil)
 

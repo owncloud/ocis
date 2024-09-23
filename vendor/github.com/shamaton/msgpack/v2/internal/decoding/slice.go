@@ -2,7 +2,6 @@ package decoding
 
 import (
 	"encoding/binary"
-	"errors"
 	"reflect"
 
 	"github.com/shamaton/msgpack/v2/def"
@@ -61,7 +60,7 @@ func (d *decoder) sliceLength(offset int, k reflect.Kind) (int, int, error) {
 func (d *decoder) hasRequiredLeastSliceSize(offset, length int) error {
 	// minimum check (byte length)
 	if len(d.data[offset:]) < length {
-		return errors.New("data length lacks to create map")
+		return def.ErrLackDataLengthToSlice
 	}
 	return nil
 }

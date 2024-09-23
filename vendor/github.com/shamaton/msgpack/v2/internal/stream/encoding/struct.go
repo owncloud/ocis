@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/shamaton/msgpack/v2/def"
+	"github.com/shamaton/msgpack/v2/ext"
 	"github.com/shamaton/msgpack/v2/internal/common"
 )
 
@@ -24,7 +25,8 @@ func (e *encoder) getStructWriter(typ reflect.Type) structWriteFunc {
 	for i := range extCoders {
 		if extCoders[i].Type() == typ {
 			return func(rv reflect.Value) error {
-				return extCoders[i].Write(e.w, rv, e.buf)
+				w := ext.CreateStreamWriter(e.w, e.buf)
+				return extCoders[i].Write(w, rv)
 			}
 		}
 	}
@@ -39,7 +41,8 @@ func (e *encoder) writeStruct(rv reflect.Value) error {
 
 	for i := range extCoders {
 		if extCoders[i].Type() == rv.Type() {
-			return extCoders[i].Write(e.w, rv, e.buf)
+			w := ext.CreateStreamWriter(e.w, e.buf)
+			return extCoders[i].Write(w, rv)
 		}
 	}
 

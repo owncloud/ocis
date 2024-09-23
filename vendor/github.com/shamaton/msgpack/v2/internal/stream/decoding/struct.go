@@ -275,7 +275,7 @@ func (d *decoder) jumpOffset() error {
 	case code == def.Fixext16:
 		_, err = d.readSizeN(def.Byte1 + def.Byte16)
 		return err
-		
+
 	case code == def.Ext8:
 		b, err := d.readSize1()
 		if err != nil {

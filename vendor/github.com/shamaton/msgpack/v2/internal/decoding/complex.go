@@ -58,7 +58,7 @@ func (d *decoder) asComplex64(offset int, k reflect.Kind) (complex64, int, error
 
 	}
 
-	return complex(0, 0), 0, fmt.Errorf("should not reach this line!! code %x decoding %v", code, k)
+	return complex(0, 0), 0, d.errorTemplate(code, k)
 }
 
 func (d *decoder) asComplex128(offset int, k reflect.Kind) (complex128, int, error) {
@@ -110,5 +110,5 @@ func (d *decoder) asComplex128(offset int, k reflect.Kind) (complex128, int, err
 
 	}
 
-	return complex(0, 0), 0, fmt.Errorf("should not reach this line!! code %x decoding %v", code, k)
+	return complex(0, 0), 0, d.errorTemplate(code, k)
 }

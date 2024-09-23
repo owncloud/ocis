@@ -1,8 +1,6 @@
 package time
 
 import (
-	"github.com/shamaton/msgpack/v2/internal/common"
-	"io"
 	"reflect"
 	"time"
 
@@ -12,9 +10,7 @@ import (
 
 var StreamEncoder = new(timeStreamEncoder)
 
-type timeStreamEncoder struct {
-	ext.StreamEncoderCommon
-}
+type timeStreamEncoder struct{}
 
 var _ ext.StreamEncoder = (*timeStreamEncoder)(nil)
 
@@ -26,50 +22,50 @@ func (timeStreamEncoder) Type() reflect.Type {
 	return typeOf
 }
 
-func (e timeStreamEncoder) Write(w io.Writer, value reflect.Value, buf *common.Buffer) error {
+func (e timeStreamEncoder) Write(w ext.StreamWriter, value reflect.Value) error {
 	t := value.Interface().(time.Time)
 
 	secs := uint64(t.Unix())
 	if secs>>34 == 0 {
 		data := uint64(t.Nanosecond())<<34 | secs
 		if data&0xffffffff00000000 == 0 {
-			if err := e.WriteByte1Int(w, def.Fixext4, buf); err != nil {
+			if err := w.WriteByte1Int(def.Fixext4); err != nil {
 				return err
 			}
-			if err := e.WriteByte1Int(w, def.TimeStamp, buf); err != nil {
+			if err := w.WriteByte1Int(def.TimeStamp); err != nil {
 				return err
 			}
-			if err := e.WriteByte4Uint64(w, data, buf); err != nil {
+			if err := w.WriteByte4Uint64(data); err != nil {
 				return err
 			}
 			return nil
 		}
 
-		if err := e.WriteByte1Int(w, def.Fixext8, buf); err != nil {
+		if err := w.WriteByte1Int(def.Fixext8); err != nil {
 			return err
 		}
-		if err := e.WriteByte1Int(w, def.TimeStamp, buf); err != nil {
+		if err := w.WriteByte1Int(def.TimeStamp); err != nil {
 			return err
 		}
-		if err := e.WriteByte8Uint64(w, data, buf); err != nil {
+		if err := w.WriteByte8Uint64(data); err != nil {
 			return err
 		}
 		return nil
 	}
 
-	if err := e.WriteByte1Int(w, def.Ext8, buf); err != nil {
+	if err := w.WriteByte1Int(def.Ext8); err != nil {
 		return err
 	}
-	if err := e.WriteByte1Int(w, 12, buf); err != nil {
+	if err := w.WriteByte1Int(12); err != nil {
 		return err
 	}
-	if err := e.WriteByte1Int(w, def.TimeStamp, buf); err != nil {
+	if err := w.WriteByte1Int(def.TimeStamp); err != nil {
 		return err
 	}
-	if err := e.WriteByte4Int(w, t.Nanosecond(), buf); err != nil {
+	if err := w.WriteByte4Int(t.Nanosecond()); err != nil {
 		return err
 	}
-	if err := e.WriteByte8Uint64(w, secs, buf); err != nil {
+	if err := w.WriteByte8Uint64(secs); err != nil {
 		return err
 	}
 	return nil

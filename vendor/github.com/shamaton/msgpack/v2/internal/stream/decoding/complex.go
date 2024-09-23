@@ -55,7 +55,7 @@ func (d *decoder) asComplex64(code byte, k reflect.Kind) (complex64, error) {
 
 	}
 
-	return complex(0, 0), fmt.Errorf("should not reach this line!! code %x decoding %v", code, k)
+	return complex(0, 0), d.errorTemplate(code, k)
 }
 
 func (d *decoder) asComplex128(code byte, k reflect.Kind) (complex128, error) {
@@ -94,7 +94,7 @@ func (d *decoder) asComplex128(code byte, k reflect.Kind) (complex128, error) {
 			return complex(0, 0), err
 		}
 		r := math.Float64frombits(binary.BigEndian.Uint64(rb))
-		
+
 		ib, err := d.readSize8()
 		if err != nil {
 			return complex(0, 0), err
@@ -104,5 +104,5 @@ func (d *decoder) asComplex128(code byte, k reflect.Kind) (complex128, error) {
 
 	}
 
-	return complex(0, 0), fmt.Errorf("should not reach this line!! code %x decoding %v", code, k)
+	return complex(0, 0), d.errorTemplate(code, k)
 }
