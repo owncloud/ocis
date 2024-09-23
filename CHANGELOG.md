@@ -64,6 +64,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Include additional logs in the collaboration service: [#10101](https://github.com/owncloud/ocis/pull/10101)
 * Bugfix - Added ShareUpdate activity: [#10104](https://github.com/owncloud/ocis/pull/10104)
 * Bugfix - CheckFileInfo will return a 404 error if the target file isn't found: [#10112](https://github.com/owncloud/ocis/pull/10112)
+* Bugfix - Always select next gateway client: [#10133](https://github.com/owncloud/ocis/pull/10133)
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 * Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
@@ -137,6 +138,13 @@ The following sections list the changes for unreleased.
    404 error code
 
    https://github.com/owncloud/ocis/pull/10112
+
+* Bugfix - Always select next gateway client: [#10133](https://github.com/owncloud/ocis/pull/10133)
+
+   We now use the gateway selector to always select the next gateway client. This
+   ensures that we can always connect to the gateway during up- and downscaling.
+
+   https://github.com/owncloud/ocis/pull/10133
 
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 
