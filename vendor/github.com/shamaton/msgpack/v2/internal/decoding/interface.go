@@ -134,7 +134,7 @@ func (d *decoder) asInterface(offset int, k reflect.Kind) (interface{}, int, err
 		}
 		v := make(map[interface{}]interface{}, l)
 		for i := 0; i < l; i++ {
-			if d.canSetAsMapKey(o) != nil {
+			if err := d.canSetAsMapKey(o); err != nil {
 				return nil, 0, err
 			}
 			key, o2, err := d.asInterface(o, k)
@@ -182,9 +182,9 @@ func (d *decoder) canSetAsMapKey(index int) error {
 	}
 	switch {
 	case d.isFixSlice(code), code == def.Array16, code == def.Array32:
-		return fmt.Errorf("can not use slice code for map key/ code: %x", code)
+		return fmt.Errorf("%w. code: %x", def.ErrCanNotSetSliceAsMapKey, code)
 	case d.isFixMap(code), code == def.Map16, code == def.Map32:
-		return fmt.Errorf("can not use map code for map key/ code: %x", code)
+		return fmt.Errorf("%w. code: %x", def.ErrCanNotSetMapAsMapKey, code)
 	}
 	return nil
 }

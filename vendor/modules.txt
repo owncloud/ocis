@@ -1808,7 +1808,7 @@ github.com/sergi/go-diff/diffmatchpatch
 # github.com/sethvargo/go-password v0.2.0
 ## explicit; go 1.14
 github.com/sethvargo/go-password/password
-# github.com/shamaton/msgpack/v2 v2.2.0
+# github.com/shamaton/msgpack/v2 v2.2.2
 ## explicit; go 1.20
 github.com/shamaton/msgpack/v2
 github.com/shamaton/msgpack/v2/def

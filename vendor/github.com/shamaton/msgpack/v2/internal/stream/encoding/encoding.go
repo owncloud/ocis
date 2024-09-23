@@ -5,6 +5,7 @@ import (
 	"io"
 	"reflect"
 
+	"github.com/shamaton/msgpack/v2/def"
 	"github.com/shamaton/msgpack/v2/internal/common"
 )
 
@@ -188,7 +189,7 @@ func (e *encoder) create(rv reflect.Value) error {
 	case reflect.Invalid:
 		return e.writeNil()
 	default:
-		return fmt.Errorf("type(%v) is unsupported", rv.Kind())
+		return fmt.Errorf("%v is %w type", rv.Kind(), def.ErrUnsupportedType)
 	}
 	return nil
 }

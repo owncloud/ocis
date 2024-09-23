@@ -23,7 +23,7 @@ func (e *encoder) calcByteSlice(l int) (int, error) {
 		return def.Byte4 + l, nil
 	}
 	// not supported error
-	return 0, fmt.Errorf("not support this array length : %d", l)
+	return 0, fmt.Errorf("%w slice length : %d", def.ErrUnsupportedType, l)
 }
 
 func (e *encoder) writeByteSliceLength(l int, offset int) int {

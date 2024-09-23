@@ -18,13 +18,13 @@ type Buffer struct {
 func (b *Buffer) Write(w io.Writer, vs ...byte) error {
 	if len(b.Data) < b.offset+len(vs) {
 		_, err := w.Write(b.Data[:b.offset])
+		b.offset = 0
 		if err != nil {
 			return err
 		}
 		if len(b.Data) < len(vs) {
 			b.Data = append(b.Data, make([]byte, len(vs)-len(b.Data))...)
 		}
-		b.offset = 0
 	}
 	for i := range vs {
 		b.Data[b.offset+i] = vs[i]

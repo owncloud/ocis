@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/shamaton/msgpack/v2/def"
 	"github.com/shamaton/msgpack/v2/internal/common"
 )
 
@@ -19,11 +20,11 @@ func Decode(data []byte, v interface{}, asArray bool) error {
 	d := decoder{data: data, asArray: asArray}
 
 	if d.data == nil || len(d.data) < 1 {
-		return fmt.Errorf("data is empty")
+		return def.ErrNoData
 	}
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Ptr {
-		return fmt.Errorf("holder must set pointer value. but got: %t", v)
+		return fmt.Errorf("%w. v.(type): %T", def.ErrReceiverNotPointer, v)
 	}
 
 	rv = rv.Elem()
@@ -33,7 +34,7 @@ func Decode(data []byte, v interface{}, asArray bool) error {
 		return err
 	}
 	if len(data) != last {
-		return fmt.Errorf("failed deserialization size=%d, last=%d", len(data), last)
+		return fmt.Errorf("%w size=%d, last=%d", def.ErrHasLeftOver, len(data), last)
 	}
 	return err
 }
@@ -191,7 +192,7 @@ func (d *decoder) decode(rv reflect.Value, offset int) (int, error) {
 				return 0, err
 			}
 			if len(bs) > rv.Len() {
-				return 0, fmt.Errorf("%v len is %d, but msgpack has %d elements", rv.Type(), rv.Len(), len(bs))
+				return 0, fmt.Errorf("%v len is %d, but msgpack has %d elements, %w", rv.Type(), rv.Len(), len(bs), def.ErrNotMatchArrayElement)
 			}
 			for i, b := range bs {
 				rv.Index(i).SetUint(uint64(b))
@@ -205,7 +206,7 @@ func (d *decoder) decode(rv reflect.Value, offset int) (int, error) {
 				return 0, err
 			}
 			if l > rv.Len() {
-				return 0, fmt.Errorf("%v len is %d, but msgpack has %d elements", rv.Type(), rv.Len(), l)
+				return 0, fmt.Errorf("%v len is %d, but msgpack has %d elements, %w", rv.Type(), rv.Len(), l, def.ErrNotMatchArrayElement)
 			}
 			bs, offset, err := d.asStringByteByLength(offset, l, k)
 			if err != nil {
@@ -224,7 +225,7 @@ func (d *decoder) decode(rv reflect.Value, offset int) (int, error) {
 		}
 
 		if l > rv.Len() {
-			return 0, fmt.Errorf("%v len is %d, but msgpack has %d elements", rv.Type(), rv.Len(), l)
+			return 0, fmt.Errorf("%v len is %d, but msgpack has %d elements, %w", rv.Type(), rv.Len(), l, def.ErrNotMatchArrayElement)
 		}
 
 		if err = d.hasRequiredLeastSliceSize(o, l); err != nil {
@@ -332,11 +333,11 @@ func (d *decoder) decode(rv reflect.Value, offset int) (int, error) {
 		}
 
 	default:
-		return 0, fmt.Errorf("type(%v) is unsupported", rv.Kind())
+		return 0, fmt.Errorf("%v is %w type", rv.Kind(), def.ErrUnsupportedType)
 	}
 	return offset, nil
 }
 
 func (d *decoder) errorTemplate(code byte, k reflect.Kind) error {
-	return fmt.Errorf("msgpack : invalid code %x decoding %v", code, k)
+	return fmt.Errorf("%w %x decoding as %v", def.ErrCanNotDecode, code, k)
 }
