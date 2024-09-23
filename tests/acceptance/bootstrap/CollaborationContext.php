@@ -34,7 +34,7 @@ use TestHelpers\CollaborationHelper;
 class CollaborationContext implements Context {
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
-	private string $storeLastAppEndpointResponse;
+	private string $lastAppOpenData;
 
 	/**
 	 * This will run before EVERY scenario.
@@ -55,19 +55,19 @@ class CollaborationContext implements Context {
 	}
 
 	/**
-	 * @param string $appData
+	 * @param string $data
 	 *
 	 * @return void
 	 */
-	public function storeLastAppEndpointResponse(string $appData): void {
-		$this->storeLastAppEndpointResponse = $appData;
+	public function setLastAppOpenData(string $data): void {
+		$this->lastAppOpenData = $data;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getLastAppEndpointResponse(): string {
-		return $this->storeLastAppEndpointResponse;
+	public function getLastAppOpenData(): string {
+		return $this->lastAppOpenData;
 	}
 
 	/**
@@ -275,39 +275,39 @@ class CollaborationContext implements Context {
 	}
 
 	/**
-	 * @Given user :user has sent POST request on app endpoint:
+	 * @Given user :user has sent the following app-open request:
 	 *
 	 * @param string $user
-	 * @param TableNode $items
+	 * @param TableNode $properties
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userHasSentPostRequestOnAppEndpoint(string $user, TableNode $items): void {
-		$rows = $items->getRowsHash();
+	public function userHasSentTheFollowingAppOpenRequest(string $user, TableNode $properties): void {
+		$rows = $properties->getRowsHash();
 		$appResponse = CollaborationHelper::sendPOSTRequestToAppOpen(
 			$this->spacesContext->getFileId($user, $rows['space'], $rows['resource']),
-			$rows['suites'],
+			$rows['app'],
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef()
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $appResponse);
-		$this->storeLastAppEndpointResponse($appResponse->getBody()->getContents());
+		$this->setLastAppOpenData($appResponse->getBody()->getContents());
 	}
 
 	/**
-	 * @When user :user tries to get the file information of file using wopi endpoint
-	 * @When user :user gets the file information of file using wopi endpoint
+	 * @When user :user tries to get the information of the last opened file using wopi endpoint
+	 * @When user :user gets the information of the last opened file using wopi endpoint
 	 *
 	 * @param string $user
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userTriesToCheckTheInformationOfDeletedFileUsingWopiEndpoint(string $user):void {
-		$response = json_decode($this->getLastAppEndpointResponse());
+	public function userGetsTheInformationOfTheLastOpenedFileUsingWopiEndpoint(string $user): void {
+		$response = json_decode($this->getLastAppOpenData());
 		$accessToken = $response->form_parameters->access_token;
 
 		// Extract the WOPISrc from the app_url

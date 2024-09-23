@@ -600,16 +600,16 @@ Feature: check file info with different wopi apps
       | FakeOffice    |
       | OnlyOffice    |
 
-
+  @issue-10097
   Scenario Outline: try to get file info of deleted file with office suites
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent POST request on app endpoint:
-      | resource        | textfile0.txt   |
-      | space           | Personal        |
-      | suites          | <office-suites> |
+    And user "Alice" has sent the following app-open request:
+      | resource | textfile0.txt   |
+      | space    | Personal        |
+      | app      | <office-suites> |
     And user "Alice" has deleted file "/textfile0.txt"
-    When user "Alice" tries to get the file information of file using wopi endpoint
-    Then the HTTP status code should be "500"
+    When user "Alice" tries to get the information of the last opened file using wopi endpoint
+    Then the HTTP status code should be "404"
     Examples:
       | office-suites |
       | Collabora     |
@@ -619,13 +619,13 @@ Feature: check file info with different wopi apps
 
   Scenario: get file info of restored file from trashbin (collabora)
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent POST request on app endpoint:
+    And user "Alice" has sent the following app-open request:
       | resource | textfile0.txt |
       | space    | Personal      |
-      | suites   | Collabora     |
+      | app      | Collabora     |
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has restored the file with original path "/textfile0.txt"
-    When user "Alice" gets the file information of file using wopi endpoint
+    When user "Alice" gets the information of the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -697,13 +697,13 @@ Feature: check file info with different wopi apps
 
   Scenario: get file info of restored file from trashbin (fakeOffice)
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent POST request on app endpoint:
+    And user "Alice" has sent the following app-open request:
       | resource | textfile0.txt |
       | space    | Personal      |
-      | suites   | FakeOffice    |
+      | app      | FakeOffice    |
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has restored the file with original path "/textfile0.txt"
-    When user "Alice" gets the file information of file using wopi endpoint
+    When user "Alice" gets the information of the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -835,13 +835,13 @@ Feature: check file info with different wopi apps
 
   Scenario: get file info of restored file from trashbin (onlyOffice)
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent POST request on app endpoint:
+    And user "Alice" has sent the following app-open request:
       | resource | textfile0.txt |
       | space    | Personal      |
-      | suites   | OnlyOffice    |
+      | app      | OnlyOffice    |
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has restored the file with original path "/textfile0.txt"
-    When user "Alice" gets the file information of file using wopi endpoint
+    When user "Alice" gets the information of the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -921,12 +921,12 @@ Feature: check file info with different wopi apps
 
   Scenario: get file info after renaming file (onlyOffice)
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent POST request on app endpoint:
+    And user "Alice" has sent the following app-open request:
       | resource | textfile0.txt |
       | space    | Personal      |
-      | suites   | OnlyOffice    |
+      | app      | OnlyOffice    |
     And user "Alice" has moved file "textfile0.txt" to "renamedfile.txt"
-    When user "Alice" gets the file information of file using wopi endpoint
+    When user "Alice" gets the information of the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -1006,12 +1006,12 @@ Feature: check file info with different wopi apps
 
   Scenario: get file info after renaming file (collabora)
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent POST request on app endpoint:
+    And user "Alice" has sent the following app-open request:
       | resource | textfile0.txt |
       | space    | Personal      |
-      | suites   | Collabora     |
+      | app      | Collabora     |
     And user "Alice" has moved file "textfile0.txt" to "renamedfile.txt"
-    When user "Alice" gets the file information of file using wopi endpoint
+    When user "Alice" gets the information of the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -1083,12 +1083,12 @@ Feature: check file info with different wopi apps
 
   Scenario: get file info after renaming file with (fakeOffice)
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And user "Alice" has sent POST request on app endpoint:
+    And user "Alice" has sent the following app-open request:
       | resource | textfile0.txt |
       | space    | Personal      |
-      | suites   | FakeOffice    |
+      | app      | FakeOffice    |
     And user "Alice" has moved file "textfile0.txt" to "renamedfile.txt"
-    When user "Alice" gets the file information of file using wopi endpoint
+    When user "Alice" gets the information of the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
