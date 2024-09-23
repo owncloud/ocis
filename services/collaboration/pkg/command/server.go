@@ -46,13 +46,13 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			tm, err := pool.StringToTLSMode(cfg.Commons.GRPCClientTLS.Mode)
+			tm, err := pool.StringToTLSMode(cfg.CS3Api.GRPCClientTLS.Mode)
 			if err != nil {
 				return err
 			}
 			gatewaySelector, err := pool.GatewaySelector(
 				cfg.CS3Api.Gateway.Name,
-				pool.WithTLSCACert(cfg.Commons.GRPCClientTLS.CACert),
+				pool.WithTLSCACert(cfg.CS3Api.GRPCClientTLS.CACert),
 				pool.WithTLSMode(tm),
 				pool.WithRegistry(registry.GetRegistry()),
 				pool.WithTracerProvider(traceProvider),
