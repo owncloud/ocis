@@ -19,6 +19,7 @@ import (
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
@@ -94,14 +95,14 @@ type FileConnectorService interface {
 // Currently, it handles file locks and getting the file info.
 // Note that operations might return any kind of error, not just ConnectorError
 type FileConnector struct {
-	gwc gatewayv1beta1.GatewayAPIClient
+	gws pool.Selectable[gatewayv1beta1.GatewayAPIClient]
 	cfg *config.Config
 }
 
 // NewFileConnector creates a new file connector
-func NewFileConnector(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *FileConnector {
+func NewFileConnector(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config) *FileConnector {
 	return &FileConnector{
-		gwc: gwc,
+		gws: gws,
 		cfg: cfg,
 	}
 }
@@ -128,7 +129,11 @@ func (f *FileConnector) GetLock(ctx context.Context) (*ConnectorResponse, error)
 		Ref: wopiContext.FileReference,
 	}
 
-	resp, err := f.gwc.GetLock(ctx, req)
+	gwc, err := f.gws.Next()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := gwc.GetLock(ctx, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("GetLock failed")
 		return nil, err
@@ -209,7 +214,11 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (*Co
 			},
 		}
 
-		resp, err := f.gwc.SetLock(ctx, req)
+		gwc, err := f.gws.Next()
+		if err != nil {
+			return nil, err
+		}
+		resp, err := gwc.SetLock(ctx, req)
 		if err != nil {
 			logger.Error().Err(err).Msg("SetLock failed")
 			return nil, err
@@ -232,7 +241,11 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (*Co
 			ExistingLockId: oldLockID,
 		}
 
-		resp, err := f.gwc.RefreshLock(ctx, req)
+		gwc, err := f.gws.Next()
+		if err != nil {
+			return nil, err
+		}
+		resp, err := gwc.RefreshLock(ctx, req)
 		if err != nil {
 			logger.Error().Err(err).Msg("UnlockAndRefresh failed")
 			return nil, err
@@ -240,7 +253,11 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (*Co
 		setOrRefreshStatus = resp.GetStatus()
 	}
 
-	statResp, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+	gwc, err := f.gws.Next()
+	if err != nil {
+		return nil, err
+	}
+	statResp, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
@@ -270,7 +287,11 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (*Co
 			Ref: wopiContext.FileReference,
 		}
 
-		resp, err := f.gwc.GetLock(ctx, req)
+		gwc, err = f.gws.Next()
+		if err != nil {
+			return nil, err
+		}
+		resp, err := gwc.GetLock(ctx, req)
 		if err != nil {
 			logger.Error().Err(err).Msg("SetLock failed, fallback to GetLock failed too")
 			return nil, err
@@ -362,13 +383,21 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (*Connec
 		},
 	}
 
-	resp, err := f.gwc.RefreshLock(ctx, req)
+	gwc, err := f.gws.Next()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := gwc.RefreshLock(ctx, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("RefreshLock failed")
 		return nil, err
 	}
 
-	statResp, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+	gwc, err = f.gws.Next()
+	if err != nil {
+		return nil, err
+	}
+	statResp, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
@@ -409,7 +438,11 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (*Connec
 			Ref: wopiContext.FileReference,
 		}
 
-		resp, err := f.gwc.GetLock(ctx, req)
+		gwc, err = f.gws.Next()
+		if err != nil {
+			return nil, err
+		}
+		resp, err := gwc.GetLock(ctx, req)
 		if err != nil {
 			logger.Error().Err(err).Msg("RefreshLock failed trying to get the current lock")
 			return nil, err
@@ -486,13 +519,21 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (*ConnectorRe
 		},
 	}
 
-	resp, err := f.gwc.Unlock(ctx, req)
+	gwc, err := f.gws.Next()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := gwc.Unlock(ctx, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("Unlock failed")
 		return nil, err
 	}
 
-	statResp, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+	gwc, err = f.gws.Next()
+	if err != nil {
+		return nil, err
+	}
+	statResp, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
@@ -521,7 +562,11 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (*ConnectorRe
 			Ref: wopiContext.FileReference,
 		}
 
-		resp, err := f.gwc.GetLock(ctx, req)
+		gwc, err = f.gws.Next()
+		if err != nil {
+			return nil, err
+		}
+		resp, err := gwc.GetLock(ctx, req)
 		if err != nil {
 			logger.Error().Err(err).Msg("Unlock failed trying to get the current lock")
 			return nil, err
@@ -598,8 +643,12 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		Str("PutTarget", target).
 		Logger()
 
+	gwc, err := f.gws.Next()
+	if err != nil {
+		return nil, err
+	}
 	// stat the current file in order to get the reference of the parent folder
-	oldStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+	oldStatRes, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
@@ -715,8 +764,12 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 		Str("PutTarget", target).
 		Logger()
 
+	gwc, err := f.gws.Next()
+	if err != nil {
+		return nil, err
+	}
 	// stat the current file in order to get the reference of the parent folder
-	oldStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+	oldStatRes, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
@@ -845,7 +898,11 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (*Connect
 
 	// we'll retry the request after a while if we get a "TOO_EARLY" code
 	for retries := 0; deleteRes == nil || deleteRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_TOO_EARLY; retries++ {
-		deleteRes, err = f.gwc.Delete(ctx, deleteReq)
+		gwc, err := f.gws.Next()
+		if err != nil {
+			return nil, err
+		}
+		deleteRes, err = gwc.Delete(ctx, deleteReq)
 		if err != nil {
 			logger.Error().Err(err).Msg("DeleteFile: stat failed")
 			return nil, err
@@ -888,7 +945,11 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (*Connect
 			Ref: wopiContext.FileReference,
 		}
 
-		resp, err2 := f.gwc.GetLock(ctx, req)
+		gwc, err := f.gws.Next()
+		if err != nil {
+			return nil, err
+		}
+		resp, err2 := gwc.GetLock(ctx, req)
 		if err2 != nil {
 			logger.Error().Err(err2).Msg("DeleteFile: GetLock failed")
 			return nil, err2
@@ -942,8 +1003,12 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 		Str("RenameTarget", target).
 		Logger()
 
+	gwc, err := f.gws.Next()
+	if err != nil {
+		return nil, err
+	}
 	// stat the current file in order to get the reference of the parent folder
-	oldStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+	oldStatRes, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
@@ -978,8 +1043,12 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 		// add the new file reference to the log context
 		newLogger := logger.With().Str("NewFileReference", targetFileReference.String()).Logger()
 
+		gwc, err = f.gws.Next()
+		if err != nil {
+			return nil, err
+		}
 		// try to put the file. It mustn't return a 400 or 409
-		moveRes, err := f.gwc.Move(ctx, &providerv1beta1.MoveRequest{
+		moveRes, err := gwc.Move(ctx, &providerv1beta1.MoveRequest{
 			Source:      wopiContext.FileReference,
 			Destination: targetFileReference,
 			LockId:      lockID,
@@ -1045,7 +1114,11 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 
 	logger := zerolog.Ctx(ctx)
 
-	statRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+	gwc, err := f.gws.Next()
+	if err != nil {
+		return nil, err
+	}
+	statRes, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 		Ref: wopiContext.FileReference,
 	})
 	if err != nil {
@@ -1261,9 +1334,13 @@ func (f *FileConnector) generateWOPISrc(wopiContext middleware.WopiContext, logg
 }
 
 func (f *FileConnector) adjustWopiReference(ctx context.Context, wopiContext *middleware.WopiContext, logger zerolog.Logger) error {
+	gwc, err := f.gws.Next()
+	if err != nil {
+		return err
+	}
 	// using resourceid + path won't do for WOPI, we need just the resource if of the new file
 	// the wopicontext has resourceid + path, which is good enough for the stat request
-	newStatRes, err := f.gwc.Stat(ctx, &providerv1beta1.StatRequest{
+	newStatRes, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
 		Ref: wopiContext.FileReference,
 	})
 	if err != nil {

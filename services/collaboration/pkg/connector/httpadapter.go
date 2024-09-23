@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/utf7"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/locks"
@@ -43,11 +44,11 @@ type HttpAdapter struct {
 
 // NewHttpAdapter will create a new HTTP adapter. A new connector using the
 // provided gateway API client and configuration will be used in the adapter
-func NewHttpAdapter(gwc gatewayv1beta1.GatewayAPIClient, cfg *config.Config) *HttpAdapter {
+func NewHttpAdapter(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config) *HttpAdapter {
 	httpAdapter := &HttpAdapter{
 		con: NewConnector(
-			NewFileConnector(gwc, cfg),
-			NewContentConnector(gwc, cfg),
+			NewFileConnector(gws, cfg),
+			NewContentConnector(gws, cfg),
 		),
 	}
 

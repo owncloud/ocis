@@ -11,6 +11,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/owncloud/ocis/v2/services/collaboration/mocks"
 	"github.com/stretchr/testify/mock"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
@@ -27,10 +28,11 @@ import (
 
 var _ = Describe("ContentConnector", func() {
 	var (
-		cc            *connector.ContentConnector
-		gatewayClient *cs3mocks.GatewayAPIClient
-		cfg           *config.Config
-		wopiCtx       middleware.WopiContext
+		cc              *connector.ContentConnector
+		gatewayClient   *cs3mocks.GatewayAPIClient
+		gatewaySelector *mocks.Selectable[gateway.GatewayAPIClient]
+		cfg             *config.Config
+		wopiCtx         middleware.WopiContext
 
 		srv           *httptest.Server
 		srvReqHeader  http.Header
@@ -40,8 +42,11 @@ var _ = Describe("ContentConnector", func() {
 	BeforeEach(func() {
 		// contentConnector only uses "cfg.CS3Api.DataGateway.Insecure", which is irrelevant for the tests
 		cfg = &config.Config{}
-		gatewayClient = &cs3mocks.GatewayAPIClient{}
-		cc = connector.NewContentConnector(gatewayClient, cfg)
+		gatewayClient = cs3mocks.NewGatewayAPIClient(GinkgoT())
+
+		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
+		gatewaySelector.On("Next").Return(gatewayClient, nil)
+		cc = connector.NewContentConnector(gatewaySelector, cfg)
 
 		wopiCtx = middleware.WopiContext{
 			AccessToken: "abcdef123456",
@@ -91,6 +96,8 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 		})
 		It("No valid context", func() {
+			gatewaySelector.EXPECT().Next().Unset()
+			gatewayClient.EXPECT().Stat(mock.Anything, mock.Anything).Unset()
 			sb := httptest.NewRecorder()
 			ctx := context.Background()
 			err := cc.GetFile(ctx, sb)
@@ -226,6 +233,7 @@ var _ = Describe("ContentConnector", func() {
 
 	Describe("PutFile", func() {
 		It("No valid context", func() {
+			gatewaySelector.EXPECT().Next().Unset()
 			reader := strings.NewReader("Content to upload is here!")
 			ctx := context.Background()
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "notARandomLockId")
