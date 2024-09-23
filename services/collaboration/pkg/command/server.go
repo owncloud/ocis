@@ -57,6 +57,9 @@ func Server(cfg *config.Config) *cli.Command {
 				pool.WithRegistry(registry.GetRegistry()),
 				pool.WithTracerProvider(traceProvider),
 			)
+			if err != nil {
+				return err
+			}
 
 			appUrls, err := helpers.GetAppURLs(cfg, logger)
 			if err != nil {
