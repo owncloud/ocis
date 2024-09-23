@@ -1232,7 +1232,7 @@ Feature: check activities
       }
       """
 
-  @issue-9856
+  @issue-9856 @issue-10127 @skip
   Scenario: check activity message with different language
     Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
     And user "Alice" has switched the system language to "de" using the Graph API
