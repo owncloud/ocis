@@ -55,6 +55,27 @@ func NewContentConnector(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], c
 	}
 }
 
+func newHttpRequest(ctx context.Context, wopiContext middleware.WopiContext, method, url, transferToken string, body io.Reader) (*http.Request, error) {
+	httpReq, err := http.NewRequestWithContext(ctx, method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	if url == "" {
+		return nil, NewConnectorError(500, "url is missing")
+	}
+	if transferToken != "" {
+		httpReq.Header.Add("X-Reva-Transfer", transferToken)
+	}
+	if wopiContext.ViewMode == appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY && wopiContext.ViewOnlyToken != "" {
+		httpReq.Header.Add("X-Access-Token", wopiContext.ViewOnlyToken)
+	} else {
+		httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
+	}
+	tracingProp := tracing.GetPropagator()
+	tracingProp.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
+	return httpReq, nil
+}
+
 // GetFile downloads the file from the storage
 // https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/getfile
 //
@@ -131,14 +152,6 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 		}
 	}
 
-	if downloadEndpoint == "" {
-		logger.Error().
-			Str("Endpoint", downloadEndpoint).
-			Bool("HasDownloadToken", hasDownloadToken).
-			Msg("GetFile: Download endpoint or token is missing")
-		return NewConnectorError(500, "GetFile: Download endpoint is missing")
-	}
-
 	httpClient := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -148,7 +161,8 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 	}
 
 	// Prepare the request to download the file
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadEndpoint, bytes.NewReader([]byte("")))
+	// public link downloads have the token in the download endpoint
+	httpReq, err := newHttpRequest(ctx, wopiContext, http.MethodGet, downloadEndpoint, downloadToken, bytes.NewReader([]byte("")))
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -157,17 +171,6 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 			Msg("GetFile: Could not create the request to the endpoint")
 		return err
 	}
-	if downloadToken != "" {
-		// public link downloads have the token in the download endpoint
-		httpReq.Header.Add("X-Reva-Transfer", downloadToken)
-	}
-	if wopiContext.ViewMode == appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY && wopiContext.ViewOnlyToken != "" {
-		httpReq.Header.Add("X-Access-Token", wopiContext.ViewOnlyToken)
-	} else {
-		httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
-	}
-	tracingProp := tracing.GetPropagator()
-	tracingProp.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
 
 	httpResp, err := httpClient.Do(httpReq)
 	if err != nil {
@@ -335,14 +338,6 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 			}
 		}
 
-		if uploadEndpoint == "" {
-			logger.Error().
-				Str("Endpoint", uploadEndpoint).
-				Bool("HasUploadToken", hasUploadToken).
-				Msg("UploadHelper: Upload endpoint or token is missing")
-			return NewResponse(500), nil
-		}
-
 		httpClient := http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
@@ -353,7 +348,8 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		}
 
 		// prepare the request to upload the contents to the upload endpoint
-		httpReq, err := http.NewRequestWithContext(ctx, http.MethodPut, uploadEndpoint, stream)
+		// public link uploads have the token in the upload endpoint
+		httpReq, err := newHttpRequest(ctx, wopiContext, http.MethodPut, uploadEndpoint, uploadToken, stream)
 		if err != nil {
 			logger.Error().
 				Err(err).
@@ -367,19 +363,11 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		// to prevent issues
 		httpReq.ContentLength = streamLength
 
-		if uploadToken != "" {
-			// public link uploads have the token in the upload endpoint
-			httpReq.Header.Add("X-Reva-Transfer", uploadToken)
-		}
-		httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
-
 		httpReq.Header.Add("X-Lock-Id", lockID)
 		// TODO: better mechanism for the upload while locked, relies on patch in REVA
 		//if lockID, ok := ctxpkg.ContextGetLockID(ctx); ok {
 		//	httpReq.Header.Add("X-Lock-Id", lockID)
 		//}
-		tracingProp := tracing.GetPropagator()
-		tracingProp.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
 
 		httpResp, err := httpClient.Do(httpReq)
 		if err != nil {
