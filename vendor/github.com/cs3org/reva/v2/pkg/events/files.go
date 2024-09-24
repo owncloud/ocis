@@ -28,11 +28,12 @@ import (
 
 // ContainerCreated is emitted when a directory has been created
 type ContainerCreated struct {
-	SpaceOwner *user.UserId
-	Executant  *user.UserId
-	Ref        *provider.Reference
-	Owner      *user.UserId
-	Timestamp  *types.Timestamp
+	SpaceOwner        *user.UserId
+	Executant         *user.UserId
+	Ref               *provider.Reference
+	Owner             *user.UserId
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -44,11 +45,12 @@ func (ContainerCreated) Unmarshal(v []byte) (interface{}, error) {
 
 // FileUploaded is emitted when a file is uploaded
 type FileUploaded struct {
-	SpaceOwner *user.UserId
-	Executant  *user.UserId
-	Ref        *provider.Reference
-	Owner      *user.UserId
-	Timestamp  *types.Timestamp
+	SpaceOwner        *user.UserId
+	Executant         *user.UserId
+	Ref               *provider.Reference
+	Owner             *user.UserId
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -60,10 +62,11 @@ func (FileUploaded) Unmarshal(v []byte) (interface{}, error) {
 
 // FileTouched is emitted when a file is uploaded
 type FileTouched struct {
-	SpaceOwner *user.UserId
-	Executant  *user.UserId
-	Ref        *provider.Reference
-	Timestamp  *types.Timestamp
+	SpaceOwner        *user.UserId
+	Executant         *user.UserId
+	Ref               *provider.Reference
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -75,10 +78,11 @@ func (FileTouched) Unmarshal(v []byte) (interface{}, error) {
 
 // FileDownloaded is emitted when a file is downloaded
 type FileDownloaded struct {
-	Executant *user.UserId
-	Ref       *provider.Reference
-	Owner     *user.UserId
-	Timestamp *types.Timestamp
+	Executant         *user.UserId
+	Ref               *provider.Reference
+	Owner             *user.UserId
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -90,10 +94,11 @@ func (FileDownloaded) Unmarshal(v []byte) (interface{}, error) {
 
 // FileLocked is emitted when a file is locked
 type FileLocked struct {
-	Executant *user.UserId
-	Ref       *provider.Reference
-	Owner     *user.UserId
-	Timestamp *types.Timestamp
+	Executant         *user.UserId
+	Ref               *provider.Reference
+	Owner             *user.UserId
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -105,10 +110,11 @@ func (FileLocked) Unmarshal(v []byte) (interface{}, error) {
 
 // FileUnlocked is emitted when a file is unlocked
 type FileUnlocked struct {
-	Executant *user.UserId
-	Ref       *provider.Reference
-	Owner     *user.UserId
-	Timestamp *types.Timestamp
+	Executant         *user.UserId
+	Ref               *provider.Reference
+	Owner             *user.UserId
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -120,12 +126,13 @@ func (FileUnlocked) Unmarshal(v []byte) (interface{}, error) {
 
 // ItemTrashed is emitted when a file or folder is trashed
 type ItemTrashed struct {
-	SpaceOwner *user.UserId
-	Executant  *user.UserId
-	ID         *provider.ResourceId
-	Ref        *provider.Reference
-	Owner      *user.UserId
-	Timestamp  *types.Timestamp
+	SpaceOwner        *user.UserId
+	Executant         *user.UserId
+	ID                *provider.ResourceId
+	Ref               *provider.Reference
+	Owner             *user.UserId
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -137,12 +144,13 @@ func (ItemTrashed) Unmarshal(v []byte) (interface{}, error) {
 
 // ItemMoved is emitted when a file or folder is moved
 type ItemMoved struct {
-	SpaceOwner   *user.UserId
-	Executant    *user.UserId
-	Ref          *provider.Reference
-	Owner        *user.UserId
-	OldReference *provider.Reference
-	Timestamp    *types.Timestamp
+	SpaceOwner        *user.UserId
+	Executant         *user.UserId
+	Ref               *provider.Reference
+	Owner             *user.UserId
+	OldReference      *provider.Reference
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -154,11 +162,12 @@ func (ItemMoved) Unmarshal(v []byte) (interface{}, error) {
 
 // ItemPurged is emitted when a file or folder is removed from trashbin
 type ItemPurged struct {
-	Executant *user.UserId
-	ID        *provider.ResourceId
-	Ref       *provider.Reference
-	Owner     *user.UserId
-	Timestamp *types.Timestamp
+	Executant         *user.UserId
+	ID                *provider.ResourceId
+	Ref               *provider.Reference
+	Owner             *user.UserId
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -170,14 +179,15 @@ func (ItemPurged) Unmarshal(v []byte) (interface{}, error) {
 
 // ItemRestored is emitted when a file or folder is restored from trashbin
 type ItemRestored struct {
-	SpaceOwner   *user.UserId
-	Executant    *user.UserId
-	ID           *provider.ResourceId
-	Ref          *provider.Reference
-	Owner        *user.UserId
-	OldReference *provider.Reference
-	Key          string
-	Timestamp    *types.Timestamp
+	SpaceOwner        *user.UserId
+	Executant         *user.UserId
+	ID                *provider.ResourceId
+	Ref               *provider.Reference
+	Owner             *user.UserId
+	OldReference      *provider.Reference
+	Key               string
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -189,12 +199,13 @@ func (ItemRestored) Unmarshal(v []byte) (interface{}, error) {
 
 // FileVersionRestored is emitted when a file version is restored
 type FileVersionRestored struct {
-	SpaceOwner *user.UserId
-	Executant  *user.UserId
-	Ref        *provider.Reference
-	Owner      *user.UserId
-	Key        string
-	Timestamp  *types.Timestamp
+	SpaceOwner        *user.UserId
+	Executant         *user.UserId
+	Ref               *provider.Reference
+	Owner             *user.UserId
+	Key               string
+	Timestamp         *types.Timestamp
+	ImpersonatingUser *user.User
 }
 
 // Unmarshal to fulfill umarshaller interface

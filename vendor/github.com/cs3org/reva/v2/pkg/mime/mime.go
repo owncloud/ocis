@@ -1054,6 +1054,7 @@ var mimeTypes = map[string]string{
 	"wmz":                      "application/x-msmetafile",
 	"woff":                     "font/woff",
 	"woff2":                    "font/woff2",
+	"wopitest":                 "text/plain", // The dummy extension for the WOPI validator https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/online/build-test-ship/validator
 	"wpd":                      "application/vnd.wordperfect",
 	"wpl":                      "application/vnd.ms-wpl",
 	"wps":                      "application/vnd.ms-works",

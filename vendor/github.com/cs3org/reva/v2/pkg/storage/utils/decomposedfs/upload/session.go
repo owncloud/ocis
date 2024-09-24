@@ -32,6 +32,7 @@ import (
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/logger"
@@ -64,13 +65,17 @@ func (s *OcisSession) lockID() string {
 	return s.info.MetaData["lockid"]
 }
 func (s *OcisSession) executantUser() *userpb.User {
+	var o *typespb.Opaque
+	_ = json.Unmarshal([]byte(s.info.Storage["UserOpaque"]), &o)
 	return &userpb.User{
 		Id: &userpb.UserId{
 			Type:     userpb.UserType(userpb.UserType_value[s.info.Storage["UserType"]]),
 			Idp:      s.info.Storage["Idp"],
 			OpaqueId: s.info.Storage["UserId"],
 		},
-		Username: s.info.Storage["UserName"],
+		Username:    s.info.Storage["UserName"],
+		DisplayName: s.info.Storage["UserDisplayName"],
+		Opaque:      o,
 	}
 }
 
@@ -277,6 +282,10 @@ func (s *OcisSession) SetExecutant(u *userpb.User) {
 	s.info.Storage["UserId"] = u.GetId().GetOpaqueId()
 	s.info.Storage["UserType"] = utils.UserTypeToString(u.GetId().Type)
 	s.info.Storage["UserName"] = u.GetUsername()
+	s.info.Storage["UserDisplayName"] = u.GetDisplayName()
+
+	b, _ := json.Marshal(u.GetOpaque())
+	s.info.Storage["UserOpaque"] = string(b)
 }
 
 // Offset returns the current upload offset

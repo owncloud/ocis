@@ -655,7 +655,7 @@ Feature: check share activity
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "displayName": {
-                                  "const": "Brian"
+                                  "const": "Brian Murphy"
                                 }
                               }
                             }
@@ -715,7 +715,7 @@ Feature: check share activity
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "displayName": {
-                                  "const": "Brian"
+                                  "const": "Brian Murphy"
                                 }
                               }
                             }

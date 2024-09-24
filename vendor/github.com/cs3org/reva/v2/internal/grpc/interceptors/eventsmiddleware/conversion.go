@@ -32,20 +32,21 @@ import (
 )
 
 // ContainerCreated converts the response to an event
-func ContainerCreated(r *provider.CreateContainerResponse, req *provider.CreateContainerRequest, spaceOwner, executant *user.UserId) events.ContainerCreated {
+func ContainerCreated(r *provider.CreateContainerResponse, req *provider.CreateContainerRequest, spaceOwner *user.UserId, executant *user.User) events.ContainerCreated {
 	return events.ContainerCreated{
-		SpaceOwner: spaceOwner,
-		Executant:  executant,
-		Ref:        req.Ref,
-		Timestamp:  utils.TSNow(),
+		SpaceOwner:        spaceOwner,
+		Executant:         executant.GetId(),
+		Ref:               req.Ref,
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // ShareCreated converts the response to an event
-func ShareCreated(r *collaboration.CreateShareResponse, executant *user.UserId) events.ShareCreated {
+func ShareCreated(r *collaboration.CreateShareResponse, executant *user.User) events.ShareCreated {
 	return events.ShareCreated{
 		ShareID:        r.Share.GetId(),
-		Executant:      executant,
+		Executant:      executant.GetId(),
 		Sharer:         r.Share.Creator,
 		GranteeUserID:  r.Share.GetGrantee().GetUserId(),
 		GranteeGroupID: r.Share.GetGrantee().GetGroupId(),
@@ -56,7 +57,7 @@ func ShareCreated(r *collaboration.CreateShareResponse, executant *user.UserId) 
 }
 
 // ShareRemoved converts the response to an event
-func ShareRemoved(r *collaboration.RemoveShareResponse, req *collaboration.RemoveShareRequest, executant *user.UserId) events.ShareRemoved {
+func ShareRemoved(r *collaboration.RemoveShareResponse, req *collaboration.RemoveShareRequest, executant *user.User) events.ShareRemoved {
 	var (
 		userid  *user.UserId
 		groupid *group.GroupId
@@ -66,7 +67,7 @@ func ShareRemoved(r *collaboration.RemoveShareResponse, req *collaboration.Remov
 	_ = utils.ReadJSONFromOpaque(r.Opaque, "granteegroupid", &userid)
 	_ = utils.ReadJSONFromOpaque(r.Opaque, "resourceid", &rid)
 	return events.ShareRemoved{
-		Executant:      executant,
+		Executant:      executant.GetId(),
 		ShareID:        req.Ref.GetId(),
 		ShareKey:       req.Ref.GetKey(),
 		GranteeUserID:  userid,
@@ -77,9 +78,9 @@ func ShareRemoved(r *collaboration.RemoveShareResponse, req *collaboration.Remov
 }
 
 // ShareUpdated converts the response to an event
-func ShareUpdated(r *collaboration.UpdateShareResponse, req *collaboration.UpdateShareRequest, executant *user.UserId) events.ShareUpdated {
+func ShareUpdated(r *collaboration.UpdateShareResponse, req *collaboration.UpdateShareRequest, executant *user.User) events.ShareUpdated {
 	return events.ShareUpdated{
-		Executant:      executant,
+		Executant:      executant.GetId(),
 		ShareID:        r.Share.Id,
 		ItemID:         r.Share.ResourceId,
 		Permissions:    r.Share.Permissions,
@@ -92,9 +93,9 @@ func ShareUpdated(r *collaboration.UpdateShareResponse, req *collaboration.Updat
 }
 
 // ReceivedShareUpdated converts the response to an event
-func ReceivedShareUpdated(r *collaboration.UpdateReceivedShareResponse, executant *user.UserId) events.ReceivedShareUpdated {
+func ReceivedShareUpdated(r *collaboration.UpdateReceivedShareResponse, executant *user.User) events.ReceivedShareUpdated {
 	return events.ReceivedShareUpdated{
-		Executant:      executant,
+		Executant:      executant.GetId(),
 		ShareID:        r.Share.Share.Id,
 		ItemID:         r.Share.Share.ResourceId,
 		Permissions:    r.Share.Share.Permissions,
@@ -107,9 +108,9 @@ func ReceivedShareUpdated(r *collaboration.UpdateReceivedShareResponse, executan
 }
 
 // LinkCreated converts the response to an event
-func LinkCreated(r *link.CreatePublicShareResponse, executant *user.UserId) events.LinkCreated {
+func LinkCreated(r *link.CreatePublicShareResponse, executant *user.User) events.LinkCreated {
 	return events.LinkCreated{
-		Executant:         executant,
+		Executant:         executant.GetId(),
 		ShareID:           r.Share.Id,
 		Sharer:            r.Share.Creator,
 		ItemID:            r.Share.ResourceId,
@@ -123,9 +124,9 @@ func LinkCreated(r *link.CreatePublicShareResponse, executant *user.UserId) even
 }
 
 // LinkUpdated converts the response to an event
-func LinkUpdated(r *link.UpdatePublicShareResponse, req *link.UpdatePublicShareRequest, executant *user.UserId) events.LinkUpdated {
+func LinkUpdated(r *link.UpdatePublicShareResponse, req *link.UpdatePublicShareRequest, executant *user.User) events.LinkUpdated {
 	return events.LinkUpdated{
-		Executant:         executant,
+		Executant:         executant.GetId(),
 		ShareID:           r.Share.Id,
 		Sharer:            r.Share.Creator,
 		ItemID:            r.Share.ResourceId,
@@ -140,9 +141,9 @@ func LinkUpdated(r *link.UpdatePublicShareResponse, req *link.UpdatePublicShareR
 }
 
 // LinkAccessed converts the response to an event
-func LinkAccessed(r *link.GetPublicShareByTokenResponse, executant *user.UserId) events.LinkAccessed {
+func LinkAccessed(r *link.GetPublicShareByTokenResponse, executant *user.User) events.LinkAccessed {
 	return events.LinkAccessed{
-		Executant:         executant,
+		Executant:         executant.GetId(),
 		ShareID:           r.Share.Id,
 		Sharer:            r.Share.Creator,
 		ItemID:            r.Share.ResourceId,
@@ -156,9 +157,9 @@ func LinkAccessed(r *link.GetPublicShareByTokenResponse, executant *user.UserId)
 }
 
 // LinkAccessFailed converts the response to an event
-func LinkAccessFailed(r *link.GetPublicShareByTokenResponse, req *link.GetPublicShareByTokenRequest, executant *user.UserId) events.LinkAccessFailed {
+func LinkAccessFailed(r *link.GetPublicShareByTokenResponse, req *link.GetPublicShareByTokenRequest, executant *user.User) events.LinkAccessFailed {
 	e := events.LinkAccessFailed{
-		Executant: executant,
+		Executant: executant.GetId(),
 		Status:    r.Status.Code,
 		Message:   r.Status.Message,
 		Timestamp: utils.TSNow(),
@@ -172,11 +173,11 @@ func LinkAccessFailed(r *link.GetPublicShareByTokenResponse, req *link.GetPublic
 }
 
 // LinkRemoved converts the response to an event
-func LinkRemoved(r *link.RemovePublicShareResponse, req *link.RemovePublicShareRequest, executant *user.UserId) events.LinkRemoved {
+func LinkRemoved(r *link.RemovePublicShareResponse, req *link.RemovePublicShareRequest, executant *user.User) events.LinkRemoved {
 	var rid *provider.ResourceId
 	_ = utils.ReadJSONFromOpaque(r.Opaque, "resourceid", &rid)
 	return events.LinkRemoved{
-		Executant:  executant,
+		Executant:  executant.GetId(),
 		ShareID:    req.Ref.GetId(),
 		ShareToken: req.Ref.GetToken(),
 		Timestamp:  utils.TSNow(),
@@ -185,119 +186,129 @@ func LinkRemoved(r *link.RemovePublicShareResponse, req *link.RemovePublicShareR
 }
 
 // FileTouched converts the response to an event
-func FileTouched(r *provider.TouchFileResponse, req *provider.TouchFileRequest, spaceOwner, executant *user.UserId) events.FileTouched {
+func FileTouched(r *provider.TouchFileResponse, req *provider.TouchFileRequest, spaceOwner *user.UserId, executant *user.User) events.FileTouched {
 	return events.FileTouched{
-		SpaceOwner: spaceOwner,
-		Executant:  executant,
-		Ref:        req.Ref,
-		Timestamp:  utils.TSNow(),
+		SpaceOwner:        spaceOwner,
+		Executant:         executant.GetId(),
+		Ref:               req.Ref,
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // FileUploaded converts the response to an event
-func FileUploaded(r *provider.InitiateFileUploadResponse, req *provider.InitiateFileUploadRequest, spaceOwner, executant *user.UserId) events.FileUploaded {
+func FileUploaded(r *provider.InitiateFileUploadResponse, req *provider.InitiateFileUploadRequest, spaceOwner *user.UserId, executant *user.User) events.FileUploaded {
 	return events.FileUploaded{
-		SpaceOwner: spaceOwner,
-		Executant:  executant,
-		Ref:        req.Ref,
-		Timestamp:  utils.TSNow(),
+		SpaceOwner:        spaceOwner,
+		Executant:         executant.GetId(),
+		Ref:               req.Ref,
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // FileDownloaded converts the response to an event
-func FileDownloaded(r *provider.InitiateFileDownloadResponse, req *provider.InitiateFileDownloadRequest, executant *user.UserId) events.FileDownloaded {
+func FileDownloaded(r *provider.InitiateFileDownloadResponse, req *provider.InitiateFileDownloadRequest, executant *user.User) events.FileDownloaded {
 	return events.FileDownloaded{
-		Executant: executant,
-		Ref:       req.Ref,
-		Timestamp: utils.TSNow(),
+		Executant:         executant.GetId(),
+		Ref:               req.Ref,
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // FileLocked converts the response to an events
-func FileLocked(r *provider.SetLockResponse, req *provider.SetLockRequest, owner, executant *user.UserId) events.FileLocked {
+func FileLocked(r *provider.SetLockResponse, req *provider.SetLockRequest, owner *user.UserId, executant *user.User) events.FileLocked {
 	return events.FileLocked{
-		Executant: executant,
-		Ref:       req.Ref,
-		Timestamp: utils.TSNow(),
+		Executant:         executant.GetId(),
+		Ref:               req.Ref,
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // FileUnlocked converts the response to an event
-func FileUnlocked(r *provider.UnlockResponse, req *provider.UnlockRequest, owner, executant *user.UserId) events.FileUnlocked {
+func FileUnlocked(r *provider.UnlockResponse, req *provider.UnlockRequest, owner *user.UserId, executant *user.User) events.FileUnlocked {
 	return events.FileUnlocked{
-		Executant: executant,
-		Ref:       req.Ref,
-		Timestamp: utils.TSNow(),
+		Executant:         executant.GetId(),
+		Ref:               req.Ref,
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // ItemTrashed converts the response to an event
-func ItemTrashed(r *provider.DeleteResponse, req *provider.DeleteRequest, spaceOwner, executant *user.UserId) events.ItemTrashed {
+func ItemTrashed(r *provider.DeleteResponse, req *provider.DeleteRequest, spaceOwner *user.UserId, executant *user.User) events.ItemTrashed {
 	opaqueID := utils.ReadPlainFromOpaque(r.Opaque, "opaque_id")
 	return events.ItemTrashed{
 		SpaceOwner: spaceOwner,
-		Executant:  executant,
+		Executant:  executant.GetId(),
 		Ref:        req.Ref,
 		ID: &provider.ResourceId{
 			StorageId: req.Ref.GetResourceId().GetStorageId(),
 			SpaceId:   req.Ref.GetResourceId().GetSpaceId(),
 			OpaqueId:  opaqueID,
 		},
-		Timestamp: utils.TSNow(),
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // ItemMoved converts the response to an event
-func ItemMoved(r *provider.MoveResponse, req *provider.MoveRequest, spaceOwner, executant *user.UserId) events.ItemMoved {
+func ItemMoved(r *provider.MoveResponse, req *provider.MoveRequest, spaceOwner *user.UserId, executant *user.User) events.ItemMoved {
 	return events.ItemMoved{
-		SpaceOwner:   spaceOwner,
-		Executant:    executant,
-		Ref:          req.Destination,
-		OldReference: req.Source,
-		Timestamp:    utils.TSNow(),
+		SpaceOwner:        spaceOwner,
+		Executant:         executant.GetId(),
+		Ref:               req.Destination,
+		OldReference:      req.Source,
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // ItemPurged converts the response to an event
-func ItemPurged(r *provider.PurgeRecycleResponse, req *provider.PurgeRecycleRequest, executant *user.UserId) events.ItemPurged {
+func ItemPurged(r *provider.PurgeRecycleResponse, req *provider.PurgeRecycleRequest, executant *user.User) events.ItemPurged {
 	return events.ItemPurged{
-		Executant: executant,
-		Ref:       req.Ref,
-		Timestamp: utils.TSNow(),
+		Executant:         executant.GetId(),
+		Ref:               req.Ref,
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // ItemRestored converts the response to an event
-func ItemRestored(r *provider.RestoreRecycleItemResponse, req *provider.RestoreRecycleItemRequest, spaceOwner, executant *user.UserId) events.ItemRestored {
+func ItemRestored(r *provider.RestoreRecycleItemResponse, req *provider.RestoreRecycleItemRequest, spaceOwner *user.UserId, executant *user.User) events.ItemRestored {
 	ref := req.Ref
 	if req.RestoreRef != nil {
 		ref = req.RestoreRef
 	}
 	return events.ItemRestored{
-		SpaceOwner:   spaceOwner,
-		Executant:    executant,
-		Ref:          ref,
-		OldReference: req.Ref,
-		Key:          req.Key,
-		Timestamp:    utils.TSNow(),
+		SpaceOwner:        spaceOwner,
+		Executant:         executant.GetId(),
+		Ref:               ref,
+		OldReference:      req.Ref,
+		Key:               req.Key,
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // FileVersionRestored converts the response to an event
-func FileVersionRestored(r *provider.RestoreFileVersionResponse, req *provider.RestoreFileVersionRequest, spaceOwner, executant *user.UserId) events.FileVersionRestored {
+func FileVersionRestored(r *provider.RestoreFileVersionResponse, req *provider.RestoreFileVersionRequest, spaceOwner *user.UserId, executant *user.User) events.FileVersionRestored {
 	return events.FileVersionRestored{
-		SpaceOwner: spaceOwner,
-		Executant:  executant,
-		Ref:        req.Ref,
-		Key:        req.Key,
-		Timestamp:  utils.TSNow(),
+		SpaceOwner:        spaceOwner,
+		Executant:         executant.GetId(),
+		Ref:               req.Ref,
+		Key:               req.Key,
+		Timestamp:         utils.TSNow(),
+		ImpersonatingUser: extractImpersonator(executant),
 	}
 }
 
 // SpaceCreated converts the response to an event
-func SpaceCreated(r *provider.CreateStorageSpaceResponse, executant *user.UserId) events.SpaceCreated {
+func SpaceCreated(r *provider.CreateStorageSpaceResponse, executant *user.User) events.SpaceCreated {
 	return events.SpaceCreated{
-		Executant: executant,
+		Executant: executant.GetId(),
 		ID:        r.StorageSpace.Id,
 		Owner:     extractOwner(r.StorageSpace.Owner),
 		Root:      r.StorageSpace.Root,
@@ -309,9 +320,9 @@ func SpaceCreated(r *provider.CreateStorageSpaceResponse, executant *user.UserId
 }
 
 // SpaceRenamed converts the response to an event
-func SpaceRenamed(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateStorageSpaceRequest, executant *user.UserId) events.SpaceRenamed {
+func SpaceRenamed(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateStorageSpaceRequest, executant *user.User) events.SpaceRenamed {
 	return events.SpaceRenamed{
-		Executant: executant,
+		Executant: executant.GetId(),
 		ID:        r.StorageSpace.Id,
 		Owner:     extractOwner(r.StorageSpace.Owner),
 		Name:      r.StorageSpace.Name,
@@ -320,9 +331,9 @@ func SpaceRenamed(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateSt
 }
 
 // SpaceUpdated converts the response to an event
-func SpaceUpdated(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateStorageSpaceRequest, executant *user.UserId) events.SpaceUpdated {
+func SpaceUpdated(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateStorageSpaceRequest, executant *user.User) events.SpaceUpdated {
 	return events.SpaceUpdated{
-		Executant: executant,
+		Executant: executant.GetId(),
 		ID:        r.StorageSpace.Id,
 		Space:     r.StorageSpace,
 		Timestamp: utils.TSNow(),
@@ -330,9 +341,9 @@ func SpaceUpdated(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateSt
 }
 
 // SpaceEnabled converts the response to an event
-func SpaceEnabled(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateStorageSpaceRequest, executant *user.UserId) events.SpaceEnabled {
+func SpaceEnabled(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateStorageSpaceRequest, executant *user.User) events.SpaceEnabled {
 	return events.SpaceEnabled{
-		Executant: executant,
+		Executant: executant.GetId(),
 		ID:        r.StorageSpace.Id,
 		Owner:     extractOwner(r.StorageSpace.Owner),
 		Timestamp: utils.TSNow(),
@@ -341,10 +352,10 @@ func SpaceEnabled(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateSt
 
 // SpaceShared converts the response to an event
 // func SpaceShared(req *provider.AddGrantRequest, executant, sharer *user.UserId, grantee *provider.Grantee) events.SpaceShared {
-func SpaceShared(r *provider.AddGrantResponse, req *provider.AddGrantRequest, executant *user.UserId) events.SpaceShared {
+func SpaceShared(r *provider.AddGrantResponse, req *provider.AddGrantRequest, executant *user.User) events.SpaceShared {
 	id := storagespace.FormatStorageID(req.Ref.ResourceId.StorageId, req.Ref.ResourceId.SpaceId)
 	return events.SpaceShared{
-		Executant:      executant,
+		Executant:      executant.GetId(),
 		Creator:        req.Grant.Creator,
 		GranteeUserID:  req.Grant.GetGrantee().GetUserId(),
 		GranteeGroupID: req.Grant.GetGrantee().GetGroupId(),
@@ -354,10 +365,10 @@ func SpaceShared(r *provider.AddGrantResponse, req *provider.AddGrantRequest, ex
 }
 
 // SpaceShareUpdated converts the response to an events
-func SpaceShareUpdated(r *provider.UpdateGrantResponse, req *provider.UpdateGrantRequest, executant *user.UserId) events.SpaceShareUpdated {
+func SpaceShareUpdated(r *provider.UpdateGrantResponse, req *provider.UpdateGrantRequest, executant *user.User) events.SpaceShareUpdated {
 	id := storagespace.FormatStorageID(req.Ref.ResourceId.StorageId, req.Ref.ResourceId.SpaceId)
 	return events.SpaceShareUpdated{
-		Executant:      executant,
+		Executant:      executant.GetId(),
 		GranteeUserID:  req.Grant.GetGrantee().GetUserId(),
 		GranteeGroupID: req.Grant.GetGrantee().GetGroupId(),
 		ID:             &provider.StorageSpaceId{OpaqueId: id},
@@ -366,10 +377,10 @@ func SpaceShareUpdated(r *provider.UpdateGrantResponse, req *provider.UpdateGran
 }
 
 // SpaceUnshared  converts the response to an event
-func SpaceUnshared(r *provider.RemoveGrantResponse, req *provider.RemoveGrantRequest, executant *user.UserId) events.SpaceUnshared {
+func SpaceUnshared(r *provider.RemoveGrantResponse, req *provider.RemoveGrantRequest, executant *user.User) events.SpaceUnshared {
 	id := storagespace.FormatStorageID(req.Ref.ResourceId.StorageId, req.Ref.ResourceId.SpaceId)
 	return events.SpaceUnshared{
-		Executant:      executant,
+		Executant:      executant.GetId(),
 		GranteeUserID:  req.Grant.GetGrantee().GetUserId(),
 		GranteeGroupID: req.Grant.GetGrantee().GetGroupId(),
 		ID:             &provider.StorageSpaceId{OpaqueId: id},
@@ -378,20 +389,20 @@ func SpaceUnshared(r *provider.RemoveGrantResponse, req *provider.RemoveGrantReq
 }
 
 // SpaceDisabled converts the response to an event
-func SpaceDisabled(r *provider.DeleteStorageSpaceResponse, req *provider.DeleteStorageSpaceRequest, executant *user.UserId) events.SpaceDisabled {
+func SpaceDisabled(r *provider.DeleteStorageSpaceResponse, req *provider.DeleteStorageSpaceRequest, executant *user.User) events.SpaceDisabled {
 	return events.SpaceDisabled{
-		Executant: executant,
+		Executant: executant.GetId(),
 		ID:        req.Id,
 		Timestamp: time.Now(),
 	}
 }
 
 // SpaceDeleted converts the response to an event
-func SpaceDeleted(r *provider.DeleteStorageSpaceResponse, req *provider.DeleteStorageSpaceRequest, executant *user.UserId) events.SpaceDeleted {
+func SpaceDeleted(r *provider.DeleteStorageSpaceResponse, req *provider.DeleteStorageSpaceRequest, executant *user.User) events.SpaceDeleted {
 	var final map[string]provider.ResourcePermissions
 	_ = utils.ReadJSONFromOpaque(r.GetOpaque(), "grants", &final)
 	return events.SpaceDeleted{
-		Executant:    executant,
+		Executant:    executant.GetId(),
 		ID:           req.Id,
 		SpaceName:    utils.ReadPlainFromOpaque(r.GetOpaque(), "spacename"),
 		FinalMembers: final,
@@ -404,4 +415,12 @@ func extractOwner(u *user.User) *user.UserId {
 		return u.Id
 	}
 	return nil
+}
+
+func extractImpersonator(u *user.User) *user.User {
+	var impersonator user.User
+	if err := utils.ReadJSONFromOpaque(u.Opaque, "impersonating-user", &impersonator); err != nil {
+		return nil
+	}
+	return &impersonator
 }

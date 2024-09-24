@@ -40,6 +40,10 @@ func RegisterAppProvider(
 	for _, extensions := range appUrls {
 		for ext := range extensions {
 			m := mime.Detect(false, ext)
+			// skip the default
+			if m == "application/octet-stream" {
+				continue
+			}
 			mimeTypesMap[m] = true
 		}
 	}

@@ -73,47 +73,43 @@ func NewUnary(m map[string]interface{}) (grpc.UnaryServerInterceptor, int, error
 		default:
 		}
 
-		var executantID *user.UserId
-		u, ok := revactx.ContextGetUser(ctx)
-		if ok {
-			executantID = u.Id
-		}
+		executant, _ := revactx.ContextGetUser(ctx)
 
 		var ev interface{}
 		switch v := res.(type) {
 		case *collaboration.CreateShareResponse:
 			if isSuccess(v) {
-				ev = ShareCreated(v, executantID)
+				ev = ShareCreated(v, executant)
 			}
 		case *collaboration.RemoveShareResponse:
 			if isSuccess(v) {
-				ev = ShareRemoved(v, req.(*collaboration.RemoveShareRequest), executantID)
+				ev = ShareRemoved(v, req.(*collaboration.RemoveShareRequest), executant)
 			}
 		case *collaboration.UpdateShareResponse:
 			if isSuccess(v) {
-				ev = ShareUpdated(v, req.(*collaboration.UpdateShareRequest), executantID)
+				ev = ShareUpdated(v, req.(*collaboration.UpdateShareRequest), executant)
 			}
 		case *collaboration.UpdateReceivedShareResponse:
 			if isSuccess(v) {
-				ev = ReceivedShareUpdated(v, executantID)
+				ev = ReceivedShareUpdated(v, executant)
 			}
 		case *link.CreatePublicShareResponse:
 			if isSuccess(v) {
-				ev = LinkCreated(v, executantID)
+				ev = LinkCreated(v, executant)
 			}
 		case *link.UpdatePublicShareResponse:
 			if isSuccess(v) {
-				ev = LinkUpdated(v, req.(*link.UpdatePublicShareRequest), executantID)
+				ev = LinkUpdated(v, req.(*link.UpdatePublicShareRequest), executant)
 			}
 		case *link.RemovePublicShareResponse:
 			if isSuccess(v) {
-				ev = LinkRemoved(v, req.(*link.RemovePublicShareRequest), executantID)
+				ev = LinkRemoved(v, req.(*link.RemovePublicShareRequest), executant)
 			}
 		case *link.GetPublicShareByTokenResponse:
 			if isSuccess(v) {
-				ev = LinkAccessed(v, executantID)
+				ev = LinkAccessed(v, executant)
 			} else {
-				ev = LinkAccessFailed(v, req.(*link.GetPublicShareByTokenRequest), executantID)
+				ev = LinkAccessFailed(v, req.(*link.GetPublicShareByTokenRequest), executant)
 			}
 		case *provider.AddGrantResponse:
 			// TODO: update CS3 APIs
@@ -121,81 +117,81 @@ func NewUnary(m map[string]interface{}) (grpc.UnaryServerInterceptor, int, error
 			// https://github.com/owncloud/ocis/issues/4312
 			r := req.(*provider.AddGrantRequest)
 			if isSuccess(v) && utils.ExistsInOpaque(r.Opaque, "spacegrant") {
-				ev = SpaceShared(v, r, executantID)
+				ev = SpaceShared(v, r, executant)
 			}
 		case *provider.UpdateGrantResponse:
 			r := req.(*provider.UpdateGrantRequest)
 			if isSuccess(v) && utils.ExistsInOpaque(r.Opaque, "spacegrant") {
-				ev = SpaceShareUpdated(v, r, executantID)
+				ev = SpaceShareUpdated(v, r, executant)
 			}
 		case *provider.RemoveGrantResponse:
 			r := req.(*provider.RemoveGrantRequest)
 			if isSuccess(v) && utils.ExistsInOpaque(r.Opaque, "spacegrant") {
-				ev = SpaceUnshared(v, req.(*provider.RemoveGrantRequest), executantID)
+				ev = SpaceUnshared(v, req.(*provider.RemoveGrantRequest), executant)
 			}
 		case *provider.CreateContainerResponse:
 			if isSuccess(v) {
-				ev = ContainerCreated(v, req.(*provider.CreateContainerRequest), ownerID, executantID)
+				ev = ContainerCreated(v, req.(*provider.CreateContainerRequest), ownerID, executant)
 			}
 		case *provider.InitiateFileDownloadResponse:
 			if isSuccess(v) {
-				ev = FileDownloaded(v, req.(*provider.InitiateFileDownloadRequest), executantID)
+				ev = FileDownloaded(v, req.(*provider.InitiateFileDownloadRequest), executant)
 			}
 		case *provider.DeleteResponse:
 			if isSuccess(v) {
-				ev = ItemTrashed(v, req.(*provider.DeleteRequest), ownerID, executantID)
+				ev = ItemTrashed(v, req.(*provider.DeleteRequest), ownerID, executant)
 			}
 		case *provider.MoveResponse:
 			if isSuccess(v) {
-				ev = ItemMoved(v, req.(*provider.MoveRequest), ownerID, executantID)
+				ev = ItemMoved(v, req.(*provider.MoveRequest), ownerID, executant)
 			}
 		case *provider.PurgeRecycleResponse:
 			if isSuccess(v) {
-				ev = ItemPurged(v, req.(*provider.PurgeRecycleRequest), executantID)
+				ev = ItemPurged(v, req.(*provider.PurgeRecycleRequest), executant)
 			}
 		case *provider.RestoreRecycleItemResponse:
 			if isSuccess(v) {
-				ev = ItemRestored(v, req.(*provider.RestoreRecycleItemRequest), ownerID, executantID)
+				ev = ItemRestored(v, req.(*provider.RestoreRecycleItemRequest), ownerID, executant)
 			}
 		case *provider.RestoreFileVersionResponse:
 			if isSuccess(v) {
-				ev = FileVersionRestored(v, req.(*provider.RestoreFileVersionRequest), ownerID, executantID)
+				ev = FileVersionRestored(v, req.(*provider.RestoreFileVersionRequest), ownerID, executant)
 			}
 		case *provider.CreateStorageSpaceResponse:
 			if isSuccess(v) && v.StorageSpace != nil { // TODO: Why are there CreateStorageSpaceResponses with nil StorageSpace?
-				ev = SpaceCreated(v, executantID)
+				ev = SpaceCreated(v, executant)
 			}
 		case *provider.UpdateStorageSpaceResponse:
 			if isSuccess(v) {
 				r := req.(*provider.UpdateStorageSpaceRequest)
 				if r.StorageSpace.Name != "" {
-					ev = SpaceRenamed(v, r, executantID)
+					ev = SpaceRenamed(v, r, executant)
 				} else if utils.ExistsInOpaque(r.Opaque, "restore") {
-					ev = SpaceEnabled(v, r, executantID)
+					ev = SpaceEnabled(v, r, executant)
 				} else {
-					ev = SpaceUpdated(v, r, executantID)
+					ev = SpaceUpdated(v, r, executant)
 				}
 			}
 		case *provider.DeleteStorageSpaceResponse:
 			if isSuccess(v) {
 				r := req.(*provider.DeleteStorageSpaceRequest)
 				if utils.ExistsInOpaque(r.Opaque, "purge") {
-					ev = SpaceDeleted(v, r, executantID)
+					ev = SpaceDeleted(v, r, executant)
 				} else {
-					ev = SpaceDisabled(v, r, executantID)
+					ev = SpaceDisabled(v, r, executant)
 				}
 			}
 		case *provider.TouchFileResponse:
 			if isSuccess(v) {
-				ev = FileTouched(v, req.(*provider.TouchFileRequest), ownerID, executantID)
+				ev = FileTouched(v, req.(*provider.TouchFileRequest), ownerID, executant)
 			}
 		case *provider.SetLockResponse:
 			if isSuccess(v) {
-				ev = FileLocked(v, req.(*provider.SetLockRequest), ownerID, executantID)
+				ev = FileLocked(v, req.(*provider.SetLockRequest), ownerID, executant)
 			}
 		case *provider.UnlockResponse:
 			if isSuccess(v) {
-				ev = FileUnlocked(v, req.(*provider.UnlockRequest), ownerID, executantID)
+				ev = FileUnlocked(v, req.(*provider.UnlockRequest), ownerID, executant)
 			}
 		}
 

@@ -159,6 +159,8 @@ func (m *manager) Authenticate(ctx context.Context, ocmshare, sharedSecret strin
 		},
 	}
 
+	user.Opaque = utils.AppendJSONToOpaque(user.Opaque, "impersonating-user", userRes.RemoteUser)
+
 	return user, scope, nil
 }
 
