@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -25,7 +26,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
 		debug.Health(health(options.Config, options.Logger)),
-		debug.Ready(ready(options.Config)),
+		debug.Ready(handlers.Ready),
 	), nil
 }
 
@@ -48,23 +49,6 @@ func health(cfg *config.Config, l log.Logger) func(http.ResponseWriter, *http.Re
 		_, err = io.WriteString(w, http.StatusText(retVal))
 		if err != nil {
 			l.Fatal().Err(err).Msg("Could not write health check body")
-		}
-	}
-}
-
-// ready implements the ready check.
-func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/plain")
-		w.WriteHeader(http.StatusOK)
-		// if we can call this function, a http(200) is a valid response as
-		// there is nothing we can check at this point for IDP
-		// if there is a mishap when initializing, there is a minimal (talking ms or ns window)
-		// timeframe where this code is callable
-		_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-		// io.WriteString should not fail but if it does, we want to know.
-		if err != nil {
-			panic(err)
 		}
 	}
 }

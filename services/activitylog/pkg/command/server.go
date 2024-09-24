@@ -9,6 +9,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
@@ -23,8 +26,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/server/http"
-	"github.com/urfave/cli/v2"
-	microstore "go-micro.dev/v4/store"
 )
 
 var _registeredEvents = []events.Unmarshaller{
@@ -120,7 +121,6 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx), // NOTE: not passing this "option" leads to a panic in go-micro
 					http.TraceProvider(tracerProvider),
 					http.Stream(evStream),
-					http.RegisteredEvents(_registeredEvents),
 					http.Store(evStore),
 					http.GatewaySelector(gatewaySelector),
 					http.HistoryClient(hClient),
