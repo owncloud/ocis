@@ -134,19 +134,19 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 				message = MessageResourceUpdated
 			}
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, true), WithUser(nil, ev.ExecutingUser, ev.ImpersonatingUser), WithSpace(toSpace(ev.FileRef)))
+			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, true), WithUser(nil, ev.ExecutingUser, ev.ImpersonatingUser))
 		case events.FileTouched:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, nil, ev.ImpersonatingUser), WithSpace(toSpace(ev.Ref)))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 		case events.ContainerCreated:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, nil, ev.ImpersonatingUser), WithSpace(toSpace(ev.Ref)))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 		case events.ItemTrashed:
 			message = MessageResourceTrashed
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithTrashedResource(ev.Ref, ev.ID), WithUser(ev.Executant, nil, ev.ImpersonatingUser), WithSpace(toSpace(ev.Ref)))
+			vars, err = s.GetVars(ctx, WithTrashedResource(ev.Ref, ev.ID), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 		case events.ItemMoved:
 			switch isRename(ev.OldReference, ev.Ref) {
 			case true:
@@ -154,7 +154,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 				vars, err = s.GetVars(ctx, WithResource(ev.Ref, false), WithOldResource(ev.OldReference), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 			case false:
 				message = MessageResourceMoved
-				vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, nil, ev.ImpersonatingUser), WithSpace(toSpace(ev.Ref)))
+				vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 			}
 			ts = utils.TSToTime(ev.Timestamp)
 		case events.ShareCreated:
