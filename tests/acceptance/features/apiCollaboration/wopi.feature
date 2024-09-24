@@ -618,8 +618,7 @@ Feature: collaboration (wopi)
       | shareType       | user       |
       | permissionsRole | Viewer     |
     When user "Brian" tries to create a file "testFile.txt" inside folder "testFolder" in space "Shares" using wopi endpoint
-    Then the HTTP status code should be "500"
-    And the JSON data of the response should match
+    Then the HTTP status code should be "403"
       """
       {
         "type": "object",
@@ -629,10 +628,10 @@ Feature: collaboration (wopi)
         ],
         "properties": {
           "code": {
-            "const": "SERVER_ERROR"
+            "const": "PERMISSION_DENIED"
           },
           "message": {
-            "const": "error calling InitiateFileUpload"
+            "const": "permission denied to create the file"
           }
         }
       }
@@ -715,7 +714,7 @@ Feature: collaboration (wopi)
       | shareType       | user         |
       | permissionsRole | Space Viewer |
     When user "Brian" tries to create a file "testFile.txt" inside folder "testFolder" in space "new-space" using wopi endpoint
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "403"
     And the JSON data of the response should match
       """
       {
@@ -726,10 +725,10 @@ Feature: collaboration (wopi)
         ],
         "properties": {
           "code": {
-            "const": "SERVER_ERROR"
+            "const": "PERMISSION_DENIED"
           },
           "message": {
-            "const": "error calling InitiateFileUpload"
+            "const": "permission denied to create the file"
           }
         }
       }
@@ -836,7 +835,7 @@ Feature: collaboration (wopi)
       | shareType       | user         |
       | permissionsRole | Space Viewer |
     When user "Brian" tries to create a file "simple.odt" inside folder "testFolder" in space "new-space" using wopi endpoint
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "403"
     And the JSON data of the response should match
       """
       {
@@ -847,10 +846,10 @@ Feature: collaboration (wopi)
         ],
         "properties": {
           "code": {
-            "const": "SERVER_ERROR"
+            "const": "PERMISSION_DENIED"
           },
           "message": {
-            "const": "error calling InitiateFileUpload"
+            "const": "permission denied to create the file"
           }
         }
       }
@@ -903,7 +902,7 @@ Feature: collaboration (wopi)
       | shareType       | user       |
       | permissionsRole | Viewer     |
     When user "Brian" tries to create a file "simple.odt" inside folder "testFolder" in space "Shares" using wopi endpoint
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "403"
     And the JSON data of the response should match
       """
       {
@@ -914,10 +913,10 @@ Feature: collaboration (wopi)
         ],
         "properties": {
           "code": {
-            "const": "SERVER_ERROR"
+            "const": "PERMISSION_DENIED"
           },
           "message": {
-            "const": "error calling InitiateFileUpload"
+            "const": "permission denied to create the file"
           }
         }
       }
@@ -966,7 +965,7 @@ Feature: collaboration (wopi)
       | permissionsRole | view         |
       | password        | %public%     |
     When the public tries to create a file "simple.odt" inside the last shared public link folder with password "%public%" using wopi endpoint
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "403"
     And the JSON data of the response should match
       """
       {
@@ -977,10 +976,10 @@ Feature: collaboration (wopi)
         ],
         "properties": {
           "code": {
-            "const": "SERVER_ERROR"
+            "const": "PERMISSION_DENIED"
           },
           "message": {
-            "const": "error calling InitiateFileUpload"
+            "const": "permission denied to create the file"
           }
         }
       }
@@ -1059,7 +1058,7 @@ Feature: collaboration (wopi)
       | permissionsRole | view      |
       | password        | %public%  |
     When the public tries to create a file "simple.odt" inside folder "testFolder" in the last shared public link space with password "%public%" using wopi endpoint
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "403"
     And the JSON data of the response should match
       """
       {
@@ -1070,10 +1069,10 @@ Feature: collaboration (wopi)
         ],
         "properties": {
           "code": {
-            "const": "SERVER_ERROR"
+            "const": "PERMISSION_DENIED"
           },
           "message": {
-            "const": "error calling InitiateFileUpload"
+            "const": "permission denied to create the file"
           }
         }
       }
