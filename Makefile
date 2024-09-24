@@ -236,7 +236,7 @@ test-gherkin-lint-fix:
 
 .PHONY: bingo-update
 bingo-update: $(BINGO)
-	$(BINGO) get -l -v
+	$(BINGO) get -l -v -t 10
 
 .PHONY: check-licenses
 check-licenses: ci-go-check-licenses ci-node-check-licenses
