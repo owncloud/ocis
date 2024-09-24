@@ -254,11 +254,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesDavOperation/moveByFileId.feature:492](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L492)
 - [apiSpacesDavOperation/moveByFileId.feature:493](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L493)
 
-#### [OCM. sharing issues](https://github.com/owncloud/ocis/issues/9534)
-
-- [apiOcm/share.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L12)
-- [apiOcm/share.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L91)
-
 #### [OCM. admin cannot get federated users if he hasn't connection with them ](https://github.com/owncloud/ocis/issues/9829)
 
 tests/acceptance/features/apiOcm/searchFederationUsers.feature

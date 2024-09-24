@@ -2538,15 +2538,16 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" lists the shares shared with (?:him|her)(| after clearing user cache) using the Graph API$/
+	 * @When /^user "([^"]*)" lists the shares shared with (?:him|her)(| after clearing user cache)(| without retry) using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $cacheStepString
+	 * @param string $retryOption
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userListsTheResourcesSharedWithThemUsingGraphApi(string $user, string $cacheStepString): void {
+	public function userListsTheResourcesSharedWithThemUsingGraphApi(string $user, string $cacheStepString, string $retryOption): void {
 		if ($cacheStepString !== '') {
 			// ENV (GRAPH_SPACES_GROUPS_CACHE_TTL | GRAPH_SPACES_USERS_CACHE_TTL) is set default to 60 sec
 			// which means 60 sec is required to clean up all the user|group cache once they are deleted
@@ -2559,6 +2560,7 @@ class GraphContext implements Context {
 		// Sometimes listing shares might not return the updated shares list
 		// so try again until @client.synchronize is true for the max. number of retries (i.e. 10)
 		// and do not retry when the share is expected to be not synced
+		$retryEnabled = ($retryOption === '');
 		$tryAgain = false;
 		$retried = 0;
 		do {
@@ -2571,17 +2573,19 @@ class GraphContext implements Context {
 
 			$jsonBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 
-			foreach ($jsonBody->value as $share) {
-				$autoSync = $this->featureContext->getUserAutoSyncSetting($credentials['username']);
-				$tryAgain = !$share->{'@client.synchronize'} && $autoSync && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+			if ($retryEnabled) {
+				foreach ($jsonBody->value as $share) {
+					$autoSync = $this->featureContext->getUserAutoSyncSetting($credentials['username']);
+					$tryAgain = !$share->{'@client.synchronize'} && $autoSync && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
 
-				if ($tryAgain) {
-					$retried += 1;
-					echo "auto-sync share for user '$user' is enabled\n";
-					echo "but share '$share->name' was not auto-synced, retrying ($retried)...\n";
-					// wait 500ms and try again
-					\usleep(500 * 1000);
-					break;
+					if ($tryAgain) {
+						$retried += 1;
+						echo "auto-sync share for user '$user' is enabled\n";
+						echo "but share '$share->name' was not auto-synced, retrying ($retried)...\n";
+						// wait 500ms and try again
+						\usleep(500 * 1000);
+						break;
+					}
 				}
 			}
 		} while ($tryAgain);

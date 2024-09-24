@@ -16,15 +16,16 @@ Feature: an user shares resources usin ScienceMesh application
     And "Brian" has accepted invitation
     And using server "LOCAL"
     And user "Alice" has created folder "folderToShare"
-    When user "Alice" sends the following resource share invitation using the Graph API:
-      | resource        | folderToShare |
-      | space           | Personal      |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+    When user "Alice" sends the following resource share invitation to federated user using the Graph API:
+      | resource        | folderToShare                 |
+      | space           | Personal                      |
+      | sharee          | Brian                         |
+      | shareType       | user                          |
+      | permissionsRole | Viewer                        |
+      | federatedServer | @federation-ocis-server:10200 |
     Then the HTTP status code should be "200"
     When using server "REMOTE"
-    And user "Brian" lists the shares shared with him using the Graph API
+    And user "Brian" lists the shares shared with him without retry using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -47,13 +48,13 @@ Feature: an user shares resources usin ScienceMesh application
                 "name"
               ],
               "properties": {
-                "@UI.Hidden":{
+                "@UI.Hidden": {
                   "type": "boolean",
                   "enum": [false]
                 },
-                "@client.synchronize":{
+                "@client.synchronize": {
                   "type": "boolean",
-                  "enum": [true]
+                  "enum": [false]
                 },
                 "createdBy": {
                   "type": "object",
@@ -63,7 +64,10 @@ Feature: an user shares resources usin ScienceMesh application
                   "properties": {
                     "user": {
                       "type": "object",
-                      "required": ["displayName", "id"],
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
                       "properties": {
                         "displayName": {
                           "type": "string",
@@ -71,7 +75,7 @@ Feature: an user shares resources usin ScienceMesh application
                         },
                         "id": {
                           "type": "string",
-                          "pattern": "^%user_id_pattern%$"
+                          "pattern": "^%federated_user_id_pattern%$"
                         }
                       }
                     }
@@ -94,12 +98,13 @@ Feature: an user shares resources usin ScienceMesh application
     And using server "REMOTE"
     And "Brian" has accepted invitation
     And user "Brian" has created folder "folderToShare"
-    When user "Brian" sends the following resource share invitation using the Graph API:
-      | resource        | folderToShare |
-      | space           | Personal      |
-      | sharee          | Alice         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+    When user "Brian" sends the following resource share invitation to federated user using the Graph API:
+      | resource        | folderToShare     |
+      | space           | Personal          |
+      | sharee          | Alice             |
+      | shareType       | user              |
+      | permissionsRole | Viewer            |
+      | federatedServer | @ocis-server:9200 |
     Then the HTTP status code should be "200"
     When using server "LOCAL"
     And user "Alice" lists the shares shared with her using the Graph API
@@ -125,11 +130,13 @@ Feature: an user shares resources usin ScienceMesh application
                 "name"
               ],
               "properties": {
-                "@UI.Hidden":{
-                  "const": "false"
+                "@UI.Hidden": {
+                  "type": "boolean",
+                  "enum": [false]
                 },
-                "@client.synchronize":{
-                  "const": "true"
+                "@client.synchronize": {
+                  "type": "boolean",
+                  "enum": [false]
                 },
                 "createdBy": {
                   "type": "object",
@@ -139,14 +146,17 @@ Feature: an user shares resources usin ScienceMesh application
                   "properties": {
                     "user": {
                       "type": "object",
-                      "required": ["displayName", "id"],
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
                       "properties": {
                         "displayName": {
                           "const": "Brian Murphy"
                         },
                         "id": {
                           "type": "string",
-                          "pattern": "^%user_id_pattern%$"
+                          "pattern": "^%federated_user_id_pattern%$"
                         }
                       }
                     }
