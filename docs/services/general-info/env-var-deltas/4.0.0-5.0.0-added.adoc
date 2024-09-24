@@ -466,10 +466,10 @@
 | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
 |
 | `OCM_OCM_INVITE_MANAGER_JSON_FILE`
-| Path to the JSON file where OCM invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| Path to the JSON file where OCM invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage.|
 |
 | `OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE`
-| Path to the JSON file where ocm invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| Path to the JSON file where ocm invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage.|
 |
 | `OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME`
 | Verify the hostname of the request against the hostname of the OCM provider.|
@@ -484,7 +484,7 @@
 | Directory where the ocm storage provider persists its data like tus upload info files.|
 |
 | `OCM_OCM_CORE_JSON_FILE`
-| Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage.|
 |
 | `OCM_OCM_SHARE_PROVIDER_DRIVER`
 | Driver to be used to persist ocm shares. Supported value is only 'json'.| `json`
@@ -496,7 +496,7 @@
 | Template for the webapp url.|
 |
 | `OCM_OCM_SHAREPROVIDER_JSON_FILE`
-| Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage.|
 
 |
 | `OCM_DEBUG_ADDR`
