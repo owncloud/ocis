@@ -16,7 +16,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 	"github.com/owncloud/ocis/v2/services/web"
 	"github.com/owncloud/ocis/v2/services/web/pkg/apps"
-	webmid "github.com/owncloud/ocis/v2/services/web/pkg/middleware"
 	svc "github.com/owncloud/ocis/v2/services/web/pkg/service/v0"
 )
 
@@ -101,7 +100,6 @@ func Server(opts ...Option) (http.Service, error) {
 			chimiddleware.RequestID,
 			chimiddleware.Compress(5),
 			middleware.NoCache,
-			webmid.SilentRefresh,
 			middleware.Version(
 				options.Config.Service.Name,
 				version.GetString(),
