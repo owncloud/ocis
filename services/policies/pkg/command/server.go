@@ -3,12 +3,13 @@ package command
 import (
 	"context"
 	"fmt"
-	"io"
-	"net/http"
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -20,7 +21,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/policies/pkg/engine/opa"
 	svcEvent "github.com/owncloud/ocis/v2/services/policies/pkg/service/event"
 	svcGRPC "github.com/owncloud/ocis/v2/services/policies/pkg/service/grpc"
-	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -129,34 +129,8 @@ func Server(cfg *config.Config) *cli.Command {
 					debug.Token(cfg.Debug.Token),
 					debug.Pprof(cfg.Debug.Pprof),
 					debug.Zpages(cfg.Debug.Zpages),
-					debug.Health(
-						func(w http.ResponseWriter, r *http.Request) {
-							w.Header().Set("Content-Type", "text/plain")
-							w.WriteHeader(http.StatusOK)
-
-							// TODO: check if services are up and running
-
-							_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-							// io.WriteString should not fail but if it does, we want to know.
-							if err != nil {
-								panic(err)
-							}
-						},
-					),
-					debug.Ready(
-						func(w http.ResponseWriter, r *http.Request) {
-							w.Header().Set("Content-Type", "text/plain")
-							w.WriteHeader(http.StatusOK)
-
-							// TODO: check if services are up and running
-
-							_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-							// io.WriteString should not fail but if it does, we want to know.
-							if err != nil {
-								panic(err)
-							}
-						},
-					),
+					debug.Health(handlers.Health),
+					debug.Ready(handlers.Ready),
 				)
 
 				gr.Add(server.ListenAndServe, func(_ error) {
