@@ -70,6 +70,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 * Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
 * Enhancement - Remove METADATA_BACKEND: [#10113](https://github.com/owncloud/ocis/pull/10113)
+* Enhancement - Load CSP configuration file if it exists: [#10139](https://github.com/owncloud/ocis/pull/10139)
 
 ## Details
 
@@ -188,6 +189,16 @@ The following sections list the changes for unreleased.
    Removes the deprecated XXX_METADATA_BACKEND envvars
 
    https://github.com/owncloud/ocis/pull/10113
+
+* Enhancement - Load CSP configuration file if it exists: [#10139](https://github.com/owncloud/ocis/pull/10139)
+
+   The Content Security Policy (CSP) configuration file is now loaded by default if
+   it exists. The configuration file looked for should be located at
+   `$OCIS_BASE_DATA_PATH/proxy/csp.yaml`. If the file does not exist, the default
+   CSP configuration is used.
+
+   https://github.com/owncloud/ocis/issues/10021
+   https://github.com/owncloud/ocis/pull/10139
 
 # Changelog for [6.4.0] (2024-09-12)
 
