@@ -74,7 +74,7 @@ require (
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20240829135935-80dc00d6f5ea
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.10
-	github.com/prometheus/client_golang v1.20.2
+	github.com/prometheus/client_golang v1.20.4
 	github.com/r3labs/sse/v2 v2.10.0
 	github.com/riandyrn/otelchi v0.10.0
 	github.com/rogpeppe/go-internal v1.12.0
