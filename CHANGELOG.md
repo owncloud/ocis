@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix Activities leak: [#10092](https://github.com/owncloud/ocis/pull/10092)
 * Bugfix - Include additional logs in the collaboration service: [#10101](https://github.com/owncloud/ocis/pull/10101)
 * Bugfix - Added ShareUpdate activity: [#10104](https://github.com/owncloud/ocis/pull/10104)
+* Bugfix - Fixed the collaboration service registration: [#10107](https://github.com/owncloud/ocis/pull/10107)
 * Bugfix - CheckFileInfo will return a 404 error if the target file isn't found: [#10112](https://github.com/owncloud/ocis/pull/10112)
 * Bugfix - Always select next gateway client: [#10133](https://github.com/owncloud/ocis/pull/10133)
 * Bugfix - Forbid Activities for Sharees: [#10136](https://github.com/owncloud/ocis/pull/10136)
@@ -133,6 +134,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10011
    https://github.com/owncloud/ocis/pull/10104
+
+* Bugfix - Fixed the collaboration service registration: [#10107](https://github.com/owncloud/ocis/pull/10107)
+
+   Fixed an issue when the collaboration service registers apps also for binary and
+   unknown mime types.
+
+   https://github.com/owncloud/ocis/issues/10086
+   https://github.com/owncloud/ocis/pull/10107
 
 * Bugfix - CheckFileInfo will return a 404 error if the target file isn't found: [#10112](https://github.com/owncloud/ocis/pull/10112)
 
