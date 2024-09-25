@@ -31,6 +31,7 @@ var _registeredEvents = []events.Unmarshaller{
 	events.UploadReady{},
 	events.FileTouched{},
 	events.ContainerCreated{},
+	events.FileDownloaded{},
 	events.ItemTrashed{},
 	events.ItemPurged{},
 	events.ItemMoved{},
