@@ -107,10 +107,6 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 	for _, e := range evRes.GetEvents() {
 		delete(toDelete, e.GetId())
 
-		if limit != 0 && len(resp.Activities) >= limit {
-			continue
-		}
-
 		if !activityAccepted(e) {
 			continue
 		}
@@ -220,6 +216,10 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 	}
 
 	sort(resp.Activities)
+
+	if limit > 0 && limit < len(resp.Activities) {
+		resp.Activities = resp.Activities[:limit]
+	}
 
 	b, err := json.Marshal(resp)
 	if err != nil {
