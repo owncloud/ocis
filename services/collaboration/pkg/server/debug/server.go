@@ -12,6 +12,11 @@ import (
 func Server(opts ...Option) (*http.Server, error) {
 	options := newOptions(opts...)
 
+	checkHandler := handlers.NewCheckHandler(
+		handlers.NewCheckHandlerConfiguration().
+			WithLogger(options.Logger),
+	)
+
 	return debug.NewService(
 		debug.Logger(options.Logger),
 		debug.Name(options.Config.Service.Name+"."+options.Config.App.Name),
@@ -20,8 +25,8 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Token(options.Config.Debug.Token),
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
-		debug.Health(handlers.Health),
-		debug.Ready(handlers.Ready),
+		debug.Health(checkHandler),
+		debug.Ready(checkHandler),
 		//debug.CorsAllowedOrigins(options.Config.HTTP.CORS.AllowedOrigins),
 		//debug.CorsAllowedMethods(options.Config.HTTP.CORS.AllowedMethods),
 		//debug.CorsAllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),

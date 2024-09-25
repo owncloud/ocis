@@ -20,9 +20,9 @@ type Options struct {
 	Token                string
 	Pprof                bool
 	Zpages               bool
-	Health               func(http.ResponseWriter, *http.Request)
-	Ready                func(http.ResponseWriter, *http.Request)
-	ConfigDump           func(http.ResponseWriter, *http.Request)
+	Health               http.Handler
+	Ready                http.Handler
+	ConfigDump           http.Handler
 	CorsAllowedOrigins   []string
 	CorsAllowedMethods   []string
 	CorsAllowedHeaders   []string
@@ -97,21 +97,21 @@ func Zpages(z bool) Option {
 }
 
 // Health provides a function to set the health option.
-func Health(h func(http.ResponseWriter, *http.Request)) Option {
+func Health(h http.Handler) Option {
 	return func(o *Options) {
 		o.Health = h
 	}
 }
 
 // Ready provides a function to set the ready option.
-func Ready(r func(http.ResponseWriter, *http.Request)) Option {
+func Ready(r http.Handler) Option {
 	return func(o *Options) {
 		o.Ready = r
 	}
 }
 
 // ConfigDump to be documented.
-func ConfigDump(r func(http.ResponseWriter, *http.Request)) Option {
+func ConfigDump(r http.Handler) Option {
 	return func(o *Options) {
 		o.ConfigDump = r
 	}
