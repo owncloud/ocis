@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - CheckFileInfo will return a 404 error if the target file isn't found: [#10112](https://github.com/owncloud/ocis/pull/10112)
 * Bugfix - Always select next gateway client: [#10133](https://github.com/owncloud/ocis/pull/10133)
 * Bugfix - Forbid Activities for Sharees: [#10136](https://github.com/owncloud/ocis/pull/10136)
+* Bugfix - Remove duplicate CSP header from responses: [#10146](https://github.com/owncloud/ocis/pull/10146)
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 * Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
@@ -162,6 +163,13 @@ The following sections list the changes for unreleased.
    Sharees may not see item activities. We now bind it to ListGrants permission.
 
    https://github.com/owncloud/ocis/pull/10136
+
+* Bugfix - Remove duplicate CSP header from responses: [#10146](https://github.com/owncloud/ocis/pull/10146)
+
+   The web service was adding a CSP on its own, and that one has been removed. The
+   proxy service will take care of the CSP header.
+
+   https://github.com/owncloud/ocis/pull/10146
 
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 
