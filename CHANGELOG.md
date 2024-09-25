@@ -68,6 +68,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Always select next gateway client: [#10133](https://github.com/owncloud/ocis/pull/10133)
 * Bugfix - Forbid Activities for Sharees: [#10136](https://github.com/owncloud/ocis/pull/10136)
 * Bugfix - Remove duplicate CSP header from responses: [#10146](https://github.com/owncloud/ocis/pull/10146)
+* Bugfix - Fix activity limit: [#10165](https://github.com/owncloud/ocis/pull/10165)
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 * Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
@@ -170,6 +171,13 @@ The following sections list the changes for unreleased.
    proxy service will take care of the CSP header.
 
    https://github.com/owncloud/ocis/pull/10146
+
+* Bugfix - Fix activity limit: [#10165](https://github.com/owncloud/ocis/pull/10165)
+
+   When requesting a limit on activities, ocis would limit first, then filter and
+   sort. Now it filters and sorts first, then limits.
+
+   https://github.com/owncloud/ocis/pull/10165
 
 * Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 
