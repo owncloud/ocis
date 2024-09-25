@@ -507,7 +507,7 @@ The original error can be accessed this way:
 		}
 	}
 
-By defaut the parser will continue after an error is returned and will
+By default the parser will continue after an error is returned and will
 cumulate all errors found during parsing. If the grammar reaches a point
 where it shouldn't continue, a panic statement can be used to terminate
 parsing. The panic will be caught at the top-level of the Parse* call

@@ -35,7 +35,7 @@ var (
 
 	// errMaxExprCnt is used to signal that the maximum number of
 	// expressions have been parsed.
-	errMaxExprCnt = errors.New("max number of expresssions parsed")
+	errMaxExprCnt = errors.New("max number of expressions parsed")
 )
 
 // Option is a function that can set an option on the parser. It returns
@@ -1053,8 +1053,8 @@ func (p *parser) parseExprWrap(expr any) (any, bool) {
 	var pt savepoint
 
 	// ==template== {{ if .LeftRecursion }}
-	isLeftRecusion := p.rstack[len(p.rstack)-1].leftRecursive
-	if p.memoize && !isLeftRecusion {
+	isLeftRecursion := p.rstack[len(p.rstack)-1].leftRecursive
+	if p.memoize && !isLeftRecursion {
 	// {{ else }}
 	if p.memoize {
 	// {{ end }} ==template==
@@ -1071,7 +1071,7 @@ func (p *parser) parseExprWrap(expr any) (any, bool) {
 
 	// ==template== {{ if not .Optimize }}
 	// ==template== {{ if .LeftRecursion }}
-	if p.memoize && !isLeftRecusion {
+	if p.memoize && !isLeftRecursion {
 	// {{ else }}
 	if p.memoize {
 	// {{ end }} ==template==
