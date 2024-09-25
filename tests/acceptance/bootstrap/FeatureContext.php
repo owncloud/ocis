@@ -34,7 +34,6 @@ use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
 use Swaggest\JsonSchema\Schema as JsonSchema;
-use TestHelpers\OcsApiHelper;
 use Laminas\Ldap\Ldap;
 use TestHelpers\SetupHelper;
 use TestHelpers\HttpRequestHelper;
@@ -44,6 +43,17 @@ use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\SettingsHelper;
 use TestHelpers\OcisConfigHelper;
+use Swaggest\JsonSchema\InvalidValue as JsonSchemaException;
+use Swaggest\JsonSchema\Exception\ArrayException;
+use Swaggest\JsonSchema\Exception\ConstException;
+use Swaggest\JsonSchema\Exception\ContentException;
+use Swaggest\JsonSchema\Exception\EnumException;
+use Swaggest\JsonSchema\Exception\LogicException;
+use Swaggest\JsonSchema\Exception\NumericException;
+use Swaggest\JsonSchema\Exception\ObjectException;
+use Swaggest\JsonSchema\Exception\StringException;
+use Swaggest\JsonSchema\Exception\TypeException;
+use Swaggest\JsonSchema\Exception\Error as JsonSchemaError;
 
 require_once 'bootstrap.php';
 
@@ -1097,6 +1107,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public function validateSchemaObject(JsonSchema $schemaObj): void {
+		// TODO: check duplicate properties
 		$this->checkInvalidValidator($schemaObj);
 
 		if ($schemaObj->type && $schemaObj->type !== "object") {
@@ -1240,9 +1251,86 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public function assertJsonDocumentMatchesSchema(object|array $json, object $schema): void {
-		$schema = JsonSchema::import($schema);
-		$this->validateSchemaRequirements($schema);
-		$schema->in($json);
+		try {
+			$schema = JsonSchema::import($schema);
+			$this->validateSchemaRequirements($schema);
+			$schema->in($json);
+		} catch (JsonSchemaException $e) {
+			// file_put_contents("test.log", var_export($e, true));
+			$this->throwJsonSchemaException($e);
+		}
+	}
+
+	/**
+	 * @param JsonSchemaException $error
+	 *
+	 * @return array
+	 */
+	public function getJsonSchemaErrors(JsonSchemaException $error): array {
+		$errors = [];
+		if (\property_exists($error, "subErrors") && $error->subErrors) {
+			foreach ($error->subErrors as $subError) {
+				$errors = \array_merge($errors, $this->getJsonSchemaErrors($subError));
+			}
+		} else {
+			$errors[] = $error;
+		}
+		return $errors;
+	}
+
+	/**
+	 * @param JsonSchemaException $e
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function throwJsonSchemaException(JsonSchemaException $e): void {
+		$errors = $this->getJsonSchemaErrors($e);
+		$messages = ["JSON Schema validation failed:"];
+		foreach ($errors as $key => $error) {
+			$expected = $error->constraint;
+			$actual = $error->data;
+			$errorMessage = $error->error;
+			$schemaPointer = \str_replace("/", "->", \trim($error->getSchemaPointer(), "/"));
+			$dataPointer = \str_replace("/", "->", \trim($error->getDataPointer(), "/"));
+
+			$pointer = \str_contains($schemaPointer, "additionalProperties") ? $dataPointer : $schemaPointer;
+			$message = ($key + 1) . ". ";
+			switch (true) {
+				case $error instanceof ArrayException:
+				case $error instanceof LogicException:
+				case $error instanceof NumericException:
+				case $error instanceof StringException:
+				case $error instanceof ContentException:
+					break;
+				case $error instanceof ConstException:
+					$errorMessage .= "\n\t   Expected: $expected"
+					. "\n\t   Received: $actual";
+					break;
+				case $error instanceof EnumException:
+					$errorMessage .= "\n\t   Expected (One of): " . \join(", ", $expected)
+					. "\n\t   Received: $actual";
+					break;
+				case $error instanceof ObjectException:
+					if (\str_starts_with($errorMessage, "Required property missing")) {
+						$properties = \join(", ", \array_keys((array)$actual));
+						$pointer .= "->required";
+						$errorMessage = "Required property missing: id"
+						. "\n\t   Received: $properties";
+					}
+					break;
+				case $error instanceof TypeException:
+					if (\in_array(\gettype($actual), ['object', 'array'])) {
+						$actual = \json_encode($actual, JSON_PRETTY_PRINT);
+					}
+					break;
+				default:
+					break;
+			}
+			$message .= "$pointer:\n\t - $errorMessage\n";
+			$messages[] = $message;
+		}
+		Assert::fail(\join("\n", $messages));
 	}
 
 	/**
