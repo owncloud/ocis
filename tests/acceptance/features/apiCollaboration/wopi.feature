@@ -619,6 +619,7 @@ Feature: collaboration (wopi)
       | permissionsRole | Viewer     |
     When user "Brian" tries to create a file "testFile.txt" inside folder "testFolder" in space "Shares" using wopi endpoint
     Then the HTTP status code should be "403"
+    And the JSON data of the response should match
       """
       {
         "type": "object",
