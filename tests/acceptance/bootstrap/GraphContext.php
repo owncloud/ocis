@@ -26,6 +26,7 @@ require_once 'bootstrap.php';
  */
 class GraphContext implements Context {
 	private FeatureContext $featureContext;
+	private SpacesContext $spacesContext;
 
 	/**
 	 * application Entity
@@ -47,6 +48,7 @@ class GraphContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
 		$this->featureContext = $environment->getContext('FeatureContext');
+		$this->spacesContext = $environment->getContext('SpacesContext');
 	}
 
 	/**
@@ -2887,6 +2889,47 @@ class GraphContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the public tries to check the activities of space :spaceName owned by user :user with password :password using the Graph API
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return void
+	 */
+	public function thePublicTriesToCheckTheActivitiesOfSpaceOwnedByUserWithPasswordUsingGraphApi(string $spaceName, string $user, string $password): void {
+		$response = GraphHelper::getActivities(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			"public",
+			$this->featureContext->getActualPassword($password),
+			$this->spacesContext->getSpaceIdByName($user, $spaceName)
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^the public tries to check the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" owned by user "([^"]*)" with password "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $resource
+	 * @param string $space
+	 * @param string $owner
+	 * @param string $password
+	 *
+	 * @return void
+	 */
+	public function thePublicTriesToCheckTheActivitiesOfResourceFromSpaceOwnedByUserWithPasswordUsingGraphApi(string $resource, string $space, string $owner, string $password): void {
+		$response = GraphHelper::getActivities(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			"public",
+			$this->featureContext->getPasswordForUser($owner),
+			$this->spacesContext->getResourceId($owner, $space, $resource)
 		);
 		$this->featureContext->setResponse($response);
 	}

@@ -1061,6 +1061,726 @@ Feature: check share activity
       }
       """
 
+  @issue-10012
+  Scenario: check link share activities of a project space
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | new-space |
+      | permissionsRole | view      |
+      | password        | %public%  |
+    And user "Alice" has updated the last resource link share with
+      | space              | new-space                |
+      | permissionsRole    | edit                     |
+      | expirationDateTime | 2200-07-15T14:00:00.000Z |
+    And user "Alice" has set the following password for the last link share:
+      | resource |               |
+      | space    | new-space     |
+      | password | 6a0Q;A3 +i^m[ |
+    When user "Alice" lists the activities of space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} shared {resource} via link"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {field} for a link {token} on {resource}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["field","folder","resource","token","user"],
+                          "properties": {
+                            "field": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "expiration date"
+                                }
+                              }
+                            },
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "token": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "pattern": "[a-zA-z]{15}"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {field} for a link {token} on {resource}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["field","folder","resource","token","user"],
+                          "properties": {
+                            "field": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "permission"
+                                }
+                              }
+                            },
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "token": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "pattern": "[a-zA-z]{15}"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {field} for a link {token} on {resource}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["field","folder","resource","token","user"],
+                          "properties": {
+                            "field": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "password"
+                                }
+                              }
+                            },
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "token": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "pattern": "[a-zA-z]{15}"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+  @issue-10012
+  Scenario: check link share activities of a file from a project space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | new-space    |
+      | permissionsRole | view         |
+      | password        | %public%     |
+    And user "Alice" has updated the last resource link share with
+      | resource           | textfile.txt             |
+      | space              | new-space                |
+      | permissionsRole    | edit                     |
+      | expirationDateTime | 2200-07-15T14:00:00.000Z |
+    And user "Alice" has set the following password for the last link share:
+      | resource | textfile.txt  |
+      | space    | new-space     |
+      | password | 6a0Q;A3 +i^m[ |
+    When user "Alice" lists the activities of file "textfile.txt" from space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 5,
+            "maxItems": 5,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} shared {resource} via link"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {field} for a link {token} on {resource}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["field","folder","resource","token","user"],
+                          "properties": {
+                            "field": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "expiration date"
+                                }
+                              }
+                            },
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "textfile.txt"
+                                }
+                              }
+                            },
+                            "token": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "pattern": "[a-zA-z]{15}"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {field} for a link {token} on {resource}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["field","folder","resource","token","user"],
+                          "properties": {
+                            "field": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "permission"
+                                }
+                              }
+                            },
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "textfile.txt"
+                                }
+                              }
+                            },
+                            "token": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "pattern": "[a-zA-z]{15}"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {field} for a link {token} on {resource}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["field","folder","resource","token","user"],
+                          "properties": {
+                            "field": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "password"
+                                }
+                              }
+                            },
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "textfile.txt"
+                                }
+                              }
+                            },
+                            "token": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "pattern": "[a-zA-z]{15}"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+  @issue-10012
+  Scenario: public tries to check link share activities of a project space
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | new-space |
+      | permissionsRole | view      |
+      | password        | %public%  |
+    And user "Alice" has updated the last resource link share with
+      | space              | new-space                |
+      | permissionsRole    | edit                     |
+      | expirationDateTime | 2200-07-15T14:00:00.000Z |
+    And user "Alice" has set the following password for the last link share:
+      | resource |               |
+      | space    | new-space     |
+      | password | 6a0Q;A3 +i^m[ |
+    When the public tries to check the activities of space "new-space" owned by user "Alice" with password "%public%" using the Graph API
+    Then the HTTP status code should be "401"
+
+  @issue-10012
+  Scenario: public tries to check link share activities of a project space file
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | new-space    |
+      | permissionsRole | view         |
+      | password        | %public%     |
+    And user "Alice" has updated the last resource link share with
+      | resource           | textfile.txt             |
+      | space              | new-space                |
+      | permissionsRole    | edit                     |
+      | expirationDateTime | 2200-07-15T14:00:00.000Z |
+    And user "Alice" has set the following password for the last link share:
+      | resource | textfile.txt  |
+      | space    | new-space     |
+      | password | 6a0Q;A3 +i^m[ |
+    When the public tries to check the activities of file "textfile.txt" from space "new-space" owned by user "Alice" with password "%public%" using the Graph API
+    Then the HTTP status code should be "401"
+
+  @issue-10012
+  Scenario: public tries to check link share activities of a project space folder
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "project-folder" in space "new-space"
+    And user "Alice" has created the following resource link share:
+      | resource        | project-folder |
+      | space           | new-space      |
+      | permissionsRole | view           |
+      | password        | %public%       |
+    And user "Alice" has updated the last resource link share with
+      | resource           | project-folder           |
+      | space              | new-space                |
+      | permissionsRole    | edit                     |
+      | expirationDateTime | 2200-07-15T14:00:00.000Z |
+    And user "Alice" has set the following password for the last link share:
+      | resource | project-folder |
+      | space    | new-space      |
+      | password | 6a0Q;A3 +i^m[  |
+    When the public tries to check the activities of folder "project-folder" from space "new-space" owned by user "Alice" with password "%public%" using the Graph API
+    Then the HTTP status code should be "401"
+
 
   Scenario: sharee tries to check the activities of a shared folder using share mount-point id
     Given user "Alice" has created folder "/FOLDER"
