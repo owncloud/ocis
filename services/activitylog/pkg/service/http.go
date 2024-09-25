@@ -134,15 +134,15 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 				message = MessageResourceUpdated
 			}
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, true), WithUser(nil, ev.ExecutingUser, ev.ImpersonatingUser))
+			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, false), WithUser(nil, ev.ExecutingUser, ev.ImpersonatingUser))
 		case events.FileTouched:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, false), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 		case events.ContainerCreated:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, false), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 		case events.ItemTrashed:
 			message = MessageResourceTrashed
 			ts = utils.TSToTime(ev.Timestamp)
@@ -154,7 +154,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 				vars, err = s.GetVars(ctx, WithResource(ev.Ref, false), WithOldResource(ev.OldReference), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 			case false:
 				message = MessageResourceMoved
-				vars, err = s.GetVars(ctx, WithResource(ev.Ref, true), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
+				vars, err = s.GetVars(ctx, WithResource(ev.Ref, false), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 			}
 			ts = utils.TSToTime(ev.Timestamp)
 		case events.ShareCreated:
