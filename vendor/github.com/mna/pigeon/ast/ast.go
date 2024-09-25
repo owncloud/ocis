@@ -304,7 +304,7 @@ func (a *ActionExpr) InitialNames() map[string]struct{} {
 	return names
 }
 
-// ThrowExpr is an expression that throws an FailureLabel to be catched by a
+// ThrowExpr is an expression that throws an FailureLabel to be caught by a
 // RecoveryChoiceExpr.
 type ThrowExpr struct {
 	p     Pos

@@ -199,7 +199,7 @@ the generated code is written to this file instead.
 	-optimize-basic-latin
 		generate optimized parser for Unicode Basic Latin character set
 	-optimize-grammar
-		performes several performance optimizations on the grammar (EXPERIMENTAL FEATURE)
+		perform several performance optimizations on the grammar (EXPERIMENTAL FEATURE)
 	-optimize-parser
 		generate optimized parser without Debug and Memoize options and
 		with some other optimizations applied.
