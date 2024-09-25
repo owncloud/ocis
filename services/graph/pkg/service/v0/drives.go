@@ -850,11 +850,13 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	logger := g.logger.SubloggerWithRequestID(ctx)
 
 	noQuotaInOpaque := true
+	remainingUnknown := true
 	var remaining, used, total int64
 	if space.Opaque != nil {
 		m := space.Opaque.Map
 		if e, ok := m["quota.remaining"]; ok {
 			noQuotaInOpaque = false
+			remainingUnknown = false
 			remaining, _ = strconv.ParseInt(string(e.Value), 10, 64)
 		}
 		if e, ok := m["quota.used"]; ok {
@@ -899,6 +901,7 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 		if res.Opaque != nil {
 			m := res.Opaque.Map
 			if e, ok := m["remaining"]; ok {
+				remainingUnknown = false
 				remaining, _ = strconv.ParseInt(string(e.Value), 10, 64)
 			}
 		}
@@ -908,15 +911,21 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	}
 
 	qta := libregraph.Quota{
-		Remaining: &remaining,
-		Used:      &used,
-		Total:     &total,
+		Used:  &used,
+		Total: &total,
+	}
+
+	if !remainingUnknown {
+		qta.Remaining = &remaining
 	}
 
 	var t int64
-	if total != 0 {
+	switch {
+	case total != 0:
 		t = total
-	} else {
+	case remainingUnknown:
+		t = math.MaxInt64
+	default:
 		// Quota was not set
 		// Use remaining bytes to calculate state
 		t = remaining
