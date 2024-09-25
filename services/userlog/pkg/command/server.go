@@ -9,6 +9,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
@@ -23,8 +26,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/server/http"
-	"github.com/urfave/cli/v2"
-	microstore "go-micro.dev/v4/store"
 )
 
 // all events we care about
@@ -144,6 +145,11 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
+				checkHandler := handlers.NewCheckHandler(
+					handlers.NewCheckHandlerConfiguration().
+						WithLogger(logger),
+				)
+
 				server := debug.NewService(
 					debug.Logger(logger),
 					debug.Name(cfg.Service.Name),
@@ -152,8 +158,8 @@ func Server(cfg *config.Config) *cli.Command {
 					debug.Token(cfg.Debug.Token),
 					debug.Pprof(cfg.Debug.Pprof),
 					debug.Zpages(cfg.Debug.Zpages),
-					debug.Health(handlers.Health),
-					debug.Ready(handlers.Ready),
+					debug.Health(checkHandler),
+					debug.Ready(checkHandler),
 				)
 
 				gr.Add(server.ListenAndServe, func(_ error) {

@@ -8,6 +8,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
@@ -19,7 +21,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/clientlog/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/clientlog/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/clientlog/pkg/service"
-	"github.com/urfave/cli/v2"
 )
 
 // all events we care about
@@ -116,6 +117,11 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
+				checkHandler := handlers.NewCheckHandler(
+					handlers.NewCheckHandlerConfiguration().
+						WithLogger(logger),
+				)
+
 				server := debug.NewService(
 					debug.Logger(logger),
 					debug.Name(cfg.Service.Name),
@@ -124,8 +130,8 @@ func Server(cfg *config.Config) *cli.Command {
 					debug.Token(cfg.Debug.Token),
 					debug.Pprof(cfg.Debug.Pprof),
 					debug.Zpages(cfg.Debug.Zpages),
-					debug.Health(handlers.Health),
-					debug.Ready(handlers.Ready),
+					debug.Health(checkHandler),
+					debug.Ready(checkHandler),
 				)
 
 				gr.Add(server.ListenAndServe, func(_ error) {
