@@ -88,3 +88,8 @@ func (bs *Blobstore) Download(node *node.Node) (io.ReadCloser, error) {
 func (bs *Blobstore) Delete(node *node.Node) error {
 	return nil
 }
+
+// GetAvailableSize returns the available size in the blobstore in bytes
+func (bs *Blobstore) GetAvailableSize(n *node.Node) (uint64, error) {
+	return node.GetAvailableSize(n.InternalPath())
+}

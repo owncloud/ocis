@@ -23,6 +23,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/permissions"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/trashbin"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/usermapper"
 )
 
@@ -30,6 +31,7 @@ import (
 type Aspects struct {
 	Lookup            node.PathLookup
 	Tree              node.Tree
+	Blobstore         tree.Blobstore
 	Trashbin          trashbin.Trashbin
 	Permissions       permissions.Permissions
 	EventStream       events.Stream
