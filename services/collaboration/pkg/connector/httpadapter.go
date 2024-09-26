@@ -190,8 +190,12 @@ func (h *HttpAdapter) PutFile(w http.ResponseWriter, r *http.Request) {
 	response, err := contentCon.PutFile(r.Context(), r.Body, r.ContentLength, lockID)
 
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
+		var connErr *ConnectorError
+		if errors.As(err, &connErr) && connErr.HttpCodeOut != 0 {
+			response = NewResponse(connErr.HttpCodeOut)
+		} else {
+			response = NewResponse(http.StatusInternalServerError)
+		}
 	}
 
 	h.writeConnectorResponse(w, r, response)
@@ -240,8 +244,12 @@ func (h *HttpAdapter) PutRelativeFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if putErr != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
+		var connErr *ConnectorError
+		if errors.As(putErr, &connErr) && connErr.HttpCodeOut != 0 {
+			response = NewResponse(connErr.HttpCodeOut)
+		} else {
+			response = NewResponse(http.StatusInternalServerError)
+		}
 	}
 
 	h.writeConnectorResponse(w, r, response)

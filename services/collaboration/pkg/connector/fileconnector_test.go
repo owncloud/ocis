@@ -906,10 +906,7 @@ var _ = Describe("FileConnector", func() {
 			stream := strings.NewReader("This is the content of a file")
 
 			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
-				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
-					return true
-				}
-				return false
+				return statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId
 			})
 			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
 				Status: status.NewOK(ctx),
@@ -962,10 +959,7 @@ var _ = Describe("FileConnector", func() {
 			stream := strings.NewReader("This is the content of a file")
 
 			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
-				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
-					return true
-				}
-				return false
+				return statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId
 			})
 			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
 				Status: status.NewOK(ctx),
@@ -1021,10 +1015,7 @@ var _ = Describe("FileConnector", func() {
 			stream := strings.NewReader("This is the content of a file")
 
 			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
-				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
-					return true
-				}
-				return false
+				return statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId
 			})
 			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
 				Status: status.NewOK(ctx),
@@ -1086,10 +1077,7 @@ var _ = Describe("FileConnector", func() {
 			stream := strings.NewReader("This is the content of a file")
 
 			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
-				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
-					return true
-				}
-				return false
+				return statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId
 			})
 			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
 				Status: status.NewOK(ctx),
@@ -1159,10 +1147,7 @@ var _ = Describe("FileConnector", func() {
 			stream := strings.NewReader("This is the content of a file")
 
 			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
-				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
-					return true
-				}
-				return false
+				return statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId
 			})
 			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
 				Status: status.NewOK(ctx),
@@ -1214,10 +1199,7 @@ var _ = Describe("FileConnector", func() {
 			stream := strings.NewReader("This is the content of a file")
 
 			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
-				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
-					return true
-				}
-				return false
+				return statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId
 			})
 			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
 				Status: status.NewOK(ctx),
@@ -1274,10 +1256,7 @@ var _ = Describe("FileConnector", func() {
 			stream := strings.NewReader("This is the content of a file")
 
 			stat1ParamMatcher := mock.MatchedBy(func(statReq *providerv1beta1.StatRequest) bool {
-				if statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId {
-					return true
-				}
-				return false
+				return statReq.Ref.ResourceId == wopiCtx.FileReference.ResourceId
 			})
 			gatewayClient.On("Stat", mock.Anything, stat1ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
 				Status: status.NewOK(ctx),
@@ -1291,13 +1270,12 @@ var _ = Describe("FileConnector", func() {
 				},
 			}, nil)
 
-			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(connector.NewResponse(500), nil)
+			ccs.On("PutFile", mock.Anything, stream, int64(stream.Len()), "").Times(1).Return(nil, connector.NewConnectorError(500, "Something happened"))
 
 			response, err := fc.PutRelativeFileRelative(ctx, ccs, stream, int64(stream.Len()), "convFile.pdf")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(response.Status).To(Equal(500))
-			Expect(response.Headers).To(BeNil())
-			Expect(response.Body).To(BeNil())
+			targetErr := connector.NewConnectorError(500, "Something happened")
+			Expect(err).To(Equal(targetErr))
+			Expect(response).To(BeNil())
 		})
 	})
 
@@ -1727,7 +1705,7 @@ var _ = Describe("FileConnector", func() {
 			u := &userv1beta1.User{}
 			u.Opaque = &typesv1beta1.Opaque{
 				Map: map[string]*typesv1beta1.OpaqueEntry{
-					"public-share-role": &typesv1beta1.OpaqueEntry{
+					"public-share-role": {
 						Decoder: "plain",
 						Value:   []byte("viewer"),
 					},

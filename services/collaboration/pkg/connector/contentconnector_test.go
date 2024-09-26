@@ -126,9 +126,8 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 
 			err := cc.GetFile(ctx, sb)
-			Expect(err).To(HaveOccurred())
-			conErr := err.(*connector.ConnectorError)
-			Expect(conErr.HttpCodeOut).To(Equal(500))
+			targetErr := connector.NewConnectorError(500, "CODE_INTERNAL Something failed")
+			Expect(err).To(Equal(targetErr))
 		})
 
 		It("Missing download endpoint", func() {
@@ -264,9 +263,9 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "notARandomLockId")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(response.Status).To(Equal(500))
-			Expect(response.Headers).To(BeNil())
+			targetErr := connector.NewConnectorError(500, "CODE_INTERNAL Something failed")
+			Expect(err).To(Equal(targetErr))
+			Expect(response).To(BeNil())
 		})
 
 		It("Mismatched lockId", func() {
@@ -354,9 +353,9 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "goodAndValidLock")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(response.Status).To(Equal(500))
-			Expect(response.Headers).To(BeNil())
+			targetErr := connector.NewConnectorError(500, "CODE_INTERNAL Something failed")
+			Expect(err).To(Equal(targetErr))
+			Expect(response).To(BeNil())
 		})
 
 		It("Empty upload successful", func() {
@@ -406,9 +405,9 @@ var _ = Describe("ContentConnector", func() {
 			}, nil)
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "goodAndValidLock")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(response.Status).To(Equal(500))
-			Expect(response.Headers).To(BeNil())
+			targetErr := connector.NewConnectorError(500, "url is missing")
+			Expect(err).To(Equal(targetErr))
+			Expect(response).To(BeNil())
 		})
 
 		It("upload request failed", func() {
@@ -438,9 +437,9 @@ var _ = Describe("ContentConnector", func() {
 
 			response, err := cc.PutFile(ctx, reader, reader.Size(), "goodAndValidLock")
 			Expect(srvReqHeader.Get("X-Access-Token")).To(Equal(wopiCtx.AccessToken))
-			Expect(err).ToNot(HaveOccurred())
-			Expect(response.Status).To(Equal(500))
-			Expect(response.Headers).To(BeNil())
+			targetErr := connector.NewConnectorError(500, "unexpected status code 404 from the upload endpoint")
+			Expect(err).To(Equal(targetErr))
+			Expect(response).To(BeNil())
 		})
 
 		It("upload request success", func() {
