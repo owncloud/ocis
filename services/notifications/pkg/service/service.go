@@ -50,7 +50,7 @@ func NewEventsNotifier(
 	logger log.Logger,
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 	valueService settingssvc.ValueService,
-	serviceAccountID, serviceAccountSecret, emailTemplatePath, defaultLanguage, ocisURL string) Service {
+	serviceAccountID, serviceAccountSecret, emailTemplatePath, defaultLanguage, ocisURL, translationPath string) Service {
 
 	return eventsNotifier{
 		logger:               logger,
@@ -64,6 +64,7 @@ func NewEventsNotifier(
 		emailTemplatePath:    emailTemplatePath,
 		defaultLanguage:      defaultLanguage,
 		ocisURL:              ocisURL,
+		translationPath:      translationPath,
 	}
 }
 
