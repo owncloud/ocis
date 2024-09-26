@@ -69,11 +69,11 @@ The following sections list the changes for unreleased.
 * Bugfix - Forbid Activities for Sharees: [#10136](https://github.com/owncloud/ocis/pull/10136)
 * Bugfix - Remove duplicate CSP header from responses: [#10146](https://github.com/owncloud/ocis/pull/10146)
 * Bugfix - Fix activity limit: [#10165](https://github.com/owncloud/ocis/pull/10165)
-* Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 * Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
 * Enhancement - Remove METADATA_BACKEND: [#10113](https://github.com/owncloud/ocis/pull/10113)
 * Enhancement - Load CSP configuration file if it exists: [#10139](https://github.com/owncloud/ocis/pull/10139)
+* Enhancement - Bump reva: [#10157](https://github.com/owncloud/ocis/pull/10157)
 
 ## Details
 
@@ -179,12 +179,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10165
 
-* Enhancement - Bump reva: [#9817](https://github.com/owncloud/ocis/pull/9817)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/9817
-
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 
    When the LDAP identity backend is configured to have write access to the
@@ -224,6 +218,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10021
    https://github.com/owncloud/ocis/pull/10139
+
+* Enhancement - Bump reva: [#10157](https://github.com/owncloud/ocis/pull/10157)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/10157
+   https://github.com/owncloud/ocis/pull/9817
 
 # Changelog for [6.4.0] (2024-09-12)
 
