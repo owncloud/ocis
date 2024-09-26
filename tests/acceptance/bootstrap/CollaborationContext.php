@@ -22,6 +22,7 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
@@ -33,6 +34,7 @@ use TestHelpers\CollaborationHelper;
 class CollaborationContext implements Context {
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
+	private string $lastAppOpenData;
 
 	/**
 	 * This will run before EVERY scenario.
@@ -50,6 +52,22 @@ class CollaborationContext implements Context {
 		// Get all the contexts you need in this context from here
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->spacesContext = $environment->getContext('SpacesContext');
+	}
+
+	/**
+	 * @param string $data
+	 *
+	 * @return void
+	 */
+	public function setLastAppOpenData(string $data): void {
+		$this->lastAppOpenData = $data;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLastAppOpenData(): string {
+		return $this->lastAppOpenData;
 	}
 
 	/**
@@ -252,6 +270,55 @@ class CollaborationContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$parentContainerId,
 				$file
+			)
+		);
+	}
+
+	/**
+	 * @Given user :user has sent the following app-open request:
+	 *
+	 * @param string $user
+	 * @param TableNode $properties
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasSentTheFollowingAppOpenRequest(string $user, TableNode $properties): void {
+		$rows = $properties->getRowsHash();
+		$appResponse = CollaborationHelper::sendPOSTRequestToAppOpen(
+			$this->spacesContext->getFileId($user, $rows['space'], $rows['resource']),
+			$rows['app'],
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef()
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $appResponse);
+		$this->setLastAppOpenData($appResponse->getBody()->getContents());
+	}
+
+	/**
+	 * @When user :user tries to get the information of the last opened file using wopi endpoint
+	 * @When user :user gets the information of the last opened file using wopi endpoint
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsTheInformationOfTheLastOpenedFileUsingWopiEndpoint(string $user): void {
+		$response = json_decode($this->getLastAppOpenData());
+		$accessToken = $response->form_parameters->access_token;
+
+		// Extract the WOPISrc from the app_url
+		$parsedUrl = parse_url($response->app_url);
+		parse_str($parsedUrl['query'], $queryParams);
+		$wopiSrc = $queryParams['WOPISrc'];
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$wopiSrc . "?access_token=$accessToken",
+				$this->featureContext->getStepLineRef()
 			)
 		);
 	}

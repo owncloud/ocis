@@ -599,3 +599,620 @@ Feature: check file info with different wopi apps
       | Collabora     |
       | FakeOffice    |
       | OnlyOffice    |
+
+  @issue-10097
+  Scenario Outline: try to get file info of deleted file with office suites
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following app-open request:
+      | resource | textfile0.txt   |
+      | space    | Personal        |
+      | app      | <office-suites> |
+    And user "Alice" has deleted file "/textfile0.txt"
+    When user "Alice" tries to get the information of the last opened file using wopi endpoint
+    Then the HTTP status code should be "404"
+    Examples:
+      | office-suites |
+      | Collabora     |
+      | FakeOffice    |
+      | OnlyOffice    |
+
+
+  Scenario: get file info of restored file from trashbin (collabora)
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following app-open request:
+      | resource | textfile0.txt |
+      | space    | Personal      |
+      | app      | Collabora     |
+    And user "Alice" has deleted file "/textfile0.txt"
+    And user "Alice" has restored the file with original path "/textfile0.txt"
+    When user "Alice" gets the information of the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "DisablePrint",
+          "OwnerId",
+          "PostMessageOrigin",
+          "Size",
+          "UserCanWrite",
+          "UserCanNotWriteRelative",
+          "UserId",
+          "UserFriendlyName",
+          "EnableOwnerTermination",
+          "SupportsLocks",
+          "SupportsRename",
+          "UserCanRename",
+          "BreadcrumbDocName"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "textfile0.txt"
+          },
+          "PostMessageOrigin": {
+            "const": "https://localhost:9200"
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "OwnerId": {
+            "type": "string"
+          },
+          "Size": {
+            "const": 11
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "EnableOwnerTermination": {
+            "const": true
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "BreadcrumbDocName": {
+            "const": "textfile0.txt"
+          }
+        }
+      }
+      """
+
+
+  Scenario: get file info of restored file from trashbin (fakeOffice)
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following app-open request:
+      | resource | textfile0.txt |
+      | space    | Personal      |
+      | app      | FakeOffice    |
+    And user "Alice" has deleted file "/textfile0.txt"
+    And user "Alice" has restored the file with original path "/textfile0.txt"
+    When user "Alice" gets the information of the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "OwnerId",
+          "Size",
+          "UserId",
+          "Version",
+          "SupportsCobalt",
+          "SupportsContainers",
+          "SupportsDeleteFile",
+          "SupportsEcosystem",
+          "SupportsExtendedLockLength",
+          "SupportsFolders",
+          "SupportsGetLock",
+          "SupportsLocks",
+          "SupportsRename",
+          "SupportsUpdate",
+          "SupportsUserInfo",
+          "UserFriendlyName",
+          "ReadOnly",
+          "RestrictedWebViewOnly",
+          "UserCanAttend",
+          "UserCanNotWriteRelative",
+          "UserCanPresent",
+          "UserCanRename",
+          "UserCanWrite",
+          "AllowAdditionalMicrosoftServices",
+          "AllowExternalMarketplace",
+          "DisablePrint",
+          "DisableTranslation",
+          "BreadcrumbDocName"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "textfile0.txt"
+          },
+          "OwnerId": {
+            "type": "string"
+          },
+          "Size": {
+            "const": 11
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          },
+          "SupportsCobalt": {
+            "const": false
+          },
+          "SupportsContainers": {
+            "const": false
+          },
+          "SupportsDeleteFile": {
+            "const": true
+          },
+          "SupportsEcosystem": {
+            "const": false
+          },
+          "SupportsExtendedLockLength": {
+            "const": true
+          },
+          "SupportsFolders": {
+            "const": false
+          },
+          "SupportsGetLock": {
+            "const": true
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "SupportsUpdate": {
+            "const": true
+          },
+          "SupportsUserInfo": {
+            "const": false
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "ReadOnly": {
+            "const": false
+          },
+          "RestrictedWebViewOnly": {
+            "const": false
+          },
+          "UserCanAttend": {
+            "const": false
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "UserCanPresent": {
+            "const": false
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "AllowAdditionalMicrosoftServices": {
+            "const": false
+          },
+          "AllowExternalMarketplace": {
+            "const": false
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "DisableTranslation": {
+            "const": false
+          },
+          "BreadcrumbDocName": {
+            "const": "textfile0.txt"
+          }
+        }
+      }
+      """
+
+
+  Scenario: get file info of restored file from trashbin (onlyOffice)
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following app-open request:
+      | resource | textfile0.txt |
+      | space    | Personal      |
+      | app      | OnlyOffice    |
+    And user "Alice" has deleted file "/textfile0.txt"
+    And user "Alice" has restored the file with original path "/textfile0.txt"
+    When user "Alice" gets the information of the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "Version",
+          "BreadcrumbDocName",
+          "BreadcrumbFolderName",
+          "BreadcrumbFolderUrl",
+          "PostMessageOrigin",
+          "DisablePrint",
+          "UserFriendlyName",
+          "UserId",
+          "ReadOnly",
+          "UserCanNotWriteRelative",
+          "UserCanRename",
+          "UserCanWrite",
+          "SupportsLocks",
+          "SupportsRename",
+          "SupportsUpdate"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "textfile0.txt"
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "SupportsUpdate": {
+            "const": true
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "ReadOnly": {
+            "const": false
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "BreadcrumbDocName": {
+            "const": "textfile0.txt"
+          },
+          "BreadcrumbFolderName": {
+            "const": "Alice Hansen"
+          },
+          "BreadcrumbFolderUrl": {
+            "type": "string"
+          },
+          "PostMessageOrigin": {
+            "type": "string"
+          }
+        }
+      }
+      """
+
+
+  Scenario: get file info after renaming file (onlyOffice)
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following app-open request:
+      | resource | textfile0.txt |
+      | space    | Personal      |
+      | app      | OnlyOffice    |
+    And user "Alice" has moved file "textfile0.txt" to "renamedfile.txt"
+    When user "Alice" gets the information of the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "Version",
+          "BreadcrumbDocName",
+          "BreadcrumbFolderName",
+          "BreadcrumbFolderUrl",
+          "PostMessageOrigin",
+          "DisablePrint",
+          "UserFriendlyName",
+          "UserId",
+          "ReadOnly",
+          "UserCanNotWriteRelative",
+          "UserCanRename",
+          "UserCanWrite",
+          "SupportsLocks",
+          "SupportsRename",
+          "SupportsUpdate"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "renamedfile.txt"
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "SupportsUpdate": {
+            "const": true
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "ReadOnly": {
+            "const": false
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "BreadcrumbDocName": {
+            "const": "renamedfile.txt"
+          },
+          "BreadcrumbFolderName": {
+            "const": "Alice Hansen"
+          },
+          "BreadcrumbFolderUrl": {
+            "type": "string"
+          },
+          "PostMessageOrigin": {
+            "type": "string"
+          }
+        }
+      }
+      """
+
+
+  Scenario: get file info after renaming file (collabora)
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following app-open request:
+      | resource | textfile0.txt |
+      | space    | Personal      |
+      | app      | Collabora     |
+    And user "Alice" has moved file "textfile0.txt" to "renamedfile.txt"
+    When user "Alice" gets the information of the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "DisablePrint",
+          "OwnerId",
+          "PostMessageOrigin",
+          "Size",
+          "UserCanWrite",
+          "UserCanNotWriteRelative",
+          "UserId",
+          "UserFriendlyName",
+          "EnableOwnerTermination",
+          "SupportsLocks",
+          "SupportsRename",
+          "UserCanRename",
+          "BreadcrumbDocName"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "renamedfile.txt"
+          },
+          "PostMessageOrigin": {
+            "const": "https://localhost:9200"
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "OwnerId": {
+            "type": "string"
+          },
+          "Size": {
+            "const": 11
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "EnableOwnerTermination": {
+            "const": true
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "BreadcrumbDocName": {
+            "const": "renamedfile.txt"
+          }
+        }
+      }
+      """
+
+
+  Scenario: get file info after renaming file with (fakeOffice)
+    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And user "Alice" has sent the following app-open request:
+      | resource | textfile0.txt |
+      | space    | Personal      |
+      | app      | FakeOffice    |
+    And user "Alice" has moved file "textfile0.txt" to "renamedfile.txt"
+    When user "Alice" gets the information of the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "OwnerId",
+          "Size",
+          "UserId",
+          "Version",
+          "SupportsCobalt",
+          "SupportsContainers",
+          "SupportsDeleteFile",
+          "SupportsEcosystem",
+          "SupportsExtendedLockLength",
+          "SupportsFolders",
+          "SupportsGetLock",
+          "SupportsLocks",
+          "SupportsRename",
+          "SupportsUpdate",
+          "SupportsUserInfo",
+          "UserFriendlyName",
+          "ReadOnly",
+          "RestrictedWebViewOnly",
+          "UserCanAttend",
+          "UserCanNotWriteRelative",
+          "UserCanPresent",
+          "UserCanRename",
+          "UserCanWrite",
+          "AllowAdditionalMicrosoftServices",
+          "AllowExternalMarketplace",
+          "DisablePrint",
+          "DisableTranslation",
+          "BreadcrumbDocName"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "renamedfile.txt"
+          },
+          "OwnerId": {
+            "type": "string"
+          },
+          "Size": {
+            "const": 11
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          },
+          "SupportsCobalt": {
+            "const": false
+          },
+          "SupportsContainers": {
+            "const": false
+          },
+          "SupportsDeleteFile": {
+            "const": true
+          },
+          "SupportsEcosystem": {
+            "const": false
+          },
+          "SupportsExtendedLockLength": {
+            "const": true
+          },
+          "SupportsFolders": {
+            "const": false
+          },
+          "SupportsGetLock": {
+            "const": true
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "SupportsUpdate": {
+            "const": true
+          },
+          "SupportsUserInfo": {
+            "const": false
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "ReadOnly": {
+            "const": false
+          },
+          "RestrictedWebViewOnly": {
+            "const": false
+          },
+          "UserCanAttend": {
+            "const": false
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "UserCanPresent": {
+            "const": false
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "AllowAdditionalMicrosoftServices": {
+            "const": false
+          },
+          "AllowExternalMarketplace": {
+            "const": false
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "DisableTranslation": {
+            "const": false
+          },
+          "BreadcrumbDocName": {
+            "const": "renamedfile.txt"
+          }
+        }
+      }
+      """
