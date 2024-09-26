@@ -65,8 +65,8 @@ The following sections list the changes for unreleased.
 * Bugfix - Added ShareUpdate activity: [#10104](https://github.com/owncloud/ocis/pull/10104)
 * Bugfix - Fixed the collaboration service registration: [#10107](https://github.com/owncloud/ocis/pull/10107)
 * Bugfix - CheckFileInfo will return a 404 error if the target file isn't found: [#10112](https://github.com/owncloud/ocis/pull/10112)
-* Bugfix - Always select next gateway client: [#10133](https://github.com/owncloud/ocis/pull/10133)
 * Bugfix - Forbid Activities for Sharees: [#10136](https://github.com/owncloud/ocis/pull/10136)
+* Bugfix - Always select next gateway client: [#10141](https://github.com/owncloud/ocis/pull/10141)
 * Bugfix - Remove duplicate CSP header from responses: [#10146](https://github.com/owncloud/ocis/pull/10146)
 * Bugfix - Fixed the missing folder variable: [#10150](https://github.com/owncloud/ocis/pull/10150)
 * Bugfix - Fix activity limit: [#10165](https://github.com/owncloud/ocis/pull/10165)
@@ -153,18 +153,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10112
 
-* Bugfix - Always select next gateway client: [#10133](https://github.com/owncloud/ocis/pull/10133)
-
-   We now use the gateway selector to always select the next gateway client. This
-   ensures that we can always connect to the gateway during up- and downscaling.
-
-   https://github.com/owncloud/ocis/pull/10133
-
 * Bugfix - Forbid Activities for Sharees: [#10136](https://github.com/owncloud/ocis/pull/10136)
 
    Sharees may not see item activities. We now bind it to ListGrants permission.
 
    https://github.com/owncloud/ocis/pull/10136
+
+* Bugfix - Always select next gateway client: [#10141](https://github.com/owncloud/ocis/pull/10141)
+
+   We now use the gateway selector to always select the next gateway client. This
+   ensures that we can always connect to the gateway during up- and downscaling.
+
+   https://github.com/owncloud/ocis/pull/10141
+   https://github.com/owncloud/ocis/pull/10133
 
 * Bugfix - Remove duplicate CSP header from responses: [#10146](https://github.com/owncloud/ocis/pull/10146)
 
