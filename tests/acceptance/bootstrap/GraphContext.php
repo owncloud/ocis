@@ -2802,7 +2802,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" lists the activities for (?:folder|file) "([^"]*)" of space "([^"]*)" using the Graph API/
+	 * @When /^user "([^"]*)" lists the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" using the Graph API/
 	 *
 	 * @param string $user
 	 * @param string $resource
@@ -2813,6 +2813,54 @@ class GraphContext implements Context {
 	 */
 	public function userListsTheActivitiesForResourceOfSpaceUsingTheGraphAPI(string $user, string $resource, string $spaceName): void {
 		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
+		$response = GraphHelper::getActivities(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$resourceId
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user tries to list the activities of folder :folder with share mount-point id using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $folder
+	 *
+	 * @return void
+	 */
+	public function userTriesToListTheActivitiesOfFolderWithShareMountIdPointIdUsingTheGraphApi(string $user, string $folder): void {
+		$resourceId = GraphHelper::getShareMountId(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$folder
+		);
+		$response = GraphHelper::getActivities(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$resourceId
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user tries to list the activities of file :file from space :spaceName owned by user :owner using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $owner
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 */
+	public function userTriesToListActivitiesOfFileFromSpaceOwnedByUserUsingTheGraphApi(string $user, string $file, string $owner, string $spaceName): void {
+		$resourceId = $this->featureContext->spacesContext->getResourceId($owner, $spaceName, $file);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2844,7 +2892,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" lists the activities for (?:folder|file) "([^"]*)" of space "([^"]*)" with (depth|limit) "([^"]*)" using the Graph API/
+	 * @When /^user "([^"]*)" lists the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" with (depth|limit) "([^"]*)" using the Graph API/
 	 *
 	 * @param string $user
 	 * @param string $resource

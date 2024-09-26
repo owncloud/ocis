@@ -18,7 +18,7 @@ Feature: check share activity
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Viewer       |
-    When user "Alice" lists the activities for file "textfile.txt" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of file "textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -138,7 +138,7 @@ Feature: check share activity
       | shareType       | user         |
       | permissionsRole | Viewer       |
     And user "Alice" has removed the access of user "Brian" from resource "textfile.txt" of space "Personal"
-    When user "Alice" lists the activities for file "textfile.txt" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of file "textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -275,7 +275,7 @@ Feature: check share activity
       | space           | Personal     |
       | permissionsRole | view         |
       | password        | %public%     |
-    When user "Alice" lists the activities for file "textfile.txt" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of file "textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -381,7 +381,7 @@ Feature: check share activity
       | permissionsRole | view         |
       | password        | %public%     |
     And user "Alice" has removed the last link share of file "textfile.txt" from space "Personal"
-    When user "Alice" lists the activities for file "textfile.txt" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of file "textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -511,7 +511,7 @@ Feature: check share activity
     And user "Brian" has uploaded file with content "some data" to "Shares/FOLDER/newfile.txt"
     And user "Brian" has uploaded file with content "edited data" to "Shares/FOLDER/newfile.txt"
     And user "Brian" has deleted file "Shares/FOLDER/newfile.txt"
-    When user "Alice" lists the activities for file "FOLDER" of space "Personal" using the Graph API
+    When user "Alice" lists the activities of file "FOLDER" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -1076,3 +1076,47 @@ Feature: check share activity
         }
       }
       """
+
+
+  Scenario: sharee tries to check the activities of a shared folder using share mount-point id
+    Given user "Alice" has created folder "/FOLDER"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | /FOLDER  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Brian" has a share "/FOLDER" synced
+    And user "Brian" has uploaded file with content "some data" to "Shares/FOLDER/newfile.txt"
+    And user "Brian" has uploaded file with content "edited data" to "Shares/FOLDER/newfile.txt"
+    And user "Brian" has deleted file "Shares/FOLDER/newfile.txt"
+    When user "Brian" tries to list the activities of folder "FOLDER" with share mount-point id using the Graph API
+    Then the HTTP status code should be "403"
+
+  @issue-9849
+  Scenario: sharee tries to check the activities of a shared folder using file-id
+    Given user "Alice" has created folder "/FOLDER"
+    And user "Alice" has uploaded file with content "some data" to "FOLDER/newfile.txt"
+    And user "ALice" has uploaded file with content "edited data" to "FOLDER/newfile.txt"
+    And user "ALice" has deleted file "FOLDER/newfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | /FOLDER  |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Brian" has a share "/FOLDER" synced
+    When user "Brian" lists the activities of folder "FOLDER" from space "Shares" using the Graph API
+    Then the HTTP status code should be "403"
+
+  @issue-9860
+  Scenario: sharee tries to check the activities of unshared file
+    Given user "Alice" has uploaded file with content "another ownCloud test text file" to "anotherTextfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When user "Brian" tries to list the activities of file "anotherTextfile.txt" from space "Personal" owned by user "Alice" using the Graph API
+    Then the HTTP status code should be "403"
