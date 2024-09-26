@@ -235,7 +235,10 @@ Feature: check file info with different wopi apps
           "UserCanWrite",
           "SupportsLocks",
           "SupportsRename",
-          "SupportsUpdate"
+          "SupportsUpdate",
+          "HostEditUrl",
+          "FileSharingUrl",
+          "FileVersionUrl"
         ],
         "properties": {
           "BaseFileName": {
@@ -285,6 +288,15 @@ Feature: check file info with different wopi apps
           },
           "PostMessageOrigin": {
             "type": "string"
+          },
+          "FileSharingUrl": {
+            "type": "string"
+          },
+          "HostEditUrl": {
+            "type": "string"
+          },
+          "FileVersionUrl": {
+            "type": "string"
           }
         }
       }
@@ -315,7 +327,10 @@ Feature: check file info with different wopi apps
           "UserCanWrite",
           "SupportsLocks",
           "SupportsRename",
-          "SupportsUpdate"
+          "SupportsUpdate",
+          "HostEditUrl",
+          "FileSharingUrl",
+          "FileVersionUrl"
         ],
         "properties": {
           "BaseFileName": {
@@ -364,6 +379,15 @@ Feature: check file info with different wopi apps
             "type": "string"
           },
           "PostMessageOrigin": {
+            "type": "string"
+          },
+          "FileSharingUrl": {
+            "type": "string"
+          },
+          "HostEditUrl": {
+            "type": "string"
+          },
+          "FileVersionUrl": {
             "type": "string"
           }
         }

@@ -45,6 +45,7 @@ var _ = Describe("FileConnector", func() {
 			},
 			App: config.App{
 				LockName: "testName_for_unittests", // Only the LockName is used
+				Name:     "test",
 			},
 			Wopi: config.Wopi{
 				WopiSrc: "https://ocis.server.prv",
@@ -1694,16 +1695,14 @@ var _ = Describe("FileConnector", func() {
 			}, nil)
 
 			expectedFileInfo := &fileinfo.Microsoft{
-				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
-				Size:                    int64(998877),
-				Version:                 "v162738490",
-				BaseFileName:            "test.txt",
-				BreadcrumbDocName:       "test.txt",
-				BreadcrumbFolderName:    "/path/to",
-				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21opaqueid",
-				UserCanNotWriteRelative: false,
-				//HostViewURL:                "http://test.ex.prv/view",
-				//HostEditURL:                "http://test.ex.prv/edit",
+				OwnerID:                    "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
+				Size:                       int64(998877),
+				Version:                    "v162738490",
+				BaseFileName:               "test.txt",
+				BreadcrumbDocName:          "test.txt",
+				BreadcrumbFolderName:       "/path/to",
+				BreadcrumbFolderURL:        "https://ocis.example.prv/f/storageid$spaceid%21opaqueid",
+				UserCanNotWriteRelative:    false,
 				SupportsExtendedLockLength: true,
 				SupportsGetLock:            true,
 				SupportsLocks:              true,
@@ -1714,6 +1713,10 @@ var _ = Describe("FileConnector", func() {
 				UserCanRename:              true,
 				UserID:                     "61646d696e40637573746f6d496470", // hex of admin@customIdp
 				UserFriendlyName:           "Pet Shaft",
+				FileSharingURL:             "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:             "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:                "https://ocis.example.prv/external-test/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				HostViewURL:                "https://ocis.example.prv/external-test/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
