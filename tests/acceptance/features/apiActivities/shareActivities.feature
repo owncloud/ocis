@@ -543,27 +543,23 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["resource","space","user"],
+                          "required": ["folder","resource","user"],
                           "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
                                 "name": {
                                   "const": "FOLDER"
-                                }
-                              }
-                            },
-                            "space": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%!%user_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "Alice Hansen"
                                 }
                               }
                             },
@@ -622,27 +618,23 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["resource","space","user"],
+                          "required": ["folder","resource","user"],
                           "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
                                 "name": {
                                   "const": "newfile.txt"
-                                }
-                              }
-                            },
-                            "space": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "Alice Hansen"
                                 }
                               }
                             },
@@ -682,27 +674,23 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["resource","space","user"],
+                          "required": ["folder","resource","user"],
                           "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
                                 "name": {
                                   "const": "newfile.txt"
-                                }
-                              }
-                            },
-                            "space": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "Alice Hansen"
                                 }
                               }
                             },
@@ -742,27 +730,23 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["resource","space","user"],
+                          "required": ["folder","resource","user"],
                           "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
                                 "name": {
                                   "const": "newfile.txt"
-                                }
-                              }
-                            },
-                            "space": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "Alice Hansen"
                                 }
                               }
                             },

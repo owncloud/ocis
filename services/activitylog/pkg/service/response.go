@@ -80,6 +80,10 @@ func WithResource(ref *provider.Reference, addSpace bool) ActivityOption {
 			vars["resource"] = Resource{
 				Name: filepath.Base(ref.GetPath()),
 			}
+			n := getFolderName(ctx, gwc, ref)
+			vars["folder"] = Resource{
+				Name: n,
+			}
 			return err
 		}
 
@@ -88,21 +92,20 @@ func WithResource(ref *provider.Reference, addSpace bool) ActivityOption {
 			Name: info.GetName(),
 		}
 
-		parent, err := utils.GetResourceByID(ctx, info.GetParentId(), gwc)
-		if err != nil {
-			return err
-		}
-
-		vars["folder"] = Resource{
-			ID:   info.GetParentId().GetOpaqueId(),
-			Name: parent.GetName(),
-		}
-
 		if addSpace {
 			vars["space"] = Resource{
 				ID:   info.GetSpace().GetId().GetOpaqueId(),
 				Name: info.GetSpace().GetName(),
 			}
+		}
+
+		parent, err := utils.GetResourceByID(ctx, info.GetParentId(), gwc)
+		if err != nil {
+			return err
+		}
+		vars["folder"] = Resource{
+			ID:   info.GetParentId().GetOpaqueId(),
+			Name: parent.GetName(),
 		}
 
 		return nil
@@ -126,6 +129,10 @@ func WithTrashedResource(ref *provider.Reference, rid *provider.ResourceId) Acti
 		vars["resource"] = Resource{
 			Name: filepath.Base(ref.GetPath()),
 		}
+		n := getFolderName(ctx, gwc, ref)
+		vars["folder"] = Resource{
+			Name: n,
+		}
 
 		resp, err := gwc.ListRecycle(ctx, &provider.ListRecycleRequest{
 			Ref: ref,
@@ -144,6 +151,12 @@ func WithTrashedResource(ref *provider.Reference, rid *provider.ResourceId) Acti
 				vars["resource"] = Resource{
 					ID:   storagespace.FormatResourceID(rid),
 					Name: filepath.Base(item.GetRef().GetPath()),
+				}
+				in := filepath.Base(filepath.Dir(item.GetRef().GetPath()))
+				if in != "." && in != "/" {
+					vars["folder"] = Resource{
+						Name: in,
+					}
 				}
 
 				return nil
@@ -231,11 +244,6 @@ func WithSharee(uid *user.UserId, gid *group.GroupId) ActivityOption {
 // WithSpace sets the space variable for an activity
 func WithSpace(spaceid *provider.StorageSpaceId) ActivityOption {
 	return func(ctx context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
-		if _, ok := vars["space"]; ok {
-			// do not override space if already set
-			return nil
-		}
-
 		s, err := utils.GetSpace(ctx, spaceid.GetOpaqueId(), gwc)
 		if err != nil {
 			vars["space"] = Resource{
@@ -308,6 +316,19 @@ func (s *ActivitylogService) GetVars(ctx context.Context, opts ...ActivityOption
 	}
 
 	return vars, nil
+}
+
+func getFolderName(ctx context.Context, gwc gateway.GatewayAPIClient, ref *provider.Reference) string {
+	n := filepath.Base(filepath.Dir(ref.GetPath()))
+	if n == "." || n == "/" {
+		s, err := utils.GetSpace(ctx, toSpace(ref).GetOpaqueId(), gwc)
+		if err == nil {
+			n = s.GetName()
+		} else {
+			n = "root"
+		}
+	}
+	return n
 }
 
 func mapField(val string) string {
