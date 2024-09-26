@@ -365,6 +365,8 @@ replace github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-202
 
 replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90
 
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.19.1-0.20240926125755-02af5a26695d
+
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible

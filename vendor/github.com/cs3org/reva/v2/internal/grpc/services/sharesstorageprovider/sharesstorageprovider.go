@@ -789,21 +789,26 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 		return nil, err
 	}
 
-	// TODO return reference?
-	return gatewayClient.Stat(ctx, &provider.StatRequest{
+	statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
 		Opaque:                req.Opaque,
 		Ref:                   buildReferenceInShare(req.Ref, receivedShare),
 		ArbitraryMetadataKeys: req.ArbitraryMetadataKeys,
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	// FIXME when stating a share jail child we need to rewrite the id and use the share
+	// when stating a share jail mountpoint we need to rewrite the id and use the share
 	// jail space id as the mountpoint has a different id than the grant
-	// but that might be problematic for eg. wopi because it needs the correct id? ...
-	// ... but that should stat the grant anyway
+	if statRes.GetStatus().GetCode() == rpc.Code_CODE_OK && receivedShare.MountPoint.Path == strings.TrimPrefix(req.Ref.Path, "./") && statRes.Info != nil {
+		statRes.Info.Id = &provider.ResourceId{
+			StorageId: utils.ShareStorageProviderID,
+			SpaceId:   utils.ShareStorageSpaceID,
+			OpaqueId:  receivedShare.GetShare().GetId().GetOpaqueId(),
+		}
+	}
 
-	// FIXME when navigating via /dav/spaces/a0ca6a90-a365-4782-871e-d44447bbc668 the web ui seems
-	// to continue navigating based on the id of resources, causing the path to change. Is that related to WOPI?
-
+	return statRes, nil
 }
 
 func (s *service) ListContainerStream(req *provider.ListContainerStreamRequest, ss provider.ProviderAPI_ListContainerStreamServer) error {
