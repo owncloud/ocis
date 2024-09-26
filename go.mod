@@ -77,7 +77,7 @@ require (
 	github.com/prometheus/client_golang v1.20.4
 	github.com/r3labs/sse/v2 v2.10.0
 	github.com/riandyrn/otelchi v0.10.0
-	github.com/rogpeppe/go-internal v1.12.0
+	github.com/rogpeppe/go-internal v1.13.1
 	github.com/rs/cors v1.11.0
 	github.com/rs/zerolog v1.33.0
 	github.com/shamaton/msgpack/v2 v2.2.2
