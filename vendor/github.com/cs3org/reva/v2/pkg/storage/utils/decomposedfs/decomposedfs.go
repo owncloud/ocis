@@ -22,6 +22,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math"
 	"net/url"
 	"path"
 	"path/filepath"
@@ -112,6 +113,7 @@ type SessionStore interface {
 type Decomposedfs struct {
 	lu           node.PathLookup
 	tp           node.Tree
+	bs           tree.Blobstore
 	trashbin     trashbin.Trashbin
 	o            *options.Options
 	p            permissions.Permissions
@@ -162,6 +164,7 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 	aspects := aspects.Aspects{
 		Lookup:            lu,
 		Tree:              tp,
+		Blobstore:         bs,
 		Permissions:       permissions.NewPermissions(node.NewPermissions(lu), permissionsSelector),
 		EventStream:       es,
 		DisableVersioning: o.DisableVersioning,
@@ -223,6 +226,7 @@ func New(o *options.Options, aspects aspects.Aspects) (storage.FS, error) {
 
 	fs := &Decomposedfs{
 		tp:              aspects.Tree,
+		bs:              aspects.Blobstore,
 		lu:              aspects.Lookup,
 		trashbin:        aspects.Trashbin,
 		o:               o,
@@ -598,9 +602,11 @@ func (fs *Decomposedfs) GetQuota(ctx context.Context, ref *provider.Reference) (
 		quotaStr = string(ri.Opaque.Map["quota"].Value)
 	}
 
-	// FIXME this reads remaining disk size from the local disk, not the blobstore
-	remaining, err = node.GetAvailableSize(n.InternalPath())
-	if err != nil {
+	remaining, err = fs.bs.GetAvailableSize(n)
+	switch {
+	case errors.Is(err, tree.ErrSizeUnlimited):
+		remaining = math.MaxUint64
+	case err != nil:
 		return 0, 0, 0, err
 	}
 

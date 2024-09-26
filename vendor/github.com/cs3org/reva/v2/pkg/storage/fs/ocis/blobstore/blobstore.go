@@ -116,6 +116,11 @@ func (bs *Blobstore) Delete(node *node.Node) error {
 	return nil
 }
 
+// GetAvailableSize returns the available size in the blobstore in bytes
+func (bs *Blobstore) GetAvailableSize(n *node.Node) (uint64, error) {
+	return node.GetAvailableSize(n.InternalPath())
+}
+
 // List lists all blobs in the Blobstore
 func (bs *Blobstore) List() ([]*node.Node, error) {
 	dirs, err := filepath.Glob(filepath.Join(bs.root, "spaces", "*", "*", "blobs", "*", "*", "*", "*", "*"))

@@ -48,7 +48,10 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-var tracer trace.Tracer
+var (
+	tracer           trace.Tracer
+	ErrSizeUnlimited = errors.New("blobstore size unlimited")
+)
 
 func init() {
 	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/tree")
@@ -59,6 +62,7 @@ type Blobstore interface {
 	Upload(node *node.Node, source string) error
 	Download(node *node.Node) (io.ReadCloser, error)
 	Delete(node *node.Node) error
+	GetAvailableSize(node *node.Node) (uint64, error)
 }
 
 // Tree manages a hierarchical tree
