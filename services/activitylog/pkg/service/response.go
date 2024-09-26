@@ -80,15 +80,7 @@ func WithResource(ref *provider.Reference, addSpace bool) ActivityOption {
 			vars["resource"] = Resource{
 				Name: filepath.Base(ref.GetPath()),
 			}
-			n := filepath.Base(filepath.Dir(ref.GetPath()))
-			if n == "." || n == "/" {
-				s, err := utils.GetSpace(ctx, toSpace(ref).GetOpaqueId(), gwc)
-				if err == nil {
-					n = s.GetName()
-				} else {
-					n = "root"
-				}
-			}
+			n := getFolderName(ctx, gwc, ref)
 			vars["folder"] = Resource{
 				Name: n,
 			}
@@ -137,15 +129,7 @@ func WithTrashedResource(ref *provider.Reference, rid *provider.ResourceId) Acti
 		vars["resource"] = Resource{
 			Name: filepath.Base(ref.GetPath()),
 		}
-		n := filepath.Base(filepath.Dir(ref.GetPath()))
-		if n == "." || n == "/" {
-			s, err := utils.GetSpace(ctx, toSpace(ref).GetOpaqueId(), gwc)
-			if err == nil {
-				n = s.GetName()
-			} else {
-				n = "root"
-			}
-		}
+		n := getFolderName(ctx, gwc, ref)
 		vars["folder"] = Resource{
 			Name: n,
 		}
@@ -332,6 +316,19 @@ func (s *ActivitylogService) GetVars(ctx context.Context, opts ...ActivityOption
 	}
 
 	return vars, nil
+}
+
+func getFolderName(ctx context.Context, gwc gateway.GatewayAPIClient, ref *provider.Reference) string {
+	n := filepath.Base(filepath.Dir(ref.GetPath()))
+	if n == "." || n == "/" {
+		s, err := utils.GetSpace(ctx, toSpace(ref).GetOpaqueId(), gwc)
+		if err == nil {
+			n = s.GetName()
+		} else {
+			n = "root"
+		}
+	}
+	return n
 }
 
 func mapField(val string) string {
