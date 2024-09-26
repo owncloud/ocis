@@ -1107,7 +1107,6 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public function validateSchemaObject(JsonSchema $schemaObj): void {
-		// TODO: check duplicate properties
 		$this->checkInvalidValidator($schemaObj);
 
 		if ($schemaObj->type && $schemaObj->type !== "object") {
@@ -1256,7 +1255,6 @@ class FeatureContext extends BehatVariablesContext {
 			$this->validateSchemaRequirements($schema);
 			$schema->in($json);
 		} catch (JsonSchemaException $e) {
-			// file_put_contents("test.log", var_export($e, true));
 			$this->throwJsonSchemaException($e);
 		}
 	}
@@ -1287,15 +1285,23 @@ class FeatureContext extends BehatVariablesContext {
 	public function throwJsonSchemaException(JsonSchemaException $e): void {
 		$errors = $this->getJsonSchemaErrors($e);
 		$messages = ["JSON Schema validation failed:"];
-		foreach ($errors as $key => $error) {
+
+		$previousPointer = '';
+		$errorCount = 0;
+		foreach ($errors as $error) {
 			$expected = $error->constraint;
 			$actual = $error->data;
 			$errorMessage = $error->error;
-			$schemaPointer = \str_replace("/", "->", \trim($error->getSchemaPointer(), "/"));
-			$dataPointer = \str_replace("/", "->", \trim($error->getDataPointer(), "/"));
+			$schemaPointer = \str_replace("/", ".", \trim($error->getSchemaPointer(), "/"));
+			$dataPointer = \str_replace("/", ".", \trim($error->getDataPointer(), "/"));
 
 			$pointer = \str_contains($schemaPointer, "additionalProperties") ? $dataPointer : $schemaPointer;
-			$message = ($key + 1) . ". ";
+			if ($pointer === $previousPointer) {
+				continue;
+			}
+			$previousPointer = $pointer;
+
+			$message = ++$errorCount . ". ";
 			switch (true) {
 				case $error instanceof ArrayException:
 				case $error instanceof LogicException:
