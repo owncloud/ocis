@@ -35,21 +35,12 @@ var (
 	MessageSpaceShared     = l10n.Template("{user} added {sharee} as member of {space}")
 	MessageSpaceUnshared   = l10n.Template("{user} removed {sharee} from {space}")
 
-	StrSomeField      = l10n.Template(_someField)
-	StrPermission     = l10n.Template(_permission)
-	StrPassword       = l10n.Template(_password)
-	StrExpirationDate = l10n.Template(_expirationDate)
-	StrDisplayName    = l10n.Template(_displayName)
-	StrDescription    = l10n.Template(_description)
-)
-
-const (
-	_someField      = "some field"
-	_permission     = "permission"
-	_password       = "password"
-	_expirationDate = "expiration date"
-	_displayName    = "display name"
-	_description    = "description"
+	StrSomeField      = l10n.Template("some field")
+	StrPermission     = l10n.Template("permission")
+	StrPassword       = l10n.Template("password")
+	StrExpirationDate = l10n.Template("expiration date")
+	StrDisplayName    = l10n.Template("display name")
+	StrDescription    = l10n.Template("description")
 )
 
 // GetActivitiesResponse is the response on GET activities requests
@@ -334,15 +325,15 @@ func getFolderName(ctx context.Context, gwc gateway.GatewayAPIClient, ref *provi
 func mapField(val string) string {
 	switch val {
 	case "TYPE_PERMISSIONS", "permission":
-		return _permission
+		return StrPermission
 	case "TYPE_PASSWORD", "password":
-		return _password
+		return StrPassword
 	case "TYPE_EXPIRATION", "expiration":
-		return _expirationDate
+		return StrExpirationDate
 	case "TYPE_DISPLAYNAME":
-		return _displayName
+		return StrDisplayName
 	case "TYPE_DESCRIPTION":
-		return _description
+		return StrDescription
 	}
-	return _someField
+	return StrSomeField
 }
