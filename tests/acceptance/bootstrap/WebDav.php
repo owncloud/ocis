@@ -3742,6 +3742,40 @@ trait WebDav {
 	}
 
 	/**
+	 * @When user :user downloads the preview of :path with width :width and height :height and processor :processor using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $width
+	 * @param string $height
+	 * @param string $processor
+	 *
+	 * @return void
+	 */
+	public function userDownloadsThePreviewOfWithWidthHeightProcessorUsingWebDAVAPI(string $user, string $path, string $width, string $height, string $processor): void {
+		$user = $this->getActualUsername($user);
+		$urlParameter = [
+			'x' => $width,
+			'y' => $height,
+			'preview' => '1',
+			'processor' => $processor
+		];
+		$response = $this->makeDavRequest(
+			$user,
+			"GET",
+			$path,
+			[],
+			null,
+			"files",
+			null,
+			false,
+			null,
+			$urlParameter,
+		);
+		$this->setResponse($response);
+	}
+
+	/**
 	 * @Given user :user has downloaded the preview of shared resource :path with width :width and height :height
 	 *
 	 * @param string $user
@@ -3760,8 +3794,9 @@ trait WebDav {
 		$this->setResponse($response);
 		$this->theHTTPStatusCodeShouldBe(200, '', $response);
 		$this->checkImageDimensions($width, $height);
+		$response->getBody()->rewind();
 		// save response to user response dictionary for further comparisons
-		$this->userResponseBodyContents[$user] = $this->responseBodyContent;
+		$this->userResponseBodyContents[$user] = $response->getBody()->getContents();
 	}
 
 	/**
@@ -3953,10 +3988,9 @@ trait WebDav {
 	 */
 	public function checkImageDimensions(string $width, string $height, ?ResponseInterface $response = null) : void {
 		$response = $response ?? $this->getResponse();
-		if ($this->responseBodyContent === null) {
-			$this->responseBodyContent = $response->getBody()->getContents();
-		}
-		$size = \getimagesizefromstring($this->responseBodyContent);
+		$response->getBody()->rewind();
+		$responseBodyContent = $response->getBody()->getContents();
+		$size = \getimagesizefromstring($responseBodyContent);
 		Assert::assertNotFalse($size, "could not get size of image");
 		Assert::assertEquals($width, $size[0], "width not as expected");
 		Assert::assertEquals($height, $size[1], "height not as expected");
@@ -3972,7 +4006,10 @@ trait WebDav {
 	 */
 	public function theDownloadedPreviewContentShouldMatchWithFixturesPreviewContentFor(string $filename):void {
 		$expectedPreview = \file_get_contents(__DIR__ . "/../fixtures/" . $filename);
-		Assert::assertEquals($expectedPreview, $this->responseBodyContent);
+		$response = $response ?? $this->getResponse();
+		$response->getBody()->rewind();
+		$responseBodyContent = $response->getBody()->getContents();
+		Assert::assertEquals($expectedPreview, $responseBodyContent);
 	}
 
 	/**
@@ -3995,8 +4032,9 @@ trait WebDav {
 		);
 		$this->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->checkImageDimensions($width, $height, $response);
+		$response->getBody()->rewind();
 		// save response to user response dictionary for further comparisons
-		$this->userResponseBodyContents[$user] = $this->responseBodyContent;
+		$this->userResponseBodyContents[$user] = $response->getBody()->getContents();
 	}
 
 	/**
