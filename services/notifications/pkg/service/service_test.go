@@ -77,7 +77,7 @@ var _ = Describe("Notifications", func() {
 			cfg := defaults.FullDefaultConfig()
 			cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 			ch := make(chan events.Event)
-			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "", "", "", "", "")
+			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "", "", "", "", "", "")
 			go evts.Run()
 
 			ch <- ev
@@ -275,7 +275,7 @@ var _ = Describe("Notifications X-Site Scripting", func() {
 			cfg := defaults.FullDefaultConfig()
 			cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 			ch := make(chan events.Event)
-			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "", "", "", "", "")
+			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "", "", "", "", "", "")
 			go evts.Run()
 
 			ch <- ev
