@@ -1,6 +1,6 @@
 ---
 title: Notification
-date: 2024-09-27T07:31:38.005737177Z
+date: 2024-09-27T08:39:33.103983639Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/notifications
@@ -74,15 +74,15 @@ Consider that embedding images via a CID resource may not be fully supported in 
 The `notifications` service has embedded translations sourced via transifex to provide a basic set of translated languages. These embedded translations are available for all deployment scenarios.
 
 In addition, the service supports custom translations, though it is currently not possible to just add custom translations to embedded ones. If custom translations are configured, the embedded ones are not used. To configure custom translations,
-the `NOTIFICATIONS_TRANSLATION_PATH` environment variable needs to point to a base folder that will contain the translation files. This path must be available from all instances of the notifications service, a shared storage is recommended. Translation files must be of type  [.po](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html#PO-Files) or [.mo](https://www.gnu.org/software/gettext/manual/html_node/Binaries.html). For each language, the filename needs to be `translations.po` (or `translations.mo`) and stored in a folder structure defining the language code. In general the path/name pattern for a translation file needs to be:
+the `NOTIFICATIONS_TRANSLATION_PATH` environment variable needs to point to a base folder that will contain the translation files. This path must be available from all instances of the notifications service, a shared storage is recommended. Translation files must be of type  [.po](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html#PO-Files) or [.mo](https://www.gnu.org/software/gettext/manual/html_node/Binaries.html). For each language, the filename needs to be `notifications.po` (or `notifications.mo`) and stored in a folder structure defining the language code. In general the path/name pattern for a translation file needs to be:
 
 ```text
-{NOTIFICATIONS_TRANSLATION_PATH}/{language-code}/LC_MESSAGES/translations.po
+{NOTIFICATIONS_TRANSLATION_PATH}/{language-code}/LC_MESSAGES/notifications.po
 ```
 
 The language code pattern is composed of `language[_territory]` where  `language` is the base language and `_territory` is optional and defines a country.
 
-For example, for the language `de`, one needs to place the corresponding translation files to `{NOTIFICATIONS_TRANSLATION_PATH}/de/LC_MESSAGES/translations.po`.
+For example, for the language `de`, one needs to place the corresponding translation files to `{NOTIFICATIONS_TRANSLATION_PATH}/de/LC_MESSAGES/notifications.po`.
 
 <!-- also see the userlog readme -->
 
