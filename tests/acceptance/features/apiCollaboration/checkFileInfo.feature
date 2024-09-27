@@ -1240,3 +1240,618 @@ Feature: check file info with different wopi apps
         }
       }
       """
+
+
+  Scenario: check the information of a project space file with fakeOffice
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And using spaces DAV path
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "text.txt"
+    When user "Alice" checks the information of file "text.txt" of space "new-space" using office "FakeOffice"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "OwnerId",
+          "Size",
+          "UserId",
+          "Version",
+          "SupportsCobalt",
+          "SupportsContainers",
+          "SupportsDeleteFile",
+          "SupportsEcosystem",
+          "SupportsExtendedLockLength",
+          "SupportsFolders",
+          "SupportsGetLock",
+          "SupportsLocks",
+          "SupportsRename",
+          "SupportsUpdate",
+          "SupportsUserInfo",
+          "UserFriendlyName",
+          "ReadOnly",
+          "RestrictedWebViewOnly",
+          "UserCanAttend",
+          "UserCanNotWriteRelative",
+          "UserCanPresent",
+          "UserCanRename",
+          "UserCanWrite",
+          "AllowAdditionalMicrosoftServices",
+          "AllowExternalMarketplace",
+          "DisablePrint",
+          "DisableTranslation",
+          "BreadcrumbDocName"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "text.txt"
+          },
+          "OwnerId": {
+            "type": "string"
+          },
+          "Size": {
+            "const": 11
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          },
+          "SupportsCobalt": {
+            "const": false
+          },
+          "SupportsContainers": {
+            "const": false
+          },
+          "SupportsDeleteFile": {
+            "const": true
+          },
+          "SupportsEcosystem": {
+            "const": false
+          },
+          "SupportsExtendedLockLength": {
+            "const": true
+          },
+          "SupportsFolders": {
+            "const": false
+          },
+          "SupportsGetLock": {
+            "const": true
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "SupportsUpdate": {
+            "const": true
+          },
+          "SupportsUserInfo": {
+            "const": false
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "ReadOnly": {
+            "const": false
+          },
+          "RestrictedWebViewOnly": {
+            "const": false
+          },
+          "UserCanAttend": {
+            "const": false
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "UserCanPresent": {
+            "const": false
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "AllowAdditionalMicrosoftServices": {
+            "const": false
+          },
+          "AllowExternalMarketplace": {
+            "const": false
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "DisableTranslation": {
+            "const": false
+          },
+          "BreadcrumbDocName": {
+            "const": "text.txt"
+          }
+        }
+      }
+      """
+
+
+  Scenario: check the information of a project space file with collabora
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And using spaces DAV path
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "text.txt"
+    When user "Alice" checks the information of file "text.txt" of space "new-space" using office "Collabora"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "DisablePrint",
+          "OwnerId",
+          "PostMessageOrigin",
+          "Size",
+          "UserCanWrite",
+          "UserCanNotWriteRelative",
+          "UserId",
+          "UserFriendlyName",
+          "EnableOwnerTermination",
+          "SupportsLocks",
+          "SupportsRename",
+          "UserCanRename",
+          "BreadcrumbDocName"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "text.txt"
+          },
+          "PostMessageOrigin": {
+            "const": "https://localhost:9200"
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "OwnerId": {
+            "type": "string"
+          },
+          "Size": {
+            "const": 11
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "EnableOwnerTermination": {
+            "const": true
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "BreadcrumbDocName": {
+            "const": "text.txt"
+          }
+        }
+      }
+      """
+
+
+  Scenario: check the information of a project space file with onlyOffice
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And using spaces DAV path
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "text.txt"
+    When user "Alice" checks the information of file "text.txt" of space "new-space" using office "OnlyOffice"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "Version",
+          "BreadcrumbDocName",
+          "BreadcrumbFolderName",
+          "BreadcrumbFolderUrl",
+          "PostMessageOrigin",
+          "DisablePrint",
+          "UserFriendlyName",
+          "UserId",
+          "ReadOnly",
+          "UserCanNotWriteRelative",
+          "UserCanRename",
+          "UserCanWrite",
+          "SupportsLocks",
+          "SupportsRename",
+          "SupportsUpdate"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "text.txt"
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "SupportsUpdate": {
+            "const": true
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "ReadOnly": {
+            "const": false
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "UserCanRename": {
+            "const": true
+          },
+          "UserCanWrite": {
+            "const": true
+          },
+          "DisablePrint": {
+            "const": false
+          },
+          "BreadcrumbDocName": {
+            "const": "text.txt"
+          },
+          "BreadcrumbFolderName": {
+            "const": "new-space"
+          },
+          "BreadcrumbFolderUrl": {
+            "type": "string"
+          },
+          "PostMessageOrigin": {
+            "type": "string"
+          }
+        }
+      }
+      """
+
+
+  Scenario Outline: check the information of a project space file with different modes (onlyOffice)
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And using spaces DAV path
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "text.txt"
+    When user "Alice" checks the information of file "text.txt" of space "new-space" using office "OnlyOffice" with view mode "<mode>"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "Version",
+          "BreadcrumbDocName",
+          "BreadcrumbFolderName",
+          "BreadcrumbFolderUrl",
+          "PostMessageOrigin",
+          "DisablePrint",
+          "UserFriendlyName",
+          "UserId",
+          "ReadOnly",
+          "UserCanNotWriteRelative",
+          "UserCanRename",
+          "UserCanWrite",
+          "SupportsLocks",
+          "SupportsRename",
+          "SupportsUpdate"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "text.txt"
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "SupportsUpdate": {
+            "const": true
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "ReadOnly": {
+            "const": false
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "UserCanRename": {
+            "const": <user-can-rename>
+          },
+          "UserCanWrite": {
+            "const": <user-can-write>
+          },
+          "DisablePrint": {
+            "const": <disable-print>
+          },
+          "BreadcrumbDocName": {
+            "const": "text.txt"
+          },
+          "BreadcrumbFolderName": {
+            "const": "new-space"
+          },
+          "BreadcrumbFolderUrl": {
+            "type": "string"
+          },
+          "PostMessageOrigin": {
+            "type": "string"
+          }
+        }
+      }
+      """
+    Examples:
+      | mode  | disable-print | user-can-write | user-can-rename |
+      | view  | true          | false          | false           |
+      | read  | false         | false          | false           |
+      | write | false         | true           | true            |
+
+
+  Scenario Outline: check the information of a project space file with different modes (fakeOffice)
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And using spaces DAV path
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "text.txt"
+    When user "Alice" checks the information of file "text.txt" of space "new-space" using office "FakeOffice" with view mode "<mode>"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "OwnerId",
+          "Size",
+          "UserId",
+          "Version",
+          "SupportsCobalt",
+          "SupportsContainers",
+          "SupportsDeleteFile",
+          "SupportsEcosystem",
+          "SupportsExtendedLockLength",
+          "SupportsFolders",
+          "SupportsGetLock",
+          "SupportsLocks",
+          "SupportsRename",
+          "SupportsUpdate",
+          "SupportsUserInfo",
+          "UserFriendlyName",
+          "ReadOnly",
+          "RestrictedWebViewOnly",
+          "UserCanAttend",
+          "UserCanNotWriteRelative",
+          "UserCanPresent",
+          "UserCanRename",
+          "UserCanWrite",
+          "AllowAdditionalMicrosoftServices",
+          "AllowExternalMarketplace",
+          "DisablePrint",
+          "DisableTranslation",
+          "BreadcrumbDocName"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "text.txt"
+          },
+          "OwnerId": {
+            "type": "string"
+          },
+          "Size": {
+            "const": 11
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          },
+          "SupportsCobalt": {
+            "const": false
+          },
+          "SupportsContainers": {
+            "const": false
+          },
+          "SupportsDeleteFile": {
+            "const": true
+          },
+          "SupportsEcosystem": {
+            "const": false
+          },
+          "SupportsExtendedLockLength": {
+            "const": true
+          },
+          "SupportsFolders": {
+            "const": false
+          },
+          "SupportsGetLock": {
+            "const": true
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "SupportsUpdate": {
+            "const": true
+          },
+          "SupportsUserInfo": {
+            "const": false
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "ReadOnly": {
+            "const": false
+          },
+          "RestrictedWebViewOnly": {
+            "const": false
+          },
+          "UserCanAttend": {
+            "const": false
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "UserCanPresent": {
+            "const": false
+          },
+          "UserCanRename": {
+            "const": <user-can-rename>
+          },
+          "UserCanWrite": {
+            "const": <user-can-write>
+          },
+          "AllowAdditionalMicrosoftServices": {
+            "const": false
+          },
+          "AllowExternalMarketplace": {
+            "const": false
+          },
+          "DisablePrint": {
+            "const": <disable-print>
+          },
+          "DisableTranslation": {
+            "const": false
+          },
+          "BreadcrumbDocName": {
+            "const": "text.txt"
+          }
+        }
+      }
+      """
+    Examples:
+      | mode  | disable-print | user-can-write | user-can-rename |
+      | view  | true          | false          | false           |
+      | read  | false         | false          | false           |
+      | write | false         | true           | true            |
+
+
+  Scenario Outline: check the information of a project space file with different modes (collabora)
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And using spaces DAV path
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "text.txt"
+    When user "Alice" checks the information of file "text.txt" of space "new-space" using office "Collabora" with view mode "<mode>"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "BaseFileName",
+          "DisablePrint",
+          "OwnerId",
+          "PostMessageOrigin",
+          "Size",
+          "UserCanWrite",
+          "UserCanNotWriteRelative",
+          "UserId",
+          "UserFriendlyName",
+          "EnableOwnerTermination",
+          "SupportsLocks",
+          "SupportsRename",
+          "UserCanRename",
+          "BreadcrumbDocName"
+        ],
+        "properties": {
+          "BaseFileName": {
+            "const": "text.txt"
+          },
+          "PostMessageOrigin": {
+            "const": "https://localhost:9200"
+          },
+          "DisablePrint": {
+            "const": <disable-print>
+          },
+          "OwnerId": {
+            "type": "string"
+          },
+          "Size": {
+            "const": 11
+          },
+          "UserCanWrite": {
+            "const": <user-can-write>
+          },
+          "UserCanNotWriteRelative": {
+            "const": false
+          },
+          "EnableOwnerTermination": {
+            "const": true
+          },
+          "UserId": {
+            "type": "string"
+          },
+          "SupportsLocks": {
+            "const": true
+          },
+          "SupportsRename": {
+            "const": true
+          },
+          "UserFriendlyName": {
+            "const": "Alice Hansen"
+          },
+          "UserCanRename": {
+            "const": <user-can-rename>
+          },
+          "BreadcrumbDocName": {
+            "const": "text.txt"
+          }
+        }
+      }
+      """
+    Examples:
+      | mode  | disable-print | user-can-write | user-can-rename |
+      | view  | true          | false          | false           |
+      | read  | false         | false          | false           |
+      | write | false         | true           | true            |
+
+
+  Scenario Outline: try to get the information of a project space file using invalid file-id
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And using spaces DAV path
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "text.txt"
+    When user "Alice" tries to check the information of file "text.txt" of space "new-space" using office "<office-suites>" with invalid file-id
+    Then the HTTP status code should be "401"
+    Examples:
+      | office-suites |
+      | Collabora     |
+      | FakeOffice    |
+      | OnlyOffice    |
