@@ -135,6 +135,10 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
 			vars, err = s.GetVars(ctx, WithResource(ev.Ref, false), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
+		case events.FileDownloaded:
+			message = MessageResourceDownloaded
+			ts = utils.TSToTime(ev.Timestamp)
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, false), WithUser(ev.Executant, nil, ev.ImpersonatingUser), WithVar("token", "", ev.ImpersonatingUser.GetId().GetOpaqueId()))
 		case events.ContainerCreated:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
