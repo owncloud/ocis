@@ -70,6 +70,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Remove duplicate CSP header from responses: [#10146](https://github.com/owncloud/ocis/pull/10146)
 * Bugfix - Fixed the missing folder variable: [#10150](https://github.com/owncloud/ocis/pull/10150)
 * Bugfix - Fix activity limit: [#10165](https://github.com/owncloud/ocis/pull/10165)
+* Bugfix - Fix email translations: [#10171](https://github.com/owncloud/ocis/pull/10171)
 * Bugfix - Fix Activities translation: [#10175](https://github.com/owncloud/ocis/pull/10175)
 * Enhancement - Allow to maintain the last sign-in timestamp of a user: [#9942](https://github.com/owncloud/ocis/pull/9942)
 * Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
@@ -189,6 +190,12 @@ The following sections list the changes for unreleased.
    sort. Now it filters and sorts first, then limits.
 
    https://github.com/owncloud/ocis/pull/10165
+
+* Bugfix - Fix email translations: [#10171](https://github.com/owncloud/ocis/pull/10171)
+
+   Email translations would not use custom translation pathes. This is now fixed.
+
+   https://github.com/owncloud/ocis/pull/10171
 
 * Bugfix - Fix Activities translation: [#10175](https://github.com/owncloud/ocis/pull/10175)
 
