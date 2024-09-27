@@ -608,7 +608,7 @@ Feature: collaboration (wopi)
       | Editor           |
       | Uploader         |
 
-
+  @issue-10126
   Scenario: sharee with permission Viewer tries to create text file inside shared folder
     Given user "Alice" has created folder "testFolder"
     And user "Alice" has sent the following resource share invitation:
@@ -702,7 +702,7 @@ Feature: collaboration (wopi)
       | Space Editor     |
       | Manager          |
 
-
+  @issue-10126
   Scenario: user with Viewer role tries to create a text file inside shared project space using wopi endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -823,7 +823,7 @@ Feature: collaboration (wopi)
       | Space Editor     |
       | Manager          |
 
-
+  @issue-10126
   Scenario: user with Viewer role tries to create a odt file inside shared project space using wopi endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -892,7 +892,7 @@ Feature: collaboration (wopi)
       | Editor           |
       | Uploader         |
 
-
+  @issue-10126
   Scenario: sharee with permission Viewer tries to create odt file inside shared folder using wopi endpoint
     Given user "Alice" has created folder "testFolder"
     And user "Alice" has sent the following resource share invitation:
@@ -956,7 +956,7 @@ Feature: collaboration (wopi)
       | upload           |
       | createOnly       |
 
-
+  @issue-10126
   Scenario: public user with permission view tries to creates odt file inside public folder using wopi endpoint
     Given user "Alice" has created folder "publicFolder"
     And user "Alice" has created the following resource link share:
@@ -1047,7 +1047,7 @@ Feature: collaboration (wopi)
       | upload           |
       | createOnly       |
 
-  @issue-8691
+  @issue-8691 @issue-10126
   Scenario: public user with permission view tries to create odt file inside folder of public space using wopi endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
