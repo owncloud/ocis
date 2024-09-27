@@ -77,6 +77,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Remove METADATA_BACKEND: [#10113](https://github.com/owncloud/ocis/pull/10113)
 * Enhancement - Load CSP configuration file if it exists: [#10139](https://github.com/owncloud/ocis/pull/10139)
 * Enhancement - Bump reva: [#10157](https://github.com/owncloud/ocis/pull/10157)
+* Enhancement - FileDownloaded Activity: [#10161](https://github.com/owncloud/ocis/pull/10161)
 * Enhancement - Update web to v10.3.0: [#10177](https://github.com/owncloud/ocis/pull/10177)
 
 ## Details
@@ -249,6 +250,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10157
    https://github.com/owncloud/ocis/pull/9817
+
+* Enhancement - FileDownloaded Activity: [#10161](https://github.com/owncloud/ocis/pull/10161)
+
+   Add an activity when a file gets downloaded via public link
+
+   https://github.com/owncloud/ocis/pull/10161
 
 * Enhancement - Update web to v10.3.0: [#10177](https://github.com/owncloud/ocis/pull/10177)
 
