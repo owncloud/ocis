@@ -329,7 +329,7 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 		objectID := invite.GetRecipients()[0].GetObjectId()
 		_, err := s.identityCache.GetAcceptedUser(ctx, objectID)
 		if err == nil {
-			return libregraph.Permission{}, errorcode.New(errorcode.NotAllowed, "federated user can not become a space member")
+			return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "federated user can not become a space member")
 		}
 	}
 
