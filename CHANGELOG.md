@@ -78,6 +78,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Load CSP configuration file if it exists: [#10139](https://github.com/owncloud/ocis/pull/10139)
 * Enhancement - Bump reva: [#10157](https://github.com/owncloud/ocis/pull/10157)
 * Enhancement - FileDownloaded Activity: [#10161](https://github.com/owncloud/ocis/pull/10161)
+* Enhancement - Add WOPI host URLs to the collaboration service: [#10174](https://github.com/owncloud/ocis/pull/10174)
 * Enhancement - Update web to v10.3.0: [#10177](https://github.com/owncloud/ocis/pull/10177)
 
 ## Details
@@ -256,6 +257,14 @@ The following sections list the changes for unreleased.
    Add an activity when a file gets downloaded via public link
 
    https://github.com/owncloud/ocis/pull/10161
+
+* Enhancement - Add WOPI host URLs to the collaboration service: [#10174](https://github.com/owncloud/ocis/pull/10174)
+
+   We added the WOPI host urls to create a better integration with WOPI clients.
+   This allows the WOPI apps to display links to our sharing and versions panel in
+   the UI.
+
+   https://github.com/owncloud/ocis/pull/10174
 
 * Enhancement - Update web to v10.3.0: [#10177](https://github.com/owncloud/ocis/pull/10177)
 
