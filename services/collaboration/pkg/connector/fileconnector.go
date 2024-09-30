@@ -1118,9 +1118,14 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	if err != nil {
 		return nil, err
 	}
+
+	fileRef := wopiContext.FileReference
+	// set path to empty string to get the full path from the stat
+	fileRef.Path = ""
 	statRes, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
-		Ref: wopiContext.FileReference,
+		Ref: fileRef,
 	})
+
 	if err != nil {
 		logger.Error().Err(err).Msg("CheckFileInfo: stat failed")
 		return nil, err
@@ -1175,18 +1180,17 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	}
 
 	breadcrumbFolderName := path.Dir(statRes.Info.Path)
-	if breadcrumbFolderName == "." || breadcrumbFolderName == "" {
+	if breadcrumbFolderName == "." || breadcrumbFolderName == "" || breadcrumbFolderName == "/" {
 		breadcrumbFolderName = statRes.GetInfo().GetSpace().GetName()
 	}
 
-	ocisUrl, err := url.Parse(f.cfg.Commons.OcisURL)
+	ocisURL, err := url.Parse(f.cfg.Commons.OcisURL)
 	if err != nil {
 		return nil, err
 	}
-	breadcrumbFolderURL, viewAppUrl, editAppUrl := *ocisUrl, *ocisUrl, *ocisUrl
-	breadcrumbFolderURL.Path = path.Join(breadcrumbFolderURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
-	viewAppUrl.Path = path.Join(viewAppUrl.Path, "external"+strings.ToLower(f.cfg.App.Name))
-	editAppUrl.Path = path.Join(editAppUrl.Path, "external"+strings.ToLower(f.cfg.App.Name))
+	privateLinkURL := &url.URL{}
+	*privateLinkURL = *ocisURL
+	privateLinkURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
 	// fileinfo map
 	infoMap := map[string]interface{}{
 		fileinfo.KeyOwnerID:           hexEncodedOwnerId,
@@ -1196,10 +1200,12 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyBreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request
 		fileinfo.KeyBreadcrumbFolderName: breadcrumbFolderName,
-		fileinfo.KeyBreadcrumbFolderURL:  breadcrumbFolderURL.String(),
+		fileinfo.KeyBreadcrumbFolderURL:  privateLinkURL.String(),
 
-		//fileinfo.KeyHostViewURL: viewAppUrl.String(),
-		//fileinfo.KeyHostEditURL: editAppUrl.String(),
+		fileinfo.KeyHostViewURL:    createHostUrl("view", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
+		fileinfo.KeyHostEditURL:    createHostUrl("write", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
+		fileinfo.KeyFileSharingURL: createShareUrl(privateLinkURL),
+		fileinfo.KeyFileVersionURL: createVersionsUrl(privateLinkURL),
 
 		fileinfo.KeyEnableOwnerTermination:     true, // only for collabora
 		fileinfo.KeySupportsExtendedLockLength: true,
@@ -1238,6 +1244,42 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 
 	logger.Debug().Interface("FileInfo", info).Msg("CheckFileInfo: success")
 	return NewResponseSuccessBody(info), nil
+}
+
+func createHostUrl(mode string, ocisUrl *url.URL, appName string, info *providerv1beta1.ResourceInfo) string {
+	webUrl := createAppExternalURL(ocisUrl, appName, info)
+	addURLParams(webUrl, map[string]string{"view_mode": mode})
+	return webUrl.String()
+}
+
+func createShareUrl(ocisURL *url.URL) string {
+	shareURL := *ocisURL
+	addURLParams(&shareURL, map[string]string{"details": "sharing"})
+	return shareURL.String()
+}
+
+func createVersionsUrl(ocisURL *url.URL) string {
+	versionsURL := *ocisURL
+	addURLParams(&versionsURL, map[string]string{"details": "versions"})
+	return versionsURL.String()
+}
+
+func addURLParams(u *url.URL, params map[string]string) {
+	q := u.Query()
+	for k, v := range params {
+		q.Add(k, v)
+	}
+	u.RawQuery = q.Encode()
+}
+
+func createAppExternalURL(ocisURL *url.URL, appName string, info *providerv1beta1.ResourceInfo) *url.URL {
+	spaceAlias := utils.ReadPlainFromOpaque(info.GetSpace().GetOpaque(), "spaceAlias")
+	appExternalURL := *ocisURL
+	appExternalURL.Path = path.Join(ocisURL.Path, "external-"+strings.ToLower(appName), spaceAlias, info.GetPath())
+	q := ocisURL.Query()
+	q.Add("fileId", storagespace.FormatResourceID(info.GetId()))
+	appExternalURL.RawQuery = q.Encode()
+	return &appExternalURL
 }
 
 func (f *FileConnector) watermarkText(user *userv1beta1.User) string {
