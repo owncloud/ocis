@@ -32,7 +32,7 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: mbarz@owncloud.com
-          OCIS_DOCKER_TAG: 5.0.5
+          OCIS_DOCKER_TAG: 5.0.8
           OCIS_DOMAIN: ocis.ocis-traefik.released.owncloud.works
           DEMO_USERS: "true"
           INBUCKET_DOMAIN: mail.ocis-traefik.released.owncloud.works
