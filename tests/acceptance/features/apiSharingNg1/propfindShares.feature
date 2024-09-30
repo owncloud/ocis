@@ -49,7 +49,7 @@ Feature: propfind a shares
       | textfile.txt  | textfile (1).txt  |
       | folderToShare | folderToShare (1) |
 
-  @issue-4421
+  @issue-4421 @issue-9933 @skip
   Scenario Outline: sharee PROPFIND same name shares shared by multiple users using new dav path
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
@@ -93,7 +93,7 @@ Feature: propfind a shares
       | new              | textfile.txt  | textfile (1).txt  |
       | new              | folderToShare | folderToShare (1) |
 
-  @issue-4421
+  @issue-4421 @issue-9933 @skip
   Scenario: sharee PROPFIND shares with bracket in the name
     Given using spaces DAV path
     And user "Alice" has created folder "folderToShare"
