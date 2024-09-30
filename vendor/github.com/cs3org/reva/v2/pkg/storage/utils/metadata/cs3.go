@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -107,6 +108,27 @@ func (cs3 *CS3) Init(ctx context.Context, spaceid string) (err error) {
 	if err != nil {
 		return err
 	}
+
+	lsRes, err := client.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
+		Filters: []*provider.ListStorageSpacesRequest_Filter{
+			{
+				Type: provider.ListStorageSpacesRequest_Filter_TYPE_ID,
+				Term: &provider.ListStorageSpacesRequest_Filter_Id{
+					Id: &provider.StorageSpaceId{OpaqueId: spaceid + "!" + spaceid},
+				},
+			},
+		},
+	})
+	switch {
+	case err != nil:
+		return err
+	case lsRes.Status.Code == rpc.Code_CODE_OK && len(lsRes.StorageSpaces) > 0:
+		if len(lsRes.StorageSpaces) > 0 {
+			cs3.SpaceRoot = lsRes.StorageSpaces[0].Root
+			return nil
+		}
+	}
+
 	// FIXME change CS3 api to allow sending a space id
 	cssr, err := client.CreateStorageSpace(ctx, &provider.CreateStorageSpaceRequest{
 		Opaque: &types.Opaque{
@@ -127,8 +149,7 @@ func (cs3 *CS3) Init(ctx context.Context, spaceid string) (err error) {
 	case cssr.Status.Code == rpc.Code_CODE_OK:
 		cs3.SpaceRoot = cssr.StorageSpace.Root
 	case cssr.Status.Code == rpc.Code_CODE_ALREADY_EXISTS:
-		// TODO make CreateStorageSpace return existing space?
-		cs3.SpaceRoot = &provider.ResourceId{SpaceId: spaceid, OpaqueId: spaceid}
+		return errtypes.AlreadyExists(fmt.Sprintf("user %s does not have access to metadata space %s, but it exists", cs3.serviceUser.Id.OpaqueId, spaceid))
 	default:
 		return errtypes.NewErrtypeFromStatus(cssr.Status)
 	}
