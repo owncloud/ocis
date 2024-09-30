@@ -77,8 +77,8 @@ The following sections list the changes for unreleased.
 * Enhancement - Add an Activity for FileUpdated: [#10072](https://github.com/owncloud/ocis/pull/10072)
 * Enhancement - Remove METADATA_BACKEND: [#10113](https://github.com/owncloud/ocis/pull/10113)
 * Enhancement - Load CSP configuration file if it exists: [#10139](https://github.com/owncloud/ocis/pull/10139)
-* Enhancement - Bump reva: [#10157](https://github.com/owncloud/ocis/pull/10157)
 * Enhancement - FileDownloaded Activity: [#10161](https://github.com/owncloud/ocis/pull/10161)
+* Enhancement - Bump reva: [#10172](https://github.com/owncloud/ocis/pull/10172)
 * Enhancement - Add WOPI host URLs to the collaboration service: [#10174](https://github.com/owncloud/ocis/pull/10174)
 * Enhancement - Update web to v10.3.0: [#10177](https://github.com/owncloud/ocis/pull/10177)
 
@@ -253,18 +253,19 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/10021
    https://github.com/owncloud/ocis/pull/10139
 
-* Enhancement - Bump reva: [#10157](https://github.com/owncloud/ocis/pull/10157)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/10157
-   https://github.com/owncloud/ocis/pull/9817
-
 * Enhancement - FileDownloaded Activity: [#10161](https://github.com/owncloud/ocis/pull/10161)
 
    Add an activity when a file gets downloaded via public link
 
    https://github.com/owncloud/ocis/pull/10161
+
+* Enhancement - Bump reva: [#10172](https://github.com/owncloud/ocis/pull/10172)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/10172
+   https://github.com/owncloud/ocis/pull/10157
+   https://github.com/owncloud/ocis/pull/9817
 
 * Enhancement - Add WOPI host URLs to the collaboration service: [#10174](https://github.com/owncloud/ocis/pull/10174)
 
