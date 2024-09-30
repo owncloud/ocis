@@ -59,6 +59,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fixed proxy build info: [#10039](https://github.com/owncloud/ocis/pull/10039)
 * Bugfix - Fixed the ocm tocken: [#10050](https://github.com/owncloud/ocis/pull/10050)
 * Bugfix - Fix ocm space sharing: [#10060](https://github.com/owncloud/ocis/pull/10060)
+* Bugfix - Fix the error code for ocm space sharing: [#10079](https://github.com/owncloud/ocis/pull/10079)
 * Bugfix - Added LinkUpdated activity: [#10085](https://github.com/owncloud/ocis/pull/10085)
 * Bugfix - Fix Activities leak: [#10092](https://github.com/owncloud/ocis/pull/10092)
 * Bugfix - Include additional logs in the collaboration service: [#10101](https://github.com/owncloud/ocis/pull/10101)
@@ -114,6 +115,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10051
    https://github.com/owncloud/ocis/pull/10060
+
+* Bugfix - Fix the error code for ocm space sharing: [#10079](https://github.com/owncloud/ocis/pull/10079)
+
+   We fixed the error code for ocm space sharing
+
+   https://github.com/owncloud/ocis/issues/10051
+   https://github.com/owncloud/ocis/pull/10079
 
 * Bugfix - Added LinkUpdated activity: [#10085](https://github.com/owncloud/ocis/pull/10085)
 
