@@ -15,7 +15,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb
-	github.com/cs3org/reva/v2 v2.24.2-0.20240926082340-b5c3c6781528
+	github.com/cs3org/reva/v2 v2.24.2-0.20240930121615-c33c803283ee
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -364,8 +364,6 @@ replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-2
 replace github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 
 replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90
-
-replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.19.1-0.20240926125755-02af5a26695d
 
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details

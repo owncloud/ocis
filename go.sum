@@ -195,8 +195,6 @@ github.com/bombsimon/logrusr/v3 v3.1.0/go.mod h1:PksPPgSFEL2I52pla2glgCyyd2OqOHA
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/bufbuild/protocompile v0.4.0 h1:LbFKd2XowZvQ/kajzguUp2DC9UEIQhIq77fZZlaQsNA=
 github.com/bufbuild/protocompile v0.4.0/go.mod h1:3v93+mbWn/v3xzN+31nwkJfrEpAUwp+BagBSZWx+TP8=
-github.com/butonic/reva/v2 v2.19.1-0.20240926125755-02af5a26695d h1:AXQmZPvOoLvkVns8IOy/gIoW7MVRiIySadXFhdwGrEg=
-github.com/butonic/reva/v2 v2.19.1-0.20240926125755-02af5a26695d/go.mod h1:p7CHBXcg6sSqB+0JMNDfC1S7TSh9FghXkw1kTV3KcJI=
 github.com/bwesterb/go-ristretto v1.2.3/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
 github.com/bytecodealliance/wasmtime-go/v3 v3.0.2 h1:3uZCA/BLTIu+DqCfguByNMJa2HVHpXvjfy0Dy7g6fuA=
 github.com/bytecodealliance/wasmtime-go/v3 v3.0.2/go.mod h1:RnUjnIXxEJcL6BgCvNyzCCRzZcxCgsZCi+RNlvYor5Q=
@@ -257,6 +255,8 @@ github.com/crewjam/saml v0.4.14 h1:g9FBNx62osKusnFzs3QTN5L9CVA/Egfgm+stJShzw/c=
 github.com/crewjam/saml v0.4.14/go.mod h1:UVSZCf18jJkk6GpWNVqcyQJMD5HsRugBPf4I1nl2mME=
 github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb h1:KmYZDReplv/yfwc1LNYpDcVhVujC3Pasv6WjXx1haSU=
 github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb/go.mod h1:yyP8PRo0EZou3nSH7H4qjlzQwaydPeIRNgX50npQHpE=
+github.com/cs3org/reva/v2 v2.24.2-0.20240930121615-c33c803283ee h1:+1sYiuA9LRQIznBNG1AFQoIGdCUCqQT1Dof2rTTsDm8=
+github.com/cs3org/reva/v2 v2.24.2-0.20240930121615-c33c803283ee/go.mod h1:p7CHBXcg6sSqB+0JMNDfC1S7TSh9FghXkw1kTV3KcJI=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
 github.com/cyphar/filepath-securejoin v0.2.4 h1:Ugdm7cg7i6ZK6x3xDF1oEu1nfkyfH53EtKeQYTC3kyg=
 github.com/cyphar/filepath-securejoin v0.2.4/go.mod h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=
