@@ -782,8 +782,8 @@ github.com/leonelquinteros/gotext v1.6.1 h1:PuTN8YUqHvfPZxW+fPXp7o0Fc2zN9L2wXBZr
 github.com/leonelquinteros/gotext v1.6.1/go.mod h1:qQRISjoonXYFdRGrTG1LARQ38Gpibad0IPeB4hpvyyM=
 github.com/libregraph/idm v0.5.0 h1:tDMwKbAOZzdeDYMxVlY5PbSqRKO7dbAW9KT42A51WSk=
 github.com/libregraph/idm v0.5.0/go.mod h1:BGMwIQ/6orJSPVzJ1x6kgG2JyG9GY05YFmbsnaD80k0=
-github.com/libregraph/lico v0.62.0 h1:4aa0hp8kLCj/oy/aGuGKQCzdQRLHY/cvDs25bdkdcXU=
-github.com/libregraph/lico v0.62.0/go.mod h1:Byuq0dALiJD9hpx2gvX5UTVZ6eWZs3sO0SeoXQQeFcE=
+github.com/libregraph/lico v0.64.0 h1:fbMV2ALjrOysGL0m58bhRrF+9e/HCL5RkoSwMN+xoWQ=
+github.com/libregraph/lico v0.64.0/go.mod h1:J2ZNe1DcO+K/5ptOOrQk2A2mn6OwXRdGUI4ASgw2WGg=
 github.com/libregraph/oidc-go v1.1.0 h1:RyudjL3UyQblqeBQI06W53PniWobqODeeyAy6v/HumA=
 github.com/libregraph/oidc-go v1.1.0/go.mod h1:qW9ubcXvZrfbbWZBaLMuk7bt5qAUMYyt9/NtXQt07Cw=
 github.com/linode/linodego v0.25.3/go.mod h1:GSBKPpjoQfxEfryoCRcgkuUOCuVtGHWhzI8OMdycNTE=
@@ -1052,8 +1052,8 @@ github.com/rogpeppe/go-internal v1.8.0/go.mod h1:WmiCO8CzOY8rg0OYDC4/i/2WRWAB6po
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR38lUII=
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
-github.com/rs/cors v1.11.0 h1:0B9GE/r9Bc2UxRMMtymBkHTenPkHDv0CW4Y98GBY+po=
-github.com/rs/cors v1.11.0/go.mod h1:XyqrcTp5zjWr1wsJ8PIRZssZ8b/WMcMf71DJnit4EMU=
+github.com/rs/cors v1.11.1 h1:eU3gRzXLRK57F5rKMGMZURNdIG4EoAmX8k94r9wXWHA=
+github.com/rs/cors v1.11.1/go.mod h1:XyqrcTp5zjWr1wsJ8PIRZssZ8b/WMcMf71DJnit4EMU=
 github.com/rs/xid v1.5.0 h1:mKX4bl4iPYJtEIxp6CYiUuLQ/8DYMoz0PUdtGgMFRVc=
 github.com/rs/xid v1.5.0/go.mod h1:trrq9SKmegXys3aeAKXMUTdJsYXVwGY3RLcfgqegfbg=
 github.com/rs/zerolog v1.33.0 h1:1cU2KZkvPxNyfgEmhHAz/1A9Bz+llsdYzklWFzgp0r8=

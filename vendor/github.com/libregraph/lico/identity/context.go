@@ -28,7 +28,9 @@ type key int
 // authRecordKey is the key for identity.AuthRecord in Contexts. It is
 // unexported; clients use identity.NewContext and identity.FromContext
 // instead of using this key directly.
-var authRecordKey key
+const (
+	authRecordKey key = iota
+)
 
 // NewContext returns a new Context that carries value auth.
 func NewContext(ctx context.Context, auth AuthRecord) context.Context {

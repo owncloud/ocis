@@ -4,6 +4,30 @@
 
 
 
+## v0.64.0 (2024-09-18)
+
+- Implement refresh and revoke for lg identifier backend session
+- Pass real src ip and user agent to lg identifier backend
+- Fix variable shadowing making error checks ineffective
+
+
+## v0.63.0 (2024-09-10)
+
+- Bump semver from 5.7.1 to 5.7.2 in /identifier
+- Ignore js license ranger border check warnings
+- Fix js license ranger for new source-map-explorer
+- Bump source-map-explorer to 2.5.3 in /identifier
+- Update linter CI version
+- Fix access token sid claim when provided via lg backend
+- Bump google.golang.org/protobuf from 1.30.0 to 1.33.0
+- Bump github.com/rs/cors from 1.10.1 to 1.11.1
+- Add password visibility icon in login dialog
+- Bump github.com/spf13/cobra from 1.7.0 to 1.8.1
+- Remove :443 from Host header for secure referrer/origin check
+- Allow authorize requests wihout openid scope
+- Bump github.com/gorilla/schema from 1.2.0 to 1.4.1
+
+
 ## v0.62.0 (2024-05-08)
 
 - Update golangci-lint config

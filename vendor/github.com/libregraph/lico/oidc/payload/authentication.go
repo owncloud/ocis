@@ -265,28 +265,36 @@ func (ar *AuthenticationRequest) ApplyRequestObject(roc *RequestObjectClaims, me
 
 // Validate validates the request data of the accociated authentication request.
 func (ar *AuthenticationRequest) Validate(keyFunc jwt.Keyfunc) error {
-	if _, ok := ar.Scopes[oidc.ScopeOpenID]; !ok {
-		return ar.NewBadRequest(oidc.ErrorCodeOAuth2InvalidRequest, "missing openid scope in request")
-	}
-
 	switch ar.RawResponseType {
 	case oidc.ResponseTypeCode:
 		// Code flow.
 		// breaks
 	case oidc.ResponseTypeCodeIDToken:
 		// Hybgrid flow.
+		if _, ok := ar.Scopes[oidc.ScopeOpenID]; !ok {
+			return ar.NewBadRequest(oidc.ErrorCodeOAuth2InvalidRequest, "missing openid scope in request")
+		}
 		// breaks
 	case oidc.ResponseTypeCodeToken:
 		// Hybgrid flow.
 		// breaks
 	case oidc.ResponseTypeCodeIDTokenToken:
 		// Hybgrid flow.
+		if _, ok := ar.Scopes[oidc.ScopeOpenID]; !ok {
+			return ar.NewBadRequest(oidc.ErrorCodeOAuth2InvalidRequest, "missing openid scope in request")
+		}
 		// breaks
 	case oidc.ResponseTypeIDToken:
 		// Implicit flow.
+		if _, ok := ar.Scopes[oidc.ScopeOpenID]; !ok {
+			return ar.NewBadRequest(oidc.ErrorCodeOAuth2InvalidRequest, "missing openid scope in request")
+		}
 		fallthrough
 	case oidc.ResponseTypeIDTokenToken:
 		// Implicit flow with access token.
+		if _, ok := ar.Scopes[oidc.ScopeOpenID]; !ok {
+			return ar.NewBadRequest(oidc.ErrorCodeOAuth2InvalidRequest, "missing openid scope in request")
+		}
 		if ar.Nonce == "" {
 			return ar.NewError(oidc.ErrorCodeOAuth2InvalidRequest, "nonce is required for implicit flow")
 		}

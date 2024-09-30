@@ -33,7 +33,7 @@
     "serve": "vite preview",
     "test": "vitest",
     "lint": "eslint --max-warnings=0 src/**/*.{ts,tsx,js,jsx}",
-    "licenses": "NODE_PATH=./node_modules node ../scripts/js-license-ranger.js",
+    "licenses": "node ../scripts/js-license-ranger.mjs",
     "analyze": "source-map-explorer 'build/static/assets/*.js'"
   },
   "devDependencies": {
@@ -59,7 +59,7 @@
     "i18next-parser": "^5.4.0",
     "if-node-version": "^1.1.1",
     "jsdom": "^22.1.0",
-    "source-map-explorer": "^1.8.0",
+    "source-map-explorer": "^2.5.3",
     "typescript": "^5.2.2",
     "vite": "^4.5.2",
     "vite-plugin-checker": "^0.6.2",

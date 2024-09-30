@@ -19,6 +19,7 @@ package lico
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -30,7 +31,10 @@ type key int
 // claimsKey is the key for claims in contexts. It is
 // unexported; clients use konnect.NewClaimsContext and
 // connect.FromClaimsContext instead of using this key directly.
-var claimsKey key
+const (
+	claimsKey key = iota
+	requestKey
+)
 
 // NewClaimsContext returns a new Context that carries value auth.
 func NewClaimsContext(ctx context.Context, claims jwt.Claims) context.Context {
@@ -41,4 +45,15 @@ func NewClaimsContext(ctx context.Context, claims jwt.Claims) context.Context {
 func FromClaimsContext(ctx context.Context) (jwt.Claims, bool) {
 	claims, ok := ctx.Value(claimsKey).(jwt.Claims)
 	return claims, ok
+}
+
+// NewRequestContext returns a new Context that carries a request object.
+func NewRequestContext(ctx context.Context, req *http.Request) context.Context {
+	return context.WithValue(ctx, requestKey, req)
+}
+
+// FromRequestContext returns the Request object stored in ctx, if any.
+func FromRequestContext(ctx context.Context) (*http.Request, bool) {
+	req, ok := ctx.Value(requestKey).(*http.Request)
+	return req, ok
 }

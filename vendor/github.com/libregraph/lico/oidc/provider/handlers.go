@@ -93,6 +93,8 @@ func (p *Provider) AuthorizeHandler(rw http.ResponseWriter, req *http.Request) {
 
 	addResponseHeaders(rw.Header())
 
+	ctx := konnect.NewRequestContext(req.Context(), req)
+
 	// OpenID Connect 1.0 authentication request validation.
 	// http://openid.net/specs/openid-connect-core-1_0.html#ImplicitValidation
 	err = req.ParseForm()
@@ -106,7 +108,7 @@ func (p *Provider) AuthorizeHandler(rw http.ResponseWriter, req *http.Request) {
 		if claims, ok := token.Claims.(*payload.RequestObjectClaims); ok {
 			// Validate signed request tokens according to spec defined at
 			// https://openid.net/specs/openid-connect-core-1_0.html#SignedRequestObject
-			registration, _ := p.clients.Get(req.Context(), claims.ClientID)
+			registration, _ := p.clients.Get(ctx, claims.ClientID)
 			if registration != nil {
 				if registration.RawRequestObjectSigningAlg != "" {
 					if token.Method.Alg() != registration.RawRequestObjectSigningAlg {
@@ -156,7 +158,7 @@ func (p *Provider) AuthorizeHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	// Inject implicit scopes set by client registration.
-	if registration, _ := p.clients.Get(req.Context(), ar.ClientID); registration != nil {
+	if registration, _ := p.clients.Get(ctx, ar.ClientID); registration != nil {
 		err = registration.ApplyImplicitScopes(ar.Scopes)
 		if err != nil {
 			p.logger.WithError(err).Debugln("failed to apply implicit scopes")
@@ -171,7 +173,7 @@ func (p *Provider) AuthorizeHandler(rw http.ResponseWriter, req *http.Request) {
 
 	// Authorization Server Authenticates End-User
 	// http://openid.net/specs/openid-connect-core-1_0.html#ImplicitAuthenticates
-	auth, err = p.identityManager.Authenticate(req.Context(), rw, req, ar, p.guestManager)
+	auth, err = p.identityManager.Authenticate(ctx, rw, req, ar, p.guestManager)
 	if err != nil {
 		goto done
 	}
@@ -190,7 +192,7 @@ func (p *Provider) AuthorizeHandler(rw http.ResponseWriter, req *http.Request) {
 
 	// Authorization Server Obtains End-User Consent/Authorization
 	// http://openid.net/specs/openid-connect-core-1_0.html#ImplicitConsent
-	auth, err = auth.Manager().Authorize(req.Context(), rw, req, ar, auth)
+	auth, err = auth.Manager().Authorize(ctx, rw, req, ar, auth)
 	if err != nil {
 		goto done
 	}
@@ -213,7 +215,7 @@ func (p *Provider) AuthorizeResponse(rw http.ResponseWriter, req *http.Request, 
 		goto done
 	}
 
-	ctx = identity.NewContext(req.Context(), auth)
+	ctx = identity.NewContext(konnect.NewRequestContext(req.Context(), req), auth)
 
 	// Create session.
 	session, err = p.updateOrCreateSession(rw, req, ar, auth)
@@ -336,6 +338,8 @@ func (p *Provider) TokenHandler(rw http.ResponseWriter, req *http.Request) {
 	rw.Header().Set("Cache-Control", "no-store")
 	rw.Header().Set("Pragma", "no-cache")
 
+	ctx := konnect.NewRequestContext(req.Context(), req)
+
 	// Validate request method
 	switch req.Method {
 	case http.MethodPost:
@@ -367,7 +371,7 @@ func (p *Provider) TokenHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	// Additional validations according to https://tools.ietf.org/html/rfc6749#section-4.1.3
-	clientDetails, err = p.clients.Lookup(req.Context(), tr.ClientID, tr.ClientSecret, tr.RedirectURI, "", false)
+	clientDetails, err = p.clients.Lookup(ctx, tr.ClientID, tr.ClientSecret, tr.RedirectURI, "", false)
 	if err != nil {
 		err = konnectoidc.NewOAuth2Error(oidc.ErrorCodeOAuth2AccessDenied, err.Error())
 		goto done
@@ -410,8 +414,8 @@ func (p *Provider) TokenHandler(rw http.ResponseWriter, req *http.Request) {
 			}
 		}
 
-		if _, ok := identity.FromContext(req.Context()); !ok {
-			req = req.WithContext(identity.NewContext(req.Context(), auth))
+		if _, ok := identity.FromContext(ctx); !ok {
+			ctx = identity.NewContext(ctx, auth)
 		}
 
 	case oidc.GrantTypeRefreshToken:
@@ -437,10 +441,11 @@ func (p *Provider) TokenHandler(rw http.ResponseWriter, req *http.Request) {
 			goto done
 		}
 
-		ctx := konnect.NewClaimsContext(req.Context(), claims)
+		ctx = konnect.NewClaimsContext(ctx, claims)
 
-		currentIdentityManager, err := p.getIdentityManagerFromClaims(claims.IdentityProvider, claims.IdentityClaims)
-		if err != nil {
+		currentIdentityManager, claimsErr := p.getIdentityManagerFromClaims(claims.IdentityProvider, claims.IdentityClaims)
+		if claimsErr != nil {
+			err = claimsErr
 			goto done
 		}
 
@@ -499,16 +504,16 @@ func (p *Provider) TokenHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	// Create access token.
-	accessTokenString, err = p.makeAccessToken(req.Context(), ar.ClientID, auth, signinMethod)
+	accessTokenString, err = p.makeAccessToken(ctx, ar.ClientID, auth, signinMethod)
 	if err != nil {
 		goto done
 	}
 
 	switch tr.GrantType {
 	case oidc.GrantTypeAuthorizationCode:
-		// Create ID token when not previously requested.
-		if !ar.ResponseTypes[oidc.ResponseTypeIDToken] {
-			idTokenString, err = p.makeIDToken(req.Context(), ar, auth, session, accessTokenString, "", signinMethod)
+		// Create ID token when not previously requested amd openid scope is authorized.
+		if !ar.ResponseTypes[oidc.ResponseTypeIDToken] && authorizedScopes[oidc.ScopeOpenID] {
+			idTokenString, err = p.makeIDToken(ctx, ar, auth, session, accessTokenString, "", signinMethod)
 			if err != nil {
 				goto done
 			}
@@ -516,7 +521,7 @@ func (p *Provider) TokenHandler(rw http.ResponseWriter, req *http.Request) {
 
 		// Create refresh token when granted.
 		if authorizedScopes[oidc.ScopeOfflineAccess] {
-			refreshTokenString, err = p.makeRefreshToken(req.Context(), ar.ClientID, auth, nil)
+			refreshTokenString, err = p.makeRefreshToken(ctx, ar.ClientID, auth, nil)
 			if err != nil {
 				goto done
 			}
@@ -595,7 +600,7 @@ func (p *Provider) UserInfoHandler(rw http.ResponseWriter, req *http.Request) {
 
 	userID, sessionRef := p.getUserIDAndSessionRefFromClaims(&claims.StandardClaims, claims.SessionClaims, claims.IdentityClaims)
 
-	ctx := konnect.NewClaimsContext(req.Context(), claims)
+	ctx := konnect.NewClaimsContext(konnect.NewRequestContext(req.Context(), req), claims)
 
 	currentIdentityManager, err := p.getIdentityManagerFromClaims(claims.IdentityProvider, claims.IdentityClaims)
 	if err != nil {
@@ -712,7 +717,7 @@ done:
 	// Support returning signed user info if the registered client requested it
 	// as specified in https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse and
 	// https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
-	registration, _ := p.clients.Get(req.Context(), claims.Audience)
+	registration, _ := p.clients.Get(ctx, claims.Audience)
 	if registration != nil {
 		if registration.RawUserInfoSignedResponseAlg != "" {
 			// Get alg.
@@ -720,7 +725,7 @@ done:
 			// Set extra claims.
 			responseAsMap[oidc.IssuerIdentifierClaim] = p.issuerIdentifier
 			responseAsMap[oidc.AudienceClaim] = registration.ID
-			tokenString, err := p.makeJWT(req.Context(), alg, jwt.MapClaims(responseAsMap))
+			tokenString, err := p.makeJWT(ctx, alg, jwt.MapClaims(responseAsMap))
 			if err != nil {
 				p.logger.WithFields(utils.ErrorAsFields(err)).Debugln("userinfo request failed to encode jwt")
 				p.ErrorPage(rw, http.StatusInternalServerError, "", err.Error())
@@ -748,6 +753,8 @@ func (p *Provider) EndSessionHandler(rw http.ResponseWriter, req *http.Request) 
 	var currentIdentityManager identity.Manager
 
 	addResponseHeaders(rw.Header())
+
+	ctx := konnect.NewRequestContext(req.Context(), req)
 
 	// Validate request.
 	err = req.ParseForm()
@@ -783,7 +790,7 @@ func (p *Provider) EndSessionHandler(rw http.ResponseWriter, req *http.Request) 
 	}
 
 	// Authorization unauthenticates end user.
-	err = currentIdentityManager.EndSession(req.Context(), rw, req, esr)
+	err = currentIdentityManager.EndSession(ctx, rw, req, esr)
 	if err != nil {
 		goto done
 	}
