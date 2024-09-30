@@ -276,5 +276,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/share.feature:232](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L232)
 - [apiOcm/share.feature:233](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L233)
 
+#### [same href in REPORT request for all dav-path-version](https://github.com/owncloud/ocis/issues/7060)
+
+- [apiSearch1/search.feature:372](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch1/search.feature#L372)
+- [apiSearch1/search.feature:373](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch1/search.feature#L373)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

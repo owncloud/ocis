@@ -359,3 +359,16 @@ Feature: Search
       | old              |
       | new              |
       | spaces           |
+
+  @issue-7060
+  Scenario Outline: check href response for searching resources in all DAV path versions
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "hello world inside root" to "file.txt"
+    When user "Alice" searches for "file.txt" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the value of the item "//d:response/d:href" in the response about user "Alice" should be "<response-value>"
+    Examples:
+      | dav-path-version | response-value                            |
+      | old              | /remote.php/webdav/file.txt               |
+      | new              | /remote.php/dav/files/%user%/file.txt     |
+      | spaces           | /remote.php/dav/spaces/%spaceid%/file.txt |
