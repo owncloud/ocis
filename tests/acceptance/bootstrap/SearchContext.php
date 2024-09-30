@@ -43,6 +43,7 @@ class SearchContext implements Context {
 	 * @When user :user searches for :pattern and limits the results to :limit items using the WebDAV API requesting these properties:
 	 * @When user :user searches for :pattern inside folder :scope using the WebDAV API
 	 * @When user :user searches for :pattern inside folder :scope in space :spaceName using the WebDAV API
+	 * @When user :user searches for :pattern within space :spaceName using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $pattern
@@ -84,9 +85,11 @@ class SearchContext implements Context {
 			= "<?xml version='1.0' encoding='utf-8' ?>\n" .
 			"	<oc:search-files xmlns:a='DAV:' xmlns:oc='http://owncloud.org/ns' >\n" .
 			"		<oc:search>\n";
-		if ($scope !== null) {
-			$scope = \trim($scope, "/");
-			$resourceID = $this->featureContext->spacesContext->getResourceId($user, $spaceName ?? "Personal", $scope);
+		if ($spaceName !== null) {
+			$resourceID = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $scope ?? "");
+			$pattern .= " scope:$resourceID";
+		} elseif ($scope !== null) {
+			$resourceID = $this->featureContext->spacesContext->getResourceId($user, "Personal", $scope);
 			$pattern .= " scope:$resourceID";
 		}
 		$body .= "<oc:pattern>$pattern</oc:pattern>\n";
