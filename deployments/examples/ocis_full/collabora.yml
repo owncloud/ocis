@@ -35,6 +35,7 @@ services:
       COLLABORATION_APP_INSECURE: "${INSECURE:-true}"
       COLLABORATION_CS3API_DATAGATEWAY_INSECURE: "${INSECURE:-true}"
       COLLABORATION_LOG_LEVEL: ${LOG_LEVEL:-info}
+      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
     volumes:
       # configure the .env file to use own paths instead of docker internal volumes
       - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
