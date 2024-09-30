@@ -1300,7 +1300,7 @@ github.com/libregraph/idm/server
 github.com/libregraph/idm/server/handler
 github.com/libregraph/idm/server/handler/boltdb
 github.com/libregraph/idm/server/handler/ldif
-# github.com/libregraph/lico v0.62.0
+# github.com/libregraph/lico v0.64.0
 ## explicit; go 1.18
 github.com/libregraph/lico
 github.com/libregraph/lico/bootstrap
@@ -1723,7 +1723,7 @@ github.com/rogpeppe/go-internal/internal/syscall/windows/sysdll
 github.com/rogpeppe/go-internal/lockedfile
 github.com/rogpeppe/go-internal/lockedfile/internal/filelock
 github.com/rogpeppe/go-internal/semver
-# github.com/rs/cors v1.11.0
+# github.com/rs/cors v1.11.1
 ## explicit; go 1.13
 github.com/rs/cors
 github.com/rs/cors/internal

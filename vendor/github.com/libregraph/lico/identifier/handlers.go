@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	konnect "github.com/libregraph/lico"
 	"github.com/libregraph/lico/identity/authorities"
 	"github.com/libregraph/lico/utils"
 )
@@ -57,6 +59,14 @@ func (i *Identifier) secureHandler(handler http.Handler) http.Handler {
 		// NOTE: this does not protect from DNS rebinding. Protection for that
 		// should be added at the frontend proxy.
 		requiredHost := req.Host
+		if host, port, splitErr := net.SplitHostPort(requiredHost); splitErr == nil {
+			if port == "443" {
+				// Ignore the port 443 as it is the default port and it is
+				// usually not part of any of the urls. It might be in the
+				// request for HTTP/3 requests.
+				requiredHost = host
+			}
+		}
 
 		// This follows https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet
 		for {
@@ -172,7 +182,7 @@ func (i *Identifier) handleLogon(rw http.ResponseWriter, req *http.Request) {
 
 	addNoCacheResponseHeaders(rw.Header())
 
-	record := &Record{}
+	record := NewRecord(req, i.Config.Config)
 
 	if r.Hello != nil {
 		err = r.Hello.parse()
@@ -184,7 +194,7 @@ func (i *Identifier) handleLogon(rw http.ResponseWriter, req *http.Request) {
 		record.HelloRequest = r.Hello
 	}
 
-	req = req.WithContext(NewRecordContext(req.Context(), record))
+	req = req.WithContext(NewRecordContext(konnect.NewRequestContext(req.Context(), req), record))
 
 	// Params is an array like this [$username, $password, $mode], defining a
 	// extensible way to extend login modes over time. The minimal length of

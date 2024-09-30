@@ -12,13 +12,27 @@
 	tls self_signed
 
 	# konnect oidc
-	proxy /.well-known/openid-configuration 127.0.0.1:8777
-	proxy /konnect/v1/jwks.json 127.0.0.1:8777
-	proxy /konnect/v1/token 127.0.0.1:8777
-	proxy /konnect/v1/userinfo 127.0.0.1:8777
-	proxy /konnect/v1/static 127.0.0.1:8777
-	proxy /konnect/v1/session 127.0.0.1:8777
-	proxy /konnect/v1/register 127.0.0.1:8777
+	proxy /.well-known/openid-configuration 127.0.0.1:8777 {
+		transparent
+	}
+	proxy /konnect/v1/jwks.json 127.0.0.1:8777 {
+		transparent
+	}
+	proxy /konnect/v1/token 127.0.0.1:8777 {
+		transparent
+	}
+	proxy /konnect/v1/userinfo 127.0.0.1:8777 {
+		transparent
+	}
+	proxy /konnect/v1/static 127.0.0.1:8777 {
+		transparent
+	}
+	proxy /konnect/v1/session 127.0.0.1:8777 {
+		transparent
+	}
+	proxy /konnect/v1/register 127.0.0.1:8777 {
+		transparent
+	}
 
 	# konnect identifier development via webpack-dev-server
 	proxy /signin/v1/ 127.0.0.1:3001 {
@@ -46,6 +60,7 @@
 	#proxy /provider/simple/konnect/v1/authorize 127.0.0.1:8777 {
 	#	without /provider/simple
 	#	header_upstream X-Forwarded-Prefix /provider/simple
+	#   transparent
 	#}
 
 	# konnect cookieserver, start with python3 ./examples/cookieserver.py 8088

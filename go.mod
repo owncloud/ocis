@@ -58,7 +58,7 @@ require (
 	github.com/kovidgoyal/imaging v1.6.3
 	github.com/leonelquinteros/gotext v1.6.1
 	github.com/libregraph/idm v0.5.0
-	github.com/libregraph/lico v0.62.0
+	github.com/libregraph/lico v0.64.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mna/pigeon v1.3.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -78,7 +78,7 @@ require (
 	github.com/r3labs/sse/v2 v2.10.0
 	github.com/riandyrn/otelchi v0.10.0
 	github.com/rogpeppe/go-internal v1.13.1
-	github.com/rs/cors v1.11.0
+	github.com/rs/cors v1.11.1
 	github.com/rs/zerolog v1.33.0
 	github.com/shamaton/msgpack/v2 v2.2.2
 	github.com/sirupsen/logrus v1.9.3

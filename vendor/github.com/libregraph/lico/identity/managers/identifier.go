@@ -200,6 +200,10 @@ func (im *IdentifierIdentityManager) Authenticate(ctx context.Context, rw http.R
 		}
 
 		if user != nil {
+			record := identifier.NewRecord(req, im.identifier.Config.Config)
+			record.IdentifiedUser = user.IdentifiedUser
+			ctx = identifier.NewRecordContext(ctx, record)
+
 			// Inject required scopes into request.
 			for scope, ok := range user.RequiredScopes() {
 				ar.Scopes[scope] = ok
