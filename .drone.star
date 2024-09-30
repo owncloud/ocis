@@ -773,7 +773,6 @@ def codestyle(ctx):
                     "ref": [
                         "refs/heads/stable-*",
                         "refs/pull/**",
-                        "refs/tags/**",
                     ],
                 },
             }
