@@ -86,6 +86,9 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// use resource id from stat response to work on the actual resource and not a share jail item
+	rid = *sres.GetInfo().GetId()
+
 	pm := sres.GetInfo().GetPermissionSet()
 	if pm == nil {
 		g.logger.Error().Err(err).Msg("no permissionset on file")
@@ -184,6 +187,9 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "can't stat resource")
 		return
 	}
+
+	// use resource id from stat response to work on the actual resource and not a share jail item
+	rid = *sres.GetInfo().GetId()
 
 	pm := sres.GetInfo().GetPermissionSet()
 	if pm == nil {
