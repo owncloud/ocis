@@ -49,6 +49,10 @@ func New() *Metrics {
 		}, []string{"version"}),
 	}
 
+	// Initialize the metrics with 0
+	m.Requests.WithLabelValues("GET").Add(0)
+	m.Errors.WithLabelValues("GET").Add(0)
+
 	_ = prometheus.Register(m.Requests)
 	_ = prometheus.Register(m.Errors)
 	_ = prometheus.Register(m.Duration)
