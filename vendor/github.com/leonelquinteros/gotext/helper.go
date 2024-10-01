@@ -37,6 +37,15 @@ func Printf(str string, vars ...interface{}) string {
 	return str
 }
 
+// Appendf applies text formatting only when needed to parse variables.
+func Appendf(b []byte, str string, vars ...interface{}) []byte {
+	if len(vars) > 0 {
+		return fmt.Appendf(b, str, vars...)
+	}
+
+	return append(b, str...)
+}
+
 // NPrintf support named format
 // NPrintf("%(name)s is Type %(type)s", map[string]interface{}{"name": "Gotext", "type": "struct"})
 func NPrintf(format string, params map[string]interface{}) {
@@ -45,7 +54,8 @@ func NPrintf(format string, params map[string]interface{}) {
 }
 
 // Sprintf support named format
-//      Sprintf("%(name)s is Type %(type)s", map[string]interface{}{"name": "Gotext", "type": "struct"})
+//
+//	Sprintf("%(name)s is Type %(type)s", map[string]interface{}{"name": "Gotext", "type": "struct"})
 func Sprintf(format string, params map[string]interface{}) string {
 	f, p := parseSprintf(format, params)
 	return fmt.Sprintf(f, p...)

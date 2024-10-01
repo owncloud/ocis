@@ -45,10 +45,9 @@ Example:
 		// Get Translation
 		fmt.Println(mo.Get("Translate this"))
 	}
-
 */
 type Mo struct {
-	//these three public members are for backwards compatibility. they are just set to the value in the domain
+	// these three public members are for backwards compatibility. they are just set to the value in the domain
 	Headers     HeaderMap
 	Language    string
 	PluralForms string
@@ -56,7 +55,7 @@ type Mo struct {
 	fs          fs.FS
 }
 
-//NewMo should always be used to instantiate a new Mo object
+// NewMo should always be used to instantiate a new Mo object
 func NewMo() *Mo {
 	mo := new(Mo)
 	mo.domain = NewDomain()
@@ -75,21 +74,33 @@ func (mo *Mo) GetDomain() *Domain {
 	return mo.domain
 }
 
-//all of the Get functions are for convenience and aid in backwards compatibility
+// all of the Get functions are for convenience and aid in backwards compatibility
 func (mo *Mo) Get(str string, vars ...interface{}) string {
 	return mo.domain.Get(str, vars...)
+}
+func (mo *Mo) Append(b []byte, str string, vars ...interface{}) []byte {
+	return mo.domain.Append(b, str, vars...)
 }
 
 func (mo *Mo) GetN(str, plural string, n int, vars ...interface{}) string {
 	return mo.domain.GetN(str, plural, n, vars...)
 }
+func (mo *Mo) AppendN(b []byte, str, plural string, n int, vars ...interface{}) []byte {
+	return mo.domain.AppendN(b, str, plural, n, vars...)
+}
 
 func (mo *Mo) GetC(str, ctx string, vars ...interface{}) string {
 	return mo.domain.GetC(str, ctx, vars...)
 }
+func (mo *Mo) AppendC(b []byte, str, ctx string, vars ...interface{}) []byte {
+	return mo.domain.AppendC(b, str, ctx, vars...)
+}
 
 func (mo *Mo) GetNC(str, plural string, n int, ctx string, vars ...interface{}) string {
 	return mo.domain.GetNC(str, plural, n, ctx, vars...)
+}
+func (mo *Mo) AppendNC(b []byte, str, plural string, n int, ctx string, vars ...interface{}) []byte {
+	return mo.domain.AppendNC(b, str, plural, n, ctx, vars...)
 }
 
 func (mo *Mo) IsTranslated(str string) bool {

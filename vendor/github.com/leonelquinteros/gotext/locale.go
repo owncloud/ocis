@@ -21,30 +21,29 @@ multiple languages at the same time by working with this object.
 
 Example:
 
-    import (
-	"encoding/gob"
-	"bytes"
-	    "fmt"
-	    "github.com/leonelquinteros/gotext"
-    )
+	    import (
+		"encoding/gob"
+		"bytes"
+		    "fmt"
+		    "github.com/leonelquinteros/gotext"
+	    )
 
-    func main() {
-        // Create Locale with library path and language code
-        l := gotext.NewLocale("/path/to/i18n/dir", "en_US")
+	    func main() {
+	        // Create Locale with library path and language code
+	        l := gotext.NewLocale("/path/to/i18n/dir", "en_US")
 
-        // Load domain '/path/to/i18n/dir/en_US/LC_MESSAGES/default.{po,mo}'
-        l.AddDomain("default")
+	        // Load domain '/path/to/i18n/dir/en_US/LC_MESSAGES/default.{po,mo}'
+	        l.AddDomain("default")
 
-        // Translate text from default domain
-        fmt.Println(l.Get("Translate this"))
+	        // Translate text from default domain
+	        fmt.Println(l.Get("Translate this"))
 
-        // Load different domain ('/path/to/i18n/dir/en_US/LC_MESSAGES/extras.{po,mo}')
-        l.AddDomain("extras")
+	        // Load different domain ('/path/to/i18n/dir/en_US/LC_MESSAGES/extras.{po,mo}')
+	        l.AddDomain("extras")
 
-        // Translate text from domain
-        fmt.Println(l.GetD("extras", "Translate this"))
-    }
-
+	        // Translate text from domain
+	        fmt.Println(l.GetD("extras", "Translate this"))
+	    }
 */
 type Locale struct {
 	// Path to locale files.
@@ -80,6 +79,14 @@ func NewLocale(p, l string) *Locale {
 func NewLocaleFS(l string, filesystem fs.FS) *Locale {
 	loc := NewLocale("", l)
 	loc.fs = filesystem
+	return loc
+}
+
+// NewLocaleFSWithPath returns a Locale working with a fs.FS on a p path folder.
+func NewLocaleFSWithPath(l string, filesystem fs.FS, p string) *Locale {
+	loc := NewLocale("", l)
+	loc.fs = filesystem
+	loc.path = p
 	return loc
 }
 
@@ -333,7 +340,7 @@ func (l *Locale) GetNDC(dom, str, plural string, n int, ctx string, vars ...inte
 	return Printf(plural, vars...)
 }
 
-//GetTranslations returns a copy of all translations in all domains of this locale. It does not support contexts.
+// GetTranslations returns a copy of all translations in all domains of this locale. It does not support contexts.
 func (l *Locale) GetTranslations() map[string]*Translation {
 	all := make(map[string]*Translation)
 

@@ -27,6 +27,13 @@ type Translator interface {
 	UnmarshalBinary([]byte) error
 	GetDomain() *Domain
 }
+type AppendTranslator interface {
+	Translator
+	Append(b []byte, str string, vars ...interface{}) []byte
+	AppendN(b []byte, str, plural string, n int, vars ...interface{}) []byte
+	AppendC(b []byte, str, ctx string, vars ...interface{}) []byte
+	AppendNC(b []byte, str, plural string, n int, ctx string, vars ...interface{}) []byte
+}
 
 // TranslatorEncoding is used as intermediary storage to encode Translator objects to Gob.
 type TranslatorEncoding struct {
@@ -66,7 +73,7 @@ func (te *TranslatorEncoding) GetTranslator() Translator {
 	return po
 }
 
-//getFileData reads a file and returns the byte slice after doing some basic sanity checking
+// getFileData reads a file and returns the byte slice after doing some basic sanity checking
 func getFileData(f string, filesystem fs.FS) ([]byte, error) {
 	if filesystem != nil {
 		return fs.ReadFile(filesystem, f)
