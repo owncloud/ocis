@@ -291,7 +291,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	if user.GetId() != "" {
 		id, err := i.ldapUUIDtoString(e, i.userAttributeMap.id, i.userIDisOctetString)
 		if err != nil {
-			i.logger.Warn().Str("dn", e.DN).Str(i.userAttributeMap.id, e.GetAttributeValue(i.userAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
+			i.logger.Warn().Str("dn", e.DN).Str(i.userAttributeMap.id, e.GetEqualFoldAttributeValue(i.userAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
 			return nil, errorcode.New(errorcode.GeneralException, "error converting uuid")
 		}
 		if id != user.GetId() {
@@ -815,7 +815,7 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	opsan := e.GetEqualFoldAttributeValue(i.userAttributeMap.userName)
 	id, err := i.ldapUUIDtoString(e, i.userAttributeMap.id, i.userIDisOctetString)
 	if err != nil {
-		i.logger.Warn().Str("dn", e.DN).Str(i.userAttributeMap.id, e.GetAttributeValue(i.userAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
+		i.logger.Warn().Str("dn", e.DN).Str(i.userAttributeMap.id, e.GetEqualFoldAttributeValue(i.userAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
 	}
 	surname := e.GetEqualFoldAttributeValue(i.userAttributeMap.surname)
 
@@ -887,7 +887,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 	}
 
 	if !i.useServerUUID {
-		attrs["owncloudUUID"] = []string{uuid.New().String()}
+		attrs[i.userAttributeMap.id] = []string{uuid.New().String()}
 	}
 
 	if user.AccountEnabled != nil {

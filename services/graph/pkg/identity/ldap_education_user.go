@@ -90,7 +90,7 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 	if user.GetId() != "" {
 		id, err := i.ldapUUIDtoString(e, i.userAttributeMap.id, i.userIDisOctetString)
 		if err != nil {
-			i.logger.Warn().Str("dn", e.DN).Str(i.userAttributeMap.id, e.GetAttributeValue(i.userAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
+			i.logger.Warn().Str("dn", e.DN).Str(i.userAttributeMap.id, e.GetEqualFoldAttributeValue(i.userAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
 			return nil, errorcode.New(errorcode.GeneralException, "error converting uuid")
 		}
 		if id != user.GetId() {
