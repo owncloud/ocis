@@ -855,7 +855,6 @@ def codestyle(ctx):
                     "ref": [
                         "refs/heads/master",
                         "refs/pull/**",
-                        "refs/tags/**",
                     ],
                 },
             }
