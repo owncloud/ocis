@@ -18,7 +18,7 @@ Feature: propfind extracted props
       | propertyName |
       | oc:audio     |
     Then the HTTP status code should be "207"
-    And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a space "new-space" with these key and value pairs:
       | key                | value                          |
       | oc:audio/oc:album  | ALBUM1234567890123456789012345 |
       | oc:audio/oc:artist | ARTIST123456789012345678901234 |
@@ -32,7 +32,7 @@ Feature: propfind extracted props
       | oc:location  |
       | oc:photo     |
     Then the HTTP status code should be "207"
-    And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a space "new-space" with these key and value pairs:
       | key                              | value                |
       | oc:image/oc:width                | 640                  |
       | oc:image/oc:height               | 480                  |
@@ -51,7 +51,7 @@ Feature: propfind extracted props
       | propertyName |
       | oc:audio     |
     Then the HTTP status code should be "207"
-    And the "PROPFIND" response to user "Alice" should contain a mountpoint "testaudio.mp3" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a mountpoint "testaudio.mp3" with these key and value pairs:
       | key                | value                          |
       | oc:audio/oc:album  | ALBUM1234567890123456789012345 |
       | oc:audio/oc:artist | ARTIST123456789012345678901234 |
@@ -65,7 +65,7 @@ Feature: propfind extracted props
       | oc:location  |
       | oc:photo     |
     Then the HTTP status code should be "207"
-    And the "PROPFIND" response to user "Alice" should contain a mountpoint "testavatar.jpg" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a mountpoint "testavatar.jpg" with these key and value pairs:
       | key                              | value                |
       | oc:image/oc:width                | 640                  |
       | oc:image/oc:height               | 480                  |
@@ -101,7 +101,7 @@ Feature: propfind extracted props
       | propertyName |
       | oc:audio     |
     Then the HTTP status code should be "207"
-    And the "PROPFIND" response to user "Brian" should contain a space "Shares" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a space "Shares" with these key and value pairs:
       | key                | value                          |
       | oc:audio/oc:album  | ALBUM1234567890123456789012345 |
       | oc:audio/oc:artist | ARTIST123456789012345678901234 |
@@ -115,7 +115,7 @@ Feature: propfind extracted props
       | oc:location  |
       | oc:photo     |
     Then the HTTP status code should be "207"
-    And the "PROPFIND" response to user "Brian" should contain a space "Shares" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a space "Shares" with these key and value pairs:
       | key                              | value                |
       | oc:image/oc:width                | 640                  |
       | oc:image/oc:height               | 480                  |

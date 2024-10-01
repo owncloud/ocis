@@ -10,47 +10,8 @@ Feature: propfind a shares
       | Brian    |
       | Carol    |
 
-  @issue-4421
+  @issue-4421 @issue-9933
   Scenario Outline: sharee PROPFIND same name shares shared by multiple users
-    Given using spaces DAV path
-    And user "Alice" has uploaded file with content "to share" to "textfile.txt"
-    And user "Alice" has created folder "folderToShare"
-    And user "Carol" has uploaded file with content "to share" to "textfile.txt"
-    And user "Carol" has created folder "folderToShare"
-    And user "Alice" has sent the following resource share invitation:
-      | resource        | <resource> |
-      | space           | Personal   |
-      | sharee          | Brian      |
-      | shareType       | user       |
-      | permissionsRole | Viewer     |
-    And user "Brian" has a share "<resource>" synced
-    And user "Carol" has sent the following resource share invitation:
-      | resource        | <resource> |
-      | space           | Personal   |
-      | sharee          | Brian      |
-      | shareType       | user       |
-      | permissionsRole | Viewer     |
-    And user "Brian" has a share "<resource-2>" synced
-    When user "Brian" sends PROPFIND request to space "Shares" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the "PROPFIND" response to user "Brian" should contain a space "Shares" with these key and value pairs:
-      | key       | value         |
-      | oc:fileid | UUIDof:Shares |
-    And the "PROPFIND" response to user "Brian" should contain a mountpoint "Shares" with these key and value pairs:
-      | key            | value      |
-      | oc:name        | <resource> |
-      | oc:permissions | S          |
-    And the "PROPFIND" response to user "Brian" should contain a mountpoint "Shares" with these key and value pairs:
-      | key            | value        |
-      | oc:name        | <resource-2> |
-      | oc:permissions | S            |
-    Examples:
-      | resource      | resource-2        |
-      | textfile.txt  | textfile (1).txt  |
-      | folderToShare | folderToShare (1) |
-
-  @issue-4421 @issue-9933 @skip
-  Scenario Outline: sharee PROPFIND same name shares shared by multiple users using new dav path
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And user "Alice" has created folder "folderToShare"
@@ -70,22 +31,22 @@ Feature: propfind a shares
       | shareType       | user       |
       | permissionsRole | Viewer     |
     And user "Brian" has a share "<resource-2>" synced
-    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "Shares" using the WebDAV API
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "/" using the WebDAV API
     Then the HTTP status code should be "207"
-    And the "PROPFIND" response to user "Brian" should contain a space "Shares" with these key and value pairs:
-      | key       | value         |
-      | oc:fileid | UUIDof:Shares |
-      | oc:name   | Shares        |
-    And the "PROPFIND" response to user "Brian" should contain a mountpoint "Shares" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a space "Shares" with these key and value pairs:
+      | key       | value             |
+      | oc:fileid | %file_id_pattern% |
+      | oc:name   | Shares            |
+    And as user "Brian" the PROPFIND response should contain a mountpoint "<resource>" with these key and value pairs:
       | key            | value             |
-      | oc:fileid      | UUIDof:<resource> |
+      | oc:fileid      | %file_id_pattern% |
       | oc:name        | <resource>        |
       | oc:permissions | S                 |
-    And the "PROPFIND" response to user "Brian" should contain a mountpoint "Shares" with these key and value pairs:
-      | key            | value               |
-      | oc:fileid      | UUIDof:<resource-2> |
-      | oc:name        | <resource-2>        |
-      | oc:permissions | S                   |
+    And as user "Brian" the PROPFIND response should contain a mountpoint "<resource-2>" with these key and value pairs:
+      | key            | value             |
+      | oc:fileid      | %file_id_pattern% |
+      | oc:name        | <resource-2>      |
+      | oc:permissions | S                 |
     Examples:
       | dav-path-version | resource      | resource-2        |
       | old              | textfile.txt  | textfile (1).txt  |
@@ -93,8 +54,8 @@ Feature: propfind a shares
       | new              | textfile.txt  | textfile (1).txt  |
       | new              | folderToShare | folderToShare (1) |
 
-  @issue-4421 @issue-9933 @skip
-  Scenario: sharee PROPFIND shares with bracket in the name
+  @issue-4421 @issue-9933
+  Scenario: sharee PROPFIND a share having bracket in the name
     Given using spaces DAV path
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "to share" to "folderToShare/textfile.txt"
@@ -116,16 +77,16 @@ Feature: propfind a shares
     And user "Brian" has a share "folderToShare (1)" synced
     When user "Brian" sends PROPFIND request from the space "Shares" to the resource "folderToShare (1)" using the WebDAV API
     Then the HTTP status code should be "207"
-    And the "PROPFIND" response to user "Brian" should contain a mountpoint "folderToShare (1)" with these key and value pairs:
-      | key            | value                    |
-      | oc:fileid      | UUIDof:folderToShare (1) |
-      | oc:name        | folderToShare            |
-      | oc:permissions | S                        |
-    And the "PROPFIND" response to user "Brian" should contain a mountpoint "folderToShare (1)" with these key and value pairs:
-      | key            | value               |
-      | oc:fileid      | UUIDof:textfile.txt |
-      | oc:name        | textfile.txt        |
-      | oc:permissions | S                   |
+    And as user "Brian" the PROPFIND response should contain a mountpoint "folderToShare (1)" with these key and value pairs:
+      | key            | value              |
+      | oc:fileid      | %share_id_pattern% |
+      | oc:name        | folderToShare      |
+      | oc:permissions | S                  |
+    And as user "Brian" the PROPFIND response should contain a mountpoint "textfile.txt" with these key and value pairs:
+      | key            | value             |
+      | oc:fileid      | %file_id_pattern% |
+      | oc:name        | textfile.txt      |
+      | oc:permissions |                   |
 
 
   Scenario Outline: check file-id from PROPFIND with shared-with-me drive-item-id
