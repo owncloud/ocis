@@ -78,9 +78,9 @@ The following sections list the changes for unreleased.
 * Enhancement - Remove METADATA_BACKEND: [#10113](https://github.com/owncloud/ocis/pull/10113)
 * Enhancement - Load CSP configuration file if it exists: [#10139](https://github.com/owncloud/ocis/pull/10139)
 * Enhancement - FileDownloaded Activity: [#10161](https://github.com/owncloud/ocis/pull/10161)
-* Enhancement - Bump reva: [#10172](https://github.com/owncloud/ocis/pull/10172)
 * Enhancement - Add WOPI host URLs to the collaboration service: [#10174](https://github.com/owncloud/ocis/pull/10174)
 * Enhancement - Update web to v10.3.0: [#10177](https://github.com/owncloud/ocis/pull/10177)
+* Enhancement - Bump reva to 2.25.0: [#10194](https://github.com/owncloud/ocis/pull/10194)
 
 ## Details
 
@@ -259,14 +259,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10161
 
-* Enhancement - Bump reva: [#10172](https://github.com/owncloud/ocis/pull/10172)
-
-   Bumps reva version
-
-   https://github.com/owncloud/ocis/pull/10172
-   https://github.com/owncloud/ocis/pull/10157
-   https://github.com/owncloud/ocis/pull/9817
-
 * Enhancement - Add WOPI host URLs to the collaboration service: [#10174](https://github.com/owncloud/ocis/pull/10174)
 
    We added the WOPI host urls to create a better integration with WOPI clients.
@@ -308,6 +300,28 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10177
    https://github.com/owncloud/web/releases/tag/v10.3.0
+
+* Enhancement - Bump reva to 2.25.0: [#10194](https://github.com/owncloud/ocis/pull/10194)
+
+  *   Bugfix [cs3org/reva#4854](https://github.com/cs3org/reva/pull/4854): Added ShareUpdate activity
+  *   Bugfix [cs3org/reva#4865](https://github.com/cs3org/reva/pull/4865): Better response codes for app new endpoint
+  *   Bugfix [cs3org/reva#4858](https://github.com/cs3org/reva/pull/4858): Better response codes for app new endpoint
+  *   Bugfix [cs3org/reva#4867](https://github.com/cs3org/reva/pull/4867): Fix remaining space calculation for S3 blobstore
+  *   Bugfix [cs3org/reva#4852](https://github.com/cs3org/reva/pull/4852): Populate public link user correctly
+  *   Bugfix [cs3org/reva#4859](https://github.com/cs3org/reva/pull/4859): Fixed the collaboration service registration
+  *   Bugfix [cs3org/reva#4835](https://github.com/cs3org/reva/pull/4835): Fix sharejail stat id
+  *   Bugfix [cs3org/reva#4856](https://github.com/cs3org/reva/pull/4856): Fix time conversion
+  *   Bugfix [cs3org/reva#4851](https://github.com/cs3org/reva/pull/4851): Use gateway selector in sciencemesh
+  *   Bugfix [cs3org/reva#4850](https://github.com/cs3org/reva/pull/4850): Write upload session info atomically
+  *   Enhancement [cs3org/reva#4866](https://github.com/cs3org/reva/pull/4866): Unit test the json ocm invite manager
+  *   Enhancement [cs3org/reva#4847](https://github.com/cs3org/reva/pull/4847): Add IsVersion to UploadReadyEvent
+  *   Enhancement [cs3org/reva#4868](https://github.com/cs3org/reva/pull/4868): Improve metadata client errors
+  *   Enhancement [cs3org/reva#4848](https://github.com/cs3org/reva/pull/4848): Add trashbin support to posixfs alongside other improvements
+
+   https://github.com/owncloud/ocis/pull/10194
+   https://github.com/owncloud/ocis/pull/10172
+   https://github.com/owncloud/ocis/pull/10157
+   https://github.com/owncloud/ocis/pull/9817
 
 # Changelog for [6.4.0] (2024-09-12)
 
