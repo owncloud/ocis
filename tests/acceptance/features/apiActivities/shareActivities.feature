@@ -1104,3 +1104,467 @@ Feature: check share activity
       | permissionsRole | Viewer       |
     When user "Brian" tries to list the activities of file "anotherTextfile.txt" from space "Personal" owned by user "Alice" using the Graph API
     Then the HTTP status code should be "403"
+
+  @issue-9676
+  Scenario: user checks public activities of a link shared file
+    Given using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | permissionsRole | edit         |
+      | password        | %public%     |
+    And the public has uploaded file "textfile.txt" with content "public test" and password "%public%" to the last link share using the public WebDAV API
+    When user "Alice" lists the activities of file "textfile.txt" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} shared {resource} via link"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {resource} in {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder","resource","user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "textfile.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "[a-zA-z]{15}"
+                                },
+                                "displayName": {
+                                  "const": "Public"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+  @issue-9676
+  Scenario: user checks public activities of a link shared folder
+    Given using SharingNG
+    And user "Alice" has created folder "/FOLDER"
+    And user "Alice" has created the following resource link share:
+      | resource        | /FOLDER  |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
+    And the public has uploaded file "text.txt" with content "added by public user" and password "%public%" to the last link share using the public WebDAV API
+    And the public has uploaded file "text.txt" with content "updated by public user" and password "%public%" to the last link share using the public WebDAV API
+    And the public has deleted file "text.txt" from the last link share with password "%public%" using the public WebDAV API
+    When user "Alice" lists the activities of file "/FOLDER" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 5,
+            "maxItems": 5,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder","resource","user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} shared {resource} via link"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder","resource","user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder","resource","user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "text.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "[a-zA-z]{15}"
+                                },
+                                "displayName": {
+                                  "const": "Public"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {resource} in {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder","resource","user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "text.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "[a-zA-z]{15}"
+                                },
+                                "displayName": {
+                                  "const": "Public"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} deleted {resource} from {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder","resource","user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "text.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "[a-zA-z]{15}"
+                                },
+                                "displayName": {
+                                  "const": "Public"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+

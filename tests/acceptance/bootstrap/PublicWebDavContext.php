@@ -123,24 +123,23 @@ class PublicWebDavContext implements Context {
 
 	/**
 	 * @param string $fileName
-	 * @param string $publicWebDAVAPIVersion
 	 * @param string $password
 	 *
 	 * @return ResponseInterface
 	 */
-	public function deleteFileFromPublicShare(string $fileName, string $publicWebDAVAPIVersion, string $password = ""):ResponseInterface {
+	public function deleteFileFromPublicShare(string $fileName, string $password = ""):ResponseInterface {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			$token,
 			0,
-			"public-files-$publicWebDAVAPIVersion"
+			"public-files-new"
 		);
 		$password = $this->featureContext->getActualPassword($password);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath$fileName";
 		$userName = $this->getUsernameForPublicWebdavApi(
 			$token,
 			$password,
-			$publicWebDAVAPIVersion
+			"new"
 		);
 		$headers = [
 			'X-Requested-With' => 'XMLHttpRequest'
@@ -155,20 +154,29 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @When /^the public deletes (?:file|folder|entry) "([^"]*)" from the last public link share using the password "([^"]*)" and (old|new) public WebDAV API$/
+	 * @Given /^the public has deleted (?:file|folder|entry) "([^"]*)" from the last link share with password "([^"]*)" using the public WebDAV API$/
 	 *
 	 * @param string $file
 	 * @param string $password
-	 * @param string $publicWebDAVAPIVersion
 	 *
 	 * @return void
 	 */
-	public function thePublicDeletesFileFromTheLastPublicShareUsingThePasswordPasswordAndOldPublicWebdavApi(string $file, string $password, string $publicWebDAVAPIVersion):void {
-		if ($publicWebDAVAPIVersion === "old") {
-			return;
-		}
+	public function thePublicHasDeletedFileFromTheLastLinkShareWithPasswordUsingPublicWebdavApi(string $file, string $password): void {
+		$response = $this->deleteFileFromPublicShare($file, $password);
+		$this->featureContext->theHTTPStatusCodeShouldBe([201, 204], "", $response);
+	}
+
+	/**
+	 * @When /^the public deletes (?:file|folder|entry) "([^"]*)" from the last link share with password "([^"]*)" using the public WebDAV API$/
+	 *
+	 * @param string $file
+	 * @param string $password
+	 *
+	 * @return void
+	 */
+	public function thePublicDeletesFileFromTheLastLinkShareWithPasswordUsingPublicWebdavApi(string $file, string $password): void {
 		$this->featureContext->setResponse(
-			$this->deleteFileFromPublicShare($file, $publicWebDAVAPIVersion, $password)
+			$this->deleteFileFromPublicShare($file, $password)
 		);
 		$this->featureContext->pushToLastStatusCodesArrays();
 	}
@@ -534,7 +542,6 @@ class PublicWebDavContext implements Context {
 	 * @param string $filename target file name
 	 * @param string $password
 	 * @param string $body content to upload
-	 * @param string $publicWebDAVAPIVersion
 	 *
 	 * @return ResponseInterface
 	 */
@@ -542,7 +549,6 @@ class PublicWebDavContext implements Context {
 		string $filename,
 		string $password = '',
 		string $body = 'test',
-		string $publicWebDAVAPIVersion = "old"
 	):ResponseInterface {
 		return $this->publicUploadContent(
 			$filename,
@@ -550,8 +556,25 @@ class PublicWebDavContext implements Context {
 			$body,
 			true,
 			[],
-			$publicWebDAVAPIVersion
 		);
+	}
+
+	/**
+	 * @Given /^the public has uploaded file "([^"]*)" with content "([^"]*)" and password "([^"]*)" to the last link share using the public WebDAV API$/
+	 *
+	 * @param string $filename
+	 * @param string $content
+	 * @param string $password
+	 *
+	 * @return void
+	 */
+	public function thePublicHasUploadedFileWithContentAndPasswordToLastLinkShareUsingPublicWebdavApi(string $filename, string $content = 'test', string $password = ''): void {
+		$response = $this->publiclyUploadingContentWithPassword(
+			$filename,
+			$password,
+			$content,
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe([201, 204], "", $response);
 	}
 
 	/**
@@ -1690,7 +1713,6 @@ class PublicWebDavContext implements Context {
 	 * @param string $body
 	 * @param bool $autoRename
 	 * @param array $additionalHeaders
-	 * @param string $publicWebDAVAPIVersion
 	 *
 	 * @return ResponseInterface|null
 	 */
@@ -1700,11 +1722,7 @@ class PublicWebDavContext implements Context {
 		string $body = 'test',
 		bool $autoRename = false,
 		array $additionalHeaders = [],
-		string $publicWebDAVAPIVersion = "old"
 	):?ResponseInterface {
-		if ($publicWebDAVAPIVersion === "old") {
-			return null;
-		}
 		$password = $this->featureContext->getActualPassword($password);
 		if ($this->featureContext->isUsingSharingNG()) {
 			$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
@@ -1714,13 +1732,13 @@ class PublicWebDavContext implements Context {
 		$davPath = WebDavHelper::getDavPath(
 			$token,
 			0,
-			"public-files-$publicWebDAVAPIVersion"
+			"public-files-new"
 		);
 		$url = $this->featureContext->getBaseUrl() . "/$davPath";
 		$userName = $this->getUsernameForPublicWebdavApi(
 			$token,
 			$password,
-			$publicWebDAVAPIVersion
+			"new"
 		);
 
 		$filename = \implode(

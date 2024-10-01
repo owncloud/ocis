@@ -19,7 +19,7 @@ Feature: changing a public link share
       | space           | Personal           |
       | permissionsRole | <permissions-role> |
       | password        | %public%           |
-    When the public deletes file "parent.txt" from the last public link share using the password "%public%" and new public WebDAV API
+    When the public deletes file "parent.txt" from the last link share with password "%public%" using the public WebDAV API
     Then the HTTP status code should be "<http-status-code>"
     And as "Alice" file "PARENT/parent.txt" <should-or-not> exist
     Examples:
@@ -62,7 +62,7 @@ Feature: changing a public link share
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When the public deletes file "parent.txt" from the last public link share using the password "invalid" and new public WebDAV API
+    When the public deletes file "parent.txt" from the last link share with password "invalid" using the public WebDAV API
     Then the HTTP status code should be "401"
     And as "Alice" file "PARENT/parent.txt" should exist
 
@@ -74,7 +74,7 @@ Feature: changing a public link share
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When the public deletes file "parent.txt" from the last public link share using the password "%public%" and new public WebDAV API
+    When the public deletes file "parent.txt" from the last link share with password "%public%" using the public WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" file "PARENT/parent.txt" should not exist
 
@@ -149,7 +149,7 @@ Feature: changing a public link share
       | space           | Personal   |
       | permissionsRole | createOnly |
       | password        | %public%   |
-    When the public deletes file "parent.txt" from the last public link share using the password "%public%" and new public WebDAV API
+    When the public deletes file "parent.txt" from the last link share with password "%public%" using the public WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "PARENT/parent.txt" should exist
 
