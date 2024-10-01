@@ -152,7 +152,7 @@ func (i *LDAP) UpdateEducationClass(ctx context.Context, id string, class libreg
 	if class.GetId() != "" {
 		id, err := i.ldapUUIDtoString(g, i.groupAttributeMap.id, i.groupIDisOctetString)
 		if err != nil {
-			i.logger.Warn().Str("dn", g.DN).Str(i.userAttributeMap.id, g.GetAttributeValue(i.userAttributeMap.id)).Msg("Invalid class. Cannot convert UUID")
+			i.logger.Warn().Str("dn", g.DN).Str(i.userAttributeMap.id, g.GetEqualFoldAttributeValue(i.userAttributeMap.id)).Msg("Invalid class. Cannot convert UUID")
 			return nil, errorcode.New(errorcode.GeneralException, "error converting uuid")
 		}
 		if id != class.GetId() {

@@ -556,7 +556,7 @@ func (i *LDAP) createGroupModelFromLDAP(e *ldap.Entry) *libregraph.Group {
 	name := e.GetEqualFoldAttributeValue(i.groupAttributeMap.name)
 	id, err := i.ldapUUIDtoString(e, i.groupAttributeMap.id, i.groupIDisOctetString)
 	if err != nil {
-		i.logger.Warn().Str("dn", e.DN).Str(i.groupAttributeMap.id, e.GetAttributeValue(i.groupAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
+		i.logger.Warn().Str("dn", e.DN).Str(i.groupAttributeMap.id, e.GetEqualFoldAttributeValue(i.groupAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
 	}
 	groupTypes := []string{}
 
