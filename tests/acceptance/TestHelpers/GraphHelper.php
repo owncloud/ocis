@@ -132,7 +132,7 @@ class GraphHelper {
 	 *
 	 * @return string regex pattern
 	 */
-	public static function sanitizeRegexPattern(string $pattern): string {
+	public static function jsonSchemaRegexToPureRegex(string $pattern): string {
 		$pattern = \str_replace("\\\\", "\\", $pattern);
 		$pattern = \str_replace("/", "\/", $pattern);
 		$pattern = \preg_replace('/^\^/', '', $pattern);

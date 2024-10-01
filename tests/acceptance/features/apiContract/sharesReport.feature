@@ -25,8 +25,8 @@ Feature: REPORT request to Shares space
     When user "Brian" searches for "SubFolder1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And as user "Brian" the REPORT response should contain a mountpoint "SubFolder1" with these key and value pairs:
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Brian" the REPORT response should contain a resource "SubFolder1" with these key and value pairs:
       | key               | value                |
       | oc:fileid         | %file_id_pattern%    |
       | oc:file-parent    | %file_id_pattern%    |
@@ -47,8 +47,8 @@ Feature: REPORT request to Shares space
     When user "Brian" searches for "frodo.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And as user "Brian" the REPORT response should contain a mountpoint "frodo.txt" with these key and value pairs:
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Brian" the REPORT response should contain a resource "frodo.txt" with these key and value pairs:
       | key                | value             |
       | oc:fileid          | %file_id_pattern% |
       | oc:file-parent     | %file_id_pattern% |
@@ -77,7 +77,7 @@ Feature: REPORT request to Shares space
     When user "Brian" searches for "folderToBrian" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
+      | X-Request-Id | %request_id_pattern% |
     And the search result should contain "0" entries
     Examples:
       | dav-path-version |
@@ -99,8 +99,8 @@ Feature: REPORT request to Shares space
     When user "Brian" searches for "secureFolder" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And as user "Brian" the REPORT response should contain a mountpoint "secureFolder" with these key and value pairs:
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Brian" the REPORT response should contain a resource "secureFolder" with these key and value pairs:
       | key               | value                |
       | oc:shareroot      | /secureFolder        |
       | oc:name           | secureFolder         |
@@ -110,9 +110,9 @@ Feature: REPORT request to Shares space
       | oc:remote-item-id | %file_id_pattern%    |
     When user "Brian" searches for "secure.txt" using the WebDAV API
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
+      | X-Request-Id | %request_id_pattern% |
     Then the HTTP status code should be "207"
-    And as user "Brian" the REPORT response should contain a mountpoint "secure.txt" with these key and value pairs:
+    And as user "Brian" the REPORT response should contain a resource "secure.txt" with these key and value pairs:
       | key                | value         |
       | oc:shareroot       | /secureFolder |
       | oc:name            | secure.txt    |
@@ -139,8 +139,8 @@ Feature: REPORT request to Shares space
     When user "Brian" searches for "secure.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And as user "Brian" the REPORT response should contain a mountpoint "secure.txt" with these key and value pairs:
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Brian" the REPORT response should contain a resource "secure.txt" with these key and value pairs:
       | key                | value       |
       | oc:shareroot       | /secure.txt |
       | oc:name            | secure.txt  |

@@ -37,12 +37,12 @@ Feature: propfind a shares
       | key       | value             |
       | oc:fileid | %file_id_pattern% |
       | oc:name   | Shares            |
-    And as user "Brian" the PROPFIND response should contain a mountpoint "<resource>" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a resource "<resource>" with these key and value pairs:
       | key            | value             |
       | oc:fileid      | %file_id_pattern% |
       | oc:name        | <resource>        |
       | oc:permissions | S                 |
-    And as user "Brian" the PROPFIND response should contain a mountpoint "<resource-2>" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a resource "<resource-2>" with these key and value pairs:
       | key            | value             |
       | oc:fileid      | %file_id_pattern% |
       | oc:name        | <resource-2>      |
@@ -77,12 +77,12 @@ Feature: propfind a shares
     And user "Brian" has a share "folderToShare (1)" synced
     When user "Brian" sends PROPFIND request from the space "Shares" to the resource "folderToShare (1)" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Brian" the PROPFIND response should contain a mountpoint "folderToShare (1)" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a resource "folderToShare (1)" with these key and value pairs:
       | key            | value              |
       | oc:fileid      | %share_id_pattern% |
       | oc:name        | folderToShare      |
       | oc:permissions | S                  |
-    And as user "Brian" the PROPFIND response should contain a mountpoint "textfile.txt" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a resource "textfile.txt" with these key and value pairs:
       | key            | value             |
       | oc:fileid      | %file_id_pattern% |
       | oc:name        | textfile.txt      |

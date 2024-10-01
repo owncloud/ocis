@@ -17,7 +17,7 @@ Feature: lock files
     Then the HTTP status code should be "200"
     When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "Alice Hansen" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "textfile.txt" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
@@ -39,7 +39,7 @@ Feature: lock files
     Then the HTTP status code should be "200"
     When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "Alice Hansen" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "textfile.txt" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
@@ -61,7 +61,7 @@ Feature: lock files
     Then the HTTP status code should be "200"
     When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "Alice Hansen" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "textfile.txt" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
@@ -104,7 +104,7 @@ Feature: lock files
     Then the HTTP status code should be "200"
     When user "Brian" sends PROPFIND request from the space "Project" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Brian" the PROPFIND response should contain a space "Alice Hansen" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a resource "textfile.txt" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
@@ -133,7 +133,7 @@ Feature: lock files
     Then the HTTP status code should be "200"
     When user "Brian" sends PROPFIND request from the space "Project" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Brian" the PROPFIND response should contain a space "Alice Hansen" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a resource "textfile.txt" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
@@ -179,7 +179,7 @@ Feature: lock files
     Then the HTTP status code should be "200"
     When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "Alice Hansen" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "textfile.txt" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
@@ -206,7 +206,7 @@ Feature: lock files
     Then the HTTP status code should be "200"
     When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "Alice Hansen" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "textfile.txt" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
@@ -253,7 +253,7 @@ Feature: lock files
     Then the HTTP status code should be "423"
     When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "Alice Hansen" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "textfile.txt" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/oc:ownername            | Alice Hansen |
@@ -277,7 +277,7 @@ Feature: lock files
     Then the HTTP status code should be "423"
     When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "textfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "Alice Hansen" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "textfile.txt" with these key and value pairs:
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |

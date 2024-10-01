@@ -30,7 +30,7 @@ Feature: Tag
     Then the HTTP status code should be "200"
     When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "use-tag" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "folderMain" with these key and value pairs:
       | key     | value                                      |
       | oc:tags | tag level#1,tag with symbols @^$#^%$@%!_+) |
     When user "Alice" creates the following tags for file "folderMain/insideTheFolder.txt" of space "use-tag":
@@ -38,7 +38,7 @@ Feature: Tag
     Then the HTTP status code should be "200"
     When user "Brian" sends PROPFIND request from the space "use-tag" to the resource "folderMain/insideTheFolder.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "use-tag" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "insideTheFolder.txt" with these key and value pairs:
       | key     | value   |
       | oc:tags | fileTag |
     When user "Alice" lists all available tags via the Graph API
@@ -68,12 +68,12 @@ Feature: Tag
     Then the HTTP status code should be "200"
     When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a mountpoint "folderMain" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "folderMain" with these key and value pairs:
       | key     | value            |
       | oc:tags | my tag,important |
     When user "Alice" sends PROPFIND request from the space "Alice Hansen" to the resource "file.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a mountpoint "file.txt" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "file.txt" with these key and value pairs:
       | key     | value                                 |
       | oc:tags | fileTag,tag with symbol @^$#^%$@%!_+) |
     When user "Alice" lists all available tags via the Graph API
@@ -188,7 +188,7 @@ Feature: Tag
       | marketing |
     And user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "use-tag" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "folderMain" with these key and value pairs:
       | key     | value       |
       | oc:tags | development |
 
@@ -268,7 +268,7 @@ Feature: Tag
     Then the HTTP status code should be "200"
     When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "use-tag" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "folderMain" with these key and value pairs:
       | key     | value         |
       | oc:tags | finance,नेपाल |
     When user "Alice" creates the following tags for file "folderMain/insideTheFolder.txt" of space "use-tag":
@@ -276,7 +276,7 @@ Feature: Tag
     Then the HTTP status code should be "200"
     When user "Brian" sends PROPFIND request from the space "use-tag" to the resource "folderMain/insideTheFolder.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Alice" the PROPFIND response should contain a space "use-tag" with these key and value pairs:
+    And as user "Alice" the PROPFIND response should contain a resource "insideTheFolder.txt" with these key and value pairs:
       | key     | value          |
       | oc:tags | file,नेपाल,Tag |
     When user "Alice" lists all available tags via the Graph API
@@ -295,8 +295,8 @@ Feature: Tag
       | engineering,finance,qa |
     Then the HTTP status code should be "200"
     When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" with depth "0" using the WebDAV API
-    Then the HTTP status code should be "207":
-    And as user "Alice" the PROPFIND response should contain a space "use-tag" with these key and value pairs:
+    Then the HTTP status code should be "207"
+    And as user "Alice" the PROPFIND response should contain a resource "folderMain" with these key and value pairs:
       | key     | value                     |
       | oc:tags | engineering,finance,hr,qa |
     When user "Alice" lists all available tags via the Graph API

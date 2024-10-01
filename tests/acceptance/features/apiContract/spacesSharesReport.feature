@@ -30,8 +30,8 @@ Feature: Report test
     When user "Brian" searches for "SubFolder1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And as user "Brian" the REPORT response should contain a mountpoint "folderMain" with these key and value pairs:
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Brian" the REPORT response should contain a resource "SubFolder1" with these key and value pairs:
       | key               | value                |
       | oc:fileid         | %file_id_pattern%    |
       | oc:file-parent    | %file_id_pattern%    |
@@ -54,8 +54,8 @@ Feature: Report test
     When user "Brian" searches for "insideTheFolder.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And as user "Brian" the REPORT response should contain a mountpoint "insideTheFolder.txt" with these key and value pairs:
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Brian" the REPORT response should contain a resource "insideTheFolder.txt" with these key and value pairs:
       | key                | value               |
       | oc:fileid          | %file_id_pattern%   |
       | oc:file-parent     | %file_id_pattern%   |
@@ -78,5 +78,5 @@ Feature: Report test
     When user "Brian" searches for "folderMain" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
+      | X-Request-Id | %request_id_pattern% |
     And the search result should contain "0" entries

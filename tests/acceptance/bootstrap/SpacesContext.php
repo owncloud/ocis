@@ -3775,7 +3775,7 @@ class SpacesContext implements Context {
 			if ($resource === '' || $resource === '/') {
 				$resource = $spaceName;
 			} else {
-				$resource = $spaceName . '/' . $resource;
+				$resource = "$spaceName/$resource";
 			}
 		}
 
@@ -3795,44 +3795,44 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^as user "([^"]*)" the (PROPFIND|REPORT) response should contain a (mountpoint|space) "([^"]*)" with these key and value pairs:$/
+	 * @Then /^as user "([^"]*)" the (PROPFIND|REPORT) response should contain a (resource|space) "([^"]*)" with these key and value pairs:$/
 	 *
 	 * @param string $user
 	 * @param string $method # method should be either PROPFIND or REPORT
-	 * @param string $type	# type should be either mountpoint or space
-	 * @param string $mountPoint
+	 * @param string $type	# type should be either resource or space
+	 * @param string $resource
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function asUsertheXMLResponseShouldContainMountpointWithTheseKeyAndValuePair(string $user, string $method, string $type, string $mountPoint, TableNode $table): void {
+	public function asUsertheXMLResponseShouldContainMountpointWithTheseKeyAndValuePair(string $user, string $method, string $type, string $resource, TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
 		if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES && $type === 'space') {
-			$space = $this->getSpaceByName($user, $mountPoint);
-			$mountPoint = $space['id'];
+			$space = $this->getSpaceByName($user, $resource);
+			$resource = $space['id'];
 		} else {
-			$mountPoint = \rawurlencode($mountPoint);
+			$resource = \rawurlencode($resource);
 		}
-		$this->theXMLResponseShouldContain($mountPoint, $table);
+		$this->theXMLResponseShouldContain($resource, $table);
 	}
 
 	/**
-	 * @param string $spaceNameOrMountPoint # an entity inside a space, or the space name itself
+	 * @param string $resource
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function theXMLResponseShouldContain(string $spaceNameOrMountPoint, TableNode $table): void {
+	public function theXMLResponseShouldContain(string $resource, TableNode $table): void {
 		$xmlResponse = $this->featureContext->getResponseXml();
-		$hrefs = array_map(fn($href) => $href->__toString(), $xmlResponse->xpath("//d:response/d:href"));
+		$hrefs = array_map(fn ($href) => $href->__toString(), $xmlResponse->xpath("//d:response/d:href"));
 
 		$currentHref = '';
 		foreach ($hrefs as $href) {
-			if (\str_ends_with(\rtrim($href, "/"), "/$spaceNameOrMountPoint")) {
+			if (\str_ends_with(\rtrim($href, "/"), "/$resource")) {
 				$currentHref = $href;
 				break;
 			}
@@ -3851,15 +3851,15 @@ class SpacesContext implements Context {
 
 			switch ($itemToFind) {
 				case "oc:fileid":
-					$expectedValue = GraphHelper::sanitizeRegexPattern($expectedValue);
+					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
 					Assert::assertRegExp($expectedValue, $actualValue, 'wrong "fileid" in the response');
 					break;
 				case "oc:file-parent":
-					$expectedValue = GraphHelper::sanitizeRegexPattern($expectedValue);
+					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
 					Assert::assertRegExp($expectedValue, $actualValue, 'wrong "file-parent" in the response');
 					break;
 				case "oc:privatelink":
-					$expectedValue = GraphHelper::sanitizeRegexPattern($expectedValue);
+					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
 					Assert::assertRegExp($expectedValue, $actualValue, 'wrong "privatelink" in the response');
 					break;
 				case "oc:tags":
@@ -3871,7 +3871,7 @@ class SpacesContext implements Context {
 
 					$actualTags = \explode(",", $actualValue);
 					\sort($actualTags);
-					$actualTags = \implode(",", $actualValue);
+					$actualTags = \implode(",", $actualTags);
 					Assert::assertEquals($expectedTags, $actualTags, "wrong '$itemToFind' in the response");
 					break;
 				case "d:lockdiscovery/d:activelock/d:timeout":
@@ -3887,7 +3887,7 @@ class SpacesContext implements Context {
 					}
 					break;
 				case "oc:remote-item-id":
-					$expectedValue = GraphHelper::sanitizeRegexPattern($expectedValue);
+					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
 					Assert::assertRegExp($expectedValue, $actualValue, 'wrong "remote-item-id" in the response');
 					break;
 				default:

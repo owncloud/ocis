@@ -18,7 +18,7 @@ Feature: Propfind test
     When user "Alice" sends PROPFIND request to space "new-space" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
+      | X-Request-Id | %request_id_pattern% |
     And as user "Alice" the PROPFIND response should contain a space "new-space" with these key and value pairs:
       | key            | value                     |
       | oc:fileid      | %file_id_pattern%         |
@@ -38,7 +38,7 @@ Feature: Propfind test
     When user "Brian" sends PROPFIND request to space "new-space" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
+      | X-Request-Id | %request_id_pattern% |
     And as user "Brian" the PROPFIND response should contain a space "new-space" with these key and value pairs:
       | key            | value                     |
       | oc:fileid      | %file_id_pattern%         |
@@ -46,7 +46,7 @@ Feature: Propfind test
       | oc:permissions | <oc-permission>           |
       | oc:privatelink | %base_url%/f/[0-9a-z-$%]+ |
       | oc:size        | 12                        |
-    Examples: 
+    Examples:
       | space-role   | oc-permission |
       | Manager      | RDNVCKZP      |
       | Space Editor | DNVCK         |
@@ -62,7 +62,7 @@ Feature: Propfind test
       | permissionsRole | <space-role> |
     When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Brian" the PROPFIND response should contain a mountpoint "folderMain" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a resource "folderMain" with these key and value pairs:
       | key            | value             |
       | oc:fileid      | %file_id_pattern% |
       | oc:file-parent | %file_id_pattern% |
@@ -85,7 +85,7 @@ Feature: Propfind test
       | permissionsRole | <space-role> |
     When user "Brian" sends PROPFIND request from the space "new-space" to the resource "folderMain/subFolder1/subFolder2" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Brian" the PROPFIND response should contain a mountpoint "subFolder2" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a resource "subFolder2" with these key and value pairs:
       | key            | value             |
       | oc:fileid      | %file_id_pattern% |
       | oc:file-parent | %file_id_pattern% |
@@ -108,7 +108,7 @@ Feature: Propfind test
       | permissionsRole | <space-role> |
     When user "Brian" sends PROPFIND request from the space "new-space" to the resource "testfile.txt" with depth "0" using the WebDAV API
     Then the HTTP status code should be "207"
-    And as user "Brian" the PROPFIND response should contain a mountpoint "testfile.txt" with these key and value pairs:
+    And as user "Brian" the PROPFIND response should contain a resource "testfile.txt" with these key and value pairs:
       | key            | value             |
       | oc:fileid      | %file_id_pattern% |
       | oc:file-parent | %file_id_pattern% |
