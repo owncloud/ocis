@@ -171,3 +171,58 @@ Feature: an user shares resources usin ScienceMesh application
         }
       }
       """
+
+
+  Scenario Outline: user tries to add federated user to a space
+    Given using server "LOCAL"
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And using server "LOCAL"
+    When user "Alice" sends the following space share invitation to federated user using the Graph API:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | federatedServer | @federation-ocis-server:10200  |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+       {
+         "type": "object",
+         "required": ["error"],
+         "properties": {
+           "error": {
+             "type": "object",
+             "required": [
+               "code",
+               "innererror",
+               "message"
+             ],
+             "properties": {
+               "code" : {
+                 "const": "invalidRequest"
+               },
+               "innererror" : {
+                 "type": "object",
+                 "required": [
+                   "date",
+                   "request-id"
+                 ]
+               },
+               "message" : {
+                 "const": "federated user can not become a space member"
+               }
+             }
+           }
+         }
+       }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |

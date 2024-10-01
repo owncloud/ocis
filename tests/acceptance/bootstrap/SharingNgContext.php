@@ -1803,4 +1803,22 @@ class SharingNgContext implements Context {
 			);
 		}
 	}
+
+	/**
+	 * @When /^user "([^"]*)" sends the following space share invitation to federated user using the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userSendsTheFollowingSpaceShareInvitationToFederatedUserUsingTheGraphApi(string $user, TableNode $table): void {
+		$rows = $table->getRowsHash();
+		Assert::assertArrayNotHasKey("resource", $rows, "'resource' should not be provided in the data-table while sharing a space");
+		$this->featureContext->setResponse(
+			$this->sendShareInvitation($user, $rows, null, true)
+		);
+	}
 }
