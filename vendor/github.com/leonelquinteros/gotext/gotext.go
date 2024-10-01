@@ -3,22 +3,21 @@ Package gotext implements GNU gettext utilities.
 
 For quick/simple translations you can use the package level functions directly.
 
-    import (
-	    "fmt"
-	    "github.com/leonelquinteros/gotext"
-    )
+	    import (
+		    "fmt"
+		    "github.com/leonelquinteros/gotext"
+	    )
 
-    func main() {
-        // Configure package
-        gotext.Configure("/path/to/locales/root/dir", "en_UK", "domain-name")
+	    func main() {
+	        // Configure package
+	        gotext.Configure("/path/to/locales/root/dir", "en_UK", "domain-name")
 
-        // Translate text from default domain
-        fmt.Println(gotext.Get("My text on 'domain-name' domain"))
+	        // Translate text from default domain
+	        fmt.Println(gotext.Get("My text on 'domain-name' domain"))
 
-        // Translate text from a different domain without reconfigure
-        fmt.Println(gotext.GetD("domain2", "Another text on a different domain"))
-    }
-
+	        // Translate text from a different domain without reconfigure
+	        fmt.Println(gotext.GetD("domain2", "Another text on a different domain"))
+	    }
 */
 package gotext
 
@@ -342,7 +341,7 @@ func GetNDC(dom, str, plural string, n int, ctx string, vars ...interface{}) str
 // IsTranslated reports whether a string is translated in given languages.
 // When the langs argument is omitted, the output of GetLanguages is used.
 func IsTranslated(str string, langs ...string) bool {
-	return IsTranslatedND(GetDomain(), str, 0, langs...)
+	return IsTranslatedND(GetDomain(), str, 1, langs...)
 }
 
 // IsTranslatedN reports whether a plural string is translated in given languages.
@@ -354,7 +353,7 @@ func IsTranslatedN(str string, n int, langs ...string) bool {
 // IsTranslatedD reports whether a domain string is translated in given languages.
 // When the langs argument is omitted, the output of GetLanguages is used.
 func IsTranslatedD(dom, str string, langs ...string) bool {
-	return IsTranslatedND(dom, str, 0, langs...)
+	return IsTranslatedND(dom, str, 1, langs...)
 }
 
 // IsTranslatedND reports whether a plural domain string is translated in any of given languages.
@@ -385,7 +384,7 @@ func IsTranslatedND(dom, str string, n int, langs ...string) bool {
 // IsTranslatedC reports whether a context string is translated in given languages.
 // When the langs argument is omitted, the output of GetLanguages is used.
 func IsTranslatedC(str, ctx string, langs ...string) bool {
-	return IsTranslatedNDC(GetDomain(), str, 0, ctx, langs...)
+	return IsTranslatedNDC(GetDomain(), str, 1, ctx, langs...)
 }
 
 // IsTranslatedNC reports whether a plural context string is translated in given languages.
