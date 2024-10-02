@@ -239,7 +239,6 @@ class SharingNgContext implements Context {
 	 * @param string $user
 	 * @param array $shareInfo
 	 * @param string|null $fileId
-	 * @param bool $isFederated
 	 *
 	 * @return ResponseInterface
 	 *
@@ -247,7 +246,7 @@ class SharingNgContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendShareInvitation(string $user, array $shareInfo, string $fileId = null, $isFederated = false): ResponseInterface {
+	public function sendShareInvitation(string $user, array $shareInfo, string $fileId = null): ResponseInterface {
 		if ($shareInfo['space'] === 'Personal' || $shareInfo['space'] === 'Shares') {
 			$space = $this->spacesContext->getSpaceByName($user, $shareInfo['space']);
 		} else {
@@ -283,8 +282,8 @@ class SharingNgContext implements Context {
 				$shareeId = "";
 				if ($shareType === "user") {
 					$shareeId = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
-					if ($isFederated) {
-						$shareeId = base64_encode($shareeId . $shareInfo['federatedServer']);
+					if (isset($shareInfo['federatedServer'])) {
+						$shareeId = ($this->featureContext->ocmContext->getAcceptedUserByName($user, $sharee))['user_id'];
 					}
 				} elseif ($shareType === "group") {
 					$shareeId = $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
@@ -352,6 +351,9 @@ class SharingNgContext implements Context {
 			$shareeId = "";
 			if ($shareType === "user") {
 				$shareeId = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
+				if (isset($shareInfo['federatedServer'])) {
+					$shareeId = ($this->featureContext->ocmContext->getAcceptedUserByName($user, $sharee))['user_id'];
+				}
 			} elseif ($shareType === "group") {
 				$shareeId = $this->featureContext->getAttributeOfCreatedGroup($sharee, 'id');
 			}
@@ -379,6 +381,7 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @Given /^user "([^"]*)" has sent the following resource share invitation:$/
+	 * @Given /^user "([^"]*)" has sent the following resource share invitation to federated user:$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -414,6 +417,7 @@ class SharingNgContext implements Context {
 	/**
 	 * @When /^user "([^"]*)" sends the following resource share invitation using the Graph API:$/
 	 * @When /^user "([^"]*)" tries to send the following resource share invitation using the Graph API:$/
+	 * @When /^user "([^"]*)" sends the following resource share invitation to federated user using the Graph API:$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -427,24 +431,6 @@ class SharingNgContext implements Context {
 		Assert::assertArrayHasKey("resource", $rows, "'resource' should be provided in the data-table while sharing a resource");
 		$this->featureContext->setResponse(
 			$this->sendShareInvitation($user, $rows)
-		);
-	}
-
-	/**
-	 * @When /^user "([^"]*)" sends the following resource share invitation to federated user using the Graph API:$/
-	 *
-	 * @param string $user
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 * @throws GuzzleException
-	 */
-	public function userSendsTheFollowingResourceShareInvitationTofederatedUserUsingTheGraphApi(string $user, TableNode $table): void {
-		$rows = $table->getRowsHash();
-		Assert::assertArrayHasKey("resource", $rows, "'resource' should be provided in the data-table while sharing a resource");
-		$this->featureContext->setResponse(
-			$this->sendShareInvitation($user, $rows, null, true)
 		);
 	}
 

@@ -170,4 +170,38 @@ class OcmHelper {
 			self::getRequestHeaders()
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $userId
+	 * @param string $idp
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function deleteConnection(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $userId,
+		string $idp
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'delete-accepted-user');
+		$body = [
+			"idp" => $idp,
+			"user_id" => $userId
+		];
+		return HttpRequestHelper::delete(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($body)
+		);
+	}
 }
