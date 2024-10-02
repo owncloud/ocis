@@ -14,14 +14,15 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Name          string
-	Address       string
-	Logger        log.Logger
-	Context       context.Context
-	Config        *config.Config
-	Metrics       *metrics.Metrics
-	Namespace     string
-	TraceProvider trace.TracerProvider
+	Name                  string
+	Address               string
+	Logger                log.Logger
+	Context               context.Context
+	Config                *config.Config
+	Metrics               *metrics.Metrics
+	Namespace             string
+	TraceProvider         trace.TracerProvider
+	MaxConcurrentRequests int
 }
 
 // newOptions initializes the available default options.
@@ -88,5 +89,12 @@ func Namespace(val string) Option {
 func TraceProvider(val trace.TracerProvider) Option {
 	return func(o *Options) {
 		o.TraceProvider = val
+	}
+}
+
+// MaxConcurrentRequests provides a function to set the MaxConcurrentRequests option.
+func MaxConcurrentRequests(val int) Option {
+	return func(o *Options) {
+		o.MaxConcurrentRequests = val
 	}
 }
