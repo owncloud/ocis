@@ -69,8 +69,8 @@ github.com/ProtonMail/go-crypto/openpgp/s2k
 github.com/RoaringBitmap/roaring
 github.com/RoaringBitmap/roaring/internal
 github.com/RoaringBitmap/roaring/roaring64
-# github.com/agnivade/levenshtein v1.1.1
-## explicit; go 1.13
+# github.com/agnivade/levenshtein v1.2.0
+## explicit; go 1.21
 github.com/agnivade/levenshtein
 # github.com/ajg/form v1.5.1
 ## explicit
@@ -1533,7 +1533,7 @@ github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
-# github.com/open-policy-agent/opa v0.68.0
+# github.com/open-policy-agent/opa v0.69.0
 ## explicit; go 1.21
 github.com/open-policy-agent/opa/ast
 github.com/open-policy-agent/opa/ast/internal/scanner
