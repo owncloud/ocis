@@ -2028,3 +2028,11 @@ Feature: check activities
         }
       }
       """
+
+  @issue-9860
+  Scenario: user tries to check activities of another user's file
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    And user "Alice" has uploaded file with content "updated ownCloud test text file" to "textfile.txt"
+    When user "Brian" tries to list the activities of file "textfile.txt" from space "Personal" owned by user "Alice" using the Graph API
+    Then the HTTP status code should be "403"
