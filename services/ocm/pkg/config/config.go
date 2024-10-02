@@ -106,7 +106,7 @@ type OCMInviteManagerDrivers struct {
 }
 
 type OCMInviteManagerJSONDriver struct {
-	File string `yaml:"file" env:"OCM_OCM_INVITE_MANAGER_JSON_FILE" desc:"Path to the JSON file where OCM invite data will be stored. This file is maintained by the instance and must not be changed manually. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/ocm." introductionVersion:"5.0"`
+	File string `yaml:"file" env:"OCM_OCM_INVITE_MANAGER_JSON_FILE" desc:"Path to the JSON file where OCM invite data will be stored. This file is maintained by the instance and must not be changed manually. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/ocm." introductionVersion:"5.0"`
 }
 
 type OCMProviderAuthorizerDrivers struct {
@@ -114,7 +114,7 @@ type OCMProviderAuthorizerDrivers struct {
 }
 
 type OCMProviderAuthorizerJSONDriver struct {
-	Providers             string `yaml:"providers" env:"OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE" desc:"Path to the JSON file where ocm invite data will be stored. Defaults to $OCIS_CONFIG_DIR:/ocmproviders.json." introductionVersion:"5.0"`
+	Providers             string `yaml:"providers" env:"OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE" desc:"Path to the JSON file where ocm invite data will be stored. Defaults to $OCIS_CONFIG_DIR/ocmproviders.json." introductionVersion:"5.0"`
 	VerifyRequestHostname bool   `yaml:"verify_request_hostname" env:"OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME" desc:"Verify the hostname of the incoming request against the hostname of the OCM provider." introductionVersion:"5.0"`
 }
 
@@ -132,7 +132,7 @@ type OCMCoreDrivers struct {
 }
 
 type OCMCoreJSONDriver struct {
-	File string `yaml:"file" env:"OCM_OCM_CORE_JSON_FILE" desc:"Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage." introductionVersion:"5.0"`
+	File string `yaml:"file" env:"OCM_OCM_CORE_JSON_FILE" desc:"Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage." introductionVersion:"5.0"`
 }
 
 type OCMShareProvider struct {
@@ -147,7 +147,7 @@ type OCMShareProviderDrivers struct {
 }
 
 type OCMShareProviderJSONDriver struct {
-	File string `yaml:"file" env:"OCM_OCM_SHAREPROVIDER_JSON_FILE" desc:"Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage." introductionVersion:"5.0"`
+	File string `yaml:"file" env:"OCM_OCM_SHAREPROVIDER_JSON_FILE" desc:"Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage." introductionVersion:"5.0"`
 }
 
 // Events combine the configuration options for the event bus.
