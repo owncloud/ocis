@@ -88,7 +88,7 @@ Feature: propfind a shares
       | oc:name        | textfile.txt      |
       | oc:permissions |                   |
 
-
+  @issue-8420
   Scenario Outline: check file-id from PROPFIND with shared-with-me drive-item-id
     Given using spaces DAV path
     And user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
@@ -107,3 +107,36 @@ Feature: propfind a shares
       | resource      |
       | textfile1.txt |
       | folderToShare |
+
+  @issue-9933
+  Scenario Outline: check file-id of different PROPFIND requests to shared items
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has uploaded file with content "lorem epsum" to "folderToShare/textfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Brian" has a share "folderToShare" synced
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "/" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the PROPFIND response should contain a resource "folderToShare" with these key and value pairs:
+      | key       | value     |
+      | oc:fileid | <pattern> |
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "folderToShare" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the PROPFIND response should contain a resource "folderToShare" with these key and value pairs:
+      | key       | value     |
+      | oc:fileid | <pattern> |
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "folderToShare/textfile.txt" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the PROPFIND response should contain a resource "folderToShare/textfile.txt" with these key and value pairs:
+      | key       | value             |
+      | oc:fileid | %file_id_pattern% |
+    Examples:
+      | dav-path-version | pattern            |
+      | old              | %file_id_pattern%  |
+      | new              | %file_id_pattern%  |
+      | spaces           | %share_id_pattern% |
