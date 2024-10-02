@@ -28,14 +28,14 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:      "127.0.0.1:9185",
-			Namespace: "com.owncloud.api",
+			Addr:                  "127.0.0.1:9185",
+			Namespace:             "com.owncloud.api",
+			MaxConcurrentRequests: 0,
 		},
 		HTTP: config.HTTP{
-			Addr:                  "127.0.0.1:9186",
-			Root:                  "/thumbnails",
-			Namespace:             "com.owncloud.web",
-			MaxConcurrentRequests: 0,
+			Addr:      "127.0.0.1:9186",
+			Root:      "/thumbnails",
+			Namespace: "com.owncloud.web",
 		},
 		Service: config.Service{
 			Name: "thumbnails",
