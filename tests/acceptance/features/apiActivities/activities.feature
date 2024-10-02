@@ -1461,7 +1461,7 @@ Feature: check activities
       }
       """
 
-  @issue-9856 @issue-10127 @skip
+  @issue-9856 @issue-10127
   Scenario: check activity message with different language
     Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
     And user "Alice" has switched the system language to "de" using the Graph API
@@ -1494,7 +1494,7 @@ Feature: check activities
                     },
                     "variables": {
                       "type": "object",
-                      "required": ["resource","space","user"],
+                      "required": ["resource","folder","user"],
                       "properties": {
                         "resource": {
                           "type": "object",
