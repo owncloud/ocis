@@ -25,6 +25,7 @@ use Behat\Behat\Context\Context;
 use PHPUnit\Framework\Assert;
 use TestHelpers\CliHelper;
 use TestHelpers\OcisConfigHelper;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * CLI context
@@ -232,5 +233,93 @@ class CliContext implements Context {
 		} else {
 			Assert::assertStringNotContainsString($output, $jsonResponse["message"]);
 		}
+	}
+
+	/**
+	 * @When the administrator lists all the upload sessions
+	 * @When the administrator lists all the upload sessions with flag :flag
+	 *
+	 * @param string|null $flag
+	 *
+	 * @return void
+	 */
+	public function theAdministratorListsAllTheUploadSessions(?string $flag = null): void {
+		if ($flag) {
+			$flag = "--$flag";
+		}
+		$command = "storage-users uploads sessions --json $flag";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator cleans all expired upload sessions
+	 *
+	 * @return void
+	 */
+	public function theAdministratorCleansAllExpiredUploadSessions(): void {
+		$command = "storage-users uploads sessions --expired --clean --json";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @Then /^the CLI response (should|should not) contain these entries:$/
+	 *
+	 * @param string $shouldOrNot
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theCLIResponseShouldContainTheseEntries(string $shouldOrNot, TableNode $table): void {
+		$expectedFiles = $table->getColumn(0);
+		$responseBody = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
+
+		// $responseBody["message"] contains a message info with the array of output json of the upload sessions command
+		// Example Output: "INFO memory is not limited, skipping package=github.com/KimMachineGun/automemlimit/memlimit [{<output-json>}]"
+		// So, only extracting the array of output json from the message
+		preg_match('/(\[.*\])/', $responseBody["message"], $matches);
+		$responseArray = \json_decode($matches[1], null, 512, JSON_THROW_ON_ERROR);
+
+		$resourceNames = [];
+		foreach ($responseArray as $item) {
+			if (isset($item->filename)) {
+				$resourceNames[] = $item->filename;
+			}
+		}
+
+		if ($shouldOrNot === "should not") {
+			foreach ($expectedFiles as $expectedFile) {
+				Assert::assertNotTrue(
+					\in_array($expectedFile, $resourceNames),
+					"The resource '$expectedFile' was found in the response."
+				);
+			}
+		} else {
+			foreach ($expectedFiles as $expectedFile) {
+				Assert::assertTrue(
+					\in_array($expectedFile, $resourceNames),
+					"The resource '$expectedFile' was not found in the response."
+				);
+			}
+		}
+	}
+
+	/**
+	 * @AfterScenario @cli-uploads-sessions
+	 *
+	 * @return void
+	 */
+	public function cleanUploadsSessions(): void {
+		$command = "storage-users uploads sessions --clean";
+		$body = [
+			"command" => $command
+		];
+		$response = CliHelper::runCommand($body);
+		Assert::assertEquals("200", $response->getStatusCode(), "Failed to clean upload sessions");
 	}
 }

@@ -182,6 +182,13 @@ config = {
                 "cliCommands",
             ],
             "skip": False,
+            "antivirusNeeded": True,
+            "extraServerEnvironment": {
+                "ANTIVIRUS_SCANNER_TYPE": "clamav",
+                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
+                "OCIS_ASYNC_UPLOADS": True,
+                "OCIS_ADD_RUN_SERVICES": "antivirus",
+            },
         },
     },
     "apiTests": {
