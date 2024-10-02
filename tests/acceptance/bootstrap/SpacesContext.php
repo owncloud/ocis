@@ -3816,7 +3816,8 @@ class SpacesContext implements Context {
 			// When using file-id, some characters need to be encoded
 			$resource = \str_replace("!", "%21", $resource);
 		} else {
-			$resource = \rawurlencode($resource);
+			$encodedPaths = \array_map(fn ($path) => \rawurlencode($path), \explode("/", $resource));
+			$resource = \join("/", $encodedPaths);
 		}
 		$this->theXMLResponseShouldContain($resource, $table->getHash());
 	}
