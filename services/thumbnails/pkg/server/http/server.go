@@ -40,7 +40,6 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Middleware(
 			middleware.RealIP,
 			middleware.RequestID,
-			ocismiddleware.Throttle(options.MaxConcurrentRequests),
 			ocismiddleware.Cors(
 				cors.Logger(options.Logger),
 				cors.AllowedOrigins(options.Config.HTTP.CORS.AllowedOrigins),
