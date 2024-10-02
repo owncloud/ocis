@@ -15,9 +15,9 @@
 | IDM_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | IDM_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | IDM_LDAPS_ADDR | string | 127.0.0.1:9235 | Listen address for the LDAPS listener (ip-addr:port).|
-| IDM_LDAPS_CERT | string | /var/lib/ocis/idm/ldap.crt | File name of the TLS server certificate for the LDAPS listener. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.|
-| IDM_LDAPS_KEY | string | /var/lib/ocis/idm/ldap.key | File name for the TLS certificate key for the server certificate. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.|
-| IDM_DATABASE_PATH | string | /var/lib/ocis/idm/ocis.boltdb | Full path to the IDM backend database. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.|
+| IDM_LDAPS_CERT | string | /var/lib/ocis/idm/ldap.crt | File name of the TLS server certificate for the LDAPS listener. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm.|
+| IDM_LDAPS_KEY | string | /var/lib/ocis/idm/ldap.key | File name for the TLS certificate key for the server certificate. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm.|
+| IDM_DATABASE_PATH | string | /var/lib/ocis/idm/ocis.boltdb | Full path to the IDM backend database. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm.|
 | IDM_CREATE_DEMO_USERS | bool | false | Flag to enable or disable the creation of the demo users.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER | string | https://localhost:9200 | The OIDC issuer URL to assign to the demo users.|
 | IDM_ADMIN_PASSWORD | string |  | Password to set for the oCIS 'admin' user. Either cleartext or an argon2id hash.|

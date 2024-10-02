@@ -34,7 +34,7 @@
 | OCIS_CACHE_AUTH_USERNAME<br/>STORAGE_SYSTEM_CACHE_AUTH_USERNAME | string |  | Username for the configured store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_CACHE_AUTH_PASSWORD<br/>STORAGE_SYSTEM_CACHE_AUTH_PASSWORD | string |  | Password for the configured store. Only applies when store type 'nats-js-kv' is configured.|
 | STORAGE_SYSTEM_DRIVER | string | ocis | The driver which should be used by the service.|
-| STORAGE_SYSTEM_OCIS_ROOT | string | /var/lib/ocis/storage/metadata | Path for the directory where the STORAGE-SYSTEM service stores it's persistent data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| STORAGE_SYSTEM_OCIS_ROOT | string | /var/lib/ocis/storage/metadata | Path for the directory where the STORAGE-SYSTEM service stores it's persistent data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage.|
 | STORAGE_SYSTEM_OCIS_MAX_ACQUIRE_LOCK_CYCLES | int | 20 | When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.|
 | STORAGE_SYSTEM_OCIS_LOCK_CYCLE_DURATION_FACTOR | int | 30 | When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.|
 | STORAGE_SYSTEM_DATA_SERVER_URL | string | http://localhost:9216/data | URL of the data server, needs to be reachable by other services using this service.|

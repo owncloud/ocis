@@ -26,7 +26,7 @@
 | OCIS_CORS_ALLOW_CREDENTIALS<br/>THUMBNAILS_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | THUMBNAILS_MAX_CONCURRENT_REQUESTS | int | 0 | Number of maximum concurrent thumbnail requests. Default is 0 which is unlimited.|
 | THUMBNAILS_RESOLUTIONS | []string | [16x16 32x32 64x64 128x128 1080x1920 1920x1080 2160x3840 3840x2160 4320x7680 7680x4320] | The supported list of target resolutions in the format WidthxHeight like 32x32. You can define any resolution as required. See the Environment Variable Types description for more details.|
-| THUMBNAILS_FILESYSTEMSTORAGE_ROOT | string | /var/lib/ocis/thumbnails | The directory where the filesystem storage will store the thumbnails. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/thumbnails.|
+| THUMBNAILS_FILESYSTEMSTORAGE_ROOT | string | /var/lib/ocis/thumbnails | The directory where the filesystem storage will store the thumbnails. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/thumbnails.|
 | OCIS_INSECURE<br/>THUMBNAILS_WEBDAVSOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the webdav source.|
 | OCIS_INSECURE<br/>THUMBNAILS_CS3SOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the CS3 source.|
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata|

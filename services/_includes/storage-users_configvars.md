@@ -34,7 +34,7 @@
 | STORAGE_USERS_DRIVER | string | ocis | The storage driver which should be used by the service. Defaults to 'ocis', Supported values are: 'ocis', 's3ng' and 'owncloudsql'. The 'ocis' driver stores all data (blob and meta data) in an POSIX compliant volume. The 's3ng' driver stores metadata in a POSIX compliant volume and uploads blobs to the s3 bucket.|
 | OCIS_DECOMPOSEDFS_PROPAGATOR<br/>STORAGE_USERS_OCIS_PROPAGATOR | string | sync | The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option.|
 | STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY | Duration | 0s | The delay between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one. See the Environment Variable Types description for more details.|
-| STORAGE_USERS_OCIS_ROOT | string | /var/lib/ocis/storage/users | The directory where the filesystem storage will store blobs and metadata. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.|
+| STORAGE_USERS_OCIS_ROOT | string | /var/lib/ocis/storage/users | The directory where the filesystem storage will store blobs and metadata. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/users.|
 | STORAGE_USERS_OCIS_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the user directory.|
 | STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT | string | com.owncloud.api.settings | Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.|
 | STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username \| lower}} | Template string to construct personal space aliases.|
@@ -50,7 +50,7 @@
 | OCIS_DISABLE_VERSIONING | bool | false | Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.|
 | OCIS_DECOMPOSEDFS_PROPAGATOR<br/>STORAGE_USERS_S3NG_PROPAGATOR | string | sync | The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option.|
 | STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY | Duration | 0s | The delay between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one. See the Environment Variable Types description for more details.|
-| STORAGE_USERS_S3NG_ROOT | string | /var/lib/ocis/storage/users | The directory where the filesystem storage will store metadata for blobs. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.|
+| STORAGE_USERS_S3NG_ROOT | string | /var/lib/ocis/storage/users | The directory where the filesystem storage will store metadata for blobs. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/users.|
 | STORAGE_USERS_S3NG_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the user directory.|
 | STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT | string | com.owncloud.api.settings | Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.|
 | STORAGE_USERS_S3NG_REGION | string | default | Region of the S3 bucket.|
@@ -73,17 +73,17 @@
 | STORAGE_USERS_S3NG_LOCK_CYCLE_DURATION_FACTOR | int | 30 | When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.|
 | STORAGE_USERS_S3NG_MAX_CONCURRENCY | int | 5 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.|
 | OCIS_DISABLE_VERSIONING | bool | false | Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.|
-| STORAGE_USERS_OWNCLOUDSQL_DATADIR | string | /var/lib/ocis/storage/owncloud | The directory where the filesystem storage will store SQL migration data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud.|
+| STORAGE_USERS_OWNCLOUDSQL_DATADIR | string | /var/lib/ocis/storage/owncloud | The directory where the filesystem storage will store SQL migration data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/owncloud.|
 | STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
 | STORAGE_USERS_OWNCLOUDSQL_LAYOUT | string | {{.Username}} | Path layout to use to navigate into a users folder in an owncloud data directory|
-| STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR | string | /var/lib/ocis/storage/uploadinfo | The directory where the filesystem will store uploads temporarily. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/uploadinfo.|
+| STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR | string | /var/lib/ocis/storage/uploadinfo | The directory where the filesystem will store uploads temporarily. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/uploadinfo.|
 | STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME | string | owncloud | Username for the database.|
 | STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD | string | owncloud | Password for the database.|
 | STORAGE_USERS_OWNCLOUDSQL_DB_HOST | string |  | Hostname or IP of the database server.|
 | STORAGE_USERS_OWNCLOUDSQL_DB_PORT | int | 3306 | Port that the database server is listening on.|
 | STORAGE_USERS_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the database to be used.|
 | STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT | string | com.owncloud.api.users | Endpoint of the users provider.|
-| STORAGE_USERS_POSIX_ROOT | string | /var/lib/ocis/storage/users | The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.|
+| STORAGE_USERS_POSIX_ROOT | string | /var/lib/ocis/storage/users | The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/users.|
 | STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE | string | users/{{.User.Username}} | Template string to construct the paths of the personal space roots.|
 | STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE | string | projects/{{.SpaceId}} | Template string to construct the paths of the projects space roots.|
 | STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT | string | com.owncloud.api.settings | Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'.|

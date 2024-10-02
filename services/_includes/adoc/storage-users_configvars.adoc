@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-02-07-17-28]
+[#deprecation-note-2024-10-02-07-37-56]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -409,7 +409,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/users ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store blobs and metadata. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
+The directory where the filesystem storage will store blobs and metadata. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/users.
 
 a|`STORAGE_USERS_OCIS_USER_LAYOUT` +
 
@@ -588,7 +588,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/users ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store metadata for blobs. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
+The directory where the filesystem storage will store metadata for blobs. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/users.
 
 a|`STORAGE_USERS_S3NG_USER_LAYOUT` +
 
@@ -842,7 +842,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/owncloud ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store SQL migration data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud.
+The directory where the filesystem storage will store SQL migration data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/owncloud.
 
 a|`STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER` +
 
@@ -875,7 +875,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/uploadinfo ++
 a| [subs=-attributes]
-The directory where the filesystem will store uploads temporarily. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/uploadinfo.
+The directory where the filesystem will store uploads temporarily. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/uploadinfo.
 
 a|`STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME` +
 
@@ -952,7 +952,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/users ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
+The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/users.
 
 a|`STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE` +
 

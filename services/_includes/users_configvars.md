@@ -23,7 +23,7 @@
 | USERS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | USERS_DRIVER | string | ldap | The driver which should be used by the users service. Supported values are 'ldap' and 'owncloudsql'.|
 | OCIS_LDAP_URI<br/>USERS_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|
-| OCIS_LDAP_CACERT<br/>USERS_LDAP_CACERT | string | /var/lib/ocis/idm/ldap.crt | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.|
+| OCIS_LDAP_CACERT<br/>USERS_LDAP_CACERT | string | /var/lib/ocis/idm/ldap.crt | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm.|
 | OCIS_LDAP_INSECURE<br/>USERS_LDAP_INSECURE | bool | false | Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.|
 | OCIS_LDAP_BIND_DN<br/>USERS_LDAP_BIND_DN | string | uid=reva,ou=sysusers,o=libregraph-idm | LDAP DN to use for simple bind authentication with the target LDAP server.|
 | OCIS_LDAP_BIND_PASSWORD<br/>USERS_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|

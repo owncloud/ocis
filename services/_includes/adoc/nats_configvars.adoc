@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-02-07-17-28]
+[#deprecation-note-2024-10-02-07-37-56]
 [caption=]
 .Deprecation notes for the nats service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -213,7 +213,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/nats ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store NATS JetStream data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/nats.
+The directory where the filesystem storage will store NATS JetStream data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/nats.
 
 a|`NATS_TLS_CERT` +
 
@@ -224,7 +224,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/nats/tls.crt ++
 a| [subs=-attributes]
-Path/File name of the TLS server certificate (in PEM format) for the NATS listener. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/nats.
+Path/File name of the TLS server certificate (in PEM format) for the NATS listener. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/nats.
 
 a|`NATS_TLS_KEY` +
 
@@ -235,7 +235,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/nats/tls.key ++
 a| [subs=-attributes]
-Path/File name for the TLS certificate key (in PEM format) for the NATS listener. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/nats.
+Path/File name for the TLS certificate key (in PEM format) for the NATS listener. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/nats.
 
 a|`OCIS_INSECURE` +
 `NATS_TLS_SKIP_VERIFY_CLIENT_CERT` +

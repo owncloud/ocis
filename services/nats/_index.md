@@ -1,6 +1,6 @@
 ---
 title: Nats
-date: 2024-10-02T07:17:33.88547217Z
+date: 2024-10-02T07:38:01.016299583Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/nats
@@ -38,7 +38,7 @@ Note that when `MICRO_REGISTRY` is configured using `kubernetes`, the NATS servi
 
 ## Persistance
 
-To be able to deliver events even after a system or service restart, nats will store events in a folder on the local filesystem. This folder can be specified by setting the `NATS_NATS_STORE_DIR` enviroment variable. If not set, the service will fall back to `$OCIS_BASE_DATA_PATH:/nats`.
+To be able to deliver events even after a system or service restart, nats will store events in a folder on the local filesystem. This folder can be specified by setting the `NATS_NATS_STORE_DIR` enviroment variable. If not set, the service will fall back to `$OCIS_BASE_DATA_PATH/nats`.
 
 ## TLS Encryption
 

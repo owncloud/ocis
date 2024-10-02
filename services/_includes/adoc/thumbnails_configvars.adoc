@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-02-07-17-28]
+[#deprecation-note-2024-10-02-07-37-56]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -316,7 +316,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/thumbnails ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store the thumbnails. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/thumbnails.
+The directory where the filesystem storage will store the thumbnails. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/thumbnails.
 
 a|`OCIS_INSECURE` +
 `THUMBNAILS_WEBDAVSOURCE_INSECURE` +

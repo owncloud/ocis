@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-02-07-17-28]
+[#deprecation-note-2024-10-02-07-37-56]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -492,7 +492,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/ocm/ocminvites.json ++
 a| [subs=-attributes]
-Path to the JSON file where OCM invite data will be stored. This file is maintained by the instance and must not be changed manually. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/ocm.
+Path to the JSON file where OCM invite data will be stored. This file is maintained by the instance and must not be changed manually. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/ocm.
 
 a|`OCM_OCM_INVITE_MANAGER_TOKEN_EXPIRATION` +
 
@@ -547,7 +547,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/etc/ocis/ocmproviders.json ++
 a| [subs=-attributes]
-Path to the JSON file where ocm invite data will be stored. Defaults to $OCIS_CONFIG_DIR:/ocmproviders.json.
+Path to the JSON file where ocm invite data will be stored. Defaults to $OCIS_CONFIG_DIR/ocmproviders.json.
 
 a|`OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME` +
 
@@ -580,7 +580,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/ocm/ocmshares.json ++
 a| [subs=-attributes]
-Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
+Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage.
 
 a|`OCM_OCM_SHARE_PROVIDER_INSECURE` +
 
@@ -624,7 +624,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/storage/ocm/ocmshares.json ++
 a| [subs=-attributes]
-Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
+Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage.
 
 a|`OCM_OCM_STORAGE_PROVIDER_INSECURE` +
 

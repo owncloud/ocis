@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-02-07-17-28]
+[#deprecation-note-2024-10-02-07-37-56]
 [caption=]
 .Deprecation notes for the idm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -191,7 +191,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/idm/ldap.crt ++
 a| [subs=-attributes]
-File name of the TLS server certificate for the LDAPS listener. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+File name of the TLS server certificate for the LDAPS listener. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm.
 
 a|`IDM_LDAPS_KEY` +
 
@@ -202,7 +202,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/idm/ldap.key ++
 a| [subs=-attributes]
-File name for the TLS certificate key for the server certificate. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+File name for the TLS certificate key for the server certificate. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm.
 
 a|`IDM_DATABASE_PATH` +
 
@@ -213,7 +213,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/var/lib/ocis/idm/ocis.boltdb ++
 a| [subs=-attributes]
-Full path to the IDM backend database. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+Full path to the IDM backend database. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm.
 
 a|`IDM_CREATE_DEMO_USERS` +
 
