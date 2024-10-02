@@ -500,10 +500,10 @@ func roleConditionForResourceType(ri *storageprovider.ResourceInfo) (string, err
 }
 
 func federatedRoleConditionForResourceType(ri *storageprovider.ResourceInfo) (string, error) {
-	switch {
-	case ri.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER:
+	switch ri.GetType() {
+	case storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER:
 		return unifiedrole.UnifiedRoleConditionFolderFederatedUser, nil
-	case ri.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE:
+	case storageprovider.ResourceType_RESOURCE_TYPE_FILE:
 		return unifiedrole.UnifiedRoleConditionFileFederatedUser, nil
 	default:
 		return "", errorcode.New(errorcode.InvalidRequest, "unsupported resource type for federated role")
