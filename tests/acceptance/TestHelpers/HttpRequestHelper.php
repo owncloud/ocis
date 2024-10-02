@@ -665,4 +665,22 @@ class HttpRequestHelper {
 	public static function getJsonDecodedResponseBodyContent(ResponseInterface $response): mixed {
 		return json_decode($response->getBody()->getContents(), null, 512, JSON_THROW_ON_ERROR);
 	}
+
+	/**
+	 * @return bool
+	 */
+	public static function sendScenarioLineReferencesInXRequestId(): bool {
+		return (\getenv("SEND_SCENARIO_LINE_REFERENCES") === "true");
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getXRequestIdRegex(): string {
+		if (self::sendScenarioLineReferencesInXRequestId()) {
+			return '/^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/';
+		}
+		$host = gethostname();
+		return "/^$host\/.*$/";
+	}
 }

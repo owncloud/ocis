@@ -145,8 +145,6 @@ class FeatureContext extends BehatVariablesContext {
 	 * in the apiComments suite.
 	 */
 	private string $stepLineRef = '';
-	private bool $sendStepLineRef = false;
-	private bool $sendStepLineRefHasBeenChecked = false;
 
 	/**
 	 * @var boolean true if TEST_SERVER_FED_URL is defined
@@ -414,17 +412,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function isTestingWithLdap(): bool {
 		return (\getenv("TEST_WITH_LDAP") === "true");
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function sendScenarioLineReferencesInXRequestId(): ?bool {
-		if ($this->sendStepLineRefHasBeenChecked === false) {
-			$this->sendStepLineRef = (\getenv("SEND_SCENARIO_LINE_REFERENCES") === "true");
-			$this->sendStepLineRefHasBeenChecked = true;
-		}
-		return $this->sendStepLineRef;
 	}
 
 	/**
@@ -880,7 +867,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return string
 	 */
 	public function getStepLineRef(): string {
-		if (!$this->sendStepLineRef) {
+		if (!HttpRequestHelper::sendScenarioLineReferencesInXRequestId()) {
 			return '';
 		}
 
@@ -2435,6 +2422,14 @@ class FeatureContext extends BehatVariablesContext {
 					"getUUIDv4Regex"
 				],
 				"parameter" => []
+			],
+			[
+				"code" => "%request_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\HttpRequestHelper',
+					"getXRequestIdRegex"
+				],
+				"parameter" => []
 			]
 		];
 		if ($user !== null) {
@@ -2522,11 +2517,15 @@ class FeatureContext extends BehatVariablesContext {
 				$substitution["function"],
 				$substitution["parameter"]
 			);
-			foreach ($functions as $function => $parameters) {
-				$replacement = \call_user_func_array(
-					$function,
-					\array_merge([$replacement], $parameters)
-				);
+
+			// do not run functions on regex patterns
+			if (!\str_ends_with($value, "_pattern%")) {
+				foreach ($functions as $function => $parameters) {
+					$replacement = \call_user_func_array(
+						$function,
+						\array_merge([$replacement], $parameters)
+					);
+				}
 			}
 			$value = \str_replace(
 				$substitution["code"],
@@ -2644,7 +2643,7 @@ class FeatureContext extends BehatVariablesContext {
 			$environment->registerContext($this->spacesContext);
 		}
 
-		if ($this->sendScenarioLineReferencesInXRequestId()) {
+		if (HttpRequestHelper::sendScenarioLineReferencesInXRequestId()) {
 			$this->scenarioString = $suiteName . '/' . $featureFileName . ':' . $scenarioLine;
 		} else {
 			$this->scenarioString = '';
@@ -2678,7 +2677,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 */
 	public function beforeEachStep(BeforeStepScope $scope): void {
-		if ($this->sendScenarioLineReferencesInXRequestId()) {
+		if (HttpRequestHelper::sendScenarioLineReferencesInXRequestId()) {
 			$this->stepLineRef = $this->scenarioString . '-' . $scope->getStep()->getLine();
 		} else {
 			$this->stepLineRef = '';

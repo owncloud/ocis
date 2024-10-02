@@ -21,7 +21,7 @@ Feature: Copy test
       | Origin | %base_url% |
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions
-      | Oc-Fileid                   | /^[a-f0-9!\$\-]{110}$/                       |
-      | Access-Control-Allow-Origin | /^%base_url%$/                               |
-      | X-Request-Id                | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
+      | Oc-Fileid                   | /^[a-f0-9!\$\-]{110}$/ |
+      | Access-Control-Allow-Origin | /^%base_url%$/         |
+      | X-Request-Id                | %request_id_pattern%   |
 

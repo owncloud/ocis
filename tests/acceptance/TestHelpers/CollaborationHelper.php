@@ -29,7 +29,6 @@ use Psr\Http\Message\ResponseInterface;
  * A helper class for managing wopi requests
  */
 class CollaborationHelper {
-
 	/**
 	 * @param string $fileId
 	 * @param string $app

@@ -116,6 +116,7 @@ class GraphHelper {
 	public static function getEtagRegex(): string {
 		return "^\\\"[a-f0-9:.]{1,32}\\\"$";
 	}
+
 	/**
 	 * Federated users have a base64 encoded string of {remoteid}@{provider} as their id
 	 * This regex matches only non empty base64 encoded strings
@@ -124,6 +125,19 @@ class GraphHelper {
 	 */
 	public static function getFederatedUserRegex(): string {
 		return '^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$';
+	}
+
+	/**
+	 * @param string $pattern
+	 *
+	 * @return string regex pattern
+	 */
+	public static function jsonSchemaRegexToPureRegex(string $pattern): string {
+		$pattern = \str_replace("\\\\", "\\", $pattern);
+		$pattern = \str_replace("/", "\/", $pattern);
+		$pattern = \preg_replace('/^\^/', '', $pattern);
+		$pattern = \preg_replace('/\$$/', '', $pattern);
+		return "/^$pattern$/";
 	}
 
 	/**

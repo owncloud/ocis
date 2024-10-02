@@ -21,15 +21,15 @@ Feature: REPORT request to project space
     And the search result of user "Alice" should contain only these entries:
       | /testFile.txt |
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
-      | key                | value               |
-      | oc:fileid          | UUIDof:testFile.txt |
-      | oc:file-parent     | UUIDof:findData     |
-      | oc:name            | testFile.txt        |
-      | d:getcontenttype   | text/plain          |
-      | oc:permissions     | RDNVW               |
-      | d:getcontentlength | 12                  |
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Alice" the REPORT response should contain a resource "testFile.txt" with these key and value pairs:
+      | key                | value             |
+      | oc:fileid          | %file_id_pattern% |
+      | oc:file-parent     | %file_id_pattern% |
+      | oc:name            | testFile.txt      |
+      | d:getcontenttype   | text/plain        |
+      | oc:permissions     | RDNVW             |
+      | d:getcontentlength | 12                |
 
 
   Scenario: check the response of the searched sub-file
@@ -41,15 +41,15 @@ Feature: REPORT request to project space
     And the search result of user "Alice" should contain only these entries:
       | /folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
-      | key                | value                                                       |
-      | oc:fileid          | UUIDof:folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
-      | oc:file-parent     | UUIDof:folderMain/SubFolder1/subFOLDER2                     |
-      | oc:name            | insideTheFolder.txt                                         |
-      | d:getcontenttype   | text/plain                                                  |
-      | oc:permissions     | RDNVW                                                       |
-      | d:getcontentlength | 12                                                          |
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Alice" the REPORT response should contain a resource "insideTheFolder.txt" with these key and value pairs:
+      | key                | value               |
+      | oc:fileid          | %file_id_pattern%   |
+      | oc:file-parent     | %file_id_pattern%   |
+      | oc:name            | insideTheFolder.txt |
+      | d:getcontenttype   | text/plain          |
+      | oc:permissions     | RDNVW               |
+      | d:getcontentlength | 12                  |
 
 
   Scenario: check the response of the searched folder
@@ -60,11 +60,11 @@ Feature: REPORT request to project space
     And the search result of user "Alice" should contain only these entries:
       | /folderMain |
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Alice" the REPORT response should contain a resource "folderMain" with these key and value pairs:
       | key              | value                |
-      | oc:fileid        | UUIDof:folderMain    |
-      | oc:file-parent   | UUIDof:findData      |
+      | oc:fileid        | %file_id_pattern%    |
+      | oc:file-parent   | %file_id_pattern%    |
       | oc:name          | folderMain           |
       | d:getcontenttype | httpd/unix-directory |
       | oc:permissions   | RDNVCK               |
@@ -79,13 +79,13 @@ Feature: REPORT request to project space
     And the search result of user "Alice" should contain only these entries:
       | /folderMain/sub-folder |
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
+      | X-Request-Id | %request_id_pattern% |
     And the HTTP status code should be "207"
-    And the "REPORT" response to user "Alice" should contain a mountpoint "findData" with these key and value pairs:
-      | key              | value                        |
-      | oc:fileid        | UUIDof:folderMain/sub-folder |
-      | oc:file-parent   | UUIDof:folderMain            |
-      | oc:name          | sub-folder                   |
-      | d:getcontenttype | httpd/unix-directory         |
-      | oc:permissions   | RDNVCK                       |
-      | oc:size          | 0                            |
+    And as user "Alice" the REPORT response should contain a resource "sub-folder" with these key and value pairs:
+      | key              | value                |
+      | oc:fileid        | %file_id_pattern%    |
+      | oc:file-parent   | %file_id_pattern%    |
+      | oc:name          | sub-folder           |
+      | d:getcontenttype | httpd/unix-directory |
+      | oc:permissions   | RDNVCK               |
+      | oc:size          | 0                    |

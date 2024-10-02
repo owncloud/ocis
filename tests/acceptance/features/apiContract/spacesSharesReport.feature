@@ -30,17 +30,17 @@ Feature: Report test
     When user "Brian" searches for "SubFolder1" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And the "REPORT" response to user "Brian" should contain a mountpoint "folderMain" with these key and value pairs:
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Brian" the REPORT response should contain a resource "SubFolder1" with these key and value pairs:
       | key               | value                |
-      | oc:fileid         | UUIDof:SubFolder1    |
-      | oc:file-parent    | UUIDof:folderMain    |
+      | oc:fileid         | %file_id_pattern%    |
+      | oc:file-parent    | %file_id_pattern%    |
       | oc:shareroot      | /folderMain          |
       | oc:name           | SubFolder1           |
       | d:getcontenttype  | httpd/unix-directory |
       | oc:permissions    | S                    |
       | oc:size           | 12                   |
-      | oc:remote-item-id | UUIDof:folderMain    |
+      | oc:remote-item-id | %file_id_pattern%    |
 
 
   Scenario: check the response of the found file
@@ -54,17 +54,17 @@ Feature: Report test
     When user "Brian" searches for "insideTheFolder.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
-    And the "REPORT" response to user "Brian" should contain a mountpoint "folderMain" with these key and value pairs:
-      | key                | value                                            |
-      | oc:fileid          | UUIDof:SubFolder1/subFOLDER2/insideTheFolder.txt |
-      | oc:file-parent     | UUIDof:SubFolder1/subFOLDER2                     |
-      | oc:shareroot       | /folderMain                                      |
-      | oc:name            | insideTheFolder.txt                              |
-      | d:getcontenttype   | text/plain                                       |
-      | oc:permissions     | SD                                               |
-      | d:getcontentlength | 12                                               |
-      | oc:remote-item-id  | UUIDof:folderMain                                |
+      | X-Request-Id | %request_id_pattern% |
+    And as user "Brian" the REPORT response should contain a resource "insideTheFolder.txt" with these key and value pairs:
+      | key                | value               |
+      | oc:fileid          | %file_id_pattern%   |
+      | oc:file-parent     | %file_id_pattern%   |
+      | oc:shareroot       | /folderMain         |
+      | oc:name            | insideTheFolder.txt |
+      | d:getcontenttype   | text/plain          |
+      | oc:permissions     | SD                  |
+      | d:getcontentlength | 12                  |
+      | oc:remote-item-id  | %file_id_pattern%   |
 
 
   Scenario: search for the shared folder when the share is not accepted
@@ -78,5 +78,5 @@ Feature: Report test
     When user "Brian" searches for "folderMain" using the WebDAV API
     Then the HTTP status code should be "207"
     And the following headers should match these regular expressions
-      | X-Request-Id | /^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/ |
+      | X-Request-Id | %request_id_pattern% |
     And the search result should contain "0" entries

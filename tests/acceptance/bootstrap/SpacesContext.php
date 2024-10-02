@@ -355,9 +355,11 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			['Depth' => '0'],
 		);
-		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml($response)->xpath("//d:response/d:propstat/d:prop/oc:fileid")), true, 512, JSON_THROW_ON_ERROR);
-		Assert::assertNotEmpty($responseArray, "the PROPFIND response for $folderName is empty");
-		return $responseArray[0][0];
+
+		$this->featureContext->theHttpStatusCodeShouldBe(207, '', $response);
+		$xmlResponse = $this->featureContext->getResponseXml($response);
+		$fileId = $xmlResponse->xpath("//d:response/d:propstat/d:prop/oc:fileid")[0];
+		return $fileId->__toString();
 	}
 
 	/**
@@ -3701,9 +3703,8 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userSendsPropfindRequestFromTheSpaceToTheResourceWithDepthUsingTheWebdavApi(string $user, string $spaceName, string $resource, ?string $folderDepth = "1"): void {
-		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToSpace($user, $spaceName, $resource, null, $folderDepth)
-		);
+		$response = $this->sendPropfindRequestToSpace($user, $spaceName, $resource, null, $folderDepth);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -3768,6 +3769,17 @@ class SpacesContext implements Context {
 			'd:lockdiscovery',
 			'd:activelock'
 		];
+
+		$davPathVersion = $this->featureContext->getDavPathVersion();
+		if ($spaceName === 'Shares' && $davPathVersion !== WebDavHelper::DAV_VERSION_SPACES) {
+			// for old/new dav paths, append the Shares space path
+			if ($resource === '' || $resource === '/') {
+				$resource = $spaceName;
+			} else {
+				$resource = "$spaceName/$resource";
+			}
+		}
+
 		return  WebDavHelper::propfind(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
@@ -3777,127 +3789,150 @@ class SpacesContext implements Context {
 			$this->featureContext->getStepLineRef(),
 			$folderDepth,
 			"files",
-			$this->featureContext->getDavPathVersion(),
+			$davPathVersion,
 			null,
 			$headers
 		);
 	}
 
 	/**
-	 * @Then /^the "([^"]*)" response should contain a space "([^"]*)" with these key and value pairs:$/
+	 * @Then /^as user "([^"]*)" the (?:PROPFIND|REPORT) response should contain a (resource|space) "([^"]*)" with these key and value pairs:$/
 	 *
-	 * @param string $method # method should be either PROPFIND or REPORT
-	 * @param string $space
+	 * @param string $user
+	 * @param string $type	# type should be either resource or space
+	 * @param string $resource
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function theResponseShouldContainSpace(string $method, string $space, TableNode $table): void {
+	public function asUsertheXMLResponseShouldContainMountpointWithTheseKeyAndValuePair(string $user, string $type, string $resource, TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
-		$this->theResponseShouldContain($method, $this->getSpaceCreator($space), $space, $table);
+		if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES && $type === 'space') {
+			$space = $this->getSpaceByName($user, $resource);
+			$resource = $space['id'];
+		} elseif (\preg_match(GraphHelper::jsonSchemaRegexToPureRegex(GraphHelper::getFileIdRegex()), $resource)) {
+			// When using file-id, some characters need to be encoded
+			$resource = \str_replace("!", "%21", $resource);
+		} else {
+			$resource = \rawurlencode($resource);
+		}
+		$this->theXMLResponseShouldContain($resource, $table->getHash());
 	}
 
 	/**
-	 * @Then /^the "([^"]*)" response to user "([^"]*)" should contain a mountpoint "([^"]*)" with these key and value pairs:$/
-	 * @Then /^the "([^"]*)" response to user "([^"]*)" should contain a space "([^"]*)" with these key and value pairs:$/
-	 *
-	 * @param string $method # method should be either PROPFIND or REPORT
-	 * @param string $user
-	 * @param string $mountPoint
-	 * @param TableNode $table
+	 * @param string $resource	// can be resource name, space id or file id
+	 * @param array $properties	// ["key" => "value"]
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function theResponseShouldContainMountPoint(string $method, string $user, string $mountPoint, TableNode $table): void {
-		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
-		$this->theResponseShouldContain($method, $user, $mountPoint, $table);
-	}
+	public function theXMLResponseShouldContain(string $resource, array $properties): void {
+		$xmlResponse = $this->featureContext->getResponseXml();
+		$hrefs = array_map(fn ($href) => $href->__toString(), $xmlResponse->xpath("//d:response/d:href"));
 
-	/**
-	 * @param string $method # method should be either PROPFIND or REPORT
-	 * @param string $user
-	 * @param string $spaceNameOrMountPoint # an entity inside a space, or the space name itself
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 */
-	public function theResponseShouldContain(string $method, string $user, string $spaceNameOrMountPoint, TableNode $table): void {
-		$xmlRes = $this->featureContext->getResponseXml();
-		foreach ($table->getHash() as $row) {
-			$findItem = $row['key'];
-			$xmlResponses = $xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem");
-			Assert::assertNotEmpty(
-				$xmlResponses,
-				'The xml response "' . $xmlRes->asXML() . '" did not contain "<' . $findItem . '>" element'
-			);
+		$currentHref = '';
+		foreach ($hrefs as $href) {
+			if (\str_ends_with(\rtrim($href, "/"), "/$resource")) {
+				$currentHref = $href;
+				break;
+			}
+		}
 
-			$responseValues = [];
-			foreach ($xmlResponses as $xmlResponse) {
-				$responseValues[] = $xmlResponse[0]->__toString();
+		foreach ($properties as $property) {
+			$itemToFind = $property['key'];
+
+			// if href is not found, build xpath using oc:name
+			$xpaths = [];
+			if (!$currentHref) {
+				$decodedResource = \urldecode($resource);
+				if ($property['key'] === 'oc:name') {
+					$xpath = "//oc:name[text()='$decodedResource']";
+				} elseif (\array_key_exists('oc:shareroot', $properties)) {
+					$xpaths[] = "//oc:name[text()='$resource']/preceding-sibling::oc:shareroot[text()='" . $properties['oc:shareroot'] . "'/preceding-sibling::/";
+					$xpaths[] = "//oc:name[text()='$resource']/preceding-sibling::oc:shareroot[text()='" . $properties['oc:shareroot'] . "'/following-sibling::/";
+					$xpaths[] = "//oc:name[text()='$resource']/following-sibling::oc:shareroot[text()='" . $properties['oc:shareroot'] . "'/preceding-sibling::/";
+					$xpaths[] = "//oc:name[text()='$resource']/following-sibling::oc:shareroot[text()='" . $properties['oc:shareroot'] . "'/following-sibling::/";
+				} else {
+					$xpaths[] = "//oc:name[text()='$decodedResource']/preceding-sibling::";
+					$xpaths[] = "//oc:name[text()='$decodedResource']/following-sibling::";
+				}
+			} else {
+				$xpath = "//d:href[text()='$currentHref']/following-sibling::d:propstat//$itemToFind";
 			}
 
-			$value = str_replace('UUIDof:', '', $row['value']);
-			switch ($findItem) {
-				case "oc:fileid":
-					$resourceType = $xmlRes->xpath("//d:response/d:propstat/d:prop/d:getcontenttype")[0]->__toString();
-					if ($method === 'PROPFIND') {
-						if (!$resourceType) {
-							Assert::assertContainsEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong fileId in the response');
-						} else {
-							Assert::assertContainsEquals($this->getFileId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong fileId in the response');
-						}
-					} else {
-						if ($resourceType === 'httpd/unix-directory') {
-							Assert::assertContainsEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong fileId in the response');
-						} else {
-							Assert::assertContainsEquals($this->getFileId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong fileId in the response');
-						}
+			if (\count($xpaths)) {
+				// check every xpath
+				foreach ($xpaths as $key => $path) {
+					$xpath = "{$path}{$itemToFind}";
+					$foundXmlItem = $xmlResponse->xpath($xpath);
+					$xpaths[$key] = $xpath;
+					if (\count($foundXmlItem)) {
+						break;
 					}
+				}
+			} else {
+				$foundXmlItem = $xmlResponse->xpath($xpath);
+				$xpaths[] = $xpath;
+			}
+
+			Assert::assertNotEmpty(
+				$foundXmlItem,
+				// all these for the sake of a nice error message
+				"Using xpaths:\n\t- " . \join("\n\t- ", $xpaths)
+				. "\n"
+				. "Could not find '<$itemToFind>' element in the XML response\n\t"
+				. "'" . \trim($xmlResponse->asXML()) . "'"
+			);
+
+			$actualValue = $foundXmlItem[0]->__toString();
+			$expectedValue = $this->featureContext->substituteInLineCodes($property['value']);
+
+			switch ($itemToFind) {
+				case "oc:fileid":
+					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
+					Assert::assertMatchesRegularExpression($expectedValue, $actualValue, 'wrong "fileid" in the response');
 					break;
 				case "oc:file-parent":
-					Assert::assertContainsEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong file-parentId in the response');
+					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
+					Assert::assertMatchesRegularExpression($expectedValue, $actualValue, 'wrong "file-parent" in the response');
 					break;
 				case "oc:privatelink":
-					Assert::assertContainsEquals($this->getPrivateLink($user, $spaceNameOrMountPoint), $responseValues, 'cannot find private link for space or resource in the response');
+					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
+					Assert::assertMatchesRegularExpression($expectedValue, $actualValue, 'wrong "privatelink" in the response');
 					break;
 				case "oc:tags":
 					// The value should be a comma-separated string of tag names.
 					// We do not care what order they happen to be in, so compare as sorted lists.
-					$expectedTags = \explode(",", $value);
+					$expectedTags = \explode(",", $expectedValue);
 					\sort($expectedTags);
 					$expectedTags = \implode(",", $expectedTags);
-					$actualTags = [];
-					foreach ($responseValues as $responseValue) {
-						$responseValue = \explode(",", $responseValue);
-						\sort($responseValue);
-						$responseValue = \implode(",", $responseValue);
-						$actualTags[] = $responseValue;
-					}
-					Assert::assertContainsEquals($expectedTags, $actualTags, "wrong $findItem in the response");
+
+					$actualTags = \explode(",", $actualValue);
+					\sort($actualTags);
+					$actualTags = \implode(",", $actualTags);
+					Assert::assertEquals($expectedTags, $actualTags, "wrong '$itemToFind' in the response");
 					break;
 				case "d:lockdiscovery/d:activelock/d:timeout":
-					if ($value === "Infinity") {
-						Assert::assertContainsEquals($value, $responseValues, "wrong $findItem in the response");
+					if ($expectedValue === "Infinity") {
+						Assert::assertEquals($expectedValue, $actualValue, "wrong '$itemToFind' in the response");
 					} else {
 						// some time may be required between a lock and propfind request.
-						$responseValue = explode('-', $responseValues[0]);
+						$responseValue = explode('-', $actualValue);
 						$responseValue = \intval($responseValue[1]);
-						$value = explode('-', $value);
-						$value = \intval($value[1]);
-						Assert::assertTrue($responseValue >= ($value - 3));
+						$expectedValue = explode('-', $expectedValue);
+						$expectedValue = \intval($expectedValue[1]);
+						Assert::assertTrue($responseValue >= ($expectedValue - 3));
 					}
 					break;
 				case "oc:remote-item-id":
-					Assert::assertContainsEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValues, 'wrong remoteItemId in the response');
+					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
+					Assert::assertMatchesRegularExpression($expectedValue, $actualValue, 'wrong "remote-item-id" in the response');
 					break;
 				default:
-					Assert::assertContainsEquals($value, $responseValues, "wrong $findItem in the response");
+					Assert::assertEquals($expectedValue, $actualValue, "wrong '$itemToFind' in the response");
 					break;
 			}
 		}
