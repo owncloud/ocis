@@ -56,6 +56,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Always treat LDAP attribute names case-insensitively: [#10204](https://github.com/owncloud/ocis/pull/10204)
+* Bugfix - Fix delete share panic: [#10219](https://github.com/owncloud/ocis/pull/10219)
 * Enhancement - Bump reva to 2.xx.x: [#10216](https://github.com/owncloud/ocis/pull/10216)
 
 ## Details
@@ -67,6 +68,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10200
    https://github.com/owncloud/ocis/pull/10204
+
+* Bugfix - Fix delete share panic: [#10219](https://github.com/owncloud/ocis/pull/10219)
+
+   Fixes a panic when deleting an ocm share
+
+   https://github.com/owncloud/ocis/pull/10219
 
 * Enhancement - Bump reva to 2.xx.x: [#10216](https://github.com/owncloud/ocis/pull/10216)
 
