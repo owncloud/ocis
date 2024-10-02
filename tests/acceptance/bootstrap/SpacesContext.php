@@ -3772,6 +3772,7 @@ class SpacesContext implements Context {
 
 		$davPathVersion = $this->featureContext->getDavPathVersion();
 		if ($spaceName === 'Shares' && $davPathVersion !== WebDavHelper::DAV_VERSION_SPACES) {
+			// for old/new dav paths, append the Shares space path
 			if ($resource === '' || $resource === '/') {
 				$resource = $spaceName;
 			} else {
@@ -3795,10 +3796,9 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^as user "([^"]*)" the (PROPFIND|REPORT) response should contain a (resource|space) "([^"]*)" with these key and value pairs:$/
+	 * @Then /^as user "([^"]*)" the (?:PROPFIND|REPORT) response should contain a (resource|space) "([^"]*)" with these key and value pairs:$/
 	 *
 	 * @param string $user
-	 * @param string $method # method should be either PROPFIND or REPORT
 	 * @param string $type	# type should be either resource or space
 	 * @param string $resource
 	 * @param TableNode $table
@@ -3807,26 +3807,29 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function asUsertheXMLResponseShouldContainMountpointWithTheseKeyAndValuePair(string $user, string $method, string $type, string $resource, TableNode $table): void {
+	public function asUsertheXMLResponseShouldContainMountpointWithTheseKeyAndValuePair(string $user, string $type, string $resource, TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
 		if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES && $type === 'space') {
 			$space = $this->getSpaceByName($user, $resource);
 			$resource = $space['id'];
+		} elseif (\preg_match(GraphHelper::jsonSchemaRegexToPureRegex(GraphHelper::getFileIdRegex()), $resource)) {
+			// When using file-id, some characters need to be encoded
+			$resource = \str_replace("!", "%21", $resource);
 		} else {
 			$resource = \rawurlencode($resource);
 		}
-		$this->theXMLResponseShouldContain($resource, $table);
+		$this->theXMLResponseShouldContain($resource, $table->getHash());
 	}
 
 	/**
-	 * @param string $resource
-	 * @param TableNode $table
+	 * @param string $resource	// can be resource name, space id or file id
+	 * @param array $properties	// ["key" => "value"]
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function theXMLResponseShouldContain(string $resource, TableNode $table): void {
+	public function theXMLResponseShouldContain(string $resource, array $properties): void {
 		$xmlResponse = $this->featureContext->getResponseXml();
 		$hrefs = array_map(fn ($href) => $href->__toString(), $xmlResponse->xpath("//d:response/d:href"));
 
@@ -3838,29 +3841,67 @@ class SpacesContext implements Context {
 			}
 		}
 
-		foreach ($table->getHash() as $row) {
-			$itemToFind = $row['key'];
-			$foundXmlItem = $xmlResponse->xpath("//d:href[text()='$currentHref']/following-sibling::d:propstat//$itemToFind");
+		foreach ($properties as $property) {
+			$itemToFind = $property['key'];
+
+			// if href is not found, build xpath using oc:name
+			$xpaths = [];
+			if (!$currentHref) {
+				$decodedResource = \urldecode($resource);
+				if ($property['key'] === 'oc:name') {
+					$xpath = "//oc:name[text()='$decodedResource']";
+				} elseif (\array_key_exists('oc:shareroot', $properties)) {
+					$xpaths[] = "//oc:name[text()='$resource']/preceding-sibling::oc:shareroot[text()='" . $properties['oc:shareroot'] . "'/preceding-sibling::/";
+					$xpaths[] = "//oc:name[text()='$resource']/preceding-sibling::oc:shareroot[text()='" . $properties['oc:shareroot'] . "'/following-sibling::/";
+					$xpaths[] = "//oc:name[text()='$resource']/following-sibling::oc:shareroot[text()='" . $properties['oc:shareroot'] . "'/preceding-sibling::/";
+					$xpaths[] = "//oc:name[text()='$resource']/following-sibling::oc:shareroot[text()='" . $properties['oc:shareroot'] . "'/following-sibling::/";
+				} else {
+					$xpaths[] = "//oc:name[text()='$decodedResource']/preceding-sibling::";
+					$xpaths[] = "//oc:name[text()='$decodedResource']/following-sibling::";
+				}
+			} else {
+				$xpath = "//d:href[text()='$currentHref']/following-sibling::d:propstat//$itemToFind";
+			}
+
+			if (\count($xpaths)) {
+				// check every xpath
+				foreach ($xpaths as $key => $path) {
+					$xpath = "{$path}{$itemToFind}";
+					$foundXmlItem = $xmlResponse->xpath($xpath);
+					$xpaths[$key] = $xpath;
+					if (\count($foundXmlItem)) {
+						break;
+					}
+				}
+			} else {
+				$foundXmlItem = $xmlResponse->xpath($xpath);
+				$xpaths[] = $xpath;
+			}
+
 			Assert::assertNotEmpty(
 				$foundXmlItem,
-				'The xml response "' . $xmlResponse->asXML() . '" did not contain "<' . $itemToFind . '>" element'
+				// all these for the sake of a nice error message
+				"Using xpaths:\n\t- " . \join("\n\t- ", $xpaths)
+				. "\n"
+				. "Could not find '<$itemToFind>' element in the XML response\n\t"
+				. "'" . \trim($xmlResponse->asXML()) . "'"
 			);
 
 			$actualValue = $foundXmlItem[0]->__toString();
-			$expectedValue = $this->featureContext->substituteInLineCodes($row['value']);
+			$expectedValue = $this->featureContext->substituteInLineCodes($property['value']);
 
 			switch ($itemToFind) {
 				case "oc:fileid":
 					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
-					Assert::assertRegExp($expectedValue, $actualValue, 'wrong "fileid" in the response');
+					Assert::assertMatchesRegularExpression($expectedValue, $actualValue, 'wrong "fileid" in the response');
 					break;
 				case "oc:file-parent":
 					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
-					Assert::assertRegExp($expectedValue, $actualValue, 'wrong "file-parent" in the response');
+					Assert::assertMatchesRegularExpression($expectedValue, $actualValue, 'wrong "file-parent" in the response');
 					break;
 				case "oc:privatelink":
 					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
-					Assert::assertRegExp($expectedValue, $actualValue, 'wrong "privatelink" in the response');
+					Assert::assertMatchesRegularExpression($expectedValue, $actualValue, 'wrong "privatelink" in the response');
 					break;
 				case "oc:tags":
 					// The value should be a comma-separated string of tag names.
@@ -3888,7 +3929,7 @@ class SpacesContext implements Context {
 					break;
 				case "oc:remote-item-id":
 					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
-					Assert::assertRegExp($expectedValue, $actualValue, 'wrong "remote-item-id" in the response');
+					Assert::assertMatchesRegularExpression($expectedValue, $actualValue, 'wrong "remote-item-id" in the response');
 					break;
 				default:
 					Assert::assertEquals($expectedValue, $actualValue, "wrong '$itemToFind' in the response");

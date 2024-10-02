@@ -674,7 +674,7 @@ class HttpRequestHelper {
 	}
 
 	/**
-	 * @return bool
+	 * @return string
 	 */
 	public static function getXRequestIdRegex(): string {
 		if (self::sendScenarioLineReferencesInXRequestId()) {
