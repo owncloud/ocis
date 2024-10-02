@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 6.5.0](#changelog-for-650-2024-10-01)
 * [Changelog for 6.4.0](#changelog-for-640-2024-09-12)
 * [Changelog for 6.3.0](#changelog-for-630-2024-08-20)
@@ -45,6 +46,26 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v6.5.0...master
+
+## Summary
+
+* Bugfix - Always treat LDAP attribute names case-insensitively: [#10204](https://github.com/owncloud/ocis/pull/10204)
+
+## Details
+
+* Bugfix - Always treat LDAP attribute names case-insensitively: [#10204](https://github.com/owncloud/ocis/pull/10204)
+
+   We fixes a bug where some LDAP attributes (e.g. owncloudUUID) were not treated
+   case-insensitively.
+
+   https://github.com/owncloud/ocis/issues/10200
+   https://github.com/owncloud/ocis/pull/10204
 
 # Changelog for [6.5.0] (2024-10-01)
 
