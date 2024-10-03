@@ -241,7 +241,7 @@ Feature: update a public link share
       | resource        | PARENT   |
       | space           | Personal |
       | permissionsRole | view     |
-    When the public deletes file "CHILD/child.txt" from the last public link share using the password "%public%" and new public WebDAV API
+    When the public deletes file "CHILD/child.txt" from the last link share with password "%public%" using the public WebDAV API
     Then the HTTP status code of responses on all endpoints should be "403"
     And as "Alice" file "PARENT/CHILD/child.txt" should exist
     Examples:
@@ -266,8 +266,8 @@ Feature: update a public link share
       | resource        | PARENT   |
       | space           | Personal |
       | permissionsRole | edit     |
-    When the public deletes file "CHILD/child.txt" from the last public link share using the password "%public%" and new public WebDAV API
-    And the public deletes file "parent.txt" from the last public link share using the password "%public%" and new public WebDAV API
+    When the public deletes file "CHILD/child.txt" from the last link share with password "%public%" using the public WebDAV API
+    And the public deletes file "parent.txt" from the last link share with password "%public%" using the public WebDAV API
     Then the HTTP status code of responses on all endpoints should be "204"
     And as "Alice" file "PARENT/CHILD/child.txt" should not exist
     And as "Alice" file "PARENT/parent.txt" should not exist

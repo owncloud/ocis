@@ -403,6 +403,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - SharingNgContext:
         - GraphContext:
+        - PublicWebDavContext:
 
     apiCollaboration:
       paths:
