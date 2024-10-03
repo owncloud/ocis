@@ -15,7 +15,7 @@ Feature: Search
     And user "Alice" has uploaded a file inside space "project101" with content "some content" to "folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt"
 
 
-  Scenario Outline: user can search items within project space
+  Scenario Outline: user can search items inside project space
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder "AlicePersonal" in space "Personal"
     And user "Alice" has uploaded a file inside space "Personal" with content "inside Alice personal space" to "AlicePersonal/insideAlicePersonal.txt"
@@ -28,11 +28,11 @@ Feature: Search
       | shareType       | user          |
       | permissionsRole | Viewer        |
     And user "Alice" has a share "BrianPersonal" synced
-    When user "Alice" searches for "*inside*" within space "project101" using the WebDAV API
+    When user "Alice" searches for "*inside*" inside space "project101" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And the search result of user "Alice" should contain these entries:
-      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt            |
+      | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
     But the search result of user "Alice" should not contain these entries:
       | /AlicePersonal/insideAlicePersonal.txt |
       | /BrianPersonal/insideBrianPersonal.txt |
@@ -43,7 +43,7 @@ Feature: Search
       | spaces           |
 
 
-  Scenario Outline: user can search items within personal space
+  Scenario Outline: user can search items inside personal space
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder "AlicePersonal" in space "Personal"
     And user "Alice" has uploaded a file inside space "Personal" with content "inside Alice personal space" to "AlicePersonal/insideAlicePersonal.txt"
@@ -56,7 +56,7 @@ Feature: Search
       | shareType       | user          |
       | permissionsRole | Viewer        |
     And user "Alice" has a share "BrianPersonal" synced
-    When user "Alice" searches for "*inside*" within space "Personal" using the WebDAV API
+    When user "Alice" searches for "*inside*" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And the search result of user "Alice" should contain only these entries:
@@ -71,7 +71,7 @@ Feature: Search
       | spaces           |
 
 
-  Scenario Outline: user cannot search items within shares space
+  Scenario Outline: user cannot search items inside shares space
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder "AlicePersonal" in space "Personal"
     And user "Alice" has uploaded a file inside space "Personal" with content "inside Alice personal space" to "AlicePersonal/insideAlicePersonal.txt"
@@ -84,11 +84,11 @@ Feature: Search
       | shareType       | user          |
       | permissionsRole | Viewer        |
     And user "Alice" has a share "BrianPersonal" synced
-    When user "Alice" searches for "*inside*" within space "Shares" using the WebDAV API
+    When user "Alice" searches for "*inside*" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
     And the search result of user "Alice" should not contain these entries:
-      | BrianPersonal/insideBrianPersonal.txt |
+      | BrianPersonal/insideBrianPersonal.txt                |
       | AlicePersonal/insideAlicePersonal.txt                |
       | folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
     Examples:
