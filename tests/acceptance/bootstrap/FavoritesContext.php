@@ -38,14 +38,16 @@ class FavoritesContext implements Context {
 	/**
 	 * @param string$user
 	 * @param string $path
+	 * @param string|null $spaceId
 	 *
 	 * @return ResponseInterface
 	 */
-	public function userFavoritesElement(string $user, string $path):ResponseInterface {
+	public function userFavoritesElement(string $user, string $path, string $spaceId = null):ResponseInterface {
 		return $this->changeFavStateOfAnElement(
 			$user,
 			$path,
-			1
+			1,
+			$spaceId
 		);
 	}
 
@@ -83,7 +85,8 @@ class FavoritesContext implements Context {
 		return $this->changeFavStateOfAnElement(
 			$user,
 			$path,
-			0
+			0,
+			null,
 		);
 	}
 
@@ -154,6 +157,7 @@ class FavoritesContext implements Context {
 			"REPORT",
 			"/",
 			null,
+			null,
 			$this->featureContext->getStepLineRef(),
 			$body,
 			$this->featureContext->getDavPathVersion()
@@ -167,16 +171,19 @@ class FavoritesContext implements Context {
 	 * @param string $user
 	 * @param string $path
 	 * @param integer $expectedValue 0|1
+	 * @param string|null $spaceId
 	 *
 	 * @return void
 	 */
-	public function asUserFileOrFolderShouldBeFavorited(string $user, string $path, int $expectedValue = 1):void {
+	public function asUserFileOrFolderShouldBeFavorited(string $user, string $path, int $expectedValue = 1, string $spaceId = null):void {
 		$property = "oc:favorite";
 		$this->webDavPropertiesContext->checkPropertyOfAFolder(
 			$user,
 			$path,
 			$property,
-			(string)$expectedValue
+			(string)$expectedValue,
+			null,
+			$spaceId,
 		);
 	}
 
@@ -198,13 +205,15 @@ class FavoritesContext implements Context {
 	 * @param string $user
 	 * @param string $path
 	 * @param int|null $favOrUnfav 1 = favorite, 0 = unfavorite
+	 * @param string|null $spaceId
 	 *
 	 * @return ResponseInterface
 	 */
 	public function changeFavStateOfAnElement(
 		string $user,
 		string $path,
-		?int $favOrUnfav
+		?int $favOrUnfav,
+		?string $spaceId,
 	):ResponseInterface {
 		$renamedUser = $this->featureContext->getActualUsername($user);
 		return WebDavHelper::proppatch(
@@ -216,7 +225,9 @@ class FavoritesContext implements Context {
 			(string)$favOrUnfav,
 			$this->featureContext->getStepLineRef(),
 			"oc='http://owncloud.org/ns'",
-			$this->featureContext->getDavPathVersion()
+			$this->featureContext->getDavPathVersion(),
+			'files',
+			$spaceId
 		);
 	}
 

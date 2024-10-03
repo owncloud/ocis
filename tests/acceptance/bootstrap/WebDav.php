@@ -282,14 +282,14 @@ trait WebDav {
 	 * this function will return `owncloud/remote.php/webdav/prueba.txt`
 	 *
 	 * @param string $user
+	 * @param string $spaceId
 	 *
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function getFullDavFilesPath(string $user):string {
-		$spaceId = null;
-		if ($this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
-			$spaceId = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
+	public function getFullDavFilesPath(string $user, ?string $spaceId = null):string {
+		if ($spaceId === null && $this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
+			$spaceId = WebDavHelper::getPersonalSpaceIdForUser(
 				$this->getBaseUrl(),
 				$user,
 				$this->getPasswordForUser($user),
@@ -373,6 +373,7 @@ trait WebDav {
 	 * @param string|null $path
 	 * @param array|null $headers
 	 * @param StreamInterface|null $body
+	 * @param string|null $spaceId
 	 * @param string|null $type
 	 * @param string|null $davPathVersion
 	 * @param bool $stream Set to true to stream a response rather
@@ -393,6 +394,7 @@ trait WebDav {
 		?string $path,
 		?array $headers,
 		$body = null,
+		?string $spaceId = null,
 		?string $type = "files",
 		?string $davPathVersion = null,
 		bool $stream = false,
@@ -423,6 +425,7 @@ trait WebDav {
 			$method,
 			$path,
 			$headers,
+			$spaceId,
 			$this->getStepLineRef(),
 			$body,
 			$davPathVersion,
@@ -444,12 +447,13 @@ trait WebDav {
 	 * @param string $folder
 	 * @param bool|null $isGivenStep
 	 * @param string|null $password
+	 * @param string|null $spaceId
 	 *
 	 * @return ResponseInterface
 	 * @throws JsonException | GuzzleException
 	 * @throws GuzzleException | JsonException
 	 */
-	public function createFolder(string $user, string $folder, ?bool $isGivenStep = false, ?string $password = null): ResponseInterface {
+	public function createFolder(string $user, string $folder, ?bool $isGivenStep = false, ?string $password = null, ?string $spaceId=null): ResponseInterface {
 		$folder = '/' . \ltrim($folder, '/');
 		return $this->makeDavRequest(
 			$user,
@@ -457,6 +461,7 @@ trait WebDav {
 			$folder,
 			[],
 			null,
+			$spaceId,
 			"files",
 			null,
 			false,
@@ -491,6 +496,7 @@ trait WebDav {
 			"GET",
 			$path,
 			[],
+			null,
 			null,
 			"files",
 			null,
@@ -1158,6 +1164,7 @@ trait WebDav {
 	 * @param string $fileName
 	 * @param string|null $password
 	 * @param array|null $headers
+	 * @param string|null $spaceId
 	 *
 	 * @return ResponseInterface
 	 */
@@ -1165,7 +1172,8 @@ trait WebDav {
 		string $user,
 		string $fileName,
 		?string $password = null,
-		?array $headers = []
+		?array $headers = [],
+		?string $spaceId = null,
 	):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$password = $this->getActualPassword($password);
@@ -1175,6 +1183,7 @@ trait WebDav {
 			$fileName,
 			$headers,
 			null,
+			$spaceId,
 			"files",
 			null,
 			false,
@@ -1218,6 +1227,7 @@ trait WebDav {
 			[],
 			$this->getStepLineRef(),
 			"0",
+			null,
 			"files",
 			$this->getDavPathVersion()
 		);
@@ -1343,6 +1353,7 @@ trait WebDav {
 			$user,
 			$path,
 			'0',
+			null,
 			null,
 			$type
 		);
@@ -1507,6 +1518,7 @@ trait WebDav {
 	 * @param string $path
 	 * @param string $folderDepth requires 1 to see elements without children
 	 * @param array|null $properties
+	 * @param string|null $spaceId
 	 * @param string $type
 	 *
 	 * @return ResponseInterface
@@ -1517,6 +1529,7 @@ trait WebDav {
 		string $path,
 		string $folderDepth,
 		?array $properties = null,
+		?string $spaceId = null,
 		string $type = "files"
 	):ResponseInterface {
 		if ($this->customDavPath !== null) {
@@ -1529,6 +1542,7 @@ trait WebDav {
 			$this->getPasswordForUser($user),
 			$path,
 			$folderDepth,
+			$spaceId,
 			$this->getStepLineRef(),
 			$properties,
 			$type,
@@ -1560,6 +1574,7 @@ trait WebDav {
 				$path,
 				$folderDepth,
 				$properties,
+				null,
 				$type
 			),
 			__METHOD__
@@ -1681,6 +1696,7 @@ trait WebDav {
 	 * @param string $user
 	 * @param string $source
 	 * @param string $destination
+	 * @param string $spaceId
 	 * @param bool|null $isGivenStep
 	 *
 	 * @return ResponseInterface
@@ -1689,6 +1705,7 @@ trait WebDav {
 		string $user,
 		string $source,
 		string $destination,
+		string $spaceId = null,
 		?bool $isGivenStep = false
 	):ResponseInterface {
 		$user = $this->getActualUsername($user);
@@ -1700,6 +1717,7 @@ trait WebDav {
 			$destination,
 			[],
 			$file,
+			$spaceId,
 			"files",
 			null,
 			false,
@@ -1746,7 +1764,7 @@ trait WebDav {
 	 * @return array
 	 */
 	public function userHasUploadedAFileTo(string $user, string $source, string $destination):array {
-		$response = $this->uploadFile($user, $source, $destination, true);
+		$response = $this->uploadFile($user, $source, $destination, null, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$source' to '$destination' for user '$user'",
@@ -2263,6 +2281,7 @@ trait WebDav {
 	 * @param string $user
 	 * @param string|null $content
 	 * @param string $destination
+	 * @param string $spaceId
 	 * @param bool|null $isGivenStep
 	 *
 	 * @return ResponseInterface
@@ -2273,7 +2292,8 @@ trait WebDav {
 		string $user,
 		?string $content,
 		string $destination,
-		?bool $isGivenStep = false
+		?string $spaceId = null,
+		?bool $isGivenStep = false,
 	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$this->pauseUploadDelete();
@@ -2283,13 +2303,14 @@ trait WebDav {
 			$destination,
 			[],
 			$content,
+			$spaceId,
 			"files",
 			null,
 			false,
 			null,
 			[],
 			null,
-			$isGivenStep
+			$isGivenStep,
 		);
 		$this->lastUploadDeleteTime = \time();
 		return $response;
@@ -2468,7 +2489,7 @@ trait WebDav {
 		string $destination
 	):array {
 		$user = $this->getActualUsername($user);
-		$response = $this->uploadFileWithContent($user, $content, $destination, true);
+		$response = $this->uploadFileWithContent($user, $content, $destination, null, true);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$destination' for user '$user'",
@@ -2498,7 +2519,7 @@ trait WebDav {
 		foreach ($files as $destination) {
 			$destination = $destination['path'];
 			$user = $this->getActualUsername($user);
-			$response = $this->uploadFileWithContent($user, $content, $destination, true);
+			$response = $this->uploadFileWithContent($user, $content, $destination, null, true);
 			$this->theHTTPStatusCodeShouldBe(
 				["201", "204"],
 				"HTTP status code was not 201 or 204 while trying to upload file '$destination' for user '$user'",
@@ -2566,6 +2587,7 @@ trait WebDav {
 	 * @param string|null $content
 	 * @param string $destination
 	 * @param bool|null $isGivenStep
+	 * @param string|null $spaceId
 	 *
 	 * @return ResponseInterface
 	 */
@@ -2574,7 +2596,8 @@ trait WebDav {
 		string $checksum,
 		?string $content,
 		string $destination,
-		?bool $isGivenStep = false
+		?bool $isGivenStep = false,
+		?string $spaceId = null
 	):ResponseInterface {
 		$this->pauseUploadDelete();
 		$response = $this->makeDavRequest(
@@ -2583,6 +2606,7 @@ trait WebDav {
 			$destination,
 			['OC-Checksum' => $checksum],
 			$content,
+			$spaceId,
 			"files",
 			null,
 			false,
@@ -3091,6 +3115,7 @@ trait WebDav {
 			$file,
 			['OC-Chunked' => '1'],
 			$data,
+			null,
 			"uploads",
 			null,
 			false,
@@ -3220,6 +3245,7 @@ trait WebDav {
 			$destination,
 			[],
 			null,
+			'',
 			"uploads",
 			null,
 			false,
@@ -3254,6 +3280,7 @@ trait WebDav {
 			$destination,
 			[],
 			$data,
+			'',
 			"uploads",
 			null,
 			false,
@@ -3419,6 +3446,7 @@ trait WebDav {
 			$source,
 			$headers,
 			null,
+			'',
 			"uploads",
 			null,
 			false,
@@ -3446,6 +3474,7 @@ trait WebDav {
 			$source,
 			$headers,
 			null,
+			'',
 			"uploads"
 		);
 	}
@@ -3714,6 +3743,7 @@ trait WebDav {
 			$path,
 			[],
 			null,
+			null,
 			"files",
 			null,
 			false,
@@ -3765,6 +3795,7 @@ trait WebDav {
 			"GET",
 			$path,
 			[],
+			null,
 			null,
 			"files",
 			null,
@@ -3842,7 +3873,7 @@ trait WebDav {
 		if ($this->getDavPathVersion() === 3) {
 			$this->setResponse($this->uploadToSharedFolder($user, $destination, $content));
 		} else {
-			$this->setResponse($this->uploadFileWithContent($user, $content, $destination));
+			$this->setResponse($this->uploadFileWithContent($user, $content, $destination, ''));
 		}
 	}
 
@@ -4071,10 +4102,11 @@ trait WebDav {
 	/**
 	 * @param string $user
 	 * @param string $path
+	 * @param string $spaceId
 	 *
 	 * @return string|null
 	 */
-	public function getFileIdForPath(string $user, string $path): ?string {
+	public function getFileIdForPath(string $user, string $path, string $spaceId = null): ?string {
 		$user = $this->getActualUsername($user);
 		try {
 			return WebDavHelper::getFileIdForPath(
@@ -4082,6 +4114,7 @@ trait WebDav {
 				$user,
 				$this->getPasswordForUser($user),
 				$path,
+				$spaceId,
 				$this->getStepLineRef(),
 				$this->getDavPathVersion()
 			);
@@ -4105,7 +4138,7 @@ trait WebDav {
 	/**
 	 * @Then /^user "([^"]*)" (file|folder) "([^"]*)" should have the previously stored id$/
 	 *
-	 * @param string $user
+	 * @param string370 $user
 	 * @param string $fileOrFolder
 	 * @param string $path
 	 *
@@ -4147,6 +4180,7 @@ trait WebDav {
 	 * @param string|null $user
 	 * @param string|null $method
 	 * @param string|null $folderpath
+	 * @param string|null $spaceId
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -4156,7 +4190,8 @@ trait WebDav {
 		TableNode $expectedFiles,
 		?string $user = null,
 		?string $method = 'REPORT',
-		?string $folderpath = ''
+		?string $folderpath = '',
+		?string $spaceId = null
 	):void {
 		if ($folderpath === "/") {
 			$folderpath = "";
@@ -4172,7 +4207,9 @@ trait WebDav {
 			}
 			if ($method === "REPORT") {
 				$fileFound = $this->findEntryFromSearchResponse(
-					$resource
+					$resource,
+					false,
+					$spaceId,
 				);
 				if (\is_object($fileFound)) {
 					$fileFound = $fileFound->xpath("d:propstat//oc:name");
@@ -4182,7 +4219,8 @@ trait WebDav {
 					$resource,
 					$user,
 					"files",
-					$folderpath
+					$folderpath,
+					$spaceId
 				);
 			}
 			if ($should) {
@@ -4482,6 +4520,7 @@ trait WebDav {
 			'/',
 			$depth,
 			null,
+			null,
 			$this->usingOldDavPath ? "public-files" : "public-files-new"
 		);
 		$this->setResponse($response);
@@ -4585,6 +4624,7 @@ trait WebDav {
 	 * @param string|null $user
 	 * @param string $type
 	 * @param string $folderPath
+	 * @param string|null $spaceId
 	 *
 	 * @return string|array|boolean
 	 *
@@ -4598,7 +4638,8 @@ trait WebDav {
 		?string $entryNameToSearch = null,
 		?string $user = null,
 		string $type = "files",
-		string $folderPath = ''
+		string $folderPath = '',
+		?string $spaceId = null
 	) {
 		$trimmedEntryNameToSearch = '';
 		// trim any leading "/" passed by the caller, we can just match the "raw" name
@@ -4609,7 +4650,7 @@ trait WebDav {
 		$folderPath = $this->escapePath($folderPath);
 		// topWebDavPath should be something like /remote.php/webdav/ or
 		// /remote.php/dav/files/alice/
-		$topWebDavPath = "/" . $this->getFullDavFilesPath($user) . "/" . $folderPath;
+		$topWebDavPath = "/" . $this->getFullDavFilesPath($user, $spaceId) . "/" . $folderPath;
 		switch ($type) {
 			case "files":
 				break;
@@ -4645,6 +4686,7 @@ trait WebDav {
 	 *
 	 * @param string|null $entryNameToSearch
 	 * @param bool|null $searchForHighlightString
+	 * @param string|null $spaceId
 	 *
 	 * @return string|array|boolean
 	 *
@@ -4656,13 +4698,14 @@ trait WebDav {
 	 */
 	public function findEntryFromSearchResponse(
 		?string $entryNameToSearch = null,
-		?bool $searchForHighlightString = false
+		?bool $searchForHighlightString = false,
+		?string $spaceId = null
 	) {
 		// trim any leading "/" passed by the caller, we can just match the "raw" name
 		if ($entryNameToSearch !== null) {
 			$entryNameToSearch = \trim($entryNameToSearch, "/");
 		}
-		$spacesBaseUrl = "/" . webDavHelper::getDavPath(null, webDavHelper::DAV_VERSION_SPACES);
+		$spacesBaseUrl = "/" . webDavHelper::getDavPath(null, webDavHelper::DAV_VERSION_SPACES, 'files', $spaceId);
 		$searchResults = $this->getResponseXml()->xpath("//d:multistatus/d:response");
 		$results = [];
 		foreach ($searchResults as $item) {

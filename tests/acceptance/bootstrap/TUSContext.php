@@ -53,13 +53,14 @@ class TUSContext implements Context {
 	 * @param string $user
 	 * @param TableNode $headers
 	 * @param string $content
+	 * @param string|null $spaceId
 	 *
 	 * @return ResponseInterface
 	 *
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function createNewTUSResourceWithHeaders(string $user, TableNode $headers, string $content = ''): ResponseInterface {
+	public function createNewTUSResourceWithHeaders(string $user, TableNode $headers, string $content = '', ?string $spaceId = null): ResponseInterface {
 		$this->featureContext->verifyTableNodeColumnsCount($headers, 2);
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
@@ -71,6 +72,7 @@ class TUSContext implements Context {
 			null,
 			$headers->getRowsHash(),
 			$content,
+			$spaceId,
 			"files",
 			null,
 			false,
@@ -119,13 +121,14 @@ class TUSContext implements Context {
 	/**
 	 * @param string $user
 	 * @param TableNode $headers
+	 * @param string|null $spaceId
 	 *
 	 * @return ResponseInterface
 	 */
-	public function createNewTUSResource(string $user, TableNode $headers):ResponseInterface {
+	public function createNewTUSResource(string $user, TableNode $headers, ?string $spaceId = null):ResponseInterface {
 		$rows = $headers->getRows();
 		$rows[] = ['Tus-Resumable', '1.0.0'];
-		return $this->createNewTUSResourceWithHeaders($user, new TableNode($rows));
+		return $this->createNewTUSResourceWithHeaders($user, new TableNode($rows), '', $spaceId);
 	}
 
 	/**
@@ -209,7 +212,7 @@ class TUSContext implements Context {
 		int     $bytes = null,
 		string  $checksum = ''
 	): void {
-		$this->uploadFileUsingTus($user, $source, $destination, $uploadMetadata, $noOfChunks, $bytes, $checksum);
+		$this->uploadFileUsingTus($user, $source, $destination, null, $uploadMetadata, $noOfChunks, $bytes, $checksum);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 	}
 
@@ -217,6 +220,7 @@ class TUSContext implements Context {
 	 * @param string $user
 	 * @param string $source
 	 * @param string $destination
+	 * @param string|null $spaceId
 	 * @param array $uploadMetadata
 	 * @param integer $noOfChunks
 	 * @param integer $bytes
@@ -228,6 +232,7 @@ class TUSContext implements Context {
 		?string $user,
 		string  $source,
 		string  $destination,
+		?string  $spaceId = null,
 		array   $uploadMetadata = [],
 		int     $noOfChunks = 1,
 		int     $bytes = null,
@@ -265,11 +270,9 @@ class TUSContext implements Context {
 				$user,
 				$this->featureContext->getDavPathVersion(),
 				"files",
-				WebDavHelper::$SPACE_ID_FROM_OCIS
-					?: $this->featureContext->getPersonalSpaceIdForUser($user)
+				$spaceId ?: $this->featureContext->getPersonalSpaceIdForUser($user)
 			)
 		);
-		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 		$client->setMetadata($uploadMetadata);
 		$sourceFile = $this->featureContext->acceptanceTestsDirLocation() . $source;
 		$client->setKey((string)rand())->file($sourceFile, $destination);
@@ -347,6 +350,7 @@ class TUSContext implements Context {
 			$user,
 			\basename($temporaryFileName),
 			$destination,
+			null,
 			[],
 			$noOfChunks
 		);
@@ -379,6 +383,7 @@ class TUSContext implements Context {
 			$user,
 			$source,
 			$destination,
+			null,
 			['mtime' => $mtime]
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
@@ -461,6 +466,7 @@ class TUSContext implements Context {
 			$user,
 			\basename($temporaryFileName),
 			$source,
+			null,
 			[],
 			1,
 			-1

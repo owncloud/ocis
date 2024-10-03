@@ -90,6 +90,7 @@ class FilesVersionsContext implements Context {
 				$endpoint,
 				null,
 				null,
+				'',
 				"versions",
 				(string)$this->featureContext->getDavPathVersion(),
 				false,
@@ -102,6 +103,7 @@ class FilesVersionsContext implements Context {
 	 * @param string $user
 	 * @param string $file
 	 * @param string|null $fileOwner
+	 * @param string|null $spaceId
 	 *
 	 * @return ResponseInterface
 	 * @throws JsonException
@@ -110,11 +112,12 @@ class FilesVersionsContext implements Context {
 	public function getFileVersions(
 		string $user,
 		string $file,
-		?string $fileOwner = null
+		?string $fileOwner = null,
+		?string $spaceId = null,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileOwner = $fileOwner ? $this->featureContext->getActualUsername($fileOwner) : $user;
-		$fileId = $this->featureContext->getFileIdForPath($fileOwner, $file);
+		$fileId = $this->featureContext->getFileIdForPath($fileOwner, $file, $spaceId);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $file user $fileOwner not found (the file may not exist)");
 		return $this->featureContext->makeDavRequest(
 			$user,
@@ -122,6 +125,7 @@ class FilesVersionsContext implements Context {
 			$this->getVersionsPathForFileId($fileId),
 			null,
 			null,
+			$spaceId,
 			null,
 			'2'
 		);
@@ -144,6 +148,7 @@ class FilesVersionsContext implements Context {
 				$endpoint,
 				null,
 				null,
+				'',
 				"versions",
 				(string)$this->featureContext->getDavPathVersion()
 			)
@@ -187,6 +192,7 @@ class FilesVersionsContext implements Context {
 			$this->getVersionsPathForFileId($fileId),
 			null,
 			$body,
+			'',
 			null,
 			'2'
 		);
@@ -394,13 +400,14 @@ class FilesVersionsContext implements Context {
 	 * @param string $user
 	 * @param string $path
 	 * @param string $index
+	 * @param string|NullCpuCoreFinder $spaceId
 	 *
 	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function downloadVersion(string $user, string $path, string $index):ResponseInterface {
+	public function downloadVersion(string $user, string $path, string $index, ?string $spaceId = null):ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
-		$fileId = $this->featureContext->getFileIdForPath($user, $path);
+		$fileId = $this->featureContext->getFileIdForPath($user, $path, $spaceId);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
 		$index = (int)$index;
 		$response = $this->listVersionFolder($user, $fileId, 1);
@@ -497,6 +504,7 @@ class FilesVersionsContext implements Context {
 			"PROPFIND",
 			$metaPath,
 			['Content-Type' => 'text/xml','Depth' => '0'],
+			null,
 			$this->featureContext->getStepLineRef(),
 			$body,
 			$this->featureContext->getDavPathVersion(),
@@ -543,6 +551,7 @@ class FilesVersionsContext implements Context {
 			$properties,
 			$this->featureContext->getStepLineRef(),
 			(string) $folderDepth,
+			'',
 			"versions"
 		);
 		return $response;
