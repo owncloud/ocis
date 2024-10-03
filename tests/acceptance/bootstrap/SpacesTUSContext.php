@@ -275,8 +275,8 @@ class SpacesTUSContext implements Context {
 		string $content,
 		string $spaceName
 	): void {
-		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
+		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
+		$response = $this->tusContext->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $content, $checksum);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
 
@@ -299,8 +299,8 @@ class SpacesTUSContext implements Context {
 		string $content,
 		string $spaceName
 	): void {
-		$spaceId = $this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
+		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
+		$response = $this->tusContext->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $content, $checksum);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -323,8 +323,8 @@ class SpacesTUSContext implements Context {
 		string $checksum,
 		string $spaceName
 	): void {
-		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
+		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
+		$response = $this->tusContext->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -345,9 +345,9 @@ class SpacesTUSContext implements Context {
 		string $spaceName,
 		TableNode $headers
 	): void {
-		$this->spacesContext->setSpaceIDByName($user, $spaceName);
 		$rows = $headers->getRowsHash();
-		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $rows['Upload-Offset'], $data, $rows['Upload-Checksum'], ['Origin' => $rows['Origin']]);
+		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
+		$response = $this->tusContext->uploadChunkToTUSLocation($user, $resourceLocation, $rows['Upload-Offset'], $data, $rows['Upload-Checksum'], ['Origin' => $rows['Origin']]);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -375,7 +375,8 @@ class SpacesTUSContext implements Context {
 		$spaceId = $this->spacesContext->setSpaceIDByName($user, $spaceName);
 		$createResponse = $this->tusContext->createNewTUSResource($user, $headers, $spaceId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $createResponse);
-		$response = $this->tusContext->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
+		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
+		$response = $this->tusContext->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
 		$this->featureContext->setResponse($response);
 	}
 

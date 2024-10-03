@@ -2395,7 +2395,7 @@ class FeatureContext extends BehatVariablesContext {
 				"code" => "%tus_upload_location%",
 				"function" => [
 					$this->tusContext,
-					"getTusResourceLocation"
+					"getLastTusResourceLocation"
 				],
 				"parameter" => []
 			],
