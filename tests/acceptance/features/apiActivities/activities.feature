@@ -183,6 +183,111 @@ Feature: check activities
       }
       """
 
+  @issue-10001
+  Scenario: check edit activity of a file
+    Given user "Alice" has uploaded file with content "ownCloud test text file" to "/textfile.txt"
+    And user "Alice" has uploaded file with content "edited ownCloud test text file" to "/textfile.txt"
+    When user "Alice" lists the activities of file "/textfile.txt" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {resource} in {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "textfile.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
   @issue-9712
   Scenario: check activities after deleting a file and a folder
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile.txt"
