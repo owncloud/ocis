@@ -28,20 +28,26 @@ The Infinite Scale Team and product management are providing a default setup for
   - minimal effort to get started with an opinionated setup
   - keep it adjustable it to your needs.
 
-### Default components
+### Default Components
 
 - Infinite Scale
 - Full Text Search
 - Collabora Online Web Office
-- LetsEncrypt for SSL certificates via Traefik Reverse Proxy
+- Prepared for LetsEncrypt SSL certificates via Traefik Reverse Proxy
 
-### Optional components
+### Optional Components
 
 - ClamAV Virusscanner
 - Cloud Importer (Experimental)
 - OnlyOffice as an alternative to Collabora
 - S3 Storage config to connect to an S3 storage backend
 - S3 Minio Server as a local S3 storage backend for debugging and development
+
+### Important Note
+
+If you deviate from the configuration setup and let the `collaboration` service run in its own container, you MUST
+ensure the ocis configuration is shared as shown in the example deployment. This is because secrets generated
+must be accessible for all services.
 
 ## Server Deployment
 
@@ -263,7 +269,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 * You now can visit oCIS and are able to open an office document in your browser. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
-## Local setup
+## Local Setup
 
 This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self-signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
@@ -302,7 +308,7 @@ CLAMAV=:clamav.yml
 
 After enabling that service, you can add the service to the stack with `docker-compose up -d` again.
 
-### Traefik dashboard
+### Traefik Dashboard
 
 If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` e.g. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
 
@@ -370,13 +376,13 @@ S3NG_SECRET_KEY=
 S3NG_BUCKET=
 ```
 
-#### Use a local minio S3 storage backend
+#### Use a Local Minio S3 Storage Backend
 
 For testing purposes, you can use a local minio S3 storage backend. To enable it, uncomment the `S3NG_MINIO` line in the `.env` file.
 
 The frontend for the minio server is available at `http://minio.owncloud.test` and the access key is `ocis` and the secret key is `ocis-secret`.
 
-## Local setup for web development
+## Local Setup for Web Development
 
 In case you want to run ownCloud Web from a development branch together with this deployment example (e.g. for feature development for the app provider frontend) you can use this deployment example with the local setup and some additional steps as described below.
 
