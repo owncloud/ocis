@@ -35,6 +35,9 @@ policies:
   - endpoint: /
     service: com.owncloud.web.web
     unprotected: true
+  - endpoint: /.well-known/ocm
+    service: com.owncloud.web.ocm
+    unprotected: true
   - endpoint: /.well-known/webfinger
     service: com.owncloud.web.webfinger
     unprotected: true
