@@ -48,7 +48,9 @@ class GraphContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
 		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->spacesContext = $environment->getContext('SpacesContext');
+		if (!\TestHelpers\OcisHelper::isTestingOnReva()) {
+			$this->spacesContext = $environment->getContext('SpacesContext');
+		}
 	}
 
 	/**
