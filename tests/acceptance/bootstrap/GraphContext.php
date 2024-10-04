@@ -2806,7 +2806,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" lists the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" using the Graph API/
+	 * @When /^user "([^"]*)" lists the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $resource
@@ -2937,7 +2937,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" lists the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" with (depth|limit|sort) "([^"]*)" using the Graph API/
+	 * @When /^user "([^"]*)" lists the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" with (depth|limit|sort) "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $resource
@@ -2978,6 +2978,39 @@ class GraphContext implements Context {
 			$actualActivity = $actualActivity->template->variables->resource->name . ":" . $actualActivity->template->message;
 			Assert::assertEquals($expectedActivity, $actualActivity, "Activity didn't match");
 		}
+	}
+
+	/**
+	 * @When /^user "([^"]*)" lists the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" with (depth|limit) "([^"]*)" and sort "(asc|desc)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $spaceName
+	 * @param string $filterType
+	 * @param string $filterValue
+	 * @param string $sortType
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userListsTheActivitiesOfResourceFromSpaceWithDepthOrLimitAndSortUsingTheGraphApi(
+		string $user,
+		string $resource,
+		string $spaceName,
+		string $filterType,
+		string $filterValue,
+		string $sortType
+	): void {
+		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
+		$response = GraphHelper::getActivities(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$resourceId,
+			[$filterType => $filterValue, 'sort' => $sortType],
+		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**

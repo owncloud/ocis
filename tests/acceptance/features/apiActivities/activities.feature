@@ -2154,6 +2154,25 @@ Feature: check activities
       | textfile.txt | {user} added {resource} to {folder}   |
       | New Folder   | {user} added {resource} to {folder}   |
 
+  @issue-10150
+  Scenario: check activities with limit and sort filters (asc/desc)
+    Given user "Alice" has created folder "/New Folder"
+    And user "Alice" has created folder "/New Folder/Sub Folder"
+    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
+    And user "Alice" has uploaded file with content "updated ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
+    When user "Alice" lists the activities of folder "New Folder" from space "Personal" with limit "2" and sort "asc" using the Graph API
+    Then the HTTP status code should be "200"
+    And the activities should be in the following order:
+      | resource   | message                             |
+      | New Folder | {user} added {resource} to {folder} |
+      | Sub Folder | {user} added {resource} to {folder} |
+    When user "Alice" lists the activities of folder "New Folder" from space "Personal" with limit "2" and sort "desc" using the Graph API
+    Then the HTTP status code should be "200"
+    And the activities should be in the following order:
+      | resource     | message                               |
+      | textfile.txt | {user} updated {resource} in {folder} |
+      | textfile.txt | {user} added {resource} to {folder}   |
+
   @issue-9860
   Scenario: user tries to check activities of another user's file
     Given user "Brian" has been created with default attributes and without skeleton files
