@@ -1,4 +1,4 @@
-// Copyright 2018-2021 CERN
+// Copyright 2018-2024 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/rhttp/global"
-	"github.com/cs3org/reva/v2/pkg/rhttp/router"
-	"github.com/mitchellh/mapstructure"
+	"github.com/cs3org/reva/v2/pkg/utils/cfg"
+	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
 )
 
@@ -32,43 +32,40 @@ func init() {
 	global.Register("wellknown", New)
 }
 
-type config struct {
-	Prefix                string `mapstructure:"prefix"`
-	Issuer                string `mapstructure:"issuer"`
-	AuthorizationEndpoint string `mapstructure:"authorization_endpoint"`
-	JwksURI               string `mapstructure:"jwks_uri"`
-	TokenEndpoint         string `mapstructure:"token_endpoint"`
-	RevocationEndpoint    string `mapstructure:"revocation_endpoint"`
-	IntrospectionEndpoint string `mapstructure:"introspection_endpoint"`
-	UserinfoEndpoint      string `mapstructure:"userinfo_endpoint"`
-	EndSessionEndpoint    string `mapstructure:"end_session_endpoint"`
-}
-
-func (c *config) init() {
-	if c.Prefix == "" {
-		c.Prefix = ".well-known"
-	}
-}
-
 type svc struct {
-	conf    *config
-	handler http.Handler
+	router chi.Router
+	Conf   *config
 }
 
-// New returns a new webuisvc
+type config struct {
+	OCMProvider OcmProviderConfig `mapstructure:"ocmprovider"`
+}
+
+// New returns a new wellknown object.
 func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) {
-	conf := &config{}
-	if err := mapstructure.Decode(m, conf); err != nil {
+	var c config
+	if err := cfg.Decode(m, &c); err != nil {
 		return nil, err
 	}
 
-	conf.init()
-
+	r := chi.NewRouter()
 	s := &svc{
-		conf: conf,
+		router: r,
+		Conf:   &c,
 	}
-	s.setHandler()
+	if err := s.routerInit(); err != nil {
+		return nil, err
+	}
+
 	return s, nil
+}
+
+func (s *svc) routerInit() error {
+	wkocmHandler := new(wkocmHandler)
+	wkocmHandler.init(&s.Conf.OCMProvider)
+	s.router.Get("/.well-known/ocm", wkocmHandler.Ocm)
+	s.router.Get("/ocm-provider", wkocmHandler.Ocm)
+	return nil
 }
 
 func (s *svc) Close() error {
@@ -76,32 +73,20 @@ func (s *svc) Close() error {
 }
 
 func (s *svc) Prefix() string {
-	return s.conf.Prefix
-}
-
-func (s *svc) Handler() http.Handler {
-	return s.handler
+	return ""
 }
 
 func (s *svc) Unprotected() []string {
-	return []string{
-		"/openid-configuration",
-	}
+	return []string{"/", "/.well-known/ocm", "/ocm-provider"}
 }
 
-func (s *svc) setHandler() {
-	s.handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (s *svc) Handler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log := appctx.GetLogger(r.Context())
-		var head string
-		head, r.URL.Path = router.ShiftPath(r.URL.Path)
-		log.Info().Msgf("wellknown routing: head=%s tail=%s", head, r.URL.Path)
-		switch head {
-		case "webfinger":
-			s.doWebfinger(w, r)
-		case "openid-configuration":
-			s.doOpenidConfiguration(w, r)
-		default:
-			w.WriteHeader(http.StatusNotFound)
-		}
+		log.Debug().Str("path", r.URL.Path).Msg(".well-known routing")
+
+		// unset raw path, otherwise chi uses it to route and then fails to match percent encoded path segments
+		r.URL.RawPath = ""
+		s.router.ServeHTTP(w, r)
 	})
 }

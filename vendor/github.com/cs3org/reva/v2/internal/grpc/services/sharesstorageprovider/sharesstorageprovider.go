@@ -798,13 +798,19 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 		return nil, err
 	}
 
-	// when stating a share jail mountpoint we need to rewrite the id and use the share
-	// jail space id as the mountpoint has a different id than the grant
+	// when stating a share jail mountpoint we need to rewrite the ids
 	if statRes.GetStatus().GetCode() == rpc.Code_CODE_OK && receivedShare.MountPoint.Path == strings.TrimPrefix(req.Ref.Path, "./") && statRes.Info != nil {
+		// overwrite id with the share jail mountpoint id
 		statRes.Info.Id = &provider.ResourceId{
 			StorageId: utils.ShareStorageProviderID,
 			SpaceId:   utils.ShareStorageSpaceID,
 			OpaqueId:  receivedShare.GetShare().GetId().GetOpaqueId(),
+		}
+		// overwrite parent id with the share jail root
+		statRes.Info.ParentId = &provider.ResourceId{
+			StorageId: utils.ShareStorageProviderID,
+			SpaceId:   utils.ShareStorageSpaceID,
+			OpaqueId:  utils.ShareStorageSpaceID,
 		}
 	}
 
