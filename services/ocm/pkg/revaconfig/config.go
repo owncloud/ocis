@@ -42,6 +42,18 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{
+				"wellknown": map[string]interface{}{
+					"prefix": ".well-known",
+					"ocmprovider": map[string]interface{}{
+						"ocm_prefix":    cfg.OCMD.Prefix,
+						"endpoint":      cfg.Commons.OcisURL,
+						"provider":      "oCIS",
+						"webdav_root":   "/dav/ocm",
+						"webapp_root":   cfg.ScienceMesh.Prefix,
+						"enable_webapp": false,
+						"enable_datatx": false,
+					},
+				},
 				"sciencemesh": map[string]interface{}{
 					"prefix":             cfg.ScienceMesh.Prefix,
 					"smtp_credentials":   map[string]string{},
