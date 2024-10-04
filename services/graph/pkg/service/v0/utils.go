@@ -3,7 +3,6 @@ package svc
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"reflect"
@@ -203,23 +202,21 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 				},
 			})
 
-			var errCode errorcode.Error
-			errors.As(errorcode.FromCS3Status(shareStat.GetStatus(), err), &errCode)
-
-			switch {
-			// skip ItemNotFound shares, they might have been deleted in the meantime or orphans.
-			case errCode.GetCode() == errorcode.ItemNotFound:
+			if err := errorcode.FromCS3Status(shareStat.GetStatus(), err); err != nil {
+				logger.Debug().Err(err).
+					Str("shareid", receivedShares[0].GetShare().GetId().GetOpaqueId()).
+					Str("resourceid", storagespace.FormatResourceID(receivedShares[0].GetShare().GetResourceId())).
+					Msg("could not stat received share, skipping")
 				return nil
-			case err == nil:
-				break
-			default:
-				logger.Error().Err(errCode).Msg("could not stat")
-				return errCode
 			}
 
 			driveItem, err := fillDriveItemPropertiesFromReceivedShare(ctx, logger, identityCache, receivedShares, shareStat.GetInfo(), availableRoles)
 			if err != nil {
-				return err
+				logger.Debug().Err(err).
+					Str("shareid", receivedShares[0].GetShare().GetId().GetOpaqueId()).
+					Str("resourceid", storagespace.FormatResourceID(receivedShares[0].GetShare().GetResourceId())).
+					Msg("could not fill drive item properties from received share, skipping")
+				return nil
 			}
 
 			if !driveItem.HasUIHidden() {
@@ -553,23 +550,21 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 				},
 			})
 
-			var errCode errorcode.Error
-			errors.As(errorcode.FromCS3Status(shareStat.GetStatus(), err), &errCode)
-
-			switch {
-			// skip ItemNotFound shares, they might have been deleted in the meantime or orphans.
-			case errCode.GetCode() == errorcode.ItemNotFound:
+			if err := errorcode.FromCS3Status(shareStat.GetStatus(), err); err != nil {
+				logger.Debug().Err(err).
+					Str("shareid", receivedShares[0].GetId().GetOpaqueId()).
+					Str("remoteshareid", receivedShares[0].GetRemoteShareId()).
+					Msg("could not stat received ocm share, skipping")
 				return nil
-			case err == nil:
-				break
-			default:
-				logger.Error().Err(errCode).Msg("could not stat")
-				return errCode
 			}
 
 			driveItem, err := fillDriveItemPropertiesFromReceivedOCMShare(ctx, logger, identityCache, receivedShares, shareStat.GetInfo(), availableRoles)
 			if err != nil {
-				return err
+				logger.Debug().Err(err).
+					Str("shareid", receivedShares[0].GetId().GetOpaqueId()).
+					Str("remoteshareid", receivedShares[0].GetRemoteShareId()).
+					Msg("could not fill drive item properties from received ocm share, skipping")
+				return nil
 			}
 
 			if !driveItem.HasUIHidden() {
