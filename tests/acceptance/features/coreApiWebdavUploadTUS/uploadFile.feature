@@ -211,3 +211,26 @@ Feature: upload file
       | old              |
       | new              |
       | spaces           |
+
+  @issue-8804
+  Scenario Outline: multiple upload locations of the same file
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
+      | Upload-Length   | 5                     |
+      #    bG9yZW0udHh0 is the base64 encode of lorem.txt
+      | Upload-Metadata | filename bG9yZW0udHh0 |
+    And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
+      | Upload-Length   | 5                     |
+      #    bG9yZW0udHh0 is the base64 encode of lorem.txt
+      | Upload-Metadata | filename bG9yZW0udHh0 |
+    When user "Alice" uploads content "lorem" with checksum "MD5 d2e16e6ef52a45b7468f1da56bba1953" and offset "0" to the index "1" location of file "lorem.txt" using the TUS protocol
+    Then the HTTP status code should be "204"
+    And the content of file "lorem.txt" for user "Alice" should be "lorem"
+    When user "Alice" tries to upload content "epsum" with checksum "MD5 d6145e3d2ced88009796acae1dc7929f" and offset "0" to the index "0" location of file "lorem.txt" using the TUS protocol
+    Then the HTTP status code should be "409"
+    And the content of file "lorem.txt" for user "Alice" should be "lorem"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
