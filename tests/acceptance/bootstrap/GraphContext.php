@@ -2935,7 +2935,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" lists the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" with (depth|limit) "([^"]*)" using the Graph API/
+	 * @When /^user "([^"]*)" lists the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" with (depth|limit|sort) "([^"]*)" using the Graph API/
 	 *
 	 * @param string $user
 	 * @param string $resource
@@ -2956,6 +2956,26 @@ class GraphContext implements Context {
 			[$filterType => $filterValue]
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then the activities should be in the following order:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theActivitiesShouldBeInTheFollowingOrder(TableNode $table): void {
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent();
+		$activities = $responseBody->value;
+
+		foreach ($table->getHash() as $index => $expectedValue) {
+			$actualActivity = $activities[$index];
+			$expectedActivity = $expectedValue['resource'] . ":" . $expectedValue['message'];
+			$actualActivity = $actualActivity->template->variables->resource->name . ":" . $actualActivity->template->message;
+			Assert::assertEquals($expectedActivity, $actualActivity, "Activity didn't match");
+		}
 	}
 
 	/**
