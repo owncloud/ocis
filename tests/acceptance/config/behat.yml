@@ -415,7 +415,6 @@ default:
         - CollaborationContext:
         - TrashbinContext:
 
-
     cliCommands:
       paths:
         - "%paths.base%/../features/cliCommands"
