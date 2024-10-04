@@ -9,15 +9,16 @@ Feature: an user shares resources usin ScienceMesh application
     And user "Brian" has been created with default attributes and without skeleton files
 
   @issue-9534
-  Scenario: users shares folder to federation users after receiver accepted invitation
+  Scenario Outline: local user shares resources to federation user
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
     And "Brian" has accepted invitation
     And using server "LOCAL"
     And user "Alice" has created folder "folderToShare"
+    And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
     When user "Alice" sends the following resource share invitation to federated user using the Graph API:
-      | resource        | folderToShare                 |
+      | resource        | <resource>                    |
       | space           | Personal                      |
       | sharee          | Brian                         |
       | shareType       | user                          |
@@ -50,11 +51,15 @@ Feature: an user shares resources usin ScienceMesh application
               "properties": {
                 "@UI.Hidden": {
                   "type": "boolean",
-                  "enum": [false]
+                  "enum": [
+                    false
+                  ]
                 },
                 "@client.synchronize": {
                   "type": "boolean",
-                  "enum": [false]
+                  "enum": [
+                    false
+                  ]
                 },
                 "createdBy": {
                   "type": "object",
@@ -82,7 +87,7 @@ Feature: an user shares resources usin ScienceMesh application
                   }
                 },
                 "name": {
-                  "const": "folderToShare"
+                  "const": "<resource>"
                 }
               }
             }
@@ -90,16 +95,21 @@ Feature: an user shares resources usin ScienceMesh application
         }
       }
       """
+    Examples:
+      | resource      |
+      | folderToShare |
+      | textfile.txt  |
 
   @issue-9534
-  Scenario: users shares folder to federation users after accepting invitation
+  Scenario Outline: federation user shares resource to local user after accepting invitation
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
     And "Brian" has accepted invitation
     And user "Brian" has created folder "folderToShare"
+    And user "Brian" has uploaded file with content "ocm test" to "/textfile.txt"
     When user "Brian" sends the following resource share invitation to federated user using the Graph API:
-      | resource        | folderToShare     |
+      | resource        | <resource>        |
       | space           | Personal          |
       | sharee          | Alice             |
       | shareType       | user              |
@@ -107,7 +117,7 @@ Feature: an user shares resources usin ScienceMesh application
       | federatedServer | @ocis-server:9200 |
     Then the HTTP status code should be "200"
     When using server "LOCAL"
-    And user "Alice" lists the shares shared with her using the Graph API
+    And user "Alice" lists the shares shared with her without retry using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -132,11 +142,15 @@ Feature: an user shares resources usin ScienceMesh application
               "properties": {
                 "@UI.Hidden": {
                   "type": "boolean",
-                  "enum": [false]
+                  "enum": [
+                    false
+                  ]
                 },
                 "@client.synchronize": {
                   "type": "boolean",
-                  "enum": [false]
+                  "enum": [
+                    false
+                  ]
                 },
                 "createdBy": {
                   "type": "object",
@@ -163,7 +177,7 @@ Feature: an user shares resources usin ScienceMesh application
                   }
                 },
                 "name": {
-                  "const": "folderToShare"
+                  "const": "<resource>"
                 }
               }
             }
@@ -171,3 +185,7 @@ Feature: an user shares resources usin ScienceMesh application
         }
       }
       """
+    Examples:
+      | resource      |
+      | folderToShare |
+      | textfile.txt  |

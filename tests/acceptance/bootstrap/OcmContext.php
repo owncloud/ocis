@@ -231,6 +231,24 @@ class OcmContext implements Context {
 	}
 
 	/**
+	 *
+	 * @param string $user
+	 * @param string $ocmUserName
+	 *
+	 * @return array
+	 * @throws GuzzleException
+	 */
+	public function getAcceptedUserByName(string $user, string $ocmUserName): array {
+		$users = ($this->featureContext->getJsonDecodedResponse($this->findAcceptedUsers($user)));
+		foreach ($users as $user) {
+			if (strpos($user["display_name"], $ocmUserName) !== false) {
+				return $user;
+			}
+		}
+		throw new \Exception("Could not find user with name '{$ocmUserName}' in the accepted users list.");
+	}
+
+	/**
 	 * @param string $user
 	 *
 	 * @return ResponseInterface
@@ -268,4 +286,51 @@ class OcmContext implements Context {
 	public function theUserWaitsForTokenToExpire(int $number): void {
 		\sleep($number);
 	}
+
+	/**
+	 * @When user :user deletes federated connection with user :ocmUser using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $ocmUser
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userDeletesFederatedConnectionWithUserUsingTheGraphApi(string $user, string $ocmUser): void {
+		$this->featureContext->setResponse($this->deleteConnection($user, $ocmUser));
+	}
+
+	/**
+	 * @When user :user has deleted federated connection with user :ocmUser
+	 *
+	 * @param string $user
+	 * @param string $ocmUser
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasDeletedFederatedConnectionWithUser(string $user, string $ocmUser): void {
+		$response = $this->deleteConnection($user, $ocmUser);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "failed while deleting connection with user $ocmUser", $response);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $ocmUser
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function deleteConnection(string $user, string $ocmUser): ResponseInterface {
+		$ocmUser = $this->getAcceptedUserByName($user, $ocmUser);
+		return OcmHelper::deleteConnection(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$ocmUser['user_id'],
+			$ocmUser['idp']
+		);
+	}
+
 }

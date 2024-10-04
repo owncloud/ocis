@@ -256,10 +256,19 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [OCM. admin cannot get federated users if he hasn't connection with them ](https://github.com/owncloud/ocis/issues/9829)
 
-tests/acceptance/features/apiOcm/searchFederationUsers.feature
-
 - [apiOcm/searchFederationUsers.feature:429](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/searchFederationUsers.feature#L429)
 - [apiOcm/searchFederationUsers.feature:601](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/searchFederationUsers.feature#L601)
+
+
+#### [OCM. federated connection is not dropped when one of the users deletes the connection](https://github.com/owncloud/ocis/issues/10216)
+
+- [apiOcm/deleteFederatedConnections.feature:39](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L39)
+- [apiOcm/deleteFederatedConnections.feature:66](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L66)
+
+
+#### [OCM. server crash after deleting share for ocm user](https://github.com/owncloud/ocis/issues/10213)
+
+- [apiOcm/deleteFederatedConnections.feature:103](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L103)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
