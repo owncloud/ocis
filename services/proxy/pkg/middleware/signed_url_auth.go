@@ -160,6 +160,16 @@ func (m SignedURLAuthenticator) signatureIsValid(req *http.Request) (err error) 
 	if computedSignature == signatureInURL {
 		return nil
 	}
+
+	// try a workaround for https://github.com/owncloud/ocis/issues/10180
+	// Some reverse proxies might replace $ with %24 in the URL leading to a mismatch in the signature
+	u = strings.Replace(u, "$", "%24", 1)
+	computedSignature = m.createSignature(u, signingKey[0].Value)
+	signatureInURL = req.URL.Query().Get(_paramOCSignature)
+	if computedSignature == signatureInURL {
+		return nil
+	}
+
 	return fmt.Errorf("signature mismatch: expected %s != actual %s", computedSignature, signatureInURL)
 }
 
