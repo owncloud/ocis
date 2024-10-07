@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-09-19 00:42+0000\n"
+"POT-Creation-Date: 2024-10-07 00:42+0000\n"
 "PO-Revision-Date: 2024-08-20 10:13+0000\n"
 "Last-Translator: Andi Chandler <andi@gowling.com>, 2024\n"
 "Language-Team: English (United Kingdom) (https://app.transifex.com/owncloud-org/teams/6149/en_GB/)\n"
@@ -21,50 +21,82 @@ msgstr ""
 "Language: en_GB\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: pkg/service/response.go:24
-msgid "{user} added {resource} to {space}"
-msgstr "{user} added {resource} to {space}"
+#: pkg/service/response.go:44
+msgid "description"
+msgstr "description"
 
-#: pkg/service/response.go:34
+#: pkg/service/response.go:43
+msgid "display name"
+msgstr "display name"
+
+#: pkg/service/response.go:42
+msgid "expiration date"
+msgstr "expiration date"
+
+#: pkg/service/response.go:41
+msgid "password"
+msgstr "password"
+
+#: pkg/service/response.go:40
+msgid "permission"
+msgstr "permission"
+
+#: pkg/service/response.go:39
+msgid "some field"
+msgstr "some field"
+
+#: pkg/service/response.go:26
+msgid "{resource} was downloaded via public link {token}"
+msgstr "{resource} was downloaded via public link {token}"
+
+#: pkg/service/response.go:24
+msgid "{user} added {resource} to {folder}"
+msgstr "{user} added {resource} to {folder}"
+
+#: pkg/service/response.go:36
 msgid "{user} added {sharee} as member of {space}"
 msgstr "{user} added {sharee} as member of {space}"
 
-#: pkg/service/response.go:26
-msgid "{user} deleted {resource} from {space}"
-msgstr "{user} deleted {resource} from {space}"
-
 #: pkg/service/response.go:27
-msgid "{user} moved {resource} to {space}"
-msgstr "{user} moved {resource} to {space}"
+msgid "{user} deleted {resource} from {folder}"
+msgstr "{user} deleted {resource} from {folder}"
 
-#: pkg/service/response.go:33
+#: pkg/service/response.go:28
+msgid "{user} moved {resource} to {folder}"
+msgstr "{user} moved {resource} to {folder}"
+
+#: pkg/service/response.go:35
 msgid "{user} removed link to {resource}"
 msgstr "{user} removed link to {resource}"
 
-#: pkg/service/response.go:30
+#: pkg/service/response.go:32
 msgid "{user} removed {sharee} from {resource}"
 msgstr "{user} removed {sharee} from {resource}"
 
-#: pkg/service/response.go:35
+#: pkg/service/response.go:37
 msgid "{user} removed {sharee} from {space}"
 msgstr "{user} removed {sharee} from {space}"
 
-#: pkg/service/response.go:28
+#: pkg/service/response.go:29
 msgid "{user} renamed {oldResource} to {resource}"
 msgstr "{user} renamed {oldResource} to {resource}"
 
-#: pkg/service/response.go:31
+#: pkg/service/response.go:33
 msgid "{user} shared {resource} via link"
 msgstr "{user} shared {resource} via link"
 
-#: pkg/service/response.go:29
+#: pkg/service/response.go:30
 msgid "{user} shared {resource} with {sharee}"
 msgstr "{user} shared {resource} with {sharee}"
 
-#: pkg/service/response.go:32
+#: pkg/service/response.go:34
 msgid "{user} updated {field} for a link {token} on {resource}"
-msgstr ""
+msgstr "{user} updated {field} for a link {token} on {resource}"
+
+#: pkg/service/response.go:31
+msgid "{user} updated {field} for the {resource}"
+msgstr "{user} updated {field} for the {resource}"
 
 #: pkg/service/response.go:25
 msgid "{user} updated {resource} in {folder}"
-msgstr ""
+msgstr "{user} updated {resource} in {folder}"
