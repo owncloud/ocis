@@ -145,8 +145,12 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 	}
 
 	key, tr, err := g.checkThumbnail(req, sRes)
-	if err != nil {
+	switch {
+	case err != nil:
 		return "", err
+	case key != "":
+		// we have matching thumbnail already, use that
+		return key, nil
 	}
 
 	ctx = imgsource.ContextSetAuthorization(ctx, src.GetAuthorization())
@@ -220,9 +224,14 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	}
 
 	key, tr, err := g.checkThumbnail(req, sRes)
-	if err != nil {
+	switch {
+	case err != nil:
 		return "", err
+	case key != "":
+		// we have matching thumbnail already, use that
+		return key, nil
 	}
+
 	if src.GetWebdavAuthorization() != "" {
 		ctx = imgsource.ContextSetAuthorization(ctx, src.GetWebdavAuthorization())
 	}
