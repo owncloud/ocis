@@ -332,5 +332,4 @@ class OcmContext implements Context {
 			$ocmUser['idp']
 		);
 	}
-
 }
