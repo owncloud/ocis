@@ -59,7 +59,7 @@ class SpacesTUSContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userHasUploadedFileViaTusInSpace(string $user, string $source, string $destination, string $spaceName): void {
-		$spaceId = $this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$this->tusContext->uploadFileUsingTus($user, $source, $destination, $spaceId);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 	}
@@ -82,7 +82,7 @@ class SpacesTUSContext implements Context {
 		string $destination,
 		string $spaceName
 	): void {
-		$spaceId = $this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$this->tusContext->uploadFileUsingTus($user, $source, $destination, $spaceId);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 	}
@@ -106,7 +106,7 @@ class SpacesTUSContext implements Context {
 		string $content,
 		TableNode $headers
 	): void {
-		$spaceId = $this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$response = $this->tusContext->createNewTUSResourceWithHeaders($user, $headers, $content, $spaceId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "Expected response status code should be 201", $response);
 	}
@@ -130,7 +130,7 @@ class SpacesTUSContext implements Context {
 		string $content,
 		TableNode $headers
 	): void {
-		$spaceId = $this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$response = $this->tusContext->createNewTUSResourceWithHeaders($user, $headers, $content, $spaceId);
 		$this->featureContext->setResponse($response);
 	}
@@ -147,7 +147,7 @@ class SpacesTUSContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	private function uploadFileViaTus(string $user, string $content, string $resource, string $spaceName): void {
-		$spaceId = $this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$tmpFile = $this->tusContext->writeDataToTempFile($content);
 		try {
 			$this->tusContext->uploadFileUsingTus(
@@ -242,7 +242,7 @@ class SpacesTUSContext implements Context {
 				break;
 			default:
 		}
-		$spaceId = $this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
 		$user = $this->featureContext->getActualUsername($user);
@@ -372,7 +372,7 @@ class SpacesTUSContext implements Context {
 		string $spaceName,
 		TableNode $headers
 	): void {
-		$spaceId = $this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$createResponse = $this->tusContext->createNewTUSResource($user, $headers, $spaceId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $createResponse);
 		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
@@ -397,7 +397,7 @@ class SpacesTUSContext implements Context {
 		string $spaceName,
 		string $mtime
 	): void {
-		$spaceId = $this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$mtime = new DateTime($mtime);
 		Assert::assertEquals(
 			$mtime->format('U'),

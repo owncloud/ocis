@@ -254,43 +254,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * This method sets space id by Space Name
-	 * This is currently used to set space id from ocis in core so that we can reuse available resource (code) and avoid duplication
-	 *
-	 * @param string $user
-	 * @param string $spaceName
-	 *
-	 * @return string
-	 * @throws GuzzleException
-	 */
-	public function setSpaceIDByName(string $user, string $spaceName): string {
-		$space = $this->getSpaceByName($user, $spaceName);
-		Assert::assertIsArray($space, "Space with name '$spaceName' not found");
-		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
-		return $space["id"];
-	}
-
-	/**
-	 * The method finds available spaces to the manager user and returns the space by spaceName
-	 *
-	 * @param string $user
-	 * @param string $spaceName
-	 *
-	 * @return array
-	 * @throws GuzzleException
-	 */
-	public function getSpaceByNameManager(string $user, string $spaceName): array {
-		$this->listAllAvailableSpaces($user);
-
-		$spaces = $this->getAvailableSpaces();
-		Assert::assertArrayHasKey($spaceName, $spaces, "Space with name '$spaceName' for user '$user' not found");
-		Assert::assertIsArray($spaces[$spaceName], "Data for space with name '$spaceName' for user '$user' not found");
-		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name '$spaceName' for user '$user' not found");
-
-		return $spaces[$spaceName];
-	}
-
-	/**
 	 * The method finds file by fileName and spaceName and returns data of file which contains in responseHeader
 	 * fileName contains the path, if the file is in the folder
 	 *
@@ -371,7 +334,7 @@ class SpacesContext implements Context {
 	 * @throws JsonException
 	 */
 	public function getPrivateLink(string $user, string $spaceName): string {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = WebDavHelper::propfind(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
@@ -755,7 +718,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function propfindSpace(string $user, string $spaceName, string $foldersPath = ''): ResponseInterface {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		return WebDavHelper::propfind(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -1273,7 +1236,7 @@ class SpacesContext implements Context {
 		if ($ownerUser === '') {
 			$ownerUser = $user;
 		}
-		$spaceId = $this->setSpaceIDByName($ownerUser, $spaceName);
+		$spaceId = $this->getSpaceIdByName($ownerUser, $spaceName);
 		return $this->featureContext->createFolder($user, $folder, false, null, $spaceId);
 	}
 
@@ -1317,7 +1280,7 @@ class SpacesContext implements Context {
 		string $content,
 		string $destination
 	): void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->uploadFileWithContent($user, $content, $destination, $spaceId);
 		$this->featureContext->setResponse($response);
 	}
@@ -1340,7 +1303,7 @@ class SpacesContext implements Context {
 		string $destination,
 		string $spaceName
 	): void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->uploadFile($user, $source, $destination, $spaceId);
 		$this->featureContext->setResponse($response);
 	}
@@ -1358,7 +1321,7 @@ class SpacesContext implements Context {
 	 * @throws Exception
 	 */
 	public function userHasUploadedAFileToInSpaceUsingTheWebdavApi(string $user, string $source, string $destination, string $spaceName): void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->uploadFile($user, $source, $destination, $spaceId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
@@ -1387,7 +1350,7 @@ class SpacesContext implements Context {
 		string $content,
 		string $destination
 	): void {
-		$spaceId = $this->setSpaceIDByName($ownerUser, $spaceName);
+		$spaceId = $this->getSpaceIdByName($ownerUser, $spaceName);
 		$response = $this->featureContext->uploadFileWithContent($user, $content, $destination, $spaceId);
 		$this->featureContext->setResponse($response);
 	}
@@ -1932,7 +1895,7 @@ class SpacesContext implements Context {
 		string $fileName,
 		string $spaceName
 	):void {
-		$this->setSpaceIDByName($user, $spaceName);
+		$this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName, $this->featureContext->getPasswordForUser($user));
 		Assert::assertGreaterThanOrEqual(
 			400,
@@ -2119,7 +2082,7 @@ class SpacesContext implements Context {
 	): array {
 		$response = $this->listAllAvailableSpacesOfUser($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->uploadFileWithContent($user, $fileContent, $destination, $spaceId, true);
 		$this->featureContext->theHTTPStatusCodeShouldBe(['201', '204'], "", $response);
 		return $response->getHeader('oc-fileid');
@@ -2872,7 +2835,8 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	): void {
-		$space = $this->getSpaceByNameManager($user, $spaceName);
+		// get space by admin user
+		$space = $this->getSpaceByName($this->featureContext->getAdminUserName(), $spaceName);
 		$fullUrl = $this->baseUrl . $this->davSpacesUrl . "trash-bin/" . $space["id"];
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest($fullUrl, $this->featureContext->getStepLineRef(), 'PROPFIND', $user, $this->featureContext->getPasswordForUser($user))
@@ -3099,7 +3063,7 @@ class SpacesContext implements Context {
 		string $fileName,
 		string $spaceName
 	): void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName, $this->featureContext->getPasswordForUser($user), [], $spaceId);
 		$this->featureContext->setResponse($response);
 	}
@@ -3119,7 +3083,7 @@ class SpacesContext implements Context {
 		string $path,
 		string $spaceName
 	): void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->featureContext->setResponse($this->checksumContext->propfindResourceChecksum($user, $path, $spaceId));
 	}
 
@@ -3142,7 +3106,7 @@ class SpacesContext implements Context {
 		string $destination,
 		string $spaceName
 	): void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->featureContext->setResponse(
 			$this->featureContext->uploadFileWithChecksumAndContent($user, $checksum, $content, $destination, false, $spaceId)
 		);
@@ -3166,7 +3130,7 @@ class SpacesContext implements Context {
 		string $index,
 		string $spaceName
 	): void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->featureContext->setResponse($this->filesVersionsContext->downloadVersion($user, $fileName, $index, $spaceId));
 	}
 
@@ -3181,7 +3145,7 @@ class SpacesContext implements Context {
 	 * @throws Exception
 	 */
 	public function userTriesToDownloadFileVersions(string $user, string $file, string $spaceName):void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->featureContext->setResponse(
 			$this->filesVersionsContext->getFileVersions($user, $file, null, $spaceId)
 		);
@@ -3198,7 +3162,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userGetsEtagOfElementInASpace(string $user, string $space, string $path): string {
-		$spaceId = $this->setSpaceIDByName($user, $space);
+		$spaceId = $this->getSpaceIdByName($user, $space);
 		$xmlObject = $this->webDavPropertiesContext->storeEtagOfElement($user, $path, '', $spaceId);
 		return $this->featureContext->getEtagFromResponseXmlObject($xmlObject);
 	}
@@ -3504,7 +3468,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		TableNode $propertiesTable
 	):void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->webDavPropertiesContext->getPropertiesOfFolder($user, $resourceName, $spaceId, $propertiesTable);
 		$this->featureContext->setResponse($response);
 	}
@@ -3530,7 +3494,7 @@ class SpacesContext implements Context {
 		// NOTE: extracting properties occurs asynchronously
 		// short wait is necessary before getting those properties
 		sleep(2);
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->webDavPropertiesContext->getPropertiesOfFolder($user, $resourceName, $spaceId, $propertiesTable);
 		$this->featureContext->setResponse($response);
 	}
@@ -3555,7 +3519,7 @@ class SpacesContext implements Context {
 		string $property,
 		string $value
 	):void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->webDavPropertiesContext->checkPropertyOfAFolder($user, $resourceName, $property, $value, null, $spaceId);
 	}
 
@@ -3570,7 +3534,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 */
 	public function asUserFileOrFolderInsideSpaceShouldOrNotBeFavorited(string $user, string $path, string $spaceName, string $shouldOrNot):void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->favoritesContext->asUserFileOrFolderShouldBeFavorited($user, $path, ($shouldOrNot === 'should') ? 1 : 0, $spaceId);
 	}
 
@@ -3585,7 +3549,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userFavoritesElementInSpaceUsingTheWebdavApi(string $user, string $path, string $spaceName): void {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->featureContext->setResponse($this->favoritesContext->userFavoritesElement($user, $path, $spaceId));
 	}
 
@@ -3601,7 +3565,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userHasStoredIdOfPathOfTheSpace(string $user, string $path, string $spaceName): void {
-		$this->setSpaceIDByName($user, $spaceName);
+		$this->getSpaceIdByName($user, $spaceName);
 		$this->featureContext->setStoredFileID($this->featureContext->getFileIdForPath($user, $path));
 	}
 
@@ -3618,7 +3582,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userFolderOfTheSpaceShouldHaveThePreviouslyStoredId(string $user, string $fileOrFolder, string $path, string $spaceName): void {
-		$this->setSpaceIDByName($user, $spaceName);
+		$this->getSpaceIdByName($user, $spaceName);
 		$user = $this->featureContext->getActualUsername($user);
 		$currentFileID = $this->featureContext->getFileIdForPath($user, $path);
 		$storedFileID = $this->featureContext->getStoredFileID();
@@ -3744,7 +3708,7 @@ class SpacesContext implements Context {
 	 * @throws JsonException
 	 */
 	public function sendPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = "", ?array $headers = [], ?string $folderDepth = "1"): ResponseInterface {
-		$spaceId = $this->setSpaceIDByName($user, $spaceName);
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$properties = [
 			'oc:id',
 			'oc:fileid',

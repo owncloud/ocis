@@ -283,7 +283,7 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function userHasLockedFileInsideSpaceSettingTheFollowingProperties(string $user, string $file, string $spaceName, TableNode $properties) {
-		$spaceId = $this->spacesContext->setSpaceIDByName($this->featureContext->getActualUsername($user), $spaceName);
+		$spaceId = $this->spacesContext->getSpaceIdByName($this->featureContext->getActualUsername($user), $spaceName);
 		$response = $this->lockFile($user, $file, $properties, null, false, true, $spaceId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
@@ -421,7 +421,7 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function userUnlocksTheLastCreatedLockOfFileInsideSpaceUsingTheWebdavApi(string $user, string $spaceName, string $file) {
-		$spaceId = $this->spacesContext->setSpaceIDByName($this->featureContext->getActualUsername($user), $spaceName);
+		$spaceId = $this->spacesContext->getSpaceIdByName($this->featureContext->getActualUsername($user), $spaceName);
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$file,
