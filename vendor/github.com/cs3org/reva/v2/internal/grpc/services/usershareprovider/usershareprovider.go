@@ -248,6 +248,7 @@ func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShar
 	return &collaboration.CreateShareResponse{
 		Status: status.NewOK(ctx),
 		Share:  createdShare,
+		Opaque: utils.AppendPlainToOpaque(nil, "resourcename", sRes.GetInfo().GetName()),
 	}, nil
 }
 
@@ -296,6 +297,7 @@ func (s *service) RemoveShare(ctx context.Context, req *collaboration.RemoveShar
 	}
 
 	o := utils.AppendJSONToOpaque(nil, "resourceid", share.GetResourceId())
+	o = utils.AppendPlainToOpaque(o, "resourcename", sRes.GetInfo().GetName())
 	if user := share.GetGrantee().GetUserId(); user != nil {
 		o = utils.AppendJSONToOpaque(o, "granteeuserid", user)
 	} else {
@@ -447,6 +449,7 @@ func (s *service) UpdateShare(ctx context.Context, req *collaboration.UpdateShar
 	res := &collaboration.UpdateShareResponse{
 		Status: status.NewOK(ctx),
 		Share:  share,
+		Opaque: utils.AppendPlainToOpaque(nil, "resourcename", sRes.GetInfo().GetName()),
 	}
 	return res, nil
 }
