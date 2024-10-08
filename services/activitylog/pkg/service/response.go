@@ -65,12 +65,15 @@ type Actor struct {
 type ActivityOption func(context.Context, gateway.GatewayAPIClient, map[string]interface{}) error
 
 // WithResource sets the resource variable for an activity
-func WithResource(ref *provider.Reference, addSpace bool) ActivityOption {
+func WithResource(ref *provider.Reference, addSpace bool, explicitResourceName string) ActivityOption {
 	return func(ctx context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
 		info, err := utils.GetResource(ctx, ref, gwc)
 		if err != nil {
+			if explicitResourceName == "" {
+				explicitResourceName = filepath.Base(ref.GetPath())
+			}
 			vars["resource"] = Resource{
-				Name: filepath.Base(ref.GetPath()),
+				Name: explicitResourceName,
 			}
 			n := getFolderName(ctx, gwc, ref)
 			vars["folder"] = Resource{
@@ -79,9 +82,12 @@ func WithResource(ref *provider.Reference, addSpace bool) ActivityOption {
 			return err
 		}
 
+		if explicitResourceName == "" {
+			explicitResourceName = info.GetName()
+		}
 		vars["resource"] = Resource{
 			ID:   storagespace.FormatResourceID(info.GetId()),
-			Name: info.GetName(),
+			Name: explicitResourceName,
 		}
 
 		if addSpace {
