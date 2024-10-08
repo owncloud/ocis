@@ -257,12 +257,19 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * @When the administrator cleans all expired upload sessions
+	 * @When the administrator cleans upload sessions with the following flags:
+	 *
+	 * @param TableNode $table
 	 *
 	 * @return void
 	 */
-	public function theAdministratorCleansAllExpiredUploadSessions(): void {
-		$command = "storage-users uploads sessions --expired --clean --json";
+	public function theAdministratorCleansUploadSessionsWithTheFollowingFlags(TableNode $table): void {
+		$flag = "";
+		foreach ($table->getRows() as $row) {
+			$flag .= "--$row[0] ";
+		}
+		$flagString = trim($flag);
+		$command = "storage-users uploads sessions $flagString --clean --json";
 		$body = [
 			"command" => $command
 		];
