@@ -13,15 +13,15 @@ default:
           ldapGroupsOU: TestGroups
           ldapInitialUserFilePath: /../config/ldap-users.ldif
       contexts:
-        - SettingsContext:
-        - GraphContext:
-        - SpacesContext:
         - FeatureContext: &common_feature_context_params
             baseUrl: http://localhost:8080
             adminUsername: admin
             adminPassword: admin
             regularUserPassword: 123456
             ocPath: apps/testing/api/v1/occ
+        - SettingsContext:
+        - GraphContext:
+        - SpacesContext:
         - CapabilitiesContext:
         - FilesVersionsContext:
         - NotificationContext:
@@ -33,9 +33,9 @@ default:
         - "%paths.base%/../features/apiSpaces"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - SettingsContext:
         - SpacesContext:
-        - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - FilesVersionsContext:
         - NotificationContext:
@@ -54,9 +54,9 @@ default:
         - "%paths.base%/../features/apiSpacesShares"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - SettingsContext:
         - SpacesContext:
-        - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - ChecksumContext:
         - FavoritesContext:
@@ -77,9 +77,9 @@ default:
         - "%paths.base%/../features/apiContract"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - SettingsContext:
         - SpacesContext:
-        - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - FilesVersionsContext:
         - OCSContext:
@@ -95,10 +95,10 @@ default:
         - "%paths.base%/../features/apiArchiver"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - SettingsContext:
         - ArchiverContext:
         - SpacesContext:
-        - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - FilesVersionsContext:
         - OCSContext:
@@ -111,10 +111,10 @@ default:
         - "%paths.base%/../features/apiGraph"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - SettingsContext:
         - GraphContext:
         - SpacesContext:
-        - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - FilesVersionsContext:
         - OCSContext:
@@ -130,10 +130,10 @@ default:
         - "%paths.base%/../features/apiGraphUserGroup"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - SettingsContext:
         - GraphContext:
         - SpacesContext:
-        - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - FilesVersionsContext:
         - OCSContext:
@@ -149,8 +149,8 @@ default:
         - "%paths.base%/../features/apiCors"
       context: *common_ldap_suite_context
       contexts:
-        - SpacesContext:
         - FeatureContext: *common_feature_context_params
+        - SpacesContext:
         - FilesVersionsContext:
         - OCSContext:
         - GraphContext:
@@ -164,8 +164,8 @@ default:
         - "%paths.base%/../features/apiDepthInfinity"
       context: *common_ldap_suite_context
       contexts:
-        - SpacesContext:
         - FeatureContext: *common_feature_context_params
+        - SpacesContext:
         - OCSContext:
         - GraphContext:
         - PublicWebDavContext:
@@ -178,8 +178,8 @@ default:
         - "%paths.base%/../features/apiAsyncUpload"
       context: *common_ldap_suite_context
       contexts:
-        - SpacesContext:
         - FeatureContext: *common_feature_context_params
+        - SpacesContext:
         - WebDavPropertiesContext:
         - FilesVersionsContext:
         - OCSContext:
@@ -192,8 +192,8 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - NotificationContext:
-        - SpacesContext:
         - FeatureContext: *common_feature_context_params
+        - SpacesContext:
         - OCSContext:
         - GraphContext:
         - FilesVersionsContext:
@@ -207,9 +207,9 @@ default:
         - "%paths.base%/../features/apiAntivirus"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - NotificationContext:
         - SpacesContext:
-        - FeatureContext: *common_feature_context_params
         - OCSContext:
         - GraphContext:
         - FilesVersionsContext:
@@ -223,9 +223,9 @@ default:
         - "%paths.base%/../features/apiDownloads"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - NotificationContext:
         - SpacesContext:
-        - FeatureContext: *common_feature_context_params
         - WebDavPropertiesContext:
         - OCSContext:
         - GraphContext:
@@ -262,10 +262,10 @@ default:
         - "%paths.base%/../features/apiSearch2"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - SettingsContext:
         - GraphContext:
         - SpacesContext:
-        - FeatureContext: *common_feature_context_params
         - FilesVersionsContext:
         - SearchContext:
         - OCSContext:
@@ -280,11 +280,11 @@ default:
         - "%paths.base%/../features/apiSearchContent"
       context: *common_ldap_suite_context
       contexts:
+        - FeatureContext: *common_feature_context_params
         - SettingsContext:
         - GraphContext:
         - SpacesContext:
         - PublicWebDavContext:
-        - FeatureContext: *common_feature_context_params
         - SearchContext:
         - CapabilitiesContext:
         - FilesVersionsContext:

@@ -27,12 +27,14 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
+use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\SetupHelper;
 use TestHelpers\GraphHelper;
-use PHPUnit\Framework\Assert;
+use TestHelpers\OcisHelper;
+use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';
 
@@ -47,7 +49,6 @@ class SpacesContext implements Context {
 	private FavoritesContext $favoritesContext;
 	private ChecksumContext $checksumContext;
 	private FilesVersionsContext $filesVersionsContext;
-	private string $baseUrl;
 
 	/**
 	 * key is space name and value is the username that created the space
@@ -266,7 +267,7 @@ class SpacesContext implements Context {
 	 */
 	public function getFileData(string $user, string $spaceName, string $fileName): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space["id"] . "/" . $fileName;
+		$fullUrl = $this->featureContext->getBaseUrl() . $this->davSpacesUrl . $space["id"] . "/" . $fileName;
 
 		return HttpRequestHelper::get(
 			$fullUrl,
@@ -388,32 +389,17 @@ class SpacesContext implements Context {
 	 *
 	 * @throws Exception
 	 */
-	public function setUpScenario(BeforeScenarioScope $scope): void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
-		// register new context
-		$this->trashbinContext = new TrashbinContext();
-		$this->webDavPropertiesContext = new WebDavPropertiesContext();
-		$this->favoritesContext = new FavoritesContext();
-		$this->checksumContext = new ChecksumContext();
-		$this->filesVersionsContext = new FilesVersionsContext();
-		$environment->registerContext($this->trashbinContext);
-		$environment->registerContext($this->webDavPropertiesContext);
-		$environment->registerContext($this->favoritesContext);
-		$environment->registerContext($this->checksumContext);
-		$environment->registerContext($this->filesVersionsContext);
 		// Get all the contexts you need in this context
-		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->ocsContext = $environment->getContext('OCSContext');
-		// Run the BeforeScenario function in OCSContext to set it up correctly
-		$this->ocsContext->before($scope);
-		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
-		SetupHelper::init(
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$this->baseUrl,
-			$this->featureContext->getOcPath()
-		);
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+		$this->ocsContext = BehatHelper::getContext($scope, $environment, 'OCSContext');
+		$this->trashbinContext = BehatHelper::getContext($scope, $environment, 'TrashbinContext');
+		$this->webDavPropertiesContext = BehatHelper::getContext($scope, $environment, 'WebDavPropertiesContext');
+		$this->favoritesContext = BehatHelper::getContext($scope, $environment, 'FavoritesContext');
+		$this->checksumContext = BehatHelper::getContext($scope, $environment, 'ChecksumContext');
+		$this->filesVersionsContext = BehatHelper::getContext($scope, $environment, 'FilesVersionsContext');
 	}
 
 	/**
@@ -424,6 +410,9 @@ class SpacesContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function cleanDataAfterTests(): void {
+		if (OcisHelper::isTestingOnReva()) {
+			return;
+		}
 		$this->deleteAllProjectSpaces();
 	}
 
@@ -2135,7 +2124,7 @@ class SpacesContext implements Context {
 			"expireDate" => $rows["expireDate"]
 		];
 
-		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
+		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl;
 
 		return $this->sendPostRequestToUrl(
 			$fullUrl,
@@ -2197,7 +2186,7 @@ class SpacesContext implements Context {
 			$body["permissions"] = $rows["permissions"];
 		}
 
-		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
+		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl;
 		$response = $this->sendPostRequestToUrl(
 			$fullUrl,
 			$user,
@@ -2278,7 +2267,7 @@ class SpacesContext implements Context {
 	 */
 	public function updateSharedResource(string $user, array $rows):ResponseInterface {
 		$shareId = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedUserGroupShareID() : $this->featureContext->getLastCreatedUserGroupShareId();
-		$fullUrl = $this->baseUrl . $this->ocsApiUrl . '/' . $shareId;
+		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl . '/' . $shareId;
 		return  HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
@@ -2358,7 +2347,7 @@ class SpacesContext implements Context {
 			"expireDate" => $rows["expireDate"]
 		];
 
-		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
+		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl;
 
 		$response =  $this->sendPostRequestToUrl(
 			$fullUrl,
@@ -2487,7 +2476,7 @@ class SpacesContext implements Context {
 		string $recipient
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . $this->ocsApiUrl . "/" . $space['id'] . "?shareWith=" . $recipient;
+		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl . "/" . $space['id'] . "?shareWith=" . $recipient;
 
 		return HttpRequestHelper::delete(
 			$fullUrl,
@@ -2794,7 +2783,7 @@ class SpacesContext implements Context {
 		string $spaceName
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . $this->davSpacesUrl . "trash-bin/" . $space["id"];
+		$fullUrl = $this->featureContext->getBaseUrl() . $this->davSpacesUrl . "trash-bin/" . $space["id"];
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
@@ -2837,7 +2826,7 @@ class SpacesContext implements Context {
 	): void {
 		// get space by admin user
 		$space = $this->getSpaceByName($this->featureContext->getAdminUserName(), $spaceName);
-		$fullUrl = $this->baseUrl . $this->davSpacesUrl . "trash-bin/" . $space["id"];
+		$fullUrl = $this->featureContext->getBaseUrl() . $this->davSpacesUrl . "trash-bin/" . $space["id"];
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest($fullUrl, $this->featureContext->getStepLineRef(), 'PROPFIND', $user, $this->featureContext->getPasswordForUser($user))
 		);
@@ -2942,10 +2931,10 @@ class SpacesContext implements Context {
 			throw new Exception(__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'");
 		}
 
-		$destination = $this->baseUrl . $this->davSpacesUrl . $space["id"] . $destination;
+		$destination = $this->featureContext->getBaseUrl() . $this->davSpacesUrl . $space["id"] . $destination;
 		$header = ["Destination" => $destination, "Overwrite" => "F"];
 
-		$fullUrl = $this->baseUrl . $pathToDeletedObject;
+		$fullUrl = $this->featureContext->getBaseUrl() . $pathToDeletedObject;
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
@@ -2989,7 +2978,7 @@ class SpacesContext implements Context {
 			throw new Exception(__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'");
 		}
 
-		$fullUrl = $this->baseUrl . $pathToDeletedObject;
+		$fullUrl = $this->featureContext->getBaseUrl() . $pathToDeletedObject;
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
@@ -3036,7 +3025,7 @@ class SpacesContext implements Context {
 		$urlParameters = \http_build_query($urlParameters, '', '&');
 		$space = $this->getSpaceByName($user, $spaceName);
 
-		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space['id'] . '/' . $fileName . '?' . $urlParameters;
+		$fullUrl = $this->featureContext->getBaseUrl() . $this->davSpacesUrl . $space['id'] . '/' . $fileName . '?' . $urlParameters;
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
@@ -3331,7 +3320,7 @@ class SpacesContext implements Context {
 			"expireDate" => $rows["expireDate"]
 		];
 
-		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
+		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl;
 
 		$response = $this->sendPostRequestToUrl(
 			$fullUrl,

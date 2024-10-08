@@ -26,6 +26,7 @@ use Psr\Http\Message\ResponseInterface;
 use TestHelpers\OcisHelper;
 use TestHelpers\OcmHelper;
 use TestHelpers\WebDavHelper;
+use TestHelpers\BehatHelper;
 
 /**
  * Acceptance test steps related to testing federation share(ocm) features
@@ -45,13 +46,10 @@ class OcmContext implements Context {
 	 * @return void
 	 */
 	public function before(BeforeScenarioScope $scope): void {
-		if (OcisHelper::isTestingOnReva()) {
-			return;
-		}
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
-		$this->featureContext = $environment->getContext('FeatureContext');
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 	}
 
 	/**
@@ -332,5 +330,4 @@ class OcmContext implements Context {
 			$ocmUser['idp']
 		);
 	}
-
 }

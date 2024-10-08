@@ -20,11 +20,12 @@
  */
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use TestHelpers\HttpRequestHelper;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Context\Context;
-use TestHelpers\SetupHelper;
 use Psr\Http\Message\ResponseInterface;
+use TestHelpers\HttpRequestHelper;
+use TestHelpers\SetupHelper;
+use TestHelpers\BehatHelper;
 use TestHelpers\WebDavHelper;
 
 /**
@@ -40,22 +41,11 @@ class AuthContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function setUpScenario(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope):void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
-		$this->featureContext = $environment->getContext('FeatureContext');
-
-		// Reset ResponseXml
-		$this->featureContext->setResponseXml([]);
-
-		// Initialize SetupHelper class
-		SetupHelper::init(
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getOcPath()
-		);
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 	}
 
 	/**

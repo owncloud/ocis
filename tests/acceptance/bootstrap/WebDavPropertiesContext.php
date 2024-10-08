@@ -24,9 +24,10 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
+use Psr\Http\Message\ResponseInterface;
 use TestHelpers\Asserts\WebDav as WebDavTest;
 use TestHelpers\WebDavHelper;
-use Psr\Http\Message\ResponseInterface;
+use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';
 
@@ -1463,6 +1464,6 @@ class WebDavPropertiesContext implements Context {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
-		$this->featureContext = $environment->getContext('FeatureContext');
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 	}
 }
