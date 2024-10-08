@@ -83,3 +83,27 @@ Feature: List upload sessions via CLI command
       | file3.txt |
     And the CLI response should not contain these entries:
       | file1.txt |
+
+
+  Scenario: user restarts upload sessions that are postprocessing
+    Given user "Alice" has uploaded file with content "upload content" to "/file1.txt"
+    And the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And user "Alice" has uploaded file with content "upload content" to "/file2.txt"
+    When the administrator restarts the upload sessions that are currently postprocessing
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | file2.txt |
+    And the CLI response should not contain these entries:
+      | file1.txt |
+
+
+  Scenario: user restarts specific upload sessions
+    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
+    And user "Alice" has uploaded file with content "upload content" to "/file2.txt"
+    When the administrator restarts upload sessions for file "file1.txt"
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | file1.txt |
+    And the CLI response should not contain these entries:
+      | file2.txt |

@@ -26,6 +26,7 @@ use PHPUnit\Framework\Assert;
 use TestHelpers\CliHelper;
 use TestHelpers\OcisConfigHelper;
 use Behat\Gherkin\Node\TableNode;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * CLI context
@@ -268,22 +269,55 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator restarts the upload sessions that are currently postprocessing
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRestartsTheUploadSessions(): void {
+		$command = "storage-users uploads sessions --processing --restart --json";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator restarts upload sessions for file :arg1
+	 *
+	 * @param string $file
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function theAdministratorRestartsUploadSessionsForFile(string $file): void {
+		$response = CliHelper::runCommand(["command" => "storage-users uploads sessions --json"]);
+		$responseArray = $this->getArrayOfJSONResponseFromCliCommand($response);
+
+		foreach ($responseArray as $item) {
+			if ($item->filename === $file) {
+				$uploadId = $item->id;
+			}
+		}
+
+		$command = "storage-users uploads sessions --id=$uploadId --restart --json";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @Then /^the CLI response (should|should not) contain these entries:$/
 	 *
 	 * @param string $shouldOrNot
 	 * @param TableNode $table
 	 *
 	 * @return void
+	 * @throws JsonException
 	 */
 	public function theCLIResponseShouldContainTheseEntries(string $shouldOrNot, TableNode $table): void {
 		$expectedFiles = $table->getColumn(0);
-		$responseBody = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
-
-		// $responseBody["message"] contains a message info with the array of output json of the upload sessions command
-		// Example Output: "INFO memory is not limited, skipping package=github.com/KimMachineGun/automemlimit/memlimit [{<output-json>}]"
-		// So, only extracting the array of output json from the message
-		preg_match('/(\[.*\])/', $responseBody["message"], $matches);
-		$responseArray = \json_decode($matches[1], null, 512, JSON_THROW_ON_ERROR);
+		$responseArray = $this->getArrayOfJSONResponseFromCliCommand($this->featureContext->getResponse());
 
 		$resourceNames = [];
 		foreach ($responseArray as $item) {
@@ -307,6 +341,23 @@ class CliContext implements Context {
 				);
 			}
 		}
+	}
+
+	/**
+	 * @param ResponseInterface $response
+	 *
+	 * @return array
+	 * @throws JsonException
+	 */
+	public function getArrayOfJSONResponseFromCliCommand(ResponseInterface $response): array {
+		$responseBody = $this->featureContext->getJsonDecodedResponse($response);
+
+		// $responseBody["message"] contains a message info with the array of output json of the upload sessions command
+		// Example Output: "INFO memory is not limited, skipping package=github.com/KimMachineGun/automemlimit/memlimit [{<output-json>}]"
+		// So, only extracting the array of output json from the message
+		preg_match('/(\[.*\])/', $responseBody["message"], $matches);
+		return \json_decode($matches[1], null, 512, JSON_THROW_ON_ERROR);
+
 	}
 
 	/**
