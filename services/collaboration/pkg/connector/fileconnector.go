@@ -1188,6 +1188,10 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	if err != nil {
 		return nil, err
 	}
+	collaborationURL, err := url.Parse(f.cfg.Wopi.WopiSrc)
+	if err != nil {
+		return nil, err
+	}
 	privateLinkURL := &url.URL{}
 	*privateLinkURL = *ocisURL
 	privateLinkURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
@@ -1240,10 +1244,41 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 
+	// if the file content is empty and a template reference is set, add the template source URL
+	if wopiContext.TemplateReference != nil && statRes.GetInfo().GetSize() == 0 {
+		if tu, err := f.createDownloadURL(wopiContext, collaborationURL); err == nil {
+			infoMap[fileinfo.KeyTemplateSource] = tu
+		}
+	}
+
 	info.SetProperties(infoMap)
 
 	logger.Debug().Interface("FileInfo", info).Msg("CheckFileInfo: success")
 	return NewResponseSuccessBody(info), nil
+}
+
+// createDownloadURL will create a download URL for the template file.
+// It uses a new wopi context with the template reference set as the file reference
+// and a reva access token to download the file.
+func (f *FileConnector) createDownloadURL(wopiContext middleware.WopiContext, collaborationURL *url.URL) (string, error) {
+	templateContext := wopiContext
+	templateContext.FileReference = wopiContext.TemplateReference
+	templateContext.TemplateReference = nil
+
+	token, _, err := middleware.GenerateWopiToken(templateContext, f.cfg)
+	if err != nil {
+		return "", err
+	}
+	downloadURL := *collaborationURL
+	downloadURL.Path = path.Join(
+		collaborationURL.Path,
+		"wopi/templates/",
+		helpers.HashResourceId(templateContext.FileReference.GetResourceId()),
+	)
+	q := downloadURL.Query()
+	q.Add("access_token", token)
+	downloadURL.RawQuery = q.Encode()
+	return downloadURL.String(), nil
 }
 
 func createHostUrl(mode string, ocisUrl *url.URL, appName string, info *providerv1beta1.ResourceInfo) string {

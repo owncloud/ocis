@@ -165,6 +165,70 @@ var _ = Describe("Wopi Context Middleware", func() {
 		mw.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
 	})
+	It("Should authorize successful with template reference", func() {
+		req := httptest.NewRequest("GET", src.String(), nil).WithContext(ctx)
+		token, err := tknMngr.MintToken(ctx, user, nil)
+		Expect(err).ToNot(HaveOccurred())
+
+		wopiContext := middleware.WopiContext{
+			AccessToken: token,
+			ViewMode:    appprovider.ViewMode_VIEW_MODE_READ_WRITE,
+			TemplateReference: &providerv1beta1.Reference{
+				ResourceId: rid,
+				Path:       ".",
+			},
+			FileReference: &providerv1beta1.Reference{
+				ResourceId: &providerv1beta1.ResourceId{
+					StorageId: "storageID",
+					OpaqueId:  "opaqueID2",
+					SpaceId:   "spaceID",
+				},
+			},
+		}
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg)
+		q := req.URL.Query()
+		q.Add("access_token", wopiToken)
+		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
+		req.URL.RawQuery = q.Encode()
+		resp := httptest.NewRecorder()
+
+		mw.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusOK))
+	})
+	It("Should not authorize when no reference matches", func() {
+		req := httptest.NewRequest("GET", src.String(), nil).WithContext(ctx)
+		token, err := tknMngr.MintToken(ctx, user, nil)
+		Expect(err).ToNot(HaveOccurred())
+
+		wopiContext := middleware.WopiContext{
+			AccessToken: token,
+			ViewMode:    appprovider.ViewMode_VIEW_MODE_READ_WRITE,
+			TemplateReference: &providerv1beta1.Reference{
+				ResourceId: &providerv1beta1.ResourceId{
+					StorageId: "storageID",
+					OpaqueId:  "opaqueID3",
+					SpaceId:   "spaceID",
+				},
+				Path: ".",
+			},
+			FileReference: &providerv1beta1.Reference{
+				ResourceId: &providerv1beta1.ResourceId{
+					StorageId: "storageID",
+					OpaqueId:  "opaqueID2",
+					SpaceId:   "spaceID",
+				},
+			},
+		}
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg)
+		q := req.URL.Query()
+		q.Add("access_token", wopiToken)
+		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
+		req.URL.RawQuery = q.Encode()
+		resp := httptest.NewRecorder()
+
+		mw.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusUnauthorized))
+	})
 	It("Should not authorize with proxy when fileID mismatches", func() {
 		cfg.Wopi.ProxySecret = "proxySecret"
 		cfg.Wopi.ProxyURL = "https://proxy"

@@ -182,5 +182,17 @@ func prepareRoutes(r *chi.Mux, options Options) {
 				})
 			})
 		})
+		r.Route("/templates/{templateID}", func(r chi.Router) {
+			r.Use(
+				func(h stdhttp.Handler) stdhttp.Handler {
+					// authentication and wopi context
+					return colabmiddleware.WopiContextAuthMiddleware(options.Config, h)
+				},
+				colabmiddleware.CollaborationTracingMiddleware,
+			)
+			r.Get("/", func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
+				adapter.GetFile(w, r)
+			})
+		})
 	})
 }

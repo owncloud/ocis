@@ -26,10 +26,11 @@ const (
 
 // WopiContext wraps all the information we need for WOPI
 type WopiContext struct {
-	AccessToken   string
-	ViewOnlyToken string
-	FileReference *providerv1beta1.Reference
-	ViewMode      appproviderv1beta1.ViewMode
+	AccessToken       string
+	ViewOnlyToken     string
+	FileReference     *providerv1beta1.Reference
+	TemplateReference *providerv1beta1.Reference
+	ViewMode          appproviderv1beta1.ViewMode
 }
 
 // WopiContextAuthMiddleware will prepare an HTTP handler to be used as
@@ -120,10 +121,21 @@ func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handl
 
 		hashedRef := helpers.HashResourceId(claims.WopiContext.FileReference.GetResourceId())
 		fileID := parseWopiFileID(cfg, r.URL.Path)
-		if fileID != hashedRef {
-			wopiLogger.Error().Msg("file reference in the URL doesn't match the one inside the access token")
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
+		if claims.WopiContext.TemplateReference != nil {
+			hashedTemplateRef := helpers.HashResourceId(claims.WopiContext.TemplateReference.GetResourceId())
+			// the fileID could be one of the references within the access token if both are set
+			// because we can use the access token to get the contents of the template file
+			if fileID != hashedTemplateRef && fileID != hashedRef {
+				wopiLogger.Error().Msg("file reference in the URL doesn't match the one inside the access token")
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+		} else {
+			if fileID != hashedRef {
+				wopiLogger.Error().Msg("file reference in the URL doesn't match the one inside the access token")
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
 		}
 
 		next.ServeHTTP(w, r.WithContext(ctx))
