@@ -8,7 +8,7 @@ Feature: List upload sessions via CLI command
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario: user lists all upload sessions
+  Scenario: list all upload sessions
     Given user "Alice" has uploaded file with content "uploaded content" to "/file0.txt"
     And the config "POSTPROCESSING_DELAY" has been set to "10s"
     And user "Alice" has uploaded file with content "uploaded content" to "/file1.txt"
@@ -22,7 +22,7 @@ Feature: List upload sessions via CLI command
       | file0.txt |
 
 
-  Scenario: user lists all upload sessions that are currently in postprocessing
+  Scenario: list all upload sessions that are currently in postprocessing
     Given the following configs have been set:
       | config                           | value     |
       | POSTPROCESSING_STEPS             | virusscan |
@@ -40,7 +40,7 @@ Feature: List upload sessions via CLI command
       | virusFile.txt |
 
 
-  Scenario: user lists all upload sessions that are infected by virus
+  Scenario: list all upload sessions that are infected by virus
     Given the following configs have been set:
       | config                           | value     |
       | POSTPROCESSING_STEPS             | virusscan |
@@ -55,7 +55,7 @@ Feature: List upload sessions via CLI command
       | file1.txt |
 
 
-  Scenario: user lists all expired upload sessions
+  Scenario: list all expired upload sessions
     Given the config "POSTPROCESSING_DELAY" has been set to "10s"
     And user "Alice" has uploaded file with content "uploaded content" to "/file1.txt"
     And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "0"
@@ -70,7 +70,7 @@ Feature: List upload sessions via CLI command
       | file1.txt |
 
 
-  Scenario: user cleans all expired upload sessions
+  Scenario: clean all expired upload sessions
     Given the config "POSTPROCESSING_DELAY" has been set to "10s"
     And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
     And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "0"
@@ -83,3 +83,27 @@ Feature: List upload sessions via CLI command
       | file3.txt |
     And the CLI response should not contain these entries:
       | file1.txt |
+
+
+  Scenario: restart upload sessions that are in postprocessing
+    Given user "Alice" has uploaded file with content "upload content" to "/file1.txt"
+    And the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And user "Alice" has uploaded file with content "upload content" to "/file2.txt"
+    When the administrator restarts the upload sessions that are in postprocessing
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | file2.txt |
+    And the CLI response should not contain these entries:
+      | file1.txt |
+
+
+  Scenario: restart upload sessions of a single file
+    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
+    And user "Alice" has uploaded file with content "upload content" to "/file2.txt"
+    When the administrator restarts the upload sessions of file "file1.txt"
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | file1.txt |
+    And the CLI response should not contain these entries:
+      | file2.txt |
