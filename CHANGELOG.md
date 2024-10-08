@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Always treat LDAP attribute names case-insensitively: [#10204](https://github.com/owncloud/ocis/pull/10204)
 * Bugfix - Fix delete share panic: [#10219](https://github.com/owncloud/ocis/pull/10219)
 * Bugfix - Continue listing shares on error: [#10243](https://github.com/owncloud/ocis/pull/10243)
+* Bugfix - Avoid re-creating thumbnails: [#10251](https://github.com/owncloud/ocis/pull/10251)
 * Enhancement - Add OCM wellknown configuration: [#9815](https://github.com/owncloud/ocis/pull/9815)
 * Enhancement - Bump reva to 2.xx.x: [#10236](https://github.com/owncloud/ocis/pull/10236)
 
@@ -83,6 +84,13 @@ The following sections list the changes for unreleased.
    or converted to a driveItem.
 
    https://github.com/owncloud/ocis/pull/10243
+
+* Bugfix - Avoid re-creating thumbnails: [#10251](https://github.com/owncloud/ocis/pull/10251)
+
+   We fixed a bug that caused the system to re-create thumbnails for images, even
+   if a thumbnail already existed in the cache.
+
+   https://github.com/owncloud/ocis/pull/10251
 
 * Enhancement - Add OCM wellknown configuration: [#9815](https://github.com/owncloud/ocis/pull/9815)
 
