@@ -944,6 +944,7 @@ def localApiTests(suite, storage, extra_environment = {}):
         "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper()),
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OCIS_WRAPPER_URL": "http://ocis-server:5200",
+        "WITH_REMOTE_PHP": True,
     }
 
     for item in extra_environment:
@@ -1142,6 +1143,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "EXPECTED_FAILURES_FILE": expectedFailuresFile,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                              "OCIS_WRAPPER_URL": "http://ocis-server:5200",
+                             "WITH_REMOTE_PHP": True,
                          },
                          "commands": [
                              "make -C %s test-acceptance-api" % (dirs["base"]),

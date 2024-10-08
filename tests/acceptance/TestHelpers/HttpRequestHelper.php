@@ -62,6 +62,18 @@ class HttpRequestHelper {
 	}
 
 	/**
+	 * @param string $url
+	 *
+	 * @return bool
+	 */
+	public static function isDAVRequest(string $url): bool {
+		if (\str_contains($url, '/dav') || \str_contains($url, '/webdav')) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 *
 	 * @param string|null $url
 	 * @param string|null $xRequestId
@@ -104,6 +116,27 @@ class HttpRequestHelper {
 				$timeout
 			);
 		}
+
+		if (self::isDAVRequest($url) && \str_starts_with($url, OcisHelper::getServerUrl())) {
+			$withRemotePhp = \getenv("WITH_REMOTE_PHP") === "true";
+			$urlHasRemotePhp = \str_contains($url, 'remote.php');
+			if (!$withRemotePhp && $urlHasRemotePhp) {
+				throw new Exception("remote.php is disabled but found in the URL: $url");
+			}
+			if ($withRemotePhp && !$urlHasRemotePhp) {
+				throw new Exception("remote.php is enabled but not found in the URL: $url");
+			}
+
+			if ($headers && \array_key_exists("Destination", $headers)) {
+				if (!$withRemotePhp && $urlHasRemotePhp) {
+					throw new Exception("remote.php is disabled but found in the URL: $url");
+				}
+				if ($withRemotePhp && !$urlHasRemotePhp) {
+					throw new Exception("remote.php is enabled but not found in the URL: $url");
+				}
+			}
+		}
+
 		$request = self::createRequest(
 			$url,
 			$xRequestId,

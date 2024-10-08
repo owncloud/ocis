@@ -177,7 +177,8 @@ class TrashbinContext implements Context {
 		$files = \array_filter(
 			$files,
 			static function ($element) use ($user) {
-				return ($element['href'] !== "/remote.php/dav/trash-bin/$user/");
+				$davPath = WebDavHelper::getDavPath($user, $davPathVersion, "trash-bin");
+				return ($element['href'] !== "/" . $davPath . "/");
 			}
 		);
 		return $files;
@@ -247,17 +248,16 @@ class TrashbinContext implements Context {
 
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
-		// set endpoint according to webdav request (2 = new, 3 = spaces)
-		$endpoint = "/remote.php/dav/trash-bin/$user";
-		if ($davPathVersion === 3) {
-			$space_id = WebDavHelper::getPersonalSpaceIdForUser(
+		$spaceId = null;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$spaceId = WebDavHelper::getPersonalSpaceIdForUser(
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$this->featureContext->getStepLineRef()
 			);
-			$endpoint = "/remote.php/dav/spaces/trash-bin/$space_id";
 		}
+		$endpoint = WebDavHelper::getDavPath($user, $davPathVersion, "trash-bin", $spaceId);
 
 		// filter out the collection itself, we only want to return the members
 		$files = \array_filter(
@@ -267,7 +267,7 @@ class TrashbinContext implements Context {
 				if ($path !== "") {
 					$path = $path . "/";
 				}
-				return ($element['href'] !== "$endpoint/$path");
+				return ($element['href'] !== "/$endpoint/$path");
 			}
 		);
 
@@ -276,13 +276,8 @@ class TrashbinContext implements Context {
 			// avoid "common" situations that could cause infinite recursion.
 			$trashbinRef = $file["href"];
 			$trimmedTrashbinRef = \trim($trashbinRef, "/");
-			if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-				$expectedStart = "remote.php/dav/spaces/trash-bin";
-			} else {
-				$expectedStart = "remote.php/dav/trash-bin/$user";
-			}
-			$expectedStartLength = \strlen($expectedStart);
-			if ((\substr($trimmedTrashbinRef, 0, $expectedStartLength) !== $expectedStart)
+			$expectedStartLength = \strlen($endpoint);
+			if ((\substr($trimmedTrashbinRef, 0, $expectedStartLength) !== $endpoint)
 				|| (\strlen($trimmedTrashbinRef) === $expectedStartLength)
 			) {
 				// A top href (maybe without even the username) has been returned
@@ -576,7 +571,7 @@ class TrashbinContext implements Context {
 	}
 
 	/**
-	 * converts the trashItemHRef from /<base>/remote.php/dav/trash-bin/<user>/<item_id>/ to /trash-bin/<user>/<item_id>
+	 * converts the trashItemHRef from /<base>/dav/trash-bin/<user>/<item_id>/ to /trash-bin/<user>/<item_id>
 	 *
 	 * @param string $href
 	 *
@@ -788,7 +783,9 @@ class TrashbinContext implements Context {
 	private function sendUndeleteRequest(string $user, string $trashItemHRef, string $destinationPath, ?string $asUser = null, ?string $password = null):ResponseInterface {
 		$asUser = $asUser ?? $user;
 		$destinationPath = \trim($destinationPath, '/');
-		$destinationValue = $this->featureContext->getBaseUrl() . "/remote.php/dav/files/$user/$destinationPath";
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
+		$destinationValue = "{$baseUrl}/{$davPath}/{$destinationPath}";
 
 		$trashItemHRef = $this->convertTrashbinHref($trashItemHRef);
 		$headers['Destination'] = $destinationValue;

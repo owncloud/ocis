@@ -492,8 +492,7 @@ class FeatureContext extends BehatVariablesContext {
 		$this->alternateAdminPassword = "IHave99LotsOfPriv";
 		$this->publicLinkSharePassword = "publicPwd:1";
 
-		// in case of CI deployment we take the server url from the environment
-		$testServerUrl = \getenv('TEST_SERVER_URL');
+		$testServerUrl = OcisHelper::getServerUrl();
 		if ($testServerUrl !== false) {
 			$this->baseUrl = \rtrim($testServerUrl, '/');
 			$this->localBaseUrl = $this->baseUrl;
@@ -806,15 +805,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getOCSPath(string $ocsApiVersion): string {
 		return \ltrim($this->getBasePath() . "/ocs/v$ocsApiVersion.php", "/");
-	}
-
-	/**
-	 * returns the complete DAV path including the base path e.g. owncloud-core/remote.php/dav
-	 *
-	 * @return string
-	 */
-	public function getDAVPathIncludingBasePath(): string {
-		return \ltrim($this->getBasePath() . "/" . $this->getDavPath(), "/");
 	}
 
 	/**
@@ -2119,7 +2109,8 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getCommentUrlRegExp(): string {
 		$basePath = \ltrim($this->getBasePath() . "/", "/");
-		return "/{$basePath}remote.php/dav/comments/files/([0-9]+)";
+		$commentsPath = WebDAVHelper::getDavPath(null, null, "comments");
+		return "/{$basePath}/{$commentsPath}/([0-9]+)";
 	}
 
 	/**
@@ -2223,14 +2214,6 @@ class FeatureContext extends BehatVariablesContext {
 				"function" => [
 					$this,
 					"getBasePath"
-				],
-				"parameter" => []
-			],
-			[
-				"code" => "%dav_path%",
-				"function" => [
-					$this,
-					"getDAVPathIncludingBasePath"
 				],
 				"parameter" => []
 			],

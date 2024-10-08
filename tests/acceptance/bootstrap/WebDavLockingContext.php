@@ -73,7 +73,7 @@ class WebDavLockingContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		if ($public === true) {
-			$type = "public-files-new";
+			$type = "public-files";
 			$password = $this->featureContext->getActualPassword("%public%");
 		} else {
 			$type = "files";
@@ -190,7 +190,9 @@ class WebDavLockingContext implements Context {
 	 */
 	public function userLocksFileInProjectSpace(string $user, string $file, string $space, TableNode $properties): ?ResponseInterface {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
-		$fullUrl = $this->featureContext->getBaseUrl() . '/dav/spaces/' . $spaceId . '/' . $file;
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$davPath = WebDavHelper::getDavPath($user, WebDavHelper::DAV_VERSION_SPACES, 'files', $spaceId);
+		$fullUrl = "$baseUrl/$davPath/$file";
 		return $this->lockFile($user, $file, $properties, $fullUrl, false, true, $spaceId);
 	}
 
@@ -603,7 +605,7 @@ class WebDavLockingContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
 		if ($public === true) {
-			$type = "public-files-new";
+			$type = "public-files";
 			$password = $this->featureContext->getActualPassword("%public%");
 		} else {
 			$type = "files";
