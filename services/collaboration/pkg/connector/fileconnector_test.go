@@ -1843,5 +1843,73 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Status).To(Equal(200))
 			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
 		})
+		It("Stat success with template", func() {
+			wopiCtx.TemplateReference = &providerv1beta1.Reference{
+				ResourceId: &providerv1beta1.ResourceId{
+					StorageId: "storageid",
+					OpaqueId:  "opaqueid2",
+					SpaceId:   "spaceid",
+				},
+			}
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(0),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			expectedFileInfo := &fileinfo.OnlyOffice{
+				Version:                 "v162738490",
+				BaseFileName:            "test.txt",
+				BreadcrumbDocName:       "test.txt",
+				BreadcrumbFolderName:    "/path/to",
+				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21opaqueid",
+				UserCanNotWriteRelative: false,
+				SupportsLocks:           true,
+				SupportsUpdate:          true,
+				SupportsRename:          true,
+				UserCanWrite:            true,
+				UserCanRename:           true,
+				UserID:                  "61646d696e40637573746f6d496470", // hex of admin@customIdp
+				UserFriendlyName:        "Pet Shaft",
+				FileSharingURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:             "https://ocis.example.prv/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				PostMessageOrigin:       "https://ocis.example.prv",
+				TemplateSource:          "https://ocis.server.prv/wopi/files/a340d017568d0d579ee061a9ac02109e32fb07082d35c40aa175864303bd9107/contents",
+			}
+
+			// change wopi app provider
+			cfg.App.Name = "OnlyOffice"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.OnlyOffice)).To(Equal(expectedFileInfo))
+		})
 	})
 })

@@ -1188,6 +1188,10 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	if err != nil {
 		return nil, err
 	}
+	collaborationURL, err := url.Parse(f.cfg.Wopi.WopiSrc)
+	if err != nil {
+		return nil, err
+	}
 	privateLinkURL := &url.URL{}
 	*privateLinkURL = *ocisURL
 	privateLinkURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
@@ -1240,10 +1244,26 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 
+	// if the file content is empty and a template reference is set, add the template source URL
+	if wopiContext.TemplateReference != nil && statRes.GetInfo().GetSize() == 0 {
+		infoMap[fileinfo.KeyTemplateSource] = createDownloadURL(wopiContext.TemplateReference, collaborationURL)
+	}
+
 	info.SetProperties(infoMap)
 
 	logger.Debug().Interface("FileInfo", info).Msg("CheckFileInfo: success")
 	return NewResponseSuccessBody(info), nil
+}
+
+func createDownloadURL(reference *providerv1beta1.Reference, collaborationURL *url.URL) string {
+	downloadURL := *collaborationURL
+	downloadURL.Path = path.Join(
+		collaborationURL.Path,
+		"wopi/files/",
+		helpers.HashResourceId(reference.GetResourceId()),
+		"contents",
+	)
+	return downloadURL.String()
 }
 
 func createHostUrl(mode string, ocisUrl *url.URL, appName string, info *providerv1beta1.ResourceInfo) string {
