@@ -68,7 +68,7 @@
 | OCIS_LDAP_USER_FILTER<br/>GRAPH_LDAP_USER_FILTER | string |  | LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.|
 | OCIS_LDAP_USER_OBJECTCLASS<br/>GRAPH_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | The object class to use for users in the default user search filter ('inetOrgPerson').|
 | OCIS_LDAP_USER_SCHEMA_MAIL<br/>GRAPH_LDAP_USER_EMAIL_ATTRIBUTE | string | mail | LDAP Attribute to use for the email address of users.|
-| LDAP_USER_SCHEMA_DISPLAY_NAME<br/>GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE | string | displayName | LDAP Attribute to use for the display name of users.|
+| OCIS_LDAP_USER_SCHEMA_DISPLAYNAME<br/>LDAP_USER_SCHEMA_DISPLAY_NAME<br/>GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE | string | displayName | LDAP Attribute to use for the display name of users.|
 | OCIS_LDAP_USER_SCHEMA_USERNAME<br/>GRAPH_LDAP_USER_NAME_ATTRIBUTE | string | uid | LDAP Attribute to use for username of users.|
 | OCIS_LDAP_USER_SCHEMA_ID<br/>GRAPH_LDAP_USER_UID_ATTRIBUTE | string | owncloudUUID | LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.|
 | OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>GRAPH_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the user ID's.|
