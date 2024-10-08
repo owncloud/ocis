@@ -18,6 +18,11 @@ services:
       - "--entryPoints.http.http.redirections.entryPoint.to=https"
       - "--entryPoints.http.http.redirections.entryPoint.scheme=https"
       - "--entryPoints.https.address=:443"
+      # change default timeouts for long-running requests
+      # this is needed for webdav clients that do not support the TUS protocol
+      - "--entryPoints.https.transport.respondingTimeouts.readTimeout=12h"
+      - "--entryPoints.https.transport.respondingTimeouts.writeTimeout=12h"
+      - "--entryPoints.https.transport.respondingTimeouts.idleTimeout=3m"
       # docker provider (get configuration from container labels)
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"
