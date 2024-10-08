@@ -255,12 +255,14 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * @When the administrator cleans all expired upload sessions
+	 * @When the administrator cleans upload sessions with flag :flag
+	 *
+	 * @param string $flag
 	 *
 	 * @return void
 	 */
-	public function theAdministratorCleansAllExpiredUploadSessions(): void {
-		$command = "storage-users uploads sessions --expired --clean --json";
+	public function theAdministratorCleansAllExpiredUploadSessions(string $flag): void {
+		$command = "storage-users uploads sessions --$flag --clean --json";
 		$body = [
 			"command" => $command
 		];

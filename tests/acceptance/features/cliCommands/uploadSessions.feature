@@ -76,10 +76,26 @@ Feature: List upload sessions via CLI command
     And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "0"
     And user "Alice" has uploaded file with content "upload content" to "/file2.txt"
     And user "Alice" has uploaded file with content "upload content" to "/file3.txt"
-    When the administrator cleans all expired upload sessions
+    When the administrator cleans upload sessions with flag "expired"
     Then the command should be successful
     And the CLI response should contain these entries:
       | file2.txt |
       | file3.txt |
+    And the CLI response should not contain these entries:
+      | file1.txt |
+
+
+  Scenario: user cleans all upload sessions that are not processing
+    Given the following configs have been set:
+      | config                           | value     |
+      | POSTPROCESSING_STEPS             | virusscan |
+      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
+    And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
+    And the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
+    When the administrator cleans upload sessions with flag "processing=false"
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | virusFile.txt |
     And the CLI response should not contain these entries:
       | file1.txt |
