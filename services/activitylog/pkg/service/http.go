@@ -160,22 +160,37 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		case events.ShareCreated:
 			message = MessageShareCreated
 			ts = utils.TSToTime(ev.CTime)
-			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, nil, nil), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
+			vars, err = s.GetVars(ctx,
+				WithResource(toRef(ev.ItemID), false),
+				WithVar("resource", storagespace.FormatResourceID(ev.ItemID), ev.ResourceName),
+				WithUser(ev.Executant, nil, nil),
+				WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.ShareUpdated:
 			if ev.Sharer != nil && ev.ItemID != nil && ev.Sharer.GetOpaqueId() == ev.ItemID.GetSpaceId() {
 				continue
 			}
 			message = MessageShareUpdated
 			ts = utils.TSToTime(ev.MTime)
-			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, nil, nil), WithTranslation(&t, loc, "field", ev.UpdateMask))
+			vars, err = s.GetVars(ctx,
+				WithResource(toRef(ev.ItemID), false),
+				WithVar("resource", storagespace.FormatResourceID(ev.ItemID), ev.ResourceName),
+				WithUser(ev.Executant, nil, nil),
+				WithTranslation(&t, loc, "field", ev.UpdateMask))
 		case events.ShareRemoved:
 			message = MessageShareDeleted
 			ts = ev.Timestamp
-			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, nil, nil), WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
+			vars, err = s.GetVars(ctx,
+				WithResource(toRef(ev.ItemID), false),
+				WithVar("resource", storagespace.FormatResourceID(ev.ItemID), ev.ResourceName),
+				WithUser(ev.Executant, nil, nil),
+				WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.LinkCreated:
 			message = MessageLinkCreated
 			ts = utils.TSToTime(ev.CTime)
-			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false), WithUser(ev.Executant, nil, nil))
+			vars, err = s.GetVars(ctx,
+				WithResource(toRef(ev.ItemID), false),
+				WithVar("resource", storagespace.FormatResourceID(ev.ItemID), ev.ResourceName),
+				WithUser(ev.Executant, nil, nil))
 		case events.LinkUpdated:
 			if ev.Sharer != nil && ev.ItemID != nil && ev.Sharer.GetOpaqueId() == ev.ItemID.GetSpaceId() {
 				continue
@@ -183,7 +198,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			message = MessageLinkUpdated
 			ts = utils.TSToTime(ev.MTime)
 			vars, err = s.GetVars(ctx,
-				WithResource(toRef(ev.ItemID), false),
+				WithVar("resource", storagespace.FormatResourceID(ev.ItemID), ev.ResourceName),
 				WithUser(ev.Executant, nil, nil),
 				WithTranslation(&t, loc, "field", []string{ev.FieldUpdated}),
 				WithVar("token", ev.ItemID.GetOpaqueId(), ev.Token))
