@@ -245,6 +245,7 @@ class WebDavPropertiesContext implements Context {
 			$properties,
 			$this->featureContext->getStepLineRef(),
 			"0",
+			null,
 			"files",
 			$this->featureContext->getDavPathVersion()
 		);
@@ -269,7 +270,7 @@ class WebDavPropertiesContext implements Context {
 			$path,
 			'0',
 			$properties,
-			'',
+			null,
 			$this->featureContext->getDavPathVersion() === 1 ? "public-files" : "public-files-new"
 		);
 	}

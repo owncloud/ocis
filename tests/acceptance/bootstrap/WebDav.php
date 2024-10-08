@@ -3245,7 +3245,7 @@ trait WebDav {
 			$destination,
 			[],
 			null,
-			'',
+			null,
 			"uploads",
 			null,
 			false,
@@ -3280,7 +3280,7 @@ trait WebDav {
 			$destination,
 			[],
 			$data,
-			'',
+			null,
 			"uploads",
 			null,
 			false,
@@ -3446,7 +3446,7 @@ trait WebDav {
 			$source,
 			$headers,
 			null,
-			'',
+			null,
 			"uploads",
 			null,
 			false,
@@ -3474,7 +3474,7 @@ trait WebDav {
 			$source,
 			$headers,
 			null,
-			'',
+			null,
 			"uploads"
 		);
 	}
@@ -3873,7 +3873,7 @@ trait WebDav {
 		if ($this->getDavPathVersion() === 3) {
 			$this->setResponse($this->uploadToSharedFolder($user, $destination, $content));
 		} else {
-			$this->setResponse($this->uploadFileWithContent($user, $content, $destination, ''));
+			$this->setResponse($this->uploadFileWithContent($user, $content, $destination, null));
 		}
 	}
 

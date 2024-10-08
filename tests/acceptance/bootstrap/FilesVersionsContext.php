@@ -90,7 +90,7 @@ class FilesVersionsContext implements Context {
 				$endpoint,
 				null,
 				null,
-				'',
+				null,
 				"versions",
 				(string)$this->featureContext->getDavPathVersion(),
 				false,
@@ -148,7 +148,7 @@ class FilesVersionsContext implements Context {
 				$endpoint,
 				null,
 				null,
-				'',
+				null,
 				"versions",
 				(string)$this->featureContext->getDavPathVersion()
 			)
@@ -192,7 +192,7 @@ class FilesVersionsContext implements Context {
 			$this->getVersionsPathForFileId($fileId),
 			null,
 			$body,
-			'',
+			null,
 			null,
 			'2'
 		);
@@ -551,7 +551,7 @@ class FilesVersionsContext implements Context {
 			$properties,
 			$this->featureContext->getStepLineRef(),
 			(string) $folderDepth,
-			'',
+			null,
 			"versions"
 		);
 		return $response;

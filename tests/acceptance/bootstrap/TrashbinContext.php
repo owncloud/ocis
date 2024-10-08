@@ -868,7 +868,7 @@ class TrashbinContext implements Context {
 					$trashItemHRef,
 					[],
 					null,
-					'',
+					null,
 					'trash-bin'
 				);
 				$this->featureContext->setResponse($response);
