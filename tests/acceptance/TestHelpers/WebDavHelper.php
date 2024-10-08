@@ -921,7 +921,7 @@ class WebDavHelper {
 			['d:getlastmodified'],
 			$xRequestId,
 			'1',
-			'',
+			null,
 			null,
 			$davVersionToUse
 		);
