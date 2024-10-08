@@ -27,6 +27,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
+use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';
 
@@ -231,7 +232,7 @@ class ShareesContext implements Context {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
-		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->ocsContext = $environment->getContext('OCSContext');
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+		$this->ocsContext = BehatHelper::getContext($scope, $environment, 'OCSContext');
 	}
 }

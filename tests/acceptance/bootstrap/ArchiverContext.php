@@ -26,6 +26,7 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\SetupHelper;
+use TestHelpers\BehatHelper;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use splitbrain\PHPArchive\Tar;
@@ -52,17 +53,11 @@ class ArchiverContext implements Context {
 	 *
 	 * @throws Exception
 	 */
-	public function setUpScenario(BeforeScenarioScope $scope): void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
-		$this->featureContext = $environment->getContext('FeatureContext');
-		SetupHelper::init(
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getOcPath()
-		);
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 	}
 
 	/**

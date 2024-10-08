@@ -11,10 +11,11 @@ declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use GuzzleHttp\Exception\GuzzleException;
 use Behat\Gherkin\Node\TableNode;
+use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\WebDavHelper;
+use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';
 
@@ -40,9 +41,9 @@ class SpacesTUSContext implements Context {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
-		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->spacesContext = $environment->getContext('SpacesContext');
-		$this->tusContext = $environment->getContext('TUSContext');
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
+		$this->tusContext = BehatHelper::getContext($scope, $environment, 'TUSContext');
 	}
 
 	/**

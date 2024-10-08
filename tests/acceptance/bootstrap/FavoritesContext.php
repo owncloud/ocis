@@ -25,6 +25,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\WebDavHelper;
+use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';
 
@@ -245,8 +246,10 @@ class FavoritesContext implements Context {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
-		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->webDavPropertiesContext = $environment->getContext(
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+		$this->webDavPropertiesContext = BehatHelper::getContext(
+			$scope,
+			$environment,
 			'WebDavPropertiesContext'
 		);
 	}

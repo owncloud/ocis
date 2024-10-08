@@ -43,6 +43,7 @@ use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\SettingsHelper;
 use TestHelpers\OcisConfigHelper;
+use TestHelpers\BehatHelper;
 use Swaggest\JsonSchema\InvalidValue as JsonSchemaException;
 use Swaggest\JsonSchema\Exception\ArrayException;
 use Swaggest\JsonSchema\Exception\ConstException;
@@ -2617,36 +2618,23 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function before(BeforeScenarioScope $scope): void {
 		$this->scenarioStartTime = \time();
+
 		// Get the environment
 		$environment = $scope->getEnvironment();
-		// registers context in every suite, as every suite has FeatureContext
-		// that calls BasicStructure.php
-		$this->ocsContext = new OCSContext();
-		$this->authContext = new AuthContext();
-		$this->tusContext = new TUSContext();
-		$this->ocmContext = new OcmContext();
-		$this->ocsContext->before($scope);
-		$this->authContext->setUpScenario($scope);
-		$this->tusContext->setUpScenario($scope);
-		$environment->registerContext($this->ocsContext);
-		$environment->registerContext($this->authContext);
-		$environment->registerContext($this->tusContext);
-		$environment->registerContext($this->ocmContext);
+		// Get all the contexts you need in this context
+		$this->ocsContext = BehatHelper::getContext($scope, $environment, 'OCSContext');
+		$this->authContext = BehatHelper::getContext($scope, $environment, 'AuthContext');
+		$this->tusContext = BehatHelper::getContext($scope, $environment, 'TUSContext');
+		$this->ocmContext = BehatHelper::getContext($scope, $environment, 'OcmContext');
+		$this->graphContext = BehatHelper::getContext($scope, $environment, 'GraphContext');
+		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
+
 		$scenarioLine = $scope->getScenario()->getLine();
 		$featureFile = $scope->getFeature()->getFile();
 		$suiteName = $scope->getSuite()->getName();
 		$featureFileName = \basename($featureFile);
-
-		if (!OcisHelper::isTestingOnReva()) {
-			$this->spacesContext = new SpacesContext();
-			$this->spacesContext->setUpScenario($scope);
-			$environment->registerContext($this->spacesContext);
-		}
-
 		if (HttpRequestHelper::sendScenarioLineReferencesInXRequestId()) {
 			$this->scenarioString = $suiteName . '/' . $featureFileName . ':' . $scenarioLine;
-		} else {
-			$this->scenarioString = '';
 		}
 
 		// Initialize SetupHelper
@@ -2661,10 +2649,6 @@ class FeatureContext extends BehatVariablesContext {
 			$suiteParameters = SetupHelper::getSuiteParameters($scope);
 			$this->connectToLdap($suiteParameters);
 		}
-
-		$this->graphContext = new GraphContext();
-		$this->graphContext->before($scope);
-		$environment->registerContext($this->graphContext);
 	}
 
 	/**

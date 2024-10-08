@@ -8,15 +8,16 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use TestHelpers\OcsApiHelper;
-use Behat\Gherkin\Node\PyStringNode;
-use TestHelpers\EmailHelper;
-use PHPUnit\Framework\Assert;
-use TestHelpers\GraphHelper;
-use TestHelpers\SettingsHelper;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Gherkin\Node\PyStringNode;
+use PHPUnit\Framework\Assert;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
+use TestHelpers\EmailHelper;
+use TestHelpers\OcsApiHelper;
+use TestHelpers\GraphHelper;
+use TestHelpers\SettingsHelper;
+use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';
 
@@ -94,13 +95,13 @@ class NotificationContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function setUpScenario(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope):void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
-		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->spacesContext = $environment->getContext('SpacesContext');
-		$this->settingsContext = $environment->getContext('SettingsContext');
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
+		$this->settingsContext = BehatHelper::getContext($scope, $environment, 'SettingsContext');
 	}
 
 	/**

@@ -12,11 +12,12 @@ declare(strict_types=1);
 use Behat\Behat\Context\Context;
 use GuzzleHttp\Exception\GuzzleException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\SettingsHelper;
-use Behat\Gherkin\Node\TableNode;
+use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';
 
@@ -25,7 +26,6 @@ require_once 'bootstrap.php';
  */
 class SettingsContext implements Context {
 	private FeatureContext $featureContext;
-	private string $baseUrl;
 	private string $settingsUrl = '/api/v0/settings/';
 
 	/**
@@ -42,8 +42,7 @@ class SettingsContext implements Context {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
-		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 	}
 
 	/**
@@ -56,7 +55,7 @@ class SettingsContext implements Context {
 	 */
 	public function getRoles(string $user): ResponseInterface {
 		return SettingsHelper::getRolesList(
-			$this->baseUrl,
+			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$this->featureContext->getStepLineRef()
@@ -90,7 +89,7 @@ class SettingsContext implements Context {
 	 */
 	public function assignRoleToUser(string $user, string $userId, string $roleId): ResponseInterface {
 		return SettingsHelper::assignRoleToUser(
-			$this->baseUrl,
+			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$userId,
@@ -110,7 +109,7 @@ class SettingsContext implements Context {
 	 */
 	public function getAssignmentsList(string $user, string $userId): ResponseInterface {
 		return SettingsHelper::getAssignmentsList(
-			$this->baseUrl,
+			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$userId,
@@ -294,7 +293,7 @@ class SettingsContext implements Context {
 	 */
 	public function sendRequestGetBundlesList(string $user): ResponseInterface {
 		return SettingsHelper::getBundlesList(
-			$this->baseUrl,
+			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$this->featureContext->getStepLineRef(),
@@ -312,7 +311,7 @@ class SettingsContext implements Context {
 	 */
 	public function getBundleByName(string $user, string $bundleName): array {
 		return SettingsHelper::getBundleByName(
-			$this->baseUrl,
+			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$bundleName,
@@ -331,7 +330,7 @@ class SettingsContext implements Context {
 	 */
 	public function sendRequestGetSettingsValuesList(string $user, array $headers = null): ResponseInterface {
 		return SettingsHelper::getValuesList(
-			$this->baseUrl,
+			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$this->featureContext->getStepLineRef(),
@@ -407,7 +406,7 @@ class SettingsContext implements Context {
 			JSON_THROW_ON_ERROR
 		);
 		return SettingsHelper::updateSettings(
-			$this->baseUrl,
+			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
@@ -460,7 +459,7 @@ class SettingsContext implements Context {
 		);
 
 		return SettingsHelper::updateSettings(
-			$this->baseUrl,
+			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,

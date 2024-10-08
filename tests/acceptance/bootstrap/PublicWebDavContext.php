@@ -24,9 +24,10 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
+use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
-use Psr\Http\Message\ResponseInterface;
+use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';
 
@@ -1797,11 +1798,11 @@ class PublicWebDavContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function setUpScenario(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope):void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
-		$this->featureContext = $environment->getContext('FeatureContext');
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 	}
 
 	/**

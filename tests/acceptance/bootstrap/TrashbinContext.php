@@ -27,6 +27,7 @@ use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
+use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';
 
@@ -1120,7 +1121,7 @@ class TrashbinContext implements Context {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
-		$this->featureContext = $environment->getContext('FeatureContext');
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 	}
 
 	/**
