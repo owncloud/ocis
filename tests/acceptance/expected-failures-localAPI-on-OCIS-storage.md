@@ -272,9 +272,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [OCM. Prevent federated users from being added as members of the space](https://github.com/owncloud/ocis/issues/10051)
 
-- [apiOcm/share.feature:231](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L231)
-- [apiOcm/share.feature:232](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L232)
-- [apiOcm/share.feature:233](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L233)
+- [apiOcm/share.feature:321](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L321)
+- [apiOcm/share.feature:322](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L322)
+- [apiOcm/share.feature:323](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L323)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
