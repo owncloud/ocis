@@ -351,7 +351,7 @@ class SharingNgContext implements Context {
 			$shareeId = "";
 			if ($shareType === "user") {
 				$shareeId = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
-				if (isset($shareInfo['federatedServer'])) {
+				if (isset($rows['federatedServer'])) {
 					$shareeId = ($this->featureContext->ocmContext->getAcceptedUserByName($user, $sharee))['user_id'];
 				}
 			} elseif ($shareType === "group") {
@@ -436,6 +436,7 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" sends the following space share invitation using permissions endpoint of the Graph API:$/
+	 * @When /^user "([^"]*)" tries to send the following space share invitation to federated user using permissions endpoint of the Graph API:$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -1429,6 +1430,7 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" (?:tries to send|sends) the following space share invitation using root endpoint of the Graph API:$/
+	 * @When /^user "([^"]*)" tries to send the following space share invitation to federated user using root endpoint of the Graph API:$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
