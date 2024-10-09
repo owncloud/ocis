@@ -57,6 +57,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Always treat LDAP attribute names case-insensitively: [#10204](https://github.com/owncloud/ocis/pull/10204)
 * Bugfix - Fix delete share panic: [#10219](https://github.com/owncloud/ocis/pull/10219)
+* Bugfix - Thumbnail request limit: [#10225](https://github.com/owncloud/ocis/pull/10225)
 * Bugfix - Continue listing shares on error: [#10243](https://github.com/owncloud/ocis/pull/10243)
 * Bugfix - Avoid re-creating thumbnails: [#10251](https://github.com/owncloud/ocis/pull/10251)
 * Enhancement - Add OCM wellknown configuration: [#9815](https://github.com/owncloud/ocis/pull/9815)
@@ -77,6 +78,14 @@ The following sections list the changes for unreleased.
    Fixes a panic when deleting an ocm share
 
    https://github.com/owncloud/ocis/pull/10219
+
+* Bugfix - Thumbnail request limit: [#10225](https://github.com/owncloud/ocis/pull/10225)
+
+   The `THUMBNAILS_MAX_CONCURRENT_REQUESTS` setting was not working correctly.
+   Previously it was just limiting the number of concurrent thumbnail downloads.
+   Now the limit is applied to the number thumbnail generations requests.
+
+   https://github.com/owncloud/ocis/pull/10225
 
 * Bugfix - Continue listing shares on error: [#10243](https://github.com/owncloud/ocis/pull/10243)
 
