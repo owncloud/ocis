@@ -18,14 +18,12 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
-	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
-	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/idm"
 	"github.com/owncloud/ocis/v2/services/idm/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idm/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/idm/pkg/logging"
+	"github.com/owncloud/ocis/v2/services/idm/pkg/server/debug"
 )
 
 // Server is the entrypoint for the server command.
@@ -95,25 +93,18 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				checkHandler := handlers.NewCheckHandler(
-					handlers.NewCheckHandlerConfiguration().
-						WithLogger(logger),
-				)
-
-				server := debug.NewService(
+				debugServer, err := debug.Server(
 					debug.Logger(logger),
-					debug.Name(cfg.Service.Name),
-					debug.Version(version.GetString()),
-					debug.Address(cfg.Debug.Addr),
-					debug.Token(cfg.Debug.Token),
-					debug.Pprof(cfg.Debug.Pprof),
-					debug.Zpages(cfg.Debug.Zpages),
-					debug.Health(checkHandler),
-					debug.Ready(checkHandler),
+					debug.Context(ctx),
+					debug.Config(cfg),
 				)
+				if err != nil {
+					logger.Info().Err(err).Str("server", "debug").Msg("Failed to initialize server")
+					return err
+				}
 
-				gr.Add(server.ListenAndServe, func(_ error) {
-					_ = server.Shutdown(ctx)
+				gr.Add(debugServer.ListenAndServe, func(_ error) {
+					_ = debugServer.Shutdown(ctx)
 					cancel()
 				})
 			}
