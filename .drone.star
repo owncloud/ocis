@@ -354,8 +354,6 @@ def main(ctx):
         ),
     )
 
-    pipelines = pipelines + k6LoadTests(ctx)
-
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
@@ -418,6 +416,9 @@ def testPipelines(ctx):
         pipelines += apiTests(ctx)
 
     pipelines += e2eTestPipeline(ctx)
+
+    if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
+        pipelines.append(k6LoadTests(ctx))
 
     return pipelines
 
@@ -2973,27 +2974,27 @@ def logRequests():
 def k6LoadTests(ctx):
     ocis_remote_environment = {
         "SSH_OCIS_REMOTE": {
-            "from_secret": "ssh_ocis_remote",
+            "from_secret": "k6_ssh_ocis_remote",
         },
         "SSH_OCIS_USERNAME": {
-            "from_secret": "ssh_ocis_user",
+            "from_secret": "k6_ssh_ocis_user",
         },
         "SSH_OCIS_PASSWORD": {
-            "from_secret": "ssh_ocis_pass",
+            "from_secret": "k6_ssh_ocis_pass",
         },
         "TEST_SERVER_URL": {
-            "from_secret": "ssh_ocis_server_url",
+            "from_secret": "k6_ssh_ocis_server_url",
         },
     }
     k6_remote_environment = {
         "SSH_K6_REMOTE": {
-            "from_secret": "ssh_k6_remote",
+            "from_secret": "k6_ssh_k6_remote",
         },
         "SSH_K6_USERNAME": {
-            "from_secret": "ssh_k6_user",
+            "from_secret": "k6_ssh_k6_user",
         },
         "SSH_K6_PASSWORD": {
-            "from_secret": "ssh_k6_pass",
+            "from_secret": "k6_ssh_k6_pass",
         },
     }
     environment = {}
@@ -3005,6 +3006,12 @@ def k6LoadTests(ctx):
 
     ocis_git_base_url = "https://raw.githubusercontent.com/owncloud/ocis"
     script_link = "%s/%s/tests/config/drone/run_k6_tests.sh" % (ocis_git_base_url, ctx.build.commit)
+
+    event_array = ["cron"]
+
+    if "k6-test" in ctx.build.title.lower():
+        event_array.append("pull_request")
+
     return [{
         "kind": "pipeline",
         "type": "docker",
@@ -3032,6 +3039,12 @@ def k6LoadTests(ctx):
                     "apk add --no-cache openssh-client sshpass",
                     "sh %s/run_k6_tests.sh --ocis-log" % (dirs["base"]),
                 ],
+                "when": {
+                    "status": [
+                        "success",
+                        "failure",
+                    ],
+                },
             },
             {
                 "name": "open-grafana-dashboard",
@@ -3039,13 +3052,17 @@ def k6LoadTests(ctx):
                 "commands": [
                     "echo 'Grafana Dashboard: https://grafana.k6.infra.owncloud.works'",
                 ],
+                "when": {
+                    "status": [
+                        "success",
+                        "failure",
+                    ],
+                },
             },
         ],
         "depends_on": [],
         "trigger": {
-            "event": [
-                "cron",
-            ],
+            "event": event_array,
         },
     }]
 
