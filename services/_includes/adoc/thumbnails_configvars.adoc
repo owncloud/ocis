@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-09-07-07-38]
+[#deprecation-note-2024-10-09-12-17-34]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -182,6 +182,17 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The bind address of the GRPC service.
 
+a|`THUMBNAILS_MAX_CONCURRENT_REQUESTS` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Number of maximum concurrent thumbnail requests. Default is 0 which is unlimited.
+
 a|`THUMBNAILS_HTTP_ADDR` +
 
 a| [subs=-attributes]
@@ -284,17 +295,6 @@ a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
-
-a|`THUMBNAILS_MAX_CONCURRENT_REQUESTS` +
-
-a| [subs=-attributes]
-++6.0.0 ++
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-Number of maximum concurrent thumbnail requests. Default is 0 which is unlimited.
 
 a|`THUMBNAILS_RESOLUTIONS` +
 

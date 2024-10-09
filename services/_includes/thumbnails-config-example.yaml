@@ -19,6 +19,7 @@ debug:
 grpc:
   addr: 127.0.0.1:9185
   tls: null
+  max_concurrent_requests: 0
 http:
   addr: 127.0.0.1:9186
   tls:
@@ -45,7 +46,6 @@ http:
     - X-Request-Id
     - Cache-Control
     allow_credentials: true
-  max_concurrent_requests: 0
 grpc_client_tls: null
 thumbnail:
   resolutions:
