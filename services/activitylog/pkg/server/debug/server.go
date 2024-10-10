@@ -14,9 +14,7 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	checkHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger).
-			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)),
-	)
+			WithLogger(options.Logger))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),

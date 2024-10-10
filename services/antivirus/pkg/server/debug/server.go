@@ -17,7 +17,6 @@ func Server(opts ...Option) (*http.Server, error) {
 	checkHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
 			WithLogger(options.Logger).
-			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)).
 			WithCheck("antivirus reachability", func(ctx context.Context) error {
 				cfg := options.Config
 				switch cfg.Scanner.Type {
