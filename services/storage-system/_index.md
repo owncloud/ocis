@@ -1,6 +1,6 @@
 ---
 title: Storage-System
-date: 2024-10-10T00:13:00.426789223Z
+date: 2024-10-10T07:14:44.743809369Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-system
@@ -13,7 +13,7 @@ geekdocCollapseSection: true
 ## Abstract
 
 
-Purpose and description to be added
+The Infinite Scale Storage-System service persists and caches user related data that is defined via Infinite Scale. This can be among other data role assignments, user settings and users shares.
 
 
 ## Table of Contents
