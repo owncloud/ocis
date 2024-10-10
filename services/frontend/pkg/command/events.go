@@ -8,6 +8,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/rs/zerolog"
 	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
@@ -133,8 +134,17 @@ func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logg
 			continue
 		}
 
-		if resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
-			l.Error().Interface("status", resp.GetStatus()).Str("userid", uid.GetOpaqueId()).Msg("unexpected status code while accepting share")
+		if code := resp.GetStatus().GetCode(); code != rpc.Code_CODE_OK {
+			// log unexpected status codes if a share cannot be accepted...
+			func() *zerolog.Event {
+				switch code {
+				// ... not found is not an error in the context of auto-accepting shares
+				case rpc.Code_CODE_NOT_FOUND:
+					return l.Debug()
+				default:
+					return l.Error()
+				}
+			}().Interface("status", resp.GetStatus()).Str("userid", uid.GetOpaqueId()).Msg("unexpected status code while accepting share")
 		}
 	}
 
