@@ -14,6 +14,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
 
@@ -111,6 +112,17 @@ func (s *Service) OpenInApp(
 		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
 		FileReference: &providerFileRef,
 		ViewMode:      req.GetViewMode(),
+	}
+
+	if templateID := utils.ReadPlainFromOpaque(req.GetOpaque(), "template"); templateID != "" {
+		templateRef, err := storagespace.ParseID(templateID)
+		if err != nil {
+			logger.Error().Err(err).Msg("OpenInApp: error parsing templateID")
+			return nil, err
+		}
+		wopiContext.TemplateReference = &providerv1beta1.Reference{
+			ResourceId: &templateRef,
+		}
 	}
 
 	accessToken, accessExpiration, err := middleware.GenerateWopiToken(wopiContext, s.config)

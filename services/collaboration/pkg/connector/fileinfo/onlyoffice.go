@@ -77,6 +77,8 @@ type OnlyOffice struct {
 	FileNameMaxLength int `json:"FileNameMaxLength,omitempty"`
 	// copied from MS WOPI
 	LastModifiedTime string `json:"LastModifiedTime,omitempty"`
+	// The ID of file (like the wopi/files/ID) can be a non-existing file. In that case, the file will be created from a template when the template (eg. an OTT file) is specified as TemplateSource in the CheckFileInfo response. The TemplateSource is supposed to be an URL like https://somewhere/accessible/file.ott that is accessible by the Online. For the actual saving of the content, normal PutFile mechanism will be used.
+	TemplateSource string `json:"TemplateSource,omitempty"`
 
 	//
 	// User metadata properties
@@ -179,7 +181,8 @@ func (oinfo *OnlyOffice) SetProperties(props map[string]interface{}) {
 			oinfo.FileNameMaxLength = value.(int)
 		case KeyLastModifiedTime:
 			oinfo.LastModifiedTime = value.(string)
-
+		case KeyTemplateSource:
+			oinfo.TemplateSource = value.(string)
 		case KeyIsAnonymousUser:
 			oinfo.IsAnonymousUser = value.(bool)
 		case KeyUserFriendlyName:
