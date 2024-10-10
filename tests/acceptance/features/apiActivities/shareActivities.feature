@@ -1128,7 +1128,7 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["field","folder","resource","token","user"],
+                          "required": ["field","resource","token","user"],
                           "properties": {
                             "field": {
                               "type": "object",
@@ -1139,15 +1139,6 @@ Feature: check share activity
                                 }
                               }
                             },
-                            "folder": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "name": {
-                                  "const": "new-space"
-                                }
-                              }
-                            },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
@@ -1211,7 +1202,7 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["field","folder","resource","token","user"],
+                          "required": ["field","resource","token","user"],
                           "properties": {
                             "field": {
                               "type": "object",
@@ -1222,15 +1213,6 @@ Feature: check share activity
                                 }
                               }
                             },
-                            "folder": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "name": {
-                                  "const": "new-space"
-                                }
-                              }
-                            },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
@@ -1294,7 +1276,7 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["field","folder","resource","token","user"],
+                          "required": ["field","resource","token","user"],
                           "properties": {
                             "field": {
                               "type": "object",
@@ -1302,15 +1284,6 @@ Feature: check share activity
                               "properties": {
                                 "name": {
                                   "const": "password"
-                                }
-                              }
-                            },
-                            "folder": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "name": {
-                                  "const": "new-space"
                                 }
                               }
                             },
@@ -1467,7 +1440,7 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["field","folder","resource","token","user"],
+                          "required": ["field","resource","token","user"],
                           "properties": {
                             "field": {
                               "type": "object",
@@ -1478,15 +1451,6 @@ Feature: check share activity
                                 }
                               }
                             },
-                            "folder": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "name": {
-                                  "const": "new-space"
-                                }
-                              }
-                            },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
@@ -1550,7 +1514,7 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["field","folder","resource","token","user"],
+                          "required": ["field","resource","token","user"],
                           "properties": {
                             "field": {
                               "type": "object",
@@ -1561,15 +1525,6 @@ Feature: check share activity
                                 }
                               }
                             },
-                            "folder": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "name": {
-                                  "const": "new-space"
-                                }
-                              }
-                            },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
@@ -1633,7 +1588,7 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["field","folder","resource","token","user"],
+                          "required": ["field","resource","token","user"],
                           "properties": {
                             "field": {
                               "type": "object",
@@ -1641,15 +1596,6 @@ Feature: check share activity
                               "properties": {
                                 "name": {
                                   "const": "password"
-                                }
-                              }
-                            },
-                            "folder": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "name": {
-                                  "const": "new-space"
                                 }
                               }
                             },
@@ -2064,17 +2010,8 @@ Feature: check share activity
                         },
                         "variables": {
                           "type": "object",
-                          "required": ["folder","resource","user"],
+                          "required": ["resource","user"],
                           "properties": {
-                            "folder": {
-                              "type": "object",
-                              "required": ["id","name"],
-                              "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
-                              }
-                            },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
@@ -2287,4 +2224,3 @@ Feature: check share activity
         }
       }
       """
-
