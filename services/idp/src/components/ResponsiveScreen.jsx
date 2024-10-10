@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -9,6 +9,7 @@ import Grid from '@material-ui/core/Grid';
 import DialogContent from '@material-ui/core/DialogContent';
 
 import Loading from './Loading';
+import { InfiniteScaleContext } from "../infiniteScaleContext";
 
 const styles = theme => ({
   root: {
@@ -44,9 +45,11 @@ const ResponsiveScreen = (props) => {
     className,
     ...other
   } = props;
+  const { theme } = useContext(InfiniteScaleContext);
 
-  const logo = withoutLogo ? null :
-    <img src={process.env.PUBLIC_URL + '/static/logo.svg'} className="oc-logo" alt="ownCloud Logo"/>;
+  const logo = (theme && !withoutLogo) ? (
+        <img src={'/' + theme.common?.logo} className="oc-logo" alt="ownCloud Logo"/>
+    ) : null;
 
   const content = loading ? <Loading/> : (withoutPadding ? children : <DialogContent>{children}</DialogContent>);
 
