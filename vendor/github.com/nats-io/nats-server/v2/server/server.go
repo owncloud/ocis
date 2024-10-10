@@ -1705,7 +1705,7 @@ func (s *Server) setSystemAccount(acc *Account) error {
 		recvqp:  newIPQueue[*inSysMsg](s, "System recvQ Pings"),
 		resetCh: make(chan struct{}),
 		sq:      s.newSendQ(),
-		statsz:  eventsHBInterval,
+		statsz:  statsHBInterval,
 		orphMax: 5 * eventsHBInterval,
 		chkOrph: 3 * eventsHBInterval,
 	}
@@ -1990,9 +1990,9 @@ func (s *Server) updateAccountWithClaimJWT(acc *Account, claimJWT string) error 
 	accClaims, _, err := s.verifyAccountClaims(claimJWT)
 	if err == nil && accClaims != nil {
 		acc.mu.Lock()
-		if acc.Issuer == _EMPTY_ {
-			acc.Issuer = accClaims.Issuer
-		}
+		// if an account is updated with a different operator signing key, we want to
+		// show a consistent issuer.
+		acc.Issuer = accClaims.Issuer
 		if acc.Name != accClaims.Subject {
 			acc.mu.Unlock()
 			return ErrAccountValidation
@@ -2926,8 +2926,10 @@ func (s *Server) startMonitoring(secure bool) error {
 		}
 		hp = net.JoinHostPort(opts.HTTPHost, strconv.Itoa(port))
 		config := opts.TLSConfig.Clone()
-		config.GetConfigForClient = s.getMonitoringTLSConfig
-		config.ClientAuth = tls.NoClientCert
+		if !s.ocspPeerVerify {
+			config.GetConfigForClient = s.getMonitoringTLSConfig
+			config.ClientAuth = tls.NoClientCert
+		}
 		httpListener, err = tls.Listen("tcp", hp, config)
 
 	} else {
@@ -3439,6 +3441,20 @@ func tlsVersion(ver uint16) string {
 		return "1.3"
 	}
 	return fmt.Sprintf("Unknown [0x%x]", ver)
+}
+
+func tlsVersionFromString(ver string) (uint16, error) {
+	switch ver {
+	case "1.0":
+		return tls.VersionTLS10, nil
+	case "1.1":
+		return tls.VersionTLS11, nil
+	case "1.2":
+		return tls.VersionTLS12, nil
+	case "1.3":
+		return tls.VersionTLS13, nil
+	}
+	return 0, fmt.Errorf("unknown version: %v", ver)
 }
 
 // We use hex here so we don't need multiple versions
