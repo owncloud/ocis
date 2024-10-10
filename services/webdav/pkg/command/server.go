@@ -82,7 +82,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				server, err := debug.Server(
+				debugServer, err := debug.Server(
 					debug.Logger(logger),
 					debug.Context(ctx),
 					debug.Config(cfg),
@@ -93,9 +93,8 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(server.ListenAndServe, func(err error) {
-					logger.Error().Err(err)
-					_ = server.Shutdown(ctx)
+				gr.Add(debugServer.ListenAndServe, func(err error) {
+					_ = debugServer.Shutdown(ctx)
 					cancel()
 				})
 			}

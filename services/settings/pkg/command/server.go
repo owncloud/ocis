@@ -94,7 +94,11 @@ func Server(cfg *config.Config) *cli.Command {
 			})
 
 			// prepare a debug server and add it to the group run.
-			debugServer, err := debug.Server(debug.Logger(logger), debug.Context(ctx), debug.Config(cfg))
+			debugServer, err := debug.Server(
+				debug.Logger(logger),
+				debug.Context(ctx),
+				debug.Config(cfg),
+			)
 			if err != nil {
 				logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 				return err
