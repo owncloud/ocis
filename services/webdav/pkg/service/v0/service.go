@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/xml"
 	"io"
+	"math/rand/v2"
 	"net/http"
 	"net/url"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -260,6 +262,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 			renderError(w, r, errTooEarly(e.Detail))
 			return
 		case http.StatusTooManyRequests:
+			addRetryAfterHeader(w)
 			renderError(w, r, errTooManyRequests(e.Detail))
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
@@ -355,6 +358,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 			renderError(w, r, errTooEarly(e.Detail))
 			return
 		case http.StatusTooManyRequests:
+			addRetryAfterHeader(w)
 			renderError(w, r, errTooManyRequests(e.Detail))
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
@@ -401,6 +405,7 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
 		case http.StatusTooManyRequests:
+			addRetryAfterHeader(w)
 			renderError(w, r, errTooManyRequests(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
@@ -445,6 +450,7 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
 		case http.StatusTooManyRequests:
+			addRetryAfterHeader(w)
 			renderError(w, r, errTooManyRequests(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
@@ -558,4 +564,9 @@ func renderError(w http.ResponseWriter, r *http.Request, err *errResponse) {
 
 func notFoundMsg(name string) string {
 	return "File with name " + name + " could not be located"
+}
+
+func addRetryAfterHeader(w http.ResponseWriter) {
+	after := rand.IntN(14) + 1
+	w.Header().Set("Retry-After", strconv.Itoa(after))
 }
