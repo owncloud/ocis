@@ -1,20 +1,35 @@
 package debug
 
 import (
-	"io"
+	"context"
 	"net/http"
 	"net/url"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 )
 
 // Server initializes the debug service and server.
 func Server(opts ...Option) (*http.Server, error) {
 	options := newOptions(opts...)
+
+	checkHandler := handlers.NewCheckHandler(
+		handlers.NewCheckHandlerConfiguration().
+			WithLogger(options.Logger).
+			WithCheck("tcp-check", func(ctx context.Context) error {
+				tcpURL := options.Config.Ldap.URI
+				u, err := url.Parse(options.Config.Ldap.URI)
+				if err != nil {
+					return err
+				}
+				if u.Host != "" {
+					tcpURL = u.Host
+				}
+
+				return handlers.NewTCPCheck(tcpURL)(ctx)
+			}),
+	)
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -24,47 +39,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Token(options.Config.Debug.Token),
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
-		debug.Health(health(options.Config, options.Logger)),
-		debug.Ready(ready(options.Config)),
+		debug.Health(checkHandler),
+		debug.Ready(checkHandler),
 	), nil
-}
-
-// health implements the health check.
-func health(cfg *config.Config, l log.Logger) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		targetHost, err := url.Parse(cfg.Ldap.URI)
-		if err != nil {
-			l.Fatal().Err(err).Str("uri", cfg.Ldap.URI).Msg("invalid LDAP URI")
-		}
-		err = shared.RunChecklist(shared.TCPConnect(targetHost.Host))
-		retVal := http.StatusOK
-		if err != nil {
-			l.Error().Err(err).Msg("Healtcheck failed")
-			retVal = http.StatusInternalServerError
-		}
-		w.Header().Set("Content-Type", "text/plain")
-		w.WriteHeader(retVal)
-
-		_, err = io.WriteString(w, http.StatusText(retVal))
-		if err != nil {
-			l.Fatal().Err(err).Msg("Could not write health check body")
-		}
-	}
-}
-
-// ready implements the ready check.
-func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/plain")
-		w.WriteHeader(http.StatusOK)
-		// if we can call this function, a http(200) is a valid response as
-		// there is nothing we can check at this point for IDP
-		// if there is a mishap when initializing, there is a minimal (talking ms or ns window)
-		// timeframe where this code is callable
-		_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-		// io.WriteString should not fail but if it does, we want to know.
-		if err != nil {
-			panic(err)
-		}
-	}
 }

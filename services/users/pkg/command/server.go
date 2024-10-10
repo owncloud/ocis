@@ -87,6 +87,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			gr.Add(debugServer.ListenAndServe, func(_ error) {
+				_ = debugServer.Shutdown(ctx)
 				cancel()
 			})
 

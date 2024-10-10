@@ -8,18 +8,18 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/clientlog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/clientlog/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/clientlog/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/clientlog/pkg/metrics"
+	"github.com/owncloud/ocis/v2/services/clientlog/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/clientlog/pkg/service"
-	"github.com/urfave/cli/v2"
 )
 
 // all events we care about
@@ -116,20 +116,18 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				server := debug.NewService(
+				debugServer, err := debug.Server(
 					debug.Logger(logger),
-					debug.Name(cfg.Service.Name),
-					debug.Version(version.GetString()),
-					debug.Address(cfg.Debug.Addr),
-					debug.Token(cfg.Debug.Token),
-					debug.Pprof(cfg.Debug.Pprof),
-					debug.Zpages(cfg.Debug.Zpages),
-					debug.Health(handlers.Health),
-					debug.Ready(handlers.Ready),
+					debug.Context(ctx),
+					debug.Config(cfg),
 				)
+				if err != nil {
+					logger.Info().Err(err).Str("server", "debug").Msg("Failed to initialize server")
+					return err
+				}
 
-				gr.Add(server.ListenAndServe, func(_ error) {
-					_ = server.Shutdown(ctx)
+				gr.Add(debugServer.ListenAndServe, func(_ error) {
+					_ = debugServer.Shutdown(ctx)
 					cancel()
 				})
 			}

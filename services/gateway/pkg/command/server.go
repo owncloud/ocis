@@ -75,9 +75,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			gr.Add(debugServer.ListenAndServe, func(_ error) {
-				logger.Info().
-					Str("server", cfg.Service.Name).
-					Msg("Shutting down debug erver")
+				_ = debugServer.Shutdown(ctx)
 				cancel()
 			})
 

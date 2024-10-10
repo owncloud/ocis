@@ -9,10 +9,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -22,9 +23,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/metrics"
+	"github.com/owncloud/ocis/v2/services/activitylog/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/server/http"
-	"github.com/urfave/cli/v2"
-	microstore "go-micro.dev/v4/store"
 )
 
 var _registeredEvents = []events.Unmarshaller{
@@ -120,7 +120,6 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx), // NOTE: not passing this "option" leads to a panic in go-micro
 					http.TraceProvider(tracerProvider),
 					http.Stream(evStream),
-					http.RegisteredEvents(_registeredEvents),
 					http.Store(evStore),
 					http.GatewaySelector(gatewaySelector),
 					http.HistoryClient(hClient),
@@ -146,20 +145,18 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				server := debug.NewService(
+				debugServer, err := debug.Server(
 					debug.Logger(logger),
-					debug.Name(cfg.Service.Name),
-					debug.Version(version.GetString()),
-					debug.Address(cfg.Debug.Addr),
-					debug.Token(cfg.Debug.Token),
-					debug.Pprof(cfg.Debug.Pprof),
-					debug.Zpages(cfg.Debug.Zpages),
-					debug.Health(handlers.Health),
-					debug.Ready(handlers.Ready),
+					debug.Context(ctx),
+					debug.Config(cfg),
 				)
+				if err != nil {
+					logger.Info().Err(err).Str("server", "debug").Msg("Failed to initialize server")
+					return err
+				}
 
-				gr.Add(server.ListenAndServe, func(_ error) {
-					_ = server.Shutdown(ctx)
+				gr.Add(debugServer.ListenAndServe, func(_ error) {
+					_ = debugServer.Shutdown(ctx)
 					cancel()
 				})
 			}
