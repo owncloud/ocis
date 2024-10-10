@@ -2,15 +2,12 @@ package debug
 
 import (
 	"context"
-	"fmt"
-	"net"
 	"net/http"
 
-	"github.com/cs3org/reva/v2/pkg/events/stream"
+	"github.com/dutchcoders/go-clamd"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/ocis/v2/services/antivirus/pkg/scanners"
 )
 
 // Server initializes the debug service and server.
@@ -20,31 +17,18 @@ func Server(opts ...Option) (*http.Server, error) {
 	checkHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
 			WithLogger(options.Logger).
-			WithCheck("nats reachability", func(ctx context.Context) error {
-				_, err := stream.NatsFromConfig("healthcheckfornats", false, stream.NatsConfig(options.Config.Events))
-				if err != nil {
-					return fmt.Errorf("could not connect to nats server: %v", err)
-				}
-				return nil
-			}).
+			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)).
 			WithCheck("antivirus reachability", func(ctx context.Context) error {
 				cfg := options.Config
 				switch cfg.Scanner.Type {
 				default:
-					// there is not av configured, return no error here
-					return nil
+					// there is not av configured, so we panic
+					panic("no antivirus configured")
 				case "clamav":
-					_, err := net.Dial("tcp", cfg.Scanner.ClamAV.Socket)
-					if err != nil {
-						return fmt.Errorf("could not connect to clamav server: %v", err)
-					}
+					return clamd.NewClamd(cfg.Scanner.ClamAV.Socket).Ping()
 				case "icap":
-					_, err := scanners.NewICAP(cfg.Scanner.ICAP.URL, cfg.Scanner.ICAP.Service, cfg.Scanner.ICAP.Timeout)
-					if err != nil {
-						return fmt.Errorf("could not connect to icap server: %v", err)
-					}
+					return handlers.NewTCPCheck(cfg.Scanner.ICAP.URL)(ctx)
 				}
-				return nil
 			}),
 	)
 
