@@ -355,6 +355,8 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 			// StatusTooEarly if file is processing
 			renderError(w, r, errTooEarly(e.Detail))
 			return
+		case http.StatusTooManyRequests:
+			renderError(w, r, errTooManyRequests(e.Detail))
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
 		case http.StatusForbidden:
@@ -401,6 +403,8 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
+		case http.StatusTooManyRequests:
+			renderError(w, r, errTooManyRequests(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
@@ -443,6 +447,8 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
+		case http.StatusTooManyRequests:
+			renderError(w, r, errTooManyRequests(e.Detail))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
