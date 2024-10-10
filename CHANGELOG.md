@@ -62,6 +62,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Avoid re-creating thumbnails: [#10251](https://github.com/owncloud/ocis/pull/10251)
 * Enhancement - Add OCM wellknown configuration: [#9815](https://github.com/owncloud/ocis/pull/9815)
 * Enhancement - Bump reva to 2.xx.x: [#10236](https://github.com/owncloud/ocis/pull/10236)
+* Enhancement - Load IDP logo from theme: [#10274](https://github.com/owncloud/ocis/pull/10274)
 
 ## Details
 
@@ -113,6 +114,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10236
    https://github.com/owncloud/ocis/pull/10216
+
+* Enhancement - Load IDP logo from theme: [#10274](https://github.com/owncloud/ocis/pull/10274)
+
+   We now load the IDP logo from the theme file.
+
+   https://github.com/owncloud/web/issues/11603
+   https://github.com/owncloud/ocis/pull/10274
 
 # Changelog for [6.5.0] (2024-10-01)
 
