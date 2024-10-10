@@ -24,8 +24,8 @@ const (
 
 // Service defines the service handlers.
 type Service interface {
-	ServeHTTP(http.ResponseWriter, *http.Request)
-	GetThumbnail(http.ResponseWriter, *http.Request)
+	ServeHTTP(w http.ResponseWriter, r *http.Request)
+	GetThumbnail(w http.ResponseWriter, r *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -57,6 +57,8 @@ func NewService(opts ...Option) Service {
 			resolutions,
 			options.ThumbnailStorage,
 			logger,
+			options.Config.Thumbnail.MaxInputWidth,
+			options.Config.Thumbnail.MaxInputHeight,
 		),
 	}
 
@@ -65,7 +67,7 @@ func NewService(opts ...Option) Service {
 		r.Get("/data", svc.GetThumbnail)
 	})
 
-	_ = chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+	_ = chi.Walk(m, func(method string, route string, _ http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		options.Logger.Debug().Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")
 		return nil
 	})
@@ -91,7 +93,7 @@ func (s Thumbnails) GetThumbnail(w http.ResponseWriter, r *http.Request) {
 	logger := s.logger.SubloggerWithRequestID(r.Context())
 	key := r.Context().Value(keyContextKey).(string)
 
-	thumbnail, err := s.manager.GetThumbnail(key)
+	thumbnailBytes, err := s.manager.GetThumbnail(key)
 	if err != nil {
 		logger.Debug().
 			Err(err).
@@ -102,8 +104,8 @@ func (s Thumbnails) GetThumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Length", strconv.Itoa(len(thumbnail)))
-	if _, err = w.Write(thumbnail); err != nil {
+	w.Header().Set("Content-Length", strconv.Itoa(len(thumbnailBytes)))
+	if _, err = w.Write(thumbnailBytes); err != nil {
 		logger.Error().
 			Err(err).
 			Str("key", key).
@@ -111,6 +113,7 @@ func (s Thumbnails) GetThumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// TransferTokenValidator validates a transfer token
 func (s Thumbnails) TransferTokenValidator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := s.logger.SubloggerWithRequestID(r.Context())

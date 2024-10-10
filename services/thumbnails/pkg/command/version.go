@@ -18,7 +18,7 @@ func Version(cfg *config.Config) *cli.Command {
 		Name:     "version",
 		Usage:    "print the version of this binary and the running service instances",
 		Category: "info",
-		Action: func(c *cli.Context) error {
+		Action: func(_ *cli.Context) error {
 			fmt.Println("Version: " + version.GetString())
 			fmt.Printf("Compiled: %s\n", version.Compiled())
 			fmt.Println("")

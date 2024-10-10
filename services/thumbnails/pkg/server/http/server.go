@@ -39,8 +39,6 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Middleware(
 			middleware.RealIP,
 			middleware.RequestID,
-			// ocismiddleware.Secure,
-			ocismiddleware.Throttle(options.MaxConcurrentRequests),
 			ocismiddleware.Version(
 				options.Config.Service.Name,
 				version.GetString(),

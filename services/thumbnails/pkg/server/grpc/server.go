@@ -1,9 +1,11 @@
 package grpc
 
 import (
+	"github.com/cs3org/reva/v2/pkg/bytesize"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc/handler/ratelimiter"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
 	svc "github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/grpc/v0"
@@ -31,6 +33,7 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Context(options.Context),
 		grpc.Version(version.GetString()),
 		grpc.TraceProvider(options.TraceProvider),
+		grpc.HandlerWrappers(ratelimiter.NewHandlerWrapper(options.MaxConcurrentRequests)),
 	)
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("Error creating thumbnail service")
@@ -54,19 +57,25 @@ func NewService(opts ...Option) grpc.Service {
 		options.Logger.Error().Err(err).Msg("could not get gateway selector")
 		return grpc.Service{}
 	}
+	b, err := bytesize.Parse(tconf.MaxInputImageFileSize)
+	if err != nil {
+		options.Logger.Error().Err(err).Msg("could not parse MaxInputImageFileSize")
+		return grpc.Service{}
+	}
+
 	var thumbnail decorators.DecoratedService
 	{
 		thumbnail = svc.NewService(
 			svc.Config(options.Config),
 			svc.Logger(options.Logger),
-			svc.ThumbnailSource(imgsource.NewWebDavSource(tconf)),
+			svc.ThumbnailSource(imgsource.NewWebDavSource(tconf, b)),
 			svc.ThumbnailStorage(
 				storage.NewFileSystemStorage(
 					tconf.FileSystemStorage,
 					options.Logger,
 				),
 			),
-			svc.CS3Source(imgsource.NewCS3Source(tconf, gatewaySelector)),
+			svc.CS3Source(imgsource.NewCS3Source(tconf, gatewaySelector, b)),
 			svc.GatewaySelector(gatewaySelector),
 		)
 		thumbnail = decorators.NewInstrument(thumbnail, options.Metrics)

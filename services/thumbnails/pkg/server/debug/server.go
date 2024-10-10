@@ -27,8 +27,8 @@ func Server(opts ...Option) (*http.Server, error) {
 }
 
 // health implements the health check.
-func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+func health(_ *config.Config) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
 
@@ -43,8 +43,8 @@ func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 }
 
 // ready implements the ready check.
-func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+func ready(_ *config.Config) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
 

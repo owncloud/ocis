@@ -8,11 +8,12 @@ import (
 	"strings"
 
 	"github.com/kovidgoyal/imaging"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 )
 
 // Generator generates a web friendly file version.
 type Generator interface {
-	Generate(image.Rectangle, interface{}, Processor) (interface{}, error)
+	Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error)
 }
 
 // SimpleGenerator is the default image generator and is used for all image types expect gif.
@@ -22,7 +23,7 @@ type SimpleGenerator struct{}
 func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error) {
 	m, ok := img.(image.Image)
 	if !ok {
-		return nil, ErrInvalidType
+		return nil, errors.ErrInvalidType
 	}
 
 	return processor.Process(m, size.Dx(), size.Dy(), imaging.Lanczos), nil
@@ -37,7 +38,7 @@ func (g GifGenerator) Generate(size image.Rectangle, img interface{}, processor 
 
 	m, ok := img.(*gif.GIF)
 	if !ok {
-		return nil, ErrInvalidType
+		return nil, errors.ErrInvalidType
 	}
 	// Create a new RGBA image to hold the incremental frames.
 	srcX, srcY := m.Config.Width, m.Config.Height
@@ -80,6 +81,6 @@ func GeneratorForType(fileType string) (Generator, error) {
 	case typeGif:
 		return GifGenerator{}, nil
 	default:
-		return nil, ErrNoEncoderForType
+		return nil, errors.ErrNoEncoderForType
 	}
 }

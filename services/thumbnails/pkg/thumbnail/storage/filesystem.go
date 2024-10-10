@@ -31,6 +31,7 @@ type FileSystem struct {
 	logger log.Logger
 }
 
+// Stat returns if a file for the given key exists on the filesystem
 func (s FileSystem) Stat(key string) bool {
 	img := filepath.Join(s.root, filesDir, key)
 	if _, err := os.Stat(img); err != nil {
@@ -39,6 +40,7 @@ func (s FileSystem) Stat(key string) bool {
 	return true
 }
 
+// Get returns the file content for the given key
 func (s FileSystem) Get(key string) ([]byte, error) {
 	img := filepath.Join(s.root, filesDir, key)
 	content, err := os.ReadFile(img)
@@ -51,6 +53,7 @@ func (s FileSystem) Get(key string) ([]byte, error) {
 	return content, nil
 }
 
+// Put stores image data in the file system for the given key
 func (s FileSystem) Put(key string, img []byte) error {
 	imgPath := filepath.Join(s.root, filesDir, key)
 	dir := filepath.Dir(imgPath)

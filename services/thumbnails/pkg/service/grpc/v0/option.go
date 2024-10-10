@@ -50,13 +50,6 @@ func Config(val *config.Config) Option {
 	}
 }
 
-// Middleware provides a function to set the middleware option.
-func Middleware(val ...func(http.Handler) http.Handler) Option {
-	return func(o *Options) {
-		o.Middleware = val
-	}
-}
-
 // ThumbnailStorage provides a function to set the thumbnail storage option.
 func ThumbnailStorage(val storage.Storage) Option {
 	return func(o *Options) {

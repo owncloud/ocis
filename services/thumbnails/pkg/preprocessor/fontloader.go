@@ -25,28 +25,28 @@ type FontMap struct {
 	DefaultFont string            `json:"defaultFont"`
 }
 
-// It contains the location of the loaded file (in FLoc) and the FontMap loaded
+// FontMapData contains the location of the loaded file (in FLoc) and the FontMap loaded
 // from the file
 type FontMapData struct {
 	FMap *FontMap
 	FLoc string
 }
 
-// It contains the location of the font used, and the loaded face (font.Face)
+// LoadedFace contains the location of the font used, and the loaded face (font.Face)
 // ready to be used
 type LoadedFace struct {
 	FontFile string
 	Face     font.Face
 }
 
-// Represents a FontLoader. Use the "NewFontLoader" to get a instance
+// FontLoader represents a FontLoader. Use the "NewFontLoader" to get a instance
 type FontLoader struct {
 	faceCache   sync.Cache
 	fontMapData *FontMapData
 	faceOpts    *opentype.FaceOptions
 }
 
-// Create a new FontLoader based on the fontMapFile. The FaceOptions will
+// NewFontLoader creates a new FontLoader based on the fontMapFile. The FaceOptions will
 // be the same for all the font loaded by this instance.
 // Note that only the fonts described in the fontMapFile will be used.
 //
@@ -92,7 +92,7 @@ func NewFontLoader(fontMapFile string, faceOpts *opentype.FaceOptions) (*FontLoa
 	}, nil
 }
 
-// Load and return the font face to be used for that script according to the
+// LoadFaceForScript loads and returns the font face to be used for that script according to the
 // FontMap set when the FontLoader was created. If the script doesn't have
 // an associated font, a default font will be used. Note that the default font
 // might not be able to handle properly the script
@@ -146,14 +146,17 @@ func (fl *FontLoader) LoadFaceForScript(script string) (*LoadedFace, error) {
 	return loadedFace, nil
 }
 
+// GetFaceOptSize returns face opt size
 func (fl *FontLoader) GetFaceOptSize() float64 {
 	return fl.faceOpts.Size
 }
 
+// GetFaceOptDPI returns face opt DPI
 func (fl *FontLoader) GetFaceOptDPI() float64 {
 	return fl.faceOpts.DPI
 }
 
+// GetScriptList returns script list
 func (fl *FontLoader) GetScriptList() []string {
 	fontMap := fl.fontMapData.FMap.FontMap
 
