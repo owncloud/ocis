@@ -436,6 +436,9 @@ func newFileStoreWithCreated(fcfg FileStoreConfig, cfg StreamConfig, created tim
 	// Attempt to recover our state.
 	err = fs.recoverFullState()
 	if err != nil {
+		if !os.IsNotExist(err) {
+			fs.warn("Recovering stream state from index errored: %v", err)
+		}
 		// Hold onto state
 		prior := fs.state
 		// Reset anything that could have been set from above.
@@ -469,7 +472,7 @@ func newFileStoreWithCreated(fcfg FileStoreConfig, cfg StreamConfig, created tim
 		go fs.cleanupOldMeta()
 	}()
 
-	// Lock while do enforcements and removals.
+	// Lock while we do enforcements and removals.
 	fs.mu.Lock()
 
 	// Check if we have any left over tombstones to process.
@@ -975,7 +978,6 @@ func (mb *msgBlock) ensureLastChecksumLoaded() {
 // Lock held on entry
 func (fs *fileStore) recoverMsgBlock(index uint32) (*msgBlock, error) {
 	mb := fs.initMsgBlock(index)
-
 	// Open up the message file, but we will try to recover from the index file.
 	// We will check that the last checksums match.
 	file, err := mb.openBlock()
@@ -1357,6 +1359,9 @@ func (mb *msgBlock) rebuildStateLocked() (*LostStreamData, []uint64, error) {
 		minTombstoneTs  int64
 	)
 
+	// To detect gaps from compaction.
+	var last uint64
+
 	for index, lbuf := uint32(0), uint32(len(buf)); index < lbuf; {
 		if index+msgHdrSize > lbuf {
 			truncate(index)
@@ -1444,8 +1449,16 @@ func (mb *msgBlock) rebuildStateLocked() (*LostStreamData, []uint64, error) {
 			mb.bytes += uint64(rl)
 		}
 
+		// Check for any gaps from compaction, meaning no ebit entry.
+		if last > 0 && seq != last+1 {
+			for dseq := last + 1; dseq < seq; dseq++ {
+				addToDmap(dseq)
+			}
+		}
+
 		// Always set last
-		atomic.StoreUint64(&mb.last.seq, seq)
+		last = seq
+		atomic.StoreUint64(&mb.last.seq, last)
 		mb.last.ts = ts
 
 		// Advance to next record.
@@ -1665,7 +1678,8 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 		for i := 0; i < int(numBlocks); i++ {
 			index, nbytes, fseq, fts, lseq, lts, numDeleted := uint32(readU64()), readU64(), readU64(), readI64(), readU64(), readI64(), readU64()
 			if bi < 0 {
-				break
+				os.Remove(fn)
+				return errCorruptState
 			}
 			mb := fs.initMsgBlock(index)
 			atomic.StoreUint64(&mb.first.seq, fseq)
@@ -1734,120 +1748,33 @@ func (fs *fileStore) recoverFullState() (rerr error) {
 		return errPriorState
 	}
 	if matched = bytes.Equal(mb.lastChecksum(), lchk[:]); !matched {
-		// Remove the last message block since recover will add in the new one.
-		fs.removeMsgBlockFromList(mb)
-		// Reverse update of tracking state for this mb, will add new state in below.
-		mstate.Msgs -= mb.msgs
-		mstate.Bytes -= mb.bytes
-		if nmb, err := fs.recoverMsgBlock(mb.index); err != nil && !os.IsNotExist(err) {
-			fs.warn("Stream state could not recover last msg block")
-			os.Remove(fn)
-			return errCorruptState
-		} else if nmb != nil {
-			fs.adjustAccounting(mb, nmb)
-			updateTrackingState(&mstate, nmb)
-		}
+		// Detected a stale index.db, we didn't write it upon shutdown so can't rely on it being correct.
+		fs.warn("Stream state outdated, last block has additional entries, will rebuild")
+		return errPriorState
 	}
 
-	// On success double check our state.
-	checkState := func() error {
-		// We check first and last seq and number of msgs and bytes. If there is a difference,
-		// return and error so we rebuild from the message block state on disk.
-		if !trackingStatesEqual(&fs.state, &mstate) {
-			fs.warn("Stream state encountered internal inconsistency on recover")
-			os.Remove(fn)
-			return errCorruptState
-		}
-		return nil
+	// We need to see if any blocks exist after our last one even though we matched the last record exactly.
+	mdir := filepath.Join(fs.fcfg.StoreDir, msgDir)
+	var dirs []os.DirEntry
+
+	<-dios
+	if f, err := os.Open(mdir); err == nil {
+		dirs, _ = f.ReadDir(-1)
+		f.Close()
 	}
+	dios <- struct{}{}
 
-	// We may need to check other blocks. Even if we matched last checksum we will see if there is another block.
-	for bi := blkIndex + 1; ; bi++ {
-		nmb, err := fs.recoverMsgBlock(bi)
-		if err != nil {
-			if os.IsNotExist(err) {
-				return checkState()
-			}
-			os.Remove(fn)
-			fs.warn("Stream state could not recover msg block %d", bi)
-			return err
-		}
-		if nmb != nil {
-			// Update top level accounting
-			if fseq := atomic.LoadUint64(&nmb.first.seq); fs.state.FirstSeq == 0 || fseq < fs.state.FirstSeq {
-				fs.state.FirstSeq = fseq
-				fs.state.FirstTime = time.Unix(0, nmb.first.ts).UTC()
-			}
-			if lseq := atomic.LoadUint64(&nmb.last.seq); lseq > fs.state.LastSeq {
-				fs.state.LastSeq = lseq
-				fs.state.LastTime = time.Unix(0, nmb.last.ts).UTC()
-			}
-			fs.state.Msgs += nmb.msgs
-			fs.state.Bytes += nmb.bytes
-			updateTrackingState(&mstate, nmb)
-		}
-	}
-}
-
-// adjustAccounting will be called when a stream state was only partially accounted for
-// within a message block, e.g. additional records were added after the stream state.
-// Lock should be held.
-func (fs *fileStore) adjustAccounting(mb, nmb *msgBlock) {
-	nmb.mu.Lock()
-	defer nmb.mu.Unlock()
-
-	// First make sure the new block is loaded.
-	if nmb.cacheNotLoaded() {
-		nmb.loadMsgsWithLock()
-	}
-	nmb.ensurePerSubjectInfoLoaded()
-
-	var smv StoreMsg
-
-	// Need to walk previous messages and undo psim stats.
-	// We already undid msgs and bytes accounting.
-	for seq, lseq := atomic.LoadUint64(&mb.first.seq), atomic.LoadUint64(&mb.last.seq); seq <= lseq; seq++ {
-		// Lookup the message. If an error will be deleted, so can skip.
-		sm, err := nmb.cacheLookup(seq, &smv)
-		if err != nil {
-			continue
-		}
-		if len(sm.subj) > 0 && fs.psim != nil {
-			if info, ok := fs.psim.Find(stringToBytes(sm.subj)); ok {
-				info.total--
+	var index uint32
+	for _, fi := range dirs {
+		if n, err := fmt.Sscanf(fi.Name(), blkScan, &index); err == nil && n == 1 {
+			if index > blkIndex {
+				fs.warn("Stream state outdated, found extra blocks, will rebuild")
+				return errPriorState
 			}
 		}
 	}
 
-	// Walk only new messages and update accounting at fs level. Any messages that should have
-	// triggered limits exceeded will be handled after the recovery and prior to the stream
-	// being available to the system.
-	for seq, lseq := atomic.LoadUint64(&mb.last.seq)+1, atomic.LoadUint64(&nmb.last.seq); seq <= lseq; seq++ {
-		// Lookup the message. If an error will be deleted, so can skip.
-		sm, err := nmb.cacheLookup(seq, &smv)
-		if err != nil {
-			continue
-		}
-		// Since we found it we just need to adjust fs totals and psim.
-		fs.state.Msgs++
-		fs.state.Bytes += fileStoreMsgSize(sm.subj, sm.hdr, sm.msg)
-	}
-
-	// Now check to see if we had a higher first for the recovered state mb vs nmb.
-	if atomic.LoadUint64(&nmb.first.seq) < atomic.LoadUint64(&mb.first.seq) {
-		// Now set first for nmb.
-		atomic.StoreUint64(&nmb.first.seq, atomic.LoadUint64(&mb.first.seq))
-	}
-
-	// Update top level accounting.
-	if fseq := atomic.LoadUint64(&nmb.first.seq); fs.state.FirstSeq == 0 || fseq < fs.state.FirstSeq {
-		fs.state.FirstSeq = fseq
-		fs.state.FirstTime = time.Unix(0, nmb.first.ts).UTC()
-	}
-	if lseq := atomic.LoadUint64(&nmb.last.seq); lseq > fs.state.LastSeq {
-		fs.state.LastSeq = lseq
-		fs.state.LastTime = time.Unix(0, nmb.last.ts).UTC()
-	}
+	return nil
 }
 
 // Grabs last checksum for the named block file.
@@ -5302,7 +5229,8 @@ func (mb *msgBlock) ensureRawBytesLoaded() error {
 // Sync msg and index files as needed. This is called from a timer.
 func (fs *fileStore) syncBlocks() {
 	fs.mu.RLock()
-	if fs.closed {
+	// If closed or a snapshot is in progress bail.
+	if fs.closed || fs.sips > 0 {
 		fs.mu.RUnlock()
 		return
 	}
@@ -6786,6 +6714,7 @@ func (fs *fileStore) PurgeEx(subject string, sequence, keep uint64) (purged uint
 	}
 
 	var smv StoreMsg
+	var tombs []msgId
 
 	fs.mu.Lock()
 	// We may remove blocks as we purge, so don't range directly on fs.blks
@@ -6839,9 +6768,11 @@ func (fs *fileStore) PurgeEx(subject string, sequence, keep uint64) (purged uint
 					purged++
 					bytes += rl
 				}
-				// FSS updates.
+				// PSIM and FSS updates.
 				mb.removeSeqPerSubject(sm.subj, seq)
 				fs.removePerSubject(sm.subj)
+				// Track tombstones we need to write.
+				tombs = append(tombs, msgId{sm.seq, sm.ts})
 
 				// Check for first message.
 				if seq == atomic.LoadUint64(&mb.first.seq) {
@@ -6880,7 +6811,16 @@ func (fs *fileStore) PurgeEx(subject string, sequence, keep uint64) (purged uint
 	if firstSeqNeedsUpdate {
 		fs.selectNextFirst()
 	}
+	fseq := fs.state.FirstSeq
 
+	// Write any tombstones as needed.
+	for _, tomb := range tombs {
+		if tomb.seq > fseq {
+			fs.lmb.writeTombstone(tomb.seq, tomb.ts)
+		}
+	}
+
+	os.Remove(filepath.Join(fs.fcfg.StoreDir, msgDir, streamStreamStateFile))
 	fs.dirty++
 	cb := fs.scb
 	fs.mu.Unlock()
@@ -6923,7 +6863,7 @@ func (fs *fileStore) purge(fseq uint64) (uint64, error) {
 	fs.bim = make(map[uint32]*msgBlock)
 	// Clear any per subject tracking.
 	fs.psim, fs.tsl = fs.psim.Empty(), 0
-	// Mark dirty
+	// Mark dirty.
 	fs.dirty++
 
 	// Move the msgs directory out of the way, will delete out of band.
@@ -6978,6 +6918,11 @@ func (fs *fileStore) purge(fseq uint64) (uint64, error) {
 
 	cb := fs.scb
 	fs.mu.Unlock()
+
+	// Force a new index.db to be written.
+	if purged > 0 {
+		fs.forceWriteFullState()
+	}
 
 	if cb != nil {
 		cb(-int64(purged), -rbytes, 0, _EMPTY_)
@@ -7173,10 +7118,18 @@ SKIP:
 	}
 	fs.state.Bytes -= bytes
 
+	// Any existing state file no longer applicable. We will force write a new one
+	// after we release the lock.
+	os.Remove(filepath.Join(fs.fcfg.StoreDir, msgDir, streamStreamStateFile))
 	fs.dirty++
 
 	cb := fs.scb
 	fs.mu.Unlock()
+
+	// Force a new index.db to be written.
+	if purged > 0 {
+		fs.forceWriteFullState()
+	}
 
 	if cb != nil && purged > 0 {
 		cb(-int64(purged), -int64(bytes), 0, _EMPTY_)
@@ -7238,6 +7191,40 @@ func (fs *fileStore) reset() error {
 	return nil
 }
 
+// Return all active tombstones in this msgBlock.
+// Write lock should be held.
+func (mb *msgBlock) tombs() []msgId {
+	var tombs []msgId
+
+	if !mb.cacheAlreadyLoaded() {
+		if err := mb.loadMsgsWithLock(); err != nil {
+			return nil
+		}
+	}
+
+	var le = binary.LittleEndian
+	buf := mb.cache.buf
+
+	for index, lbuf := uint32(0), uint32(len(buf)); index < lbuf; {
+		if index+msgHdrSize > lbuf {
+			return tombs
+		}
+		hdr := buf[index : index+msgHdrSize]
+		rl, seq := le.Uint32(hdr[0:]), le.Uint64(hdr[4:])
+		// Clear any headers bit that could be set.
+		rl &^= hbit
+		// Check for tombstones.
+		if seq&tbit != 0 {
+			ts := int64(le.Uint64(hdr[12:]))
+			tombs = append(tombs, msgId{seq &^ tbit, ts})
+		}
+		// Advance to next record.
+		index += rl
+	}
+
+	return tombs
+}
+
 // Truncate will truncate a stream store up to seq. Sequence needs to be valid.
 func (fs *fileStore) Truncate(seq uint64) error {
 	// Check for request to reset.
@@ -7273,6 +7260,10 @@ func (fs *fileStore) Truncate(seq uint64) error {
 		fs.mu.Unlock()
 		return err
 	}
+	// Collect all tombstones, we want to put these back so we can survive
+	// a restore without index.db properly.
+	var tombs []msgId
+	tombs = append(tombs, nlmb.tombs()...)
 
 	var purged, bytes uint64
 
@@ -7290,6 +7281,8 @@ func (fs *fileStore) Truncate(seq uint64) error {
 	getLastMsgBlock := func() *msgBlock { return fs.blks[len(fs.blks)-1] }
 	for mb := getLastMsgBlock(); mb != nlmb; mb = getLastMsgBlock() {
 		mb.mu.Lock()
+		// We do this to load tombs.
+		tombs = append(tombs, mb.tombs()...)
 		purged += mb.msgs
 		bytes += mb.bytes
 		fs.removeMsgBlock(mb)
@@ -7312,10 +7305,28 @@ func (fs *fileStore) Truncate(seq uint64) error {
 	// Reset our subject lookup info.
 	fs.resetGlobalPerSubjectInfo()
 
+	// Always create new write block.
+	fs.newMsgBlockForWrite()
+
+	// Write any tombstones as needed.
+	for _, tomb := range tombs {
+		if tomb.seq <= lsm.seq {
+			fs.lmb.writeTombstone(tomb.seq, tomb.ts)
+		}
+	}
+
+	// Any existing state file no longer applicable. We will force write a new one
+	// after we release the lock.
+	os.Remove(filepath.Join(fs.fcfg.StoreDir, msgDir, streamStreamStateFile))
 	fs.dirty++
 
 	cb := fs.scb
 	fs.mu.Unlock()
+
+	// Force a new index.db to be written.
+	if purged > 0 {
+		fs.forceWriteFullState()
+	}
 
 	if cb != nil {
 		cb(-int64(purged), -int64(bytes), 0, _EMPTY_)
@@ -8138,26 +8149,6 @@ func (fs *fileStore) streamSnapshot(w io.WriteCloser, includeConsumers bool) {
 	msgPre := msgDir + "/"
 	var bbuf []byte
 
-	const minLen = 32
-	sfn := filepath.Join(fs.fcfg.StoreDir, msgDir, streamStreamStateFile)
-	if buf, err := os.ReadFile(sfn); err == nil && len(buf) >= minLen {
-		if fs.aek != nil {
-			ns := fs.aek.NonceSize()
-			buf, err = fs.aek.Open(nil, buf[:ns], buf[ns:len(buf)-highwayhash.Size64], nil)
-			if err == nil {
-				// Redo hash checksum at end on plaintext.
-				fs.mu.Lock()
-				hh.Reset()
-				hh.Write(buf)
-				buf = fs.hh.Sum(buf)
-				fs.mu.Unlock()
-			}
-		}
-		if err == nil && writeFile(msgPre+streamStreamStateFile, buf) != nil {
-			return
-		}
-	}
-
 	// Now do messages themselves.
 	for _, mb := range blks {
 		if mb.pendingWriteSize() > 0 {
@@ -8193,6 +8184,30 @@ func (fs *fileStore) streamSnapshot(w io.WriteCloser, includeConsumers bool) {
 		// Do this one unlocked.
 		if writeFile(msgPre+fmt.Sprintf(blkScan, mb.index), bbuf) != nil {
 			return
+		}
+	}
+
+	// Do index.db last. We will force a write as well.
+	// Write out full state as well before proceeding.
+	if err := fs.forceWriteFullState(); err == nil {
+		const minLen = 32
+		sfn := filepath.Join(fs.fcfg.StoreDir, msgDir, streamStreamStateFile)
+		if buf, err := os.ReadFile(sfn); err == nil && len(buf) >= minLen {
+			if fs.aek != nil {
+				ns := fs.aek.NonceSize()
+				buf, err = fs.aek.Open(nil, buf[:ns], buf[ns:len(buf)-highwayhash.Size64], nil)
+				if err == nil {
+					// Redo hash checksum at end on plaintext.
+					fs.mu.Lock()
+					hh.Reset()
+					hh.Write(buf)
+					buf = fs.hh.Sum(buf)
+					fs.mu.Unlock()
+				}
+			}
+			if err == nil && writeFile(msgPre+streamStreamStateFile, buf) != nil {
+				return
+			}
 		}
 	}
 
@@ -8267,9 +8282,6 @@ func (fs *fileStore) Snapshot(deadline time.Duration, checkMsgs, includeConsumer
 			return nil, fmt.Errorf("snapshot check detected %d bad messages", len(ld.Msgs))
 		}
 	}
-
-	// Write out full state as well before proceeding.
-	fs.writeFullState()
 
 	pr, pw := net.Pipe()
 
