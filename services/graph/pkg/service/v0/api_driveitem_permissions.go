@@ -173,6 +173,9 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		if errors.Is(err, identity.ErrNotFound) && s.config.IncludeOCMSharees {
 			user, err = s.identityCache.GetAcceptedUser(ctx, objectID)
 			federated = true
+			if err == nil && IsSpaceRoot(statResponse.GetInfo().GetId()) {
+				return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "federated user can not become a space member")
+			}
 		}
 		if err != nil {
 			s.logger.Debug().Err(err).Interface("userId", objectID).Msg("failed user lookup")
@@ -323,14 +326,6 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 
 	if space.SpaceType != _spaceTypeProject {
 		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "unsupported space type")
-	}
-
-	if s.config.IncludeOCMSharees && len(invite.GetRecipients()) > 0 {
-		objectID := invite.GetRecipients()[0].GetObjectId()
-		_, err := s.identityCache.GetAcceptedUser(ctx, objectID)
-		if err == nil {
-			return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "federated user can not become a space member")
-		}
 	}
 
 	rootResourceID := space.GetRoot()
