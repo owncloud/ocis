@@ -12,9 +12,16 @@ import (
 func Server(opts ...Option) (*http.Server, error) {
 	options := newOptions(opts...)
 
-	checkHandler := handlers.NewCheckHandler(
+	healthHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger))
+			WithLogger(options.Logger),
+	)
+
+	readyHandler := handlers.NewCheckHandler(
+		handlers.NewCheckHandlerConfiguration().
+			WithLogger(options.Logger).
+			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)),
+	)
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -24,7 +31,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Token(options.Config.Debug.Token),
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
-		debug.Health(checkHandler),
-		debug.Ready(checkHandler),
+		debug.Health(healthHandler),
+		debug.Ready(readyHandler),
 	), nil
 }
