@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-10-05 00:07+0000\n"
+"POT-Creation-Date: 2024-10-12 01:07+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
 "Last-Translator: Roman Perekhod, 2024\n"
 "Language-Team: Ukrainian (https://app.transifex.com/owncloud-org/teams/6149/uk/)\n"
@@ -35,14 +35,16 @@ msgid ""
 "Download all your data before that date as no access past that date is "
 "possible."
 msgstr ""
+"Увага! Сервер буде вимкнено та деініціалізовано {date}. Завантажте всі свої "
+"дані до цієї дати, оскільки доступ після цієї дати неможливий."
 
 #: pkg/service/templates.go:14
 msgid "File {resource} was deleted because it violates the policies"
-msgstr ""
+msgstr "Файл {resource} видалено, оскільки він порушує правила"
 
 #: pkg/service/templates.go:58
 msgid "Instance will be shut down and deprovisioned"
-msgstr ""
+msgstr "Сервер буде вимкнено та деініціалізовано"
 
 #: pkg/service/templates.go:38
 msgid "Membership expired"
@@ -106,8 +108,8 @@ msgstr "{user} видалив вас з Простіру {space}"
 
 #: pkg/service/templates.go:44
 msgid "{user} shared {resource} with you"
-msgstr ""
+msgstr "{user} поділився {resource} з вами"
 
 #: pkg/service/templates.go:49
 msgid "{user} unshared {resource} with you"
-msgstr ""
+msgstr "{user} вилучив спільний доступ до {resource} для вас"
