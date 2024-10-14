@@ -410,3 +410,120 @@ Feature: an user shares resources usin ScienceMesh application
         }
       }
       """
+
+  @issue-9898
+  Scenario: user lists permissions of a resource shared to a federated user
+    Given using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And using server "LOCAL"
+    And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | textfile.txt                  |
+      | space           | Personal                      |
+      | sharee          | Brian                         |
+      | shareType       | user                          |
+      | permissionsRole | Viewer                        |
+      | federatedServer | @federation-ocis-server:10200 |
+    And using server "LOCAL"
+    When user "Alice" gets permissions list for file "textfile.txt" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues",
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "oneOf":[
+                {
+                  "type": "object",
+                  "required": [
+                    "grantedToV2",
+                    "id",
+                    "roles"
+                  ],
+                  "properties": {
+                    "grantedToV2": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["@libre.graph.userType","displayName","id"],
+                          "properties": {
+                            "@libre.graph.userType": {
+                              "type": "string",
+                              "const": "Federated"
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^%federated_user_id_pattern%$"
+                            },
+                            "displayName": {
+                              "const": "Brian Murphy"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "invitation": {
+                      "type": "object",
+                      "required": ["invitedBy"],
+                      "properties": {
+                        "invitedBy": {
+                          "type": "object",
+                          "required": ["user"],
+                          "properties": {
+                            "user": {
+                              "type": "object",
+                              "required": ["@libre.graph.userType", "displayName", "id"],
+                              "properties": {
+                                "@libre.graph.userType": {
+                                  "type": "string",
+                                  "const": "Member"
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%user_id_pattern%$"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "roles": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "string",
+                        "pattern": "^%role_id_pattern%$"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
