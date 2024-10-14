@@ -183,6 +183,10 @@ func TestPreviewGenerationTooBigImage(t *testing.T) {
 
 			ext := path.Ext(tt.fileName)
 			req.Encoder, _ = EncoderForType(ext)
+			req.Generator, err = GeneratorFor(ext, "fit")
+			if err != nil {
+				return
+			}
 			generate, err := sut.Generate(req, convert)
 			if err != nil {
 				return

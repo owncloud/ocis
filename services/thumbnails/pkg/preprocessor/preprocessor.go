@@ -27,18 +27,6 @@ type FileConverter interface {
 	Convert(r io.Reader) (interface{}, error)
 }
 
-// ImageDecoder is a converter for the image file
-type ImageDecoder struct{}
-
-// Convert reads the image file and returns the thumbnail image
-func (i ImageDecoder) Convert(r io.Reader) (interface{}, error) {
-	img, err := imaging.Decode(r, imaging.AutoOrientation(true))
-	if err != nil {
-		return nil, errors.Wrap(err, `could not decode the image`)
-	}
-	return img, nil
-}
-
 // GifDecoder is a converter for the gif file
 type GifDecoder struct{}
 
