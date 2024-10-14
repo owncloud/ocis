@@ -32,17 +32,10 @@ ci-node-generate: assets
 .PHONY: assets
 assets: pnpm-build \
 		assets/identifier/static \
-		assets/identifier/static/logo.svg \
 		assets/identifier/static/favicon.ico
 
 assets/identifier/static:
 	mkdir -p assets/identifier/static
-
-LOGO_URL = https://raw.githubusercontent.com/owncloud/assets/main/logo.svg
-
-.PHONY: assets/identifier/static/logo.svg # force overwrite
-assets/identifier/static/logo.svg:
-	curl --fail -o assets/identifier/static/logo.svg ${LOGO_URL}
 
 FAVICON_URL = https://raw.githubusercontent.com/owncloud/assets/main/favicon.ico
 
