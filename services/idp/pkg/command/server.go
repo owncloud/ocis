@@ -36,7 +36,10 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
-			configlog.ReturnFatal(parser.ParseConfig(cfg))
+			err := configlog.ReturnFatal(parser.ParseConfig(cfg))
+			if err != nil {
+				return err
+			}
 
 			if cfg.IDP.EncryptionSecretFile != "" {
 				if err := ensureEncryptionSecretExists(cfg.IDP.EncryptionSecretFile); err != nil {
@@ -94,7 +97,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				server, err := debug.Server(
+				debugServer, err := debug.Server(
 					debug.Logger(logger),
 					debug.Context(ctx),
 					debug.Config(cfg),
@@ -104,8 +107,8 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(server.ListenAndServe, func(_ error) {
-					_ = server.Shutdown(ctx)
+				gr.Add(debugServer.ListenAndServe, func(_ error) {
+					_ = debugServer.Shutdown(ctx)
 					cancel()
 				})
 			}

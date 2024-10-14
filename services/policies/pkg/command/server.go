@@ -3,14 +3,13 @@ package command
 import (
 	"context"
 	"fmt"
-	"io"
-	"net/http"
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -18,9 +17,9 @@ import (
 	"github.com/owncloud/ocis/v2/services/policies/pkg/config"
 	"github.com/owncloud/ocis/v2/services/policies/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/policies/pkg/engine/opa"
+	"github.com/owncloud/ocis/v2/services/policies/pkg/server/debug"
 	svcEvent "github.com/owncloud/ocis/v2/services/policies/pkg/service/event"
 	svcGRPC "github.com/owncloud/ocis/v2/services/policies/pkg/service/grpc"
-	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -121,46 +120,18 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				server := debug.NewService(
+				debugServer, err := debug.Server(
 					debug.Logger(logger),
-					debug.Name(cfg.Service.Name),
-					debug.Version(version.GetString()),
-					debug.Address(cfg.Debug.Addr),
-					debug.Token(cfg.Debug.Token),
-					debug.Pprof(cfg.Debug.Pprof),
-					debug.Zpages(cfg.Debug.Zpages),
-					debug.Health(
-						func(w http.ResponseWriter, r *http.Request) {
-							w.Header().Set("Content-Type", "text/plain")
-							w.WriteHeader(http.StatusOK)
-
-							// TODO: check if services are up and running
-
-							_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-							// io.WriteString should not fail but if it does, we want to know.
-							if err != nil {
-								panic(err)
-							}
-						},
-					),
-					debug.Ready(
-						func(w http.ResponseWriter, r *http.Request) {
-							w.Header().Set("Content-Type", "text/plain")
-							w.WriteHeader(http.StatusOK)
-
-							// TODO: check if services are up and running
-
-							_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-							// io.WriteString should not fail but if it does, we want to know.
-							if err != nil {
-								panic(err)
-							}
-						},
-					),
+					debug.Context(ctx),
+					debug.Config(cfg),
 				)
+				if err != nil {
+					logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
+					return err
+				}
 
-				gr.Add(server.ListenAndServe, func(_ error) {
-					_ = server.Shutdown(ctx)
+				gr.Add(debugServer.ListenAndServe, func(_ error) {
+					_ = debugServer.Shutdown(ctx)
 					cancel()
 				})
 			}

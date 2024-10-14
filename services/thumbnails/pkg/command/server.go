@@ -74,6 +74,7 @@ func Server(cfg *config.Config) *cli.Command {
 			server, err := debug.Server(
 				debug.Logger(logger),
 				debug.Config(cfg),
+				debug.Context(ctx),
 			)
 			if err != nil {
 				logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
