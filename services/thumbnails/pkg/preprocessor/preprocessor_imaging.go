@@ -1,3 +1,5 @@
+//go:build !enable_vips
+
 package preprocessor
 
 import (
