@@ -1,0 +1,102 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Keram, 2024
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2024-10-14 01:38+0000\n"
+"PO-Revision-Date: 2024-08-20 10:13+0000\n"
+"Last-Translator: Keram, 2024\n"
+"Language-Team: Uyghur (https://app.transifex.com/owncloud-org/teams/6149/ug/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ug\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: pkg/service/response.go:44
+msgid "description"
+msgstr "description"
+
+#: pkg/service/response.go:43
+msgid "display name"
+msgstr "كۆرسىتىش ئىسمى"
+
+#: pkg/service/response.go:42
+msgid "expiration date"
+msgstr "مۇددىتى توشقان"
+
+#: pkg/service/response.go:41
+msgid "password"
+msgstr "پارول"
+
+#: pkg/service/response.go:40
+msgid "permission"
+msgstr "ئىجازەت"
+
+#: pkg/service/response.go:39
+msgid "some field"
+msgstr "بەزى ساھە"
+
+#: pkg/service/response.go:26
+msgid "{resource} was downloaded via public link {token}"
+msgstr "{مەنبە public ئاممىۋى ئۇلىنىش {بەلگە} ئارقىلىق چۈشۈرۈلدى"
+
+#: pkg/service/response.go:24
+msgid "{user} added {resource} to {folder}"
+msgstr "{ئىشلەتكۈچى} ھۆججەت قىسقۇچقا {بايلىق} قوشۇلدى"
+
+#: pkg/service/response.go:36
+msgid "{user} added {sharee} as member of {space}"
+msgstr "{ئىشلەتكۈچى} {بوشلۇق} نىڭ ئەزاسى سۈپىتىدە {sharee} قوشۇلدى"
+
+#: pkg/service/response.go:27
+msgid "{user} deleted {resource} from {folder}"
+msgstr "{ئىشلەتكۈچى} ھۆججەت قىسقۇچتىن {مەنبە} ئۆچۈرۈلگەن"
+
+#: pkg/service/response.go:28
+msgid "{user} moved {resource} to {folder}"
+msgstr "{ئىشلەتكۈچى} بايلىق {ھۆججەت} ھۆججەت قىسقۇچىغا يۆتكەلدى"
+
+#: pkg/service/response.go:35
+msgid "{user} removed link to {resource}"
+msgstr "{ئىشلەتكۈچى} مەنبە {ئۇلىنىشقا ئۇلانغان"
+
+#: pkg/service/response.go:32
+msgid "{user} removed {sharee} from {resource}"
+msgstr "{ئىشلەتكۈچى} مەنبەدىن {sharee} چىقىرىۋېتىلدى"
+
+#: pkg/service/response.go:37
+msgid "{user} removed {sharee} from {space}"
+msgstr "{ئىشلەتكۈچى} {بوشلۇقتىن {sharee} ئېلىۋېتىلدى"
+
+#: pkg/service/response.go:29
+msgid "{user} renamed {oldResource} to {resource}"
+msgstr "{ئىشلەتكۈچى} ئۆزگەرتىلگەن {oldResource} دىن {مەنبە}"
+
+#: pkg/service/response.go:33
+msgid "{user} shared {resource} via link"
+msgstr "{ئىشلەتكۈچى} ئورتاقلىشىش {مەنبە link ئۇلىنىش ئارقىلىق"
+
+#: pkg/service/response.go:30
+msgid "{user} shared {resource} with {sharee}"
+msgstr "{ئىشلەتكۈچى} ئورتاق بەھرىلىنىدىغان {بايلىق} بىلەن {ئورتاقلىشىش}"
+
+#: pkg/service/response.go:34
+msgid "{user} updated {field} for a link {token} on {resource}"
+msgstr "{ئىشلەتكۈچى} يېڭىلانغان {مەيدان} ئۇلانمىسى {بەلگە} ئۈچۈن {مەنبە}"
+
+#: pkg/service/response.go:31
+msgid "{user} updated {field} for the {resource}"
+msgstr "{ئىشلەتكۈچى} مەنبە} ئۈچۈن} يېڭىلانغان {ساھە}"
+
+#: pkg/service/response.go:25
+msgid "{user} updated {resource} in {folder}"
+msgstr "{ئىشلەتكۈچى} ھۆججەت قىسقۇچتىكى} يېڭىلانغان {مەنبە}"

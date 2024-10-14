@@ -1,0 +1,169 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Keram, 2024
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2024-10-14 01:38+0000\n"
+"PO-Revision-Date: 2023-04-19 11:11+0000\n"
+"Last-Translator: Keram, 2024\n"
+"Language-Team: Uyghur (https://app.transifex.com/owncloud-org/teams/6149/ug/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ug\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. UnsharedSpace email template, resolves via {{ .CallToAction }}
+#: pkg/email/templates.go:60
+msgid "Click here to check it: {ShareLink}"
+msgstr "بۇ يەرنى چېكىپ تەكشۈرۈپ بېقىڭ: {ShareLink}"
+
+#. ShareCreated email template, resolves via {{ .CallToAction }}
+#. SharedSpace email template, resolves via {{ .CallToAction }}
+#: pkg/email/templates.go:18 pkg/email/templates.go:45
+msgid "Click here to view it: {ShareLink}"
+msgstr "بۇ يەرنى چېكىپ كۆرۈڭ: {ShareLink}"
+
+#. ShareCreated email template, resolves via {{ .Greeting }}
+#: pkg/email/templates.go:14
+msgid "Hello {ShareGrantee}"
+msgstr "ياخشىمۇسىز {ShareGrantee}"
+
+#. ShareExpired email template, resolves via {{ .Greeting }}
+#: pkg/email/templates.go:27
+msgid "Hello {ShareGrantee},"
+msgstr "ياخشىمۇسىز {ShareGrantee},"
+
+#. SharedSpace email template, resolves via {{ .Greeting }}
+#. UnsharedSpace email template, resolves via {{ .Greeting }}
+#. MembershipExpired email template, resolves via {{ .Greeting }}
+#: pkg/email/templates.go:41 pkg/email/templates.go:54
+#: pkg/email/templates.go:69
+msgid "Hello {SpaceGrantee},"
+msgstr "ياخشىمۇسىز {SpaceGrantee},"
+
+#. ScienceMeshInviteTokenGenerated email template, resolves via {{ .Greeting
+#. }}
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
+#. via {{ .Greeting }}
+#: pkg/email/templates.go:82 pkg/email/templates.go:99
+msgid "Hi,"
+msgstr "ياخشىمۇسىز ،"
+
+#. MembershipExpired email template, Subject field (resolves directly)
+#: pkg/email/templates.go:67
+msgid "Membership of '{SpaceName}' expired at {ExpiredAt}"
+msgstr "'{SpaceName}' نىڭ ئەزالىق مۇددىتى Exp ExpiredAt at دە ئاخىرلاشتى"
+
+#. ScienceMeshInviteTokenGenerated email template, Subject field (resolves
+#. directly)
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, Subject
+#. field (resolves directly)
+#: pkg/email/templates.go:80 pkg/email/templates.go:97
+msgid "ScienceMesh: {InitiatorName} wants to collaborate with you"
+msgstr "ScienceMesh: {InitiatorName you سىز بىلەن ھەمكارلىشىشنى خالايدۇ"
+
+#. ShareExpired email template, Subject field (resolves directly)
+#: pkg/email/templates.go:25
+msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
+msgstr "«{ShareFolder}» نىڭ ۋاقتى توشىدۇ {ExpiredAt}"
+
+#. MembershipExpired email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:71
+msgid ""
+"Your membership of space {SpaceName} has expired at {ExpiredAt}\n"
+"\n"
+"Even though this membership has expired you still might have access through other shares and/or space memberships"
+msgstr ""
+"بوشلۇق {SpaceName} ئەزالىقىڭىزنىڭ ۋاقتى {ExpiredAt at دە توشىدۇ\n"
+"\n"
+"گەرچە بۇ ئەزالىق مۇددىتى توشقان بولسىمۇ ، سىز يەنىلا باشقا پايلار ۋە ياكى بوشلۇق ئەزالىرى ئارقىلىق زىيارەت قىلالايسىز"
+
+#. ShareExpired email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:29
+msgid ""
+"Your share to {ShareFolder} has expired at {ExpiredAt}\n"
+"\n"
+"Even though this share has been revoked you still might have access through other shares and/or space memberships."
+msgstr ""
+"سىزنىڭ «ShareFolder}» دىكى ئۈلۈشىڭىز {ExpiredAt at دە ئاخىرلاشتى\n"
+"\n"
+"گەرچە بۇ ئۈلۈش ئەمەلدىن قالدۇرۇلغان بولسىمۇ ، سىز يەنىلا باشقا پايلار ۋە ياكى بوشلۇق ئەزالىرى ئارقىلىق زىيارەت قىلالايسىز."
+
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
+#. via {{ .MessageBody }}
+#: pkg/email/templates.go:101
+msgid ""
+"{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.\n"
+"Please visit your federation settings and use the following details:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+msgstr ""
+"{ShareSharer} ({ShareSharerMail}) سىز بىلەن ھەمكارلىق بايلىقىنى ئورتاقلىشىشنى باشلايدۇ.\n"
+"فېدېراتسىيە تەڭشەكلىرىڭىزنى زىيارەت قىلىڭ ۋە تۆۋەندىكى تەپسىلاتلارنى ئىشلىتىڭ:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+
+#. ScienceMeshInviteTokenGenerated email template, resolves via {{
+#. .MessageBody }}
+#: pkg/email/templates.go:84
+msgid ""
+"{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.\n"
+"To accept the invite, please visit the following URL:\n"
+"{ShareLink}\n"
+"\n"
+"Alternatively, you can visit your federation settings and use the following details:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+msgstr ""
+"{ShareSharer} ({ShareSharerMail}) سىز بىلەن ھەمكارلىق بايلىقىنى ئورتاقلىشىشنى باشلايدۇ.\n"
+"تەكلىپنى قوبۇل قىلىش ئۈچۈن تۆۋەندىكى URL نى زىيارەت قىلىڭ:\n"
+"{ShareLink}\n"
+"\n"
+"ئۇنىڭدىن باشقا ، فېدېراتسىيە تەڭشەكلىرىڭىزنى زىيارەت قىلىپ ، تۆۋەندىكى تەپسىلاتلارنى ئىشلىتەلەيسىز:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+
+#. ShareCreated email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:16
+msgid "{ShareSharer} has shared \"{ShareFolder}\" with you."
+msgstr "{ShareSharer} سىز بىلەن «{ShareFolder}» نى ئورتاقلاشتى."
+
+#. ShareCreated email template, Subject field (resolves directly)
+#: pkg/email/templates.go:12
+msgid "{ShareSharer} shared '{ShareFolder}' with you"
+msgstr "{ShareSharer} ئورتاقلاشتى '{ShareFolder}'"
+
+#. SharedSpace email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:43
+msgid "{SpaceSharer} has invited you to join \"{SpaceName}\"."
+msgstr "{SpaceSharer} سىزنى «{SpaceName}» غا قاتنىشىشقا تەكلىپ قىلدى."
+
+#. UnsharedSpace email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:56
+msgid ""
+"{SpaceSharer} has removed you from \"{SpaceName}\".\n"
+"\n"
+"You might still have access through your other groups or direct membership."
+msgstr ""
+"{SpaceSharer} سىزنى \"{SpaceName}\" دىن ئۆچۈردى.\n"
+"\n"
+"باشقا گۇرۇپپىلار ياكى بىۋاسىتە ئەزالىق سالاھىيىتىڭىز بىلەن يەنىلا زىيارەت قىلالايسىز."
+
+#. SharedSpace email template, Subject field (resolves directly)
+#: pkg/email/templates.go:39
+msgid "{SpaceSharer} invited you to join {SpaceName}"
+msgstr "{SpaceSharer} سىزنى {SpaceName to غا قاتنىشىشقا تەكلىپ قىلدى"
+
+#. UnsharedSpace email template, Subject field (resolves directly)
+#: pkg/email/templates.go:52
+msgid "{SpaceSharer} removed you from {SpaceName}"
+msgstr "{SpaceSharer} سىزنى {SpaceName from دىن ئۆچۈردى"

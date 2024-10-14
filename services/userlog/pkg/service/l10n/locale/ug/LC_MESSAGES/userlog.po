@@ -1,0 +1,115 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Keram, 2024
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2024-10-14 01:38+0000\n"
+"PO-Revision-Date: 2023-03-15 08:28+0000\n"
+"Last-Translator: Keram, 2024\n"
+"Language-Team: Uyghur (https://app.transifex.com/owncloud-org/teams/6149/ug/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ug\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: pkg/service/templates.go:39
+msgid "Access to Space {space} lost"
+msgstr "بوشلۇققا ئېرىشىش {بوشلۇق} يوقاپ كەتتى"
+
+#: pkg/service/templates.go:54
+msgid "Access to {resource} expired"
+msgstr "{بايلىق} غا كىرىش ۋاقتى توشتى"
+
+#: pkg/service/templates.go:59
+msgid ""
+"Attention! The instance will be shut down and deprovisioned on {date}. "
+"Download all your data before that date as no access past that date is "
+"possible."
+msgstr ""
+"دىققەت! بۇ مىسال {چېسلادا تاقىلىدۇ. ئۇ چېسلادىن بۇرۇن بارلىق سانلىق "
+"مەلۇماتلىرىڭىزنى چۈشۈرۈڭ ، چۈنكى بۇ چېسلادىن ئۆتكىلى بولمايدۇ."
+
+#: pkg/service/templates.go:14
+msgid "File {resource} was deleted because it violates the policies"
+msgstr "ھۆججەت {مەنبە} سىياسەتكە خىلاپلىق قىلغانلىقى ئۈچۈن ئۆچۈرۈلدى"
+
+#: pkg/service/templates.go:58
+msgid "Instance will be shut down and deprovisioned"
+msgstr "ئەھۋال توختىتىلىدۇ ۋە ئەمەلدىن قالدۇرۇلىدۇ"
+
+#: pkg/service/templates.go:38
+msgid "Membership expired"
+msgstr "ئەزالىق مۇددىتى توشتى"
+
+#: pkg/service/templates.go:13
+msgid "Policies enforced"
+msgstr "سىياسەتلەر ئىجرا قىلىندى"
+
+#: pkg/service/templates.go:23
+msgid "Removed from Space"
+msgstr "بوشلۇقتىن چىقىرىۋېتىلدى"
+
+#: pkg/service/templates.go:43
+msgid "Resource shared"
+msgstr "بايلىق ئورتاقلاشتى"
+
+#: pkg/service/templates.go:48
+msgid "Resource unshared"
+msgstr "بايلىق ئورتاقلاشمىغان"
+
+#: pkg/service/templates.go:53
+msgid "Share expired"
+msgstr "ھەمبەھىرلىنىش ۋاقتى توشتى"
+
+#: pkg/service/templates.go:33
+msgid "Space deleted"
+msgstr "بوشلۇق ئۆچۈرۈلدى"
+
+#: pkg/service/templates.go:28
+msgid "Space disabled"
+msgstr "بوشلۇق چەكلەنگەن"
+
+#: pkg/service/templates.go:18
+msgid "Space shared"
+msgstr "بوشلۇق ئورتاقلاشتى"
+
+#: pkg/service/templates.go:8
+msgid "Virus found"
+msgstr "ۋىرۇس بايقالدى"
+
+#: pkg/service/templates.go:9
+msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
+msgstr "ۋىرۇس {مەنبە in دىن تېپىلدى. يوللاش مۇمكىن ئەمەس. ۋىرۇس: {ۋىرۇس}"
+
+#: pkg/service/templates.go:19
+msgid "{user} added you to Space {space}"
+msgstr "{ئىشلەتكۈچى} سىزنى بوشلۇق {بوشلۇقىغا قوشتى"
+
+#: pkg/service/templates.go:34
+msgid "{user} deleted Space {space}"
+msgstr "{ئىشلەتكۈچى} ئۆچۈرۈلگەن بوشلۇق {بوشلۇق}"
+
+#: pkg/service/templates.go:29
+msgid "{user} disabled Space {space}"
+msgstr "{ئىشلەتكۈچى} چەكلەنگەن بوشلۇق {بوشلۇق}"
+
+#: pkg/service/templates.go:24
+msgid "{user} removed you from Space {space}"
+msgstr "{ئىشلەتكۈچى} سىزنى بوشلۇق {بوشلۇقتىن چىقىرىۋەتتى"
+
+#: pkg/service/templates.go:44
+msgid "{user} shared {resource} with you"
+msgstr "{ئىشلەتكۈچى} ئورتاقلاشقان {بايلىق} سىز بىلەن"
+
+#: pkg/service/templates.go:49
+msgid "{user} unshared {resource} with you"
+msgstr "{ئىشلەتكۈچى} ئورتاقلاشمىغان {مەنبە} سىز بىلەن"
