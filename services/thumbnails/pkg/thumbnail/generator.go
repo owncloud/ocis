@@ -14,35 +14,8 @@ import (
 // Generator generates a web friendly file version.
 type Generator interface {
 	Generate(size image.Rectangle, img interface{}) (interface{}, error)
+	Dimensions(img interface{}) (image.Rectangle, error)
 	ProcessorID() string
-}
-
-// SimpleGenerator is the default image generator and is used for all image types expect gif.
-type SimpleGenerator struct {
-	processor Processor
-}
-
-func NewSimpleGenerator(filetype, process string) (SimpleGenerator, error) {
-	processor, err := ProcessorFor(filetype, process)
-	if err != nil {
-		return SimpleGenerator{}, err
-	}
-	return SimpleGenerator{processor: processor}, nil
-}
-
-// ProcessorID returns the processor identification.
-func (g SimpleGenerator) ProcessorID() string {
-	return g.processor.ID()
-}
-
-// Generate generates a alternative image version.
-func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}) (interface{}, error) {
-	m, ok := img.(image.Image)
-	if !ok {
-		return nil, errors.ErrInvalidType
-	}
-
-	return g.processor.Process(m, size.Dx(), size.Dy(), imaging.Lanczos), nil
 }
 
 // GifGenerator is used to create a web friendly version of the provided gif image.
@@ -51,7 +24,7 @@ type GifGenerator struct {
 }
 
 func NewGifGenerator(filetype, process string) (GifGenerator, error) {
-	processor, err := ProcessorFor(filetype, process)
+	processor, err := ProcessorFor(process, filetype)
 	if err != nil {
 		return GifGenerator{}, err
 	}
@@ -95,6 +68,14 @@ func (g GifGenerator) Generate(size image.Rectangle, img interface{}) (interface
 	m.Config.Height = size.Dy()
 
 	return m, nil
+}
+
+func (g GifGenerator) Dimensions(img interface{}) (image.Rectangle, error) {
+	m, ok := img.(*gif.GIF)
+	if !ok {
+		return image.Rectangle{}, errors.ErrInvalidType
+	}
+	return m.Image[0].Bounds(), nil
 }
 
 func (g GifGenerator) imageToPaletted(img image.Image, p color.Palette) *image.Paletted {
