@@ -91,9 +91,11 @@ func (h *CheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.SetLimit(h.conf.limit)
 
 	for name, check := range h.conf.checks {
+		checker := check
+		checkerName := name
 		g.Go(func() error { // https://go.dev/blog/loopvar-preview per iteration scope since go 1.22
-			if err := check(ctx); err != nil { // since go 1.22 for loops have a per-iteration scope instead of per-loop scope, no need to pin the check...
-				return fmt.Errorf("'%s': %w", name, err)
+			if err := checker(ctx); err != nil { // since go 1.22 for loops have a per-iteration scope instead of per-loop scope, no need to pin the check...
+				return fmt.Errorf("'%s': %w", checkerName, err)
 			}
 
 			return nil
