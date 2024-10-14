@@ -2,6 +2,7 @@ package debug
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/dutchcoders/go-clamd"
@@ -27,8 +28,7 @@ func Server(opts ...Option) (*http.Server, error) {
 				cfg := options.Config
 				switch cfg.Scanner.Type {
 				default:
-					// there is not av configured, so we panic
-					panic("no antivirus configured")
+					return errors.New("no antivirus configured")
 				case "clamav":
 					return clamd.NewClamd(cfg.Scanner.ClamAV.Socket).Ping()
 				case "icap":
