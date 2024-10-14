@@ -2,6 +2,7 @@ package debug
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
@@ -12,9 +13,12 @@ import (
 func Server(opts ...Option) (*http.Server, error) {
 	options := newOptions(opts...)
 
+	// For nats readiness and liveness checks are identical
+	// the nats server will neither be healthy nor ready when it can not reach the nats server/cluster
 	checkHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger),
+			WithLogger(options.Logger).
+			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Nats.Host+":"+strconv.Itoa(options.Config.Nats.Port))),
 	)
 
 	return debug.NewService(
