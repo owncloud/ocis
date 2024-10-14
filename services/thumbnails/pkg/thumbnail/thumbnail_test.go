@@ -1,14 +1,16 @@
 package thumbnail
 
 import (
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/preprocessor"
-	"github.com/stretchr/testify/assert"
 	"image"
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"testing"
+
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/preprocessor"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -131,10 +133,12 @@ func TestPrepareRequest(t *testing.T) {
 				t.Errorf("PrepareRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-
 			// funcs are not reflactable, ignore
-			if diff := cmp.Diff(tt.want, got, cmpopts.IgnoreFields(Request{}, "Processor")); diff != "" {
+			if diff := cmp.Diff(tt.want, got, cmpopts.IgnoreFields(Request{}, "Generator")); diff != "" {
 				t.Errorf("PrepareRequest(): %v", diff)
+			}
+			if reflect.TypeOf(got.Generator) != reflect.TypeOf(tt.want.Generator) {
+				t.Errorf("PrepareRequest() = %v, want %v", reflect.TypeOf(got.Generator), reflect.TypeOf(tt.want.Generator))
 			}
 		})
 	}
