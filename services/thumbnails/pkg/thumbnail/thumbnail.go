@@ -35,7 +35,6 @@ type Request struct {
 	Encoder    Encoder
 	Generator  Generator
 	Checksum   string
-	Processor  Processor
 }
 
 // Manager is responsible for generating thumbnails
@@ -86,7 +85,7 @@ func (s SimpleManager) Generate(r Request, img interface{}) (string, error) {
 		return "", errors.ErrImageTooLarge
 	}
 
-	thumbnail, err := r.Generator.Generate(match, img, r.Processor)
+	thumbnail, err := r.Generator.Generate(match, img)
 	if err != nil {
 		return "", err
 	}
@@ -120,7 +119,7 @@ func mapToStorageRequest(r Request) storage.Request {
 		Checksum:       r.Checksum,
 		Resolution:     r.Resolution,
 		Types:          r.Encoder.Types(),
-		Characteristic: r.Processor.ID(),
+		Characteristic: r.Generator.ProcessorID(),
 	}
 }
 
@@ -136,15 +135,11 @@ func IsMimeTypeSupported(m string) bool {
 
 // PrepareRequest prepare the request based on image parameters
 func PrepareRequest(width, height int, tType, checksum, pID string) (Request, error) {
-	generator, err := GeneratorForType(tType)
+	generator, err := GeneratorFor(tType, pID)
 	if err != nil {
 		return Request{}, err
 	}
 	encoder, err := EncoderForType(tType)
-	if err != nil {
-		return Request{}, err
-	}
-	processor, err := ProcessorFor(pID, tType)
 	if err != nil {
 		return Request{}, err
 	}
@@ -154,6 +149,5 @@ func PrepareRequest(width, height int, tType, checksum, pID string) (Request, er
 		Generator:  generator,
 		Encoder:    encoder,
 		Checksum:   checksum,
-		Processor:  processor,
 	}, nil
 }

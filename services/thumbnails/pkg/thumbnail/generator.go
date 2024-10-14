@@ -13,27 +13,59 @@ import (
 
 // Generator generates a web friendly file version.
 type Generator interface {
-	Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error)
+	Generate(size image.Rectangle, img interface{}) (interface{}, error)
+	ProcessorID() string
 }
 
 // SimpleGenerator is the default image generator and is used for all image types expect gif.
-type SimpleGenerator struct{}
+type SimpleGenerator struct {
+	processor Processor
+}
+
+func NewSimpleGenerator(filetype, process string) (SimpleGenerator, error) {
+	processor, err := ProcessorFor(filetype, process)
+	if err != nil {
+		return SimpleGenerator{}, err
+	}
+	return SimpleGenerator{processor: processor}, nil
+}
+
+// ProcessorID returns the processor identification.
+func (g SimpleGenerator) ProcessorID() string {
+	return g.processor.ID()
+}
 
 // Generate generates a alternative image version.
-func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error) {
+func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}) (interface{}, error) {
 	m, ok := img.(image.Image)
 	if !ok {
 		return nil, errors.ErrInvalidType
 	}
 
-	return processor.Process(m, size.Dx(), size.Dy(), imaging.Lanczos), nil
+	return g.processor.Process(m, size.Dx(), size.Dy(), imaging.Lanczos), nil
 }
 
 // GifGenerator is used to create a web friendly version of the provided gif image.
-type GifGenerator struct{}
+type GifGenerator struct {
+	processor Processor
+}
+
+func NewGifGenerator(filetype, process string) (GifGenerator, error) {
+	processor, err := ProcessorFor(filetype, process)
+	if err != nil {
+		return GifGenerator{}, err
+	}
+	return GifGenerator{processor: processor}, nil
+
+}
+
+// ProcessorID returns the processor identification.
+func (g GifGenerator) ProcessorID() string {
+	return g.processor.ID()
+}
 
 // Generate generates a alternative gif version.
-func (g GifGenerator) Generate(size image.Rectangle, img interface{}, processor Processor) (interface{}, error) {
+func (g GifGenerator) Generate(size image.Rectangle, img interface{}) (interface{}, error) {
 	// Code inspired by https://github.com/willnorris/gifresize/blob/db93a7e1dcb1c279f7eeb99cc6d90b9e2e23e871/gifresize.go
 
 	m, ok := img.(*gif.GIF)
@@ -49,7 +81,7 @@ func (g GifGenerator) Generate(size image.Rectangle, img interface{}, processor 
 		bounds := frame.Bounds()
 		prev := tmp
 		draw.Draw(tmp, bounds, frame, bounds.Min, draw.Over)
-		processed := processor.Process(tmp, size.Dx(), size.Dy(), imaging.Lanczos)
+		processed := g.processor.Process(tmp, size.Dx(), size.Dy(), imaging.Lanczos)
 		m.Image[i] = g.imageToPaletted(processed, frame.Palette)
 
 		switch m.Disposal[i] {
@@ -72,14 +104,14 @@ func (g GifGenerator) imageToPaletted(img image.Image, p color.Palette) *image.P
 	return pm
 }
 
-// GeneratorForType returns the generator for a given file type
+// GeneratorFor returns the generator for a given file type
 // or nil if the type is not supported.
-func GeneratorForType(fileType string) (Generator, error) {
+func GeneratorFor(fileType, processorID string) (Generator, error) {
 	switch strings.ToLower(fileType) {
 	case typePng, typeJpg, typeJpeg, typeGgs:
-		return SimpleGenerator{}, nil
+		return NewSimpleGenerator(fileType, processorID)
 	case typeGif:
-		return GifGenerator{}, nil
+		return NewGifGenerator(fileType, processorID)
 	default:
 		return nil, errors.ErrNoEncoderForType
 	}
