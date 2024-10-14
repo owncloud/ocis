@@ -1,13 +1,11 @@
-//go:build !enable_vips
+//go:build enable_vips
 
 package thumbnail
 
 import (
-	"image"
-	"image/jpeg"
-	"image/png"
 	"io"
 
+	"github.com/davidbyttow/govips/v2/vips"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 )
 
@@ -16,11 +14,17 @@ type PngEncoder struct{}
 
 // Encode encodes to png format
 func (e PngEncoder) Encode(w io.Writer, img interface{}) error {
-	m, ok := img.(image.Image)
+	m, ok := img.(*vips.ImageRef)
 	if !ok {
 		return errors.ErrInvalidType
 	}
-	return png.Encode(w, m)
+
+	buf, _, err := m.ExportPng(vips.NewPngExportParams())
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(buf)
+	return err
 }
 
 // Types returns the png suffix
@@ -38,11 +42,17 @@ type JpegEncoder struct{}
 
 // Encode encodes to jpg
 func (e JpegEncoder) Encode(w io.Writer, img interface{}) error {
-	m, ok := img.(image.Image)
+	m, ok := img.(*vips.ImageRef)
 	if !ok {
 		return errors.ErrInvalidType
 	}
-	return jpeg.Encode(w, m, nil)
+
+	buf, _, err := m.ExportJpeg(vips.NewJpegExportParams())
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(buf)
+	return err
 }
 
 // Types returns the jpg suffixes.
