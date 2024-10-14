@@ -1941,7 +1941,9 @@ def docs():
                 "name": "docs-generate",
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
-                "commands": ["make docs-generate"],
+                "commands": [
+                    "retry -t 3 make docs-generate"
+                ],
             },
             {
                 "name": "prepare",
