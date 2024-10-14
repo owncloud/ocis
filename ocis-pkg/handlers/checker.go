@@ -108,7 +108,7 @@ func (h *CheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.conf.logger.Error().Err(err).Msg("check failed")
 	}
 
-	w.Header().Set("Content-Type", "text/plain") // fixMe: should be application/json!?!
+	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(status)
 
 	if _, err := io.WriteString(w, http.StatusText(status)); err != nil { // io.WriteString should not fail, but if it does, we want to know.
