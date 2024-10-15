@@ -148,6 +148,7 @@ class TrashbinContext implements Context {
 	public function listTopOfTrashbinFolder(?string $user, string $depth = "1"):array {
 		$password = $this->featureContext->getPasswordForUser($user);
 		$davPathVersion = $this->featureContext->getDavPathVersion();
+		var_dump($davPathVersion);
 		$response = WebDavHelper::listFolder(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -176,7 +177,7 @@ class TrashbinContext implements Context {
 		// filter root element
 		$files = \array_filter(
 			$files,
-			static function ($element) use ($user) {
+			static function ($element) use ($user, $davPathVersion) {
 				$davPath = WebDavHelper::getDavPath($user, $davPathVersion, "trash-bin");
 				return ($element['href'] !== "/" . $davPath . "/");
 			}

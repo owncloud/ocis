@@ -407,6 +407,7 @@ class SpacesContext implements Context {
 		$this->favoritesContext = BehatHelper::getContext($scope, $environment, 'FavoritesContext');
 		$this->checksumContext = BehatHelper::getContext($scope, $environment, 'ChecksumContext');
 		$this->filesVersionsContext = BehatHelper::getContext($scope, $environment, 'FilesVersionsContext');
+		$this->archiverContext = BehatHelper::getContext($scope, $environment, 'ArchiverContext');
 	}
 
 	/**
@@ -1996,19 +1997,19 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (copies|moves|renames) a file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id path "([^"]*)"$/
+	 * @When /^user "([^"]*)" (copies|moves|renames) a file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $actionType
 	 * @param string $sourceFile
 	 * @param string $destinationFile
 	 * @param string $toSpaceName
-	 * @param string $url
+	 * @param string $fileId
 	 *
 	 * @throws GuzzleException
 	 * @return void
 	 */
-	public function userCopiesOrMovesFileWithFileIdFromAndToSpaceBetweenSpaces(string $user, string $actionType, string $sourceFile, string $destinationFile, string $toSpaceName, string $url): void {
+	public function userCopiesMovesFileIntoInsideSpaceUsingFileId(string $user, string $actionType, string $sourceFile, string $destinationFile, string $toSpaceName, string $fileId): void {
 		// split the source when there are sub-folders
 		$sourceFile = \trim($sourceFile, "/");
 		$sourceFile = \explode("/", $sourceFile);
@@ -2020,15 +2021,18 @@ class SpacesContext implements Context {
 		} elseif ($actionType === 'renames') {
 			$fileDestination = $destinationFile;
 		}
+
 		$baseUrl = $this->featureContext->getBaseUrl();
+		$sourceDavPath = WebdavHelper::getDavPath(null, $this->featureContext->getDavPathVersion());
 		if ($toSpaceName === 'Shares') {
+			// TODO: fix for Shares
 			$sharesPath = $this->featureContext->getSharesMountPath($user, $fileDestination);
 			$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
 			$headers['Destination'] = $baseUrl . "/$davPath" . $sharesPath;
 		} else {
-			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $url);
+			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $fileId);
 		}
-		$fullUrl = $baseUrl . $url;
+		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
 		if ($actionType === 'copies') {
 			$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 		} elseif ($actionType === 'moves' || $actionType === 'renames') {

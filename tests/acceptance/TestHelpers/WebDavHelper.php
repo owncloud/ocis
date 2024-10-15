@@ -716,7 +716,7 @@ class WebDavHelper {
 		}
 
 		// get space id if testing with spaces dav
-		if ($spaceId === null && $davPathVersionToUse === self::DAV_VERSION_SPACES && $type !== "public-files") {
+		if ($spaceId === null && $davPathVersionToUse === self::DAV_VERSION_SPACES && !\in_array($type, ["public-files", "versions"])) {
 			$path = \ltrim($path, "/");
 			if (\str_starts_with($path, "Shares/")) {
 				$spaceId = self::getSharesSpaceIdForUser(
