@@ -39,11 +39,10 @@ func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
 }
 
 // GgsDecoder is a converter for the geogebra slides file
-type GgsDecoder struct{}
+type GgsDecoder struct{ thumbnailpath string }
 
 // Convert reads the ggs file and returns the thumbnail image
 func (g GgsDecoder) Convert(r io.Reader) (interface{}, error) {
-	geogebraThumbnail := "_slide0/geogebra_thumbnail.png"
 	var buf bytes.Buffer
 	_, err := io.Copy(&buf, r)
 	if err != nil {
@@ -54,7 +53,7 @@ func (g GgsDecoder) Convert(r io.Reader) (interface{}, error) {
 		return nil, err
 	}
 	for _, file := range zipReader.File {
-		if file.Name == geogebraThumbnail {
+		if file.Name == g.thumbnailpath {
 			thumbnail, err := file.Open()
 			if err != nil {
 				return nil, err
@@ -70,7 +69,7 @@ func (g GgsDecoder) Convert(r io.Reader) (interface{}, error) {
 			return img, nil
 		}
 	}
-	return nil, errors.Errorf("%s not found", geogebraThumbnail)
+	return nil, errors.Errorf("%s not found", g.thumbnailpath)
 }
 
 // AudioDecoder is a converter for the audio file
@@ -258,7 +257,9 @@ func ForType(mimeType string, opts map[string]interface{}) FileConverter {
 			fontLoader: fontLoader,
 		}
 	case "application/vnd.geogebra.slides":
-		return GgsDecoder{}
+		return GgsDecoder{"_slide0/geogebra_thumbnail.png"}
+	case "application/vnd.geogebra.pinboard":
+		return GgsDecoder{"geogebra_thumbnail.png"}
 	case "image/gif":
 		return GifDecoder{}
 	case "audio/flac":

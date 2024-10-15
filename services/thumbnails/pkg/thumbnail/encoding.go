@@ -14,6 +14,7 @@ const (
 	typeJpeg = "jpeg"
 	typeGif  = "gif"
 	typeGgs  = "ggs"
+	typeGgp  = "ggp"
 )
 
 // Encoder encodes the thumbnail to a specific format.
@@ -52,7 +53,7 @@ func (e GifEncoder) MimeType() string {
 // or nil if the type is not supported.
 func EncoderForType(fileType string) (Encoder, error) {
 	switch strings.ToLower(fileType) {
-	case typePng, typeGgs:
+	case typePng, typeGgs, typeGgp:
 		return PngEncoder{}, nil
 	case typeJpg, typeJpeg:
 		return JpegEncoder{}, nil
@@ -71,6 +72,8 @@ func GetExtForMime(fileType string) string {
 		return ext
 	case "application/vnd.geogebra.slides":
 		return typeGgs
+	case "application/vnd.geogebra.pinboard":
+		return typeGgp
 	default:
 		return ""
 	}
