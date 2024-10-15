@@ -17,8 +17,9 @@ type check func(ctx context.Context) error
 
 // CheckHandlerConfiguration defines the configuration for the CheckHandler.
 type CheckHandlerConfiguration struct {
+	Checks map[string]check
+
 	logger        log.Logger
-	checks        map[string]check
 	limit         int
 	statusFailed  int
 	statusSuccess int
@@ -27,7 +28,8 @@ type CheckHandlerConfiguration struct {
 // NewCheckHandlerConfiguration initializes a new CheckHandlerConfiguration.
 func NewCheckHandlerConfiguration() CheckHandlerConfiguration {
 	return CheckHandlerConfiguration{
-		checks:        make(map[string]check),
+		Checks: make(map[string]check),
+
 		limit:         -1,
 		statusFailed:  http.StatusInternalServerError,
 		statusSuccess: http.StatusOK,
@@ -42,17 +44,17 @@ func (c CheckHandlerConfiguration) WithLogger(l log.Logger) CheckHandlerConfigur
 
 // WithCheck sets a check for the CheckHandlerConfiguration.
 func (c CheckHandlerConfiguration) WithCheck(name string, f check) CheckHandlerConfiguration {
-	if _, ok := c.checks[name]; ok {
+	if _, ok := c.Checks[name]; ok {
 		c.logger.Panic().Str("check", name).Msg("check already exists")
 	}
 
-	c.checks[name] = f
+	c.Checks[name] = f
 	return c
 }
 
 // WithInheritedChecksFrom appends the checks from another CheckHandlerConfiguration.
 func (c CheckHandlerConfiguration) WithInheritedChecksFrom(other CheckHandlerConfiguration) CheckHandlerConfiguration {
-	for name, check := range other.checks {
+	for name, check := range other.Checks {
 		c.WithCheck(name, check)
 	}
 
@@ -79,27 +81,27 @@ func (c CheckHandlerConfiguration) WithStatusSuccess(status int) CheckHandlerCon
 
 // CheckHandler is a http Handler that performs different checks.
 type CheckHandler struct {
-	conf CheckHandlerConfiguration
+	Conf CheckHandlerConfiguration
 }
 
 // NewCheckHandler initializes a new CheckHandler.
 func NewCheckHandler(c CheckHandlerConfiguration) *CheckHandler {
-	c.checks = maps.Clone(c.checks) // prevent check duplication after initialization
+	c.Checks = maps.Clone(c.Checks) // prevent check duplication after initialization
 	return &CheckHandler{
-		conf: c,
+		Conf: c,
 	}
 }
 
 // AddCheck adds a check to the CheckHandler.
 func (h *CheckHandler) AddCheck(name string, c check) {
-	h.conf.WithCheck(name, c)
+	h.Conf.WithCheck(name, c)
 }
 
 func (h *CheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g, ctx := errgroup.WithContext(r.Context())
-	g.SetLimit(h.conf.limit)
+	g.SetLimit(h.Conf.limit)
 
-	for name, check := range h.conf.checks {
+	for name, check := range h.Conf.Checks {
 		checker := check
 		checkerName := name
 		g.Go(func() error { // https://go.dev/blog/loopvar-preview per iteration scope since go 1.22
@@ -111,16 +113,16 @@ func (h *CheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	status := h.conf.statusSuccess
+	status := h.Conf.statusSuccess
 	if err := g.Wait(); err != nil {
-		status = h.conf.statusFailed
-		h.conf.logger.Error().Err(err).Msg("check failed")
+		status = h.Conf.statusFailed
+		h.Conf.logger.Error().Err(err).Msg("check failed")
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(status)
 
 	if _, err := io.WriteString(w, http.StatusText(status)); err != nil { // io.WriteString should not fail, but if it does, we want to know.
-		h.conf.logger.Panic().Err(err).Msg("failed to write response")
+		h.Conf.logger.Panic().Err(err).Msg("failed to write response")
 	}
 }
