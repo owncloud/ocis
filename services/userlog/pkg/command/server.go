@@ -84,7 +84,6 @@ func Server(cfg *config.Config) *cli.Command {
 			st := store.Create(
 				store.Store(cfg.Persistence.Store),
 				store.TTL(cfg.Persistence.TTL),
-				store.Size(cfg.Persistence.Size),
 				microstore.Nodes(cfg.Persistence.Nodes...),
 				microstore.Database(cfg.Persistence.Database),
 				microstore.Table(cfg.Persistence.Table),

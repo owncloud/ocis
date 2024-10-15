@@ -14,7 +14,7 @@ Possible stores that can be configured via `OCS_PRESIGNEDURL_SIGNING_KEYS_STORE`
   -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
   -   `ocisstoreservice`:  Stores data in the legacy ocis store service. Requires setting `OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` to `com.owncloud.api.store`.
 
-The `memory` or `ocmem` stores cannot be used as they do not share the memory from the ocs service signing key memory store, even in a single process.
+The `memory` store cannot be used as it does not share the memory from the ocs service signing key memory store, even in a single process.
 
 Make sure to configure the same store in the proxy service.
 
