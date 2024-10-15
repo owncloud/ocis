@@ -3,6 +3,10 @@ NAME := ocis
 
 TAGS := disable_crypt
 
+ifdef ENABLE_VIPS
+	TAGS := ${TAGS},enable_vips
+endif
+
 include ../.make/recursion.mk
 
 ############ tooling ############
