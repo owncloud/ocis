@@ -76,7 +76,7 @@ variables:
   do_ignore: true
 - rawname: _registryEnv
   path: ocis-pkg/registry/registry.go:114
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY
   type: string
   default_value: nats-js-kv
@@ -87,7 +87,7 @@ variables:
   do_ignore: false
 - rawname: _registryAddressEnv
   path: ocis-pkg/registry/registry.go:118
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY_ADDRESS
   type: ""
   default_value: ""
@@ -162,6 +162,22 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
+- rawname: _registryAddressEnv
+  path: ocis-pkg/registry/registry.go:91
+  foundincode: true
+  name: _registryAddressEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: _registryEnv
+  path: ocis-pkg/registry/registry.go:87
+  foundincode: true
+  name: _registryEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:382
   foundincode: true
