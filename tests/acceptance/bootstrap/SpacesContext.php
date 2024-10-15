@@ -2041,15 +2041,14 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" tries to move (?:file|folder) "([^"]*)" of space "([^"]*)" to (space|folder) "([^"]*)" using its id in destination path "([^"]*)"$/
-	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" of space "([^"]*)" to (folder) "([^"]*)" using its id in destination path "([^"]*)"$/
+	 * @When /^user "([^"]*)" tries to move (?:file|folder) "([^"]*)" of space "([^"]*)" to (space|folder) "([^"]*)" using its id in destination path$/
+	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" of space "([^"]*)" to (folder) "([^"]*)" using its id in destination path$/
 	 *
 	 * @param string $user
 	 * @param string $source
 	 * @param string $sourceSpace
 	 * @param string $destinationType
 	 * @param string $destinationName
-	 * @param string $destinationPath
 	 *
 	 * @throws GuzzleException
 	 * @return void
@@ -2059,23 +2058,25 @@ class SpacesContext implements Context {
 		string $source,
 		string $sourceSpace,
 		string $destinationType,
-		string $destinationName,
-		string $destinationPath
+		string $destinationName
 	): void {
 		$source = \trim($source, "/");
 		$baseUrl = $this->featureContext->getBaseUrl();
-		$suffix = "";
-		if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
-			$suffix = $this->getSpaceIdByName($user, $sourceSpace) . "/";
+		$davPathVersion = $this->featureContext->getDavPathVersion();
+		$spaceId = null;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$spaceId = $this->getSpaceIdByName($user, $sourceSpace);
 		}
-		$fullUrl = $baseUrl . \rtrim($destinationPath, "/") . "/$suffix$source";
+		$sourceDavPath = WebDavHelper::getDavPath($user, $davPathVersion, "files", $spaceId);
+		$fullUrl = "$baseUrl/$sourceDavPath/$source";
 
 		if ($destinationType === "space") {
 			$destinationId = $this->getSpaceIdByName($user, $destinationName);
 		} else {
 			$destinationId = $this->getResourceId($user, $sourceSpace, $destinationName);
 		}
-		$headers['Destination'] = $baseUrl . \rtrim($destinationPath, "/") . "/$destinationId";
+		$destinationDavPath = WebDavHelper::getDavPath(null, $davPathVersion);
+		$headers['Destination'] = "$baseUrl/$destinationDavPath/$destinationId";
 
 		$response = $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
 		$this->featureContext->setResponse($response);

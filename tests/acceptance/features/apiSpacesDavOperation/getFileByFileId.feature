@@ -15,9 +15,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: get content of a file inside a folder
@@ -28,9 +27,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: get content of a file inside a project space
@@ -42,9 +40,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: sharee gets content of a shared file
@@ -63,7 +60,6 @@ Feature: accessing files using file id
     And the downloaded content should be "some data"
     Examples:
       | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
 
@@ -83,9 +79,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: sharee gets content of a file inside a shared space
@@ -103,9 +98,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: user tries to get content of file owned by others
@@ -115,9 +109,8 @@ Feature: accessing files using file id
     When user "Brian" sends HTTP method "GET" to URL "<dav-path>"
     Then the HTTP status code should be "404"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: sharee gets content of a shared file when sync is disable
@@ -135,9 +128,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: sharee gets content of a file inside a shared folder when sync is disable
@@ -156,9 +148,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: user who is member of group gets content of a shared file when sync is disable
@@ -179,9 +170,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: user who is member of group gets content of a shared folder when sync is disable
@@ -203,9 +193,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some data"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: sharee gets content of a shared file in project space when sync is disabled
@@ -226,9 +215,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: sharee gets content of a file inside a shared folder in project space when sync is disabled
@@ -250,9 +238,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: user who is member of group gets content of a shared file in project space when sync is disabled
@@ -275,9 +262,8 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: user who is member of group gets content of a file from shared folder in project space when sync is disabled
@@ -301,6 +287,5 @@ Feature: accessing files using file id
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
