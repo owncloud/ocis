@@ -4153,14 +4153,10 @@ trait WebDav {
 		TableNode $expectedFiles
 	):void {
 		$user = $this->getActualUsername($user);
-		$space = $this->spacesContext->getSpaceByName($user, "Personal");
 		$this->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
-			$user,
-			"REPORT",
-			"",
-			$space["id"]
+			$user
 		);
 	}
 
@@ -4621,12 +4617,11 @@ trait WebDav {
 		foreach ($searchResults as $item) {
 			$href = (string)$item->xpath("d:href")[0];
 			$shareRootXml = $item->xpath("d:propstat//oc:shareroot");
-			$href = \preg_replace($hrefRegex, "", $href);
-			$resourcePath = $href;
+			$resourcePath = \preg_replace($hrefRegex, "", $href);
 			// do not try to parse the resource path
 			// if the item to search is space itself
 			if (!GraphHelper::isSpaceId($entryNameToSearch ?? '')) {
-				$resourcePath = \substr($href, \strpos($href, '/') + 1);
+				$resourcePath = \substr($resourcePath, \strpos($resourcePath, '/') + 1);
 			}
 			if (\count($shareRootXml)) {
 				$shareroot = \trim((string)$shareRootXml[0], "/");
