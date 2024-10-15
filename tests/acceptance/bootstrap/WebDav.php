@@ -4095,9 +4095,7 @@ trait WebDav {
 		?string $folderpath = '',
 		?string $spaceId = null
 	):void {
-		if ($folderpath === "/") {
-			$folderpath = "";
-		}
+		$folderpath = \trim($folderpath, "/");
 		$this->verifyTableNodeColumnsCount($expectedFiles, 1);
 		$elementRows = $expectedFiles->getRows();
 		$should = ($shouldOrNot !== "not");
@@ -4155,10 +4153,14 @@ trait WebDav {
 		TableNode $expectedFiles
 	):void {
 		$user = $this->getActualUsername($user);
+		$space = $this->spacesContext->getSpaceByName($user, "Personal");
 		$this->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
-			$user
+			$user,
+			"REPORT",
+			"",
+			$space["id"]
 		);
 	}
 
@@ -4605,13 +4607,22 @@ trait WebDav {
 		if ($entryNameToSearch !== null) {
 			$entryNameToSearch = \trim($entryNameToSearch, "/");
 		}
+
 		$spacesBaseUrl = "/" . WebDavHelper::getDavPath(null, WebDavHelper::DAV_VERSION_SPACES, 'files', $spaceId);
+		$spacesBaseUrl = "/" . WebDavHelper::getDavPath(null, $this->getDavPathVersion(), 'files', $spaceId);
+		$spacesBaseUrl = \rtrim($spacesBaseUrl, "/") . "/";
+		$hrefRegex = \preg_quote($spacesBaseUrl, "/");
+		if (\in_array($this->getDavPathVersion(), [WebDavHelper::DAV_VERSION_SPACES, WebDavHelper::DAV_VERSION_NEW])) {
+			$hrefRegex .= "[a-zA-Z0-9-_$!:%]+";
+		}
+		$hrefRegex = "/^" . $hrefRegex . "/";
+
 		$searchResults = $this->getResponseXml()->xpath("//d:multistatus/d:response");
 		$results = [];
 		foreach ($searchResults as $item) {
 			$href = (string)$item->xpath("d:href")[0];
 			$shareRootXml = $item->xpath("d:propstat//oc:shareroot");
-			$href = \str_replace($spacesBaseUrl, "", $href);
+			$href = \preg_replace($hrefRegex, "", $href);
 			$resourcePath = $href;
 			// do not try to parse the resource path
 			// if the item to search is space itself
