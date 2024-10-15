@@ -168,6 +168,11 @@ _ocdav: api compatibility, return correct status code_
 - [coreApiWebdavProperties/copyFile.feature:1068](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L1068)
 - [coreApiWebdavProperties/copyFile.feature:1069](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/copyFile.feature#L1069)
 
+#### [same href in REPORT request for all dav-path-version](https://github.com/owncloud/ocis/issues/7060)
+
+- [apiSearch1/dateSearch.feature:17](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch1/dateSearch.feature#L17)
+- [apiSearch1/dateSearch.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch1/dateSearch.feature#L18)
+
 ### Won't fix
 
 Not everything needs to be implemented for ocis. While the oc10 testsuite covers these things we are not looking at them right now.

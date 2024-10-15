@@ -151,7 +151,7 @@ class CollaborationContext implements Context {
 	public function createFile(string $file, string $password, string $folder = ""): void {
 		$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
 		$baseUrl = $this->featureContext->getBaseUrl();
-		$davPath = WebDavHelper::getDavPath($token, null, "public-files");
+		$davPath = WebDavHelper::getDavPath($token, WebDavHelper::DAV_VERSION_NEW, "public-files");
 		$response = HttpRequestHelper::sendRequest(
 			"$baseUrl/$davPath/$folder",
 			$this->featureContext->getStepLineRef(),
