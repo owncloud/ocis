@@ -418,7 +418,7 @@ def testPipelines(ctx):
     pipelines += e2eTestPipeline(ctx)
 
     if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
-        pipelines.append(k6LoadTests(ctx))
+        pipelines += k6LoadTests(ctx)
 
     return pipelines
 
