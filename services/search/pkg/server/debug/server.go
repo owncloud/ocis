@@ -14,7 +14,8 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	checkHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger),
+			WithLogger(options.Logger).
+			WithCheck("grpc reachability", handlers.NewGRPCCheck(options.Config.GRPC.Addr)),
 	)
 
 	return debug.NewService(
