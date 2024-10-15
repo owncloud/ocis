@@ -9,13 +9,9 @@ This package also configures the service registry which will be used to look up 
 Available registries are:
 
 -   nats-js-kv (default)
--   kubernetes
 -   memory
--   etcd (deprecated)
--   consul (deprecated)
--   mdns (deprecated)
 
-To configure which registry to use, you have to set the environment variable `MICRO_REGISTRY`, and for all except `memory` and `mdns` you also have to set the registry address via `MICRO_REGISTRY_ADDRESS`.
+To configure which registry to use, you have to set the environment variable `MICRO_REGISTRY`, and for all except `memory` you also have to set the registry address via `MICRO_REGISTRY_ADDRESS`.
 
 ## Memory limits
 
