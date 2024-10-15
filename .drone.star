@@ -1406,7 +1406,7 @@ def dockerRelease(ctx, arch, repo, build_type):
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
-                    "make -C ocis release-linux-docker-%s" % (arch),
+                    "make -C ocis release-linux-docker-%s ENABLE_VIPS=true" % (arch),
                 ],
             },
             {
