@@ -625,7 +625,11 @@ class AuthContext implements Context {
 			$endpoint,
 			$username
 		);
-		$fullUrl = $this->featureContext->getBaseUrl() . $endpoint;
+		if (WebdavHelper::isDAVRequest($endpoint)) {
+			$endpoint = \ltrim($endpoint, '/');
+			$endpoint = WebdavHelper::withRemotePhp($endpoint);
+		}
+		$fullUrl = $this->featureContext->getBaseUrl() . "/$endpoint";
 		$response = HttpRequestHelper::sendRequestOnce(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
