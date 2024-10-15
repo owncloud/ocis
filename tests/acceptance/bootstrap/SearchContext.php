@@ -23,7 +23,9 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
+use Psr\Http\Message\ResponseInterface;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\BehatHelper;
@@ -37,33 +39,26 @@ class SearchContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
-	 * @When user :user searches for :pattern using the WebDAV API
-	 * @When user :user searches for :pattern and limits the results to :limit items using the WebDAV API
-	 * @When user :user searches for :pattern using the WebDAV API requesting these properties:
-	 * @When user :user searches for :pattern and limits the results to :limit items using the WebDAV API requesting these properties:
-	 * @When user :user searches for :pattern inside folder :scope using the WebDAV API
-	 * @When user :user searches for :pattern inside folder :scope in space :spaceName using the WebDAV API
-	 *
 	 * @param string $user
 	 * @param string $pattern
 	 * @param string|null $limit
+	 * @param string|null $scopeType
 	 * @param string|null $scope
 	 * @param string|null $spaceName
 	 * @param TableNode|null $properties
 	 *
-	 * @return void
+	 * @return ResponseInterface
+	 * @throws GuzzleException|JsonException
 	 */
-	public function userSearchesUsingWebDavAPI(
-		string    $user,
-		string    $pattern,
-		?string   $limit = null,
-		?string   $scope = null,
-		?string   $spaceName = null,
-		TableNode $properties = null
-	): void {
-		// NOTE: because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously
-		// short wait is necessary before searching
-		sleep(5);
+	private function searchFiles(
+		string     $user,
+		string     $pattern,
+		?string    $limit = null,
+		?string    $scopeType = null,
+		?string    $scope = null,
+		?string    $spaceName = null,
+		?TableNode $properties = null
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$password = $this->featureContext->getPasswordForUser($user);
@@ -85,9 +80,13 @@ class SearchContext implements Context {
 			"	<oc:search-files xmlns:a='DAV:' xmlns:oc='http://owncloud.org/ns' >\n" .
 			"		<oc:search>\n";
 		if ($scope !== null) {
-			$scope = \trim($scope, "/");
-			$resourceID = $this->featureContext->spacesContext->getResourceId($user, $spaceName ?? "Personal", $scope);
-			$pattern .= " scope:$resourceID";
+			if ($scopeType === "space") {
+				$spaceId = $this->featureContext->spacesContext->getSpaceIdByName($user, $scope);
+				$pattern .= " scope:$spaceId";
+			} else {
+				$resourceID = $this->featureContext->spacesContext->getResourceId($user, $spaceName ?? "Personal", $scope);
+				$pattern .= " scope:$resourceID";
+			}
 		}
 		$body .= "<oc:pattern>$pattern</oc:pattern>\n";
 		if ($limit !== null) {
@@ -114,7 +113,7 @@ class SearchContext implements Context {
 		}
 
 		$fullUrl = WebDavHelper::sanitizeUrl("$baseUrl/$davPath");
-		$response = HttpRequestHelper::sendRequest(
+		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
 			'REPORT',
@@ -123,6 +122,32 @@ class SearchContext implements Context {
 			null,
 			$body
 		);
+	}
+
+	/**
+	 * @When user :user searches for :pattern using the WebDAV API
+	 * @When user :user searches for :pattern and limits the results to :limit items using the WebDAV API
+	 * @When user :user searches for :pattern using the WebDAV API requesting these properties:
+	 * @When user :user searches for :pattern and limits the results to :limit items using the WebDAV API requesting these properties:
+	 *
+	 * @param string $user
+	 * @param string $pattern
+	 * @param string|null $limit
+	 * @param TableNode|null $properties
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userSearchesUsingWebDavAPI(
+		string     $user,
+		string     $pattern,
+		?string    $limit = null,
+		?TableNode $properties = null
+	): void {
+		// NOTE: because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously
+		// short wait is necessary before searching
+		sleep(5);
+		$response = $this->searchFiles($user, $pattern, $limit, null, null, null, $properties);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -220,5 +245,32 @@ class SearchContext implements Context {
 				"Expected text highlight to be '$expectedContent' but found '$actualContent'"
 			);
 		}
+	}
+
+	/**
+	 * @When /^user "([^"]*)" searches for "([^"]*)" inside (folder|space) "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" searches for "([^"]*)" inside (folder) "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $pattern
+	 * @param string $scopeType
+	 * @param string $scope
+	 * @param string|null $spaceName
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userSearchesInsideFolderOrSpaceUsingWebDavAPI(
+		string  $user,
+		string  $pattern,
+		string  $scopeType,
+		string  $scope,
+		?string $spaceName = null,
+	): void {
+		// NOTE: since indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously,
+		// a short wait is necessary before searching
+		sleep(5);
+		$response = $this-> searchFiles($user, $pattern, null, $scopeType, $scope, $spaceName);
+		$this->featureContext->setResponse($response);
 	}
 }
