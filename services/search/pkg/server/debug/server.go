@@ -1,6 +1,7 @@
 package debug
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
@@ -18,6 +19,19 @@ func Server(opts ...Option) (*http.Server, error) {
 			WithCheck("grpc reachability", handlers.NewGRPCCheck(options.Config.GRPC.Addr)),
 	)
 
+	readyHandler := handlers.NewCheckHandler(
+		handlers.NewCheckHandlerConfiguration().
+			WithLogger(options.Logger).
+			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)).
+			WithCheck("tika-check", func(ctx context.Context) error {
+				if options.Config.Extractor.Type == "tika" {
+					return handlers.NewTCPCheck(options.Config.Extractor.Tika.TikaURL)(ctx)
+				}
+				return nil
+			}).
+			WithInheritedChecksFrom(checkHandler.Conf),
+	)
+
 	return debug.NewService(
 		debug.Logger(options.Logger),
 		debug.Name(options.Config.Service.Name),
@@ -27,6 +41,6 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
 		debug.Health(checkHandler),
-		debug.Ready(checkHandler),
+		debug.Ready(readyHandler),
 	), nil
 }
