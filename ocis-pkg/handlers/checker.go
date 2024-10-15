@@ -50,6 +50,15 @@ func (c CheckHandlerConfiguration) WithCheck(name string, f check) CheckHandlerC
 	return c
 }
 
+// WithInheritedChecksFrom appends the checks from another CheckHandlerConfiguration.
+func (c CheckHandlerConfiguration) WithInheritedChecksFrom(other CheckHandlerConfiguration) CheckHandlerConfiguration {
+	for name, check := range other.checks {
+		c.WithCheck(name, check)
+	}
+
+	return c
+}
+
 // WithLimit limits the number of active goroutines for the checks to at most n
 func (c CheckHandlerConfiguration) WithLimit(n int) CheckHandlerConfiguration {
 	c.limit = n
