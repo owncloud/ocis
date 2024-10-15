@@ -13,14 +13,20 @@ release-dirs:
 DOCKER_LDFLAGS += -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseDataPathType=path" -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseDataPathValue=/var/lib/ocis"
 DOCKER_LDFLAGS += -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseConfigPathType=path" -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseConfigPathValue=/etc/ocis"
 
+# We can't link statically when vips is enabled but we still
+# prefer static linking where possible
+ifndef ENABLE_VIPS
+	DOCKER_LDFLAGS += -extldflags "-static"
+endif
+
 release-linux-docker-amd64: release-dirs
 	GOOS=linux \
 	GOARCH=amd64 \
 	go build \
-		-tags 'netgo $(TAGS)' \
+		-tags 'netgo,$(TAGS)' \
 		-buildmode=pie \
 		-trimpath \
-		-ldflags '-extldflags "-static" $(LDFLAGS) $(DOCKER_LDFLAGS)' \
+		-ldflags '$(LDFLAGS) $(DOCKER_LDFLAGS)' \
 		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-amd64' \
 		./cmd/$(NAME)
 
@@ -28,9 +34,9 @@ release-linux-docker-arm: release-dirs
 	GOOS=linux \
 	GOARCH=arm \
 	go build \
-		-tags 'netgo $(TAGS)' \
+		-tags 'netgo,$(TAGS)' \
 		-trimpath \
-		-ldflags '-extldflags "-static" $(LDFLAGS) $(DOCKER_LDFLAGS)' \
+		-ldflags '$(LDFLAGS) $(DOCKER_LDFLAGS)' \
 		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-arm' \
 		./cmd/$(NAME)
 
@@ -41,10 +47,10 @@ release-linux-docker-arm64: release-dirs
 	GOOS=linux \
 	GOARCH=arm64 \
 	go build \
-		-tags 'netgo $(TAGS)' \
+		-tags 'netgo,$(TAGS)' \
 		-buildmode=pie \
 		-trimpath \
-		-ldflags '-extldflags "-static" $(LDFLAGS) $(DOCKER_LDFLAGS)' \
+		-ldflags '$(LDFLAGS) $(DOCKER_LDFLAGS)' \
 		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-arm64' \
 		./cmd/$(NAME)
 
@@ -53,7 +59,7 @@ release-linux: release-dirs
 	GOOS=linux \
 	GOARCH=amd64 \
 	go build \
-		-tags 'netgo $(TAGS)' \
+		-tags 'netgo,$(TAGS)' \
 		-buildmode=pie \
 		-trimpath \
 		-ldflags '-extldflags "-static" $(LDFLAGS)' \
@@ -63,7 +69,7 @@ release-linux: release-dirs
 	GOOS=linux \
 	GOARCH=386 \
 	go build \
-		-tags 'netgo $(TAGS)' \
+		-tags 'netgo,$(TAGS)' \
 		-trimpath \
 		-ldflags '-extldflags "-static" $(LDFLAGS)' \
 		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-linux-386' \
@@ -72,7 +78,7 @@ release-linux: release-dirs
 	GOOS=linux \
 	GOARCH=arm64 \
 	go build \
-		-tags 'netgo $(TAGS)' \
+		-tags 'netgo,$(TAGS)' \
 		-buildmode=pie \
 		-trimpath \
 		-ldflags '-extldflags "-static" $(LDFLAGS)' \
@@ -82,7 +88,7 @@ release-linux: release-dirs
 	GOOS=linux \
 	GOARCH=arm \
 	go build \
-		-tags 'netgo $(TAGS)' \
+		-tags 'netgo,$(TAGS)' \
 		-trimpath \
 		-ldflags '-extldflags "-static" $(LDFLAGS)' \
 		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-linux-arm' \
@@ -96,7 +102,7 @@ release-darwin: release-dirs
 	GOOS=darwin \
 	GOARCH=amd64 \
 	go build \
-		-tags 'netgo $(TAGS)' \
+		-tags 'netgo,$(TAGS)' \
 		-buildmode=pie \
 		-trimpath \
 		-ldflags '$(LDFLAGS)' \
@@ -106,7 +112,7 @@ release-darwin: release-dirs
 	GOOS=darwin \
 	GOARCH=arm64 \
 	go build \
-		-tags 'netgo $(TAGS)' \
+		-tags 'netgo,$(TAGS)' \
 		-buildmode=pie \
 		-trimpath \
 		-ldflags '$(LDFLAGS)' \

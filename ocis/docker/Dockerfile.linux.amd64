@@ -1,9 +1,9 @@
-FROM amd64/alpine:3.18
+FROM amd64/alpine:3.20
 
 ARG VERSION=""
 ARG REVISION=""
 
-RUN apk add --no-cache ca-certificates mailcap tree attr curl inotify-tools bash libc6-compat && \
+RUN apk add --no-cache ca-certificates mailcap tree attr curl inotify-tools bash libc6-compat vips && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
