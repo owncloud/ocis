@@ -727,6 +727,8 @@ class WebDavPropertiesContext implements Context {
 	 */
 	public function valueOfItemOfPathShouldBe(string $user, string $xpath, string $path, string $expectedValue):void {
 		$path = $this->featureContext->substituteInLineCodes($path, $user);
+		$path = \ltrim($path, '/');
+		$path = "/" . WebdavHelper::withRemotePhp($path);
 		$fullXpath = "//d:response/d:href[.='$path']/following-sibling::d:propstat$xpath";
 		$this->assertValueOfItemInResponseAboutUserIs(
 			$fullXpath,

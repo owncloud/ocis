@@ -61,6 +61,18 @@ class WebDavHelper {
 	}
 
 	/**
+	 * @param string $url
+	 *
+	 * @return bool
+	 */
+	public static function isDAVRequest(string $url): bool {
+		if (\str_contains($url, '/dav') || \str_contains($url, '/webdav')) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * clear space id reference for user
 	 *
 	 * @param string|null $user

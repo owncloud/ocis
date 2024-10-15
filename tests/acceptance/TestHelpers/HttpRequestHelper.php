@@ -62,18 +62,6 @@ class HttpRequestHelper {
 	}
 
 	/**
-	 * @param string $url
-	 *
-	 * @return bool
-	 */
-	public static function isDAVRequest(string $url): bool {
-		if (\str_contains($url, '/dav') || \str_contains($url, '/webdav')) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 *
 	 * @param string|null $url
 	 * @param string|null $xRequestId
@@ -117,7 +105,7 @@ class HttpRequestHelper {
 			);
 		}
 
-		if (self::isDAVRequest($url) && \str_starts_with($url, OcisHelper::getServerUrl())) {
+		if (WebdavHelper::isDAVRequest($url) && \str_starts_with($url, OcisHelper::getServerUrl())) {
 			$withRemotePhp = \getenv("WITH_REMOTE_PHP") === "true";
 			$urlHasRemotePhp = \str_contains($url, 'remote.php');
 			if (!$withRemotePhp && $urlHasRemotePhp) {
