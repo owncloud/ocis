@@ -1,9 +1,7 @@
 package debug
 
 import (
-	"context"
 	"net/http"
-	"net/url"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
@@ -23,18 +21,7 @@ func Server(opts ...Option) (*http.Server, error) {
 	readinessHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
 			WithLogger(options.Logger).
-			WithCheck("tcp-check", func(ctx context.Context) error {
-				tcpURL := options.Config.Ldap.URI
-				u, err := url.Parse(options.Config.Ldap.URI)
-				if err != nil {
-					return err
-				}
-				if u.Host != "" {
-					tcpURL = u.Host
-				}
-
-				return handlers.NewTCPCheck(tcpURL)(ctx)
-			}).
+			WithCheck("ldap-check", handlers.NewTCPCheck(options.Config.Ldap.URI)).
 			WithInheritedChecksFrom(healthHandler.Conf),
 	)
 
