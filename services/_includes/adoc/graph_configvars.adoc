@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-15-08-35-01]
+[#deprecation-note-2024-10-15-11-04-34]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -798,7 +798,7 @@ LDAP Attribute to use for the email address of users.
 a|`OCIS_LDAP_USER_SCHEMA_DISPLAYNAME` +
 `LDAP_USER_SCHEMA_DISPLAY_NAME` +
 `GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE` +
-xref:deprecation-note-2024-10-15-08-35-01[Deprecation Note]
+xref:deprecation-note-2024-10-15-11-04-34[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
