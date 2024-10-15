@@ -3,7 +3,7 @@ FROM amd64/alpine:latest
 ARG VERSION=""
 ARG REVISION=""
 
-RUN apk add --no-cache ca-certificates mailcap tree attr curl libc6-compat delve && \
+RUN apk add --no-cache ca-certificates mailcap tree attr curl inotify-tools bash libc6-compat vips delve && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \

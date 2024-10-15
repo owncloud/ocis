@@ -26,11 +26,11 @@ FROM owncloudci/golang:1.22 as build
 COPY --from=generate /ocis /ocis
 
 WORKDIR /ocis/ocis
-RUN make ci-go-generate build
+RUN make ci-go-generate build ENABLE_VIPS=true
 
-FROM alpine:3.18
+FROM alpine:3.20
 
-RUN apk add --no-cache ca-certificates mailcap tree attr curl && \
+RUN apk add --no-cache ca-certificates mailcap tree attr curl vips && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
