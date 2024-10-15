@@ -75,21 +75,21 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
-	 * @When the public tries to get the number of versions of file :file with password :password using file-id path :endpoint
+	 * @When the public tries to get the number of versions of file :file with password :password using file-id :endpoint
 	 *
 	 * @param string $file
 	 * @param string $password
-	 * @param string $endpoint
+	 * @param string $fileId
 	 *
 	 * @return void
 	 */
-	public function thePublicGetsTheNumberOfVersionsOfFileWithPasswordUsingFileIdPath(string $file, string $password, string $endpoint): void {
+	public function thePublicTriesToGetTheNumberOfVersionsOfFileWithPasswordUsingFileId(string $file, string $password, string $fileId): void {
 		$password = $this->featureContext->getActualPassword($password);
 		$this->featureContext->setResponse(
 			$this->featureContext->makeDavRequest(
 				"public",
 				"PROPFIND",
-				$endpoint,
+				$this->getVersionsPathForFileId($fileId),
 				null,
 				null,
 				null,

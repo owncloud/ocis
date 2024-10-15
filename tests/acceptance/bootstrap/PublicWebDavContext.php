@@ -1546,10 +1546,10 @@ class PublicWebDavContext implements Context {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
 			$token,
-			$this - featureContext->getDavPathVersion(),
+			$this->featureContext->getDavPathVersion(),
 			"public-files"
 		);
-		$url = $this->featureContext->getBaseUrl() . "/$davPath";
+		$url = $this->featureContext->getBaseUrl() . "/$davPath/";
 		$password = $this->featureContext->getActualPassword($password);
 		$userName = $this->getUsernameForPublicWebdavApi(
 			$token,

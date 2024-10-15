@@ -4608,7 +4608,6 @@ trait WebDav {
 			$entryNameToSearch = \trim($entryNameToSearch, "/");
 		}
 
-		$spacesBaseUrl = "/" . WebDavHelper::getDavPath(null, WebDavHelper::DAV_VERSION_SPACES, 'files', $spaceId);
 		$spacesBaseUrl = "/" . WebDavHelper::getDavPath(null, $this->getDavPathVersion(), 'files', $spaceId);
 		$spacesBaseUrl = \rtrim($spacesBaseUrl, "/") . "/";
 		$hrefRegex = \preg_quote($spacesBaseUrl, "/");
