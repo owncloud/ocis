@@ -18,7 +18,8 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	checkHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger),
+			WithLogger(options.Logger).
+			WithCheck("web reachability", handlers.NewHTTPCheck(options.Config.HTTP.Addr)),
 	)
 
 	var configDumpFunc http.HandlerFunc = configDump(options.Config)

@@ -14,13 +14,15 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	healthHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger),
+			WithLogger(options.Logger).
+			WithCheck("http reachability", handlers.NewHTTPCheck(options.Config.HTTP.Addr)),
 	)
 
 	readyHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
 			WithLogger(options.Logger).
-			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)),
+			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)).
+			WithInheritedChecksFrom(healthHandler.Conf),
 	)
 
 	return debug.NewService(
