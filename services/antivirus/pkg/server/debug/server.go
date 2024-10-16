@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/dutchcoders/go-clamd"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/checks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -23,7 +25,7 @@ func Server(opts ...Option) (*http.Server, error) {
 	readyHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
 			WithLogger(options.Logger).
-			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)).
+			WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Cluster)).
 			WithCheck("antivirus reachability", func(ctx context.Context) error {
 				cfg := options.Config
 				switch cfg.Scanner.Type {
@@ -32,7 +34,7 @@ func Server(opts ...Option) (*http.Server, error) {
 				case "clamav":
 					return clamd.NewClamd(cfg.Scanner.ClamAV.Socket).Ping()
 				case "icap":
-					return handlers.NewTCPCheck(cfg.Scanner.ICAP.URL)(ctx)
+					return checks.NewTCPCheck(cfg.Scanner.ICAP.URL)(ctx)
 				}
 			}),
 	)

@@ -1,10 +1,12 @@
 package debug
 
 import (
+	"net/http"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/checks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"net/http"
 )
 
 // Server initializes the debug service and server.
@@ -13,7 +15,7 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	checkHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger).WithCheck("web reachability", handlers.NewHTTPCheck(options.Config.HTTP.Addr)),
+			WithLogger(options.Logger).WithCheck("web reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr)),
 	)
 
 	return debug.NewService(

@@ -1,4 +1,4 @@
-package handlers
+package checks
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 )
 
 // NewTCPCheck returns a check that connects to a given tcp endpoint.
-func NewTCPCheck(address string) func(ctx context.Context) error {
+func NewTCPCheck(address string) func(context.Context) error {
 	return func(_ context.Context) error {
 		conn, err := net.DialTimeout("tcp", address, 3*time.Second)
 		if err != nil {

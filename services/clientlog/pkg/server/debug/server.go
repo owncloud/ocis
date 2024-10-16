@@ -3,6 +3,7 @@ package debug
 import (
 	"net/http"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/checks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -20,8 +21,8 @@ func Server(opts ...Option) (*http.Server, error) {
 	readyHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
 			WithLogger(options.Logger).
-			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)).
-			WithInheritedChecksFrom(checkHandler.Conf),
+			WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Cluster)).
+			WithChecks(checkHandler.Checks()),
 	)
 
 	return debug.NewService(

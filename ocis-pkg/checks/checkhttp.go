@@ -1,4 +1,4 @@
-package handlers
+package checks
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// NewHttpCheck checks the reachability of a http server.
+// NewHTTPCheck checks the reachability of a http server.
 func NewHTTPCheck(url string) func(context.Context) error {
 	return func(_ context.Context) error {
 		c := http.Client{
