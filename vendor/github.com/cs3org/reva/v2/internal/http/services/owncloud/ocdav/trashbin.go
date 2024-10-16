@@ -29,6 +29,8 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel/codes"
+
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
@@ -36,15 +38,15 @@ import (
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/propfind"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/spacelookup"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"go.opentelemetry.io/otel/codes"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	rstatus "github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 )
 
 // TrashbinHandler handles trashbin requests
@@ -373,8 +375,8 @@ func (h *TrashbinHandler) formatTrashPropfind(ctx context.Context, s *svc, space
 func (h *TrashbinHandler) itemToPropResponse(ctx context.Context, s *svc, spaceID, refBase string, pf *propfind.XML, item *provider.RecycleItem) (*propfind.ResponseXML, error) {
 
 	baseURI := ctx.Value(net.CtxKeyBaseURI).(string)
-	ref := path.Join(baseURI, refBase, item.Key)
-	if item.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+	ref := path.Join(baseURI, refBase, item.GetKey())
+	if item.GetType() == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 		ref += "/"
 	}
 
@@ -385,9 +387,9 @@ func (h *TrashbinHandler) itemToPropResponse(ctx context.Context, s *svc, spaceI
 
 	// TODO(jfd): if the path we list here is taken from the ListRecycle request we rely on the gateway to prefix it with the mount point
 
-	t := utils.TSToTime(item.DeletionTime).UTC()
+	t := utils.TSToTime(item.GetDeletionTime()).UTC()
 	dTime := t.Format(time.RFC1123Z)
-	size := strconv.FormatUint(item.Size, 10)
+	size := strconv.FormatUint(item.GetSize(), 10)
 
 	// when allprops has been requested
 	if pf.Allprop != nil {
@@ -397,11 +399,11 @@ func (h *TrashbinHandler) itemToPropResponse(ctx context.Context, s *svc, spaceI
 			Prop:   []prop.PropertyXML{},
 		}
 		// yes this is redundant, can be derived from oc:trashbin-original-location which contains the full path, clients should not fetch it
-		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-original-filename", path.Base(item.Ref.Path)))
-		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-original-location", strings.TrimPrefix(item.Ref.Path, "/")))
-		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-delete-timestamp", strconv.FormatUint(item.DeletionTime.Seconds, 10)))
+		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-original-filename", path.Base(item.GetRef().GetPath())))
+		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-original-location", strings.TrimPrefix(item.GetRef().GetPath(), "/")))
+		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-delete-timestamp", strconv.FormatUint(item.GetDeletionTime().GetSeconds(), 10)))
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-delete-datetime", dTime))
-		if item.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+		if item.GetType() == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 			propstatOK.Prop = append(propstatOK.Prop, prop.Raw("d:resourcetype", "<d:collection/>"))
 			propstatOK.Prop = append(propstatOK.Prop, prop.Raw("oc:size", size))
 		} else {
@@ -427,21 +429,21 @@ func (h *TrashbinHandler) itemToPropResponse(ctx context.Context, s *svc, spaceI
 			case net.NsOwncloud:
 				switch pf.Prop[i].Local {
 				case "oc:size":
-					if item.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+					if item.GetType() == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 						propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:size", size))
 					} else {
 						propstatNotFound.Prop = append(propstatNotFound.Prop, prop.NotFound("oc:size"))
 					}
 				case "trashbin-original-filename":
 					// yes this is redundant, can be derived from oc:trashbin-original-location which contains the full path, clients should not fetch it
-					propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-original-filename", path.Base(item.Ref.Path)))
+					propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-original-filename", path.Base(item.GetRef().GetPath())))
 				case "trashbin-original-location":
 					// TODO (jfd) double check and clarify the cs3 spec what the Key is about and if Path is only the folder that contains the file or if it includes the filename
-					propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-original-location", strings.TrimPrefix(item.Ref.Path, "/")))
+					propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-original-location", strings.TrimPrefix(item.GetRef().GetPath(), "/")))
 				case "trashbin-delete-datetime":
 					propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-delete-datetime", dTime))
 				case "trashbin-delete-timestamp":
-					propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-delete-timestamp", strconv.FormatUint(item.DeletionTime.Seconds, 10)))
+					propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:trashbin-delete-timestamp", strconv.FormatUint(item.GetDeletionTime().GetSeconds(), 10)))
 				case "spaceid":
 					propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:spaceid", spaceID))
 				default:
@@ -450,20 +452,20 @@ func (h *TrashbinHandler) itemToPropResponse(ctx context.Context, s *svc, spaceI
 			case net.NsDav:
 				switch pf.Prop[i].Local {
 				case "getcontentlength":
-					if item.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+					if item.GetType() == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 						propstatNotFound.Prop = append(propstatNotFound.Prop, prop.NotFound("d:getcontentlength"))
 					} else {
 						propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontentlength", size))
 					}
 				case "resourcetype":
-					if item.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+					if item.GetType() == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 						propstatOK.Prop = append(propstatOK.Prop, prop.Raw("d:resourcetype", "<d:collection/>"))
 					} else {
 						propstatOK.Prop = append(propstatOK.Prop, prop.Raw("d:resourcetype", ""))
 						// redirectref is another option
 					}
 				case "getcontenttype":
-					if item.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+					if item.GetType() == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 						propstatOK.Prop = append(propstatOK.Prop, prop.Raw("d:getcontenttype", "httpd/unix-directory"))
 					} else {
 						propstatNotFound.Prop = append(propstatNotFound.Prop, prop.NotFound("d:getcontenttype"))

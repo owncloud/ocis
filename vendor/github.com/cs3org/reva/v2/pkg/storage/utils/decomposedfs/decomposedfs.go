@@ -836,13 +836,13 @@ func (fs *Decomposedfs) Move(ctx context.Context, oldRef, newRef *provider.Refer
 		return
 	}
 
-	rp, err := fs.p.AssemblePermissions(ctx, oldNode)
+	orp, err := fs.p.AssemblePermissions(ctx, oldNode)
 	switch {
 	case err != nil:
 		return err
-	case !rp.Move:
+	case !orp.Move:
 		f, _ := storagespace.FormatReference(oldRef)
-		if rp.Stat {
+		if orp.Stat {
 			return errtypes.PermissionDenied(f)
 		}
 		return errtypes.NotFound(f)
@@ -856,19 +856,19 @@ func (fs *Decomposedfs) Move(ctx context.Context, oldRef, newRef *provider.Refer
 		return
 	}
 
-	rp, err = fs.p.AssemblePermissions(ctx, newNode)
+	nrp, err := fs.p.AssemblePermissions(ctx, newNode)
 	switch {
 	case err != nil:
 		return err
-	case oldNode.IsDir(ctx) && !rp.CreateContainer:
+	case oldNode.IsDir(ctx) && !nrp.CreateContainer:
 		f, _ := storagespace.FormatReference(newRef)
-		if rp.Stat {
+		if nrp.Stat {
 			return errtypes.PermissionDenied(f)
 		}
 		return errtypes.NotFound(f)
-	case !oldNode.IsDir(ctx) && !rp.InitiateFileUpload:
+	case !oldNode.IsDir(ctx) && !nrp.InitiateFileUpload:
 		f, _ := storagespace.FormatReference(newRef)
-		if rp.Stat {
+		if nrp.Stat {
 			return errtypes.PermissionDenied(f)
 		}
 		return errtypes.NotFound(f)
@@ -882,7 +882,13 @@ func (fs *Decomposedfs) Move(ctx context.Context, oldRef, newRef *provider.Refer
 		return err
 	}
 
-	return fs.tp.Move(ctx, oldNode, newNode)
+	if err := fs.tp.Move(ctx, oldNode, newNode); err != nil {
+		return err
+	}
+
+	fs.publishEvent(ctx, fs.moveEvent(ctx, oldRef, newRef, oldNode, newNode, orp, nrp))
+
+	return nil
 }
 
 // GetMD returns the metadata for the specified resource
@@ -1240,4 +1246,33 @@ func (fs *Decomposedfs) PurgeRecycleItem(ctx context.Context, ref *provider.Refe
 }
 func (fs *Decomposedfs) EmptyRecycle(ctx context.Context, ref *provider.Reference) error {
 	return fs.trashbin.EmptyRecycle(ctx, ref)
+}
+
+func (fs *Decomposedfs) getNodePath(ctx context.Context, n *node.Node, perms *provider.ResourcePermissions) (string, error) {
+	hp := func(n *node.Node) bool {
+		return perms.GetGetPath()
+	}
+	return fs.lu.Path(ctx, n, hp)
+}
+
+func (fs *Decomposedfs) refFromNode(ctx context.Context, n *node.Node, storageId string, perms *provider.ResourcePermissions) (*provider.Reference, error) {
+	var err error
+	if perms == nil {
+		perms, err = fs.p.AssemblePermissions(ctx, n)
+		if err != nil {
+			return nil, err
+		}
+	}
+	path, err := fs.getNodePath(ctx, n, perms)
+	if err != nil {
+		return nil, err
+	}
+	return &provider.Reference{
+		ResourceId: &provider.ResourceId{
+			StorageId: storageId,
+			OpaqueId:  n.SpaceID,
+			SpaceId:   n.SpaceID,
+		},
+		Path: path,
+	}, nil
 }
