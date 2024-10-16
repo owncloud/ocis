@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Continue listing shares on error: [#10243](https://github.com/owncloud/ocis/pull/10243)
 * Bugfix - Avoid re-creating thumbnails: [#10251](https://github.com/owncloud/ocis/pull/10251)
 * Bugfix - Thumbnail request limit: [#10280](https://github.com/owncloud/ocis/pull/10280)
+* Bugfix - Forbid the ocm space sharing: [#10287](https://github.com/owncloud/ocis/pull/10287)
 * Bugfix - Use secure config defaults for OCM: [#10307](https://github.com/owncloud/ocis/pull/10307)
 * Enhancement - Add OCM wellknown configuration: [#9815](https://github.com/owncloud/ocis/pull/9815)
 * Enhancement - Bump reva to 2.xx.x: [#10236](https://github.com/owncloud/ocis/pull/10236)
@@ -106,6 +107,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10280
    https://github.com/owncloud/ocis/pull/10225
+
+* Bugfix - Forbid the ocm space sharing: [#10287](https://github.com/owncloud/ocis/pull/10287)
+
+   We forbid adding the federated users as members of the space via items invite.
+
+   https://github.com/owncloud/ocis/issues/10051
+   https://github.com/owncloud/ocis/pull/10287
 
 * Bugfix - Use secure config defaults for OCM: [#10307](https://github.com/owncloud/ocis/pull/10307)
 
