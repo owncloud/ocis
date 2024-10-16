@@ -745,6 +745,8 @@ default:
         - SharingNgContext:
         - WebDavPropertiesContext:
         - OcisConfigContext:
+        - SpacesTUSContext:
+        - TUSContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
