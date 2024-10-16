@@ -89,3 +89,29 @@ To have more control over memory (and CPU) consumption the maximum number of con
 ## Thumbnails and SecureView
 
 If a resource is shared using SecureView, the share reciever will get a 403 (forbidden) response when requesting a thumbnail. The requesting client needs to decide what to show and usually a placeholder thumbnail is used.
+
+## Using libvips for thumbnail generation
+
+To improve performance (and to support a wider range of images formats) the thumbnails service is able to utilize libvips (https://www.libvips.org/) for thumbnail generation. Support for libvips needs to be
+enabled at buildtime and has a couple of implications:
+
+*  With libvips support enabled it is not possible to create a statically linked ocis binary
+*  So the libvips shared libraries need to be available at runtime in the same release that was used to build the ocis binary
+*  When using the ocis docker images the libvips shared libraries are included in the image
+
+Support of libvips is disabled by default. To enable it make sure libvips and its buildtime dependencies are install in your build environment. Then just set
+the `ENABLE_VIPS` variable on the `make` command:
+
+```shell
+make -C ocis build ENABLE_VIPS=1
+```
+
+Or include the `enable_vips` build tag in the `go build` command:
+
+```shell
+go build -tags enable_vips -o ocis -o bin/ocis ./cmd/ocis
+```
+
+When building a docker image using the Dockerfile in the top-level directory of ocis, libvips support is enabled and the libvips shared libraries are included
+in the resulting docker image.
+
