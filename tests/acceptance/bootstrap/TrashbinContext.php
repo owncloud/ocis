@@ -150,13 +150,15 @@ class TrashbinContext implements Context {
 		$davPathVersion = $this->featureContext->getDavPathVersion();
 
 		$uniquePath = $user;
+		$spaceId = null;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$uniquePath = WebDavHelper::getPersonalSpaceIdForUser(
+			$spaceId = WebDavHelper::getPersonalSpaceIdForUser(
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$password,
 				$this->featureContext->getStepLineRef()
 			);
+			$uniquePath = $spaceId;
 		}
 		$response = WebDavHelper::listFolder(
 			$this->featureContext->getBaseUrl(),
