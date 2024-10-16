@@ -764,7 +764,11 @@ class WebDavHelper {
 			$urlParameter = \http_build_query($urlParameter, '', '&');
 			$path .= '?' . $urlParameter;
 		}
-		$fullUrl = self::sanitizeUrl("{$baseUrl}/{$davPath}/{$path}");
+		$fullUrl = self::sanitizeUrl("{$baseUrl}/{$davPath}");
+		// NOTE: no need to append path for archive and versions endpoints
+		if (!\in_array($type, ["archive", "versions"])) {
+			$fullUrl .= "/{$path}";
+		}
 
 		if ($authType === 'bearer') {
 			$headers['Authorization'] = 'Bearer ' . $password;
