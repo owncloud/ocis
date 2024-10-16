@@ -14,7 +14,15 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	checkHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger),
+			WithLogger(options.Logger).
+			WithCheck("grpc reachability", handlers.NewGRPCCheck(options.Config.GRPC.Addr)),
+	)
+
+	readyHandler := handlers.NewCheckHandler(
+		handlers.NewCheckHandlerConfiguration().
+			WithLogger(options.Logger).
+			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)).
+			WithInheritedChecksFrom(checkHandler.Conf),
 	)
 
 	return debug.NewService(
@@ -26,6 +34,6 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
 		debug.Health(checkHandler),
-		debug.Ready(checkHandler),
+		debug.Ready(readyHandler),
 	), nil
 }

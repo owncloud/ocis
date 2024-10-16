@@ -17,6 +17,13 @@ func Server(opts ...Option) (*http.Server, error) {
 			WithLogger(options.Logger),
 	)
 
+	readyHandler := handlers.NewCheckHandler(
+		handlers.NewCheckHandlerConfiguration().
+			WithLogger(options.Logger).
+			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Events.Cluster)).
+			WithInheritedChecksFrom(checkHandler.Conf),
+	)
+
 	return debug.NewService(
 		debug.Logger(options.Logger),
 		debug.Name(options.Config.Service.Name),
@@ -26,6 +33,6 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
 		debug.Health(checkHandler),
-		debug.Ready(checkHandler),
+		debug.Ready(readyHandler),
 	), nil
 }
