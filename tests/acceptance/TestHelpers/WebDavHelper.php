@@ -747,7 +747,7 @@ class WebDavHelper {
 		}
 
 		$uniquePath = $user;
-		if ($davPathVersionToUse === self::DAV_VERSION_SPACES) {
+		if ($davPathVersionToUse === self::DAV_VERSION_SPACES && !\in_array($type, ["archive", "versions"])) {
 			$uniquePath = $spaceId;
 		} elseif ($type === "versions") {
 			// $path is file-id in case of versions
