@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add OCM wellknown configuration: [#9815](https://github.com/owncloud/ocis/pull/9815)
 * Enhancement - Bump reva to 2.xx.x: [#10236](https://github.com/owncloud/ocis/pull/10236)
 * Enhancement - Load IDP logo from theme: [#10274](https://github.com/owncloud/ocis/pull/10274)
+* Enhancement - Remove Deprecations: [#10305](https://github.com/owncloud/ocis/pull/10305)
 
 ## Details
 
@@ -125,6 +126,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/11603
    https://github.com/owncloud/ocis/pull/10274
+
+* Enhancement - Remove Deprecations: [#10305](https://github.com/owncloud/ocis/pull/10305)
+
+   Remove deprecated stores/caches/registries and envvars from the codebase.
+
+   https://github.com/owncloud/ocis/pull/10305
 
 # Changelog for [6.5.0] (2024-10-01)
 
