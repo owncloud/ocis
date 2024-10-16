@@ -898,6 +898,7 @@ class WebDavPropertiesContext implements Context {
 			$user,
 			['preg_quote' => ['/']]
 		);
+		$expectedHref = WebdavHelper::withRemotePhp($expectedHref);
 
 		$index = 0;
 		while (true) {
@@ -954,6 +955,14 @@ class WebDavPropertiesContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$value = $xmlPart[0]->__toString();
 		$callback = ($this->featureContext->isUsingSharingNG()) ? "shareNgGetLastCreatedLinkShareToken" : "getLastCreatedPublicShareToken";
+
+		if (\str_ends_with($xpath, "d:href")) {
+			$pattern = \preg_replace("/^\//", "", $pattern);
+			$pattern = \preg_replace("/^\^/", "", $pattern);
+			$pattern = \ltrim($pattern, "\/");
+			$withRemotePhp = \rtrim(WebdavHelper::withRemotePhp(""), "/");
+			$pattern = "/^\/{$withRemotePhp}\/{$pattern}";
+		}
 		$pattern = $this->featureContext->substituteInLineCodes(
 			$pattern,
 			$user,
