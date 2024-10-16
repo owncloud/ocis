@@ -2012,6 +2012,65 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has (copied|moved|renamed) a file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id path "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $actionType
+	 * @param string $sourceFile
+	 * @param string $destinationFile
+	 * @param string $toSpaceName
+	 * @param string $url
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasRenamedAFileIntoUsingFileIdPath(string $user, string $actionType, string $sourceFile, string $destinationFile, string $toSpaceName, string $url): void {
+		$sourceFile = \trim($sourceFile, "/");
+		$sourceFile = \explode("/", $sourceFile);
+		$sourceFile = \end($sourceFile);
+		$destinationFile = \trim($destinationFile, "/");
+		$fileDestination = '';
+		if ($actionType === 'copied' || $actionType === 'moved') {
+			$fileDestination = $this->escapePath($destinationFile) . '/' . $this->escapePath($sourceFile);
+		} elseif ($actionType === 'renamed') {
+			$fileDestination = $destinationFile;
+		}
+		$baseUrl = $this->featureContext->getBaseUrl();
+		if ($toSpaceName === 'Shares') {
+			$sharesPath = $this->featureContext->getSharesMountPath($user, $fileDestination);
+			$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
+			$headers['Destination'] = $baseUrl . "/$davPath" . $sharesPath;
+		} else {
+			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $url);
+		}
+		$fullUrl = $baseUrl . $url;
+		if ($actionType === 'copied') {
+			$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+		} elseif ($actionType === 'moved' || $actionType === 'renamed') {
+			$response = $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+		}
+		Assert::assertEquals(
+			201,
+			$response->getStatusCode(),
+			"Response did not return expected status code"
+		);
+	}
+
+	/**
+	 * @Given user :user has sent HTTP method :verb to URL :url with content :content
+	 *
+	 * @param string $user
+	 * @param string $url
+	 * @param string $content
+	 *
+	 * @return void
+	 */
+	public function userHasEditedAFileWithContentInsideSpaceUsingFileIdPath(string $user, string $url, string $content): void {
+		$response = $this->featureContext->sendingToWithDirectUrl($user, 'PUT', $url, $content);
+		$this->featureContext->theHTTPStatusCodeShouldBe(['201', '204'], "", $response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" tries to move (?:file|folder) "([^"]*)" of space "([^"]*)" to (space|folder) "([^"]*)" using its id in destination path "([^"]*)"$/
 	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" of space "([^"]*)" to (folder) "([^"]*)" using its id in destination path "([^"]*)"$/
 	 *
