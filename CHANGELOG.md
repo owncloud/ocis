@@ -117,6 +117,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10236
    https://github.com/owncloud/ocis/pull/10216
+   https://github.com/owncloud/ocis/pull/10315
 
 * Enhancement - Load IDP logo from theme: [#10274](https://github.com/owncloud/ocis/pull/10274)
 
