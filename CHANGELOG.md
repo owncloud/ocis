@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Continue listing shares on error: [#10243](https://github.com/owncloud/ocis/pull/10243)
 * Bugfix - Avoid re-creating thumbnails: [#10251](https://github.com/owncloud/ocis/pull/10251)
 * Bugfix - Thumbnail request limit: [#10280](https://github.com/owncloud/ocis/pull/10280)
+* Bugfix - Use secure config defaults for OCM: [#10307](https://github.com/owncloud/ocis/pull/10307)
 * Enhancement - Add OCM wellknown configuration: [#9815](https://github.com/owncloud/ocis/pull/9815)
 * Enhancement - Bump reva to 2.xx.x: [#10236](https://github.com/owncloud/ocis/pull/10236)
 * Enhancement - Load IDP logo from theme: [#10274](https://github.com/owncloud/ocis/pull/10274)
@@ -105,6 +106,10 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10280
    https://github.com/owncloud/ocis/pull/10225
+
+* Bugfix - Use secure config defaults for OCM: [#10307](https://github.com/owncloud/ocis/pull/10307)
+
+   https://github.com/owncloud/ocis/pull/10307
 
 * Enhancement - Add OCM wellknown configuration: [#9815](https://github.com/owncloud/ocis/pull/9815)
 
