@@ -4610,7 +4610,8 @@ trait WebDav {
 		$spacesBaseUrl = \rtrim($spacesBaseUrl, "/") . "/";
 		$hrefRegex = \preg_quote($spacesBaseUrl, "/");
 		if (\in_array($this->getDavPathVersion(), [WebDavHelper::DAV_VERSION_SPACES, WebDavHelper::DAV_VERSION_NEW])
-			&& !GraphHelper::isSpaceId($entryNameToSearch ?? '')) {
+			&& !GraphHelper::isSpaceId($entryNameToSearch ?? '')
+		) {
 			$hrefRegex .= "[a-zA-Z0-9-_$!:%]+";
 		}
 		$hrefRegex = "/^" . $hrefRegex . "/";
