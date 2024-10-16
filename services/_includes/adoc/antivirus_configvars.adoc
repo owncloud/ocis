@@ -2,11 +2,11 @@
 // if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
 // if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-16-08-26-19]
+[#deprecation-note-2024-10-16-12-58-01]
 [caption=]
 .Deprecation notes for the antivirus service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -15,11 +15,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| Changing the envvar type for consistency reasons.
-| 5.0
-| next-prod
-| ANTIVIRUS_ICAP_SCAN_TIMEOUT
 |===
 
 {empty} +
@@ -292,17 +287,6 @@ a| [subs=-attributes]
 ++/run/clamav/clamd.ctl ++
 a| [subs=-attributes]
 The socket clamav is running on. Note the default value is an example which needs adaption according your OS.
-
-a|`ANTIVIRUS_ICAP_TIMEOUT` +
-xref:deprecation-note-2024-10-16-08-26-19[Deprecation Note]
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++int64 ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-Timeout for the ICAP client.
 
 a|`ANTIVIRUS_ICAP_SCAN_TIMEOUT` +
 

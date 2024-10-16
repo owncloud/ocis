@@ -51,11 +51,10 @@
 | FRONTEND_OCS_PERSONAL_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Home namespace identifier.|
 | FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE | string | {{.Mail}} | Additional information attribute for the user like {{.Mail}}.|
 | OCIS_CACHE_STORE<br/>FRONTEND_OCS_STAT_CACHE_STORE | string | memory | The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.|
-| OCIS_CACHE_STORE_NODES<br/>FRONTEND_OCS_STAT_CACHE_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
+| OCIS_CACHE_STORE_NODES<br/>FRONTEND_OCS_STAT_CACHE_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
 | OCIS_CACHE_DATABASE | string | cache-stat | The database name the configured store should use.|
 | FRONTEND_OCS_STAT_CACHE_TABLE | string |  | The database table the store should use.|
 | OCIS_CACHE_TTL<br/>FRONTEND_OCS_STAT_CACHE_TTL | Duration | 5m0s | Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.|
-| OCIS_CACHE_SIZE<br/>FRONTEND_OCS_STAT_CACHE_SIZE | int | 0 | Max number of entries to hold in the cache.|
 | OCIS_CACHE_DISABLE_PERSISTENCE<br/>FRONTEND_OCS_STAT_CACHE_DISABLE_PERSISTENCE | bool | false | Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.|
 | OCIS_CACHE_AUTH_USERNAME<br/>FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME | string |  | The username to use for authentication. Only applies when using the 'nats-js-kv' store type.|
 | OCIS_CACHE_AUTH_PASSWORD<br/>FRONTEND_OCS_STAT_CACHE_AUTH_PASSWORD | string |  | The password to use for authentication. Only applies when using the 'nats-js-kv' store type.|

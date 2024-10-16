@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-16-08-26-19]
+[#deprecation-note-2024-10-16-12-58-01]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -328,7 +328,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
 a| [subs=-attributes]
-A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_DATABASE` +
 
@@ -352,18 +352,6 @@ a| [subs=-attributes]
 ++5m0s ++
 a| [subs=-attributes]
 Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
-
-a|`OCIS_CACHE_SIZE` +
-`GATEWAY_PROVIDER_CACHE_SIZE` +
-
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
 
 a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `GATEWAY_PROVIDER_CACHE_DISABLE_PERSISTENCE` +
@@ -423,7 +411,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
 a| [subs=-attributes]
-A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_DATABASE` +
 
@@ -447,18 +435,6 @@ a| [subs=-attributes]
 ++5m0s ++
 a| [subs=-attributes]
 Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
-
-a|`OCIS_CACHE_SIZE` +
-`GATEWAY_CREATE_HOME_CACHE_SIZE` +
-
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
 
 a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `GATEWAY_CREATE_HOME_CACHE_DISABLE_PERSISTENCE` +

@@ -14,12 +14,11 @@
 | POSTPROCESSING_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | POSTPROCESSING_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | POSTPROCESSING_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| OCIS_PERSISTENT_STORE<br/>POSTPROCESSING_STORE | string | nats-js-kv | The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
-| OCIS_PERSISTENT_STORE_NODES<br/>POSTPROCESSING_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
+| OCIS_PERSISTENT_STORE<br/>POSTPROCESSING_STORE | string | nats-js-kv | The type of the store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.|
+| OCIS_PERSISTENT_STORE_NODES<br/>POSTPROCESSING_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
 | POSTPROCESSING_STORE_DATABASE | string | postprocessing | The database name the configured store should use.|
 | POSTPROCESSING_STORE_TABLE | string |  | The database table the store should use.|
 | OCIS_PERSISTENT_STORE_TTL<br/>POSTPROCESSING_STORE_TTL | Duration | 0s | Time to live for events in the store. See the Environment Variable Types description for more details.|
-| OCIS_PERSISTENT_STORE_SIZE<br/>POSTPROCESSING_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.|
 | OCIS_PERSISTENT_STORE_AUTH_USERNAME<br/>POSTPROCESSING_STORE_AUTH_USERNAME | string |  | The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_PERSISTENT_STORE_AUTH_PASSWORD<br/>POSTPROCESSING_STORE_AUTH_PASSWORD | string |  | The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_EVENTS_ENDPOINT<br/>POSTPROCESSING_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|

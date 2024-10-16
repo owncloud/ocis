@@ -31,7 +31,6 @@ store:
   database: activitylog
   table: ""
   ttl: 0s
-  size: 0
   username: ""
   password: ""
 reva_gateway: com.owncloud.api.gateway

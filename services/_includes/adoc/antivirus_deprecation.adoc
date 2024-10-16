@@ -1,2 +1,2 @@
-:show-deprecation: true
+:show-deprecation: false
 

@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-16-08-26-19]
+[#deprecation-note-2024-10-16-12-58-01]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -154,7 +154,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
 a| [subs=-attributes]
-A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+A list of nodes to access the configured store. This has no effect when 'memory' store are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
 a|`GRAPH_CACHE_STORE_DATABASE` +
 
@@ -189,18 +189,6 @@ a| [subs=-attributes]
 ++336h0m0s ++
 a| [subs=-attributes]
 Time to live for cache records in the graph. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
-
-a|`OCIS_CACHE_SIZE` +
-`GRAPH_CACHE_SIZE` +
-
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
 
 a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
 `GRAPH_CACHE_DISABLE_PERSISTENCE` +
@@ -798,7 +786,7 @@ LDAP Attribute to use for the email address of users.
 a|`OCIS_LDAP_USER_SCHEMA_DISPLAYNAME` +
 `LDAP_USER_SCHEMA_DISPLAY_NAME` +
 `GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE` +
-xref:deprecation-note-2024-10-16-08-26-19[Deprecation Note]
+xref:deprecation-note-2024-10-16-12-58-01[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]

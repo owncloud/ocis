@@ -35,6 +35,5 @@ store:
   database: eventhistory
   table: ""
   ttl: 336h0m0s
-  size: 0
   username: ""
   password: ""

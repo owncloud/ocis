@@ -105,7 +105,6 @@ ocs:
   stat_cache_database: cache-stat
   stat_cache_table: ""
   stat_cache_ttl: 5m0s
-  stat_cache_size: 0
   stat_cache_disable_persistence: false
   stat_cache_auth_username: ""
   stat_cache_auth_password: ""

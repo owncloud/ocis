@@ -131,7 +131,6 @@ oidc:
     database: cache-userinfo
     table: ""
     ttl: 10s
-    size: 0
     disable_persistence: false
     username: ""
     password: ""

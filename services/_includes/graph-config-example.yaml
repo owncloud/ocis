@@ -18,7 +18,6 @@ cache:
   database: cache-roles
   table: ""
   ttl: 336h0m0s
-  size: 0
   disable_persistence: false
   username: ""
   password: ""

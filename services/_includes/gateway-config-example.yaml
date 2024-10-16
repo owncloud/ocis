@@ -39,7 +39,6 @@ cache:
   - 127.0.0.1:9233
   provider_cache_database: cache-providers
   provider_cache_ttl: 5m0s
-  provider_cache_size: 0
   provider_cache_disable_persistence: false
   provider_cache_auth_username: ""
   provider_cache_auth_password: ""
@@ -48,7 +47,6 @@ cache:
   - 127.0.0.1:9233
   create_home_cache_database: cache-createhome
   create_home_cache_ttl: 5m0s
-  create_home_cache_size: 0
   create_home_cache_disable_persistence: false
   create_home_cache_auth_username: ""
   create_home_cache_auth_password: ""

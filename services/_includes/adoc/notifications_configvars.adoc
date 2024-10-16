@@ -2,11 +2,11 @@
 // if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
 // if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-16-08-26-19]
+[#deprecation-note-2024-10-16-12-58-01]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -15,11 +15,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| The NOTIFICATIONS_SMTP_ENCRYPTION values 'ssl' and 'tls' are deprecated and will be removed in the future.
-| 5.0.0
-| next-prod
-| Use 'starttls' instead of 'tls' and 'ssltls' instead of 'ssl'.
 |===
 
 {empty} +
@@ -266,7 +261,7 @@ a| [subs=-attributes]
 Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none' or 'auto'. If set to 'auto' or unset, the authentication method is automatically negotiated with the server.
 
 a|`NOTIFICATIONS_SMTP_ENCRYPTION` +
-xref:deprecation-note-2024-10-16-08-26-19[Deprecation Note]
+
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -274,7 +269,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++none ++
 a| [subs=-attributes]
-Encryption method for the SMTP communication. Possible values are 'starttls', 'ssl', 'ssltls', 'tls' and 'none'.
+Encryption method for the SMTP communication. Possible values are 'starttls', 'ssltls' and 'none'.
 
 a|`OCIS_EVENTS_ENDPOINT` +
 `NOTIFICATIONS_EVENTS_ENDPOINT` +

@@ -31,7 +31,6 @@ scanner:
   clamav:
     socket: /run/clamav/clamd.ctl
   icap:
-    timeout: 0
     scan_timeout: 5m0s
     url: icap://127.0.0.1:1344
     service: avscan

@@ -23,7 +23,6 @@ store:
   database: postprocessing
   table: ""
   ttl: 0s
-  size: 0
   username: ""
   password: ""
 postprocessing:

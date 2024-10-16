@@ -59,7 +59,6 @@ metadata_config:
     files_table: settings_files
     directories_table: settings_dirs
     ttl: 10m0s
-    size: 0
     disable_persistence: false
     username: ""
     password: ""

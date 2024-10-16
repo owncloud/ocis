@@ -1,6 +1,6 @@
 ---
 title: Userlog
-date: 2024-10-16T08:26:23.628388073Z
+date: 2024-10-16T12:58:05.534271738Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/userlog
@@ -50,10 +50,6 @@ The `userlog` service persists information via the configured store in `USERLOG_
   -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
   -   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `noop`: Stores nothing. Useful for testing. Not recommended in production environments.
-  -   `ocmem`: Advanced in-memory store allowing max size. (deprecated)
-  -   `redis`: Stores data in a configured Redis cluster. (deprecated)
-  -   `etcd`: Stores data in a configured etcd cluster. (deprecated)
-  -   `nats-js`: Stores data using object-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/obj_store) (deprecated)
 
 Other store types may work but are not supported currently.
 

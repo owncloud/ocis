@@ -21,12 +21,11 @@
 | OCIS_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
-| OCIS_PERSISTENT_STORE<br/>ACTIVITYLOG_STORE | string | nats-js-kv | The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
-| OCIS_PERSISTENT_STORE_NODES<br/>ACTIVITYLOG_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
+| OCIS_PERSISTENT_STORE<br/>ACTIVITYLOG_STORE | string | nats-js-kv | The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.|
+| OCIS_PERSISTENT_STORE_NODES<br/>ACTIVITYLOG_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
 | ACTIVITYLOG_STORE_DATABASE | string | activitylog | The database name the configured store should use.|
 | ACTIVITYLOG_STORE_TABLE | string |  | The database table the store should use.|
 | OCIS_PERSISTENT_STORE_TTL<br/>ACTIVITYLOG_STORE_TTL | Duration | 0s | Time to live for events in the store. See the Environment Variable Types description for more details.|
-| OCIS_PERSISTENT_STORE_SIZE<br/>ACTIVITYLOG_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.|
 | OCIS_PERSISTENT_STORE_AUTH_USERNAME<br/>ACTIVITYLOG_STORE_AUTH_USERNAME | string |  | The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_PERSISTENT_STORE_AUTH_PASSWORD<br/>ACTIVITYLOG_STORE_AUTH_PASSWORD | string |  | The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata|

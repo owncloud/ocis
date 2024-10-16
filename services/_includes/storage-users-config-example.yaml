@@ -160,7 +160,6 @@ filemetadata_cache:
   - 127.0.0.1:9233
   database: storage-users
   ttl: 24m0s
-  size: 0
   disable_persistence: false
   username: ""
   password: ""
@@ -170,7 +169,6 @@ id_cache:
   - 127.0.0.1:9233
   database: ids-storage-users
   ttl: 24m0s
-  size: 0
   disable_persistence: false
   username: ""
   password: ""

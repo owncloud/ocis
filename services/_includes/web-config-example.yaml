@@ -67,7 +67,6 @@ http:
     - X-HTTP-Method-Override
     allow_credentials: false
 asset:
-  path: ""
   core_path: /var/lib/ocis/web/assets/core
   themes_path: /var/lib/ocis/web/assets/themes
   apps_path: /var/lib/ocis/web/assets/apps

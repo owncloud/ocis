@@ -38,7 +38,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++nats-js-kv ++
 a| [subs=-attributes]
-++The Go micro registry type to use. Supported types are: 'memory', 'nats-js-kv' (default) and 'kubernetes'. Note that 'nats', 'etcd', 'consul' and 'mdns' are deprecated and will be removed in a later version. Only change on supervision of ownCloud Support. ++
+++The Go micro registry type to use. Supported types are: 'memory' and 'nats-js-kv' (default). Only change on supervision of ownCloud Support. ++
     
 
 a| `MICRO_REGISTRY_ADDRESS` +

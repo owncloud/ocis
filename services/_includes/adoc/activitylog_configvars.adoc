@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-16-08-26-19]
+[#deprecation-note-2024-10-16-12-58-01]
 [caption=]
 .Deprecation notes for the activitylog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -258,7 +258,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++nats-js-kv ++
 a| [subs=-attributes]
-The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
 
 a|`OCIS_PERSISTENT_STORE_NODES` +
 `ACTIVITYLOG_STORE_NODES` +
@@ -270,7 +270,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
 a| [subs=-attributes]
-A list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
 a|`ACTIVITYLOG_STORE_DATABASE` +
 
@@ -305,18 +305,6 @@ a| [subs=-attributes]
 ++0s ++
 a| [subs=-attributes]
 Time to live for events in the store. See the Environment Variable Types description for more details.
-
-a|`OCIS_PERSISTENT_STORE_SIZE` +
-`ACTIVITYLOG_STORE_SIZE` +
-
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
 
 a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
 `ACTIVITYLOG_STORE_AUTH_USERNAME` +
