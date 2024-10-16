@@ -2674,6 +2674,31 @@ trait WebDav {
 	}
 
 	/**
+	 * @Given user :user has updated a file with content :content using file-id :fileId
+	 *
+	 * @param string $user
+	 * @param string $content
+	 * @param string $fileId
+	 *
+	 * @return void
+	 */
+	public function userHasUpdatedAFileWithContentUsingFileId(string $user, string $content, string $fileId): void {
+		$baseUrl = $this->getBaseUrl();
+		$sourceDavPath = WebdavHelper::getDavPath($this->getDavPathVersion());
+		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
+		$response = HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->getStepLineRef(),
+			'PUT',
+			$user,
+			$this->getPasswordForUser($user),
+			null,
+			$content
+		);
+		$this->theHTTPStatusCodeShouldBe('204', '', $response);
+	}
+
+	/**
 	 * @Given /^user "([^"]*)" has deleted (?:file|folder|entity) "([^"]*)"$/
 	 *
 	 * @param string $user
