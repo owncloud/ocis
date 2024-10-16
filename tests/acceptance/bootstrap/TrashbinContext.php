@@ -793,7 +793,23 @@ class TrashbinContext implements Context {
 		$asUser = $asUser ?? $user;
 		$destinationPath = \trim($destinationPath, '/');
 		$baseUrl = $this->featureContext->getBaseUrl();
-		$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
+		$davPathVersion = $this->featureContext->getDavPathVersion();
+
+		$spaceId = null;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			if (\str_starts_with($destinationPath, "Shares/")) {
+				$spaceId = $this->featureContext->spacesContext->getSpaceIdByName($user, "Shares");
+				$destinationPath = \str_replace("Shares/", "", $destinationPath);
+			} else {
+				$spaceId = WebDavHelper::getPersonalSpaceIdForUser(
+					$baseUrl,
+					$user,
+					$this->featureContext->getPasswordForUser($user),
+					$this->featureContext->getStepLineRef()
+				);
+			}
+		}
+		$davPath = WebDavHelper::getDavPath($user, $davPathVersion, "files", $spaceId);
 		$destinationValue = "{$baseUrl}/{$davPath}/{$destinationPath}";
 
 		$trashItemHRef = $this->convertTrashbinHref($trashItemHRef);
@@ -806,7 +822,7 @@ class TrashbinContext implements Context {
 			null,
 			null,
 			'trash-bin',
-			'2',
+			$davPathVersion,
 			false,
 			$password,
 			[],

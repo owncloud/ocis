@@ -75,8 +75,11 @@ class AuthContext implements Context {
 		?string $body = null,
 		?array $headers = []
 	): ResponseInterface {
-		$fullUrl = $this->featureContext->getBaseUrl() . $url;
-
+		if (WebdavHelper::isDAVRequest($url)) {
+			$url = \ltrim($url, '/');
+			$url = WebdavHelper::withRemotePhp($url);
+		}
+		$fullUrl = $this->featureContext->getBaseUrl() . "/$url";
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),

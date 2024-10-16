@@ -12,7 +12,8 @@ Feature: auth
     Then the HTTP status code should be "401"
     Examples:
       | dav-path              |
-      | /remote.php/webdav    |
+      | /webdav               |
+      | /dav/files/%username% |
       | /dav/spaces/%spaceid% |
 
   @smokeTest
@@ -21,5 +22,6 @@ Feature: auth
     Then the HTTP status code should be "207"
     Examples:
       | dav-path              |
-      | /remote.php/webdav    |
+      | /webdav               |
+      | /dav/files/%username% |
       | /dav/spaces/%spaceid% |

@@ -348,7 +348,7 @@ class PublicWebDavContext implements Context {
 
 		$username = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getPasswordForUser($user);
-		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath$path";
+		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$path";
 
 		return HttpRequestHelper::get(
 			$fullUrl,
