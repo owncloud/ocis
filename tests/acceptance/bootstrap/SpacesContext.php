@@ -2026,8 +2026,8 @@ class SpacesContext implements Context {
 		$sourceDavPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		if ($toSpaceName === 'Shares') {
 			$sharesPath = $this->featureContext->getSharesMountPath($user, $fileDestination);
-			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion(), $user);
-			$headers['Destination'] = $baseUrl . "/$davPath" . $sharesPath;
+			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion());
+			$headers['Destination'] = "$baseUrl/$davPath/$sharesPath";
 		} else {
 			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName, $fileId);
 		}
