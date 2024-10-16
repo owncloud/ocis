@@ -939,17 +939,16 @@ class WebDavHelper {
 		?string $xRequestId = '',
 		?int $davVersionToUse = self::DAV_VERSION_NEW
 	):string {
-		$path = self::getDavPath($token, $davVersionToUse, "public-files");
 		$response = self::propfind(
 			$baseUrl,
 			null,
 			null,
-			"{$path}/{$fileName}",
+			"{$token}/{$fileName}",
 			['d:getlastmodified'],
 			$xRequestId,
 			'1',
 			null,
-			null,
+			"public-files",
 			$davVersionToUse
 		);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
