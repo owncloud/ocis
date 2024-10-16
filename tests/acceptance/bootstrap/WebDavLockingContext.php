@@ -196,7 +196,13 @@ class WebDavLockingContext implements Context {
 	public function userLocksFileInProjectSpace(string $user, string $file, string $space, TableNode $properties): ?ResponseInterface {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$baseUrl = $this->featureContext->getBaseUrl();
-		$davPath = WebDavHelper::getDavPath($user, WebDavHelper::DAV_VERSION_SPACES, 'files', $spaceId);
+		$davPathVersion = $this->featureContext->getDavPathVersion();
+		$uniquePath = $user;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$uniquePath = $spaceId;
+		}
+
+		$davPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath);
 		$fullUrl = "$baseUrl/$davPath/$file";
 		return $this->lockFile($user, $file, $properties, $fullUrl, false, true, $spaceId);
 	}
@@ -229,7 +235,13 @@ class WebDavLockingContext implements Context {
 	 */
 	public function userTriesToLockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
-		$davPath = WebdavHelper::getDavPath($user, $this->featureContext->getDavPathVersion(), "files", $spaceId);
+		$davPathVersion = $this->featureContext->getDavPathVersion();
+		$uniquePath = $user;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$uniquePath = $spaceId;
+		}
+
+		$davPath = WebdavHelper::getDavPath($davPathVersion, $uniquePath);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$file";
 		$response = $this->lockFile($user, $file, $properties, $fullUrl, false, false, $spaceId);
 		$this->featureContext->setResponse($response);
@@ -246,7 +258,7 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function userLocksFileUsingFileIdUsingWebDavAPISettingFollowingProperties(string $user, string $file, string $fileId, TableNode $properties) {
-		$davPath = WebdavHelper::getDavPath(null, $this->featureContext->getDavPathVersion());
+		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileId";
 		$response = $this->lockFile($user, $file, $properties, $fullUrl);
@@ -264,7 +276,7 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function userTriesToLockFileUsingFileIdUsingWebDavAPI(string $user, string $file, string $fileId, TableNode $properties) {
-		$davPath = WebdavHelper::getDavPath(null, $this->featureContext->getDavPathVersion());
+		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileId";
 		$response = $this->lockFile($user, $file, $properties, $fullUrl, false, false);
@@ -312,7 +324,7 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function userHasLockedFileUsingFileId(string $user, string $file, string $fileId, TableNode $properties) {
-		$davPath = WebdavHelper::getDavPath(null, $this->featureContext->getDavPathVersion());
+		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileId";
 		$response = $this->lockFile($user, $file, $properties, $fullUrl);
@@ -459,7 +471,7 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function userUnlocksTheLastCreatedLockOfFileWithFileIdPathUsingTheWebdavApi(string $user, string $itemToUnlock, string $fileId) {
-		$davPath = WebdavHelper::getDavPath(null, $this->featureContext->getDavPathVersion());
+		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileId";
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI($user, $itemToUnlock, $user, $itemToUnlock, false, $fullUrl);

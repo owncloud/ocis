@@ -595,7 +595,7 @@ class AuthContext implements Context {
 			if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
 				$suffix = $this->featureContext->spacesContext->getSpaceIdByName($user, "Personal");
 			}
-			$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
+			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion(), $user);
 			$headers['Destination'] = "{$baseUrl}/{$davPath}/{$suffix}/moved";
 		}
 

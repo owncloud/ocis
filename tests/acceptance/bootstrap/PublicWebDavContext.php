@@ -145,8 +145,8 @@ class PublicWebDavContext implements Context {
 	public function deleteFileFromPublicShare(string $fileName, string $password = ""): ResponseInterface {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
-			$token,
 			$this->getPublicDavVersion("new"),
+			$token,
 			"public-files"
 		);
 		$password = $this->featureContext->getActualPassword($password);
@@ -225,8 +225,8 @@ class PublicWebDavContext implements Context {
 	public function renameFileFromPublicShare(string $fileName, string $toFileName, string $publicWebDAVAPIVersion, ?string $password = ""):ResponseInterface {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
-			$token,
 			$this->getPublicDavVersion($publicWebDAVAPIVersion),
+			$token,
 			"public-files"
 		);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileName";
@@ -340,8 +340,8 @@ class PublicWebDavContext implements Context {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 
 		$davPath = WebDavHelper::getDavPath(
-			$token,
 			$this->featureContext->getDavPathVersion(),
+			$token,
 			"public-files"
 		);
 
@@ -380,8 +380,8 @@ class PublicWebDavContext implements Context {
 			$token = $this->featureContext->getLastCreatedPublicShareToken();
 		}
 		$davPath = WebDavHelper::getDavPath(
-			$token,
 			$this->getPublicDavVersion($publicWebDAVAPIVersion),
+			$token,
 			"public-files"
 		);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$path";
@@ -484,8 +484,8 @@ class PublicWebDavContext implements Context {
 	public function thePublicCopiesFileUsingTheWebDAVApi(string $source, string $destination, string $publicWebDAVAPIVersion):void {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
-			$token,
 			$this->getPublicDavVersion($publicWebDAVAPIVersion),
+			$token,
 			"public-files"
 		);
 		$baseUrl = $this->featureContext->getLocalBaseUrl() . '/' . $davPath;
@@ -1544,8 +1544,8 @@ class PublicWebDavContext implements Context {
 	):ResponseInterface {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
-			$token,
 			$this->featureContext->getDavPathVersion(),
+			$token,
 			"public-files"
 		);
 		$url = $this->featureContext->getBaseUrl() . "/$davPath/";
@@ -1700,8 +1700,8 @@ class PublicWebDavContext implements Context {
 			$token = $this->featureContext->getLastCreatedPublicShareToken();
 		}
 		$davPath = WebDavHelper::getDavPath(
-			$token,
 			$this->getPublicDavVersion("new"),
+			$token,
 			"public-files"
 		);
 		$userName = $this->getUsernameForPublicWebdavApi(
@@ -1805,8 +1805,8 @@ class PublicWebDavContext implements Context {
 		}
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(
-			null,
 			$this->getPublicDavVersion($publicWebDAVAPIVersion),
+			$token,
 			"public-files"
 		);
 		$password = $this->featureContext->getActualPassword($password);
@@ -1815,7 +1815,7 @@ class PublicWebDavContext implements Context {
 			$password,
 			$publicWebDAVAPIVersion
 		);
-		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath$token";
+		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath";
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),

@@ -37,16 +37,6 @@ require_once 'bootstrap.php';
 class FilesVersionsContext implements Context {
 	private FeatureContext $featureContext;
 
-	// TODO: check if this can be removed
-	/**
-	 * @param string $fileId
-	 *
-	 * @return string
-	 */
-	private function getVersionsPathForFileId(string $fileId):string {
-		return "$fileId/v";
-	}
-
 	/**
 	 * @When user :user tries to get versions of file :file from :fileOwner
 	 *
@@ -89,7 +79,7 @@ class FilesVersionsContext implements Context {
 			$this->featureContext->makeDavRequest(
 				"public",
 				"PROPFIND",
-				$this->getVersionsPathForFileId($fileId),
+				$fileId,
 				null,
 				null,
 				null,
@@ -124,7 +114,7 @@ class FilesVersionsContext implements Context {
 		return $this->featureContext->makeDavRequest(
 			$user,
 			"PROPFIND",
-			$this->getVersionsPathForFileId($fileId),
+			$fileId,
 			null,
 			null,
 			$spaceId,
@@ -146,7 +136,7 @@ class FilesVersionsContext implements Context {
 			$this->featureContext->makeDavRequest(
 				$user,
 				"PROPFIND",
-				$this->getVersionsPathForFileId($fileId),
+				$fileId,
 				null,
 				null,
 				null,
@@ -189,7 +179,7 @@ class FilesVersionsContext implements Context {
 		return $this->featureContext->makeDavRequest(
 			$user,
 			"PROPFIND",
-			$this->getVersionsPathForFileId($fileId),
+			$fileId,
 			null,
 			$body,
 			null,
@@ -217,7 +207,7 @@ class FilesVersionsContext implements Context {
 		$xmlPart = $responseXml->xpath("//d:response/d:href");
 		//restoring the version only works with DAV path v2
 		$destinationUrl = $this->featureContext->getBaseUrl() . "/" .
-			WebDavHelper::getDavPath($user, 2) . \trim($path, "/");
+			WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_NEW, $user) . \trim($path, "/");
 		$fullUrl = $this->featureContext->getBaseUrlWithoutPath() .
 			$xmlPart[$versionIndex];
 		return HttpRequestHelper::sendRequest(
@@ -546,7 +536,7 @@ class FilesVersionsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$password,
-			$this->getVersionsPathForFileId($fileId),
+			$fileId,
 			$properties,
 			$this->featureContext->getStepLineRef(),
 			(string) $folderDepth,

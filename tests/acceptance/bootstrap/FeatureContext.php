@@ -2111,7 +2111,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getCommentUrlRegExp(): string {
 		$basePath = \ltrim($this->getBasePath() . "/", "/");
-		$commentsPath = WebDAVHelper::getDavPath(null, null, "comments");
+		$commentsPath = WebDAVHelper::getDavPath(WebDavHelper::DAV_VERSION_NEW, null, "comments");
 		return "/{$basePath}/{$commentsPath}/([0-9]+)";
 	}
 

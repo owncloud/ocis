@@ -240,7 +240,14 @@ trait WebDav {
 				$this->getStepLineRef()
 			);
 		}
-		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion(), "files", $spaceId);
+
+		$davPathVersion = $this->getDavPathVersion();
+		$uniquePath = $user;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$uniquePath = $spaceId;
+		}
+
+		$davPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath);
 		$path = "{$this->getBasePath()}/{$davPath}";
 		$path = WebDavHelper::sanitizeUrl($path);
 		return \ltrim($path, "/");
@@ -252,7 +259,7 @@ trait WebDav {
 	 * @return string
 	 */
 	public function getPublicLinkDavPath(string $token):string {
-		$davPath = WebDavHelper::getDavPath($token, $this->getDavPathVersion(), "public-files");
+		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $token, "public-files");
 		$path = "{$this->getBasePath()}/{$davPath}";
 		$path = WebDavHelper::sanitizeUrl($path);
 		return \ltrim($path, "/");
@@ -481,8 +488,15 @@ trait WebDav {
 				$fileDestination = \preg_replace("/^Shares\//", "", $fileDestination);
 			}
 		}
-		$fullUrl = $this->getBaseUrl() . '/' .
-			WebDavHelper::getDavPath($user, $this->getDavPathVersion(), "files", $spaceId);
+
+		$davPathVersion = $this->getDavPathVersion();
+		$uniquePath = $user;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$uniquePath = $spaceId;
+		}
+
+		$davPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath);
+		$fullUrl = $this->getBaseUrl() . "/$davPath";
 		return \rtrim($fullUrl, '/') . '/' . $fileDestination;
 	}
 
@@ -1105,7 +1119,7 @@ trait WebDav {
 	 */
 	public function publicGetsSizeOfLastSharedPublicLinkUsingTheWebdavApi():void {
 		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
-		$davPath = WebDavHelper::getDavPath($token, $this->getDavPathVersion(), "public-files");
+		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $token, "public-files");
 		$url = "{$this->getBaseUrl()}/{$davPath}";
 		$this->response = HttpRequestHelper::sendRequest(
 			$url,
@@ -2645,7 +2659,7 @@ trait WebDav {
 	 */
 	public function userDeletesFileFromSpaceUsingFileIdPath(string $user, string $filename, string $space, string $fileId):void {
 		$baseUrl = $this->getBaseUrl();
-		$davPath = WebDavHelper::getDavPath("null", $this->getDavPathVersion());
+		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion());
 		$user = $this->getActualUsername($user);
 		$password =  $this->getPasswordForUser($user);
 		$fullUrl = "$baseUrl/$davPath/$fileId";
@@ -3840,7 +3854,7 @@ trait WebDav {
 		}
 		$sharesPath = $this->getSharesMountPath($user, $path) . '/?' . $urlParameter;
 
-		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
+		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $user);
 		$fullUrl = $this->getBaseUrl() . "/$davPath/$sharesPath";
 
 		return HttpRequestHelper::sendRequest(
@@ -3867,7 +3881,7 @@ trait WebDav {
 	): ResponseInterface {
 		$sharesPath = $this->getSharesMountPath($user, $destination);
 
-		$davPath = WebDavHelper::getDavPath($user, $this->getDavPathVersion());
+		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $user);
 		$fullUrl = $this->getBaseUrl() . "/$davPath/$sharesPath";
 
 		return HttpRequestHelper::sendRequest(
@@ -4607,7 +4621,7 @@ trait WebDav {
 			$entryNameToSearch = \trim($entryNameToSearch, "/");
 		}
 
-		$spacesBaseUrl = "/" . WebDavHelper::getDavPath(null, $this->getDavPathVersion(), 'files', $spaceId);
+		$spacesBaseUrl = "/" . WebDavHelper::getDavPath($this->getDavPathVersion(), $spaceId);
 		$spacesBaseUrl = \rtrim($spacesBaseUrl, "/") . "/";
 		$hrefRegex = \preg_quote($spacesBaseUrl, "/");
 		if (\in_array($this->getDavPathVersion(), [WebDavHelper::DAV_VERSION_SPACES, WebDavHelper::DAV_VERSION_NEW])

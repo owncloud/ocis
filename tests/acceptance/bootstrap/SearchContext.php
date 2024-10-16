@@ -109,7 +109,7 @@ class SearchContext implements Context {
 		// - webdav
 		// - dav/files
 		// - dav/spaces
-		$davPath = WebDavHelper::getDavPath(null, $davPathVersionToUse);
+		$davPath = WebDavHelper::getDavPath($davPathVersionToUse);
 		$fullUrl = WebDavHelper::sanitizeUrl("$baseUrl/$davPath");
 
 		return HttpRequestHelper::sendRequest(
