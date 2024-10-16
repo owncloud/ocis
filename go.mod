@@ -15,7 +15,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/cs3org/go-cs3apis v0.0.0-20240724121416-062c4e3046cb
-	github.com/cs3org/reva/v2 v2.25.1-0.20241004072335-2a6fdbed139d
+	github.com/cs3org/reva/v2 v2.25.1-0.20241015142909-99548fe690bd
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1

@@ -461,6 +461,11 @@ func (s *svc) handleOpen(openMode int) http.HandlerFunc {
 			App:      r.Form.Get("app_name"),
 			Opaque:   utils.AppendPlainToOpaque(nil, "lang", lang),
 		}
+
+		templateID := r.Form.Get("template_id")
+		if templateID != "" {
+			openReq.Opaque = utils.AppendPlainToOpaque(openReq.Opaque, "template", templateID)
+		}
 		openRes, err := client.OpenInApp(ctx, &openReq)
 		if err != nil {
 			writeError(w, r, appErrorServerError,
@@ -567,7 +572,8 @@ type MimeTypeInfo struct {
 type ProviderInfo struct {
 	appregistry.ProviderInfo
 	// TODO make this part of the CS3 provider info
-	SecureView bool `json:"secure_view"`
+	SecureView bool   `json:"secure_view"`
+	TargetExt  string `json:"target_ext,omitempty"`
 }
 
 // buildApps rewrites the mime type info to only include apps that
@@ -598,6 +604,7 @@ func buildApps(mimeTypes []*appregistry.MimeTypeInfo, userAgent, secureViewAppAd
 		}
 		if len(apps) > 0 {
 			mt := &MimeTypeInfo{}
+			addTemplateInfo(m, apps)
 			proto.Merge(&mt.MimeTypeInfo, m)
 			mt.AppProviders = apps
 			res = append(res, mt)

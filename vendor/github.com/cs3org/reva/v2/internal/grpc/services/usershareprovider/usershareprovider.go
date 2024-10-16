@@ -485,7 +485,7 @@ func (s *service) GetReceivedShare(ctx context.Context, req *collaboration.GetRe
 
 	share, err := s.sm.GetReceivedShare(ctx, req.Ref)
 	if err != nil {
-		log.Err(err).Msg("error getting received share")
+		log.Debug().Err(err).Msg("error getting received share")
 		switch err.(type) {
 		case errtypes.NotFound:
 			return &collaboration.GetReceivedShareResponse{

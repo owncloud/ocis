@@ -136,6 +136,10 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				if err != nil {
 					appctx.GetLogger(context.Background()).Error().Err(err).Str("session", ev.Upload.ID).Msg("failed to list upload session")
 				} else {
+					if len(ups) < 1 {
+						appctx.GetLogger(context.Background()).Error().Str("session", ev.Upload.ID).Msg("upload session not found")
+						continue
+					}
 					up := ups[0]
 					executant := up.Executant()
 					ref := up.Reference()
