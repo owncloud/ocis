@@ -115,7 +115,7 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 
 	sha1h, md5h, adler32h, err := node.CalculateChecksums(ctx, session.binPath())
 	if err != nil {
-		log.Info().Err(err).Msg("error copying checksums")
+		return err
 	}
 
 	// compare if they match the sent checksum

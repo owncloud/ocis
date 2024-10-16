@@ -116,6 +116,11 @@ func (lu *Lookup) NodeIDFromParentAndName(ctx context.Context, parent *node.Node
 		}
 		return "", err
 	}
+	_, err = os.Stat(filepath.Join(parent.InternalPath(), name))
+	if err != nil {
+		return "", err
+	}
+
 	return string(id), nil
 }
 
@@ -245,8 +250,6 @@ func (lu *Lookup) Path(ctx context.Context, n *node.Node, hasPermission node.Per
 			appctx.GetLogger(ctx).
 				Error().Err(err).
 				Str("path", p).
-				Str("spaceid", n.SpaceID).
-				Str("nodeid", n.ID).
 				Msg("Path()")
 			return
 		}

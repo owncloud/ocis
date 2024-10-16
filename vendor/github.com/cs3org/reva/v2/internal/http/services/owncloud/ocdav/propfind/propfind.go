@@ -523,7 +523,11 @@ func (p *Handler) propfindResponse(ctx context.Context, w http.ResponseWriter, r
 }
 
 // TODO this is just a stat -> rename
-func (p *Handler) statSpace(ctx context.Context, client gateway.GatewayAPIClient, ref *provider.Reference, metadataKeys, fieldMaskPaths []string) (*provider.ResourceInfo, *rpc.Status, error) {
+func (p *Handler) statSpace(ctx context.Context, ref *provider.Reference, metadataKeys, fieldMaskPaths []string) (*provider.ResourceInfo, *rpc.Status, error) {
+	client, err := p.selector.Next()
+	if err != nil {
+		return nil, nil, err
+	}
 	req := &provider.StatRequest{
 		Ref:                   ref,
 		ArbitraryMetadataKeys: metadataKeys,
@@ -542,18 +546,12 @@ func (p *Handler) getResourceInfos(ctx context.Context, w http.ResponseWriter, r
 	span.SetAttributes(attribute.KeyValue{Key: "depth", Value: attribute.StringValue(depth.String())})
 	defer span.End()
 
-	client, err := p.selector.Next()
-	if err != nil {
-		log.Error().Err(err).Msg("error getting grpc client")
-		w.WriteHeader(http.StatusInternalServerError)
-		return nil, false, false
-	}
-
 	metadataKeys, fieldMaskPaths := metadataKeys(pf)
 
 	// we need to stat all spaces to aggregate the root etag, mtime and size
 	// TODO cache per space (hah, no longer per user + per space!)
 	var (
+		err                 error
 		rootInfo            *provider.ResourceInfo
 		mostRecentChildInfo *provider.ResourceInfo
 		aggregatedChildSize uint64
@@ -569,7 +567,7 @@ func (p *Handler) getResourceInfos(ctx context.Context, w http.ResponseWriter, r
 			if err != nil {
 				continue
 			}
-			info, status, err := p.statSpace(ctx, client, &spaceRef, metadataKeys, fieldMaskPaths)
+			info, status, err := p.statSpace(ctx, &spaceRef, metadataKeys, fieldMaskPaths)
 			if err != nil || status.GetCode() != rpc.Code_CODE_OK {
 				continue
 			}
@@ -587,7 +585,7 @@ func (p *Handler) getResourceInfos(ctx context.Context, w http.ResponseWriter, r
 			info = space.RootInfo
 		} else {
 			var status *rpc.Status
-			info, status, err = p.statSpace(ctx, client, spaceRef, metadataKeys, fieldMaskPaths)
+			info, status, err = p.statSpace(ctx, spaceRef, metadataKeys, fieldMaskPaths)
 			if err != nil || status.GetCode() != rpc.Code_CODE_OK {
 				continue
 			}
@@ -656,6 +654,12 @@ func (p *Handler) getResourceInfos(ctx context.Context, w http.ResponseWriter, r
 		case spaceInfo.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER && depth == net.DepthOne:
 			switch {
 			case strings.HasPrefix(requestPath, spaceInfo.Path) && spaceData.SpaceType != "virtual":
+				client, err := p.selector.Next()
+				if err != nil {
+					log.Error().Err(err).Msg("error getting grpc client")
+					w.WriteHeader(http.StatusInternalServerError)
+					return nil, false, false
+				}
 				req := &provider.ListContainerRequest{
 					Ref:                   spaceData.Ref,
 					ArbitraryMetadataKeys: metadataKeys,
@@ -691,6 +695,12 @@ func (p *Handler) getResourceInfos(ctx context.Context, w http.ResponseWriter, r
 
 				if info.Type != provider.ResourceType_RESOURCE_TYPE_CONTAINER || spaceData.SpaceType == "virtual" {
 					continue
+				}
+				client, err := p.selector.Next()
+				if err != nil {
+					log.Error().Err(err).Msg("error getting grpc client")
+					w.WriteHeader(http.StatusInternalServerError)
+					return nil, false, false
 				}
 				req := &provider.ListContainerRequest{
 					Ref: &provider.Reference{

@@ -78,28 +78,35 @@ func (b XattrsBackend) GetInt64(ctx context.Context, filePath, key string) (int6
 
 // List retrieves a list of names of extended attributes associated with the
 // given path in the file system.
-func (XattrsBackend) List(ctx context.Context, filePath string) (attribs []string, err error) {
+func (b XattrsBackend) List(ctx context.Context, filePath string) (attribs []string, err error) {
+	return b.list(ctx, filePath, true)
+}
+
+func (b XattrsBackend) list(ctx context.Context, filePath string, acquireLock bool) (attribs []string, err error) {
 	attrs, err := xattr.List(filePath)
 	if err == nil {
 		return attrs, nil
 	}
 
-	f, err := lockedfile.OpenFile(filePath+filelocks.LockFileSuffix, os.O_CREATE|os.O_WRONLY, 0600)
-	if err != nil {
-		return nil, err
-	}
-	defer cleanupLockfile(f)
+	// listing xattrs failed, try again, either with lock or without
+	if acquireLock {
+		f, err := lockedfile.OpenFile(filePath+filelocks.LockFileSuffix, os.O_CREATE|os.O_WRONLY, 0600)
+		if err != nil {
+			return nil, err
+		}
+		defer cleanupLockfile(ctx, f)
 
+	}
 	return xattr.List(filePath)
 }
 
 // All reads all extended attributes for a node, protected by a
 // shared file lock
 func (b XattrsBackend) All(ctx context.Context, path string) (map[string][]byte, error) {
-	return b.getAll(ctx, path, false)
+	return b.getAll(ctx, path, false, true)
 }
 
-func (b XattrsBackend) getAll(ctx context.Context, path string, skipCache bool) (map[string][]byte, error) {
+func (b XattrsBackend) getAll(ctx context.Context, path string, skipCache, acquireLock bool) (map[string][]byte, error) {
 	attribs := map[string][]byte{}
 
 	if !skipCache {
@@ -109,7 +116,7 @@ func (b XattrsBackend) getAll(ctx context.Context, path string, skipCache bool) 
 		}
 	}
 
-	attrNames, err := b.List(ctx, path)
+	attrNames, err := b.list(ctx, path, acquireLock)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +169,7 @@ func (b XattrsBackend) SetMultiple(ctx context.Context, path string, attribs map
 		if err != nil {
 			return err
 		}
-		defer cleanupLockfile(lockedFile)
+		defer cleanupLockfile(ctx, lockedFile)
 	}
 
 	// error handling: Count if there are errors while setting the attribs.
@@ -181,7 +188,7 @@ func (b XattrsBackend) SetMultiple(ctx context.Context, path string, attribs map
 		return errors.Wrap(xerr, "Failed to set all xattrs")
 	}
 
-	attribs, err = b.getAll(ctx, path, true)
+	attribs, err = b.getAll(ctx, path, true, false)
 	if err != nil {
 		return err
 	}
@@ -195,15 +202,14 @@ func (b XattrsBackend) Remove(ctx context.Context, path string, key string, acqu
 		if err != nil {
 			return err
 		}
-		defer cleanupLockfile(lockedFile)
+		defer cleanupLockfile(ctx, lockedFile)
 	}
 
 	err := xattr.Remove(path, key)
 	if err != nil {
 		return err
 	}
-
-	attribs, err := b.getAll(ctx, path, true)
+	attribs, err := b.getAll(ctx, path, true, false)
 	if err != nil {
 		return err
 	}
@@ -217,7 +223,7 @@ func (XattrsBackend) IsMetaFile(path string) bool { return strings.HasSuffix(pat
 func (b XattrsBackend) Purge(ctx context.Context, path string) error {
 	_, err := os.Stat(path)
 	if err == nil {
-		attribs, err := b.getAll(ctx, path, true)
+		attribs, err := b.getAll(ctx, path, true, true)
 		if err != nil {
 			return err
 		}
@@ -270,7 +276,7 @@ func (b XattrsBackend) Lock(path string) (UnlockFunc, error) {
 	}, nil
 }
 
-func cleanupLockfile(f *lockedfile.File) {
+func cleanupLockfile(ctx context.Context, f *lockedfile.File) {
 	_ = f.Close()
 	_ = os.Remove(f.Name())
 }

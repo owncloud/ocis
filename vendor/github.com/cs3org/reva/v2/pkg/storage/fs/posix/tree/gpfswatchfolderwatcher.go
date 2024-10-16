@@ -41,22 +41,24 @@ func (w *GpfsWatchFolderWatcher) Watch(topic string) {
 			continue
 		}
 
-		if isLockFile(lwev.Path) || isTrash(lwev.Path) {
+		if isLockFile(lwev.Path) || isTrash(lwev.Path) || w.tree.isUpload(lwev.Path) {
 			continue
 		}
 
+		isDir := strings.Contains(lwev.Event, "IN_ISDIR")
+
 		switch {
 		case strings.Contains(lwev.Event, "IN_CREATE"):
-			go func() { _ = w.tree.Scan(lwev.Path, ActionCreate, false, false) }()
+			go func() { _ = w.tree.Scan(lwev.Path, ActionCreate, isDir, false) }()
+
 		case strings.Contains(lwev.Event, "IN_CLOSE_WRITE"):
 			bytesWritten, err := strconv.Atoi(lwev.BytesWritten)
 			if err == nil && bytesWritten > 0 {
-				go func() { _ = w.tree.Scan(lwev.Path, ActionUpdate, false, true) }()
+				go func() { _ = w.tree.Scan(lwev.Path, ActionUpdate, isDir, true) }()
 			}
 		case strings.Contains(lwev.Event, "IN_MOVED_TO"):
 			go func() {
-				_ = w.tree.Scan(lwev.Path, ActionMove, false, true)
-				_ = w.tree.WarmupIDCache(lwev.Path, false)
+				_ = w.tree.Scan(lwev.Path, ActionMove, isDir, true)
 			}()
 		}
 	}

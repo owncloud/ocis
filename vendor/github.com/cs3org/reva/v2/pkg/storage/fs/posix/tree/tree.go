@@ -142,7 +142,7 @@ func New(lu node.PathLookup, bs Blobstore, um usermapper.Mapper, trashbin *trash
 		go t.watcher.Watch(watchPath)
 		go t.workScanQueue()
 		go func() {
-			_ = t.WarmupIDCache(o.Root, true)
+			_ = t.WarmupIDCache(o.Root, true, false)
 		}()
 	}
 
@@ -328,7 +328,7 @@ func (t *Tree) Move(ctx context.Context, oldNode *node.Node, newNode *node.Node)
 	_ = t.lookup.(*lookup.Lookup).CacheID(ctx, newNode.SpaceID, newNode.ID, filepath.Join(newNode.ParentPath(), newNode.Name))
 	// update id cache for the moved subtree.
 	if oldNode.IsDir(ctx) {
-		err = t.WarmupIDCache(filepath.Join(newNode.ParentPath(), newNode.Name), false)
+		err = t.WarmupIDCache(filepath.Join(newNode.ParentPath(), newNode.Name), false, false)
 		if err != nil {
 			return err
 		}
@@ -650,9 +650,9 @@ func (t *Tree) removeNode(ctx context.Context, path string, n *node.Node) error 
 }
 
 // Propagate propagates changes to the root of the tree
-func (t *Tree) Propagate(ctx context.Context, n *node.Node, _ int64) (err error) {
+func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err error) {
 	// We do not propagate size diffs here but rely on the assimilation to take care of the tree sizes instead
-	return t.propagator.Propagate(ctx, n, 0)
+	return t.propagator.Propagate(ctx, n, sizeDiff)
 }
 
 // WriteBlob writes a blob to the blobstore
@@ -699,6 +699,9 @@ func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (met
 	// we also need to touch the actual node file here it stores the mtime of the resource
 	h, err := os.OpenFile(n.InternalPath(), os.O_CREATE|os.O_EXCL, 0600)
 	if err != nil {
+		if os.IsExist(err) {
+			return unlock, errtypes.AlreadyExists(n.InternalPath())
+		}
 		return unlock, err
 	}
 	h.Close()
@@ -825,4 +828,8 @@ func isLockFile(path string) bool {
 
 func isTrash(path string) bool {
 	return strings.HasSuffix(path, ".trashinfo") || strings.HasSuffix(path, ".trashitem")
+}
+
+func (t *Tree) isUpload(path string) bool {
+	return strings.HasPrefix(path, t.options.UploadDirectory)
 }

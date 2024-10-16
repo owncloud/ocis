@@ -332,6 +332,7 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 	default:
 		res.Status = status.NewOK(ctx)
 		res.Share = share
+		res.Opaque = utils.AppendPlainToOpaque(nil, "resourcename", sRes.GetInfo().GetName())
 	}
 
 	return res, nil
@@ -353,15 +354,15 @@ func (s *service) RemovePublicShare(ctx context.Context, req *link.RemovePublicS
 			Status: status.NewInternal(ctx, "error loading public share"),
 		}, err
 	}
-	if !publicshare.IsCreatedByUser(ps, user) {
-		sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: ps.ResourceId}})
-		if err != nil {
-			log.Err(err).Interface("resource_id", ps.ResourceId).Msg("failed to stat shared resource")
-			return &link.RemovePublicShareResponse{
-				Status: status.NewInternal(ctx, "failed to stat shared resource"),
-			}, err
-		}
 
+	sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: ps.ResourceId}})
+	if err != nil {
+		log.Err(err).Interface("resource_id", ps.ResourceId).Msg("failed to stat shared resource")
+		return &link.RemovePublicShareResponse{
+			Status: status.NewInternal(ctx, "failed to stat shared resource"),
+		}, err
+	}
+	if !publicshare.IsCreatedByUser(ps, user) {
 		if !sRes.GetInfo().GetPermissionSet().RemoveGrant {
 			return &link.RemovePublicShareResponse{
 				Status: status.NewPermissionDenied(ctx, nil, "no permission to delete public share"),
@@ -374,8 +375,10 @@ func (s *service) RemovePublicShare(ctx context.Context, req *link.RemovePublicS
 			Status: status.NewInternal(ctx, "error deleting public share"),
 		}, err
 	}
+	o := utils.AppendJSONToOpaque(nil, "resourceid", ps.GetResourceId())
+	o = utils.AppendPlainToOpaque(o, "resourcename", sRes.GetInfo().GetName())
 	return &link.RemovePublicShareResponse{
-		Opaque: utils.AppendJSONToOpaque(nil, "resourceid", ps.GetResourceId()),
+		Opaque: o,
 		Status: status.NewOK(ctx),
 	}, nil
 }
@@ -603,6 +606,7 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 	res := &link.UpdatePublicShareResponse{
 		Status: status.NewOK(ctx),
 		Share:  updateR,
+		Opaque: utils.AppendPlainToOpaque(nil, "resourcename", sRes.GetInfo().GetName()),
 	}
 	return res, nil
 }
