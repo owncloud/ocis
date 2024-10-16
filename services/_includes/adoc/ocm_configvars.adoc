@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-16-12-58-01]
+[#deprecation-note-2024-10-16-15-13-51]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -556,7 +556,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
-++false ++
+++true ++
 a| [subs=-attributes]
 Verify the hostname of the incoming request against the hostname of the OCM provider.
 

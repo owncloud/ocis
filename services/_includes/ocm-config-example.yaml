@@ -98,7 +98,7 @@ ocm_provider_authorizer_driver: json
 ocm_provider_authorizer_drivers:
   json:
     providers: /etc/ocis/ocmproviders.json
-    verify_request_hostname: false
+    verify_request_hostname: true
 ocm_share_provider:
   driver: json
   drivers:
