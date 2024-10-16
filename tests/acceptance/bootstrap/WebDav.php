@@ -3852,10 +3852,17 @@ trait WebDav {
 		} else {
 			$urlParameter = null;
 		}
-		$sharesPath = $this->getSharesMountPath($user, $path) . '/?' . $urlParameter;
 
-		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $user);
-		$fullUrl = $this->getBaseUrl() . "/$davPath/$sharesPath";
+		$davPathVersion = $this->getDavPathVersion();
+		$uniquePath = $user;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$uniquePath = $this->getSharesMountPath($user, $path);
+			$path = "";
+		}
+		$path = \ltrim($path, "/");
+		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $uniquePath);
+		$davPath = \rtrim($davPath, "/");
+		$fullUrl = $this->getBaseUrl() . "/$davPath/$path?$urlParameter";
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
