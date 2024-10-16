@@ -1,6 +1,6 @@
 ---
 title: Auth-App
-date: 2024-10-16T15:13:55.554267897Z
+date: 2024-10-16T18:52:56.518948292Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-app
