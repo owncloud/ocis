@@ -37,7 +37,8 @@ use TestHelpers\GraphHelper;
  * WebDav functions
  */
 trait WebDav {
-	// TODO: make spaces path the default one
+	// defaults to the new DAV path
+	// maybe we want to make spaces the default in the future
 	private int $currentDAVPath = WebDavHelper::DAV_VERSION_NEW;
 
 	/**

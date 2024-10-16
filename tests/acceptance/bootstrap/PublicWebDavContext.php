@@ -37,7 +37,6 @@ require_once 'bootstrap.php';
 class PublicWebDavContext implements Context {
 	private FeatureContext $featureContext;
 
-	// TODO: mayeb this will not be required anymore
 	/**
 	 * @param string $versionString (old|new)
 	 *

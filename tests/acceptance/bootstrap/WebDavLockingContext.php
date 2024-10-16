@@ -196,7 +196,6 @@ class WebDavLockingContext implements Context {
 	public function userLocksFileInProjectSpace(string $user, string $file, string $space, TableNode $properties): ?ResponseInterface {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$baseUrl = $this->featureContext->getBaseUrl();
-		// TODO: make usable for all dav paths
 		$davPath = WebDavHelper::getDavPath($user, WebDavHelper::DAV_VERSION_SPACES, 'files', $spaceId);
 		$fullUrl = "$baseUrl/$davPath/$file";
 		return $this->lockFile($user, $file, $properties, $fullUrl, false, true, $spaceId);

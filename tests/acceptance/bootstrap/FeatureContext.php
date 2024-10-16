@@ -1941,8 +1941,6 @@ class FeatureContext extends BehatVariablesContext {
 		}
 	}
 
-	// TODO do similar for other usernames for e.g. %regularuser% or %test-user-1%
-
 	/**
 	 * @param string|null $functionalUsername
 	 *

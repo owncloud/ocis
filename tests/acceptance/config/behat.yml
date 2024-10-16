@@ -18,7 +18,7 @@ default:
             adminUsername: admin
             adminPassword: admin
             regularUserPassword: 123456
-            ocPath: apps/testing/api/v1/occ
+            ocPath: apps/testing/api/v1/occ # TODO: clean me
         - SettingsContext:
         - GraphContext:
         - SpacesContext:
