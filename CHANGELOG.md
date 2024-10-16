@@ -63,9 +63,9 @@ The following sections list the changes for unreleased.
 * Bugfix - Forbid the ocm space sharing: [#10287](https://github.com/owncloud/ocis/pull/10287)
 * Bugfix - Use secure config defaults for OCM: [#10307](https://github.com/owncloud/ocis/pull/10307)
 * Enhancement - Add OCM wellknown configuration: [#9815](https://github.com/owncloud/ocis/pull/9815)
-* Enhancement - Bump reva to 2.xx.x: [#10236](https://github.com/owncloud/ocis/pull/10236)
 * Enhancement - Load IDP logo from theme: [#10274](https://github.com/owncloud/ocis/pull/10274)
 * Enhancement - Remove Deprecations: [#10305](https://github.com/owncloud/ocis/pull/10305)
+* Enhancement - Bump reva to 2.xx.x: [#10321](https://github.com/owncloud/ocis/pull/10321)
 
 ## Details
 
@@ -125,14 +125,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/9815
 
-* Enhancement - Bump reva to 2.xx.x: [#10236](https://github.com/owncloud/ocis/pull/10236)
-
-   TODO
-
-   https://github.com/owncloud/ocis/pull/10236
-   https://github.com/owncloud/ocis/pull/10216
-   https://github.com/owncloud/ocis/pull/10315
-
 * Enhancement - Load IDP logo from theme: [#10274](https://github.com/owncloud/ocis/pull/10274)
 
    We now load the IDP logo from the theme file.
@@ -145,6 +137,15 @@ The following sections list the changes for unreleased.
    Remove deprecated stores/caches/registries and envvars from the codebase.
 
    https://github.com/owncloud/ocis/pull/10305
+
+* Enhancement - Bump reva to 2.xx.x: [#10321](https://github.com/owncloud/ocis/pull/10321)
+
+   TODO
+
+   https://github.com/owncloud/ocis/pull/10321
+   https://github.com/owncloud/ocis/pull/10236
+   https://github.com/owncloud/ocis/pull/10216
+   https://github.com/owncloud/ocis/pull/10315
 
 # Changelog for [6.5.0] (2024-10-01)
 
