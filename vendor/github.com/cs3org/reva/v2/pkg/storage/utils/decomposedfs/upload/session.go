@@ -86,7 +86,10 @@ func (s *OcisSession) Purge(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		f.Close()
+		os.Remove(sessionPath + ".lock")
+	}()
 	if err := os.Remove(sessionPath); err != nil {
 		return err
 	}

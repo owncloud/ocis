@@ -28,13 +28,15 @@ import (
 	"sync"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"golang.org/x/exp/maps"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/share/manager/jsoncs3/shareid"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
 )
 
 // name is the Tracer name used to identify this instrumentation library.
@@ -246,7 +248,7 @@ func (c *Cache) List(ctx context.Context, userid string) (map[string]SpaceShareI
 
 	for ssid, cached := range us.UserShares {
 		r[ssid] = SpaceShareIDs{
-			IDs: cached.IDs,
+			IDs: maps.Clone(cached.IDs),
 		}
 	}
 	return r, nil

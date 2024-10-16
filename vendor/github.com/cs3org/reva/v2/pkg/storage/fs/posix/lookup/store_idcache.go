@@ -24,6 +24,7 @@ import (
 
 	microstore "go-micro.dev/v4/store"
 
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
 	"github.com/cs3org/reva/v2/pkg/store"
 )
@@ -64,15 +65,43 @@ func (c *StoreIDCache) Delete(_ context.Context, spaceID, nodeID string) error {
 func (c *StoreIDCache) DeleteByPath(ctx context.Context, path string) error {
 	spaceID, nodeID, ok := c.GetByPath(ctx, path)
 	if !ok {
-		return nil
+		appctx.GetLogger(ctx).Error().Str("record", path).Msg("could not get spaceID and nodeID from cache")
+	} else {
+		err := c.cache.Delete(reverseCacheKey(path))
+		if err != nil {
+			appctx.GetLogger(ctx).Error().Err(err).Str("record", path).Str("spaceID", spaceID).Str("nodeID", nodeID).Msg("could not get spaceID and nodeID from cache")
+		}
+
+		err = c.cache.Delete(cacheKey(spaceID, nodeID))
+		if err != nil {
+			appctx.GetLogger(ctx).Error().Err(err).Str("record", path).Str("spaceID", spaceID).Str("nodeID", nodeID).Msg("could not get spaceID and nodeID from cache")
+		}
 	}
 
-	err := c.cache.Delete(reverseCacheKey(path))
+	list, err := c.cache.List(
+		microstore.ListPrefix(reverseCacheKey(path) + "/"),
+	)
 	if err != nil {
 		return err
 	}
+	for _, record := range list {
+		spaceID, nodeID, ok := c.GetByPath(ctx, record)
+		if !ok {
+			appctx.GetLogger(ctx).Error().Str("record", record).Msg("could not get spaceID and nodeID from cache")
+			continue
+		}
 
-	return c.cache.Delete(cacheKey(spaceID, nodeID))
+		err := c.cache.Delete(reverseCacheKey(record))
+		if err != nil {
+			appctx.GetLogger(ctx).Error().Err(err).Str("record", record).Str("spaceID", spaceID).Str("nodeID", nodeID).Msg("could not get spaceID and nodeID from cache")
+		}
+
+		err = c.cache.Delete(cacheKey(spaceID, nodeID))
+		if err != nil {
+			appctx.GetLogger(ctx).Error().Err(err).Str("record", record).Str("spaceID", spaceID).Str("nodeID", nodeID).Msg("could not get spaceID and nodeID from cache")
+		}
+	}
+	return nil
 }
 
 // DeletePath removes only the path entry from the cache

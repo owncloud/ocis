@@ -59,7 +59,7 @@ start:
 			if err != nil {
 				continue
 			}
-			if isLockFile(ev.Path) || isTrash(ev.Path) {
+			if isLockFile(ev.Path) || isTrash(ev.Path) || w.tree.isUpload(ev.Path) {
 				continue
 			}
 			switch ev.Event {
@@ -73,7 +73,7 @@ start:
 			case "RENAME":
 				go func() {
 					_ = w.tree.Scan(ev.Path, ActionMove, false, true)
-					_ = w.tree.WarmupIDCache(ev.Path, false)
+					_ = w.tree.WarmupIDCache(ev.Path, false, false)
 				}()
 			}
 		case io.EOF:

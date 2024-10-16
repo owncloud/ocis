@@ -66,6 +66,8 @@ type queueItem struct {
 	timer *time.Timer
 }
 
+const dirtyFlag = "user.ocis.dirty"
+
 // NewScanDebouncer returns a new SpaceDebouncer instance
 func NewScanDebouncer(d time.Duration, f func(item scanItem)) *ScanDebouncer {
 	return &ScanDebouncer{
@@ -147,7 +149,7 @@ func (t *Tree) workScanQueue() {
 				}
 
 				if item.Recurse {
-					err = t.WarmupIDCache(item.Path, true)
+					err = t.WarmupIDCache(item.Path, true, false)
 					if err != nil {
 						log.Error().Err(err).Str("path", item.Path).Msg("failed to warmup id cache")
 					}
@@ -172,6 +174,9 @@ func (t *Tree) Scan(path string, action EventAction, isDir bool, recurse bool) e
 					ForceRescan: false,
 				})
 			}
+			if err := t.setDirty(filepath.Dir(path), true); err != nil {
+				return err
+			}
 			t.scanDebouncer.Debounce(scanItem{
 				Path:        filepath.Dir(path),
 				ForceRescan: true,
@@ -180,6 +185,9 @@ func (t *Tree) Scan(path string, action EventAction, isDir bool, recurse bool) e
 		} else {
 			// 2. New directory
 			//  -> scan directory
+			if err := t.setDirty(path, true); err != nil {
+				return err
+			}
 			t.scanDebouncer.Debounce(scanItem{
 				Path:        path,
 				ForceRescan: true,
@@ -368,7 +376,7 @@ func (t *Tree) assimilate(item scanItem) error {
 				}
 				if fi.IsDir() {
 					// if it was moved and it is a directory we need to propagate the move
-					go func() { _ = t.WarmupIDCache(item.Path, false) }()
+					go func() { _ = t.WarmupIDCache(item.Path, false, true) }()
 				}
 
 				parentID, err := t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.ParentidAttr)
@@ -536,7 +544,8 @@ assimilate:
 }
 
 // WarmupIDCache warms up the id cache
-func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
+func (t *Tree) WarmupIDCache(root string, assimilate, onlyDirty bool) error {
+	root = filepath.Clean(root)
 	spaceID := []byte("")
 
 	scopeSpace := func(spaceCandidate string) error {
@@ -557,9 +566,12 @@ func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
 
 	sizes := make(map[string]int64)
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		// skip lock files
+		// skip lock and upload files
 		if isLockFile(path) {
 			return nil
+		}
+		if isTrash(path) || t.isUpload(path) {
+			return filepath.SkipDir
 		}
 
 		if err != nil {
@@ -568,8 +580,19 @@ func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
 
 		// calculate tree sizes
 		if !info.IsDir() {
-			dir := filepath.Dir(path)
-			sizes[dir] += info.Size()
+			dir := path
+			for dir != root {
+				dir = filepath.Clean(filepath.Dir(dir))
+				sizes[dir] += info.Size()
+			}
+		} else if onlyDirty {
+			dirty, err := t.isDirty(path)
+			if err != nil {
+				return err
+			}
+			if !dirty {
+				return filepath.SkipDir
+			}
 		}
 
 		attribs, err := t.lookup.MetadataBackend().All(context.Background(), path)
@@ -618,10 +641,14 @@ func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
 		} else if assimilate {
 			_ = t.assimilate(scanItem{Path: path, ForceRescan: true})
 		}
-		return nil
+		return t.setDirty(path, false)
 	})
 
 	for dir, size := range sizes {
+		if dir == root {
+			// Propagate the size diff further up the tree
+			_ = t.propagateSizeDiff(dir, size)
+		}
 		_ = t.lookup.MetadataBackend().Set(context.Background(), dir, prefixes.TreesizeAttr, []byte(fmt.Sprintf("%d", size)))
 	}
 
@@ -630,4 +657,41 @@ func (t *Tree) WarmupIDCache(root string, assimilate bool) error {
 	}
 
 	return nil
+}
+
+func (t *Tree) propagateSizeDiff(dir string, size int64) error {
+	// First find the space id
+	spaceID, _, err := t.findSpaceId(dir)
+	if err != nil {
+		return err
+	}
+	attrs, err := t.lookup.MetadataBackend().All(context.Background(), dir)
+	if err != nil {
+		return err
+	}
+	n, err := t.lookup.NodeFromID(context.Background(), &provider.ResourceId{
+		StorageId: t.options.MountID,
+		SpaceId:   spaceID,
+		OpaqueId:  string(attrs[prefixes.IDAttr]),
+	})
+	if err != nil {
+		return err
+	}
+	oldSize, err := node.Attributes(attrs).Int64(prefixes.TreesizeAttr)
+	if err != nil {
+		return err
+	}
+	return t.Propagate(context.Background(), n, size-oldSize)
+}
+
+func (t *Tree) setDirty(path string, dirty bool) error {
+	return t.lookup.MetadataBackend().Set(context.Background(), path, dirtyFlag, []byte(fmt.Sprintf("%t", dirty)))
+}
+
+func (t *Tree) isDirty(path string) (bool, error) {
+	dirtyAttr, err := t.lookup.MetadataBackend().Get(context.Background(), path, dirtyFlag)
+	if err != nil {
+		return false, err
+	}
+	return string(dirtyAttr) == "true", nil
 }
