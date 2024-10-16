@@ -323,20 +323,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSearchContent/contentSearch.feature:215](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L215)
 - [apiSearchContent/contentSearch.feature:266](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L266)
 - [apiSearchContent/contentSearch.feature:267](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L267)
-- [coreApiWebdavOperations/search.feature:42](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L42)
-- [coreApiWebdavOperations/search.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L43)
-- [coreApiWebdavOperations/search.feature:60](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L60)
-- [coreApiWebdavOperations/search.feature:61](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L61)
-- [coreApiWebdavOperations/search.feature:79](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L79)
-- [coreApiWebdavOperations/search.feature:80](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L80)
-- [coreApiWebdavOperations/search.feature:110](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L110)
-- [coreApiWebdavOperations/search.feature:111](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L111)
-- [coreApiWebdavOperations/search.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L130)
-- [coreApiWebdavOperations/search.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L131)
-- [coreApiWebdavOperations/search.feature:151](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L151)
-- [coreApiWebdavOperations/search.feature:152](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L152)
-- [coreApiWebdavOperations/search.feature:229](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L229)
-- [coreApiWebdavOperations/search.feature:230](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L230)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
