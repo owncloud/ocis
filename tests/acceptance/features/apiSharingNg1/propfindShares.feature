@@ -123,18 +123,25 @@ Feature: propfind a shares
     When user "Brian" sends PROPFIND request from the space "Shares" to the resource "/" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" the PROPFIND response should contain a resource "folderToShare" with these key and value pairs:
-      | key       | value     |
-      | oc:fileid | <pattern> |
+      | key            | value                               |
+      | oc:fileid      | <pattern>                           |
+      | oc:file-parent | %self::oc:spaceid%!%uuidv4_pattern% |
     When user "Brian" sends PROPFIND request from the space "Shares" to the resource "folderToShare" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" the PROPFIND response should contain a resource "folderToShare" with these key and value pairs:
-      | key       | value     |
-      | oc:fileid | <pattern> |
+      | key            | value                               |
+      | oc:fileid      | <pattern>                           |
+      | oc:file-parent | %self::oc:spaceid%!%uuidv4_pattern% |
+    And as user "Brian" the PROPFIND response should contain a resource "folderToShare/textfile.txt" with these key and value pairs:
+      | key            | value                               |
+      | oc:fileid      | %file_id_pattern%                   |
+      | oc:file-parent | %self::oc:spaceid%!%uuidv4_pattern% |
     When user "Brian" sends PROPFIND request from the space "Shares" to the resource "folderToShare/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And as user "Brian" the PROPFIND response should contain a resource "folderToShare/textfile.txt" with these key and value pairs:
-      | key       | value             |
-      | oc:fileid | %file_id_pattern% |
+      | key            | value                               |
+      | oc:fileid      | %file_id_pattern%                   |
+      | oc:file-parent | %self::oc:spaceid%!%uuidv4_pattern% |
     Examples:
       | dav-path-version | pattern            |
       | old              | %file_id_pattern%  |
