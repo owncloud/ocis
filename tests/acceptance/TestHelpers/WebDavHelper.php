@@ -66,7 +66,7 @@ class WebDavHelper {
 	 * @return bool
 	 */
 	public static function isDAVRequest(string $url): bool {
-		$found = \preg_match("/((\/dav|dav\/)|(\/wedav|wedav\/))/", $url);
+		$found = \preg_match("/(\bwebdav\b|\bdav\b)/", $url);
 		return (bool)$found;
 	}
 

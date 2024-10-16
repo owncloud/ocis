@@ -17,8 +17,8 @@ Feature: make webdav request with special urls
       | endpoint                                 |
       | //webdav/textfile0.txt                   |
       | //dav//files/%username%/textfile1.txt    |
-      | /dav/files/%username%/PARENT/parent.txt  |
-      | //webdav/PARENT                          |
+      | /dav//files/%username%/PARENT/parent.txt |
+      | /webdav//PARENT                          |
       | //dav/files/%username%//FOLDER           |
     Then the HTTP status code of responses on each endpoint should be "200,200,204,204,200" on oCIS or "204,204,204,204,204" on reva
 
@@ -27,8 +27,8 @@ Feature: make webdav request with special urls
     When user "Alice" requests these endpoints with "DELETE" using password "%regular%" about user "Alice"
       | endpoint                                  |
       | //dav/spaces/%spaceid%/textfile0.txt      |
-      | /dav//spaces/%spaceid%/PARENT/parent.txt  |
-      | //dav/spaces/%spaceid%/PARENT             |
+      | //dav//spaces/%spaceid%/PARENT/parent.txt |
+      | /dav//spaces/%spaceid%/PARENT             |
       | //dav/spaces/%spaceid%//FOLDER            |
     Then the HTTP status code of responses on each endpoint should be "200,200,204,200" on oCIS or "204,204,204,204" on reva
 
@@ -169,7 +169,7 @@ Feature: make webdav request with special urls
       | //dav//files/%username%/textfile1.txt    |
       | /dav//files/%username%/PARENT/parent.txt |
       | /webdav//PARENT                          |
-      | /dav//files/%username%//FOLDER           |
+      | //dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on each endpoint should be "200,200,400,400,200" respectively
 
 
