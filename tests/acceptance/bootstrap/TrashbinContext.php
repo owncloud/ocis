@@ -148,9 +148,10 @@ class TrashbinContext implements Context {
 	public function listTopOfTrashbinFolder(?string $user, string $depth = "1"):array {
 		$password = $this->featureContext->getPasswordForUser($user);
 		$davPathVersion = $this->featureContext->getDavPathVersion();
-		$spaceId = null;
+
+		$uniquePath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$spaceId = WebDavHelper::getPersonalSpaceIdForUser(
+			$uniquePath = WebDavHelper::getPersonalSpaceIdForUser(
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$password,
@@ -185,8 +186,8 @@ class TrashbinContext implements Context {
 		// filter root element
 		$files = \array_filter(
 			$files,
-			static function ($element) use ($user, $davPathVersion, $spaceId) {
-				$davPath = WebDavHelper::getDavPath($user, $davPathVersion, "trash-bin", $spaceId);
+			static function ($element) use ($davPathVersion, $uniquePath) {
+				$davPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath, "trash-bin");
 				return ($element['href'] !== "/" . $davPath . "/");
 			}
 		);
@@ -257,16 +258,16 @@ class TrashbinContext implements Context {
 
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
-		$spaceId = null;
+		$uniquePath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$spaceId = WebDavHelper::getPersonalSpaceIdForUser(
+			$uniquePath = WebDavHelper::getPersonalSpaceIdForUser(
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$this->featureContext->getStepLineRef()
 			);
 		}
-		$endpoint = WebDavHelper::getDavPath($user, $davPathVersion, "trash-bin", $spaceId);
+		$endpoint = WebDavHelper::getDavPath($davPathVersion, $uniquePath, "trash-bin");
 
 		// filter out the collection itself, we only want to return the members
 		$files = \array_filter(
@@ -795,13 +796,13 @@ class TrashbinContext implements Context {
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPathVersion = $this->featureContext->getDavPathVersion();
 
-		$spaceId = null;
+		$uniquePath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
 			if (\str_starts_with($destinationPath, "Shares/")) {
-				$spaceId = $this->featureContext->spacesContext->getSpaceIdByName($user, "Shares");
+				$uniquePath = $this->featureContext->spacesContext->getSpaceIdByName($user, "Shares");
 				$destinationPath = \str_replace("Shares/", "", $destinationPath);
 			} else {
-				$spaceId = WebDavHelper::getPersonalSpaceIdForUser(
+				$uniquePath = WebDavHelper::getPersonalSpaceIdForUser(
 					$baseUrl,
 					$user,
 					$this->featureContext->getPasswordForUser($user),
@@ -809,7 +810,7 @@ class TrashbinContext implements Context {
 				);
 			}
 		}
-		$davPath = WebDavHelper::getDavPath($user, $davPathVersion, "files", $spaceId);
+		$davPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath);
 		$destinationValue = "{$baseUrl}/{$davPath}/{$destinationPath}";
 
 		$trashItemHRef = $this->convertTrashbinHref($trashItemHRef);
