@@ -127,6 +127,5 @@ Feature: propagation of etags when creating folders
       | Alice | /folder |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |

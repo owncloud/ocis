@@ -305,7 +305,7 @@ trait WebDav {
 		$body = null,
 		?string $spaceId = null,
 		?string $type = "files",
-		?string $davPathVersion = null,
+		?int $davPathVersion = null,
 		bool $stream = false,
 		?string $password = null,
 		?array $urlParameter = [],
@@ -2633,21 +2633,23 @@ trait WebDav {
 	}
 
 	/**
-	 * @When user :user deletes file :filename from space :space using file-id path :davPath
+	 * @When user :user deletes file :filename from space :space using file-id :fileId
 	 *
 	 * @param string $user
 	 * @param string $filename
 	 * @param string $space
-	 * @param string $davPath
+	 * @param string $fileId
 	 *
 	 * @return void
 	 */
-	public function userDeletesFileFromSpaceUsingFileIdPath(string $user, string $filename, string $space, string $davPath):void {
-		$requestUrl = $this->getBaseUrl() . $davPath;
+	public function userDeletesFileFromSpaceUsingFileIdPath(string $user, string $filename, string $space, string $fileId):void {
+		$baseUrl = $this->getBaseUrl();
+		$davPath = WebDavHelper::getDavPath("null", $this->getDavPathVersion());
 		$user = $this->getActualUsername($user);
 		$password =  $this->getPasswordForUser($user);
+		$fullUrl = "$baseUrl/$davPath/$fileId";
 		$response = HttpRequestHelper::sendRequest(
-			$requestUrl,
+			$fullUrl,
 			null,
 			'DELETE',
 			$user,
@@ -4607,7 +4609,8 @@ trait WebDav {
 		$spacesBaseUrl = "/" . WebDavHelper::getDavPath(null, $this->getDavPathVersion(), 'files', $spaceId);
 		$spacesBaseUrl = \rtrim($spacesBaseUrl, "/") . "/";
 		$hrefRegex = \preg_quote($spacesBaseUrl, "/");
-		if (\in_array($this->getDavPathVersion(), [WebDavHelper::DAV_VERSION_SPACES, WebDavHelper::DAV_VERSION_NEW])) {
+		if (\in_array($this->getDavPathVersion(), [WebDavHelper::DAV_VERSION_SPACES, WebDavHelper::DAV_VERSION_NEW])
+			&& !GraphHelper::isSpaceId($entryNameToSearch ?? '')) {
 			$hrefRegex .= "[a-zA-Z0-9-_$!:%]+";
 		}
 		$hrefRegex = "/^" . $hrefRegex . "/";

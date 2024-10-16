@@ -10,7 +10,6 @@ Feature: reindex space via CLI command
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some data" to "textfile.txt"
-    And using new DAV path
 
 
   Scenario: reindex all spaces

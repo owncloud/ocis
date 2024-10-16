@@ -3650,7 +3650,7 @@ class SpacesContext implements Context {
 			$spaceId = $space['id'];
 		}
 
-		$topWebDavPath = WebDavHelper::getDavPath(null, WebDavHelper::DAV_VERSION_SPACES, null, $spaceId);
+		$topWebDavPath = "/" . WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion(), "files", $spaceId);
 
 		$spaceFound = false;
 		foreach ($responseArray as $value) {
