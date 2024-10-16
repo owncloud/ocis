@@ -857,7 +857,8 @@ class WebDavHelper {
 			}
 			if ($davPathVersionToUse === self::DAV_VERSION_OLD) {
 				if ($type === "public-files") {
-					// TODO: check if the endpoint exist
+					// TODO: cleanup
+					// this endpoint does not exist
 					return self::withRemotePhp("public.php/webdav");
 				}
 				return self::withRemotePhp("webdav");

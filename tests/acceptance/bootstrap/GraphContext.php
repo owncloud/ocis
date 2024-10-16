@@ -53,48 +53,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @param string $user
-	 * @param string|null $userName
-	 * @param string|null $password
-	 * @param string|null $email
-	 * @param string|null $displayName
-	 * @param string|null $requester
-	 * @param string|null $requesterPassword
-	 *
-	 * @return void
-	 * @throws JsonException
-	 * @throws GuzzleException
-	 */
-	public function userHasBeenEditedUsingTheGraphApi(
-		string $user,
-		?string $userName = null,
-		?string $password = null,
-		?string $email = null,
-		?string $displayName = null,
-		?string $requester = null,
-		?string $requesterPassword = null
-	): void {
-		if (!$requester) {
-			$requester = $this->featureContext->getAdminUsername();
-			$requesterPassword = $this->featureContext->getAdminPassword();
-		}
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-		$response = GraphHelper::editUser(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$requester,
-			$requesterPassword,
-			$userId,
-			$userName,
-			$password,
-			$email,
-			$displayName
-		);
-		$this->featureContext->setResponse($response);
-		$this->featureContext->theHttpStatusCodeShouldBe(200); // TODO 204 when prefer=minimal header was sent
-	}
-
-	/**
 	 * @When /^the user "([^"]*)" changes the email of user "([^"]*)" to "([^"]*)" using the Graph API$/
 	 * @When /^the user "([^"]*)" tries to change the email of user "([^"]*)" to "([^"]*)" using the Graph API$/
 	 *

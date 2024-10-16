@@ -103,17 +103,15 @@ class SearchContext implements Context {
 			$body .= "	</a:prop>";
 		}
 		$body .= "	</oc:search-files>";
+
 		$davPathVersionToUse = $this->featureContext->getDavPathVersion();
-		// TODO: need to fix for spaces
-		$davPath = WebDavHelper::getDavPath($doDavRequestAsUser ?? $user, $davPathVersionToUse, 'files', null);
-
-		if ($davPathVersionToUse == WebDavHelper::DAV_VERSION_NEW) {
-			// Removes the last component('username' in this case) from the WebDAV path by going up one level in the directory structure.
-			// e.g. dav/files/Alice ==> dav/files/
-			$davPath = \dirname($davPath, 1);
-		}
-
+		// $davPath will be one of the followings:
+		// - webdav
+		// - dav/files
+		// - dav/spaces
+		$davPath = WebDavHelper::getDavPath(null, $davPathVersionToUse);
 		$fullUrl = WebDavHelper::sanitizeUrl("$baseUrl/$davPath");
+
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),

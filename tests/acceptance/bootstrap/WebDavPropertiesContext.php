@@ -917,7 +917,6 @@ class WebDavPropertiesContext implements Context {
 			// 'dav' from "dav/spaces/%spaceid%/C++ file.cpp"
 			$explodeExpected = \explode('/', $expectedHref)[0];
 
-			// TODO: check if the following code is needed
 			$remotePhpIndex = \array_search($explodeExpected, $explodeDecoded);
 			if ($remotePhpIndex) {
 				$explodedHrefPartArray = \array_slice($explodeDecoded, $remotePhpIndex);
