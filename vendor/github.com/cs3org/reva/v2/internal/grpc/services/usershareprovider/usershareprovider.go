@@ -248,6 +248,7 @@ func (s *service) CreateShare(ctx context.Context, req *collaboration.CreateShar
 	return &collaboration.CreateShareResponse{
 		Status: status.NewOK(ctx),
 		Share:  createdShare,
+		Opaque: utils.AppendPlainToOpaque(nil, "resourcename", sRes.GetInfo().GetName()),
 	}, nil
 }
 
@@ -296,6 +297,7 @@ func (s *service) RemoveShare(ctx context.Context, req *collaboration.RemoveShar
 	}
 
 	o := utils.AppendJSONToOpaque(nil, "resourceid", share.GetResourceId())
+	o = utils.AppendPlainToOpaque(o, "resourcename", sRes.GetInfo().GetName())
 	if user := share.GetGrantee().GetUserId(); user != nil {
 		o = utils.AppendJSONToOpaque(o, "granteeuserid", user)
 	} else {
@@ -447,6 +449,7 @@ func (s *service) UpdateShare(ctx context.Context, req *collaboration.UpdateShar
 	res := &collaboration.UpdateShareResponse{
 		Status: status.NewOK(ctx),
 		Share:  share,
+		Opaque: utils.AppendPlainToOpaque(nil, "resourcename", sRes.GetInfo().GetName()),
 	}
 	return res, nil
 }
@@ -535,16 +538,21 @@ func (s *service) UpdateReceivedShare(ctx context.Context, req *collaboration.Up
 	var uid userpb.UserId
 	_ = utils.ReadJSONFromOpaque(req.Opaque, "userid", &uid)
 	updatedShare, err := s.sm.UpdateReceivedShare(ctx, req.Share, req.UpdateMask, &uid)
-	if err != nil {
+	switch err.(type) {
+	case nil:
 		return &collaboration.UpdateReceivedShareResponse{
-			Status: status.NewInternal(ctx, "error updating received share"),
+			Status: status.NewOK(ctx),
+			Share:  updatedShare,
+		}, nil
+	case errtypes.NotFound:
+		return &collaboration.UpdateReceivedShareResponse{
+			Status: status.NewNotFound(ctx, "error getting received share"),
+		}, nil
+	default:
+		return &collaboration.UpdateReceivedShareResponse{
+			Status: status.NewInternal(ctx, "error getting received share"),
 		}, nil
 	}
-
-	return &collaboration.UpdateReceivedShareResponse{
-		Status: status.NewOK(ctx),
-		Share:  updatedShare,
-	}, nil
 }
 
 func setReceivedShareMountPoint(ctx context.Context, gwc gateway.GatewayAPIClient, req *collaboration.UpdateReceivedShareRequest) (*rpc.Status, error) {
