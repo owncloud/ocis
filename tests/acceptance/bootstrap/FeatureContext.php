@@ -1482,8 +1482,6 @@ class FeatureContext extends BehatVariablesContext {
 			$reqHeaders = \array_merge($headers, $reqHeaders);
 		}
 
-		var_dump($fullUrl);
-		var_dump($headers);
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->getStepLineRef(),

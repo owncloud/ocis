@@ -38,19 +38,19 @@ Feature: get file properties
     And the properties response should contain an etag
     And there should be an entry with href containing "<expected-href>" in the response to user "Alice"
     Examples:
-      | dav-path-version | file-name     | expected-href                                |
-      | old              | /C++ file.cpp | remote.php/webdav/C++ file.cpp               |
-      | old              | /file #2.txt  | remote.php/webdav/file #2.txt                |
-      | old              | /file ?2.txt  | remote.php/webdav/file ?2.txt                |
-      | old              | /file &2.txt  | remote.php/webdav/file &2.txt                |
-      | new              | /C++ file.cpp | remote.php/dav/files/%username%/C++ file.cpp |
-      | new              | /file #2.txt  | remote.php/dav/files/%username%/file #2.txt  |
-      | new              | /file ?2.txt  | remote.php/dav/files/%username%/file ?2.txt  |
-      | new              | /file &2.txt  | remote.php/dav/files/%username%/file &2.txt  |
-      | spaces           | /C++ file.cpp | dav/spaces/%spaceid%/C++ file.cpp            |
-      | spaces           | /file #2.txt  | dav/spaces/%spaceid%/file #2.txt             |
-      | spaces           | /file ?2.txt  | dav/spaces/%spaceid%/file ?2.txt             |
-      | spaces           | /file &2.txt  | dav/spaces/%spaceid%/file &2.txt             |
+      | dav-path-version | file-name     | expected-href                     |
+      | old              | /C++ file.cpp | webdav/C++ file.cpp               |
+      | old              | /file #2.txt  | webdav/file #2.txt                |
+      | old              | /file ?2.txt  | webdav/file ?2.txt                |
+      | old              | /file &2.txt  | webdav/file &2.txt                |
+      | new              | /C++ file.cpp | dav/files/%username%/C++ file.cpp |
+      | new              | /file #2.txt  | dav/files/%username%/file #2.txt  |
+      | new              | /file ?2.txt  | dav/files/%username%/file ?2.txt  |
+      | new              | /file &2.txt  | dav/files/%username%/file &2.txt  |
+      | spaces           | /C++ file.cpp | dav/spaces/%spaceid%/C++ file.cpp |
+      | spaces           | /file #2.txt  | dav/spaces/%spaceid%/file #2.txt  |
+      | spaces           | /file ?2.txt  | dav/spaces/%spaceid%/file ?2.txt  |
+      | spaces           | /file &2.txt  | dav/spaces/%spaceid%/file &2.txt  |
 
   @issue-1296
   Scenario Outline: user sends a PROPFIND request on various folder names
@@ -64,28 +64,28 @@ Feature: get file properties
     And there should be an entry with href containing "<expected-href>/file1.txt" in the response to user "Alice"
     And there should be an entry with href containing "<expected-href>/file2.txt" in the response to user "Alice"
     Examples:
-      | dav-path-version | folder-name     | expected-href                                  |
-      | old              | /upload         | remote.php/webdav/upload                       |
-      | old              | /strängé folder | remote.php/webdav/strängé folder               |
-      | old              | /C++ folder     | remote.php/webdav/C++ folder                   |
-      | old              | /नेपाली         | remote.php/webdav/नेपाली                       |
-      | old              | /folder #2.txt  | remote.php/webdav/folder #2.txt                |
-      | old              | /folder ?2.txt  | remote.php/webdav/folder ?2.txt                |
-      | old              | /folder &2.txt  | remote.php/webdav/folder &2.txt                |
-      | new              | /upload         | remote.php/dav/files/%username%/upload         |
-      | new              | /strängé folder | remote.php/dav/files/%username%/strängé folder |
-      | new              | /C++ folder     | remote.php/dav/files/%username%/C++ folder     |
-      | new              | /नेपाली         | remote.php/dav/files/%username%/नेपाली         |
-      | new              | /folder #2.txt  | remote.php/dav/files/%username%/folder #2.txt  |
-      | new              | /folder ?2.txt  | remote.php/dav/files/%username%/folder ?2.txt  |
-      | new              | /folder &2.txt  | remote.php/dav/files/%username%/folder &2.txt  |
-      | spaces           | /upload         | dav/spaces/%spaceid%/upload                    |
-      | spaces           | /strängé folder | dav/spaces/%spaceid%/strängé folder            |
-      | spaces           | /C++ folder     | dav/spaces/%spaceid%/C++ folder                |
-      | spaces           | /नेपाली         | dav/spaces/%spaceid%/नेपाली                    |
-      | spaces           | /folder #2.txt  | dav/spaces/%spaceid%/folder #2.txt             |
-      | spaces           | /folder ?2.txt  | dav/spaces/%spaceid%/folder ?2.txt             |
-      | spaces           | /folder &2.txt  | dav/spaces/%spaceid%/folder &2.txt             |
+      | dav-path-version | folder-name     | expected-href                       |
+      | old              | /upload         | webdav/upload                       |
+      | old              | /strängé folder | webdav/strängé folder               |
+      | old              | /C++ folder     | webdav/C++ folder                   |
+      | old              | /नेपाली           | webdav/नेपाली                         |
+      | old              | /folder #2.txt  | webdav/folder #2.txt                |
+      | old              | /folder ?2.txt  | webdav/folder ?2.txt                |
+      | old              | /folder &2.txt  | webdav/folder &2.txt                |
+      | new              | /upload         | dav/files/%username%/upload         |
+      | new              | /strängé folder | dav/files/%username%/strängé folder |
+      | new              | /C++ folder     | dav/files/%username%/C++ folder     |
+      | new              | /नेपाली           | dav/files/%username%/नेपाली           |
+      | new              | /folder #2.txt  | dav/files/%username%/folder #2.txt  |
+      | new              | /folder ?2.txt  | dav/files/%username%/folder ?2.txt  |
+      | new              | /folder &2.txt  | dav/files/%username%/folder &2.txt  |
+      | spaces           | /upload         | dav/spaces/%spaceid%/upload         |
+      | spaces           | /strängé folder | dav/spaces/%spaceid%/strängé folder |
+      | spaces           | /C++ folder     | dav/spaces/%spaceid%/C++ folder     |
+      | spaces           | /नेपाली           | dav/spaces/%spaceid%/नेपाली           |
+      | spaces           | /folder #2.txt  | dav/spaces/%spaceid%/folder #2.txt  |
+      | spaces           | /folder ?2.txt  | dav/spaces/%spaceid%/folder ?2.txt  |
+      | spaces           | /folder &2.txt  | dav/spaces/%spaceid%/folder &2.txt  |
 
 
   Scenario Outline: user sends a PROPFIND request on various files inside various folders
