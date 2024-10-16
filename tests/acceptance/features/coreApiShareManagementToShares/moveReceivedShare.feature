@@ -85,8 +85,8 @@ Feature: sharing
     And as user "Carol" the value of the item "//oc:name" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
     And as user "Carol" the value of the item "//d:displayname" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
     Examples:
-      | dav-path                                 | dav-path-personal                |
-      | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% |
+      | dav-path                                 | dav-path-personal     |
+      | /dav/spaces/%shares_drive_id%            | /dav/spaces/%spaceid% |
 
   @issue-8242
   Scenario Outline: share receiver renames the shared item (old/new webdav)
@@ -166,9 +166,9 @@ Feature: sharing
     And as user "Brian" the value of the item "//oc:name" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
     And as user "Brian" the value of the item "//d:displayname" of path "<dav-path>/sharefile.txt" in the response should be "sharefile.txt"
     Examples:
-      | dav-path                                 | dav-path-personal                | permissions-role |
-      | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% | Viewer           |
-      | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% | Secure viewer    |
+      | dav-path                                 | dav-path-personal     | permissions-role |
+      | /dav/spaces/%shares_drive_id%            | /dav/spaces/%spaceid% | Viewer           |
+      | /dav/spaces/%shares_drive_id%            | /dav/spaces/%spaceid% | Secure viewer    |
 
 
   Scenario: keep group share when the one user renames the share and the user is deleted

@@ -75,8 +75,8 @@ class AuthContext implements Context {
 		?string $body = null,
 		?array $headers = []
 	): ResponseInterface {
+		$url = \ltrim($url, '/');
 		if (WebdavHelper::isDAVRequest($url)) {
-			$url = \ltrim($url, '/');
 			$url = WebdavHelper::withRemotePhp($url);
 		}
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$url";
@@ -628,8 +628,8 @@ class AuthContext implements Context {
 			$endpoint,
 			$username
 		);
+		$endpoint = \ltrim($endpoint, '/');
 		if (WebdavHelper::isDAVRequest($endpoint)) {
-			$endpoint = \ltrim($endpoint, '/');
 			$endpoint = WebdavHelper::withRemotePhp($endpoint);
 		}
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$endpoint";

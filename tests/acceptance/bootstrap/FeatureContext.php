@@ -1448,8 +1448,8 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws GuzzleException
 	 */
 	public function sendingToWithDirectUrl(string $user, string $verb, string $url, ?string $body = null, ?string $password = null, ?array $headers = null): ResponseInterface {
+		$url = \ltrim($url, '/');
 		if (WebdavHelper::isDAVRequest($url)) {
-			$url = \ltrim($url, '/');
 			$url = WebdavHelper::withRemotePhp($url);
 		}
 		$fullUrl = $this->getBaseUrl() . "/$url";
@@ -1482,6 +1482,8 @@ class FeatureContext extends BehatVariablesContext {
 			$reqHeaders = \array_merge($headers, $reqHeaders);
 		}
 
+		var_dump($fullUrl);
+		var_dump($headers);
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->getStepLineRef(),

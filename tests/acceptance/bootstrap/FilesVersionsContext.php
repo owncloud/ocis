@@ -94,7 +94,7 @@ class FilesVersionsContext implements Context {
 				null,
 				null,
 				"versions",
-				(string)$this->featureContext->getDavPathVersion(),
+				$this->featureContext->getDavPathVersion(),
 				false,
 				$password
 			)

@@ -286,11 +286,11 @@ Feature: get file properties
     And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
 
     Examples:
-      | url                                             | message1               | message2           |
-      | /remote.php/dav/files/does-not-exist            | Resource not found     | Resource not found |
-      | /remote.php/dav/does-not-exist                  | File not found in root |                    |
-      | /remote.php/dav/spaces/%spaceid%/does-not-exist | Resource not found     |                    |
-      | /remote.php/dav/spaces/%spaceid%/file1.txt      | Resource not found     |                    |
+      | url                                  | message1               | message2           |
+      | /dav/files/does-not-exist            | Resource not found     | Resource not found |
+      | /dav/does-not-exist                  | File not found in root |                    |
+      | /dav/spaces/%spaceid%/does-not-exist | Resource not found     |                    |
+      | /dav/spaces/%spaceid%/file1.txt      | Resource not found     |                    |
 
   @issue-1297
   Scenario Outline: add, receive multiple custom meta properties to a file
