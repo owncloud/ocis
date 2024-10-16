@@ -88,6 +88,8 @@ func (d *driver) Upload(ctx context.Context, req storage.UploadRequest, _ storag
 		return &provider.ResourceInfo{}, err
 	}
 
+	defer cleanup(&upload{Info: info})
+
 	client, _, rel, err := d.webdavClient(ctx, nil, &provider.Reference{
 		Path: filepath.Join(info.MetaData["dir"], info.MetaData["filename"]),
 	})
@@ -297,6 +299,7 @@ func (u *upload) FinishUpload(ctx context.Context) error {
 		}
 	}
 
+	defer cleanup(u)
 	// compare if they match the sent checksum
 	// TODO the tus checksum extension would do this on every chunk, but I currently don't see an easy way to pass in the requested checksum. for now we do it in FinishUpload which is also called for chunked uploads
 	if u.Info.MetaData["checksum"] != "" {
@@ -316,7 +319,6 @@ func (u *upload) FinishUpload(ctx context.Context) error {
 			err = errtypes.BadRequest("unsupported checksum algorithm: " + parts[0])
 		}
 		if err != nil {
-			u.cleanup()
 			return err
 		}
 	}
@@ -336,7 +338,6 @@ func (u *upload) FinishUpload(ctx context.Context) error {
 		Path: filepath.Join(u.Info.MetaData["dir"], u.Info.MetaData["filename"]),
 	})
 	if err != nil {
-		u.cleanup()
 		return err
 	}
 
@@ -358,13 +359,8 @@ func (u *upload) FinishUpload(ctx context.Context) error {
 	return client.WriteStream(rel, f, 0)
 }
 
-func (u *upload) cleanup() {
-	_ = os.Remove(u.BinPath())
-	_ = os.Remove(u.InfoPath())
-}
-
 func (u *upload) Terminate(ctx context.Context) error {
-	u.cleanup()
+	cleanup(u)
 	return nil
 }
 
@@ -402,4 +398,12 @@ func (u *upload) checkHash(expected string, h hash.Hash) error {
 		return errtypes.ChecksumMismatch(fmt.Sprintf("invalid checksum: expected %s got %x", u.Info.MetaData["checksum"], h.Sum(nil)))
 	}
 	return nil
+}
+
+func cleanup(u *upload) {
+	if u == nil {
+		return
+	}
+	_ = os.Remove(u.BinPath())
+	_ = os.Remove(u.InfoPath())
 }

@@ -2,11 +2,12 @@ package preprocessor
 
 import (
 	"bytes"
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/opentype"
 	"io"
 	"os"
 	"testing"
+
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/opentype"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -80,14 +81,14 @@ var _ = Describe("ImageDecoder", func() {
 		})
 
 		It("should decode a ggs", func() {
-			decoder := GgsDecoder{}
+			decoder := GgsDecoder{"_slide0/geogebra_thumbnail.png"}
 			img, err := decoder.Convert(fileReader)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(img).ToNot(BeNil())
 		})
 
 		It("should return an error if the ggs is invalid", func() {
-			decoder := GgsDecoder{}
+			decoder := GgsDecoder{"_slide0/geogebra_thumbnail.png"}
 			img, err := decoder.Convert(bytes.NewReader([]byte("not a ggs")))
 			Expect(err).To(HaveOccurred())
 			Expect(img).To(BeNil())

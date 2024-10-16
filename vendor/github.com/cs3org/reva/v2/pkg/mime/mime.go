@@ -322,6 +322,7 @@ var mimeTypes = map[string]string{
 	"geojson":                  "application/geo+json",
 	"gex":                      "application/vnd.geometry-explorer",
 	"ggb":                      "application/vnd.geogebra.file",
+	"ggp":                      "application/vnd.geogebra.pinboard",
 	"ggs":                      "application/vnd.geogebra.slides",
 	"ggt":                      "application/vnd.geogebra.tool",
 	"ghf":                      "application/vnd.groove-help",
