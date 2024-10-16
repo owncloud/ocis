@@ -57,7 +57,6 @@ func Server(cfg *config.Config) *cli.Command {
 			userInfoCache := store.Create(
 				store.Store(cfg.OIDC.UserinfoCache.Store),
 				store.TTL(cfg.OIDC.UserinfoCache.TTL),
-				store.Size(cfg.OIDC.UserinfoCache.Size),
 				microstore.Nodes(cfg.OIDC.UserinfoCache.Nodes...),
 				microstore.Database(cfg.OIDC.UserinfoCache.Database),
 				microstore.Table(cfg.OIDC.UserinfoCache.Table),

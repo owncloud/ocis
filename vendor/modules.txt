@@ -81,9 +81,6 @@ github.com/alexedwards/argon2id
 # github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964
 ## explicit
 github.com/amoghe/go-crypt
-# github.com/armon/go-metrics v0.4.1
-## explicit; go 1.12
-github.com/armon/go-metrics
 # github.com/armon/go-radix v1.0.0
 ## explicit
 github.com/armon/go-radix
@@ -940,27 +937,9 @@ github.com/go-micro/plugins/v4/events/natsjs
 # github.com/go-micro/plugins/v4/logger/zerolog v1.2.0
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/logger/zerolog
-# github.com/go-micro/plugins/v4/registry/consul v1.2.1
-## explicit; go 1.17
-github.com/go-micro/plugins/v4/registry/consul
-# github.com/go-micro/plugins/v4/registry/etcd v1.2.0
-## explicit; go 1.17
-github.com/go-micro/plugins/v4/registry/etcd
-# github.com/go-micro/plugins/v4/registry/kubernetes v1.1.2
-## explicit; go 1.18
-github.com/go-micro/plugins/v4/registry/kubernetes
-github.com/go-micro/plugins/v4/registry/kubernetes/client
-github.com/go-micro/plugins/v4/registry/kubernetes/client/api
-github.com/go-micro/plugins/v4/registry/kubernetes/client/watch
-# github.com/go-micro/plugins/v4/registry/mdns v1.2.0
-## explicit; go 1.17
-github.com/go-micro/plugins/v4/registry/mdns
 # github.com/go-micro/plugins/v4/registry/memory v1.2.0
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/registry/memory
-# github.com/go-micro/plugins/v4/registry/nats v1.2.2
-## explicit; go 1.17
-github.com/go-micro/plugins/v4/registry/nats
 # github.com/go-micro/plugins/v4/server/grpc v1.2.0
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/server/grpc
@@ -1180,21 +1159,9 @@ github.com/grpc-ecosystem/grpc-gateway/v2/internal/httprule
 github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options
 github.com/grpc-ecosystem/grpc-gateway/v2/runtime
 github.com/grpc-ecosystem/grpc-gateway/v2/utilities
-# github.com/hashicorp/consul/api v1.25.1
-## explicit; go 1.19
-github.com/hashicorp/consul/api
-github.com/hashicorp/consul/api/watch
-# github.com/hashicorp/go-cleanhttp v0.5.2
-## explicit; go 1.13
-github.com/hashicorp/go-cleanhttp
 # github.com/hashicorp/go-hclog v1.6.3
 ## explicit; go 1.13
 github.com/hashicorp/go-hclog
-# github.com/hashicorp/go-immutable-radix v1.3.1
-## explicit
-github.com/hashicorp/go-immutable-radix
-# github.com/hashicorp/go-msgpack v1.1.5
-## explicit; go 1.13
 # github.com/hashicorp/go-plugin v1.6.1
 ## explicit; go 1.17
 github.com/hashicorp/go-plugin
@@ -1202,15 +1169,6 @@ github.com/hashicorp/go-plugin/internal/cmdrunner
 github.com/hashicorp/go-plugin/internal/grpcmux
 github.com/hashicorp/go-plugin/internal/plugin
 github.com/hashicorp/go-plugin/runner
-# github.com/hashicorp/go-rootcerts v1.0.2
-## explicit; go 1.12
-github.com/hashicorp/go-rootcerts
-# github.com/hashicorp/golang-lru v0.6.0
-## explicit; go 1.12
-github.com/hashicorp/golang-lru/simplelru
-# github.com/hashicorp/serf v0.10.1
-## explicit; go 1.12
-github.com/hashicorp/serf/coordinate
 # github.com/hashicorp/yamux v0.1.1
 ## explicit; go 1.15
 github.com/hashicorp/yamux
@@ -1393,15 +1351,9 @@ github.com/minio/sha256-simd
 # github.com/mitchellh/copystructure v1.2.0
 ## explicit; go 1.15
 github.com/mitchellh/copystructure
-# github.com/mitchellh/go-homedir v1.1.0
-## explicit
-github.com/mitchellh/go-homedir
 # github.com/mitchellh/go-testing-interface v1.14.1
 ## explicit; go 1.14
 github.com/mitchellh/go-testing-interface
-# github.com/mitchellh/hashstructure v1.1.0
-## explicit; go 1.14
-github.com/mitchellh/hashstructure
 # github.com/mitchellh/mapstructure v1.5.0
 ## explicit; go 1.14
 github.com/mitchellh/mapstructure

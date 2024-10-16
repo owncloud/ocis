@@ -155,7 +155,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Cache = &config.Cache{
 			Store: cfg.Commons.Cache.Store,
 			Nodes: cfg.Commons.Cache.Nodes,
-			Size:  cfg.Commons.Cache.Size,
 		}
 	} else if cfg.Cache == nil {
 		cfg.Cache = &config.Cache{}

@@ -79,7 +79,6 @@ func Server(cfg *config.Config) *cli.Command {
 			evStore := store.Create(
 				store.Store(cfg.Store.Store),
 				store.TTL(cfg.Store.TTL),
-				store.Size(cfg.Store.Size),
 				microstore.Nodes(cfg.Store.Nodes...),
 				microstore.Database(cfg.Store.Database),
 				microstore.Table(cfg.Store.Table),

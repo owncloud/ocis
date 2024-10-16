@@ -84,14 +84,9 @@ func (m Mail) getMailClient() (*mail.SMTPClient, error) {
 	}
 
 	switch strings.ToLower(m.conf.Notifications.SMTP.Encryption) {
-	case "tls":
-		server.Encryption = mail.EncryptionTLS
-		server.TLSConfig.ServerName = m.conf.Notifications.SMTP.Host
 	case "starttls":
 		server.Encryption = mail.EncryptionSTARTTLS
 		server.TLSConfig.ServerName = m.conf.Notifications.SMTP.Host
-	case "ssl":
-		server.Encryption = mail.EncryptionSSL
 	case "ssltls":
 		server.Encryption = mail.EncryptionSSLTLS
 	case "none":

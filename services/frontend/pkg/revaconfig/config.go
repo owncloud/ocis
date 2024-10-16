@@ -168,7 +168,6 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 						"cache_database":            cfg.OCS.StatCacheDatabase,
 						"cache_table":               cfg.OCS.StatCacheTable,
 						"cache_ttl":                 cfg.OCS.StatCacheTTL,
-						"cache_size":                cfg.OCS.StatCacheSize,
 						"cache_disable_persistence": cfg.OCS.StatCacheDisablePersistence,
 						"cache_auth_username":       cfg.OCS.StatCacheAuthUsername,
 						"cache_auth_password":       cfg.OCS.StatCacheAuthPassword,

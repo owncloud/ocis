@@ -2,10 +2,8 @@ package parser
 
 import (
 	"errors"
-	"time"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/antivirus/pkg/config"
 	"github.com/owncloud/ocis/v2/services/antivirus/pkg/config/defaults"
 
@@ -36,10 +34,5 @@ func ParseConfig(cfg *config.Config) error {
 
 // Validate validates our little config
 func Validate(cfg *config.Config) error {
-	if cfg.Scanner.ICAP.DeprecatedTimeout != 0 {
-		cfg.Scanner.ICAP.Timeout = time.Duration(cfg.Scanner.ICAP.DeprecatedTimeout) * time.Second
-		log.Deprecation("ANTIVIRUS_ICAP_TIMEOUT is deprecated, use ANTIVIRUS_ICAP_SCAN_TIMEOUT instead")
-	}
-
 	return nil
 }

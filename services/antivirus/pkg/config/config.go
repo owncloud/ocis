@@ -73,8 +73,7 @@ type ClamAV struct {
 
 // ICAP provides configuration options for icap
 type ICAP struct {
-	DeprecatedTimeout int64         `yaml:"timeout" env:"ANTIVIRUS_ICAP_TIMEOUT" desc:"Timeout for the ICAP client." introductionVersion:"pre5.0" deprecationVersion:"5.0" removalVersion:"%%NEXT_PRODUCTION_VERSION%%" deprecationInfo:"Changing the envvar type for consistency reasons." deprecationReplacement:"ANTIVIRUS_ICAP_SCAN_TIMEOUT"`
-	Timeout           time.Duration `yaml:"scan_timeout" env:"ANTIVIRUS_ICAP_SCAN_TIMEOUT" desc:"Scan timeout for the ICAP client. Defaults to '5m' (5 minutes). See the Environment Variable Types description for more details." introductionVersion:"5.0"`
-	URL               string        `yaml:"url" env:"ANTIVIRUS_ICAP_URL" desc:"URL of the ICAP server." introductionVersion:"pre5.0"`
-	Service           string        `yaml:"service" env:"ANTIVIRUS_ICAP_SERVICE" desc:"The name of the ICAP service." introductionVersion:"pre5.0"`
+	Timeout time.Duration `yaml:"scan_timeout" env:"ANTIVIRUS_ICAP_SCAN_TIMEOUT" desc:"Scan timeout for the ICAP client. Defaults to '5m' (5 minutes). See the Environment Variable Types description for more details." introductionVersion:"5.0"`
+	URL     string        `yaml:"url" env:"ANTIVIRUS_ICAP_URL" desc:"URL of the ICAP server." introductionVersion:"pre5.0"`
+	Service string        `yaml:"service" env:"ANTIVIRUS_ICAP_SERVICE" desc:"The name of the ICAP service." introductionVersion:"pre5.0"`
 }

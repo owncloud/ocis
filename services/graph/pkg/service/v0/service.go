@@ -182,7 +182,6 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		storeOptions := []microstore.Option{
 			store.Store(options.Config.Cache.Store),
 			store.TTL(options.Config.Cache.TTL),
-			store.Size(options.Config.Cache.Size),
 			microstore.Nodes(options.Config.Cache.Nodes...),
 			microstore.Database(options.Config.Cache.Database),
 			microstore.Table(options.Config.Cache.Table),

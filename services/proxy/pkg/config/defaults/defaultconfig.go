@@ -303,7 +303,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.OIDC.UserinfoCache = &config.Cache{
 			Store: cfg.Commons.Cache.Store,
 			Nodes: cfg.Commons.Cache.Nodes,
-			Size:  cfg.Commons.Cache.Size,
 		}
 	} else if cfg.OIDC.UserinfoCache == nil {
 		cfg.OIDC.UserinfoCache = &config.Cache{}
