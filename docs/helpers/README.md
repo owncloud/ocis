@@ -17,7 +17,7 @@
 
 ## Introduction
 
-`docs/helpers` contains a go program named `main.go` which creates docs by extracting information from the code using additional go programs. Individual steps (programs) can be called manually if needed. Note that not all programs are called automatically on purpose, see the [Tasks for New Releases](#tasks-for-new-releases) below. `main.go` is used by `make docs-generate` which is triggered by the CI or can be called manually. It calls the other required programs and has these main responsibilities for automatic runs:
+`docs/helpers` contains a go program named `main.go` which creates docs by extracting information from the code using additional go programs. Individual steps (programs) can be called manually if needed. Note that not all programs are called automatically on purpose, see the [Tasks for New Releases](#tasks-for-new-releases) below. `main.go` is used by `make docs-generate` (or `make -C docs docs-generate` when running manually from the repos root) which is triggered by the CI or can be called manually. It calls the other required programs and has these main responsibilities for automatic runs:
 
 - Generate docs for envvars in config structs including deprecations if there are any.
 - Extract and generate docs for `extended` envvars that are not mentioned in config structs (aka "rogue" envvars).
@@ -30,6 +30,8 @@
 - The generated adoc files can be found at: `docs/services/_includes/adoc` when running locally respectively in the `docs branch` after the CI has finished.
 - The file name for global envvars is named: `global_configvars.adoc`.
 - The file name for extended envvars is named: `extended_configvars.adoc`.
+- A file named `docs/helpers/env_vars.yaml` contaning envvar changes gets updated in case changes have ben identified.
+- A file named `docs/helpers/extended_vars.yaml` contaning changes for extended envvars gets updated in case changes have been identified. Note, if changes appear, **this file needs manual treatment** before committing, see [Extended Envvars](#extended-envvars) below.
 
 ## Admin Doc Process
 
@@ -40,7 +42,7 @@ Whenever a build from the [ocis admin](https://github.com/owncloud/docs-ocis) do
 The following is valid for envvars and yaml files related to the doc process:
 
 * When filing a pull request in the ocis master branch relating to docs, CI runs `make docs-generate` and copies the result into the `docs` branch of ocis. This branch is then taken as base for owncloud.dev and as reference for the [admin docs](https://doc.owncloud.com/ocis/next/).
-* When running `make docs-generate` locally, the same output is created as above but it stays in the same branch where the make command was issued.
+* When running `make docs-generate` _locally_, the same output is created as above but it stays in the same branch where the make command was issued.
 
 In both cases, `make docs-generate` removes files in the target folder `_includes` to avoid remnants. All content is recreated.
 
@@ -75,32 +77,32 @@ If global envvars do not appear in the list of globals, before checking if the c
 
 ### General Extended Envvars Info
 
-"Extended" envvars are variables that need to be present *before* the core or services are starting up as they depend on the info provided like path for config files etc. Therefore they are _not_ bound to services like other envvars.
+"Extended" envvars are variables that need to be present *before* the core or services are starting up as they depend on the info provided like path for config files etc. Therefore they are _not_ bound to services like other envvars. Extended envvars are identified via `os.Getenv`, usually defined via a subfolder of `ocis-pkg`. The real envvar name name cant be automatically assigned and needs to be manually defined via the code in the `extended_vars.yaml` file.
 
 It can happen that extended envvars are found but do not need to be published as they are for internal use only. Those envvars can be defined to be ignored for further processing.
 
 **IMPORTANT:**
 
-- First Time Identification\
-  Once an extended envvar has been identified, it is added to the `extended_vars.yaml` file found in this folder but never changed or touched by the process anymore. There is one exception with respect to single/double quote usage. While you can (and will) manually define a text like: `"'/var/lib/ocis'"`, quotes are transformed by the process in the .yaml file to: `'''/var/lib/ocis'''`. There is no need to change this back, as the final step transforms this correctly for the adoc table.
+- **First Time Identification**\
+  Once an extended envvar has been identified, it is added to the `extended_vars.yaml` file found, but never changed or touched by the process anymore. There is one exception with respect to single/double quote usage. While you can (and will) manually define a text like: `"'/var/lib/ocis'"`, quotes are transformed by the process in the .yaml file to: `'''/var/lib/ocis'''`. There is no need to change this back, as the final step transforms this correctly for the adoc table.
 
-- Item Naming\
-  An extended envvar may not have the right naming. It may appear as `name: registryEnv`. In case, this envvar needs to be named properly like `name: MICRO_REGISTRY` which can only be done in close developer alignment.
+- **Item Naming**\
+  An extended envvar may not have the right naming. It may appear as `name: _registryEnv`. In case, this envvar needs to be named properly like `name: MICRO_REGISTRY` which can only be done in close alignment with development.
 
-- Item Uniqueness\
-  The identification if an envvar is already presentin the yaml file is made via the `rawname` and the `path` identifier which includes the line number. **If there is a change in the source file shifting line numbers, new items will get added and the old ones not get touched.** Though technically ok, this can cause confusion to identify which items are correctly present or just added additionally just be cause code location has changed.
+- **Item Uniqueness**\
+  The identification, if an envvar is already present in the yaml file, is made via the `rawname` and the `path` identifier which includes the line number. **If there is a change in the source file shifting line numbers, new items will get added and old ones do not get touched.** Though technically ok, this can cause confusion to identify which items are correctly present or just added additionally just be cause code location has changed. In case there are multiple occurrences of the same `rawname` value, check which one contains relevant data and set `do_ignore` to `false` and all others to `true`. When there are two identical blocks with different source references, mostly the one containing a proper `default_value` is the active one. Populate the false block with the envvar data to be used.
 
-- Fix Items\
-  If an item has been identified as additionally added because there was a change in the code location, it is mostly sufficient to just fix the line number in the `path` key of the existing/correct one. You can double check by removing the newly added re-run a `make docs-generate`. In case the fix was correct, no new item of the same will re-appear.
+- **Fixing Items**\
+  If an item has been identified as additionally added because there was a change in the code location, it is mostly sufficient to just fix the line number in the `path` key of the existing/correct one and double check by removing the newly added ones. Then, re-run `make docs-generate`. In case the fix was correct, no new items of the same will re-appear.
 
-- Remove Orphaned Items\
-  To get rid of items with wrong line numbers, check `rawname` the `path` and correct the existing ones, especially the one containing the description and which is marked to be shown. Only items that have a real line number match need to be present, orphaned items can safely be removed. You can double-check valid items by creating a dummy branch, delete the `extended_vars.yaml` and run `make docs-generate` to regenerate the file having only items with valid path references.
+- **Remove Orphaned Items**\
+  To get rid of items with wrong line numbers, check `rawname` the `path` and correct the _existing ones_, especially the one containing the description and which is marked `do_ignore` false. Only items that have a real line number match need to be present, orphaned items can safely be removed. You can double-check valid items by creating a dummy branch, delete the `extended_vars.yaml` and run `make docs-generate` to regenerate the file having only items with valid path references. With that info, you can remove orphaned items from the live file. Note to be careful on judging only on `foundincode` set to false indicating an item not existing anymore. Fix all items first, when rerunning `make docs-generate`, this may change back to true!
 
-- Sort Ordering\
+- **Sort Ordering**\
   Do not change the sort order of extended envvar blocks as they are automatically reordered alphabetically.
 
-- Mandatory Key Values \
-  Because extended envvars do not have the same structural setup as "normal" envvars (like type, description or defaults), this info needs to be provided manually once - even if found multiple times. Any change of this info will be noticed during the next CI run, the corresponding adoc file generated, changes transported to the docs branch and published in the next admin docs build. See the following example with all keys listed and populated:
+- **Mandatory Key Values**\
+  Because extended envvars do not have the same structural setup as "normal" envvars (like type, description or defaults), this info needs to be provided manually once - for each valid block. Any change of this info will be noticed during the next CI run, the corresponding adoc file generated, changes transported to the docs branch and published in the next admin docs build. See the following example with all keys listed and populated:
     ```yaml
     rawname: registryAddressEnv
     path: ocis-pkg/registry/registry.go:44
