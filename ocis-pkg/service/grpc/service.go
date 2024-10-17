@@ -68,6 +68,7 @@ func NewServiceWithClient(client client.Client, opts ...Option) (Service, error)
 		micro.WrapHandler(mtracer.NewHandlerWrapper(
 			mtracer.WithTraceProvider(sopts.TraceProvider),
 		)),
+		micro.WrapHandler(sopts.HandlerWrappers...),
 		micro.WrapSubscriber(mtracer.NewSubscriberWrapper(
 			mtracer.WithTraceProvider(sopts.TraceProvider),
 		)),

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"go-micro.dev/v4/server"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -12,16 +13,17 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger        log.Logger
-	Namespace     string
-	Name          string
-	Version       string
-	Address       string
-	TLSEnabled    bool
-	TLSCert       string
-	TLSKey        string
-	Context       context.Context
-	TraceProvider trace.TracerProvider
+	Logger          log.Logger
+	Namespace       string
+	Name            string
+	Version         string
+	Address         string
+	TLSEnabled      bool
+	TLSCert         string
+	TLSKey          string
+	Context         context.Context
+	TraceProvider   trace.TracerProvider
+	HandlerWrappers []server.HandlerWrapper
 }
 
 // newOptions initializes the available default options.
@@ -98,5 +100,11 @@ func Context(ctx context.Context) Option {
 func TraceProvider(tp trace.TracerProvider) Option {
 	return func(o *Options) {
 		o.TraceProvider = tp
+	}
+}
+
+func HandlerWrappers(w ...server.HandlerWrapper) Option {
+	return func(o *Options) {
+		o.HandlerWrappers = w
 	}
 }

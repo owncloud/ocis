@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/metrics"
 	"github.com/urfave/cli/v2"
 	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 // Option defines a single option function.
@@ -15,14 +16,13 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Namespace             string
-	Logger                log.Logger
-	Context               context.Context
-	Config                *config.Config
-	Metrics               *metrics.Metrics
-	Flags                 []cli.Flag
-	TraceProvider         trace.TracerProvider
-	MaxConcurrentRequests int
+	Namespace     string
+	Logger        log.Logger
+	Context       context.Context
+	Config        *config.Config
+	Metrics       *metrics.Metrics
+	Flags         []cli.Flag
+	TraceProvider trace.TracerProvider
 }
 
 // newOptions initializes the available default options.
@@ -77,14 +77,7 @@ func TraceProvider(traceProvider trace.TracerProvider) Option {
 		if traceProvider != nil {
 			o.TraceProvider = traceProvider
 		} else {
-			o.TraceProvider = trace.NewNoopTracerProvider()
+			o.TraceProvider = noop.NewTracerProvider()
 		}
-	}
-}
-
-// MaxConcurrentRequests provides a function to set the MaxConcurrentRequests option.
-func MaxConcurrentRequests(val int) Option {
-	return func(o *Options) {
-		o.MaxConcurrentRequests = val
 	}
 }

@@ -28,14 +28,14 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:      "127.0.0.1:9185",
-			Namespace: "com.owncloud.api",
+			Addr:                  "127.0.0.1:9185",
+			Namespace:             "com.owncloud.api",
+			MaxConcurrentRequests: 0,
 		},
 		HTTP: config.HTTP{
-			Addr:                  "127.0.0.1:9186",
-			Root:                  "/thumbnails",
-			Namespace:             "com.owncloud.web",
-			MaxConcurrentRequests: 0,
+			Addr:      "127.0.0.1:9186",
+			Root:      "/thumbnails",
+			Namespace: "com.owncloud.web",
 		},
 		Service: config.Service{
 			Name: "thumbnails",
@@ -45,10 +45,13 @@ func DefaultConfig() *config.Config {
 			FileSystemStorage: config.FileSystemStorage{
 				RootDirectory: path.Join(defaults.BaseDataPath(), "thumbnails"),
 			},
-			WebdavAllowInsecure: false,
-			RevaGateway:         shared.DefaultRevaConfig().Address,
-			CS3AllowInsecure:    false,
-			DataEndpoint:        "http://127.0.0.1:9186/thumbnails/data",
+			WebdavAllowInsecure:   false,
+			RevaGateway:           shared.DefaultRevaConfig().Address,
+			CS3AllowInsecure:      false,
+			DataEndpoint:          "http://127.0.0.1:9186/thumbnails/data",
+			MaxInputWidth:         7680,
+			MaxInputHeight:        7680,
+			MaxInputImageFileSize: "50MB",
 		},
 	}
 }

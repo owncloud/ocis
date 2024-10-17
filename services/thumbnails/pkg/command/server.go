@@ -26,10 +26,10 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:     "server",
 		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
-		Before: func(c *cli.Context) error {
+		Before: func(_ *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		Action: func(_ *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
 			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
@@ -49,12 +49,12 @@ func Server(cfg *config.Config) *cli.Command {
 					}
 					return context.WithCancel(cfg.Context)
 				}()
-				metrics = metrics.New()
+				m = metrics.New()
 			)
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(version.GetString()).Set(1)
+			m.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			service := grpc.NewService(
 				grpc.Logger(logger),
@@ -63,8 +63,9 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Name(cfg.Service.Name),
 				grpc.Namespace(cfg.GRPC.Namespace),
 				grpc.Address(cfg.GRPC.Addr),
-				grpc.Metrics(metrics),
+				grpc.Metrics(m),
 				grpc.TraceProvider(traceProvider),
+				grpc.MaxConcurrentRequests(cfg.GRPC.MaxConcurrentRequests),
 			)
 
 			gr.Add(service.Run, func(_ error) {
@@ -95,10 +96,9 @@ func Server(cfg *config.Config) *cli.Command {
 				http.Logger(logger),
 				http.Context(ctx),
 				http.Config(cfg),
-				http.Metrics(metrics),
+				http.Metrics(m),
 				http.Namespace(cfg.HTTP.Namespace),
 				http.TraceProvider(traceProvider),
-				http.MaxConcurrentRequests(cfg.HTTP.MaxConcurrentRequests),
 			)
 			if err != nil {
 				logger.Info().
