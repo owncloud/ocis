@@ -4,17 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Sebastian Flügel <sebastian.fluegel@lifestylechanger.de>, 2024
 # Martin <github@diemattels.at>, 2024
+# Michael Barz <mbarz@owncloud.com>, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-10-10 00:08+0000\n"
+"POT-Creation-Date: 2024-10-17 17:45+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
-"Last-Translator: Martin <github@diemattels.at>, 2024\n"
+"Last-Translator: Michael Barz <mbarz@owncloud.com>, 2024\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,23 +31,23 @@ msgstr ""
 #: pkg/unifiedrole/roles.go:126 pkg/unifiedrole/roles.go:138
 #: pkg/unifiedrole/roles.go:144
 msgid "Can edit"
-msgstr "kann bearbeiten"
+msgstr "Kann bearbeiten"
 
 #. UnifiedRole SpaseEditorWithoutVersions, Role DisplayName (resolves
 #. directly)
 #: pkg/unifiedrole/roles.go:132
 msgid "Can edit without versions"
-msgstr "Bearbeiten ohne Versionserstellung"
+msgstr "Kann bearbeiten ohne Historie"
 
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:156
 msgid "Can manage"
-msgstr "Mitgliederverwaltung erlaubt"
+msgstr "Kann verwalten"
 
 #. UnifiedRole EditorLite, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:150
 msgid "Can upload"
-msgstr "Hochladen erlaubt"
+msgstr "Kann hochladen"
 
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
@@ -55,12 +55,12 @@ msgstr "Hochladen erlaubt"
 #: pkg/unifiedrole/roles.go:96 pkg/unifiedrole/roles.go:102
 #: pkg/unifiedrole/roles.go:108
 msgid "Can view"
-msgstr "Ansehen erlaubt"
+msgstr "Kann anzeigen"
 
 #. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:162
 msgid "Can view (secure)"
-msgstr "Ansehen erlaubt (sichere Ansicht)"
+msgstr "Kann anzeigen (sichere Ansicht)"
 
 #. default description for new spaces
 #: pkg/service/v0/spacetemplates.go:32
@@ -111,8 +111,8 @@ msgstr "Ansehen, herunterladen hochladen, editieren, hinzufügen, löschen."
 #: pkg/unifiedrole/roles.go:153
 msgid "View, download, upload, edit, add, delete and manage members."
 msgstr ""
-"Ansehen, herunterladen hochladen, editieren, hinzufügen, löschen, "
-"Userverwaltung."
+"Ansehen, herunterladen hochladen, bearbeiten, hinzufügen, löschen, teilen "
+"und Mitglieder verwalten."
 
 #. UnifiedRoleListGrants Editor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:117
