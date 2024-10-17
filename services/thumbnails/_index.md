@@ -1,6 +1,6 @@
 ---
 title: Thumbnails
-date: 2024-10-17T08:01:31.979989247Z
+date: 2024-10-17T12:07:18.841494099Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/thumbnails
@@ -28,6 +28,7 @@ The thumbnails service provides methods to generate thumbnails for various files
 * [Deleting Thumbnails](#deleting-thumbnails)
 * [Memory Considerations](#memory-considerations)
 * [Thumbnails and SecureView](#thumbnails-and-secureview)
+* [Using libvips for Thumbnail Generation](#using-libvips-for-thumbnail-generation)
 * [Example Yaml Config](#example-yaml-config)
 
 ## File Locations Overview
@@ -117,6 +118,32 @@ To have more control over memory (and CPU) consumption the maximum number of con
 ## Thumbnails and SecureView
 
 If a resource is shared using SecureView, the share reciever will get a 403 (forbidden) response when requesting a thumbnail. The requesting client needs to decide what to show and usually a placeholder thumbnail is used.
+
+## Using libvips for Thumbnail Generation
+
+To improve performance and to support a wider range of images formats, the thumbnails service is able to utilize the [libvips library](https://www.libvips.org/) for thumbnail generation. Support for libvips needs to be
+enabled at buildtime and has a couple of implications:
+
+*  With libvips support enabled, it is not possible to create a statically linked ocis binary.
+*  Therefore, the libvips shared libraries need to be available at runtime in the same release that was used to build the ocis binary.
+*  When using the ocis docker images, the libvips shared libraries are included in the image and are correctly embedded.
+
+Support of libvips is disabled by default. To enable it, make sure libvips and its buildtime dependencies are installed in your build environment.
+Then you just need to set the `ENABLE_VIPS` variable on the `make` command:
+
+```shell
+make -C ocis build ENABLE_VIPS=1
+```
+
+Or include the `enable_vips` build tag in the `go build` command:
+
+```shell
+go build -tags enable_vips -o ocis -o bin/ocis ./cmd/ocis
+```
+
+When building a docker image using the Dockerfile in the top-level directory of ocis, libvips support is enabled and the libvips shared libraries are included
+in the resulting docker image.
+
 ## Example Yaml Config
 {{< include file="services/_includes/thumbnails-config-example.yaml"  language="yaml" >}}
 
