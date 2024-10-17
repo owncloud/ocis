@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Load IDP logo from theme: [#10274](https://github.com/owncloud/ocis/pull/10274)
 * Enhancement - WebOffice Templates: [#10276](https://github.com/owncloud/ocis/pull/10276)
 * Enhancement - Remove Deprecations: [#10305](https://github.com/owncloud/ocis/pull/10305)
+* Enhancement - Allow to use libvips for generating thumbnails: [#10310](https://github.com/owncloud/ocis/pull/10310)
 * Enhancement - Bump reva to 2.xx.x: [#10321](https://github.com/owncloud/ocis/pull/10321)
 
 ## Details
@@ -191,6 +192,17 @@ The following sections list the changes for unreleased.
    Remove deprecated stores/caches/registries and envvars from the codebase.
 
    https://github.com/owncloud/ocis/pull/10305
+
+* Enhancement - Allow to use libvips for generating thumbnails: [#10310](https://github.com/owncloud/ocis/pull/10310)
+
+   To improve performance (and to be able to support a wider range of images
+   formats in the future) the thumbnails service is now able to utilize libvips
+   (https://www.libvips.org/) for generating thumbnails. Enabling the use of
+   libvips is implemented as a build-time option which is currently disabled for
+   the "bare-metal" build of the ocis binary and enabled for the docker image
+   builds.
+
+   https://github.com/owncloud/ocis/pull/10310
 
 * Enhancement - Bump reva to 2.xx.x: [#10321](https://github.com/owncloud/ocis/pull/10321)
 
