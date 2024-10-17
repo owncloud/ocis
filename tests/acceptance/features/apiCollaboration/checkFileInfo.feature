@@ -1855,3 +1855,10 @@ Feature: check file info with different wopi apps
       | Collabora     |
       | FakeOffice    |
       | OnlyOffice    |
+
+  @issue-10086
+  Scenario: check that '/app/list' doesn't contain 'application/octet-stream' MIME type
+    When user "Alice" sends HTTP method "GET" to URL "/app/list"
+    Then the HTTP status code should be "200"
+    And the response should not contain the following MIME types:
+      | application/octet-stream |
