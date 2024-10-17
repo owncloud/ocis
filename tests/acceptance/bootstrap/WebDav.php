@@ -361,7 +361,6 @@ trait WebDav {
 	 * @throws GuzzleException | JsonException
 	 */
 	public function createFolder(string $user, string $folder, ?bool $isGivenStep = false, ?string $password = null, ?string $spaceId=null): ResponseInterface {
-		$folder = '/' . \ltrim($folder, '/');
 		return $this->makeDavRequest(
 			$user,
 			"MKCOL",
@@ -2207,6 +2206,11 @@ trait WebDav {
 	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$this->pauseUploadDelete();
+
+		if (\str_starts_with($destination, "Shares/") && $this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
+			$spaceId = $this->spacesContext->getSpaceIdByName($user, "Shares");
+			$destination = \str_replace("Shares/", "", $destination);
+		}
 		$response = $this->makeDavRequest(
 			$user,
 			"PUT",
@@ -3782,11 +3786,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function userUploadsFileWithContentSharedResourceToUsingTheWebdavApi(string $user, string $content, string $destination): void {
-		if ($this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
-			$this->setResponse($this->uploadToSharedFolder($user, $destination, $content));
-		} else {
-			$this->setResponse($this->uploadFileWithContent($user, $content, $destination, null));
-		}
+		$this->setResponse($this->uploadFileWithContent($user, $content, $destination));
 	}
 
 	/**
@@ -3863,35 +3863,6 @@ trait WebDav {
 			'GET',
 			$user,
 			$this->getPasswordForUser($user)
-		);
-	}
-
-	/**
-	 * @param string $user
-	 * @param string $destination
-	 * @param string|null $content
-	 *
-	 * @return ResponseInterface
-	 * @throws GuzzleException
-	 */
-	public function uploadToSharedFolder(
-		string $user,
-		string $destination,
-		?string $content = null
-	): ResponseInterface {
-		$sharesPath = $this->getSharesMountPath($user, $destination);
-
-		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $user);
-		$fullUrl = $this->getBaseUrl() . "/$davPath/$sharesPath";
-
-		return HttpRequestHelper::sendRequest(
-			$fullUrl,
-			$this->getStepLineRef(),
-			'PUT',
-			$user,
-			$this->getPasswordForUser($user),
-			null,
-			$content
 		);
 	}
 
