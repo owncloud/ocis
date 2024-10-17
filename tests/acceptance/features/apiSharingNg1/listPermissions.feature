@@ -2297,3 +2297,98 @@ Feature: List a sharing permissions
         }
       }
       """
+
+
+  Scenario: user lists permissions of a space after enabling 'Space Editor Without Versions' role
+    Given the administrator has enabled the permissions role "Space Editor Without Versions"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    When user "Alice" lists the permissions of space "new-space" using root endpoint of the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues"
+        ],
+        "properties": {
+          "@libre.graph.permissions.roles.allowedValues": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "const": "Can view"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "const": 2
+                    },
+                    "description": {
+                      "const": "View, download, upload, edit, add and delete."
+                    },
+                    "displayName": {
+                      "const": "Can edit without versions"
+                    },
+                    "id": {
+                      "const": "3284f2d5-0070-4ad8-ac40-c247f7c1fb27"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "const": "Can edit"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "const": "Can manage"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
