@@ -3,11 +3,13 @@
 package thumbnail
 
 import (
+	"bytes"
 	"image"
 	"strings"
 
 	"github.com/davidbyttow/govips/v2/vips"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"golang.org/x/image/bmp"
 )
 
 // SimpleGenerator is the default image generator and is used for all image types expect gif.
@@ -26,7 +28,7 @@ func NewSimpleGenerator(filetype, process string) (SimpleGenerator, error) {
 	case "resize":
 		return SimpleGenerator{crop: vips.InterestingNone, process: process, size: vips.SizeForce}, nil
 	default:
-		return SimpleGenerator{crop: vips.InterestingNone, process: process}, nil
+		return SimpleGenerator{crop: vips.InterestingAttention, process: process, size: vips.SizeBoth}, nil
 	}
 }
 
@@ -37,8 +39,23 @@ func (g SimpleGenerator) ProcessorID() string {
 
 // Generate generates a alternative image version.
 func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}) (interface{}, error) {
-	m, ok := img.(*vips.ImageRef)
-	if !ok {
+	var m *vips.ImageRef
+	var err error
+	switch img.(type) {
+	case *image.RGBA:
+		// This comes from the txt preprocessor
+		var buf bytes.Buffer
+		if err = bmp.Encode(&buf, img.(*image.RGBA)); err != nil {
+			return nil, err
+		}
+		m, err = vips.NewImageFromReader(&buf)
+		if err != nil {
+			return nil, err
+		}
+
+	case *vips.ImageRef:
+		m = img.(*vips.ImageRef)
+	default:
 		return nil, errors.ErrInvalidType
 	}
 
@@ -54,9 +71,14 @@ func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}) (interf
 }
 
 func (g SimpleGenerator) Dimensions(img interface{}) (image.Rectangle, error) {
-	m, ok := img.(*vips.ImageRef)
-	if !ok {
+	switch img.(type) {
+	case *image.RGBA:
+		m := img.(*image.RGBA)
+		return m.Bounds(), nil
+	case *vips.ImageRef:
+		m := img.(*vips.ImageRef)
+		return image.Rect(0, 0, m.Width(), m.Height()), nil
+	default:
 		return image.Rectangle{}, errors.ErrInvalidType
 	}
-	return image.Rect(0, 0, m.Width(), m.Height()), nil
 }
