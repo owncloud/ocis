@@ -30,8 +30,8 @@
 - The generated adoc files can be found at: `docs/services/_includes/adoc` when running locally respectively in the `docs branch` after the CI has finished.
 - The file name for global envvars is named: `global_configvars.adoc`.
 - The file name for extended envvars is named: `extended_configvars.adoc`.
-- A file named `docs/helpers/env_vars.yaml` contaning envvar changes gets updated in case changes have ben identified.
-- A file named `docs/helpers/extended_vars.yaml` contaning changes for extended envvars gets updated in case changes have been identified. Note, if changes appear, **this file needs manual treatment** before committing, see [Extended Envvars](#extended-envvars) below.
+- A file named `docs/helpers/env_vars.yaml` containing envvar changes gets updated if changes have been identified.
+- A file named `docs/helpers/extended_vars.yaml` containing changes for extended envvars gets updated if changes have been identified. Note, if changes appear, **this file needs manual treatment** before committing, see [Extended Envvars](#extended-envvars) below.
 
 ## Admin Doc Process
 
@@ -90,10 +90,10 @@ It can happen that extended envvars are found but do not need to be published as
   An extended envvar may not have the right naming. It may appear as `name: _registryEnv`. In case, this envvar needs to be named properly like `name: MICRO_REGISTRY` which can only be done in close alignment with development.
 
 - **Item Uniqueness**\
-  The identification, if an envvar is already present in the yaml file, is made via the `rawname` and the `path` identifier which includes the line number. **If there is a change in the source file shifting line numbers, new items will get added and old ones do not get touched.** Though technically ok, this can cause confusion to identify which items are correctly present or just added additionally just be cause code location has changed. In case there are multiple occurrences of the same `rawname` value, check which one contains relevant data and set `do_ignore` to `false` and all others to `true`. When there are two identical blocks with different source references, mostly the one containing a proper `default_value` is the active one. Populate the false block with the envvar data to be used.
+  The identification, if an envvar is already present in the yaml file, is made via the `rawname` and the `path` identifier which includes the line number. **If there is a change in the source file shifting line numbers, new items will get added and old ones do not get touched.** Though technically ok, this can cause confusion to identify which items are correctly present or just added additionally just be cause code location has changed. If there are multiple occurrences of the same `rawname` value, check which one contains relevant data and set `do_ignore` to `false` and all others to `true`. When there are two identical blocks with different source references, mostly the one containing a proper `default_value` is the active one. Populate the false block with the envvar data to be used.
 
 - **Fixing Items**\
-  If an item has been identified as additionally added because there was a change in the code location, it is mostly sufficient to just fix the line number in the `path` key of the existing/correct one and double check by removing the newly added ones. Then, re-run `make docs-generate`. In case the fix was correct, no new items of the same will re-appear.
+  If an item has been identified as additionally added because there was a change in the code location, it is mostly sufficient to just fix the line number in the `path` key of the existing/correct one and double check by removing the newly added ones. Then, re-run `make docs-generate`. If the fix was correct, no new items of the same will re-appear.
 
 - **Remove Orphaned Items**\
   To get rid of items with wrong line numbers, check `rawname` the `path` and correct the _existing ones_, especially the one containing the description and which is marked `do_ignore` false. Only items that have a real line number match need to be present, orphaned items can safely be removed. You can double-check valid items by creating a dummy branch, delete the `extended_vars.yaml` and run `make docs-generate` to regenerate the file having only items with valid path references. With that info, you can remove orphaned items from the live file. Note to be careful on judging only on `foundincode` set to false indicating an item not existing anymore. Fix all items first, when rerunning `make docs-generate`, this may change back to true!
