@@ -64,6 +64,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Use secure config defaults for OCM: [#10307](https://github.com/owncloud/ocis/pull/10307)
 * Enhancement - Add OCM wellknown configuration: [#9815](https://github.com/owncloud/ocis/pull/9815)
 * Enhancement - Load IDP logo from theme: [#10274](https://github.com/owncloud/ocis/pull/10274)
+* Enhancement - WebOffice Templates: [#10276](https://github.com/owncloud/ocis/pull/10276)
 * Enhancement - Remove Deprecations: [#10305](https://github.com/owncloud/ocis/pull/10305)
 * Enhancement - Bump reva to 2.xx.x: [#10321](https://github.com/owncloud/ocis/pull/10321)
 
@@ -131,6 +132,59 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/11603
    https://github.com/owncloud/ocis/pull/10274
+
+* Enhancement - WebOffice Templates: [#10276](https://github.com/owncloud/ocis/pull/10276)
+
+   We are now able to use templates for WebOffice and use them as a starting point
+   for new documents.
+
+   We are supporting the following mime types:
+
+   ## OnlyOffice
+
+   - **MimeType:** `application/vnd.ms-word.template.macroenabled.12`
+   **TargetExtension:** `docx`
+
+   - **MimeType:** `application/vnd.oasis.opendocument.text-template`
+   **TargetExtension:** `docx`
+
+   - **MimeType:**
+   `application/vnd.openxmlformats-officedocument.wordprocessingml.template`
+   **TargetExtension:** `docx`
+
+   - **MimeType:** `application/vnd.oasis.opendocument.spreadsheet-template`
+   **TargetExtension:** `xlsx`
+
+   - **MimeType:** `application/vnd.ms-excel.template.macroenabled.12`
+   **TargetExtension:** `xlsx`
+
+   - **MimeType:**
+   `application/vnd.openxmlformats-officedocument.spreadsheetml.template`
+   **TargetExtension:** `xlsx`
+
+   - **MimeType:** `application/vnd.oasis.opendocument.presentation-template`
+   **TargetExtension:** `pptx`
+
+   - **MimeType:** `application/vnd.ms-powerpoint.template.macroenabled.12`
+   **TargetExtension:** `pptx`
+
+   - **MimeType:**
+   `application/vnd.openxmlformats-officedocument.presentationml.template`
+   **TargetExtension:** `pptx`
+
+   ## Collabora
+
+   - **MimeType:** `application/vnd.oasis.opendocument.spreadsheet-template`
+   **TargetExtension:** `ods`
+
+   - **MimeType:** `application/vnd.oasis.opendocument.text-template`
+   **TargetExtension:** `odt`
+
+   - **MimeType:** `application/vnd.oasis.opendocument.presentation-template`
+   **TargetExtension:** `odp`
+
+   https://github.com/owncloud/ocis/issues/9785
+   https://github.com/owncloud/ocis/pull/10276
 
 * Enhancement - Remove Deprecations: [#10305](https://github.com/owncloud/ocis/pull/10305)
 
