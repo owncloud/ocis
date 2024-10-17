@@ -120,13 +120,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @return SimpleXMLElement|null
-	 */
-	public function getResponseXmlObject():?SimpleXMLElement {
-		return $this->responseXmlObject;
-	}
-
-	/**
 	 * @param SimpleXMLElement $responseXmlObject
 	 *
 	 * @return void
@@ -429,7 +422,7 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theNumberOfVersionsShouldBe(int $number):void {
-		$resXml = $this->getResponseXmlObject();
+		$resXml = $this->getResponseXml();
 		if ($resXml === null) {
 			$resXml = HttpRequestHelper::getResponseXml(
 				$this->getResponse(),
@@ -455,7 +448,7 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theNumberOfEtagElementInTheResponseShouldBe(int $number):void {
-		$resXml = $this->getResponseXmlObject();
+		$resXml = $this->getResponseXml();
 		if ($resXml === null) {
 			$resXml = HttpRequestHelper::getResponseXml(
 				$this->getResponse(),
@@ -4458,7 +4451,7 @@ trait WebDav {
 	 * @return array
 	 */
 	public function findEntryFromReportResponse(?string $user):array {
-		$responseXmlObj = $this->getResponseXmlObject();
+		$responseXmlObj = $this->getResponseXml();
 		$responseResources = [];
 		$hrefs = $responseXmlObj->xpath('//d:href');
 		foreach ($hrefs as $href) {
@@ -4718,7 +4711,7 @@ trait WebDav {
 	 */
 	public function checkAuthorOfAVersionOfFile(string $index, string $expectedUsername):void {
 		$expectedUserDisplayName = $this->getUserDisplayName($expectedUsername);
-		$resXml = $this->getResponseXmlObject();
+		$resXml = $this->getResponseXml();
 		if ($resXml === null) {
 			$resXml = HttpRequestHelper::getResponseXml(
 				$this->getResponse(),
