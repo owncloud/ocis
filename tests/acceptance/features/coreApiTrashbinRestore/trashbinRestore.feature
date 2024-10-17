@@ -136,14 +136,14 @@ Feature: restore deleted files/folders
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Brian" tries to restore the file with original path "/textfile0.txt" from the trashbin of user "Alice" using the trashbin API
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "<http-status-code>"
     And as "Alice" the folder with original path "/textfile0.txt" should exist in the trashbin
     And user "Alice" should not see the following elements
       | /textfile0.txt |
     Examples:
-      | dav-path-version |
-      | new              |
-      | spaces           |
+      | dav-path-version | http-status-code |
+      | new              | 404              |
+      | spaces           | 400              |
 
   @smokeTest
   Scenario Outline: deleted file cannot be restored with invalid password
