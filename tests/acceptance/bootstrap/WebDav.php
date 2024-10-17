@@ -391,6 +391,8 @@ trait WebDav {
 	public function downloadPreviews(string $user, ?string $path, ?string $doDavRequestAsUser, ?string $width, ?string $height):ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$doDavRequestAsUser = $this->getActualUsername($doDavRequestAsUser);
+		$doDavRequestAsUser = $doDavRequestAsUser ?? $user;
+		$password = $this->getPasswordForUser($doDavRequestAsUser);
 		$urlParameter = [
 			'x' => $width,
 			'y' => $height,
@@ -406,7 +408,7 @@ trait WebDav {
 			"files",
 			null,
 			false,
-			null,
+			$password,
 			$urlParameter,
 			$doDavRequestAsUser
 		);
@@ -3867,21 +3869,21 @@ trait WebDav {
 	}
 
 	/**
-	 * @When user :user1 downloads the preview of :path of :user2 with width :width and height :height using the WebDAV API
+	 * @When user :user downloads the preview of :path of :ofUser with width :width and height :height using the WebDAV API
 	 *
-	 * @param string $user1
+	 * @param string $user
 	 * @param string $path
-	 * @param string $doDavRequestAsUser
+	 * @param string $ofUser
 	 * @param string $width
 	 * @param string $height
 	 *
 	 * @return void
 	 */
-	public function downloadPreviewOfOtherUser(string $user1, string $path, string $doDavRequestAsUser, string $width, string $height):void {
+	public function downloadPreviewOfOtherUser(string $user, string $path, string $ofUser, string $width, string $height):void {
 		$response = $this->downloadPreviews(
-			$user1,
+			$ofUser,
 			$path,
-			$doDavRequestAsUser,
+			$user,
 			$width,
 			$height
 		);
