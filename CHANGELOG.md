@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 5.0.8](#changelog-for-508-2024-09-30)
 * [Changelog for 5.0.7](#changelog-for-507-2024-09-04)
 * [Changelog for 5.0.6](#changelog-for-506-2024-07-17)
@@ -40,6 +41,41 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.8...master
+
+## Summary
+
+* Bugfix - Thumbnail request limit: [#10280](https://github.com/owncloud/ocis/pull/10280)
+* Change - Define maximum input image dimensions and size when generating previews: [#10270](https://github.com/owncloud/ocis/pull/10270)
+
+## Details
+
+* Bugfix - Thumbnail request limit: [#10280](https://github.com/owncloud/ocis/pull/10280)
+
+   The `THUMBNAILS_MAX_CONCURRENT_REQUESTS` setting was not working correctly.
+   Previously it was just limiting the number of concurrent thumbnail downloads.
+   Now the limit is applied to the number thumbnail generations requests.
+   Additionally the webdav service is now returning a "Retry-After" header when it
+   is hitting the ratelimit of the thumbnail service.
+
+   https://github.com/owncloud/ocis/pull/10280
+   https://github.com/owncloud/ocis/pull/10270
+   https://github.com/owncloud/ocis/pull/10225
+
+* Change - Define maximum input image dimensions and size when generating previews: [#10270](https://github.com/owncloud/ocis/pull/10270)
+
+   This is a general hardening change to limit processing time and resources of the
+   thumbnailer.
+
+   https://github.com/owncloud/ocis/pull/10270
+   https://github.com/owncloud/ocis/pull/9360
+   https://github.com/owncloud/ocis/pull/9035
+   https://github.com/owncloud/ocis/pull/9069
 
 # Changelog for [5.0.8] (2024-09-30)
 
