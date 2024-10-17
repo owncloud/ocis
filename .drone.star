@@ -40,7 +40,7 @@ REDIS = "redis:6-alpine"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
 
 DEFAULT_PHP_VERSION = "8.2"
-DEFAULT_NODEJS_VERSION = "18"
+DEFAULT_NODEJS_VERSION = "20"
 
 dirs = {
     "base": "/drone/src",
@@ -198,7 +198,7 @@ config = {
     },
     "e2eTests": {
         "part": {
-            "skip": True,  # TODO: reenable them as soon as the test is fixed in web
+            "skip": False,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc"],  # suites to skip
         },
@@ -1212,7 +1212,7 @@ def e2eTestPipeline(ctx):
 
     for name, suite in config["e2eTests"].items():
         if "skip" in suite and suite["skip"]:
-            return pipelines
+            continue
 
         params = {}
         for item in defaults:
