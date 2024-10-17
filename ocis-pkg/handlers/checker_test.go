@@ -21,13 +21,15 @@ func TestCheckHandlerConfiguration(t *testing.T) {
 	handlerConfiguration := handlers.NewCheckHandlerConfiguration().WithCheck("check-1", nopCheck)
 
 	t.Run("add check", func(t *testing.T) {
-		handlerConfiguration.WithCheck("check-2", nopCheck)
-		require.Equal(t, 2, len(handlers.NewCheckHandler(handlerConfiguration).Checks()))
+		inheritedHandlerConfiguration := handlerConfiguration.WithCheck("check-2", nopCheck)
+		require.Equal(t, 1, len(handlers.NewCheckHandler(handlerConfiguration).Checks()))
+		require.Equal(t, 2, len(handlers.NewCheckHandler(inheritedHandlerConfiguration).Checks()))
 	})
 
 	t.Run("add checks", func(t *testing.T) {
-		handlerConfiguration.WithChecks(map[string]func(ctx context.Context) error{"check-3": nopCheck, "check-4": nopCheck})
-		require.Equal(t, 4, len(handlers.NewCheckHandler(handlerConfiguration).Checks()))
+		inheritedHandlerConfiguration := handlerConfiguration.WithChecks(map[string]func(ctx context.Context) error{"check-2": nopCheck, "check-3": nopCheck})
+		require.Equal(t, 1, len(handlers.NewCheckHandler(handlerConfiguration).Checks()))
+		require.Equal(t, 3, len(handlers.NewCheckHandler(inheritedHandlerConfiguration).Checks()))
 	})
 
 	t.Run("checks are unique", func(t *testing.T) {

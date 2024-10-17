@@ -50,14 +50,16 @@ func (c CheckHandlerConfiguration) WithCheck(name string, check checker) CheckHa
 		c.logger.Panic().Str("check", name).Msg("check already exists")
 	}
 
+	c.checks = maps.Clone(c.checks) // prevent propagated check duplication, maps are references;
 	c.checks[name] = check
+
 	return c
 }
 
 // WithChecks adds multiple checks to the CheckHandlerConfiguration.
 func (c CheckHandlerConfiguration) WithChecks(checks checkers) CheckHandlerConfiguration {
 	for name, check := range checks {
-		c.WithCheck(name, check)
+		c.checks = c.WithCheck(name, check).checks
 	}
 
 	return c
